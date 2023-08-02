@@ -1,6 +1,5 @@
-package mega.privacy.android.app.myAccount
+package mega.privacy.android.app.main.dialog.storagestatus
 
-import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -15,19 +14,27 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.h6
 import mega.privacy.android.domain.entity.AccountType
@@ -42,20 +49,67 @@ internal const val ACHIEVEMENT_TAG = "storage_status_dialog:button_achievement"
 internal const val HORIZONTAL_ACTION_TAG = "storage_status_dialog:button_horizontal_action"
 internal const val VERTICAL_ACTION_TAG = "storage_status_dialog:button_vertical_action"
 
+/**
+ * Helper compose view to show StorageStatusDialogView including viewModel and navigation logic
+ */
 @Composable
 internal fun StorageStatusDialogView(
-    onDismissRequest: () -> Unit,
+    storageState: StorageState,
+    preWarning: Boolean,
+    overQuotaAlert: Boolean,
+    onUpgradeClick: () -> Unit,
+    onCustomizedPlanClick: (email: String, accountType: AccountType) -> Unit,
+    onAchievementsClick: () -> Unit,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: StorageStatusViewModel = viewModel(),
+) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val coroutineScope = rememberCoroutineScope()
+    val dialogState = StorageStatusDialogState(
+        storageState = storageState,
+        overQuotaAlert = overQuotaAlert,
+        preWarning = preWarning,
+        isAchievementsEnabled = uiState.isAchievementsEnabled,
+        product = uiState.product,
+        accountType = uiState.accountType,
+    )
+
+    StorageStatusDialogView(
+        modifier = modifier,
+        dismissClickListener = onClose,
+        state = dialogState,
+        actionButtonClickListener = {
+            when (uiState.accountType) {
+                AccountType.PRO_III -> {
+                    coroutineScope.launch {
+                        onCustomizedPlanClick(viewModel.getUserEmail(), uiState.accountType)
+                    }
+                }
+
+                else -> onUpgradeClick()
+            }
+            onClose()
+        },
+        achievementButtonClickListener = {
+            onAchievementsClick()
+            onClose()
+        }
+    )
+}
+
+@Composable
+internal fun StorageStatusDialogView(
     state: StorageStatusDialogState,
     dismissClickListener: () -> Unit,
-    horizontalActionButtonClickListener: () -> Unit,
-    verticalActionButtonClickListener: () -> Unit,
+    actionButtonClickListener: () -> Unit,
     achievementButtonClickListener: () -> Unit,
     modifier: Modifier = Modifier,
     usePlatformDefaultWidth: Boolean = true,
 ) {
     val detail = getDetail(state = state)
     Dialog(
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = dismissClickListener /* is not dismissible, but just in case */,
         properties = DialogProperties(
             dismissOnClickOutside = false,
             dismissOnBackPress = false,
@@ -125,7 +179,7 @@ internal fun StorageStatusDialogView(
                                 .padding(start = 16.dp)
                                 .testTag(HORIZONTAL_ACTION_TAG),
                             text = detail.horizontalActionButtonText,
-                            onClick = horizontalActionButtonClickListener,
+                            onClick = actionButtonClickListener,
                         )
                     }
                 } else {
@@ -138,7 +192,7 @@ internal fun StorageStatusDialogView(
                         TextMegaButton(
                             modifier = Modifier.testTag(VERTICAL_ACTION_TAG),
                             text = detail.verticalActionButtonText,
-                            onClick = verticalActionButtonClickListener,
+                            onClick = actionButtonClickListener,
                         )
 
                         TextMegaButton(
@@ -275,52 +329,56 @@ private fun getDetail(state: StorageStatusDialogState): DialogViewDetail {
     )
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "HorizontalButtonDialog")
+@CombinedThemePreviews
 @Composable
-private fun PreviewHorizontalButtonDialog() {
+private fun PreviewHorizontalButtonDialog(
+    @PreviewParameter(StorageStatusDialogPreviewProvider::class) storageState: StorageStatusDialogState,
+) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        val storageState = StorageStatusDialogState().copy(
-            storageState = StorageState.Red,
-            accountType = AccountType.FREE,
-            product = null,
-            isAchievementsEnabled = false,
-            overQuotaAlert = true,
-            preWarning = false
-        )
-
         StorageStatusDialogView(
-            onDismissRequest = { },
             state = storageState,
             dismissClickListener = {},
-            horizontalActionButtonClickListener = {},
-            verticalActionButtonClickListener = {},
+            actionButtonClickListener = {},
             achievementButtonClickListener = {}
         )
     }
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "VerticalButtonDialog")
-@Composable
-private fun PreviewVerticalButtonDialogView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        val storageState = StorageStatusDialogState(
-            storageState = StorageState.Red,
-            accountType = AccountType.FREE,
-            product = null,
-            isAchievementsEnabled = true,
-            overQuotaAlert = true,
-            preWarning = false
+private class StorageStatusDialogPreviewProvider :
+    PreviewParameterProvider<StorageStatusDialogState> {
+    override val values: Sequence<StorageStatusDialogState>
+        get() = sequenceOf(
+            StorageStatusDialogState(
+                storageState = StorageState.Red,
+                accountType = AccountType.PRO_III,
+                product = null,
+                isAchievementsEnabled = false,
+                overQuotaAlert = false,
+                preWarning = false
+            ),
+            StorageStatusDialogState(
+                storageState = StorageState.Red,
+                accountType = AccountType.PRO_I,
+                product = null,
+                isAchievementsEnabled = true,
+                overQuotaAlert = false,
+                preWarning = false
+            ),
+            StorageStatusDialogState().copy(
+                storageState = StorageState.Red,
+                accountType = AccountType.FREE,
+                product = null,
+                isAchievementsEnabled = false,
+                overQuotaAlert = true,
+                preWarning = false
+            ),
+            StorageStatusDialogState().copy(
+                storageState = StorageState.Orange,
+                accountType = AccountType.FREE,
+                product = null,
+                isAchievementsEnabled = false,
+                overQuotaAlert = true,
+                preWarning = true
+            )
         )
-
-        StorageStatusDialogView(
-            onDismissRequest = { },
-            state = storageState,
-            dismissClickListener = {},
-            horizontalActionButtonClickListener = {},
-            verticalActionButtonClickListener = {},
-            achievementButtonClickListener = {}
-        )
-    }
 }

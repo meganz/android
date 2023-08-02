@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.startdownload.view
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
@@ -16,8 +17,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
 import mega.privacy.android.app.R
-import mega.privacy.android.app.myAccount.StorageStatusDialogState
-import mega.privacy.android.app.myAccount.StorageStatusDialogView
+import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
+import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadTransfersViewModel
@@ -28,6 +30,8 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Trans
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent.StartDownloadForOffline
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent.StartDownloadNode
 import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDialog
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.domain.entity.StorageState
@@ -78,7 +82,7 @@ private fun StartDownloadTransferView(
 ) {
     val context = LocalContext.current
     val showOfflineAlertDialog = remember { mutableStateOf(false) }
-    val showQuotaExceededDialog = remember { mutableStateOf<StorageStatusDialogState?>(null) }
+    val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
 
     EventEffect(
         event = uiState.oneOffViewEvent,
@@ -105,14 +109,23 @@ private fun StartDownloadTransferView(
         )
     }
     showQuotaExceededDialog.value?.let {
-        //This view will be replaced with another with full StorageStatusViewModel logic in task: TRAN-181
         StorageStatusDialogView(
-            onDismissRequest = { showQuotaExceededDialog.value = null },
-            dismissClickListener = { showQuotaExceededDialog.value = null },
-            state = it,
-            horizontalActionButtonClickListener = {},
-            verticalActionButtonClickListener = {},
-            achievementButtonClickListener = {},
+            storageState = it,
+            preWarning = it != StorageState.Red,
+            overQuotaAlert = true,
+            onUpgradeClick = {
+                context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
+            },
+            onCustomizedPlanClick = { email, accountType ->
+                AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
+            },
+            onAchievementsClick = {
+                context.startActivity(
+                    Intent(context, MyAccountActivity::class.java)
+                        .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+                )
+            },
+            onClose = { showQuotaExceededDialog.value = null },
         )
     }
 }
@@ -121,7 +134,7 @@ private suspend fun consumeEvent(
     event: StartDownloadTransferEvent,
     snackBarHostState: SnackbarHostState,
     showOfflineAlertDialog: MutableState<Boolean>,
-    showQuotaExceededDialog: MutableState<StorageStatusDialogState?>,
+    showQuotaExceededDialog: MutableState<StorageState?>,
     context: Context,
 ) {
     when (event) {
@@ -137,19 +150,11 @@ private suspend fun consumeEvent(
                 }
 
                 is QuotaExceededMegaException -> {
-                    showQuotaExceededDialog.value = StorageStatusDialogState(
-                        storageState = StorageState.Red,
-                        overQuotaAlert = true,
-                        preWarning = false,
-                    )
+                    showQuotaExceededDialog.value = StorageState.Red
                 }
 
                 is NotEnoughQuotaMegaException -> {
-                    showQuotaExceededDialog.value = StorageStatusDialogState(
-                        storageState = StorageState.Orange,
-                        overQuotaAlert = true,
-                        preWarning = true,
-                    )
+                    showQuotaExceededDialog.value = StorageState.Orange
                 }
 
                 else -> {

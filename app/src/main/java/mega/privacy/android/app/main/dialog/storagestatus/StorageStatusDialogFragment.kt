@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.dialog
+package mega.privacy.android.app.main.dialog.storagestatus
 
 import android.content.Intent
 import android.os.Bundle
@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
-import mega.privacy.android.app.myAccount.StorageStatusDialogView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -60,7 +59,6 @@ internal class StorageStatusDialogFragment : DialogFragment() {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
                     StorageStatusDialogView(
                         modifier = Modifier.padding(horizontal = 24.dp),
-                        onDismissRequest = { dismissAllowingStateLoss() },
                         state = StorageStatusDialogState(
                             storageState = storageState,
                             isAchievementsEnabled = uiState.isAchievementsEnabled,
@@ -70,12 +68,7 @@ internal class StorageStatusDialogFragment : DialogFragment() {
                             overQuotaAlert = overQuotaAlert
                         ),
                         dismissClickListener = { dismissAllowingStateLoss() },
-                        horizontalActionButtonClickListener = {
-                            coroutineScope.launch {
-                                openUpdateAccountScreen(uiState.accountType)
-                            }
-                        },
-                        verticalActionButtonClickListener = {
+                        actionButtonClickListener = {
                             coroutineScope.launch {
                                 openUpdateAccountScreen(uiState.accountType)
                             }

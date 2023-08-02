@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.myaccount
+package test.mega.privacy.android.app.main.dialog.storagestatus
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -6,13 +6,13 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.myAccount.ACHIEVEMENT_TAG
-import mega.privacy.android.app.myAccount.HORIZONTAL_ACTION_TAG
-import mega.privacy.android.app.myAccount.HORIZONTAL_DISMISS_TAG
+import mega.privacy.android.app.main.dialog.storagestatus.ACHIEVEMENT_TAG
+import mega.privacy.android.app.main.dialog.storagestatus.HORIZONTAL_ACTION_TAG
+import mega.privacy.android.app.main.dialog.storagestatus.HORIZONTAL_DISMISS_TAG
+import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
+import mega.privacy.android.app.main.dialog.storagestatus.VERTICAL_ACTION_TAG
+import mega.privacy.android.app.main.dialog.storagestatus.VERTICAL_DISMISS_TAG
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
-import mega.privacy.android.app.myAccount.StorageStatusDialogView
-import mega.privacy.android.app.myAccount.VERTICAL_ACTION_TAG
-import mega.privacy.android.app.myAccount.VERTICAL_DISMISS_TAG
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import org.junit.Rule
@@ -31,17 +31,14 @@ class StorageStatusDialogViewTest {
     private fun setComponent(
         storageStatusDialogState: StorageStatusDialogState,
         dismissClickListener: () -> Unit = { },
-        horizontalActionButtonClickListener: () -> Unit = { },
-        verticalActionButtonClickListener: () -> Unit = { },
-        achievementButtonClickListener: () -> Unit = { }
+        actionButtonClickListener: () -> Unit = { },
+        achievementButtonClickListener: () -> Unit = { },
     ) {
         composeTestRule.setContent {
             StorageStatusDialogView(
-                onDismissRequest = { },
                 state = storageStatusDialogState,
                 dismissClickListener = dismissClickListener,
-                horizontalActionButtonClickListener = horizontalActionButtonClickListener,
-                verticalActionButtonClickListener = verticalActionButtonClickListener,
+                actionButtonClickListener = actionButtonClickListener,
                 achievementButtonClickListener = achievementButtonClickListener
             )
         }
@@ -94,24 +91,24 @@ class StorageStatusDialogViewTest {
     }
 
     @Test
-    fun `test that horizontalActionButtonClickListener is fired when horizontal action button is pressed`() {
+    fun `test that actionButtonClickListener is fired when horizontal action button is pressed`() {
         val horizontalActionButtonClickListener = mock<() -> Unit>()
         val storageDialogState = getStorageDialogState(isAchievementEnabled = false)
         setComponent(
             storageDialogState,
-            horizontalActionButtonClickListener = horizontalActionButtonClickListener
+            actionButtonClickListener = horizontalActionButtonClickListener
         )
         composeTestRule.onNodeWithTag(HORIZONTAL_ACTION_TAG).performClick()
         verify(horizontalActionButtonClickListener).invoke()
     }
 
     @Test
-    fun `test that verticalActionButtonClickListener is fired when vertical action button is pressed`() {
+    fun `test that actionButtonClickListener is fired when vertical action button is pressed`() {
         val verticalActionButtonClickListener = mock<() -> Unit>()
         val storageDialogState = getStorageDialogState(isAchievementEnabled = true)
         setComponent(
             storageDialogState,
-            verticalActionButtonClickListener = verticalActionButtonClickListener
+            actionButtonClickListener = verticalActionButtonClickListener
         )
         composeTestRule.onNodeWithTag(VERTICAL_ACTION_TAG).performClick()
         verify(verticalActionButtonClickListener).invoke()

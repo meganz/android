@@ -1,5 +1,7 @@
 package mega.privacy.android.app.myAccount
 
+import mega.privacy.android.app.main.dialog.storagestatus.SubscriptionCheckResult
+
 /**
  * The visible state of subscription dialog
  */

@@ -57,7 +57,7 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.myAccount.StorageStatusDialogView
+import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
@@ -139,8 +139,7 @@ internal fun FolderLinkView(
     onResetMoreOptionNode: () -> Unit,
     onResetOpenMoreOption: () -> Unit,
     onStorageStatusDialogDismiss: () -> Unit,
-    onStorageDialogHorizontalActionButtonClick: () -> Unit,
-    onStorageDialogVerticalActionButtonClick: () -> Unit,
+    onStorageDialogActionButtonClick: () -> Unit,
     onStorageDialogAchievementButtonClick: () -> Unit,
     emptyViewString: String,
     thumbnailViewModel: ThumbnailViewModel,
@@ -295,11 +294,9 @@ internal fun FolderLinkView(
 
         if (state.storageStatusDialogState != null) {
             StorageStatusDialogView(
-                onDismissRequest = onStorageStatusDialogDismiss,
                 state = state.storageStatusDialogState,
                 dismissClickListener = onStorageStatusDialogDismiss,
-                horizontalActionButtonClickListener = onStorageDialogHorizontalActionButtonClick,
-                verticalActionButtonClickListener = onStorageDialogVerticalActionButtonClick,
+                actionButtonClickListener = onStorageDialogActionButtonClick,
                 achievementButtonClickListener = onStorageDialogAchievementButtonClick,
             )
         }

@@ -1,13 +1,15 @@
-package mega.privacy.android.app.myAccount
+package mega.privacy.android.app.main.dialog.storagestatus
+
+import mega.privacy.android.app.myAccount.PlatformInfo
 
 /**
  * The result of subscription check
  * @param typeID the type regarding subscription dialog
  * @param platformInfo the subscription platform information
  */
-data class SubscriptionCheckResult (
+data class SubscriptionCheckResult(
     val typeID: Int,
-    val platformInfo: PlatformInfo? = null
+    val platformInfo: PlatformInfo? = null,
 )
 
 const val TYPE_ANDROID_PLATFORM = 11

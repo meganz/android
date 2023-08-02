@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.main.dialog
+package test.mega.privacy.android.app.main.dialog.storagestatus
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.main.dialog.StorageStatusViewModel
+import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product

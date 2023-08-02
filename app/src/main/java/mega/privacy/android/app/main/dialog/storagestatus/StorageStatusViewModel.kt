@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.dialog
+package mega.privacy.android.app.main.dialog.storagestatus
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
