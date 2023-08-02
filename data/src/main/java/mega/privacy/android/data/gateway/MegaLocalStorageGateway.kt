@@ -4,7 +4,6 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -108,12 +107,6 @@ interface MegaLocalStorageGateway {
     suspend fun isCameraUploadsByWifi(): Boolean
 
     /**
-     * Get all pending sync records
-     * @return pending sync records
-     */
-    suspend fun getPendingSyncRecords(): List<SyncRecord>
-
-    /**
      * Get sync file upload
      */
     suspend fun getCameraSyncFileUpload(): String?
@@ -124,75 +117,6 @@ interface MegaLocalStorageGateway {
      * @param uploadOption A specific [Int] from MegaPreferences
      */
     suspend fun setCameraSyncFileUpload(uploadOption: Int)
-
-    /**
-     * Delete sync records by type
-     */
-    suspend fun deleteAllSyncRecords(syncRecordType: Int)
-
-    /**
-     * Delete sync records by path
-     */
-    suspend fun deleteSyncRecordByPath(path: String?, isSecondary: Boolean)
-
-    /**
-     * Delete sync records by local path
-     */
-    suspend fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean)
-
-    /**
-     * Delete sync records by fingerprint
-     */
-    suspend fun deleteSyncRecordByFingerPrint(
-        originalPrint: String,
-        newPrint: String,
-        isSecondary: Boolean,
-    )
-
-    /**
-     * Get sync record by fingerprint
-     * @return sync record
-     */
-    suspend fun getSyncRecordByFingerprint(
-        fingerprint: String?,
-        isSecondary: Boolean,
-        isCopy: Boolean,
-    ): SyncRecord?
-
-    /**
-     * Get sync record by new path
-     * @return sync record
-     */
-    suspend fun getSyncRecordByNewPath(path: String): SyncRecord?
-
-    /**
-     * Get sync record by local path
-     * @return sync record
-     */
-    suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord?
-
-    /**
-     * Does file name exist
-     */
-    suspend fun doesFileNameExist(
-        fileName: String,
-        isSecondary: Boolean,
-        type: Int,
-    ): Boolean
-
-    /**
-     * Does local path exist
-     */
-    suspend fun doesLocalPathExist(
-        fileName: String,
-        isSecondary: Boolean,
-        type: Int,
-    ): Boolean
-
-    /**
-     * Save sync record
-     */
-    suspend fun saveSyncRecord(record: SyncRecord)
 
     /**
      * Get photo time stamp
@@ -380,16 +304,6 @@ interface MegaLocalStorageGateway {
     suspend fun shouldClearSyncRecords(): Boolean
 
     /**
-     * Get maximum time stamp by upload sync record type
-     */
-    suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long
-
-    /**
-     * Get video sync record with status type
-     */
-    suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord>
-
-    /**
      * Checks whether compressing videos require the device to be charged or not
      *
      * @return true if the device needs to be charged to compress videos, and false if otherwise
@@ -417,15 +331,6 @@ interface MegaLocalStorageGateway {
      * @param size The maximum video file size that can be compressed
      */
     suspend fun setVideoCompressionSizeLimit(size: Int)
-
-    /**
-     * Update sync record status by local path
-     */
-    suspend fun updateSyncRecordStatusByLocalPath(
-        syncStatusType: Int,
-        localPath: String?,
-        isSecondary: Boolean,
-    )
 
     /**
      * Get non contact by handle
@@ -543,13 +448,6 @@ interface MegaLocalStorageGateway {
     suspend fun setUploadVideoQuality(quality: Int)
 
     /**
-     * Sets the new Video Sync Status for Camera Uploads
-     *
-     * @param syncStatus The new Video Sync Status, represented as an [Int]
-     */
-    suspend fun setUploadVideoSyncStatus(syncStatus: Int)
-
-    /**
      * Set camera upload on/off
      *
      * @param enable
@@ -567,16 +465,6 @@ interface MegaLocalStorageGateway {
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record
      */
     suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
-
-    /**
-     * Delete all Primary Sync Records
-     */
-    suspend fun deleteAllPrimarySyncRecords()
-
-    /**
-     * Delete all Secondary Sync Records
-     */
-    suspend fun deleteAllSecondarySyncRecords()
 
 
     /**
@@ -706,11 +594,6 @@ interface MegaLocalStorageGateway {
      * clears attributes.
      */
     suspend fun clearAttributes()
-
-    /**
-     * Deletes sync records.
-     */
-    suspend fun deleteAllSyncRecordsTypeAny()
 
     /**
      * Clears chat settings.

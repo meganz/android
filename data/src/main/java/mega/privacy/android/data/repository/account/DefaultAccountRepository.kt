@@ -24,6 +24,7 @@ import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -135,6 +136,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val ephemeralCredentialsGateway: EphemeralCredentialsGateway,
     private val accountBlockedDetailMapper: AccountBlockedDetailMapper,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -633,11 +635,10 @@ internal class DefaultAccountRepository @Inject constructor(
             clearChatItems()
             clearCompletedTransfers()
             clearAttributes()
-            deleteAllSyncRecordsTypeAny()
             clearChatSettings()
             clearBackups()
         }
-
+        megaLocalRoomGateway.deleteAllSyncRecordsTypeAny()
         callsPreferencesGateway.clearPreferences()
         chatPreferencesGateway.clearPreferences()
         accountPreferencesGateway.clearPreferences()

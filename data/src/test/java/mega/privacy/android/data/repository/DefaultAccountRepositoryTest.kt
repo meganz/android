@@ -10,6 +10,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -96,6 +97,7 @@ class DefaultAccountRepositoryTest {
     private val myAccountCredentialsMapper = mock<MyAccountCredentialsMapper>()
     private val ephemeralCredentialsGateway = mock<EphemeralCredentialsGateway>()
     private val accountBlockedDetailMapper = AccountBlockedDetailMapper()
+    private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -154,6 +156,7 @@ class DefaultAccountRepositoryTest {
             appEventGateway = appEventGateway,
             ephemeralCredentialsGateway = ephemeralCredentialsGateway,
             accountBlockedDetailMapper = accountBlockedDetailMapper,
+            megaLocalRoomGateway = megaLocalRoomGateway
         )
 
     }
@@ -882,7 +885,7 @@ class DefaultAccountRepositoryTest {
             verify(localStorageGateway).clearChatItems()
             verify(localStorageGateway).clearCompletedTransfers()
             verify(localStorageGateway).clearAttributes()
-            verify(localStorageGateway).deleteAllSyncRecordsTypeAny()
+            verify(megaLocalRoomGateway).deleteAllSyncRecordsTypeAny()
             verify(localStorageGateway).clearChatSettings()
             verify(localStorageGateway).clearBackups()
         }

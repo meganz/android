@@ -7,7 +7,6 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -176,36 +175,6 @@ interface DatabaseHandler {
     val failedOrCancelledTransfers: ArrayList<CompletedTransfer>
 
     fun saveCredentials(userCredentials: UserCredentials)
-    fun saveSyncRecord(record: SyncRecord)
-    fun updateVideoState(state: Int)
-    fun fileNameExists(name: String?, isSecondary: Boolean, fileType: Int): Boolean
-    fun localPathExists(localPath: String?, isSecondary: Boolean, fileType: Int): Boolean
-    fun recordExists(
-        originalFingerprint: String?,
-        isSecondary: Boolean,
-        isCopyOnly: Boolean,
-    ): SyncRecord?
-
-    fun findAllPendingSyncRecords(): List<SyncRecord>
-    fun findVideoSyncRecordsByState(state: Int): List<SyncRecord>
-    fun deleteAllSyncRecords(fileType: Int)
-    fun deleteAllSyncRecordsTypeAny()
-    fun deleteAllSecondarySyncRecords()
-    fun deleteAllPrimarySyncRecords()
-    fun deleteVideoRecordsByState(state: Int)
-    fun findSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean): SyncRecord?
-    fun deleteSyncRecordByPath(path: String?, isSecondary: Boolean)
-    fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean)
-    fun deleteSyncRecordByNewPath(newPath: String?)
-    fun deleteSyncRecordByFileName(fileName: String?)
-    fun deleteSyncRecordByFingerprint(
-        oriFingerprint: String?,
-        newFingerprint: String?,
-        isSecondary: Boolean,
-    )
-
-    fun updateSyncRecordStatusByLocalPath(status: Int, localPath: String?, isSecondary: Boolean)
-    fun findSyncRecordByNewPath(newPath: String?): SyncRecord?
     fun shouldClearCamsyncRecords(): Boolean
     fun saveShouldClearCamsyncRecords(should: Boolean)
     fun findMaxTimestamp(isSecondary: Boolean, fileType: Int): Long?

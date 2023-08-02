@@ -292,7 +292,7 @@ class DefaultCameraUploadRepositoryTest {
         @Test
         fun `test that camera uploads retrieves the sync record by fingerprint`() = runTest {
             whenever(
-                localStorageGateway.getSyncRecordByFingerprint(
+                megaLocalRoomGateway.getSyncRecordByFingerprint(
                     fingerprint = anyOrNull(),
                     isSecondary = any(),
                     isCopy = any(),
@@ -309,14 +309,14 @@ class DefaultCameraUploadRepositoryTest {
 
         @Test
         fun `test that camera uploads retrieves the sync record by new path`() = runTest {
-            whenever(localStorageGateway.getSyncRecordByNewPath(any())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getSyncRecordByNewPath(any())).thenReturn(null)
             assertThat(underTest.getSyncRecordByNewPath("")).isEqualTo(null)
         }
 
         @Test
         fun `test that camera uploads retrieves the sync record by local path`() = runTest {
             whenever(
-                localStorageGateway.getSyncRecordByLocalPath(
+                megaLocalRoomGateway.getSyncRecordByLocalPath(
                     path = any(),
                     isSecondary = any(),
                 )

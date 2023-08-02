@@ -5,7 +5,6 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -99,57 +98,11 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun isCameraUploadsByWifi(): Boolean =
         dbHandler.preferences?.camSyncWifi?.toBoolean() ?: true
 
-    override suspend fun getPendingSyncRecords(): List<SyncRecord> =
-        dbHandler.findAllPendingSyncRecords()
-
     override suspend fun getCameraSyncFileUpload(): String? =
         dbHandler.preferences?.camSyncFileUpload
 
     override suspend fun setCameraSyncFileUpload(uploadOption: Int) =
         dbHandler.setCamSyncFileUpload(uploadOption)
-
-    override suspend fun deleteAllSyncRecords(syncRecordType: Int) =
-        dbHandler.deleteAllSyncRecords(syncRecordType)
-
-    override suspend fun deleteSyncRecordByPath(path: String?, isSecondary: Boolean) =
-        dbHandler.deleteSyncRecordByPath(path, isSecondary)
-
-    override suspend fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean) =
-        dbHandler.deleteSyncRecordByLocalPath(localPath, isSecondary)
-
-    override suspend fun deleteSyncRecordByFingerPrint(
-        originalPrint: String,
-        newPrint: String,
-        isSecondary: Boolean,
-    ) = dbHandler.deleteSyncRecordByFingerprint(originalPrint, newPrint, isSecondary)
-
-    override suspend fun getSyncRecordByFingerprint(
-        fingerprint: String?,
-        isSecondary: Boolean,
-        isCopy: Boolean,
-    ): SyncRecord? = dbHandler.recordExists(fingerprint, isSecondary, isCopy)
-
-    override suspend fun getSyncRecordByNewPath(path: String): SyncRecord? =
-        dbHandler.findSyncRecordByNewPath(path)
-
-    override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
-        dbHandler.findSyncRecordByLocalPath(path, isSecondary)
-
-    override suspend fun doesFileNameExist(
-        fileName: String,
-        isSecondary: Boolean,
-        type: Int,
-    ): Boolean =
-        dbHandler.fileNameExists(fileName, isSecondary, type)
-
-    override suspend fun doesLocalPathExist(
-        fileName: String,
-        isSecondary: Boolean,
-        type: Int,
-    ): Boolean =
-        dbHandler.localPathExists(fileName, isSecondary, type)
-
-    override suspend fun saveSyncRecord(record: SyncRecord) = dbHandler.saveSyncRecord(record)
 
     override suspend fun getPhotoTimeStamp() = dbHandler.preferences?.camSyncTimeStamp
 
@@ -233,12 +186,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun shouldClearSyncRecords(): Boolean = dbHandler.shouldClearCamsyncRecords()
 
-    override suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long =
-        dbHandler.findMaxTimestamp(isSecondary, syncRecordType) ?: 0
-
-    override suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
-        dbHandler.findVideoSyncRecordsByState(syncStatusType)
-
     override suspend fun isChargingRequiredForVideoCompression(): Boolean =
         dbHandler.preferences?.conversionOnCharging?.toBoolean() ?: true
 
@@ -251,12 +198,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun setVideoCompressionSizeLimit(size: Int) =
         dbHandler.setChargingOnSize(size)
-
-    override suspend fun updateSyncRecordStatusByLocalPath(
-        syncStatusType: Int,
-        localPath: String?,
-        isSecondary: Boolean,
-    ) = dbHandler.updateSyncRecordStatusByLocalPath(syncStatusType, localPath, isSecondary)
 
     override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =
         dbHandler.findNonContactByHandle(userHandle.toString())
@@ -318,10 +259,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setCameraUploadVideoQuality(quality)
     }
 
-    override suspend fun setUploadVideoSyncStatus(syncStatus: Int) {
-        dbHandler.updateVideoState(syncStatus)
-    }
-
     override suspend fun setCameraUploadsEnabled(enable: Boolean) = with(dbHandler) {
         preferences?.camSyncEnabled = enable.toString()
         setCamSyncEnabled(enable)
@@ -333,10 +270,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
     }
-
-    override suspend fun deleteAllPrimarySyncRecords() = dbHandler.deleteAllPrimarySyncRecords()
-
-    override suspend fun deleteAllSecondarySyncRecords() = dbHandler.deleteAllSecondarySyncRecords()
 
     override suspend fun getChatFilesFolderHandle() = dbHandler.myChatFilesFolderHandle
 
@@ -393,8 +326,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun clearCompletedTransfers() = dbHandler.clearCompletedTransfers()
 
     override suspend fun clearAttributes() = dbHandler.clearAttributes()
-
-    override suspend fun deleteAllSyncRecordsTypeAny() = dbHandler.deleteAllSyncRecordsTypeAny()
 
     override suspend fun clearChatSettings() = dbHandler.clearChatSettings()
 
