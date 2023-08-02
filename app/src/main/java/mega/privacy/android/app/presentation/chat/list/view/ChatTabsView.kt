@@ -88,8 +88,8 @@ fun ChatTabsView(
             SnackbarHost(hostState = it) { data ->
                 Snackbar(
                     snackbarData = data,
-                    modifier = Modifier.padding(bottom = 80.dp),
-                    backgroundColor = MaterialTheme.colors.white_black
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    backgroundColor = MaterialTheme.colors.onPrimary,
                 )
             }
         },

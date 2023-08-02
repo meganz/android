@@ -73,7 +73,7 @@ class GetLastMessageUseCase @Inject constructor(
             }
 
             return@withContext when (chatListItem.lastMessageType) {
-                TYPE_INVALID, TYPE_SCHED_MEETING ->
+                TYPE_INVALID ->
                     context.getString(R.string.no_conversation_history)
 
                 LAST_MSG_LOADING ->
@@ -151,6 +151,11 @@ class GetLastMessageUseCase @Inject constructor(
                     }
                     "${chatListItem.getSenderName()}: $message"
                 }
+
+                TYPE_SCHED_MEETING -> String.format(
+                    context.getString(R.string.chat_chat_room_message_updated_scheduled_meeting),
+                    chatListItem.getSenderName(true)
+                ).cleanHtmlText()
 
                 else -> {
                     if (chatListItem.lastMessage.isNullOrBlank()) {

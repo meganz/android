@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.notification.model.extensions
 
 import mega.privacy.android.app.presentation.notification.model.SchedMeetingNotification
 import mega.privacy.android.domain.entity.ScheduledMeetingAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingCancelAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDateTimeAlert
 import mega.privacy.android.domain.entity.UserAlert
 
@@ -11,17 +12,18 @@ import mega.privacy.android.domain.entity.UserAlert
  * @return SchedMeetingNotification
  */
 internal fun UserAlert.schedMeetingNotification(): SchedMeetingNotification? =
-    if (this is ScheduledMeetingAlert) {
-        SchedMeetingNotification(
-            scheduledMeeting = scheduledMeeting?.copy(
-                startDateTime = startDate ?: scheduledMeeting?.startDateTime,
-                endDateTime = endDate ?: scheduledMeeting?.endDateTime,
-            ),
-            hasTimeChanged = hasTimeChanged(),
-            hasDateChanged = hasDateChanged(),
-        )
-    } else {
-        null
+    when {
+        this is ScheduledMeetingAlert && (this !is UpdatedScheduledMeetingCancelAlert || !this.isRecurring) ->
+            SchedMeetingNotification(
+                scheduledMeeting = scheduledMeeting?.copy(
+                    startDateTime = startDate ?: scheduledMeeting?.startDateTime,
+                    endDateTime = endDate ?: scheduledMeeting?.endDateTime,
+                ),
+                hasTimeChanged = hasTimeChanged(),
+                hasDateChanged = hasDateChanged(),
+            )
+
+        else -> null
     }
 
 /**
