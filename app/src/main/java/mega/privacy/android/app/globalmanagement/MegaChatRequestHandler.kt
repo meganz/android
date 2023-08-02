@@ -2,8 +2,10 @@ package mega.privacy.android.app.globalmanagement
 
 import android.app.Application
 import android.content.Intent
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
@@ -12,9 +14,9 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
@@ -48,11 +50,12 @@ class MegaChatRequestHandler @Inject constructor(
     private val megaApi: MegaApiAndroid,
     @ApplicationScope
     private val sharingScope: CoroutineScope,
+    @MainDispatcher
+    private val mainDispatcher: CoroutineDispatcher,
     private val chatManagement: ChatManagement,
     private val myAccountInfo: MyAccountInfo,
     private val passcodeManagement: PasscodeManagement,
     private val transfersManagement: TransfersManagement,
-    private val chatRequestMapper: ChatRequestMapper,
     private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
 ) : MegaChatRequestListenerInterface {
@@ -117,30 +120,34 @@ class MegaChatRequestHandler @Inject constructor(
                     localLogoutAppUseCase(ClearPsa { PsaManager::clearPsa })
                     //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                     broadcastFinishActivityUseCase()
-                }
-                if (isLoggingRunning) {
-                    Timber.d("Already in Login Activity, not necessary to launch it again")
-                    return
-                }
-                val loginIntent = Intent(application, LoginActivity::class.java).apply {
-                    if (MegaApplication.urlConfirmationLink != null) {
-                        putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                            .putExtra(
-                                Constants.EXTRA_CONFIRMATION,
-                                MegaApplication.urlConfirmationLink
-                            )
-                        if (activityLifecycleHandler.isActivityVisible) {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        } else {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    withContext(mainDispatcher) {
+                        if (isLoggingRunning) {
+                            Timber.d("Already in Login Activity, not necessary to launch it again")
+                            return@withContext
                         }
-                        action = Constants.ACTION_CONFIRM
-                        MegaApplication.urlConfirmationLink = null
-                    } else {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        val loginIntent = Intent(application, LoginActivity::class.java).apply {
+                            if (MegaApplication.urlConfirmationLink != null) {
+                                putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                                    .putExtra(
+                                        Constants.EXTRA_CONFIRMATION,
+                                        MegaApplication.urlConfirmationLink
+                                    )
+                                if (activityLifecycleHandler.isActivityVisible) {
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                } else {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                }
+                                action = Constants.ACTION_CONFIRM
+                                MegaApplication.urlConfirmationLink = null
+                            } else {
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        }
+                        application.startActivity(loginIntent)
                     }
                 }
-                application.startActivity(loginIntent)
             } else {
                 Timber.d("Disable chat finish logout")
             }
