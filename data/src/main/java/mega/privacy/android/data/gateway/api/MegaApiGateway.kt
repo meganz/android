@@ -2769,4 +2769,17 @@ interface MegaApiGateway {
      */
 
     suspend fun createPreview(imagePath: String, destinationPath: String): Boolean
+
+    /**
+     * Pause/resume all transfers
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PAUSE_TRANSFERS
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getFlag - Returns the first parameter
+     *
+     * @param pause    true to pause all transfers / false to resume all transfers
+     * @param listener MegaRequestListener to track this request
+     */
+    fun pauseTransfers(pause: Boolean, listener: MegaRequestListenerInterface)
 }

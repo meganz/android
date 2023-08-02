@@ -36,7 +36,6 @@ import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
-import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -1307,4 +1306,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun createPreview(imagePath: String, destinationPath: String) =
         megaApi.createPreview(imagePath, destinationPath)
+
+    override fun pauseTransfers(pause: Boolean, listener: MegaRequestListenerInterface) =
+        megaApi.pauseTransfers(pause, listener)
 }

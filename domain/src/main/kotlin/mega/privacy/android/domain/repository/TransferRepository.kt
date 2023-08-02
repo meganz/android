@@ -361,4 +361,12 @@ interface TransferRepository {
      * @return Current upload speed.
      */
     suspend fun getCurrentUploadSpeed(): Int
+
+    /**
+     * Pause transfers
+     *
+     * @param isPause
+     * @return boolean is pause or resume
+     */
+    suspend fun pauseTransfers(isPause: Boolean): Boolean
 }

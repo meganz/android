@@ -426,4 +426,12 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getCurrentUploadSpeed() = withContext(ioDispatcher) {
         megaApiGateway.currentUploadSpeed
     }
+
+    override suspend fun pauseTransfers(isPause: Boolean): Boolean = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("pauseTransfers") { it.flag }
+            megaApiGateway.pauseTransfers(isPause, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
 }

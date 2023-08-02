@@ -41,6 +41,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -594,6 +595,51 @@ class DefaultTransfersRepositoryTest {
         runTest {
             whenever(megaLocalRoomGateway.getCompletedTransfersCount()).thenReturn(0)
             assertThat(underTest.isCompletedTransfersEmpty()).isTrue()
+        }
+
+    @ParameterizedTest(name = "pauseTransfers: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that pauseTransfers returns success when MegaApi returns API_OK`(isPause: Boolean) =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { flag }.thenReturn(isPause)
+            }
+
+            whenever(megaApiGateway.pauseTransfers(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            assertThat(underTest.pauseTransfers(isPause)).isEqualTo(isPause)
+        }
+
+    @Test
+    fun `test that pauseTransfers finishes with general MegaException when MegaApi returns error other than API_OK`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EFAILED)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.pauseTransfers(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.pauseTransfers(true)
+            }
         }
 
     @Nested
