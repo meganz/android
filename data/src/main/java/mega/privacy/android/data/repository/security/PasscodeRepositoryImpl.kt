@@ -57,7 +57,7 @@ internal class PasscodeRepositoryImpl @Inject constructor(
         .flowOn(ioDispatcher)
         .firstOrNull()
 
-    override suspend fun monitorIsPasscodeEnabled() =
+    override fun monitorIsPasscodeEnabled() =
         passcodeStoreGateway.monitorPasscodeEnabledState()
             .flowOn(ioDispatcher)
 

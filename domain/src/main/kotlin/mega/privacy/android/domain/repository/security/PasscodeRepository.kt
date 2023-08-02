@@ -73,7 +73,7 @@ interface PasscodeRepository {
      *
      * @return
      */
-    suspend fun monitorIsPasscodeEnabled(): Flow<Boolean?>
+    fun monitorIsPasscodeEnabled(): Flow<Boolean?>
 
     /**
      * Set passcode enabled
