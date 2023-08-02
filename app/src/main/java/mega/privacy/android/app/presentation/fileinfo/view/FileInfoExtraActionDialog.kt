@@ -1,11 +1,16 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationWithRadioButtonsDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.shares.AccessPermission
 
 @Composable
@@ -48,4 +53,31 @@ internal fun ExtraActionDialog(
             }
         )
     }
+}
+
+@CombinedThemeRtlPreviews
+@Composable
+private fun ExtraActionDialogPreview(
+    @PreviewParameter(ExtraActionDialogPreviewProvider::class) action: FileInfoExtraAction,
+) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ExtraActionDialog(
+            action = action,
+            onRemoveConfirmed = { },
+            onPermissionSelected = { _, _ -> },
+            onDismiss = {}
+        )
+    }
+}
+
+private class ExtraActionDialogPreviewProvider : PreviewParameterProvider<FileInfoExtraAction> {
+    override val values: Sequence<FileInfoExtraAction>
+        get() = sequenceOf(
+            FileInfoExtraAction.ConfirmRemove.SendToRubbish,
+            FileInfoExtraAction.ChangePermission(
+                listOf("email1@example.com", "email2@example.com"),
+                AccessPermission.READ
+            )
+        )
+
 }

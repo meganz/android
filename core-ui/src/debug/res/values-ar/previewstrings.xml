@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <string name="discard">تجاهل</string>
+    <string name="action_long">عمل طويل طويل جدا</string>
+    <string name="cancel">يلغي</string>
+    <string name="cancel_long">طويل جدا إلغاء</string>
+    <string name="dialog_title">عنوان الحوار</string>
+    <string name="dialog_text">مشروع نبذ؟</string>
+    <string name="dialog_text_long">تجاهل مسودة مسودة مسودة مسودة مسودة مسودة</string>
+</resources>

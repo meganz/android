@@ -16,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -104,9 +106,9 @@ private fun MegaAlertDialogPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         PreviewBox {
             MegaAlertDialog(
-                text = "Discard draft?",
-                confirmButtonText = "Discard",
-                cancelButtonText = "Cancel",
+                text = stringResource(id = R.string.dialog_text),
+                confirmButtonText = stringResource(id = R.string.discard),
+                cancelButtonText = stringResource(id = R.string.cancel),
                 onConfirm = {},
                 onDismiss = {},
             )
@@ -120,9 +122,9 @@ private fun MegaAlertDialogPreviewLongAction() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         PreviewBox {
             MegaAlertDialog(
-                text = "Discard draft?",
-                confirmButtonText = "Very long long long action",
-                cancelButtonText = "Very long Cancel",
+                text = stringResource(id = R.string.dialog_text),
+                confirmButtonText = stringResource(id = R.string.action_long),
+                cancelButtonText = stringResource(id = R.string.cancel_long),
                 onConfirm = {},
                 onDismiss = {},
             )
@@ -136,10 +138,10 @@ private fun MegaAlertDialogPreviewTitle() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         PreviewBox {
             MegaAlertDialog(
-                title = "Dialog title",
-                text = "Discard draft draft draft draft draft draft draft draft draft draft ",
-                confirmButtonText = "Discard",
-                cancelButtonText = "Cancel",
+                title = stringResource(id = R.string.dialog_title),
+                text = stringResource(id = R.string.dialog_text_long),
+                confirmButtonText = stringResource(id = R.string.discard),
+                cancelButtonText = stringResource(id = R.string.cancel),
                 onConfirm = {},
                 onDismiss = {},
             )

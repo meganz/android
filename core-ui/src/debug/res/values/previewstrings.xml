@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <string name="discard">Discard</string>
+    <string name="action_long" tools:ignore="Typos">Very long long long action</string>
+    <string name="cancel">Cancel</string>
+    <string name="cancel_long">Very long Cancel</string>
+    <string name="dialog_title">Dialog title</string>
+    <string name="dialog_text">Discard draft?</string>
+    <string name="dialog_text_long" tools:ignore="Typos">Discard draft draft draft draft draft draft draft draft draft draft</string>
+</resources>
