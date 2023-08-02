@@ -9,6 +9,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
@@ -27,9 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
@@ -78,9 +78,8 @@ fun PhotosBodyView(
             ) {
                 when (selectedTab) {
                     PhotosTab.Timeline -> isBarVisibleTimeline || !isScrollingDownTimeline
-                    else -> isBarVisibleAlbums || !isScrollingDownAlbums
+                    PhotosTab.Albums -> isBarVisibleAlbums || !isScrollingDownAlbums
                 }
-
             }
         }
         PagerView(

@@ -3,10 +3,14 @@ package mega.privacy.android.app.presentation.photos.albums.actionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.mobile.analytics.event.AlbumDeselectAllEvent
+import mega.privacy.mobile.analytics.event.AlbumListShareLinkMenuItemEvent
+import mega.privacy.mobile.analytics.event.AlbumSelectAllEvent
 
 /**
  * Action Mode Callback class for Albums
@@ -45,6 +49,7 @@ class AlbumsActionModeCallback(
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.action_menu_get_link -> {
+                Analytics.tracker.trackEvent(AlbumListShareLinkMenuItemEvent)
                 val selectedAlbums = fragment.albumsViewModel.state.value.selectedAlbumIds
                 if (selectedAlbums.size == 1) {
                     fragment.openAlbumGetLinkScreen()
@@ -63,10 +68,16 @@ class AlbumsActionModeCallback(
             }
 
             R.id.action_context_select_all -> {
-                fragment.albumsViewModel.selectAllAlbums()
+                with(fragment.albumsViewModel) {
+                    Analytics.tracker.trackEvent(
+                        AlbumSelectAllEvent(albumsCount = state.value.albums.filter { it.id is Album.UserAlbum }.size)
+                    )
+                    selectAllAlbums()
+                }
             }
 
             R.id.action_context_clear_selection -> {
+                Analytics.tracker.trackEvent(AlbumDeselectAllEvent)
                 fragment.albumsViewModel.clearAlbumSelection()
             }
         }

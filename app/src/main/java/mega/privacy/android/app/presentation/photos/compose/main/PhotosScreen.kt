@@ -36,6 +36,8 @@ import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetect
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.AlbumSelected
+import mega.privacy.mobile.analytics.event.AlbumSelectedEvent
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -82,6 +84,7 @@ fun PhotosScreen(
         selectedTab = photosViewState.selectedTab,
         pagerState = pagerState,
         onTabSelected = { tab ->
+            Analytics.tracker.trackEvent(tab.analyticsInfo)
             photosViewModel.onTabSelected(selectedTab = tab)
             coroutineScope.launch {
                 pagerState.scrollToPage(tab.ordinal)
@@ -132,7 +135,12 @@ fun PhotosScreen(
         albumsView = {
             AlbumsView(
                 albumsViewState = albumsViewState,
-                openAlbum = onNavigateAlbumContent,
+                openAlbum = {
+                    Analytics.tracker.trackEvent(
+                        AlbumSelectedEvent(selectionType = AlbumSelected.SelectionType.Single)
+                    )
+                    onNavigateAlbumContent(it)
+                },
                 downloadPhoto = photoDownloaderViewModel::downloadPhoto,
                 onDialogPositiveButtonClicked = albumsViewModel::createNewAlbum,
                 setDialogInputPlaceholder = albumsViewModel::setPlaceholderAlbumTitle,
@@ -144,8 +152,14 @@ fun PhotosScreen(
                 clearAlbumDeletedMessage = { albumsViewModel.updateAlbumDeletedMessage(message = "") },
                 onAlbumSelection = { album ->
                     if (album.id in albumsViewState.selectedAlbumIds) {
+                        Analytics.tracker.trackEvent(
+                            AlbumSelectedEvent(selectionType = AlbumSelected.SelectionType.MultiRemove)
+                        )
                         albumsViewModel.unselectAlbum(album)
                     } else {
+                        Analytics.tracker.trackEvent(
+                            AlbumSelectedEvent(selectionType = AlbumSelected.SelectionType.MultiAdd)
+                        )
                         albumsViewModel.selectAlbum(album)
                     }
                 },

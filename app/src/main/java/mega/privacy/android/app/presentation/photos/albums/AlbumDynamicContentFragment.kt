@@ -25,6 +25,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
@@ -43,6 +44,8 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.AlbumContentScreenEvent
+import mega.privacy.mobile.analytics.event.AlbumContentShareLinkMenuToolbarEvent
 import javax.inject.Inject
 
 /**
@@ -121,6 +124,11 @@ class AlbumDynamicContentFragment : Fragment() {
         setHasOptionsMenu(true)
         setupFlow()
         setupParentActivityUI()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Analytics.tracker.trackEvent(AlbumContentScreenEvent)
     }
 
     /**
@@ -248,26 +256,35 @@ class AlbumDynamicContentFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_menu_get_link -> {
+                Analytics.tracker.trackEvent(AlbumContentShareLinkMenuToolbarEvent)
                 openAlbumGetLinkScreen(isNewLink = true)
             }
+
             R.id.action_menu_manage_link -> {
+                Analytics.tracker.trackEvent(AlbumContentShareLinkMenuToolbarEvent)
                 openAlbumGetLinkScreen(isNewLink = false)
             }
+
             R.id.action_menu_remove_link -> {
                 albumContentViewModel.showRemoveLinkConfirmation()
             }
+
             R.id.action_menu_sort_by -> {
                 albumsViewModel.showSortByDialog(showSortByDialog = true)
             }
+
             R.id.action_menu_filter -> {
                 albumsViewModel.showFilterDialog(showFilterDialog = true)
             }
+
             R.id.action_menu_delete -> {
                 handleAlbumDeletion()
             }
+
             R.id.action_menu_rename -> {
                 albumsViewModel.showRenameDialog(showRenameDialog = true)
             }
+
             R.id.action_menu_select_album_cover -> {
                 openAlbumCoverSelectionScreen()
             }
