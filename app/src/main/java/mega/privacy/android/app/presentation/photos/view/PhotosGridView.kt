@@ -334,6 +334,8 @@ fun Modifier.photosZoomGestureDetector(
                 } else {
                     onZoomOut()
                 }
+                // Consume event in case to trigger scroll
+                event.changes.map { it.consume() }
                 break
             }
         } while (!canceled && event.changes.any { it.pressed })
