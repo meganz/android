@@ -1,12 +1,10 @@
 package mega.privacy.android.domain.usecase.passcode
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
 import mega.privacy.android.domain.repository.security.PasscodeRepository
+import mega.privacy.android.domain.testutils.hotFlow
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -111,10 +109,4 @@ internal class UpdatePasscodeStateUseCaseTest {
         verify(passcodeRepository).setLocked(true)
     }
 
-    private fun <T> hotFlow(vararg elements: T): Flow<T> = flow {
-        elements.forEach {
-            emit(it)
-        }
-        awaitCancellation()
-    }
 }
