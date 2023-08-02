@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
@@ -391,7 +390,12 @@ private fun LoginInProgress(
                     }
                 }
             }
-            MegaCircularProgressIndicator(modifier = Modifier.testTag(LOGIN_PROGRESS_TEST_TAG))
+            MegaCircularProgressIndicator(
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .size(72.dp)
+                    .testTag(LOGIN_PROGRESS_TEST_TAG)
+            )
             fetchNodesUpdate?.temporaryError?.let {
                 LoginInProgressText(
                     stringId = it.messageId,
