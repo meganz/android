@@ -30,14 +30,14 @@ fun MegaLinearProgressIndicator(
     LinearProgressIndicator(
         modifier = modifier.fillMaxWidth(),
         progress = progress,
-        color = MaterialTheme.colors.secondaryVariant,
+        color = MaterialTheme.colors.secondary,
         strokeCap = strokeCap,
         backgroundColor = MaterialTheme.colors.grey_200_grey_700
     )
 } else {
     LinearProgressIndicator(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colors.secondaryVariant,
+        color = MaterialTheme.colors.secondary,
         strokeCap = strokeCap,
         backgroundColor = MaterialTheme.colors.grey_200_grey_700
     )
