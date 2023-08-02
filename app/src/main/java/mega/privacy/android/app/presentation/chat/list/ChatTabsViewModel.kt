@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -44,6 +46,7 @@ import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseC
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -354,9 +357,10 @@ class ChatTabsViewModel @Inject constructor(
             val featureFlagEnabled = getFeatureFlagValue(AppFeatures.ScheduleMeeting)
             if (featureFlagEnabled) {
                 runCatching {
+                    delay(TimeUnit.SECONDS.toMillis(2)) // Delay required by design
                     getMeetingTooltipsUseCase()
                 }.onSuccess { tooltips ->
-                    state.update { it.copy(tooltipToBeShown = tooltips) }
+                    state.update { it.copy(tooltip = tooltips) }
                 }.onFailure(Timber.Forest::e)
             }
         }
@@ -450,13 +454,14 @@ class ChatTabsViewModel @Inject constructor(
     }
 
     /**
-     * On current Meeting tooltip has been dismissed
+     * Set next meeting tooltip to be shown
+     *
+     * @param tooltip   [MeetingTooltipItem] to be shown next
      */
-    fun onTooltipDismissed() {
+    fun setNextMeetingTooltip(tooltip: MeetingTooltipItem) {
         viewModelScope.launch {
             runCatching {
-                val currentTooltip = state.value.tooltipToBeShown
-                setNextMeetingTooltipUseCase(currentTooltip)
+                setNextMeetingTooltipUseCase(tooltip)
             }.onSuccess {
                 retrieveTooltips()
             }.onFailure(Timber.Forest::e)

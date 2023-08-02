@@ -50,14 +50,14 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  * @param selectedIds
  * @param scrollToTop
  * @param isMeetingView
- * @param tooltipsToBeShown
+ * @param tooltip
  * @param onItemClick
  * @param onItemMoreClick
  * @param onItemSelected
  * @param onFirstItemVisible
  * @param onScrollInProgress
  * @param onEmptyButtonClick
- * @param onTooltipDismissed
+ * @param onShowNextTooltip
  */
 @Composable
 fun ChatListView(
@@ -66,14 +66,14 @@ fun ChatListView(
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     isMeetingView: Boolean,
-    tooltipsToBeShown: MeetingTooltipItem = MeetingTooltipItem.NONE,
+    tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
     onItemClick: (Long) -> Unit = {},
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
     onFirstItemVisible: (Boolean) -> Unit = {},
     onScrollInProgress: (Boolean) -> Unit = {},
     onEmptyButtonClick: () -> Unit = {},
-    onTooltipDismissed: () -> Unit = {},
+    onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -85,13 +85,13 @@ fun ChatListView(
                 items = items,
                 selectedIds = selectedIds,
                 scrollToTop = scrollToTop,
-                tooltipsToBeShown = tooltipsToBeShown,
+                tooltip = tooltip,
                 onItemClick = onItemClick,
                 onItemMoreClick = onItemMoreClick,
                 onItemSelected = onItemSelected,
                 onFirstItemVisible = onFirstItemVisible,
                 onScrollInProgress = onScrollInProgress,
-                onTooltipDismissed = onTooltipDismissed,
+                onShowNextTooltip = onShowNextTooltip,
             )
         } else {
             EmptyView(
@@ -108,18 +108,18 @@ private fun ListView(
     items: List<ChatRoomItem>,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
-    tooltipsToBeShown: MeetingTooltipItem,
+    tooltip: MeetingTooltipItem,
     onItemClick: (Long) -> Unit,
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
     onFirstItemVisible: (Boolean) -> Unit,
     onScrollInProgress: (Boolean) -> Unit,
-    onTooltipDismissed: () -> Unit,
+    onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     var selectionEnabled by remember { mutableStateOf(false) }
-    var pendingTooltipShown = false
-    var recurringTooltipShown = false
+    var showTooltip = tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
+            || tooltip == MeetingTooltipItem.RECURRING || tooltip == MeetingTooltipItem.PENDING
 
     LazyColumn(
         state = listState,
@@ -139,7 +139,14 @@ private fun ListView(
                 if (index != 0) ChatDivider()
             }
 
-            val itemView: @Composable () -> Unit = {
+            TooltipView(
+                tooltip = tooltip,
+                showTooltip = showTooltip,
+                itemIsRecurring = item is ChatRoomItem.MeetingChatRoomItem && item.isRecurring() && item.hasPermissions,
+                itemIsPending = item is ChatRoomItem.MeetingChatRoomItem && item.isPending,
+                onShowNextTooltip = onShowNextTooltip,
+                onTooltipShown = { showTooltip = false },
+            ) {
                 ChatRoomItemView(
                     modifier = modifier.testTag("chat_room_list:item"),
                     item = item,
@@ -149,40 +156,6 @@ private fun ListView(
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
                 )
-            }
-
-            when {
-                !pendingTooltipShown && tooltipsToBeShown == MeetingTooltipItem.PENDING
-                        && item is ChatRoomItem.MeetingChatRoomItem && item.isPending -> {
-                    pendingTooltipShown = true
-                    MegaTooltip(
-                        modifier = modifier.testTag("chat_room_list:tooltip_start"),
-                        titleText = stringResource(R.string.btn_start_meeting),
-                        descriptionText = stringResource(R.string.meeting_list_tooltip_sched_description),
-                        actionText = stringResource(R.string.button_permission_info),
-                        showOnTop = false,
-                        arrowPosition = 0.5f,
-                        onDismissed = onTooltipDismissed,
-                        content = itemView
-                    )
-                }
-
-                !recurringTooltipShown && tooltipsToBeShown == MeetingTooltipItem.RECURRING
-                        && item is ChatRoomItem.MeetingChatRoomItem && item.isRecurring() && item.hasPermissions -> {
-                    recurringTooltipShown = true
-                    MegaTooltip(
-                        modifier = modifier.testTag("chat_room_list:tooltip_recurring"),
-                        titleText = stringResource(R.string.meeting_list_tooltip_recurring_title),
-                        descriptionText = stringResource(R.string.meeting_list_tooltip_recurring_description),
-                        actionText = stringResource(R.string.button_permission_info),
-                        showOnTop = false,
-                        arrowPosition = 0.5f,
-                        onDismissed = onTooltipDismissed,
-                        content = itemView
-                    )
-                }
-
-                else -> itemView()
             }
         }
     }
@@ -206,6 +179,63 @@ private fun ListView(
 
     LaunchedEffect(selectedIds) {
         selectionEnabled = selectedIds.isNotEmpty()
+    }
+}
+
+@Composable
+private fun TooltipView(
+    tooltip: MeetingTooltipItem,
+    showTooltip: Boolean,
+    itemIsRecurring: Boolean,
+    itemIsPending: Boolean,
+    onShowNextTooltip: (MeetingTooltipItem) -> Unit,
+    onTooltipShown: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    when {
+        showTooltip && (tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
+                || tooltip == MeetingTooltipItem.RECURRING) && itemIsRecurring -> {
+            onTooltipShown()
+            MegaTooltip(
+                modifier = Modifier.testTag("chat_room_list:tooltip_recurring"),
+                titleText = stringResource(R.string.meeting_list_tooltip_recurring_title),
+                descriptionText = stringResource(R.string.meeting_list_tooltip_recurring_description),
+                actionText = stringResource(R.string.button_permission_info),
+                showOnTop = false,
+                arrowPosition = 0.5f,
+                content = content,
+                onDismissed = {
+                    if (tooltip == MeetingTooltipItem.RECURRING_OR_PENDING) {
+                        onShowNextTooltip(MeetingTooltipItem.PENDING)
+                    } else {
+                        onShowNextTooltip(MeetingTooltipItem.NONE)
+                    }
+                }
+            )
+        }
+
+        showTooltip && (tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
+                || tooltip == MeetingTooltipItem.PENDING) && itemIsPending -> {
+            onTooltipShown()
+            MegaTooltip(
+                modifier = Modifier.testTag("chat_room_list:tooltip_start"),
+                titleText = stringResource(R.string.btn_start_meeting),
+                descriptionText = stringResource(R.string.meeting_list_tooltip_sched_description),
+                actionText = stringResource(R.string.button_permission_info),
+                showOnTop = false,
+                arrowPosition = 0.5f,
+                content = content,
+                onDismissed = {
+                    if (tooltip == MeetingTooltipItem.RECURRING_OR_PENDING) {
+                        onShowNextTooltip(MeetingTooltipItem.RECURRING)
+                    } else {
+                        onShowNextTooltip(MeetingTooltipItem.NONE)
+                    }
+                }
+            )
+        }
+
+        else -> content()
     }
 }
 

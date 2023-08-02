@@ -71,7 +71,7 @@ fun ChatTabsView(
     onCancelScheduledMeeting: () -> Unit = {},
     onDismissDialog: () -> Unit = {},
     onStartChatClick: () -> Unit = {},
-    onTooltipDismissed: () -> Unit = {},
+    onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
     val scaffoldState = rememberScaffoldState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -94,14 +94,14 @@ fun ChatTabsView(
             }
         },
         floatingActionButton = {
-            if (state.tooltipToBeShown == MeetingTooltipItem.CREATE && pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
+            if (state.tooltip == MeetingTooltipItem.CREATE && pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
                 MegaTooltip(
                     titleText = stringResource(R.string.chat_schedule_meeting),
                     descriptionText = stringResource(R.string.meeting_list_tooltip_fab_description),
                     actionText = stringResource(R.string.button_permission_info),
                     showOnTop = true,
                     arrowPosition = 0.89f,
-                    onDismissed = onTooltipDismissed
+                    onDismissed = { onShowNextTooltip(MeetingTooltipItem.RECURRING_OR_PENDING) },
                 ) {
                     FabButton(showFabButton, onStartChatClick)
                 }
@@ -153,12 +153,12 @@ fun ChatTabsView(
                     scrollToTop = scrollToTop,
                     onItemClick = onItemClick,
                     isMeetingView = isMeetingView,
-                    tooltipsToBeShown = state.tooltipToBeShown,
+                    tooltip = state.tooltip,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
                     onScrollInProgress = { showFabButton = !it },
                     onEmptyButtonClick = onStartChatClick,
-                    onTooltipDismissed = onTooltipDismissed,
+                    onShowNextTooltip = onShowNextTooltip,
                 )
             }
 

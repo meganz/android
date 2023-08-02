@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  * @property searchQuery
  * @property snackBar
  * @property isParticipatingInChatCallResult
- * @property tooltipToBeShown
+ * @property tooltip
  * @constructor Create empty Chat tab state
  */
 data class ChatsTabState constructor(
@@ -28,5 +28,5 @@ data class ChatsTabState constructor(
     val searchQuery: String? = null,
     val snackBar: SnackBarItem? = null,
     val isParticipatingInChatCallResult: Boolean? = null,
-    val tooltipToBeShown: MeetingTooltipItem = MeetingTooltipItem.NONE,
+    val tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
 )

@@ -14,18 +14,10 @@ class SetNextMeetingTooltipUseCase @Inject constructor(
 ) {
 
     /**
-     * Set next scheduled meetings tooltip based on current item
+     * Set scheduled meetings tooltip to be shown
      *
-     * @param currentItem   [MeetingTooltipItem]
+     * @param item   [MeetingTooltipItem]
      */
-    suspend operator fun invoke(currentItem: MeetingTooltipItem) {
-        val items = MeetingTooltipItem.values()
-        val currentItemIndex = items.indexOf(currentItem)
-        if (currentItemIndex < items.size - 1) {
-            val nextItem = items[currentItemIndex + 1]
-            remotePreferencesRepository.setMeetingTooltipPreference(nextItem)
-        } else {
-            remotePreferencesRepository.setMeetingTooltipPreference(currentItem)
-        }
-    }
+    suspend operator fun invoke(item: MeetingTooltipItem) =
+        remotePreferencesRepository.setMeetingTooltipPreference(item)
 }

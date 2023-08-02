@@ -147,7 +147,7 @@ class ChatTabsFragment : Fragment() {
                         },
                         onDismissDialog = ::onDismissDialog,
                         onStartChatClick = ::startChatAction,
-                        onTooltipDismissed = viewModel::onTooltipDismissed,
+                        onShowNextTooltip = viewModel::setNextMeetingTooltip,
                     )
                 }
             }

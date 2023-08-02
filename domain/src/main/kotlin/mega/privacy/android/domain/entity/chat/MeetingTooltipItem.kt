@@ -10,14 +10,19 @@ enum class MeetingTooltipItem {
     CREATE,
 
     /**
-     * Start Pending Meeting tooltip
+     * Manage Recurring or Start Pending Meeting tooltips
      */
-    PENDING,
+    RECURRING_OR_PENDING,
 
     /**
      * Manage Recurring Meeting tooltip
      */
     RECURRING,
+
+    /**
+     * Start Pending Meeting tooltip
+     */
+    PENDING,
 
     /**
      * All tooltips have been shown

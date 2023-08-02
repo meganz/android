@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,13 +23,11 @@ import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.skydoves.balloon.compose.rememberBalloonBuilder
 import com.skydoves.balloon.compose.setBackgroundColor
-import kotlinx.coroutines.delay
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_tooltip_white
 import mega.privacy.android.core.ui.theme.extensions.white_black
-import java.util.concurrent.TimeUnit
 
 /**
  * Mega tooltip Balloon
@@ -108,14 +105,10 @@ fun MegaTooltip(
     ) { balloonWindow ->
         window = balloonWindow
         content()
-
-        LaunchedEffect(Unit) {
-            delay(TimeUnit.SECONDS.toMillis(2))
-            if (showOnTop) {
-                balloonWindow.showAlignTop()
-            } else {
-                balloonWindow.showAtCenter()
-            }
+        if (showOnTop) {
+            balloonWindow.showAlignTop()
+        } else {
+            balloonWindow.showAtCenter()
         }
     }
 }

@@ -8,7 +8,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SetNextMeetingTooltipUseCaseTest {
@@ -22,26 +21,12 @@ class SetNextMeetingTooltipUseCaseTest {
     }
 
     @Test
-    fun `invoke should set next meeting tooltip preference when current item is not the last one`() =
+    fun `test that invoke sets next meeting tooltip preference`() =
         runTest {
-            val currentItem = MeetingTooltipItem.CREATE
-            val nextItem =
-                MeetingTooltipItem.values()[MeetingTooltipItem.values().indexOf(currentItem) + 1]
+            val item = MeetingTooltipItem.RECURRING
 
-            underTest.invoke(currentItem)
+            underTest.invoke(item)
 
-            verify(remotePreferencesRepository).setMeetingTooltipPreference(nextItem)
-            verifyNoMoreInteractions(remotePreferencesRepository)
-        }
-
-    @Test
-    fun `invoke should set current meeting tooltip preference when current item is the last one`() =
-        runTest {
-            val currentItem = MeetingTooltipItem.values().last()
-
-            underTest.invoke(currentItem)
-
-            verify(remotePreferencesRepository).setMeetingTooltipPreference(currentItem)
-            verifyNoMoreInteractions(remotePreferencesRepository)
+            verify(remotePreferencesRepository).setMeetingTooltipPreference(item)
         }
 }
