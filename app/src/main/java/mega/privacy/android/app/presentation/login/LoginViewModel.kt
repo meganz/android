@@ -402,8 +402,11 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             val result = runCatching { querySignupLinkUseCase(link) }
             var accountConfirmed: Boolean? = null
+            var newAccountSession: AccountSession? = null
             val messageId = if (result.isSuccess) {
                 accountConfirmed = true
+                newAccountSession = state.value.accountSession?.copy(email = result.getOrNull())
+                    ?: AccountSession(email = result.getOrNull())
                 R.string.account_confirmed
             } else {
                 (result.exceptionOrNull() as QuerySignupLinkException).messageId
@@ -416,6 +419,7 @@ class LoginViewModel @Inject constructor(
                 state.copy(
                     isLoginRequired = true,
                     isLoginInProgress = false,
+                    accountSession = newAccountSession,
                     isAccountConfirmed = isAccountConfirmed,
                     intentState = LoginIntentState.AlreadySet,
                     isCheckingSignupLink = false,
