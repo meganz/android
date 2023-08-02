@@ -611,6 +611,9 @@
             <meta-data
                 android:name="mega.privacy.android.app.initializer.AnalyticsInitializer"
                 android:value="androidx.startup" />
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.PasscodeInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity
