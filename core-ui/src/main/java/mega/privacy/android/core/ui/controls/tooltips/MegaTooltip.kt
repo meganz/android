@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.skydoves.balloon.BalloonAnimation
 import com.skydoves.balloon.BalloonSizeSpec
-import com.skydoves.balloon.OnBalloonDismissListener
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.skydoves.balloon.compose.rememberBalloonBuilder
@@ -55,9 +54,10 @@ fun MegaTooltip(
     var window: BalloonWindow? by remember { mutableStateOf(null) }
     val bgColor = MaterialTheme.colors.dark_blue_tooltip_white
     val builder = rememberBalloonBuilder {
-        setIsVisibleOverlay(true)
+        setIsVisibleOverlay(false)
         setDismissWhenTouchOutside(false)
         setDismissWhenOverlayClicked(false)
+        setDismissWhenLifecycleOnPause(false)
         setWidth(BalloonSizeSpec.WRAP)
         setHeight(BalloonSizeSpec.WRAP)
         setArrowSize(10)
@@ -67,7 +67,7 @@ fun MegaTooltip(
         setPadding(16)
         setCornerRadius(8f)
         setBalloonAnimation(BalloonAnimation.FADE)
-        setOnBalloonDismissListener(OnBalloonDismissListener(onDismissed))
+        passTouchEventToAnchor = true
         setBackgroundColor(bgColor)
     }
 
@@ -98,7 +98,10 @@ fun MegaTooltip(
                     style = MaterialTheme.typography.caption,
                     modifier = Modifier
                         .padding(top = 12.dp)
-                        .clickable { window?.dismiss() },
+                        .clickable {
+                            onDismissed()
+                            window?.dismiss()
+                        },
                 )
             }
         }

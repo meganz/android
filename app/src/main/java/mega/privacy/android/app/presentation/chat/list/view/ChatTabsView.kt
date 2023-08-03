@@ -74,8 +74,8 @@ fun ChatTabsView(
     onStartChatClick: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
+    val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
     var scrollToTop by remember { mutableStateOf(false) }
@@ -85,8 +85,8 @@ fun ChatTabsView(
 
     Scaffold(
         scaffoldState = scaffoldState,
-        snackbarHost = {
-            SnackbarHost(hostState = it) { data ->
+        snackbarHost = { hostState ->
+            SnackbarHost(hostState = hostState) { data ->
                 Snackbar(
                     snackbarData = data,
                     modifier = Modifier.padding(bottom = 4.dp),
@@ -104,7 +104,7 @@ fun ChatTabsView(
                     arrowPosition = 0.89f,
                     onDismissed = { onShowNextTooltip(MeetingTooltipItem.RECURRING_OR_PENDING) },
                 ) {
-                    FabButton(showFabButton, onStartChatClick)
+                    FabButton(true, onStartChatClick)
                 }
             } else {
                 FabButton(showFabButton, onStartChatClick)
@@ -190,8 +190,6 @@ fun ChatTabsView(
                 onTabSelected(ChatTab.values()[pagerState.currentPage])
             }
 
-            val context = LocalContext.current
-
             EventEffect(
                 event = state.snackbarMessageContent, onConsumed = onResetSnackbarMessage
             ) { resId ->
@@ -205,8 +203,6 @@ fun ChatTabsView(
             }
         }
     }
-
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
     managementState.isChatHistoryEmpty?.let { isChatHistoryEmpty ->
         managementState.chatRoomItem?.let { chatRoomItem ->
