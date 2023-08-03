@@ -2625,6 +2625,21 @@ interface MegaApiGateway {
     fun removeBackup(backupId: Long, listener: MegaRequestListenerInterface)
 
     /**
+     * Fetch information about all registered backups for Backup Centre
+     *
+     * The associated request type with this request is MegaRequest::TYPE_BACKUP_INFO
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getListener - Returns the MegaRequestListener to track this request
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getMegaBackupInfoList - Returns information about all registered backups
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getBackupInfo(listener: MegaRequestListenerInterface)
+
+    /**
      * Reconnect and retry all transfers.
      */
     suspend fun reconnect()

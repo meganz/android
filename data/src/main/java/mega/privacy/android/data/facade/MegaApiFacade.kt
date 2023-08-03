@@ -1258,6 +1258,10 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.removeBackup(backupId, listener)
     }
 
+    override fun getBackupInfo(listener: MegaRequestListenerInterface) {
+        megaApi.getBackupInfo(listener)
+    }
+
     override suspend fun reconnect() = megaApi.reconnect()
 
     override fun createCancelToken(): MegaCancelToken = MegaCancelToken.createInstance()
