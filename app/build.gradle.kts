@@ -1,3 +1,5 @@
+import groovy.lang.Closure
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -53,18 +55,17 @@ android {
         val appVersion: String by rootProject.extra
         versionName = appVersion
 
-        val isDebugBuild: groovy.lang.Closure<Boolean> by extra
-        if (isDebugBuild(gradle.startParameter.taskNames)) {
+        if (useStaticVersion()) {
             println("Create DEBUG build using static versionCode")
             versionCode = 9999
             versionNameSuffix = "(9999_debug)"
         } else {
             println("Create NORMAL build using dynamic versionCode")
-            val readVersionCode: groovy.lang.Closure<Int> by extra
+            val readVersionCode: Closure<Int> by extra
             versionCode = readVersionCode()
-            val readVersionNameChannel: groovy.lang.Closure<String> by extra
-            val readVersionNameTag: groovy.lang.Closure<String> by extra
-            val getAppGitHash: groovy.lang.Closure<String> by extra
+            val readVersionNameChannel: Closure<String> by extra
+            val readVersionNameTag: Closure<String> by extra
+            val getAppGitHash: Closure<String> by extra
             versionNameSuffix =
                 "${readVersionNameChannel()}(${readVersionCode()}${readVersionNameTag()})(${getAppGitHash()})"
         }
@@ -76,22 +77,22 @@ android {
 
         buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${versionName}_${versionCode}\"")
 
-        val shouldActivateGreeter: groovy.lang.Closure<Boolean> by extra
+        val shouldActivateGreeter: Closure<Boolean> by extra
         buildConfigField("boolean", "ACTIVATE_GREETER", "${shouldActivateGreeter()}")
 
-        val shouldActivateNocturn: groovy.lang.Closure<Boolean> by extra
+        val shouldActivateNocturn: Closure<Boolean> by extra
         buildConfigField("boolean", "ACTIVATE_NOCTURN", "${shouldActivateNocturn()}")
 
-        val getNocturnTimeout: groovy.lang.Closure<Long> by extra
+        val getNocturnTimeout: Closure<Long> by extra
         buildConfigField("long", "NOCTURN_TIMEOUT", "${getNocturnTimeout()}")
 
         resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
 
         val megaSdkVersion: String by rootProject.extra
-        val getSdkGitHash: groovy.lang.Closure<String> by extra
+        val getSdkGitHash: Closure<String> by extra
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion)}\"")
 
-        val getChatGitHash: groovy.lang.Closure<String> by extra
+        val getChatGitHash: Closure<String> by extra
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion)}\"")
 
         testInstrumentationRunner = "test.mega.privacy.android.app.HiltTestRunner"
@@ -122,7 +123,7 @@ android {
                 // Enable processing and uploading of native symbols to Crashlytics servers.
                 // This flag must be enabled to see properly-symbolicated native
                 // stack traces in the Crashlytics dashboard.
-                val nativeLibsDir: groovy.lang.Closure<String> by extra
+                val nativeLibsDir: Closure<String> by extra
                 "nativeSymbolUploadEnabled"(true)
                 "unstrippedNativeLibsDir"(nativeLibsDir())
             }
@@ -176,9 +177,9 @@ android {
         jniLibs.pickFirsts.add("lib/x86_64/libmodpng.so")
     }
 
-    val readReleaseNotes: groovy.lang.Closure<String> by extra
-    val readTesterGroupList: groovy.lang.Closure<String> by extra
-    val readTesters: groovy.lang.Closure<String> by extra
+    val readReleaseNotes: Closure<String> by extra
+    val readTesterGroupList: Closure<String> by extra
+    val readTesters: Closure<String> by extra
 
     buildTypes {
         debug {
@@ -253,7 +254,7 @@ android {
     }
     lint {
         checkReleaseBuilds = false
-        val shouldCombineLintReports: groovy.lang.Closure<Boolean> by extra
+        val shouldCombineLintReports: Closure<Boolean> by extra
         if (shouldCombineLintReports()) {
             checkDependencies = true
             htmlReport = true
@@ -414,7 +415,7 @@ dependencies {
 
     coreLibraryDesugaring(lib.desugar)
 
-    val shouldUsePrebuiltSdk: groovy.lang.Closure<Boolean> by rootProject.extra
+    val shouldUsePrebuiltSdk: Closure<Boolean> by rootProject.extra
     if (shouldUsePrebuiltSdk()) {
         // These 2 ExoPlayer libs are created by SDK build. If upgrading ExoPlayer version,
         // remember to upload these 2 files.
@@ -621,7 +622,7 @@ tasks.register("createUnitTestCoverageReport") {
  */
 tasks.register("printAppGitHash") {
     doLast {
-        val getAppGitHash: groovy.lang.Closure<String> by ext
+        val getAppGitHash: Closure<String> by ext
         println(getAppGitHash())
     }
 }
@@ -653,7 +654,22 @@ tasks.register("printPrebuildSdkVersion") {
  */
 tasks.register("printAppVersionNameChannel") {
     doLast {
-        val readVersionNameChannel: groovy.lang.Closure<String> by ext
+        val readVersionNameChannel: Closure<String> by ext
         println(readVersionNameChannel())
     }
+}
+
+/**
+ * Decide whether to use static version code
+ */
+fun useStaticVersion(): Boolean {
+    val isCiBuild: Closure<Boolean> by extra
+    val isServerBuild: Closure<Boolean> by extra
+    val buildTypeMatches: Closure<Boolean> by extra
+    val taskNames = gradle.startParameter.taskNames
+    return buildTypeMatches("debug", taskNames) ||
+            buildTypeMatches("lint", taskNames) ||
+            buildTypeMatches("test", taskNames) ||
+            (buildTypeMatches("qa", taskNames) && !isServerBuild()) ||
+            (buildTypeMatches("qa", taskNames) && isCiBuild())
 }

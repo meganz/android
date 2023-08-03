@@ -19,9 +19,9 @@ val shouldUsePrebuiltSdk: groovy.lang.Closure<Boolean> by extra
 /**
  * Checks if it is CI Build
  */
-val isCiBuild: groovy.lang.Closure<Boolean> by extra
+val isServerBuild: groovy.lang.Closure<Boolean> by extra
 
-if (!shouldUsePrebuiltSdk() || isCiBuild()) {
+if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     include(":sdk")
 }
 
@@ -40,12 +40,12 @@ include(":xray")
 include(":analytics")
 include(":core-ui-test")
 
-println("isCiBuild = ${isCiBuild()}")
+println("isServerBuild = ${isServerBuild()}")
 
 buildCache {
     local {
-        isEnabled = !isCiBuild()
-        isPush = !isCiBuild()
+        isEnabled = !isServerBuild()
+        isPush = !isServerBuild()
     }
 
     remote<HttpBuildCache> {
@@ -55,7 +55,7 @@ buildCache {
             username = System.getenv()["ARTIFACTORY_USER"]
             password = System.getenv()["ARTIFACTORY_ACCESS_TOKEN"]
         }
-        isPush = isCiBuild()
-        isEnabled = isCiBuild()
+        isPush = isServerBuild()
+        isEnabled = isServerBuild()
     }
 }

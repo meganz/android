@@ -106,8 +106,12 @@ boolean shouldUsePrebuiltSdk() {
     return usePrebuiltSdk == null || usePrebuiltSdk != "false"
 }
 
-boolean isCiBuild() {
+boolean isServerBuild() {
     return System.getenv("BUILD_NUMBER") != null
+}
+
+boolean isCiBuild() {
+    return System.getenv("IS_CI_BUILD") == "true"
 }
 
 /**
@@ -132,7 +136,7 @@ boolean shouldCombineLintReports() {
 def queryPrebuiltSdkProperty(String property, String version) {
     def commit = "N/A"
     // Only query SDK property in CI. Skip this step in local build to reduce compile time
-    if (isCiBuild()) {
+    if (isServerBuild()) {
         def stdout = new ByteArrayOutputStream()
         def url = "${System.env.ARTIFACTORY_BASE_URL}/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
         exec {
@@ -266,26 +270,30 @@ Long getNocturnTimeout() {
 }
 
 /**
- * Check gradle command parameter to decide whether it is debug build.
- * @param taskNames list of gradle parameters, e.g. ["clean", "app:assembleGmsDebug"]
- * @return whether user wants to create a DEBUG build.
+ * Check if the gradle command parameter matches the build type.
+ *
+ * @param type the type keyword to check. Possible values:
+ *      - "qa"  QA build
+ *      - "debug" Debug build
+ *      - "lint" Lint check build
+ *      - "test" Test case build
+ * @param taskNames – list of gradle parameters, e.g. ["clean", "app:assembleGmsDebug"]
+ * @return
  */
-boolean isDebugBuild(List<String> taskNames) {
-    def debugBuild = false
+boolean buildTypeMatches(String type, List<String> taskNames) {
+    boolean result = false
     taskNames.collect { it.toLowerCase() }
             .forEach { name ->
-                if (name.contains("clean")) return
+                // skip "clean" command, because we don't care
+                if (name.contains("clean")) {
+                    return
+                }
 
-                boolean containDebugKeywords = name.contains("debug") ||
-                        name.contains("qa") ||
-                        name.contains("lint") ||
-                        name.contains("test")
-
-                if (containDebugKeywords) {
-                    debugBuild = true
+                if (name.contains(type.toLowerCase())) {
+                    result = true
                 }
             }
-    return debugBuild
+    return result
 }
 
 /**
@@ -308,7 +316,7 @@ ext {
     readTesters = this.&readTesters
     readTesterGroupList = this.&readTesterGroupList
     shouldUsePrebuiltSdk = this.&shouldUsePrebuiltSdk
-    isCiBuild = this.&isCiBuild
+    isServerBuild = this.&isServerBuild
     shouldCombineLintReports = this.&shouldCombineLintReports
     getAppGitHash = this.&getAppGitHash
     getSdkGitHash = this.&getSdkGitHash
@@ -316,6 +324,7 @@ ext {
     shouldActivateGreeter = this.&shouldActivateGreeter
     shouldActivateNocturn = this.&shouldActivateNocturn
     getNocturnTimeout = this.&getNocturnTimeout
-    isDebugBuild = this.&isDebugBuild
     nativeLibsDir = this.&nativeLibsDir
+    isCiBuild = this.&isCiBuild
+    buildTypeMatches = this.&buildTypeMatches
 }

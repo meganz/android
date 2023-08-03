@@ -72,7 +72,7 @@ extra["javaVersion"] = JavaVersion.VERSION_17
 /**
  * Checks if it is CI Build
  */
-val isCiBuild: groovy.lang.Closure<Boolean> by ext
+val isServerBuild: groovy.lang.Closure<Boolean> by ext
 
 /**
  * Checks whether to use Prebuilt Sdk
@@ -83,9 +83,9 @@ val shouldUsePrebuiltSdk: groovy.lang.Closure<Boolean> by ext
  * Checks whether to Suppress Warnings
  */
 val shouldSuppressWarnings by extra(
-    fun(): Boolean = isCiBuild() && System.getenv("DO_NOT_SUPPRESS_WARNINGS") != "true"
+    fun(): Boolean = isServerBuild() && System.getenv("DO_NOT_SUPPRESS_WARNINGS") != "true"
 )
 
-if (!shouldUsePrebuiltSdk() || isCiBuild()) {
+if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     apply(from = "${project.rootDir}/tools/prebuilt-sdk.gradle")
 }
