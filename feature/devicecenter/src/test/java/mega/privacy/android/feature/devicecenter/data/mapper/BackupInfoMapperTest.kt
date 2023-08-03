@@ -16,6 +16,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertAll
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 /**
@@ -88,6 +89,17 @@ internal class BackupInfoMapperTest {
         assertMappedBackupInfoObject(underTest(sdkBackupInfo))
     }
 
+    @Test
+    fun `test that null is returned when mega backup info is null`() {
+        assertThat(underTest(null)).isNull()
+        verifyNoInteractions(
+            backupInfoStateMapper,
+            backupInfoSubStateMapper,
+            backupInfoHeartbeatStatusMapper,
+            backupInfoTypeMapper,
+        )
+    }
+
     /**
      * Initializes a [MegaBackupInfo] with data
      *
@@ -114,24 +126,28 @@ internal class BackupInfoMapperTest {
 
     /**
      * Checks whether all values mapped from [MegaBackupInfo] to [BackupInfo] are correct
+     *
+     * @param backupInfo A potentially nullable [BackupInfo] object
      */
-    private fun assertMappedBackupInfoObject(backupInfo: BackupInfo) = assertAll(
-        "Grouped Assertions of ${BackupInfo::class.simpleName}",
-        { assertThat(backupInfo.id).isEqualTo(id) },
-        { assertThat(backupInfo.type).isEqualTo(expectedType) },
-        { assertThat(backupInfo.rootHandle).isEqualTo(rootHandle) },
-        { assertThat(backupInfo.localFolderPath).isEqualTo(localFolderPath) },
-        { assertThat(backupInfo.deviceId).isEqualTo(deviceId) },
-        { assertThat(backupInfo.state).isEqualTo(expectedState) },
-        { assertThat(backupInfo.subState).isEqualTo(expectedSubState) },
-        { assertThat(backupInfo.extraInfo).isEqualTo(extraInfo) },
-        { assertThat(backupInfo.name).isEqualTo(name) },
-        { assertThat(backupInfo.timestamp).isEqualTo(timestamp) },
-        { assertThat(backupInfo.status).isEqualTo(expectedHeartbeatStatus) },
-        { assertThat(backupInfo.progress).isEqualTo(progress) },
-        { assertThat(backupInfo.uploadCount).isEqualTo(uploadCount) },
-        { assertThat(backupInfo.downloadCount).isEqualTo(downloadCount) },
-        { assertThat(backupInfo.lastActivityTimestamp).isEqualTo(lastActivityTimestamp) },
-        { assertThat(backupInfo.lastSyncedNodeHandle).isEqualTo(lastSyncedNodeHandle) },
-    )
+    private fun assertMappedBackupInfoObject(backupInfo: BackupInfo?) = backupInfo?.let {
+        assertAll(
+            "Grouped Assertions of ${BackupInfo::class.simpleName}",
+            { assertThat(it.id).isEqualTo(id) },
+            { assertThat(it.type).isEqualTo(expectedType) },
+            { assertThat(it.rootHandle).isEqualTo(rootHandle) },
+            { assertThat(it.localFolderPath).isEqualTo(localFolderPath) },
+            { assertThat(it.deviceId).isEqualTo(deviceId) },
+            { assertThat(it.state).isEqualTo(expectedState) },
+            { assertThat(it.subState).isEqualTo(expectedSubState) },
+            { assertThat(it.extraInfo).isEqualTo(extraInfo) },
+            { assertThat(it.name).isEqualTo(name) },
+            { assertThat(it.timestamp).isEqualTo(timestamp) },
+            { assertThat(it.status).isEqualTo(expectedHeartbeatStatus) },
+            { assertThat(it.progress).isEqualTo(progress) },
+            { assertThat(it.uploadCount).isEqualTo(uploadCount) },
+            { assertThat(it.downloadCount).isEqualTo(downloadCount) },
+            { assertThat(it.lastActivityTimestamp).isEqualTo(lastActivityTimestamp) },
+            { assertThat(it.lastSyncedNodeHandle).isEqualTo(lastSyncedNodeHandle) },
+        )
+    }
 }

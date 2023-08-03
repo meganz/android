@@ -22,25 +22,27 @@ internal class BackupInfoMapper @Inject constructor(
     /**
      * Invocation function
      *
-     * @param sdkBackupInfo The [MegaBackupInfo]
-     * @return The [BackupInfo] object
+     * @param sdkBackupInfo A potentially nullable [MegaBackupInfo]
+     * @return A potentially nullable [BackupInfo] object
      */
-    operator fun invoke(sdkBackupInfo: MegaBackupInfo) = BackupInfo(
-        id = sdkBackupInfo.id(),
-        type = backupInfoTypeMapper(sdkBackupInfo.type()),
-        rootHandle = sdkBackupInfo.root(),
-        localFolderPath = sdkBackupInfo.localFolder(),
-        deviceId = sdkBackupInfo.deviceId(),
-        state = backupInfoStateMapper(sdkBackupInfo.state()),
-        subState = backupInfoSubStateMapper(sdkBackupInfo.substate()),
-        extraInfo = sdkBackupInfo.extra(),
-        name = sdkBackupInfo.name(),
-        timestamp = sdkBackupInfo.ts(),
-        status = backupInfoHeartbeatStatusMapper(sdkBackupInfo.status()),
-        progress = sdkBackupInfo.progress(),
-        uploadCount = sdkBackupInfo.uploads(),
-        downloadCount = sdkBackupInfo.downloads(),
-        lastActivityTimestamp = sdkBackupInfo.activityTs(),
-        lastSyncedNodeHandle = sdkBackupInfo.lastSync(),
-    )
+    operator fun invoke(sdkBackupInfo: MegaBackupInfo?) = sdkBackupInfo?.let { megaBackupInfo ->
+        BackupInfo(
+            id = megaBackupInfo.id(),
+            type = backupInfoTypeMapper(megaBackupInfo.type()),
+            rootHandle = megaBackupInfo.root(),
+            localFolderPath = megaBackupInfo.localFolder(),
+            deviceId = megaBackupInfo.deviceId(),
+            state = backupInfoStateMapper(megaBackupInfo.state()),
+            subState = backupInfoSubStateMapper(megaBackupInfo.substate()),
+            extraInfo = megaBackupInfo.extra(),
+            name = megaBackupInfo.name(),
+            timestamp = megaBackupInfo.ts(),
+            status = backupInfoHeartbeatStatusMapper(megaBackupInfo.status()),
+            progress = megaBackupInfo.progress(),
+            uploadCount = megaBackupInfo.uploads(),
+            downloadCount = megaBackupInfo.downloads(),
+            lastActivityTimestamp = megaBackupInfo.activityTs(),
+            lastSyncedNodeHandle = megaBackupInfo.lastSync(),
+        )
+    }
 }
