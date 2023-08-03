@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.os.Build
 import androidx.core.content.ContextCompat.getSystemService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -113,10 +114,37 @@ internal class DefaultNetworkRepository @Inject constructor(
 
     override fun isMeteredConnection() = connectivityManager?.isActiveNetworkMetered
 
+    @Suppress("DEPRECATION")
     override fun isOnWifi(): Boolean {
-        connectivityManager ?: return false
-        val capabilities = connectivityManager.getActiveNetworkCapabilities()
-        return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+        return connectivityManager?.getActiveNetworkCapabilities()?.let {
+            return@let when {
+                it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                    true
+                }
+
+                /*
+                 * On newer devices even though the VPN is connected it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) returns true.
+                 * so it.hasTransport(NetworkCapabilities.TRANSPORT_VPN) will be invoked
+                 * only when it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) returns false
+                 * and then we will look for whether device is disconnected to WiFi
+                 * or not on older devices when it's connected to VPN
+                 *  otherwise it should return false immediately for newer devices.
+                 */
+
+                it.hasTransport(NetworkCapabilities.TRANSPORT_VPN) -> {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                        connectivityManager.allNetworks.any { network ->
+                            connectivityManager.getNetworkCapabilities(network)
+                                ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                        }
+                    } else {
+                        false
+                    }
+                }
+
+                else -> false
+            }
+        } ?: false
     }
 
     override fun monitorChatSignalPresence(): Flow<Unit> =
