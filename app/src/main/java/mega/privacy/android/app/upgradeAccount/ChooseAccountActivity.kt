@@ -37,7 +37,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
     }
 
     private lateinit var binding: ActivityChooseAccountBinding
-    private val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
+    private val viewModel by viewModels<ChooseAccountViewModel>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -191,13 +191,13 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
                 val textStorage: Spanned = viewModel.generateByteString(
                     this,
                     account.storage.toLong(),
-                    ChooseUpgradeAccountViewModel.TYPE_STORAGE_LABEL
+                    ChooseAccountViewModel.TYPE_STORAGE_LABEL
                 )
 
                 val textTransfer: Spanned = viewModel.generateByteString(
                     this,
                     account.transfer.toLong(),
-                    ChooseUpgradeAccountViewModel.TYPE_TRANSFER_LABEL
+                    ChooseAccountViewModel.TYPE_TRANSFER_LABEL
                 )
 
                 when (account.level) {
