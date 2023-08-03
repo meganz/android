@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.chat.list.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
@@ -17,6 +19,7 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  * @property snackBar
  * @property isParticipatingInChatCallResult
  * @property tooltip
+ * @property snackbarMessageContent
  * @constructor Create empty Chat tab state
  */
 data class ChatsTabState constructor(
@@ -29,4 +32,5 @@ data class ChatsTabState constructor(
     val snackBar: SnackBarItem? = null,
     val isParticipatingInChatCallResult: Boolean? = null,
     val tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
+    val snackbarMessageContent: StateEventWithContent<Int> = consumed(),
 )

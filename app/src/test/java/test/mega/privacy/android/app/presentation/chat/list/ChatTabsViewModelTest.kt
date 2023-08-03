@@ -29,6 +29,7 @@ import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorSingleOccurrenceScheduledMeetingCancelledUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import org.junit.jupiter.api.AfterAll
@@ -68,6 +69,8 @@ internal class ChatTabsViewModelTest {
     private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase = mock()
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase = mock()
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase = mock()
+    private val monitorSingleOccurrenceScheduledMeetingCancelledUseCase: MonitorSingleOccurrenceScheduledMeetingCancelledUseCase =
+        mock()
 
     @BeforeAll
     fun setup() {
@@ -128,6 +131,7 @@ internal class ChatTabsViewModelTest {
             getMeetingTooltipsUseCase,
             setNextMeetingTooltipUseCase,
             getFeatureFlagValue,
+            monitorSingleOccurrenceScheduledMeetingCancelledUseCase,
         )
     }
 

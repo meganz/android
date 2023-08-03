@@ -44,6 +44,7 @@ internal class AppEventFacade @Inject constructor(
     private val stopTransfersWork = MutableSharedFlow<Boolean>()
     private val chatSignalPresence = MutableSharedFlow<Unit>()
     private val accountBlocked = MutableSharedFlow<AccountBlockedDetail>()
+    private val scheduledMeetingCanceled = MutableSharedFlow<Int>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
     private val _finishActivity = MutableSharedFlow<Boolean>()
@@ -183,6 +184,11 @@ internal class AppEventFacade @Inject constructor(
         accountBlocked.emit(accountBlockedDetail)
 
     override fun monitorAccountBlocked() = accountBlocked.asSharedFlow()
+    override fun monitorScheduledMeetingCanceled(): Flow<Int> =
+        scheduledMeetingCanceled.toSharedFlow(appScope)
+
+    override suspend fun broadcastScheduledMeetingCanceled(messageResId: Int) =
+        scheduledMeetingCanceled.emit(messageResId)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

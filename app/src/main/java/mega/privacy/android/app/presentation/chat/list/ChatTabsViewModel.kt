@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.chat.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -43,6 +45,7 @@ import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorSingleOccurrenceScheduledMeetingCancelledUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import timber.log.Timber
@@ -68,6 +71,10 @@ import javax.inject.Inject
  * @property getCurrentChatStatusUseCase
  * @property clearChatHistoryUseCase
  * @property isParticipatingInChatCallUseCase
+ * @property getMeetingTooltipsUseCase
+ * @property setNextMeetingTooltipUseCase
+ * @property getFeatureFlagValue
+ * @property monitorSingleOccurrenceScheduledMeetingCancelledUseCase
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -91,6 +98,7 @@ class ChatTabsViewModel @Inject constructor(
     private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase,
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
+    private val monitorSingleOccurrenceScheduledMeetingCancelledUseCase: MonitorSingleOccurrenceScheduledMeetingCancelledUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -106,6 +114,11 @@ class ChatTabsViewModel @Inject constructor(
         requestChats()
         retrieveChatStatus()
         retrieveTooltips()
+
+        viewModelScope.launch {
+            monitorSingleOccurrenceScheduledMeetingCancelledUseCase().conflate()
+                .collect { messageResId -> triggerSnackbarMessage(messageResId) }
+        }
     }
 
     /**
@@ -467,4 +480,17 @@ class ChatTabsViewModel @Inject constructor(
             }.onFailure(Timber.Forest::e)
         }
     }
+
+    /**
+     * Trigger event to show Snackbar message
+     *
+     * @param messageResId  Content for snack bar
+     */
+    private fun triggerSnackbarMessage(messageResId: Int) =
+        state.update { it.copy(snackbarMessageContent = triggered(messageResId)) }
+
+    /**
+     * Reset and notify that snackbarMessage is consumed
+     */
+    fun onSnackbarMessageConsumed() = state.update { it.copy(snackbarMessageContent = consumed()) }
 }

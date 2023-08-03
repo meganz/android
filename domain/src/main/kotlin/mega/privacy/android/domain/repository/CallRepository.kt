@@ -284,4 +284,18 @@ interface CallRepository {
      * @return A list of ids of active calls
      */
     suspend fun getChatCallIds(): List<Long>
+
+    /**
+     * Monitor scheduled meeting canceled.
+     *
+     * @return Flow [Int]
+     */
+    fun monitorScheduledMeetingCanceled(): Flow<Int>
+
+    /**
+     * Broadcast scheduled meeting canceled.
+     *
+     * @param messageResId [Int]
+     */
+    suspend fun broadcastScheduledMeetingCanceled(messageResId: Int)
 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.handles.HandleListMapper
@@ -58,6 +59,7 @@ import kotlin.coroutines.resume
  * @property megaChatScheduledMeetingFlagsMapper    [MegaChatScheduledMeetingFlagsMapper]
  * @property megaChatScheduledMeetingRulesMapper    [MegaChatScheduledMeetingRulesMapper]
  * @property megaChatPeerListMapper                 [MegaChatPeerListMapper]
+ * @property appEventGateway                        [AppEventGateway]
  * @property dispatcher                             [CoroutineDispatcher]
  */
 internal class CallRepositoryImpl @Inject constructor(
@@ -72,6 +74,7 @@ internal class CallRepositoryImpl @Inject constructor(
     private val megaChatScheduledMeetingFlagsMapper: MegaChatScheduledMeetingFlagsMapper,
     private val megaChatScheduledMeetingRulesMapper: MegaChatScheduledMeetingRulesMapper,
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
+    private val appEventGateway: AppEventGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : CallRepository {
 
@@ -452,4 +455,10 @@ internal class CallRepositoryImpl @Inject constructor(
     override suspend fun getChatCallIds(): List<Long> = withContext(dispatcher) {
         megaChatApiGateway.getChatCallIds()?.let(handleListMapper::invoke) ?: emptyList()
     }
+
+    override fun monitorScheduledMeetingCanceled(): Flow<Int> =
+        appEventGateway.monitorScheduledMeetingCanceled()
+
+    override suspend fun broadcastScheduledMeetingCanceled(messageResId: Int) =
+        appEventGateway.broadcastScheduledMeetingCanceled(messageResId)
 }

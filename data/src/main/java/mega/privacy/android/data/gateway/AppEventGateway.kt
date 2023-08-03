@@ -310,4 +310,18 @@ internal interface AppEventGateway {
      * Monitors blocked account.
      */
     fun monitorAccountBlocked(): Flow<AccountBlockedDetail>
+
+    /**
+     * Monitor scheduled meeting canceled.
+     *
+     * @return Flow [Int]
+     */
+    fun monitorScheduledMeetingCanceled(): Flow<Int>
+
+    /**
+     * Broadcast scheduled meeting canceled.
+     *
+     * @param messageResId [Int]
+     */
+    suspend fun broadcastScheduledMeetingCanceled(messageResId: Int)
 }

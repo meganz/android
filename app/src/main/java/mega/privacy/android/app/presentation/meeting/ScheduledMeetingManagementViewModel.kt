@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
@@ -53,8 +54,14 @@ import javax.inject.Inject
  * @property cancelScheduledMeetingOccurrenceUseCase    [CancelScheduledMeetingOccurrenceUseCase]
  * @property getChatRoomUseCase                         [GetChatRoom]
  * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
+ * @property queryChatLink                              [QueryChatLink]
+ * @property removeChatLink                             [RemoveChatLink]
+ * @property createChatLink                             [CreateChatLink]
+ * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
  * @property monitorChatListItemUpdates                 [MonitorChatListItemUpdates]
  * @property monitorChatListItemUpdates                 [MegaChatApiGateway]
+ * @property updateOccurrenceUseCase                    [UpdateOccurrenceUseCase]
+ * @property broadcastScheduledMeetingCancelledUseCase  [BroadcastScheduledMeetingCanceledUseCase]
  * @property state                                      Current view state as [ScheduledMeetingManagementState]
  */
 @HiltViewModel
@@ -73,6 +80,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val updateOccurrenceUseCase: UpdateOccurrenceUseCase,
+    private val broadcastScheduledMeetingCancelledUseCase: BroadcastScheduledMeetingCanceledUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScheduledMeetingManagementState())
     val state: StateFlow<ScheduledMeetingManagementState> = _state
@@ -205,6 +213,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar))
         }.onFailure { exception ->
             Timber.e(exception)
+            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
         }
     }
 
@@ -218,6 +227,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar))
         }.onFailure { exception ->
             Timber.e(exception)
+            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
         }
     }
 
@@ -243,6 +253,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             )
         }.onFailure { exception ->
             Timber.e(exception)
+            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
         }
     }
 
@@ -270,9 +281,10 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             }
         }.onSuccess {
             _state.update { it.copy(finish = true) }
-            triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar))
+            broadcastScheduledMeetingCancelledUseCase(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar)
         }.onFailure { exception ->
             Timber.e(exception)
+            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
         }
     }
 
@@ -286,9 +298,10 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             }
         }.onSuccess {
             _state.update { it.copy(finish = true) }
-            triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar))
+            broadcastScheduledMeetingCancelledUseCase(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar)
         }.onFailure { exception ->
             Timber.e(exception)
+            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
         }
     }
 

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.handles.HandleListMapper
@@ -114,6 +115,8 @@ class CallRepositoryImplTest {
         )
     }
 
+    private val appEventGateway = mock<AppEventGateway>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -130,7 +133,8 @@ class CallRepositoryImplTest {
             chatSessionMapper = chatSessionMapper,
             megaChatScheduledMeetingFlagsMapper = megaChatScheduledMeetingFlagsMapper,
             megaChatScheduledMeetingRulesMapper = megaChatScheduledMeetingRulesMapper,
-            megaChatPeerListMapper = megaChatPeerListMapper
+            megaChatPeerListMapper = megaChatPeerListMapper,
+            appEventGateway = appEventGateway
         )
 
         whenever(megaChatRoom.chatId).thenReturn(chatId)
