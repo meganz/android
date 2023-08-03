@@ -68,7 +68,6 @@ import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.app.presentation.extensions.iconRes
@@ -357,7 +356,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
         collectFlows()
         registerBroadcastReceivers()
-        startActivity(Intent(this, AskForDisplayOverActivity::class.java))
     }
 
     private fun configureActivityLaunchers() {

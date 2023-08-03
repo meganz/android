@@ -3,19 +3,20 @@ package mega.privacy.android.app.globalmanagement
 import android.app.Application
 import android.content.Context
 import android.os.PowerManager
+import android.provider.Settings
 import android.util.Pair
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.IncomingCallNotification
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -309,7 +310,7 @@ class CallChangesObserver @Inject constructor(
      * @param callToLaunch The incoming call
      */
     private fun checkOneToOneIncomingCall(callToLaunch: MegaChatCall) {
-        if (IncomingCallNotification.shouldNotify(application) && !activityLifecycleHandler.isActivityVisible) {
+        if (shouldNotify(application) && !activityLifecycleHandler.isActivityVisible) {
             initWakeLock()
             Timber.d("The notification should be displayed. Chat ID of incoming call ${callToLaunch.chatid}")
             showOneCallNotification(callToLaunch)
@@ -347,9 +348,6 @@ class CallChangesObserver @Inject constructor(
         isIgnored: Boolean,
     ) {
         chatManagement.setOpeningMeetingLink(chatId, false)
-        if (IncomingCallNotification.shouldNotify(application)) {
-            IncomingCallNotification.toSystemSettingNotification(application)
-        }
         wakeLock?.takeIf { it.isHeld }?.release()
         chatManagement.removeNotificationShown(chatId)
 
@@ -376,4 +374,7 @@ class CallChangesObserver @Inject constructor(
             Timber.e(e, "EXCEPTION when showing missed call notification")
         }
     }
+
+    private fun shouldNotify(context: Context?) =
+        Util.isAndroid10OrUpper() && !Settings.canDrawOverlays(context)
 }

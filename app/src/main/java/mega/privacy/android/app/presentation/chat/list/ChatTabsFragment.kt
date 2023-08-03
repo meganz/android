@@ -39,7 +39,6 @@ import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -154,8 +153,6 @@ class ChatTabsFragment : Fragment() {
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        startActivity(Intent(requireContext(), AskForDisplayOverActivity::class.java))
-
         viewLifecycleOwner.collectFlow(viewModel.getState(), Lifecycle.State.RESUMED) { state ->
             if (state.selectedIds.isNotEmpty()) {
                 if (actionMode == null) {
