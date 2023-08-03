@@ -75,11 +75,6 @@ fun MegaAlertDialog(
                     .padding(horizontal = 8.dp, vertical = 2.dp),
                 horizontalArrangement = Arrangement.End
             ) {
-                TextMegaButton(
-                    modifier = Modifier.testTag(CONFIRM_TAG),
-                    text = confirmButtonText,
-                    onClick = onConfirm,
-                )
                 cancelButtonText?.let {
                     TextMegaButton(
                         modifier = Modifier.testTag(CANCEL_TAG),
@@ -87,6 +82,11 @@ fun MegaAlertDialog(
                         onClick = onDismiss,
                     )
                 }
+                TextMegaButton(
+                    modifier = Modifier.testTag(CONFIRM_TAG),
+                    text = confirmButtonText,
+                    onClick = onConfirm,
+                )
             }
         },
         properties = DialogProperties(
