@@ -3,12 +3,14 @@ package mega.privacy.android.app.presentation.filelink
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -56,12 +58,19 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+            EventEffect(
+                event = uiState.openFile,
+                onConsumed = viewModel::resetOpenFile,
+                action = ::onOpenFile
+            )
+
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 FileLinkView(
                     viewState = uiState,
                     onBackPressed = { onBackPressedDispatcher.onBackPressed() },
                     onShareClicked = ::onShareClicked,
-                    onPreviewClick = { },
+                    onPreviewClick = { viewModel.onPreviewClick(this@FileLinkComposeActivity) },
                     onSaveToDeviceClicked = { },
                     onImportClicked = { },
                 )
@@ -102,6 +111,23 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Open the file in a separate activity
+     *
+     * @param intent    Intent of the activity to open
+     */
+    private fun onOpenFile(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(
+                this,
+                getString(R.string.intent_not_available),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 

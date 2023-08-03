@@ -35,39 +35,7 @@ internal class FileLinkRepositoryImpl @Inject constructor(
 ) : FileLinkRepository {
 
     override suspend fun getPublicNode(url: String) = withContext(ioDispatcher) {
-        val result = suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request: MegaRequest, error: MegaError ->
-                    when (error.errorCode) {
-                        MegaError.API_OK -> {
-                            continuation.resumeWith(Result.success(request))
-                        }
-
-                        MegaError.API_EBLOCKED -> {
-                            continuation.resumeWith(Result.failure(PublicNodeException.LinkRemoved()))
-                        }
-
-                        MegaError.API_ETOOMANY -> {
-                            continuation.resumeWith(Result.failure(PublicNodeException.AccountTerminated()))
-                        }
-
-                        MegaError.API_EINCOMPLETE -> {
-                            continuation.resumeWith(Result.failure(PublicNodeException.DecryptionKeyRequired()))
-                        }
-
-                        else -> {
-                            continuation.resumeWith(Result.failure(PublicNodeException.GenericError()))
-                        }
-                    }
-                }
-            )
-            megaApiGateway.getPublicNode(url, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-
-        val publicNode = result.publicMegaNode
+        val publicNode = getPublicMegaNode(nodeFileLink = url)
         if (publicNode.handle != MegaApiJava.INVALID_HANDLE) {
             megaLocalStorageGateway.setLastPublicHandle(publicNode.handle)
             megaLocalStorageGateway.setLastPublicHandleTimeStamp()
@@ -126,6 +94,44 @@ internal class FileLinkRepositoryImpl @Inject constructor(
                 }
                 megaApiGateway.encryptLinkWithPassword(link, password, listener)
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
+
+    override suspend fun getFileUrlByPublicLink(link: String): String? =
+        getPublicMegaNode(link).let { node ->
+            megaApiGateway.httpServerGetLocalLink(node)
+        }
+
+    private suspend fun getPublicMegaNode(nodeFileLink: String): MegaNode =
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resumeWith(Result.success(request.publicMegaNode))
+                        }
+
+                        MegaError.API_EBLOCKED -> {
+                            continuation.resumeWith(Result.failure(PublicNodeException.LinkRemoved()))
+                        }
+
+                        MegaError.API_ETOOMANY -> {
+                            continuation.resumeWith(Result.failure(PublicNodeException.AccountTerminated()))
+                        }
+
+                        MegaError.API_EINCOMPLETE -> {
+                            continuation.resumeWith(Result.failure(PublicNodeException.DecryptionKeyRequired()))
+                        }
+
+                        else -> {
+                            continuation.resumeWith(Result.failure(PublicNodeException.GenericError()))
+                        }
+                    }
+                }
+            )
+            megaApiGateway.getPublicNode(nodeFileLink, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
             }
         }
 }

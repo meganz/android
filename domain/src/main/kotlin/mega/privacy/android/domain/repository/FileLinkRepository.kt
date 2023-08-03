@@ -21,4 +21,12 @@ interface FileLinkRepository {
      * @param password
      */
     suspend fun encryptLinkWithPassword(link: String, password: String): String
+
+    /**
+     * Get file url by public link
+     *
+     * @param link public file link
+     * @return local link
+     */
+    suspend fun getFileUrlByPublicLink(link: String): String?
 }

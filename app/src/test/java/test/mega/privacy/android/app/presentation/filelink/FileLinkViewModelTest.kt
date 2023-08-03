@@ -1,8 +1,10 @@
 package test.mega.privacy.android.app.presentation.filelink
 
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -15,6 +17,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
+import mega.privacy.android.app.presentation.mapper.GetIntentFromFileLinkToOpenFileMapper
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -44,6 +47,8 @@ class FileLinkViewModelTest {
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
+    private val getIntentFromFileLinkToOpenFileMapper =
+        mock<GetIntentFromFileLinkToOpenFileMapper>()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -67,7 +72,8 @@ class FileLinkViewModelTest {
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
             getNodeByHandle = getNodeByHandle,
-            getPublicNodeUseCase = getPublicNodeUseCase
+            getPublicNodeUseCase = getPublicNodeUseCase,
+            getIntentFromFileLinkToOpenFileMapper = getIntentFromFileLinkToOpenFileMapper
         )
     }
 
@@ -80,6 +86,7 @@ class FileLinkViewModelTest {
             assertThat(initial.url).isEmpty()
             assertThat(initial.title).isEmpty()
             assertThat(initial.sizeInBytes).isEqualTo(0)
+            assertThat(initial.handle).isEqualTo(-1)
             assertThat(initial.previewPath).isNull()
             assertThat(initial.iconResource).isNull()
             assertThat(initial.askForDecryptionDialog).isFalse()
@@ -87,6 +94,7 @@ class FileLinkViewModelTest {
             assertThat(initial.collisionCheckThrowable).isNull()
             assertThat(initial.copyThrowable).isNull()
             assertThat(initial.copySuccess).isFalse()
+            assertThat(initial.openFile).isInstanceOf(consumed<Intent>().javaClass)
         }
     }
 
@@ -308,4 +316,13 @@ class FileLinkViewModelTest {
                 assertThat(newValue.askForDecryptionDialog).isEqualTo(false)
             }
         }
+
+    @Test
+    fun `test that openFile should be reset to consumed when resetOpenFile is invoked`() = runTest {
+        underTest.state.test {
+            underTest.resetOpenFile()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.openFile).isInstanceOf(consumed<Intent>().javaClass)
+        }
+    }
 }

@@ -227,4 +227,27 @@ class FileLinkRepositoryImplTest {
                 )
             }
         }
+
+    @Test
+    fun `test that correct local link is returned when getFileUrlByPublicLink is invoked`() =
+        runTest {
+            val publicNodeLink = "https://mega.co.nz/abc"
+            val publicNode = mock<MegaNode>()
+            val localLink = "Local Link"
+
+            val megaRequest = mock<MegaRequest> {
+                on { publicMegaNode }.thenReturn(publicNode)
+            }
+            val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+
+            whenever(megaApiGateway.getPublicNode(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                )
+            }
+            whenever(megaApiGateway.httpServerGetLocalLink(publicNode)).thenReturn(localLink)
+            assertThat(underTest.getFileUrlByPublicLink(publicNodeLink)).isEqualTo(localLink)
+        }
 }

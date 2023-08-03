@@ -1,9 +1,12 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import android.app.Activity
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,6 +17,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
+import mega.privacy.android.app.presentation.mapper.GetIntentFromFileLinkToOpenFileMapper
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
@@ -38,6 +42,7 @@ class FileLinkViewModel @Inject constructor(
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
+    private val getIntentFromFileLinkToOpenFileMapper: GetIntentFromFileLinkToOpenFileMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -212,4 +217,24 @@ class FileLinkViewModel @Inject constructor(
     private fun resetJobInProgressState() {
         _state.update { it.copy(jobInProgressState = null) }
     }
+
+    /**
+     * Handle preview content click
+     */
+    fun onPreviewClick(activity: Activity) = viewModelScope.launch {
+        runCatching {
+            with(state.value) {
+                getIntentFromFileLinkToOpenFileMapper(activity, handle, title, sizeInBytes, url)
+            }
+        }.onSuccess { intent ->
+            intent?.let { _state.update { it.copy(openFile = triggered(intent)) } }
+        }.onFailure {
+            Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+        }
+    }
+
+    /**
+     * Reset and notify that openFile event is consumed
+     */
+    fun resetOpenFile() = _state.update { it.copy(openFile = consumed()) }
 }
