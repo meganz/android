@@ -73,13 +73,13 @@ internal class DeviceNodeMapperTest {
         val deviceNodes = listOf(
             OwnDeviceNode(
                 id = currentDeviceId,
-                name = deviceIdAndNameMap[currentDeviceId] ?: "",
+                name = deviceIdAndNameMap[currentDeviceId].orEmpty(),
                 status = currentDeviceStatus,
                 folders = currentDeviceFolderNodes,
             ),
             OtherDeviceNode(
                 id = otherDeviceId,
-                name = deviceIdAndNameMap[otherDeviceId] ?: "",
+                name = deviceIdAndNameMap[otherDeviceId].orEmpty(),
                 status = otherDeviceStatus,
                 folders = otherDeviceFolderNodes,
             ),

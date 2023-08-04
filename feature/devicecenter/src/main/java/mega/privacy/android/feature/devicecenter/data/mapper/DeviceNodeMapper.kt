@@ -39,27 +39,26 @@ internal class DeviceNodeMapper @Inject constructor(
         deviceNodeList.add(
             OwnDeviceNode(
                 id = currentDeviceId,
-                name = deviceIdAndNameMap[currentDeviceId] ?: "",
+                name = deviceIdAndNameMap[currentDeviceId].orEmpty(),
                 status = deviceNodeStatusMapper(currentDeviceFolders),
                 folders = currentDeviceFolders,
             )
         )
 
         // Other Devices
-        val otherDevicesIdAndNameMap =
-            deviceIdAndNameMap.filter { (deviceId) -> deviceId != currentDeviceId }
-        otherDevicesIdAndNameMap.forEach { (otherDeviceId, otherDeviceName) ->
-            val otherDeviceFolders =
-                deviceFolderNodeMapper(backupInfoList.filterBackupInfoByDeviceId(otherDeviceId))
-            deviceNodeList.add(
-                OtherDeviceNode(
-                    id = otherDeviceId,
-                    name = otherDeviceName,
-                    status = deviceNodeStatusMapper(otherDeviceFolders),
-                    folders = otherDeviceFolders,
+        deviceIdAndNameMap.filter { (deviceId) -> deviceId != currentDeviceId }
+            .forEach { (otherDeviceId, otherDeviceName) ->
+                val otherDeviceFolders =
+                    deviceFolderNodeMapper(backupInfoList.filterBackupInfoByDeviceId(otherDeviceId))
+                deviceNodeList.add(
+                    OtherDeviceNode(
+                        id = otherDeviceId,
+                        name = otherDeviceName,
+                        status = deviceNodeStatusMapper(otherDeviceFolders),
+                        folders = otherDeviceFolders,
+                    )
                 )
-            )
-        }
+            }
 
         return deviceNodeList.toList()
     }

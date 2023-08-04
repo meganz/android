@@ -27,7 +27,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
         return backupInfoList.map { backupInfo ->
             DeviceFolderNode(
                 id = backupInfo.id.toString(),
-                name = backupInfo.name ?: "",
+                name = backupInfo.name.orEmpty(),
                 status = backupInfo.getDeviceFolderStatus(currentTime),
             )
         }
