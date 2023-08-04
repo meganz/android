@@ -434,4 +434,8 @@ internal class DefaultTransfersRepository @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
+
+    override suspend fun deleteAllCompletedTransfers() = withContext(ioDispatcher) {
+        megaLocalRoomGateway.deleteAllCompletedTransfers()
+    }
 }

@@ -120,6 +120,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun getCompletedTransfersCount() =
         completedTransferDao.getCompletedTransfersCount()
 
+    override suspend fun deleteAllCompletedTransfers() =
+        completedTransferDao.deleteAllCompletedTransfers()
+
     override suspend fun getActiveTransferByTag(tag: Int) =
         activeTransferDao.getActiveTransferByTag(tag)
 

@@ -642,6 +642,13 @@ class DefaultTransfersRepositoryTest {
             }
         }
 
+    @Test
+    fun `test that deleteAllCompletedTransfers room gateway is called when deleteAllCompletedTransfers is called`(
+    ) = runTest {
+        underTest.deleteAllCompletedTransfers()
+        verify(megaLocalRoomGateway).deleteAllCompletedTransfers()
+    }
+
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class ActiveTransfersTest {

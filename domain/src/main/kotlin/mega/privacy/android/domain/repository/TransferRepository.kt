@@ -369,4 +369,9 @@ interface TransferRepository {
      * @return boolean is pause or resume
      */
     suspend fun pauseTransfers(isPause: Boolean): Boolean
+
+    /**
+     * Delete all completed transfers
+     */
+    suspend fun deleteAllCompletedTransfers()
 }
