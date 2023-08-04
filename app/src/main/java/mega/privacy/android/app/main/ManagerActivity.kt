@@ -2542,22 +2542,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     finish()
                 }
 
-                Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER -> {
-                    fileBrowserViewModel.setBrowserParentHandle(
-                        intent.getLongExtra(
-                            "parentHandle",
-                            -1
-                        )
-                    )
-                    intent.removeExtra("parentHandle")
-
-                    //Refresh Cloud Fragment
-                    refreshCloudDrive()
-
-                    //Refresh Rubbish Fragment
-                    refreshRubbishBin()
-                }
-
                 Constants.ACTION_OVERQUOTA_STORAGE -> {
                     showOverQuotaAlert(false)
                 }

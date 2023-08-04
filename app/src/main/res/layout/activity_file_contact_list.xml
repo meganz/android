@@ -20,59 +20,9 @@
         android:fitsSystemWindows="false">
 
         <RelativeLayout
+            android:id="@+id/file_contact_list_browser_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:id="@+id/file_contact_list_layout"
-                android:layout_width="match_parent"
-                android:layout_height="72dp" >
-
-                <ImageView
-                    android:id="@+id/file_properties_icon"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:scaleType="fitCenter"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="14dp"/>
-
-                <TextView
-                    android:id="@+id/node_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/file_properties_icon"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="24dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    android:singleLine="false" />
-
-                <TextView
-                    android:id="@+id/node_last_update"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/node_name"
-                    android:layout_toRightOf="@id/file_properties_icon"
-                    android:layout_marginLeft="8dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
-                    android:ellipsize="end"
-                    android:maxLines="1"/>
-            </RelativeLayout>
-
-            <View
-                android:id="@+id/separator_file_contact_list"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/grey_012_white_012"
-                android:layout_below="@id/file_contact_list_layout" />
-
-            <RelativeLayout
-                android:id="@+id/file_contact_list_browser_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/separator_file_contact_list">
 
                 <TextView
                     android:id="@+id/file_contact_list_text_warning_message"
@@ -91,22 +41,20 @@
                     android:layout_below="@id/file_contact_list_text_warning_message"
                     android:choiceMode="multipleChoice" />
 
-                <ImageView
-                    android:id="@+id/file_contact_list_empty_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
+            <ImageView
+                android:id="@+id/file_contact_list_empty_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
 
-                <TextView
-                    android:id="@+id/file_contact_list_empty_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/file_contact_list_empty_image"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/standard_margin"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
-            </RelativeLayout>
-
+            <TextView
+                android:id="@+id/file_contact_list_empty_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/file_contact_list_empty_image"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/standard_margin"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
         </RelativeLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

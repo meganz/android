@@ -65,8 +65,7 @@ import java.io.File
  * File Version list activity
  */
 @AndroidEntryPoint
-class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, View.OnClickListener,
-    MegaGlobalListenerInterface, SnackbarShower {
+class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, MegaGlobalListenerInterface, SnackbarShower {
 
     private lateinit var binding: ActivityVersionsFileBinding
 
@@ -805,20 +804,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
     fun hideMultipleSelect() {
         adapter?.isMultipleSelect = false
         actionMode?.finish()
-    }
-
-    override fun onClick(v: View) {
-        when (v.id) {
-            R.id.file_contact_list_layout -> {
-                val i = Intent(this, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER
-                    putExtra("parentHandle", node?.handle)
-                }
-
-                startActivity(i)
-                finish()
-            }
-        }
     }
 
     fun notifyDataSetChanged() {

@@ -11,7 +11,6 @@ import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSION
 import static mega.privacy.android.app.listeners.ShareListener.REMOVE_SHARE_LISTENER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
 import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTACT;
@@ -36,7 +35,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -67,14 +65,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import javax.inject.Inject;
-
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -84,16 +77,10 @@ import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener;
-import mega.privacy.android.app.namecollision.data.NameCollision;
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.contact.FileContactListActivityExtensionKt;
 import mega.privacy.android.app.presentation.contact.FileContactListViewModel;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
-import mega.privacy.android.app.usecase.UploadUseCase;
-import mega.privacy.android.app.utils.AlertDialogUtil;
-import mega.privacy.android.app.utils.permission.PermissionUtils;
-import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -109,11 +96,6 @@ import timber.log.Timber;
 @AndroidEntryPoint
 public class FileContactListActivity extends PasscodeActivity implements OnClickListener, MegaGlobalListenerInterface, FileContactsListBottomSheetDialogListener {
 
-    @Inject
-    CheckNameCollisionUseCase checkNameCollisionUseCase;
-    @Inject
-    UploadUseCase uploadUseCase;
-
     public FileContactListViewModel viewModel;
 
     private ContactController contactController;
@@ -123,13 +105,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     FileContactListActivity fileContactListActivity = this;
     MegaShare selectedShare;
 
-    TextView nameView;
-    ImageView imageView;
-    TextView createdView;
-
     CoordinatorLayout coordinatorLayout;
     RelativeLayout container;
-    RelativeLayout contactLayout;
     RecyclerView listView;
     LinearLayoutManager mLayoutManager;
     ImageView emptyImage;
@@ -155,8 +132,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
     AlertDialog statusDialog;
     AlertDialog permissionsDialog;
-
-    private List<ShareInfo> filePreparedInfos;
 
     MenuItem addSharingContact;
     MenuItem selectMenuItem;
@@ -379,19 +354,11 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
             coordinatorLayout = findViewById(R.id.coordinator_layout_file_contact_list);
             container = findViewById(R.id.file_contact_list);
-            imageView = findViewById(R.id.file_properties_icon);
-            nameView = findViewById(R.id.node_name);
-            createdView = findViewById(R.id.node_last_update);
-            contactLayout = findViewById(R.id.file_contact_list_layout);
-            contactLayout.setVisibility(View.GONE);
-            warningText = findViewById(R.id.file_contact_list_text_warning_message);
-            findViewById(R.id.separator_file_contact_list).setVisibility(View.GONE);
 
             fab = findViewById(R.id.floating_button_file_contact_list);
             fab.setOnClickListener(this);
 
-            nameView.setText(node.getName());
-            imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+            warningText = findViewById(R.id.file_contact_list_text_warning_message);
 
             listView = findViewById(R.id.file_contact_list_view_browser);
             listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
@@ -412,17 +379,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             emptyText = findViewById(R.id.file_contact_list_empty_text);
             emptyImage.setImageResource(R.drawable.ic_empty_contacts);
             emptyText.setText(R.string.contacts_list_empty_text);
-
-            if (node.getCreationTime() != 0) {
-                try {
-                    createdView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));
-                } catch (Exception ex) {
-                    createdView.setText("");
-                }
-
-            } else {
-                createdView.setText("");
-            }
         }
 
         contactController = new ContactController(this);
@@ -753,60 +709,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         }
     }
 
-    /*
-     * Handle processed upload intent
-     */
-    public void onIntentProcessed() {
-        List<ShareInfo> infos = filePreparedInfos;
-
-        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-        if (parentNode == null) {
-            AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-            showSnackbar(getString(R.string.error_temporary_unavaible));
-            return;
-        }
-
-        if (infos == null) {
-            AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-            showSnackbar(getString(R.string.upload_can_not_open));
-            return;
-        }
-
-        if (viewModel.getStorageState() == StorageState.PayWall) {
-            AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-            showOverDiskQuotaPaywallWarning();
-            return;
-        }
-
-        composite.add(checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-
-                    if (throwable != null) {
-                        showSnackbar(getString(R.string.error_temporary_unavaible));
-                    } else {
-                        ArrayList<NameCollision> collisions = result.getFirst();
-                        List<ShareInfo> withoutCollisions = result.getSecond();
-
-                        if (!collisions.isEmpty()) {
-                            nameCollisionActivityContract.launch(collisions);
-                        }
-
-                        if (!withoutCollisions.isEmpty()) {
-                            PermissionUtils.checkNotificationsPermission(this);
-                            String text = getResources().getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
-
-                            composite.add(uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(() -> showSnackbar(text), Timber::e));
-                        }
-                    }
-                }));
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
@@ -973,7 +875,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     }
 
     public void showSnackbar(String s) {
-        showSnackbar(contactLayout, s);
+        showSnackbar(container, s);
     }
 
     public MegaUser getSelectedContact() {

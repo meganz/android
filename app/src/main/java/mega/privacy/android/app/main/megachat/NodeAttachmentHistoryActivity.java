@@ -7,7 +7,6 @@ import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogI
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
-import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.FORWARD_ONLY_OPTION;
@@ -92,7 +91,6 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
@@ -125,7 +123,7 @@ import timber.log.Timber;
 
 @AndroidEntryPoint
 public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
-        MegaChatRequestListenerInterface, OnClickListener, MegaChatNodeHistoryListenerInterface,
+        MegaChatRequestListenerInterface, MegaChatNodeHistoryListenerInterface,
         StoreDataBeforeForward<ArrayList<MegaChatMessage>>, SnackbarShower {
 
     @Inject
@@ -748,16 +746,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         adapter.setMultipleSelect(false);
         if (actionMode != null) {
             actionMode.finish();
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.file_contact_list_layout) {
-            Intent i = new Intent(this, ManagerActivity.class);
-            i.setAction(ACTION_REFRESH_PARENTHANDLE_BROWSER);
-            startActivity(i);
-            finish();
         }
     }
 
