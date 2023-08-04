@@ -69,7 +69,6 @@ fun ArchivedChatsView(
                 ChatRoomItemBottomSheetView(
                     item = item,
                     onUnarchiveClick = { onItemUnarchived(item.chatId).also { hideSheet() } },
-                    isCancelSchedMeetingEnabled = false,
                 )
             } else {
                 hideSheet()

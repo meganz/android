@@ -12,11 +12,9 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
@@ -104,9 +102,6 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
-        val isCancelSchedMeetingEnabled = runBlocking {
-            getFeatureFlagValueUseCase(AppFeatures.CancelSchedMeeting)
-        }
         AndroidTheme(isDark = isDark) {
             RecurringMeetingInfoView(
                 state = uiState,
@@ -114,7 +109,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onBackPressed = { finish() },
                 onOccurrenceClicked = { occurrence ->
-                    if (managementState.chatRoom?.ownPrivilege == ChatRoomPermission.Moderator && isCancelSchedMeetingEnabled) {
+                    if (managementState.chatRoom?.ownPrivilege == ChatRoomPermission.Moderator) {
                         scheduledMeetingManagementViewModel.let {
                             it.onOccurrenceTap(occurrence)
                             managementState.chatId?.let { chatId ->

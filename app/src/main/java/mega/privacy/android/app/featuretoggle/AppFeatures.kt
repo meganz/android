@@ -31,14 +31,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables the options to cancel scheduled meeting and cancel an occurrence
-     */
-    CancelSchedMeeting(
-        "Enables the options to cancel scheduled meeting and cancel an occurrence",
-        false
-    ),
-
-    /**
      * Enables DownloadWorker for download nodes, instead of DownloadService. This is a work in progress feature.
      */
     DownloadWorker(

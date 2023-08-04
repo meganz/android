@@ -61,7 +61,6 @@ internal fun ChatRoomItemBottomSheetView(
     onUnarchiveClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
     onLeaveClick: () -> Unit = {},
-    isCancelSchedMeetingEnabled: Boolean,
 ) {
     if (item == null) {
         Text(
@@ -262,7 +261,7 @@ internal fun ChatRoomItemBottomSheetView(
             )
 
             when {
-                canCancel(item, isCancelSchedMeetingEnabled) -> {
+                canCancel(item) -> {
 
                     ChatDivider()
                     MenuItem(
@@ -295,10 +294,9 @@ internal fun ChatRoomItemBottomSheetView(
  * Check if can cancel the scheduled meeting
  *
  * @param item  [ChatRoomItem] of the scheduled meeting
- * @param isCancelSchedMeetingEnabled   Cancel scheduled meeting feature flag status
  */
-private fun canCancel(item: ChatRoomItem?, isCancelSchedMeetingEnabled: Boolean): Boolean =
-    item is ChatRoomItem.MeetingChatRoomItem && item.isPending && item.hasPermissions && isCancelSchedMeetingEnabled
+private fun canCancel(item: ChatRoomItem?): Boolean =
+    item is ChatRoomItem.MeetingChatRoomItem && item.isPending && item.hasPermissions
 
 @Composable
 private fun MenuItem(
@@ -360,7 +358,6 @@ private fun PreviewIndividualChatRoomItemBottomSheetView() {
             hasPermissions = true,
             isMuted = Random.nextBoolean(),
         ),
-        isCancelSchedMeetingEnabled = true,
     )
 }
 
@@ -379,7 +376,6 @@ private fun PreviewGroupChatRoomItemBottomSheetView() {
             isMuted = Random.nextBoolean(),
             isPublic = Random.nextBoolean(),
         ),
-        isCancelSchedMeetingEnabled = true,
     )
 }
 
@@ -400,7 +396,6 @@ private fun PreviewMeetingChatRoomItemBottomSheetView() {
             isRecurringMonthly = Random.nextBoolean(),
             isPublic = Random.nextBoolean(),
         ),
-        isCancelSchedMeetingEnabled = true,
     )
 }
 
@@ -419,6 +414,5 @@ private fun PreviewArchivedChatRoomItemBottomSheetView() {
             isMuted = Random.nextBoolean(),
             isArchived = true,
         ),
-        isCancelSchedMeetingEnabled = true,
     )
 }
