@@ -64,10 +64,11 @@ import javax.inject.Inject
  * @property createChatLink                             [CreateChatLink]
  * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
  * @property monitorChatListItemUpdates                 [MonitorChatListItemUpdates]
- * @property monitorChatListItemUpdates                 [MegaChatApiGateway]
- * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
+ * @property megaChatApiGateway                         [MegaChatApiGateway]
  * @property updateOccurrenceUseCase                    [UpdateOccurrenceUseCase]
- * @property broadcastScheduledMeetingCancelledUseCase  [BroadcastScheduledMeetingCanceledUseCase]
+ * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
+ * @property monitorChatRoomUpdates                     [MonitorChatRoomUpdates]
+ * @property broadcastScheduledMeetingCanceledUseCase   [BroadcastScheduledMeetingCanceledUseCase]
  * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
  * @property state                                      Current view state as [ScheduledMeetingManagementState]setWaitingRoom
  */
@@ -89,7 +90,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val updateOccurrenceUseCase: UpdateOccurrenceUseCase,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
-    private val broadcastScheduledMeetingCancelledUseCase: BroadcastScheduledMeetingCanceledUseCase,
+    private val broadcastScheduledMeetingCanceledUseCase: BroadcastScheduledMeetingCanceledUseCase,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScheduledMeetingManagementState())
@@ -303,7 +304,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             }
         }.onSuccess {
             _state.update { it.copy(finish = true) }
-            broadcastScheduledMeetingCancelledUseCase(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar)
+            broadcastScheduledMeetingCanceledUseCase(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar)
         }.onFailure { exception ->
             Timber.e(exception)
             triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
@@ -320,7 +321,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             }
         }.onSuccess {
             _state.update { it.copy(finish = true) }
-            broadcastScheduledMeetingCancelledUseCase(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar)
+            broadcastScheduledMeetingCanceledUseCase(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar)
         }.onFailure { exception ->
             Timber.e(exception)
             triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))

@@ -4,9 +4,9 @@ import mega.privacy.android.domain.repository.CallRepository
 import javax.inject.Inject
 
 /**
- * Use case for monitoring when a recurring scheduled meeting with a single occurrence is canceled.
+ * Use case for monitoring when a recurring scheduled meeting is canceled.
  */
-class MonitorSingleOccurrenceScheduledMeetingCancelledUseCase @Inject constructor(
+class MonitorScheduledMeetingCanceledUseCase @Inject constructor(
     private val callRepository: CallRepository,
 ) {
     /**

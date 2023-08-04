@@ -139,10 +139,8 @@ class ChatTabsFragment : Fragment() {
                         onItemClick = ::onItemClick,
                         onItemMoreClick = ::onItemMoreClick,
                         onItemSelected = ::onItemSelected,
-                        onResetSnackbarMessage = {
-                            viewModel.onSnackbarMessageConsumed()
-                            scheduledMeetingManagementViewModel.onSnackbarMessageConsumed()
-                        },
+                        onResetStateSnackbarMessage = viewModel::onSnackbarMessageConsumed,
+                        onResetManagementStateSnackbarMessage = scheduledMeetingManagementViewModel::onSnackbarMessageConsumed,
                         onCancelScheduledMeeting = {
                             scheduledMeetingManagementViewModel.onCancelScheduledMeeting()
                             onDismissDialog()

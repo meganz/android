@@ -17,7 +17,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
@@ -68,7 +67,8 @@ fun ChatTabsView(
     onItemClick: (Long) -> Unit = {},
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
-    onResetSnackbarMessage: () -> Unit = {},
+    onResetStateSnackbarMessage: () -> Unit = {},
+    onResetManagementStateSnackbarMessage: () -> Unit = {},
     onCancelScheduledMeeting: () -> Unit = {},
     onDismissDialog: () -> Unit = {},
     onStartChatClick: () -> Unit = {},
@@ -86,13 +86,16 @@ fun ChatTabsView(
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost = { hostState ->
-            SnackbarHost(hostState = hostState) { data ->
-                Snackbar(
-                    snackbarData = data,
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    backgroundColor = MaterialTheme.colors.onPrimary,
-                )
-            }
+            SnackbarHost(
+                hostState = hostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        backgroundColor = MaterialTheme.colors.onPrimary,
+                    )
+                }
+            )
         },
         floatingActionButton = {
             if (state.tooltip == MeetingTooltipItem.CREATE && pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
@@ -191,13 +194,14 @@ fun ChatTabsView(
             }
 
             EventEffect(
-                event = state.snackbarMessageContent, onConsumed = onResetSnackbarMessage
+                event = state.snackbarMessageContent, onConsumed = onResetStateSnackbarMessage
             ) { resId ->
                 scaffoldState.snackbarHostState.showSnackbar(context.resources.getString(resId))
             }
 
             EventEffect(
-                event = managementState.snackbarMessageContent, onConsumed = onResetSnackbarMessage
+                event = managementState.snackbarMessageContent,
+                onConsumed = onResetManagementStateSnackbarMessage
             ) {
                 scaffoldState.snackbarHostState.showSnackbar(it)
             }

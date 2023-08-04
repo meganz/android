@@ -45,7 +45,7 @@ import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorSingleOccurrenceScheduledMeetingCancelledUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import timber.log.Timber
@@ -74,7 +74,7 @@ import javax.inject.Inject
  * @property getMeetingTooltipsUseCase
  * @property setNextMeetingTooltipUseCase
  * @property getFeatureFlagValue
- * @property monitorSingleOccurrenceScheduledMeetingCancelledUseCase
+ * @property monitorScheduledMeetingCanceledUseCase
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -98,7 +98,7 @@ class ChatTabsViewModel @Inject constructor(
     private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase,
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
-    private val monitorSingleOccurrenceScheduledMeetingCancelledUseCase: MonitorSingleOccurrenceScheduledMeetingCancelledUseCase,
+    private val monitorScheduledMeetingCanceledUseCase: MonitorScheduledMeetingCanceledUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -116,7 +116,7 @@ class ChatTabsViewModel @Inject constructor(
         retrieveTooltips()
 
         viewModelScope.launch {
-            monitorSingleOccurrenceScheduledMeetingCancelledUseCase().conflate()
+            monitorScheduledMeetingCanceledUseCase().conflate()
                 .collect { messageResId -> triggerSnackbarMessage(messageResId) }
         }
     }
