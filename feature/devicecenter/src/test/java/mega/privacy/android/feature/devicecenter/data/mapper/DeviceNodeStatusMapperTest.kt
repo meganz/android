@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.domain.mapper
+package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState

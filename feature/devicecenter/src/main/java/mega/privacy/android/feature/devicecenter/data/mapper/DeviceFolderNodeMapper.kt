@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.domain.mapper
+package mega.privacy.android.feature.devicecenter.data.mapper
 
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoHeartbeatStatus
@@ -14,7 +14,7 @@ import javax.inject.Inject
 /**
  * Mapper that converts a list of [BackupInfo] objects into a list of [DeviceFolderNode] objects
  */
-class DeviceFolderNodeMapper @Inject constructor() {
+internal class DeviceFolderNodeMapper @Inject constructor() {
 
     /**
      * Invocation function

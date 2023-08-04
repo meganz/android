@@ -6,8 +6,10 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.feature.devicecenter.data.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupDeviceNamesMapper
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupInfoListMapper
+import mega.privacy.android.feature.devicecenter.data.mapper.DeviceNodeMapper
 import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
 import nz.mega.sdk.MegaApiJava
 import javax.inject.Inject
@@ -17,12 +19,14 @@ import javax.inject.Inject
  *
  * @property backupDeviceNamesMapper [BackupDeviceNamesMapper]
  * @property backupInfoListMapper [BackupInfoListMapper]
+ * @property deviceNodeMapper [DeviceNodeMapper]
  * @property ioDispatcher [CoroutineDispatcher]
  * @property megaApiGateway [MegaApiGateway]
  */
 internal class DeviceCenterRepositoryImpl @Inject constructor(
     private val backupDeviceNamesMapper: BackupDeviceNamesMapper,
     private val backupInfoListMapper: BackupInfoListMapper,
+    private val deviceNodeMapper: DeviceNodeMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaApiGateway: MegaApiGateway,
 ) : DeviceCenterRepository {
@@ -36,6 +40,18 @@ internal class DeviceCenterRepositoryImpl @Inject constructor(
                 megaApiGateway.removeRequestListener(listener)
             }
         }
+    }
+
+    override suspend fun getDevices(
+        currentDeviceId: String,
+        backupInfoList: List<BackupInfo>,
+        deviceIdAndNameMap: Map<String, String>,
+    ) = withContext(ioDispatcher) {
+        deviceNodeMapper(
+            currentDeviceId = currentDeviceId,
+            backupInfoList = backupInfoList,
+            deviceIdAndNameMap = deviceIdAndNameMap,
+        )
     }
 
     override suspend fun getDeviceId() = withContext(ioDispatcher) {

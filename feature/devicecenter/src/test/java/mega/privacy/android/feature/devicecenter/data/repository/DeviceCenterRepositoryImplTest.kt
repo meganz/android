@@ -9,6 +9,9 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupDeviceNamesMapper
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupInfoListMapper
+import mega.privacy.android.feature.devicecenter.data.mapper.DeviceNodeMapper
+import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
+import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBackupInfoList
@@ -42,6 +45,7 @@ internal class DeviceCenterRepositoryImplTest {
 
     private val backupDeviceNamesMapper = mock<BackupDeviceNamesMapper>()
     private val backupInfoListMapper = mock<BackupInfoListMapper>()
+    private val deviceNodeMapper = mock<DeviceNodeMapper>()
     private val megaApiGateway = mock<MegaApiGateway>()
 
     private val deviceId = "12345-6789"
@@ -52,6 +56,7 @@ internal class DeviceCenterRepositoryImplTest {
         underTest = DeviceCenterRepositoryImpl(
             backupDeviceNamesMapper = backupDeviceNamesMapper,
             backupInfoListMapper = backupInfoListMapper,
+            deviceNodeMapper = deviceNodeMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
             megaApiGateway = megaApiGateway,
         )
@@ -59,7 +64,7 @@ internal class DeviceCenterRepositoryImplTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(backupDeviceNamesMapper, backupInfoListMapper, megaApiGateway)
+        reset(backupDeviceNamesMapper, backupInfoListMapper, deviceNodeMapper, megaApiGateway)
     }
 
     @Test
@@ -88,6 +93,34 @@ internal class DeviceCenterRepositoryImplTest {
 
         verifyNoInteractions(backupInfoListMapper)
         assertThrows<MegaException> { underTest.getBackupInfo() }
+    }
+
+    @Test
+    fun `test that get devices returns the list of backup devices`() = runTest {
+        val currentDeviceId = "12345-6789"
+        val backupInfoList = listOf<BackupInfo>(
+            mock()
+        )
+        val deviceIdAndNameMap = mapOf(currentDeviceId to "Device Name One")
+        val deviceNodes = listOf(
+            mock<OwnDeviceNode>(),
+            mock<OtherDeviceNode>()
+        )
+
+        whenever(
+            deviceNodeMapper(
+                currentDeviceId = currentDeviceId,
+                backupInfoList = backupInfoList,
+                deviceIdAndNameMap = deviceIdAndNameMap,
+            )
+        ).thenReturn(deviceNodes)
+        assertThat(
+            underTest.getDevices(
+                currentDeviceId = currentDeviceId,
+                backupInfoList = backupInfoList,
+                deviceIdAndNameMap = deviceIdAndNameMap,
+            )
+        ).isEqualTo(deviceNodes)
     }
 
     @ParameterizedTest(name = "deviceId: \"{0}\"")

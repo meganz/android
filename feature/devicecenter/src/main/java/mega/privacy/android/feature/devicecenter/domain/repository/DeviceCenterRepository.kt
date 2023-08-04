@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.devicecenter.domain.repository
 
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfo
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceNode
 
 /**
  * Repository class that provides several functions for Device Center Use Cases
@@ -13,6 +14,21 @@ interface DeviceCenterRepository {
      * @return A list of [BackupInfo] objects
      */
     suspend fun getBackupInfo(): List<BackupInfo>
+
+    /**
+     * Retrieves all of the User's Backup Devices
+     *
+     * @param currentDeviceId The Device ID of the Current Device being used
+     * @param backupInfoList A list of [BackupInfo] objects
+     * @param deviceIdAndNameMap A [Map] whose Key-Value Pair consists of the Device ID and Device Name
+     *
+     * @return A list of [DeviceNode] objects
+     */
+    suspend fun getDevices(
+        currentDeviceId: String,
+        backupInfoList: List<BackupInfo>,
+        deviceIdAndNameMap: Map<String, String>,
+    ): List<DeviceNode>
 
     /**
      * Retrieves the Device ID of the current Device

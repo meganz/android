@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.domain.mapper
+package mega.privacy.android.feature.devicecenter.data.mapper
 
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
@@ -8,7 +8,7 @@ import javax.inject.Inject
  * Given a list of [DeviceFolderNode] objects, this Mapper that returns a specific Device Status
  * based on a given priority number
  */
-class DeviceNodeStatusMapper @Inject constructor() {
+internal class DeviceNodeStatusMapper @Inject constructor() {
     /**
      * Invocation function
      *
