@@ -417,6 +417,7 @@ import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
+import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -565,6 +566,9 @@ public class ChatActivity extends PasscodeActivity
 
     @Inject
     NotificationManagerCompat notificationManager;
+
+    @Inject
+    HasMediaPermissionUseCase hasMediaPermissionUseCase;
 
     private ChatViewModel viewModel;
 
@@ -3788,7 +3792,7 @@ public class ChatActivity extends PasscodeActivity
 
             case REQUEST_READ_STORAGE:
                 if (isBottomSheetDialogShown(bottomSheetDialogFragment) && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
-                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).getViewModel().updatePermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE, grantResults[0] == PackageManager.PERMISSION_GRANTED);
+                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).getViewModel().updatePermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE, hasMediaPermissionUseCase.invoke());
                 }
                 break;
 

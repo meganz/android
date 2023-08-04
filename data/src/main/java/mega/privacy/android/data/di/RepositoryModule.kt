@@ -28,7 +28,6 @@ import mega.privacy.android.data.repository.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
 import mega.privacy.android.data.repository.DefaultQRCodeRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
-import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.DefaultSettingsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
@@ -44,6 +43,8 @@ import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
+import mega.privacy.android.data.repository.PermissionRepositoryImpl
+import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
@@ -75,6 +76,7 @@ import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
+import mega.privacy.android.domain.repository.PermissionRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
@@ -251,5 +253,7 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindRemotePreferencesRepository(implementation: RemotePreferencesRepositoryImpl): RemotePreferencesRepository
 
-
+    @Binds
+    @Singleton
+    abstract fun bindPermissionRepository(implementation: PermissionRepositoryImpl): PermissionRepository
 }

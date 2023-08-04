@@ -81,6 +81,7 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
+import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DeleteThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GeneratePreviewUseCase
@@ -196,6 +197,7 @@ class CameraUploadsWorkerTest {
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val performanceReporter: PerformanceReporter = mock()
+    private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
 
     @Before
     fun setUp() {
@@ -301,6 +303,7 @@ class CameraUploadsWorkerTest {
             deleteThumbnailUseCase = deleteThumbnailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             performanceReporter = performanceReporter,
+            hasMediaPermissionUseCase = hasMediaPermissionUseCase
         )
     }
 

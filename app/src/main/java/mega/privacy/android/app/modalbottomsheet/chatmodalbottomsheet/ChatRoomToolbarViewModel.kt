@@ -6,14 +6,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAllGalleryImages
 import mega.privacy.android.domain.usecase.GetAllGalleryVideos
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -94,6 +96,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
                 true -> {
                     file.copy(hasCameraPermissions = true)
                 }
+
                 else -> file
             }
         }.toMutableList()
@@ -110,6 +113,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
             Manifest.permission.READ_EXTERNAL_STORAGE -> {
                 updateReadStoragePermissions(isGranted)
             }
+
             Manifest.permission.CAMERA -> {
                 updateCameraPermissions(isGranted)
             }
@@ -150,6 +154,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
             if (_hasReadStoragePermissionsGranted.value) {
                 viewModelScope.launch(ioDispatcher) {
                     getAllGalleryVideos()
+                        .catch { Timber.e(it) }
                         .collectLatest { video ->
                             addFile(video)
                         }
@@ -157,6 +162,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
 
                 viewModelScope.launch(ioDispatcher) {
                     getAllGalleryImages()
+                        .catch { Timber.e(it) }
                         .collectLatest { image ->
                             addFile(image)
                         }
@@ -184,6 +190,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
                 fileToUpload.id -> {
                     file.copy(isSelected = !file.isSelected)
                 }
+
                 else -> file
             }
         }.toMutableList()

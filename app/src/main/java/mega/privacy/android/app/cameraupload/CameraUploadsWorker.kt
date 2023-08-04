@@ -1,6 +1,5 @@
 package mega.privacy.android.app.cameraupload
 
-import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -123,6 +122,7 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
+import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DeleteThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GeneratePreviewUseCase
@@ -223,6 +223,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val deletePreviewUseCase: DeletePreviewUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val performanceReporter: PerformanceReporter,
+    private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -381,7 +382,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 performanceEnabled =
                     getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPerformance)
                 initService()
-                if (hasMediaPermission() && isLoginSuccessful() && canRunCameraUploads()) {
+                if (hasMediaPermissionUseCase() && isLoginSuccessful() && canRunCameraUploads()) {
                     Timber.d("Calling startWorker() successful. Starting Camera Uploads")
                     cancelNotifications()
 
@@ -515,35 +516,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 && isSecondaryFolderConfigured()
                 && areCameraUploadsSyncHandlesEstablished()
                 && areFoldersCheckedAndEstablished()
-
-    /**
-     * Check if the device has the required permission
-     *
-     * @return true if the device has the required permission
-     */
-    private fun hasMediaPermission(): Boolean {
-        val hasMediaPermissions =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                permissionsGateway.hasPermissions(
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                ) || permissionsGateway.hasPermissions(
-                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
-                )
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                permissionsGateway.hasPermissions(
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                )
-            } else {
-                permissionsGateway.hasPermissions(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                )
-            }
-        return hasMediaPermissions.also {
-            Timber.d("Device has required permissions $it")
-        }
-    }
 
     /**
      * Check if the account has enough cloud storage space
