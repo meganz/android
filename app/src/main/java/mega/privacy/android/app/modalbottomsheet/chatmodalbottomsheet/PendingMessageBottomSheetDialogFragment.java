@@ -19,10 +19,10 @@ import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.megachat.ChatActivity;
-import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.domain.entity.chat.PendingMessage;
+import mega.privacy.android.domain.entity.chat.PendingMessageState;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaTransfer;
 import timber.log.Timber;
 
 public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -61,8 +61,8 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
 
         LinearLayout separator = contentView.findViewById(R.id.separator);
 
-        PendingMessageSingle pMsg = dbH.findPendingMessageById(messageId);
-        isUploadingMessage = pMsg != null && pMsg.getState() != PendingMessageSingle.STATE_ERROR_UPLOADING && pMsg.getState() != PendingMessageSingle.STATE_ERROR_ATTACHING;
+        PendingMessage pMsg = dbH.findPendingMessageById(messageId);
+        isUploadingMessage = pMsg != null && pMsg.getState() != PendingMessageState.ERROR_UPLOADING.getValue() && pMsg.getState() != PendingMessageState.ERROR_ATTACHING.getValue();
 
         if (isUploadingMessage) {
             if (dbH.getTransferQueueStatus()) {

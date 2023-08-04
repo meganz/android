@@ -152,7 +152,6 @@ import java.util.Map;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -172,7 +171,6 @@ import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.MessageVoiceClip;
-import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService;
 import mega.privacy.android.app.objects.GifData;
@@ -185,6 +183,8 @@ import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting;
+import mega.privacy.android.domain.entity.chat.PendingMessage;
+import mega.privacy.android.domain.entity.chat.PendingMessageState;
 import mega.privacy.android.domain.entity.contacts.ContactLink;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1583,8 +1583,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             boolean areTransfersPaused = dbH.getTransferQueueStatus();
 
             if (areTransfersPaused
-                    && message.getPendingMessage().getState() != PendingMessageSingle.STATE_ERROR_UPLOADING
-                    && message.getPendingMessage().getState() != PendingMessageSingle.STATE_ERROR_ATTACHING) {
+                    && message.getPendingMessage().getState() != PendingMessageState.ERROR_UPLOADING.getValue()
+                    && message.getPendingMessage().getState() != PendingMessageState.ERROR_ATTACHING.getValue()) {
                 ((ViewHolderMessageChat) holder).retryAlert.setText(R.string.manual_resume_alert);
             }
 
@@ -1615,7 +1615,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     ((ViewHolderMessageChat) holder).errorUploadingVoiceClip.setVisibility(View.GONE);
                     ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
-                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING || areTransfersPaused) {
+                    if (message.getPendingMessage().getState() == PendingMessageState.ERROR_ATTACHING.getValue() || areTransfersPaused) {
                         ((ViewHolderMessageChat) holder).errorUploadingVoiceClip.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).notAvailableOwnVoiceclip.setVisibility(View.VISIBLE);
@@ -1649,7 +1649,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         }
                     }
 
-                    if (preview == null && (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING
+                    if (preview == null && (message.getPendingMessage().getState() == PendingMessageState.ERROR_UPLOADING.getValue() || message.getPendingMessage().getState() == PendingMessageState.ERROR_ATTACHING.getValue()
                             || areTransfersPaused)) {
                         ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
@@ -1673,25 +1673,18 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(name).getIconResourceId());
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
 
-                    PendingMessageSingle pendingMsg = message.getPendingMessage();
+                    PendingMessage pendingMsg = message.getPendingMessage();
                     Timber.d("State of the message: %s", pendingMsg.getState());
 
                     String state = null;
 
-                    switch (pendingMsg.getState()) {
-                        case PendingMessageSingle.STATE_ERROR_UPLOADING:
-                        case PendingMessageSingle.STATE_ERROR_ATTACHING:
-                            state = context.getString(R.string.attachment_uploading_state_error);
-                            break;
-
-                        case PendingMessageSingle.STATE_COMPRESSING:
-                            state = context.getString(R.string.attachment_uploading_state_compressing);
-                            break;
-
-                        default:
-                            if (!areTransfersPaused) {
-                                state = context.getString(R.string.attachment_uploading_state_uploading);
-                            }
+                    if (pendingMsg.getState() == PendingMessageState.ERROR_UPLOADING.getValue()
+                            || pendingMsg.getState() == PendingMessageState.ERROR_ATTACHING.getValue()) {
+                        state = context.getString(R.string.attachment_uploading_state_error);
+                    } else if (pendingMsg.getState() == PendingMessageState.COMPRESSING.getValue()) {
+                        state = context.getString(R.string.attachment_uploading_state_compressing);
+                    } else if (!areTransfersPaused) {
+                        state = context.getString(R.string.attachment_uploading_state_uploading);
                     }
 
                     if (state != null) {
@@ -7483,7 +7476,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                     boolean areTransfersPaused = dbH.getTransferQueueStatus();
 
-                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING
+                    if (message.getPendingMessage().getState() == PendingMessageState.ERROR_UPLOADING.getValue() || message.getPendingMessage().getState() == PendingMessageState.ERROR_ATTACHING.getValue()
                             || areTransfersPaused) {
                         Timber.w("Message is on ERROR state");
                         holder.urlOwnMessageLayout.setVisibility(View.GONE);

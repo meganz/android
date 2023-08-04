@@ -351,8 +351,6 @@ import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.presentation.chat.ContactInvitation;
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.ChatController;
@@ -379,11 +377,13 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
+import mega.privacy.android.app.presentation.chat.ContactInvitation;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment;
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
+import mega.privacy.android.app.presentation.filelink.FileLinkActivity;
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
@@ -414,6 +414,8 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.chat.FileGalleryItem;
+import mega.privacy.android.domain.entity.chat.PendingMessage;
+import mega.privacy.android.domain.entity.chat.PendingMessageState;
 import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
@@ -1325,9 +1327,9 @@ public class ChatActivity extends PasscodeActivity
 
             long pendingMessageId = intent.getLongExtra(PENDING_MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
             if (pendingMessageId != MEGACHAT_INVALID_HANDLE) {
-                PendingMessageSingle pendingMessage = dbH.findPendingMessageById(pendingMessageId);
+                PendingMessage pendingMessage = dbH.findPendingMessageById(pendingMessageId);
 
-                if (pendingMessage == null || pendingMessage.chatId != idChat) {
+                if (pendingMessage == null || pendingMessage.getChatId() != idChat) {
                     Timber.e("pendingMessage is null or is not the same chat, cannot update it.");
                     return;
                 }
@@ -4174,7 +4176,7 @@ public class ChatActivity extends PasscodeActivity
      *
      * @param pendMsg The pending message.
      */
-    private void retryPendingMessage(PendingMessageSingle pendMsg) {
+    private void retryPendingMessage(PendingMessage pendMsg) {
         if (pendMsg == null) {
             Timber.e("Pending message does not exist");
             showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available,
@@ -4196,7 +4198,7 @@ public class ChatActivity extends PasscodeActivity
 
             // Remove the old message from the UI and DB
             removePendingMsg(pendMsg);
-            PendingMessageSingle pMsgSingle = createAttachmentPendingMessage(idChat,
+            PendingMessage pMsgSingle = createAttachmentPendingMessage(idChat,
                     f.getAbsolutePath(), f.getName(), false);
 
             long idMessageDb = pMsgSingle.getId();
@@ -7252,7 +7254,7 @@ public class ChatActivity extends PasscodeActivity
 
             if (messageToCheck.isUploading()) {
                 // Remove pending uploading messages.
-                megaApi.cancelTransferByTag(messageToCheck.pendingMessage.transferTag);
+                megaApi.cancelTransferByTag(messageToCheck.pendingMessage.getTransferTag());
             } else {
                 break;
             }
@@ -7312,7 +7314,7 @@ public class ChatActivity extends PasscodeActivity
                 continue;
             }
 
-            PendingMessageSingle pendingMsg = msg.getPendingMessage();
+            PendingMessage pendingMsg = msg.getPendingMessage();
 
             if (pendingMsg.getTransferTag() != INVALID_ID) {
                 MegaTransfer transfer = megaApi.getTransferByTag(pendingMsg.getTransferTag());
@@ -7322,18 +7324,18 @@ public class ChatActivity extends PasscodeActivity
 
                 if (transfer == null || transfer.getState() == MegaTransfer.STATE_FAILED) {
                     int tag = transfer != null ? transfer.getTag() : INVALID_ID;
-                    dbH.updatePendingMessage(pendingMsg.getId(), tag, INVALID_OPTION, PendingMessageSingle.STATE_ERROR_UPLOADING);
-                    pendingMsg.setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
+                    dbH.updatePendingMessage(pendingMsg.getId(), tag, INVALID_OPTION, PendingMessageState.ERROR_UPLOADING.getValue());
+                    pendingMsg.setState(PendingMessageState.ERROR_UPLOADING.getValue());
                     msg.setPendingMessage(pendingMsg);
                 } else if (transfer.getState() == MegaTransfer.STATE_COMPLETED || transfer.getState() == MegaTransfer.STATE_CANCELLED) {
-                    dbH.updatePendingMessage(pendingMsg.getId(), transfer.getTag(), INVALID_OPTION, PendingMessageSingle.STATE_SENT);
+                    dbH.updatePendingMessage(pendingMsg.getId(), transfer.getTag(), INVALID_OPTION, PendingMessageState.SENT.getValue());
                     continue;
                 }
-            } else if (pendingMsg.getState() == PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER) {
-                dbH.updatePendingMessage(pendingMsg.getId(), INVALID_ID, INVALID_OPTION, PendingMessageSingle.STATE_PREPARING);
-                pendingMsg.setState(PendingMessageSingle.STATE_PREPARING);
+            } else if (pendingMsg.getState() == PendingMessageState.PREPARING_FROM_EXPLORER.getValue()) {
+                dbH.updatePendingMessage(pendingMsg.getId(), INVALID_ID, INVALID_OPTION, PendingMessageState.PREPARING.getValue());
+                pendingMsg.setState(PendingMessageState.PREPARING.getValue());
                 msg.setPendingMessage(pendingMsg);
-            } else if (pendingMsg.getState() == PendingMessageSingle.STATE_COMPRESSING) {
+            } else if (pendingMsg.getState() == PendingMessageState.COMPRESSING.getValue()) {
                 if (isServiceRunning(ChatUploadService.class)) {
                     startService(new Intent(this, ChatUploadService.class)
                             .setAction(ACTION_CHECK_COMPRESSING_MESSAGE)
@@ -7357,7 +7359,7 @@ public class ChatActivity extends PasscodeActivity
      * @param pendingMsg Pending message from which the transfer has to be found.
      * @return The transfer if exist, null otherwise.
      */
-    private MegaTransfer findTransferFromPendingMessage(PendingMessageSingle pendingMsg) {
+    private MegaTransfer findTransferFromPendingMessage(PendingMessage pendingMsg) {
         if (megaApi.getNumPendingUploads() == 0) {
             Timber.d("There is not any upload in progress.");
             return null;
@@ -7859,7 +7861,7 @@ public class ChatActivity extends PasscodeActivity
 
     public void showUploadingAttachmentBottomSheet(AndroidMegaChatMessage message, int position) {
         if (message == null || message.getPendingMessage() == null
-                || message.getPendingMessage().getState() == PendingMessageSingle.STATE_COMPRESSING
+                || message.getPendingMessage().getState() == PendingMessageState.COMPRESSING.getValue()
                 || isBottomSheetDialogShown(bottomSheetDialogFragment)) {
             return;
         }
@@ -7968,13 +7970,13 @@ public class ChatActivity extends PasscodeActivity
      *
      * @param pMsg The pending message.
      */
-    public void removePendingMsg(PendingMessageSingle pMsg) {
-        if (pMsg == null || pMsg.getState() == PendingMessageSingle.STATE_SENT) {
+    public void removePendingMsg(PendingMessage pMsg) {
+        if (pMsg == null || pMsg.getState() == PendingMessageState.SENT.getValue()) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_message_already_sent), MEGACHAT_INVALID_HANDLE);
             return;
         }
 
-        if ((pMsg.getState() == PendingMessageSingle.STATE_UPLOADING || pMsg.getState() == PendingMessageSingle.STATE_ATTACHING)
+        if ((pMsg.getState() == PendingMessageState.UPLOADING.getValue() || pMsg.getState() == PendingMessageState.ATTACHING.getValue())
                 && pMsg.getTransferTag() != INVALID_ID) {
             MegaApplication.getChatManagement().setPendingMessageToBeCancelled(pMsg.getTransferTag(), pMsg.getId());
             megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
@@ -8008,20 +8010,20 @@ public class ChatActivity extends PasscodeActivity
      *
      * @param pendingMsg The pending message to update.
      */
-    private void updatePendingMessage(PendingMessageSingle pendingMsg) {
+    private void updatePendingMessage(PendingMessage pendingMsg) {
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
 
         while (itr.hasPrevious()) {
             AndroidMegaChatMessage messageToCheck = itr.previous();
 
             if (messageToCheck.getPendingMessage() != null
-                    && messageToCheck.getPendingMessage().getId() == pendingMsg.id) {
+                    && messageToCheck.getPendingMessage().getId() == pendingMsg.getId()) {
                 int indexToChange = itr.nextIndex();
                 Timber.d("Found index to update: %s", indexToChange);
 
                 messages.set(indexToChange, new AndroidMegaChatMessage(pendingMsg,
-                        pendingMsg.getState() >= PendingMessageSingle.STATE_PREPARING
-                                && pendingMsg.getState() <= PendingMessageSingle.STATE_COMPRESSING));
+                        pendingMsg.getState() >= PendingMessageState.PREPARING.getValue()
+                                && pendingMsg.getState() <= PendingMessageState.COMPRESSING.getValue()));
 
                 adapter.modifyMessage(messages, indexToChange + 1);
                 break;
@@ -8441,7 +8443,7 @@ public class ChatActivity extends PasscodeActivity
                         if (indexToChange != -1) {
                             Timber.d("Index modified: %s", indexToChange);
 
-                            PendingMessageSingle pendingMsg = null;
+                            PendingMessage pendingMsg = null;
                             if (idPendMsg != -1) {
                                 pendingMsg = dbH.findPendingMessageById(idPendMsg);
 
@@ -8649,7 +8651,7 @@ public class ChatActivity extends PasscodeActivity
             for (ShareInfo info : infos) {
                 Intent intent = new Intent(this, ChatUploadService.class);
 
-                PendingMessageSingle pMsgSingle = createAttachmentPendingMessage(idChat,
+                PendingMessage pMsgSingle = createAttachmentPendingMessage(idChat,
                         info.getFileAbsolutePath(), info.getTitle(), false);
 
                 long idMessage = pMsgSingle.getId();
@@ -9002,7 +9004,7 @@ public class ChatActivity extends PasscodeActivity
         }
 
         Intent intent = new Intent(this, ChatUploadService.class);
-        PendingMessageSingle pMsgSingle = new PendingMessageSingle();
+        PendingMessage pMsgSingle = new PendingMessage();
         pMsgSingle.setChatId(idChat);
         if (isVoiceClip(file.getAbsolutePath())) {
             pMsgSingle.setType(TYPE_VOICE_CLIP);

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.megachat;
 
 
+import mega.privacy.android.domain.entity.chat.PendingMessage;
 import mega.privacy.android.domain.entity.contacts.ContactLink;
 import nz.mega.sdk.MegaChatMessage;
 
@@ -11,7 +12,7 @@ public class AndroidMegaChatMessage {
     final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 
     MegaChatMessage message;
-    PendingMessageSingle pendingMessage;
+    PendingMessage pendingMessage;
     int infoToShow=-1;
     boolean showAvatar = true;
     boolean uploading = false;
@@ -23,7 +24,7 @@ public class AndroidMegaChatMessage {
         this.message = message;
     }
 
-    public AndroidMegaChatMessage(PendingMessageSingle pendingMessage, boolean uploading) {
+    public AndroidMegaChatMessage(PendingMessage pendingMessage, boolean uploading) {
         this.pendingMessage = pendingMessage;
         this.uploading = uploading;
     }
@@ -53,11 +54,11 @@ public class AndroidMegaChatMessage {
         this.uploading = uploading;
     }
 
-    public PendingMessageSingle getPendingMessage() {
+    public PendingMessage getPendingMessage() {
         return pendingMessage;
     }
 
-    public void setPendingMessage(PendingMessageSingle pendingMessage) {
+    public void setPendingMessage(PendingMessage pendingMessage) {
         this.pendingMessage = pendingMessage;
     }
 

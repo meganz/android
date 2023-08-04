@@ -17,7 +17,6 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
-import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removeSecondaryBackup
@@ -48,6 +47,8 @@ import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
@@ -3662,8 +3663,8 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param message Pending message to add.
      * @return The identifier of the pending message.
      */
-    override fun addPendingMessageFromFileExplorer(message: PendingMessageSingle): Long {
-        return addPendingMessage(message, PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER)
+    override fun addPendingMessageFromFileExplorer(message: PendingMessage): Long {
+        return addPendingMessage(message, PendingMessageState.PREPARING_FROM_EXPLORER.value)
     }
 
     /**
@@ -3673,8 +3674,8 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param state   State of the pending message.
      * @return The identifier of the pending message.
      */
-    override fun addPendingMessage(message: PendingMessageSingle): Long {
-        return addPendingMessage(message, PendingMessageSingle.STATE_PREPARING)
+    override fun addPendingMessage(message: PendingMessage): Long {
+        return addPendingMessage(message, PendingMessageState.PREPARING.value)
     }
 
     /**
@@ -3684,7 +3685,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @return The identifier of the pending message.
      */
     override fun addPendingMessage(
-        message: PendingMessageSingle,
+        message: PendingMessage,
         state: Int,
     ): Long {
         val values = ContentValues()
@@ -3698,9 +3699,9 @@ class SqliteDatabaseHandler @Inject constructor(
         return db.insert(TABLE_PENDING_MSG_SINGLE, null, values)
     }
 
-    override fun findPendingMessageById(messageId: Long): PendingMessageSingle? {
+    override fun findPendingMessageById(messageId: Long): PendingMessage? {
         Timber.d("findPendingMessageById")
-        var pendMsg: PendingMessageSingle? = null
+        var pendMsg: PendingMessage? = null
         val selectQuery =
             "SELECT * FROM $TABLE_PENDING_MSG_SINGLE WHERE $KEY_ID ='$messageId'"
         Timber.d("QUERY: %s", selectQuery)
@@ -3725,12 +3726,12 @@ class SqliteDatabaseHandler @Inject constructor(
                     val fingerPrint = decrypt(cursor.getString(7))
                     val transferTag = cursor.getInt(8)
                     val state = cursor.getInt(9)
-                    pendMsg = PendingMessageSingle(
+                    pendMsg = PendingMessage(
                         messageId,
                         chatId,
                         timestamp,
                         idTempKarere,
-                        filePath,
+                        filePath.orEmpty(),
                         fingerPrint,
                         name,
                         nodeHandle,
@@ -3756,7 +3757,7 @@ class SqliteDatabaseHandler @Inject constructor(
             idMessage,
             transferTag,
             Constants.INVALID_OPTION,
-            PendingMessageSingle.STATE_UPLOADING
+            PendingMessageState.UPLOADING.value
         )
     }
 
@@ -3814,7 +3815,7 @@ class SqliteDatabaseHandler @Inject constructor(
         val pendMsgs = ArrayList<AndroidMegaChatMessage>()
         val chat = idChat.toString()
         val selectQuery =
-            "SELECT * FROM $TABLE_PENDING_MSG_SINGLE WHERE $KEY_PENDING_MSG_STATE < ${PendingMessageSingle.STATE_SENT} AND $KEY_ID_CHAT ='${
+            "SELECT * FROM $TABLE_PENDING_MSG_SINGLE WHERE $KEY_PENDING_MSG_STATE < ${PendingMessageState.SENT.value} AND $KEY_ID_CHAT ='${
                 encrypt(chat)
             }'"
         Timber.d("QUERY: %s", selectQuery)
@@ -3842,12 +3843,12 @@ class SqliteDatabaseHandler @Inject constructor(
                         val fingerPrint = decrypt(cursor.getString(7))
                         val transferTag = cursor.getInt(8)
                         val state = cursor.getInt(9)
-                        val pendMsg = PendingMessageSingle(
+                        val pendMsg = PendingMessage(
                             id,
                             chatId,
                             timestamp,
                             idTempKarere,
-                            filePath,
+                            filePath.orEmpty(),
                             fingerPrint,
                             name,
                             nodeHandle,
@@ -3891,7 +3892,7 @@ class SqliteDatabaseHandler @Inject constructor(
         Timber.d("removeSentPendingMessages")
         db.delete(
             TABLE_PENDING_MSG_SINGLE,
-            KEY_PENDING_MSG_STATE + "=" + PendingMessageSingle.STATE_SENT,
+            KEY_PENDING_MSG_STATE + "=" + PendingMessageState.SENT.value,
             null
         )
     }

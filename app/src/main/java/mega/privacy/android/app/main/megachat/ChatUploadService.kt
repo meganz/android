@@ -5,7 +5,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.wifi.WifiManager
@@ -20,7 +19,6 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -55,6 +53,8 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
@@ -62,7 +62,6 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
@@ -147,7 +146,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
     //1 - over quota
     //2 - pre-over quota
     private var isOverQuota = Constants.NOT_OVERQUOTA_STATE
-    private var pendingMessages: ArrayList<PendingMessageSingle>? = null
+    private var pendingMessages: ArrayList<PendingMessage>? = null
     private var mapVideoDownsampling: HashMap<String, Int>? = null
     private val mapProgressTransfers: HashMap<Int, Transfer> = HashMap()
     private var app: MegaApplication? = null
@@ -347,7 +346,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
             return
         }
 
-        val pendingMessageSingles = ArrayList<PendingMessageSingle>()
+        val pendingMessages = ArrayList<PendingMessage>()
         parentNode = MegaNode.unserialize(intent.getStringExtra(EXTRA_PARENT_NODE))
 
         if (intent.hasExtra(EXTRA_NAME_EDITED)) {
@@ -399,26 +398,26 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                     val path = entry.value
                     totalUploads++
                     acquireLock()
-                    pendingMessageSingles.clear()
+                    pendingMessages.clear()
 
                     for (i in idPendMsgs.indices) {
-                        var pendingMsg: PendingMessageSingle?
+                        var pendingMsg: PendingMessage?
 
                         if (idPendMsgs[i] != -1L) {
                             pendingMsg = dbH.findPendingMessageById(idPendMsgs[i])
                             //									One transfer for file --> onTransferFinish() attach to all selected chats
-                            if (pendingMsg != null && pendingMsg.getChatId() != -1L
-                                && path == pendingMsg.getFilePath()
-                                && fingerprint == pendingMsg.getFingerprint()
+                            if (pendingMsg != null && pendingMsg.chatId != -1L
+                                && path == pendingMsg.filePath
+                                && fingerprint == pendingMsg.fingerprint
                             ) {
-                                if (!pendingMessageSingles.contains(pendingMsg)) {
-                                    pendingMessageSingles.add(pendingMsg)
+                                if (!pendingMessages.contains(pendingMsg)) {
+                                    pendingMessages.add(pendingMsg)
                                 }
 
                                 if (onlyOneChat) {
                                     if (snackbarChatHandle == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                                        snackbarChatHandle = pendingMsg.getChatId()
-                                    } else if (snackbarChatHandle != pendingMsg.getChatId()) {
+                                        snackbarChatHandle = pendingMsg.chatId
+                                    } else if (snackbarChatHandle != pendingMsg.chatId) {
                                         onlyOneChat = false
                                     }
                                 }
@@ -426,14 +425,14 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                         }
                     }
 
-                    initUpload(pendingMessageSingles, null)
+                    initUpload(pendingMessages, null)
                 }
             }
         } else {
             val chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1)
             type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE)
             val idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1)
-            var pendingMsg: PendingMessageSingle? = null
+            var pendingMsg: PendingMessage? = null
 
             if (idPendMsg != -1L) {
                 pendingMsg = dbH.findPendingMessageById(idPendMsg)
@@ -450,9 +449,9 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                         totalUploads++
                     }
                     acquireLock()
-                    pendingMessageSingles.clear()
-                    pendingMessageSingles.add(pendingMsg)
-                    initUpload(pendingMessageSingles, type)
+                    pendingMessages.clear()
+                    pendingMessages.add(pendingMsg)
+                    initUpload(pendingMessages, type)
                 }
             } else {
                 Timber.e("Error the chatId is not correct: $chatId")
@@ -460,10 +459,10 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         }
     }
 
-    private fun initUpload(pendingMsgs: ArrayList<PendingMessageSingle>, type: String?) {
+    private fun initUpload(pendingMsgs: ArrayList<PendingMessage>, type: String?) {
         Timber.d("initUpload")
         val pendingMsg = pendingMsgs[0]
-        val file = File(pendingMsg.getFilePath())
+        val file = File(pendingMsg.filePath)
 
         lifecycleScope.launch {
             chatPreferencesGateway
@@ -480,14 +479,14 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                             val fingerprint = megaApi.getFingerprint(compressedFile.absolutePath)
                             for (pendMsg in pendingMsgs) {
                                 if (fingerprint != null) {
-                                    pendMsg.setFingerprint(fingerprint)
+                                    pendMsg.fingerprint = fingerprint
                                 }
                                 pendingMessages!!.add(pendMsg)
                             }
                             compressedFile.absolutePath
                         } else {
                             pendingMessages!!.addAll(pendingMsgs)
-                            pendingMsg.getFilePath()
+                            pendingMsg.filePath
                         }
 
                         startUpload(pendingMsg.id, type, fileNames!![pendingMsg.name], uploadPath)
@@ -536,17 +535,17 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
 
                             if (outFile == null) {
                                 addPendingMessagesAndStartUpload(
-                                    pendingMsg.getId(),
+                                    pendingMsg.id,
                                     type,
-                                    fileNames!![pendingMsg.getName()],
-                                    pendingMsg.getFilePath(),
+                                    fileNames!![pendingMsg.name],
+                                    pendingMsg.filePath,
                                     pendingMsgs
                                 )
                             } else {
                                 totalVideos++
                                 numberVideosPending++
                                 for (pendMsg in pendingMsgs) {
-                                    pendMsg.setVideoDownSampled(outFile.absolutePath)
+                                    pendMsg.videoDownSampled = outFile.absolutePath
                                     pendingMessages!!.add(pendMsg)
                                 }
                                 mapVideoDownsampling!![outFile.absolutePath] = 0
@@ -555,23 +554,23 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                                 }
                                 videoDownsampling!!.changeResolution(
                                     file, outFile.absolutePath,
-                                    pendingMsg.getId(), dbH.chatVideoQuality
+                                    pendingMsg.id, dbH.chatVideoQuality
                                 )
                             }
                         } catch (throwable: Throwable) {
                             Timber.e("EXCEPTION: Video cannot be downsampled", throwable)
                             addPendingMessagesAndStartUpload(
-                                pendingMsg.getId(),
+                                pendingMsg.id,
                                 type,
-                                fileNames!![pendingMsg.getName()],
-                                pendingMsg.getFilePath(),
+                                fileNames!![pendingMsg.name],
+                                pendingMsg.filePath,
                                 pendingMsgs
                             )
                         }
                     } else {
                         addPendingMessagesAndStartUpload(
-                            pendingMsg.getId(), type,
-                            fileNames!![pendingMsg.getName()], pendingMsg.getFilePath(), pendingMsgs
+                            pendingMsg.id, type,
+                            fileNames!![pendingMsg.name], pendingMsg.filePath, pendingMsgs
                         )
                     }
 
@@ -597,7 +596,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
      */
     private fun addPendingMessagesAndStartUpload(
         idPendingMessage: Long, type: String?, fileName: String?,
-        localPath: String, pendingMsgs: ArrayList<PendingMessageSingle>,
+        localPath: String, pendingMsgs: ArrayList<PendingMessage>,
     ) {
         for (msg in pendingMsgs) {
             if (!(pendingMessages ?: return).contains(msg)) {
@@ -710,11 +709,11 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                     fileName = fileNames!![pendMsg.name]
                 }
 
-                if (pendMsg.getVideoDownSampled() != null && pendMsg.getVideoDownSampled() == returnedFile) {
+                if (pendMsg.videoDownSampled != null && pendMsg.videoDownSampled == returnedFile) {
                     val fingerPrint = megaApi.getFingerprint(returnedFile)
 
                     if (fingerPrint != null) {
-                        pendMsg.setFingerprint(fingerPrint)
+                        pendMsg.fingerprint = fingerPrint
                     }
                 }
             }
@@ -728,10 +727,10 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                     fileName = fileNames!![pendMsg.name]
                 }
 
-                if (pendMsg.getVideoDownSampled() != null) {
-                    if (pendMsg.getVideoDownSampled() == returnedFile) {
-                        pendMsg.setVideoDownSampled(null)
-                        downFile = File(pendMsg.getFilePath())
+                if (pendMsg.videoDownSampled != null) {
+                    if (pendMsg.videoDownSampled == returnedFile) {
+                        pendMsg.videoDownSampled = null
+                        downFile = File(pendMsg.filePath)
                         Timber.d("Found the downFile")
                     }
                 } else {
@@ -1219,7 +1218,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                     dbH.updatePendingMessageOnTransferFinish(
                         id,
                         "-1",
-                        PendingMessageSingle.STATE_ERROR_UPLOADING
+                        PendingMessageState.ERROR_UPLOADING.value
                     )
 
                     launchErrorToChat(id)
@@ -1257,10 +1256,10 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
      * Checks if pendingMessages list is empty.
      * If not, do nothing.
      * If so, means the service has been restarted after a transfers resumption or some error happened
-     * and tries to get the PendingMessageSingle related to the current MegaTransfer from DB.
-     * If the PendingMessageSingle exists, attaches it to the chat conversation.
+     * and tries to get the PendingMessage related to the current MegaTransfer from DB.
+     * If the PendingMessage exists, attaches it to the chat conversation.
      *
-     * @param id       Identifier of PendingMessageSingle.
+     * @param id       Identifier of PendingMessage.
      * @param transfer Current MegaTransfer.
      * @return True if the list is empty, false otherwise.
      */
@@ -1275,7 +1274,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
     /**
      * Attaches a message to a chat conversation getting it from DB.
      *
-     * @param id       Identifier of PendingMessageSingle.
+     * @param id       Identifier of PendingMessage.
      * @param transfer Current MegaTransfer.
      */
     private fun attachMessageFromDB(id: Long, transfer: Transfer) {
@@ -1297,7 +1296,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         dbH.updatePendingMessageOnTransferFinish(
             id,
             nodeHandle.toString() + "",
-            PendingMessageSingle.STATE_ATTACHING
+            PendingMessageState.ATTACHING.value
         )
 
         if (arePendingMessagesEmpty(id, transfer)) {
@@ -1308,7 +1307,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         var msgNotFound = true
 
         for (pendMsg in pendingMessages!!) {
-            if (pendMsg.getId() == id || pendMsg.getFingerprint() == fingerprint) {
+            if (pendMsg.id == id || pendMsg.fingerprint == fingerprint) {
                 attach(pendMsg, transfer)
                 msgNotFound = false
             }
@@ -1320,15 +1319,15 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         }
     }
 
-    fun attach(pendMsg: PendingMessageSingle, transfer: Transfer) = with(transfer) {
+    fun attach(pendMsg: PendingMessage, transfer: Transfer) = with(transfer) {
         Timber.d("attach")
         requestSent++
-        pendMsg.setNodeHandle(nodeHandle)
-        pendMsg.setState(PendingMessageSingle.STATE_ATTACHING)
-        megaChatApi.attachNode(pendMsg.getChatId(), nodeHandle, this@ChatUploadService)
+        pendMsg.nodeHandle = nodeHandle
+        pendMsg.state = PendingMessageState.ATTACHING.value
+        megaChatApi.attachNode(pendMsg.chatId, nodeHandle, this@ChatUploadService)
 
         if (FileUtil.isVideoFile(localPath)) {
-            val pathDownsampled = pendMsg.getVideoDownSampled()
+            val pathDownsampled = pendMsg.videoDownSampled
             if (localPath == pathDownsampled) {
                 //Delete the local temp video file
                 val f = File(localPath)
@@ -1350,7 +1349,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         dbH.updatePendingMessageOnTransferFinish(
             id,
             nodeHandle.toString() + "",
-            PendingMessageSingle.STATE_ATTACHING
+            PendingMessageState.ATTACHING.value
         )
 
         if (arePendingMessagesEmpty(id, transfer)) {
@@ -1358,11 +1357,11 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         }
 
         for (pendMsg in pendingMessages!!) {
-            if (pendMsg.getId() == id) {
-                pendMsg.setNodeHandle(nodeHandle)
-                pendMsg.setState(PendingMessageSingle.STATE_ATTACHING)
+            if (pendMsg.id == id) {
+                pendMsg.nodeHandle = nodeHandle
+                pendMsg.state = PendingMessageState.ATTACHING.value
                 megaChatApi.attachVoiceMessage(
-                    pendMsg.getChatId(),
+                    pendMsg.chatId,
                     nodeHandle,
                     this@ChatUploadService
                 )
@@ -1380,10 +1379,10 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         for (i in pendingMessages!!.indices) {
             val pendMsg = pendingMessages!![i]
 
-            if (pendMsg.getFilePath() == localPath) {
-                if (pendMsg.getNodeHandle() == -1L) {
+            if (pendMsg.filePath == localPath) {
+                if (pendMsg.nodeHandle == -1L) {
                     Timber.d("Set node handle to the pdf file: $nodeHandle")
-                    pendMsg.setNodeHandle(nodeHandle)
+                    pendMsg.nodeHandle = nodeHandle
                 } else {
                     Timber.e("Set node handle error")
                 }
@@ -1396,10 +1395,10 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         dbH.updatePendingMessageOnTransferFinish(
             id,
             nodeHandle.toString() + "",
-            PendingMessageSingle.STATE_ATTACHING
+            PendingMessageState.ATTACHING.value
         )
 
-        pendingMessages?.forEach { if (it.getChatId() == id) return@with }
+        pendingMessages?.forEach { if (it.chatId == id) return@with }
 
         //Message not found, try to get it from DB.
         dbH.findPendingMessageById(id)?.let { pendingMessages?.add(it) }
@@ -1410,8 +1409,8 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         Timber.d("Node Handle: $nodeHandle")
         //Find the pending message
         pendingMessages?.forEach { pendMsg ->
-            if (pendMsg.getNodeHandle() == nodeHandle) {
-                Timber.d("Send node: $nodeHandle to chat: ${pendMsg.getChatId()}")
+            if (pendMsg.nodeHandle == nodeHandle) {
+                Timber.d("Send node: $nodeHandle to chat: ${pendMsg.chatId}")
                 requestSent++
                 val nodePdf = megaApi.getNodeByHandle(nodeHandle)
 
@@ -1419,7 +1418,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                     Timber.d("The pdf node has preview")
                 }
 
-                megaChatApi.attachNode(pendMsg.getChatId(), nodeHandle, this)
+                megaChatApi.attachNode(pendMsg.chatId, nodeHandle, this)
             } else {
                 Timber.e("PDF attach error")
             }
@@ -1496,7 +1495,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                     val pendMsg = pendingMessages!![i]
 
                     //Check node handles - if match add to DB the karere temp id of the message
-                    val nodeHandle = pendMsg.getNodeHandle()
+                    val nodeHandle = pendMsg.nodeHandle
                     val node = nodeList[0]
 
                     if (node.handle == nodeHandle) {
@@ -1504,9 +1503,9 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                         val tempId = request.megaChatMessage.tempId
                         Timber.d("The tempId of the message is: $tempId")
                         dbH.updatePendingMessageOnAttach(
-                            pendMsg.getId(),
+                            pendMsg.id,
                             tempId.toString() + "",
-                            PendingMessageSingle.STATE_SENT
+                            PendingMessageState.SENT.value
                         )
                         pendingMessages!!.removeAt(i)
                         break
@@ -1520,18 +1519,18 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                 for (i in pendingMessages!!.indices) {
                     val pendMsg = pendingMessages!![i]
                     //Check node handles - if match add to DB the karere temp id of the message
-                    val nodeHandle = pendMsg.getNodeHandle()
+                    val nodeHandle = pendMsg.nodeHandle
                     val node = nodeList[0]
 
                     if (node.handle == nodeHandle) {
-                        MegaApplication.getChatManagement().removeMsgToDelete(pendMsg.getId())
+                        MegaApplication.getChatManagement().removeMsgToDelete(pendMsg.id)
                         Timber.d("The message MATCH!!")
                         dbH.updatePendingMessageOnAttach(
-                            pendMsg.getId(),
+                            pendMsg.id,
                             (-1).toString(),
-                            PendingMessageSingle.STATE_ERROR_ATTACHING
+                            PendingMessageState.ERROR_ATTACHING.value
                         )
-                        launchErrorToChat(pendMsg.getId())
+                        launchErrorToChat(pendMsg.id)
                         break
                     }
                 }
@@ -1550,15 +1549,15 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         for (i in pendingMessages!!.indices) {
             val pendMsg = pendingMessages!![i]
 
-            if (pendMsg.getId() == id) {
+            if (pendMsg.id == id) {
                 val openChatId = MegaApplication.openChatId
 
-                if (pendMsg.getChatId() == openChatId) {
+                if (pendMsg.chatId == openChatId) {
                     Timber.w("Error update activity")
                     val intent = Intent(this, ChatActivity::class.java)
                     intent.action = Constants.ACTION_UPDATE_ATTACHMENT
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.putExtra("ID_MSG", pendMsg.getId())
+                    intent.putExtra("ID_MSG", pendMsg.id)
                     intent.putExtra("IS_OVERQUOTA", isOverQuota)
                     startActivity(intent)
                 }

@@ -111,11 +111,12 @@ import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
-import mega.privacy.android.domain.entity.settings.ChatSettings;
 import mega.privacy.android.domain.entity.VideoQuality;
+import mega.privacy.android.domain.entity.chat.PendingMessage;
+import mega.privacy.android.domain.entity.chat.PendingMessageState;
+import mega.privacy.android.domain.entity.settings.ChatSettings;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -1589,11 +1590,11 @@ public class ChatUtil {
      * @param fromExplorer True if the file comes from File Explorer, false otherwise.
      * @return The pending message after add it to the DB.
      */
-    public static PendingMessageSingle createAttachmentPendingMessage(long idChat, String filePath, String fileName, boolean fromExplorer) {
+    public static PendingMessage createAttachmentPendingMessage(long idChat, String filePath, String fileName, boolean fromExplorer) {
         long idPendingMessage;
         LegacyDatabaseHandler dbH = MegaApplication.getInstance().getDbH();
 
-        PendingMessageSingle pendingMsg = new PendingMessageSingle();
+        PendingMessage pendingMsg = new PendingMessage();
         pendingMsg.setChatId(idChat);
         pendingMsg.setUploadTimestamp(System.currentTimeMillis() / 1000);
         pendingMsg.setFilePath(filePath);
@@ -1601,8 +1602,8 @@ public class ChatUtil {
         pendingMsg.setFingerprint(MegaApplication.getInstance().getMegaApi().getFingerprint(filePath));
 
         if (MimeTypeList.typeForName(fileName).isMp4Video() && dbH.getChatVideoQuality() != VideoQuality.ORIGINAL.getValue()) {
-            idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageSingle.STATE_COMPRESSING);
-            pendingMsg.setState(PendingMessageSingle.STATE_COMPRESSING);
+            idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageState.COMPRESSING.getValue());
+            pendingMsg.setState(PendingMessageState.COMPRESSING.getValue());
         } else if (fromExplorer) {
             idPendingMessage = dbH.addPendingMessageFromFileExplorer(pendingMsg);
         } else {

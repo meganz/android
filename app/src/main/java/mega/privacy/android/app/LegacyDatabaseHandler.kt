@@ -3,10 +3,10 @@ package mega.privacy.android.app
 import android.database.sqlite.SQLiteDatabase
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
-import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.chat.PendingMessage
 
 /**
  * Legacy database handler
@@ -41,7 +41,7 @@ interface LegacyDatabaseHandler : DatabaseHandler {
      * @param message Pending message to add.
      * @return The identifier of the pending message.
      */
-    fun addPendingMessageFromFileExplorer(message: PendingMessageSingle): Long
+    fun addPendingMessageFromFileExplorer(message: PendingMessage): Long
 
     /**
      * Adds a pending message.
@@ -50,7 +50,7 @@ interface LegacyDatabaseHandler : DatabaseHandler {
      * @param state   State of the pending message.
      * @return The identifier of the pending message.
      */
-    fun addPendingMessage(message: PendingMessageSingle): Long
+    fun addPendingMessage(message: PendingMessage): Long
 
     /**
      * Adds a pending message.
@@ -59,11 +59,11 @@ interface LegacyDatabaseHandler : DatabaseHandler {
      * @return The identifier of the pending message.
      */
     fun addPendingMessage(
-        message: PendingMessageSingle,
+        message: PendingMessage,
         state: Int,
     ): Long
 
-    fun findPendingMessageById(messageId: Long): PendingMessageSingle?
+    fun findPendingMessageById(messageId: Long): PendingMessage?
     fun findPendingMessagesNotSent(idChat: Long): ArrayList<AndroidMegaChatMessage>
     fun addSDTransfer(transfer: SDTransfer): Long
     fun saveBackup(backup: Backup): Boolean
