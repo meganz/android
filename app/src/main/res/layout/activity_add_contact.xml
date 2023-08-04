@@ -34,7 +34,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@color/yellow_100_yellow_700_alpha_015"
-				android:padding="8dp"
+				android:padding="16dp"
 				android:visibility="gone"
 				android:text="@string/contact_share_file_to_unverified_contact_warning_message"
 				android:textAppearance="@style/TextAppearance.Mega.Caption.13sp.Grey87Yellow700"

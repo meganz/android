@@ -55,6 +55,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -71,9 +72,11 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.adapters.MegaSharedFolderAdapter;
@@ -99,7 +102,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaSet;
 import nz.mega.sdk.MegaSetElement;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaSync;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import timber.log.Timber;
@@ -132,10 +134,11 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     LinearLayoutManager mLayoutManager;
     ImageView emptyImage;
     TextView emptyText;
+    private TextView warningText;
     FloatingActionButton fab;
 
     ArrayList<MegaShare> listContacts;
-    ArrayList<MegaShare> tempListContacts;
+    List<MegaShare> tempListContacts;
 
 
     long nodeHandle;
@@ -228,15 +231,13 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                 dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 
                 final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-                dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        clearSelections();
-                        if (permissionsDialog != null) {
-                            permissionsDialog.dismiss();
-                        }
-                        statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_permissions_changing_folder));
-                        contactController.changePermissions(contactController.getEmailShares(shares), item, node);
+                dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item1) -> {
+                    clearSelections();
+                    if (permissionsDialog != null) {
+                        permissionsDialog.dismiss();
                     }
+                    statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_permissions_changing_folder));
+                    contactController.changePermissions(contactController.getEmailShares(shares), item1, node);
                 });
 
                 permissionsDialog = dialogBuilder.create();
@@ -383,19 +384,14 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             createdView = findViewById(R.id.node_last_update);
             contactLayout = findViewById(R.id.file_contact_list_layout);
             contactLayout.setVisibility(View.GONE);
+            warningText = findViewById(R.id.file_contact_list_text_warning_message);
             findViewById(R.id.separator_file_contact_list).setVisibility(View.GONE);
 
-            fab = (FloatingActionButton) findViewById(R.id.floating_button_file_contact_list);
+            fab = findViewById(R.id.floating_button_file_contact_list);
             fab.setOnClickListener(this);
 
             nameView.setText(node.getName());
-
             imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-
-            tempListContacts = megaApi.getOutShares(node);
-            if (tempListContacts != null && !tempListContacts.isEmpty()) {
-                listContacts.addAll(megaApi.getOutShares(node));
-            }
 
             listView = findViewById(R.id.file_contact_list_view_browser);
             listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
@@ -417,17 +413,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             emptyImage.setImageResource(R.drawable.ic_empty_contacts);
             emptyText.setText(R.string.contacts_list_empty_text);
 
-            if (listContacts.size() != 0) {
-                emptyImage.setVisibility(View.GONE);
-                emptyText.setVisibility(View.GONE);
-                listView.setVisibility(View.VISIBLE);
-            } else {
-                emptyImage.setVisibility(View.VISIBLE);
-                emptyText.setVisibility(View.VISIBLE);
-                listView.setVisibility(View.GONE);
-
-            }
-
             if (node.getCreationTime() != 0) {
                 try {
                     createdView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));
@@ -438,23 +423,12 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             } else {
                 createdView.setText("");
             }
-
-            if (adapter == null) {
-                adapter = new MegaSharedFolderAdapter(this, node, listContacts, listView);
-                listView.setAdapter(adapter);
-                adapter.setShareList(listContacts);
-            } else {
-                adapter.setShareList(listContacts);
-            }
-
-            adapter.setPositionClicked(-1);
-            adapter.setMultipleSelect(false);
-
-            listView.setAdapter(adapter);
         }
 
         contactController = new ContactController(this);
         nodeController = new NodeController(this);
+
+        viewModel.getMegaShares(node);
 
         registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
@@ -464,6 +438,19 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
         registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+        collectFlows();
+    }
+
+    private void collectFlows() {
+        ViewExtensionsKt.collectFlow(this, viewModel.getShowNotVerifiedContactBanner(), Lifecycle.State.STARTED, showBanner -> {
+            warningText.setVisibility(showBanner ? View.VISIBLE : View.GONE);
+            return Unit.INSTANCE;
+        });
+        ViewExtensionsKt.collectFlow(this, viewModel.getMegaShare(), Lifecycle.State.STARTED, shares -> {
+            tempListContacts = shares;
+            updateListView();
+            return Unit.INSTANCE;
+        });
     }
 
     /**
@@ -647,19 +634,15 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                 emptyText.setVisibility(View.GONE);
                 if (parentHandle == -1) {
                     aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
-
                     aB.setLogo(R.drawable.ic_action_navigation_accept_white);
-                    supportInvalidateOptionsMenu();
-                    adapter.setShareList(listContacts);
-                    listView.scrollToPosition(0);
                 } else {
                     contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
                     aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
                     aB.setLogo(R.drawable.ic_action_navigation_previous_item);
-                    supportInvalidateOptionsMenu();
-                    adapter.setShareList(listContacts);
-                    listView.scrollToPosition(0);
                 }
+                supportInvalidateOptionsMenu();
+                adapter.setShareList(listContacts);
+                listView.scrollToPosition(0);
             }
         }
     }
@@ -904,36 +887,35 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         }
 
         if (node.isFolder()) {
-            listContacts.clear();
-
-            tempListContacts = megaApi.getOutShares(node);
-            if (tempListContacts != null && !tempListContacts.isEmpty()) {
-                listContacts.addAll(megaApi.getOutShares(node));
-            }
-
-            if (listContacts != null) {
-                if (listContacts.size() > 0) {
-                    listView.setVisibility(View.VISIBLE);
-                    emptyImage.setVisibility(View.GONE);
-                    emptyText.setVisibility(View.GONE);
-
-                    if (adapter != null) {
-                        adapter.setNode(node);
-                        adapter.setContext(this);
-                        adapter.setShareList(listContacts);
-                        adapter.setListFragment(listView);
-                    } else {
-                        adapter = new MegaSharedFolderAdapter(this, node, listContacts, listView);
-                    }
-                } else {
-                    listView.setVisibility(View.GONE);
-                    emptyImage.setVisibility(View.VISIBLE);
-                    emptyText.setVisibility(View.VISIBLE);
-                    //((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
-                }
-            }
+            viewModel.getMegaShares(node);
         }
+    }
 
+    private void updateListView() {
+        listContacts.clear();
+        if (tempListContacts != null && !tempListContacts.isEmpty()) {
+            listContacts.addAll(tempListContacts);
+        }
+        if (listContacts.size() > 0) {
+            listView.setVisibility(View.VISIBLE);
+            emptyImage.setVisibility(View.GONE);
+            emptyText.setVisibility(View.GONE);
+
+            if (adapter != null) {
+                adapter.setNode(node);
+                adapter.setContext(this);
+                adapter.setShareList(listContacts);
+                adapter.setListFragment(listView);
+            } else {
+                adapter = new MegaSharedFolderAdapter(this, node, listContacts, listView);
+                adapter.setMultipleSelect(false);
+            }
+            listView.setAdapter(adapter);
+        } else {
+            listView.setVisibility(View.GONE);
+            emptyImage.setVisibility(View.VISIBLE);
+            emptyText.setVisibility(View.VISIBLE);
+        }
         listView.invalidate();
     }
 
@@ -980,21 +962,14 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
     @Override
     public void onReloadNeeded(MegaApiJava api) {
-
-
     }
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
-
-
     }
 
     @Override
-    public void onContactRequestsUpdate(MegaApiJava api,
-                                        ArrayList<MegaContactRequest> requests) {
-
-
+    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
     }
 
     public void showSnackbar(String s) {
@@ -1004,14 +979,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     public MegaUser getSelectedContact() {
         String email = selectedShare.getUser();
         return megaApi.getContact(email);
-    }
-
-    public MegaShare getSelectedShare() {
-        return selectedShare;
-    }
-
-    public void setSelectedShare(MegaShare selectedShare) {
-        this.selectedShare = selectedShare;
     }
 
     private void updateAdapter(long handleReceived) {

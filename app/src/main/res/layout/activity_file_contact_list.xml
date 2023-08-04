@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/file_contact_list"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_file_contact_list"
@@ -15,9 +15,9 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout_file_contact_list"
         android:layout_width="match_parent"
-        android:fitsSystemWindows="false"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_file_contact_list">
+        android:layout_below="@id/toolbar_file_contact_list"
+        android:fitsSystemWindows="false">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -72,12 +72,23 @@
                 android:id="@+id/file_contact_list_browser_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/separator_file_contact_list" >
+                android:layout_below="@id/separator_file_contact_list">
+
+                <TextView
+                    android:id="@+id/file_contact_list_text_warning_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/yellow_100_yellow_700_alpha_015"
+                    android:padding="16dp"
+                    android:text="@string/contact_share_file_to_unverified_contact_warning_message"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.13sp.Grey87Yellow700"
+                    android:visibility="gone" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/file_contact_list_view_browser"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_below="@id/file_contact_list_text_warning_message"
                     android:choiceMode="multipleChoice" />
 
                 <ImageView
@@ -102,10 +113,10 @@
             android:id="@+id/floating_button_file_contact_list"
             android:layout_width="@dimen/fab_button_diameter"
             android:layout_height="@dimen/fab_button_diameter"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_add_white"
             android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom|end"/>
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add_white" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-    
- </RelativeLayout>
+
+</RelativeLayout>
