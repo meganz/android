@@ -38,6 +38,8 @@ import java.time.temporal.WeekFields
  * @property enabledAllowAddParticipantsOption          True if is enabled the allow non-hosts to add participants option, false otherwise.
  * @property enabledMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property enabledSendCalendarInviteOption            True if is enabled the send calendar invite option, false otherwise.
+ * @property enabledSendCalendarInviteOption            True if is enabled the send calendar invite option, false otherwise.
+ * @property enabledWaitingRoomOption                   True if is enabled waiting room option, false otherwise.
  * @property descriptionText                            Description text
  * @property buttons                                    List of available action buttons.
  * @property snackbarMessageContent                     State to show snackbar message.
@@ -57,6 +59,7 @@ import java.time.temporal.WeekFields
  * @property initialMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property initialAllowAddParticipantsOption          True if is enabled the allow non-hosts to add participants option, false otherwise.
  * @property initialSendCalendarInviteOption            True if is enabled the send calendar invite option, false otherwise.
+ * @property initialWaitingRoomOption                   True if is enabled waiting room option, false otherwise.
  * @property initialParticipantsList                    List of participants handles.
  * @property weekList                                   List of [Weekday] in the week.
  */
@@ -76,6 +79,7 @@ data class CreateScheduledMeetingState constructor(
     val enabledMeetingLinkOption: Boolean = false,
     val enabledAllowAddParticipantsOption: Boolean = true,
     val enabledSendCalendarInviteOption: Boolean = false,
+    val enabledWaitingRoomOption: Boolean = false,
     val descriptionText: String = "",
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val discardMeetingDialog: Boolean = false,
@@ -91,6 +95,7 @@ data class CreateScheduledMeetingState constructor(
     val initialMeetingLinkOption: Boolean = false,
     val initialAllowAddParticipantsOption: Boolean = true,
     val initialSendCalendarInviteOption: Boolean = false,
+    val initialWaitingRoomOption: Boolean = false,
     val initialParticipantsList: List<ContactItem> = emptyList(),
     val weekList: List<Weekday> =
         listOf(
@@ -124,6 +129,7 @@ data class CreateScheduledMeetingState constructor(
                     initialMeetingLinkOption != enabledMeetingLinkOption ||
                     initialAllowAddParticipantsOption != enabledAllowAddParticipantsOption ||
                     initialSendCalendarInviteOption != enabledSendCalendarInviteOption ||
+                    initialWaitingRoomOption != enabledWaitingRoomOption ||
                     !startDate.isEqual(schedMeet.getZoneStartTime()) ||
                     !endDate.isEqual(schedMeet.getZoneEndTime()) ||
                     initialParticipantsList != participantItemList ||

@@ -73,6 +73,15 @@ interface ChatRepository {
     suspend fun setOpenInvite(chatId: Long, isOpenInvite: Boolean): ChatRequest
 
     /**
+     * Update waiting room setting.
+     *
+     * @param chatId    The Chat id.
+     * @param enabled   True, should be enabled. False, should be disabled.
+     * @return True if non-hosts are allowed to add participants, false otherwise.
+     */
+    suspend fun setWaitingRoom(chatId: Long, enabled: Boolean): ChatRequest
+
+    /**
      * Leave chat
      *
      * @param chatId    The Chat id.

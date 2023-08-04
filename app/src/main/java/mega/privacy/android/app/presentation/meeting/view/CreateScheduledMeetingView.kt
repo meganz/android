@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -60,6 +61,7 @@ import mega.privacy.android.app.presentation.extensions.meeting.getUntilZonedDat
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationWithRadioButtonsDialog
@@ -95,20 +97,22 @@ private val dateFormatter by lazy {
 @Composable
 internal fun CreateScheduledMeetingView(
     state: CreateScheduledMeetingState,
-    isWaitingRoomEnabled: Boolean = false,
-    onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
+    managementState: ScheduledMeetingManagementState,
     onDiscardClicked: () -> Unit,
     onAcceptClicked: () -> Unit,
     onStartTimeClicked: () -> Unit,
     onStartDateClicked: () -> Unit,
     onEndTimeClicked: () -> Unit,
     onEndDateClicked: () -> Unit,
-    onScrollChange: (Boolean) -> Unit,
     onDismiss: () -> Unit,
     onResetSnackbarMessage: () -> Unit,
     onDiscardMeetingDialog: () -> Unit,
+    onLearnMoreWarningClicked: () -> Unit,
+    onCloseWarningClicked: () -> Unit,
     onDescriptionValueChange: (String) -> Unit,
     onTitleValueChange: (String) -> Unit,
+    onScrollChange: (Boolean) -> Unit,
+    onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
     onRecurrenceDialogOptionClicked: (RecurrenceDialogOption) -> Unit,
 ) {
 
@@ -151,42 +155,53 @@ internal fun CreateScheduledMeetingView(
             onDiscard = onDismiss
         )
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            item(key = "Schedule meeting start date and time") {
-                ScheduledMeetingDateAndTime(
-                    state = state,
-                    isStart = true,
-                    onDateClicked = onStartDateClicked,
-                    onTimeClicked = onStartTimeClicked
+        Column {
+            if (state.enabledWaitingRoomOption && state.enabledAllowAddParticipantsOption && !managementState.isWarningClosed && managementState.isWaitingRoomFeatureFlagEnabled) {
+                WaitingRoomWarningDialog(
+                    onLearnMoreClicked = onLearnMoreWarningClicked,
+                    onCloseClicked = onCloseWarningClicked
                 )
             }
 
-            item(key = "Schedule meeting end date and time") {
-                ScheduledMeetingDateAndTime(
-                    state = state,
-                    isStart = false,
-                    onDateClicked = onEndDateClicked,
-                    onTimeClicked = onEndTimeClicked
-                )
-            }
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.padding(paddingValues)
+            ) {
 
-            items(state.buttons) { button ->
-                ActionButton(
-                    state = state,
-                    action = button,
-                    onButtonClicked = onButtonClicked
-                )
-            }
-
-            item(key = "Schedule meeting add description") {
-                if (state.isEditingDescription || state.descriptionText.isNotEmpty()) {
-                    AddDescriptionButton(
-                        description = state.descriptionText,
-                        onValueChange = onDescriptionValueChange
+                item(key = "Schedule meeting start date and time") {
+                    ScheduledMeetingDateAndTime(
+                        state = state,
+                        isStart = true,
+                        onDateClicked = onStartDateClicked,
+                        onTimeClicked = onStartTimeClicked
                     )
+                }
+
+                item(key = "Schedule meeting end date and time") {
+                    ScheduledMeetingDateAndTime(
+                        state = state,
+                        isStart = false,
+                        onDateClicked = onEndDateClicked,
+                        onTimeClicked = onEndTimeClicked
+                    )
+                }
+
+                items(state.buttons) { button ->
+                    ActionButton(
+                        state = state,
+                        isWaitingRoomFeatureFlagEnabled = managementState.isWaitingRoomFeatureFlagEnabled,
+                        action = button,
+                        onButtonClicked = onButtonClicked
+                    )
+                }
+
+                item(key = "Schedule meeting add description") {
+                    if (state.isEditingDescription || state.descriptionText.isNotEmpty()) {
+                        AddDescriptionButton(
+                            description = state.descriptionText,
+                            onValueChange = onDescriptionValueChange
+                        )
+                    }
                 }
             }
         }
@@ -245,6 +260,7 @@ private fun ScheduledMeetingDateAndTime(
 ) {
     Box(
         Modifier
+            .testTag(DATE_AND_TIME_TAG)
             .fillMaxWidth()
             .padding(start = 72.dp, end = 16.dp)
             .height(56.dp)
@@ -254,8 +270,9 @@ private fun ScheduledMeetingDateAndTime(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .clickable { onDateClicked() },
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.onPrimary
+            style = MaterialTheme.typography.subtitle1.copy(
+                color = MaterialTheme.colors.onPrimary
+            ),
         )
 
         Text(
@@ -263,8 +280,9 @@ private fun ScheduledMeetingDateAndTime(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .clickable { onTimeClicked() },
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.onPrimary
+            style = MaterialTheme.typography.subtitle1.copy(
+                color = MaterialTheme.colors.onPrimary
+            ),
         )
     }
 }
@@ -332,83 +350,86 @@ private fun AddDescriptionButton(
 @Composable
 private fun ActionButton(
     state: CreateScheduledMeetingState,
+    isWaitingRoomFeatureFlagEnabled: Boolean,
     action: ScheduleMeetingAction,
     onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
-            if ((action != ScheduleMeetingAction.Recurrence && action != ScheduleMeetingAction.EndRecurrence && action != ScheduleMeetingAction.AddParticipants) ||
-                ((action == ScheduleMeetingAction.Recurrence || action == ScheduleMeetingAction.EndRecurrence)) || state.allowAddParticipants
-            ) {
+    if (action != ScheduleMeetingAction.WaitingRoom || isWaitingRoomFeatureFlagEnabled) {
+        Column(modifier = Modifier
+            .testTag(ACTION_BUTTON_TAG)
+            .fillMaxWidth()
+            .clickable {
                 onButtonClicked(action)
-            }
-        }) {
-        if ((action != ScheduleMeetingAction.AddDescription || !state.isEditingDescription)
-            && (action != ScheduleMeetingAction.EndRecurrence || state.rulesSelected.freq != OccurrenceFrequencyType.Invalid)
-        ) {
-            ActionOption(
-                state = state,
-                action = action,
-                isChecked = when (action) {
-                    ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
-                    ScheduleMeetingAction.AllowNonHostAddParticipants -> state.enabledAllowAddParticipantsOption
-                    ScheduleMeetingAction.SendCalendarInvite -> state.enabledSendCalendarInviteOption
-                    else -> true
-                },
-                hasSwitch = when (action) {
-                    ScheduleMeetingAction.Recurrence,
-                    ScheduleMeetingAction.EndRecurrence,
-                    ScheduleMeetingAction.AddParticipants,
-                    ScheduleMeetingAction.AddDescription,
-                    -> false
+            }) {
+            if ((action != ScheduleMeetingAction.AddDescription || !state.isEditingDescription)
+                && (action != ScheduleMeetingAction.EndRecurrence || state.rulesSelected.freq != OccurrenceFrequencyType.Invalid)
+            ) {
+                ActionOption(
+                    state = state,
+                    action = action,
+                    isChecked = when (action) {
+                        ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
+                        ScheduleMeetingAction.AllowNonHostAddParticipants -> state.enabledAllowAddParticipantsOption
+                        ScheduleMeetingAction.SendCalendarInvite -> state.enabledSendCalendarInviteOption
+                        ScheduleMeetingAction.WaitingRoom -> state.enabledWaitingRoomOption
+                        else -> true
+                    },
+                    hasSwitch = when (action) {
+                        ScheduleMeetingAction.Recurrence,
+                        ScheduleMeetingAction.EndRecurrence,
+                        ScheduleMeetingAction.AddParticipants,
+                        ScheduleMeetingAction.AddDescription,
+                        -> false
 
-                    else -> true
-                }
-            )
+                        else -> true
+                    }
+                )
 
-            CustomDivider(
-                withStartPadding = when (action) {
-                    ScheduleMeetingAction.Recurrence,
-                    ScheduleMeetingAction.EndRecurrence,
-                    ScheduleMeetingAction.AddParticipants,
-                    ScheduleMeetingAction.SendCalendarInvite,
-                    -> true
+                CustomDivider(
+                    withStartPadding = when (action) {
+                        ScheduleMeetingAction.Recurrence,
+                        ScheduleMeetingAction.EndRecurrence,
+                        ScheduleMeetingAction.AddParticipants,
+                        ScheduleMeetingAction.SendCalendarInvite,
+                        ScheduleMeetingAction.WaitingRoom,
+                        -> true
 
-                    else -> false
-                }
-            )
+                        else -> false
+                    }
+                )
 
-            if (action == ScheduleMeetingAction.Recurrence && state.showMonthlyRecurrenceWarning) {
-                state.rulesSelected.monthDayList?.let { list ->
-                    list.first().let { day ->
-                        Text(
-                            modifier = Modifier
-                                .padding(
-                                    start = 72.dp,
-                                    end = 16.dp,
-                                    top = 8.dp,
-                                    bottom = 8.dp
+                if (action == ScheduleMeetingAction.Recurrence && state.showMonthlyRecurrenceWarning) {
+                    state.rulesSelected.monthDayList?.let { list ->
+                        list.first().let { day ->
+                            Text(
+                                modifier = Modifier
+                                    .padding(
+                                        start = 72.dp,
+                                        end = 16.dp,
+                                        top = 8.dp,
+                                        bottom = 8.dp
+                                    ),
+                                style = MaterialTheme.typography.subtitle2.copy(
+                                    color = MaterialTheme.colors.textColorSecondary,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Normal,
                                 ),
-                            style = MaterialTheme.typography.subtitle2.copy(
-                                color = MaterialTheme.colors.textColorSecondary,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Normal,
-                            ),
-                            text = pluralStringResource(
-                                R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
-                                day,
-                                day
-                            ),
-                        )
-                        CustomDivider(withStartPadding = true)
+                                text = pluralStringResource(
+                                    R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
+                                    day,
+                                    day
+                                ),
+                            )
+                            CustomDivider(withStartPadding = true)
+                        }
+
                     }
 
                 }
-
             }
         }
     }
+
 }
 
 /**
@@ -546,21 +567,19 @@ private fun ActionOption(
                             if (action == ScheduleMeetingAction.EndRecurrence) 54.dp else 32.dp,
                             end = 15.dp
                         ),
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.subtitle1.copy(
+                        color = MaterialTheme.colors.onPrimary
+                    ),
                     text = stringResource(id = action.title),
-                    color = MaterialTheme.colors.onPrimary
                 )
 
                 var subtitle: String? = null
 
                 when (action) {
-                    ScheduleMeetingAction.MeetingLink -> {
-                        action.description?.let { description ->
-                            subtitle = stringResource(id = description)
-                        }
-                    }
-
-                    ScheduleMeetingAction.SendCalendarInvite -> {
+                    ScheduleMeetingAction.MeetingLink,
+                    ScheduleMeetingAction.SendCalendarInvite,
+                    ScheduleMeetingAction.WaitingRoom,
+                    -> {
                         action.description?.let { description ->
                             subtitle = stringResource(id = description)
                         }
@@ -599,11 +618,13 @@ private fun ActionOption(
                         modifier = Modifier
                             .padding(
                                 start = if (action == ScheduleMeetingAction.EndRecurrence) 54.dp else 32.dp,
+                                top = if (action == ScheduleMeetingAction.MeetingLink || action == ScheduleMeetingAction.SendCalendarInvite) 10.dp else if (action == ScheduleMeetingAction.WaitingRoom) 18.dp else 0.dp,
                                 end = 15.dp
                             ),
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.body2.copy(
+                            color = MaterialTheme.colors.textColorSecondary
+                        ),
                         text = it,
-                        color = MaterialTheme.colors.textColorSecondary
                     )
                 }
             }
@@ -689,6 +710,9 @@ private fun RecurringMeetingDialog(
     }
 }
 
+internal const val DATE_AND_TIME_TAG = "create_scheduled_meeting:date_and_time"
+internal const val ACTION_BUTTON_TAG = "create_scheduled_meeting:action_button"
+
 /**
  * Discard Meeting Alert Dialog Preview
  */
@@ -731,7 +755,6 @@ fun PreviewRecurringMeetingDialog() {
     }
 }
 
-
 /**
  * Create scheduled meeting View Preview
  */
@@ -748,6 +771,7 @@ private fun PreviewCreateScheduledMeetingView() {
                 buttons = ScheduleMeetingAction.values().asList(),
                 snackbarMessageContent = consumed()
             ),
+            managementState = ScheduledMeetingManagementState(),
             onButtonClicked = {},
             onDiscardClicked = {},
             onAcceptClicked = {},
@@ -759,9 +783,11 @@ private fun PreviewCreateScheduledMeetingView() {
             onDismiss = {},
             onResetSnackbarMessage = {},
             onDiscardMeetingDialog = {},
-            onDescriptionValueChange = { },
-            onTitleValueChange = { },
-            onRecurrenceDialogOptionClicked = { }
+            onDescriptionValueChange = {},
+            onTitleValueChange = {},
+            onRecurrenceDialogOptionClicked = {},
+            onLearnMoreWarningClicked = {},
+            onCloseWarningClicked = {},
         )
     }
 }

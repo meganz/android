@@ -186,6 +186,25 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setWaitingRoom(
+        chatId: Long,
+        enabled: Boolean,
+    ): ChatRequest = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.setWaitingRoom(
+                chatId,
+                enabled,
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
     private fun onRequestSetOpenInviteCompleted(continuation: Continuation<Boolean>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {

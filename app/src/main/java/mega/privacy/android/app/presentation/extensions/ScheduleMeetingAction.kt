@@ -12,6 +12,7 @@ internal val ScheduleMeetingAction.title: Int
         ScheduleMeetingAction.SendCalendarInvite -> R.string.meetings_schedule_meeting_send_calendar_invite_label
         ScheduleMeetingAction.AllowNonHostAddParticipants -> R.string.chat_group_chat_info_allow_non_host_participants_option
         ScheduleMeetingAction.AddDescription -> R.string.meetings_schedule_meeting_add_description_label
+        ScheduleMeetingAction.WaitingRoom -> R.string.meetings_schedule_meeting_waiting_room_label
     }
 
 internal val ScheduleMeetingAction.description: Int?
@@ -23,6 +24,7 @@ internal val ScheduleMeetingAction.description: Int?
         ScheduleMeetingAction.SendCalendarInvite -> R.string.scheduled_meetings_send_calendar_invite_panel_title
         ScheduleMeetingAction.AllowNonHostAddParticipants -> null
         ScheduleMeetingAction.AddDescription -> null
+        ScheduleMeetingAction.WaitingRoom -> R.string.meetings_schedule_meeting_waiting_room_description
     }
 
 internal val ScheduleMeetingAction.icon: Int?
@@ -34,4 +36,5 @@ internal val ScheduleMeetingAction.icon: Int?
         ScheduleMeetingAction.SendCalendarInvite -> R.drawable.ic_send_calendar
         ScheduleMeetingAction.AllowNonHostAddParticipants -> R.drawable.ic_users
         ScheduleMeetingAction.AddDescription -> R.drawable.ic_sched_meeting_description
+        ScheduleMeetingAction.WaitingRoom -> R.drawable.waiting_room_ic
     }

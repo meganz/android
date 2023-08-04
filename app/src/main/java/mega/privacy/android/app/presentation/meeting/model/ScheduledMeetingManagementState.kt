@@ -13,22 +13,25 @@ import java.time.ZonedDateTime
 
 /**
  * Scheduled meeting management state
- * @property finish                         True, if the activity is to be terminated.
- * @property selectedOccurrence             Current selected [ChatScheduledMeetingOccurr]
- * @property isChatHistoryEmpty             True if chat history only has management messages or false otherwise
- * @property chatId                         Chat ID of the scheduled meeting
- * @property selectOccurrenceEvent          Select [ChatScheduledMeetingOccurr] event
- * @property chatRoom                       [ChatRoom] of the scheduled meeting
- * @property snackbarMessageContent         State to show snackbar message
- * @property displayDialog                  Indicates if display confirm dialog or not
- * @property enabledMeetingLinkOption       True if is enabled the meeting link option, false otherwise.
- * @property meetingLink                    Meeting link.
- * @property cancelOccurrenceTapped         Indicates if cancel occurrence option was tapped
- * @property editOccurrenceTapped           Indicates if edit occurrence option was tapped
- * @property chatRoomItem                   Selected [ChatRoomItem]
- * @property editedOccurrence               Edited [ChatScheduledMeetingOccurr]
- * @property editedOccurrenceDate          [ZonedDateTime]
- * @property chatRoomItem                   Selected [ChatRoomItem]
+ * @property finish                             True, if the activity is to be terminated.
+ * @property selectedOccurrence                 Current selected [ChatScheduledMeetingOccurr]
+ * @property isChatHistoryEmpty                 True if chat history only has management messages or false otherwise
+ * @property chatId                             Chat ID of the scheduled meeting
+ * @property selectOccurrenceEvent              Select [ChatScheduledMeetingOccurr] event
+ * @property chatRoom                           [ChatRoom] of the scheduled meeting
+ * @property snackbarMessageContent             State to show snackbar message
+ * @property displayDialog                      Indicates if display confirm dialog or not
+ * @property enabledMeetingLinkOption           True if is enabled the meeting link option, false otherwise.
+ * @property meetingLink                        Meeting link.
+ * @property cancelOccurrenceTapped             Indicates if cancel occurrence option was tapped
+ * @property editOccurrenceTapped               Indicates if edit occurrence option was tapped
+ * @property chatRoomItem                       Selected [ChatRoomItem]
+ * @property editedOccurrence                   Edited [ChatScheduledMeetingOccurr]
+ * @property editedOccurrenceDate               [ZonedDateTime]
+ * @property chatRoomItem                       Selected [ChatRoomItem]
+ * @property isWarningClosed                    True if waiting room warning was closed, false if not.
+ * @property enabledWaitingRoomOption           True if is enabled the waiting room option, false otherwise.
+ * @property isWaitingRoomFeatureFlagEnabled    True, if waiting room feature flag is enabled. False, if not.
  * @constructor Create empty Scheduled meeting management state
  */
 data class ScheduledMeetingManagementState constructor(
@@ -42,11 +45,14 @@ data class ScheduledMeetingManagementState constructor(
     val displayDialog: Boolean = false,
     val enabledMeetingLinkOption: Boolean = true,
     val meetingLink: String? = null,
+    val enabledWaitingRoomOption: Boolean = false,
     val cancelOccurrenceTapped: Boolean = false,
     val editOccurrenceTapped: Boolean = false,
     val chatRoomItem: ChatRoomItem? = null,
     val editedOccurrence: ChatScheduledMeetingOccurr? = null,
     val editedOccurrenceDate: ZonedDateTime? = null,
+    val isWarningClosed: Boolean = false,
+    val isWaitingRoomFeatureFlagEnabled: Boolean = false,
 ) {
 
     /**

@@ -216,37 +216,6 @@ class ScheduledMeetingInfoViewTest {
     }
 
     @Test
-    fun `test that manage chat history button is shown`() {
-        initComposeRuleContent(
-            ScheduledMeetingInfoState(
-                isHost = true,
-                scheduledMeeting = getChatScheduledMeeting()
-            ),
-            ScheduledMeetingManagementState()
-        )
-        composeRule.onNodeWithText(R.string.meetings_info_manage_history_option)
-            .assertExists()
-    }
-
-    @Test
-    fun `test that verify manage chat history button performs action`() {
-        val onButtonClicked = mock<(ScheduledMeetingInfoAction) -> Unit>()
-        initComposeRuleContent(
-            ScheduledMeetingInfoState(
-                isHost = true,
-                scheduledMeeting = getChatScheduledMeeting()
-            ),
-            ScheduledMeetingManagementState(),
-            onButtonClicked = onButtonClicked
-        )
-
-        composeRule.onNodeWithText(R.string.meetings_info_manage_history_option)
-            .performClick()
-
-        verify(onButtonClicked).invoke(ScheduledMeetingInfoAction.ManageChatHistory)
-    }
-
-    @Test
     fun `test that enabled encrypted key rotation label is shown`() {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
@@ -255,6 +224,7 @@ class ScheduledMeetingInfoViewTest {
                 scheduledMeeting = getChatScheduledMeeting()
             ),
             ScheduledMeetingManagementState()
+
         )
         composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .assertExists()
@@ -268,7 +238,10 @@ class ScheduledMeetingInfoViewTest {
                 isOpenInvite = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState()
+            ScheduledMeetingManagementState(
+                enabledMeetingLinkOption = true,
+                isWarningClosed = false
+            )
         )
         composeRule.onNodeWithText(R.string.add_participants_menu_item)
             .assertExists()
@@ -400,7 +373,9 @@ class ScheduledMeetingInfoViewTest {
                 onDismiss = {},
                 onLeaveGroupDialog = {},
                 onInviteParticipantsDialog = {},
-                onSnackbarShown = {}
+                onSnackbarShown = {},
+                onCloseWarningClicked = {},
+                onLearnMoreWarningClicked = {},
             )
         }
     }
@@ -425,7 +400,9 @@ class ScheduledMeetingInfoViewTest {
                 onDismiss = {},
                 onLeaveGroupDialog = {},
                 onInviteParticipantsDialog = {},
-                onSnackbarShown = {}
+                onSnackbarShown = {},
+                onCloseWarningClicked = {},
+                onLearnMoreWarningClicked = {},
             )
         }
     }

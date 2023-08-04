@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
@@ -25,19 +26,23 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
+import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
+import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateOccurrenceUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
@@ -60,9 +65,11 @@ import javax.inject.Inject
  * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
  * @property monitorChatListItemUpdates                 [MonitorChatListItemUpdates]
  * @property monitorChatListItemUpdates                 [MegaChatApiGateway]
+ * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
  * @property updateOccurrenceUseCase                    [UpdateOccurrenceUseCase]
  * @property broadcastScheduledMeetingCancelledUseCase  [BroadcastScheduledMeetingCanceledUseCase]
- * @property state                                      Current view state as [ScheduledMeetingManagementState]
+ * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
+ * @property state                                      Current view state as [ScheduledMeetingManagementState]setWaitingRoom
  */
 @HiltViewModel
 class ScheduledMeetingManagementViewModel @Inject constructor(
@@ -80,7 +87,10 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val updateOccurrenceUseCase: UpdateOccurrenceUseCase,
+    private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
+    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val broadcastScheduledMeetingCancelledUseCase: BroadcastScheduledMeetingCanceledUseCase,
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScheduledMeetingManagementState())
     val state: StateFlow<ScheduledMeetingManagementState> = _state
@@ -92,6 +102,18 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      */
     val isConnected: Boolean
         get() = monitorConnectivityUseCase().value
+
+    init {
+        viewModelScope.launch {
+            _state.update { state ->
+                getFeatureFlagValue(AppFeatures.WaitingRoomSettings).let { flag ->
+                    state.copy(
+                        isWaitingRoomFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+        }
+    }
 
     /**
      * Checks if chat history is empty (only management messages)
@@ -306,6 +328,27 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     }
 
     /**
+     * Enable or disable waiting room option
+     */
+    fun setWaitingRoom(isWaitingRoom: Boolean = !state.value.enabledWaitingRoomOption) =
+        state.value.chatId?.let { chatId ->
+            viewModelScope.launch {
+                runCatching {
+                    setWaitingRoomUseCase(chatId, isWaitingRoom)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+                }.onSuccess {
+                    _state.update { state ->
+                        state.copy(
+                            enabledWaitingRoomOption = isWaitingRoom
+                        )
+                    }
+                }
+            }
+        }
+
+    /**
      * Trigger event to show Snackbar message
      *
      * @param message     Content for snack bar
@@ -362,9 +405,11 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         chatRoom = chat,
+                        enabledWaitingRoomOption = chat.isWaitingRoom,
                     )
                 }
 
+                getChatRoomUpdates(chat.chatId)
                 queryChatLink()
                 getChatListItemUpdates()
             }
@@ -373,6 +418,24 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             Timber.e(exception)
         }
     }
+
+    /**
+     * Get chat room updates
+     *
+     * @param chatId Chat id.
+     */
+    private fun getChatRoomUpdates(chatId: Long) =
+        viewModelScope.launch {
+            monitorChatRoomUpdates(chatId).collectLatest { chat ->
+                if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
+                    _state.update {
+                        it.copy(
+                            enabledWaitingRoomOption = chat.isWaitingRoom,
+                        )
+                    }
+                }
+            }
+        }
 
     /**
      * Get chat list item updates
@@ -578,6 +641,14 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
                     )
                 )
             }
+        }
+
+    /**
+     * Close waiting room warning
+     */
+    fun closeWaitingRoomWarning() =
+        _state.update {
+            it.copy(isWarningClosed = true)
         }
 
     /**

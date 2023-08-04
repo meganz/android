@@ -156,6 +156,19 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Set waiting room setting for a chat room
+     *
+     * @param chatId  The chat id.
+     * @param enabled  True if allow add participants, false otherwise.
+     * @param listener Listener.
+     */
+    fun setWaitingRoom(
+        chatId: Long,
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
      * Get all chat rooms
      *
      * @return  The list of chat rooms

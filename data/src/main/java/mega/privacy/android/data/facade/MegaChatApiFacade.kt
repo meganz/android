@@ -221,6 +221,12 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.setOpenInvite(chatId, enabled, listener)
 
+    override fun setWaitingRoom(
+        chatId: Long,
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.setWaitingRoom(chatId, enabled, listener)
+
     override fun getChatRooms(): List<MegaChatRoom> =
         chatApi.chatRooms
 

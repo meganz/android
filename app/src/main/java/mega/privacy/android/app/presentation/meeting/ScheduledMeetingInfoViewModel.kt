@@ -50,6 +50,7 @@ import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaApiJava
@@ -82,6 +83,7 @@ import javax.inject.Inject
  * @property monitorUpdatePushNotificationSettingsUseCase   [MonitorUpdatePushNotificationSettingsUseCase]
  * @property cameraGateway                                  [CameraGateway]
  * @property deviceGateway                                  [DeviceGateway]
+ * @property setWaitingRoomUseCase                          [SetWaitingRoomUseCase]
  * @property state                    Current view state as [ScheduledMeetingInfoState]
 
  */
@@ -111,6 +113,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val cameraGateway: CameraGateway,
     private val deviceGateway: DeviceGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
+    private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -169,8 +172,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 chat?.apply {
                     if (isActive) {
                         Timber.d("Chat room is active")
-                        _state.update {
-                            it.copy(
+                        _state.update { state ->
+                            state.copy(
                                 chatId = chatId,
                                 chatTitle = title,
                                 isHost = ownPrivilege == ChatRoomPermission.Moderator,
@@ -310,6 +313,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         } else {
                             retentionTimeSeconds
                         }
+
                         copy(
                             isHost = isHost,
                             isOpenInvite = isOpenInvite,
@@ -726,10 +730,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     Timber.e(exception)
                     showSnackBar(R.string.general_text_error)
                 }.onSuccess { result ->
-                    _state.update {
-                        it.copy(
-                            isOpenInvite = result || it.isHost,
-                            enabledAllowNonHostAddParticipantsOption = result
+                    _state.update { state ->
+                        state.copy(
+                            isOpenInvite = result || state.isHost,
+                            enabledAllowNonHostAddParticipantsOption = result,
                         )
                     }
                 }

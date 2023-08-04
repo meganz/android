@@ -132,11 +132,9 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _state.update { state ->
-                val initialStartDate = state.getInitialStartDate()
-                val initialEndDate = state.getInitialEndDate()
                 state.copy(
-                    startDate = initialStartDate,
-                    endDate = initialEndDate
+                    startDate = state.getInitialStartDate(),
+                    endDate = state.getInitialEndDate()
                 )
             }
         }
@@ -230,10 +228,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             onDescriptionChange(it.description ?: "")
             val initialStartDate = it.getZoneStartTime()
             val initialEndDate = it.getZoneEndTime()
-            val sendCalendarInvite = it.flags?.sendEmails
+            val sendCalendarInvite = it.flags?.sendEmails ?: false
             _state.update { state ->
                 state.copy(
-                    enabledSendCalendarInviteOption = sendCalendarInvite ?: false,
+                    enabledSendCalendarInviteOption = sendCalendarInvite,
+                    initialSendCalendarInviteOption = sendCalendarInvite,
                     rulesSelected = it.rules ?: ChatScheduledRules(),
                     startDate = initialStartDate ?: state.getInitialStartDate(),
                     endDate = initialEndDate ?: state.getInitialEndDate(),
@@ -245,10 +244,12 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Update initial value of meeting link
      *
-     * @param hasMeetingLink    True, it it has meeting link. False, if not.
+     * @param hasMeetingLink    True, if it has meeting link. False, if not.
+     * @param isWaitingRoom     True, if it is waiting room. False, if not.
      */
     fun updateInitialChatValues(
         hasMeetingLink: Boolean,
+        isWaitingRoom: Boolean,
     ) =
         when (state.value.type) {
             ScheduledMeetingType.Edition -> {
@@ -256,6 +257,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                     state.copy(
                         enabledMeetingLinkOption = hasMeetingLink,
                         initialMeetingLinkOption = hasMeetingLink,
+                        enabledWaitingRoomOption = isWaitingRoom,
+                        initialWaitingRoomOption = isWaitingRoom
                     )
                 }
             }
@@ -499,7 +502,10 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      */
     fun onAllowNonHostAddParticipantsTap() =
         _state.update { state ->
-            state.copy(enabledAllowAddParticipantsOption = !state.enabledAllowAddParticipantsOption)
+            val newValue = !state.enabledAllowAddParticipantsOption
+            state.copy(
+                enabledAllowAddParticipantsOption = newValue,
+            )
         }
 
     /**
@@ -591,7 +597,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                                     publicChat = true,
                                     title = state.meetingTitle,
                                     speakRequest = false,
-                                    waitingRoom = false,
+                                    waitingRoom = state.enabledWaitingRoomOption,
                                     openInvite = state.enabledAllowAddParticipantsOption,
                                     timezone = ZoneId.systemDefault().id,
                                     startDate = state.startDate.toEpochSecond(),
@@ -604,7 +610,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
 
                             ScheduledMeetingType.Edition ->
                                 updateScheduledMeetingUseCase(
-                                    chatId = state.scheduledMeeting?.chatId ?: -1L,
+                                    chatId = chatId,
                                     schedId = state.scheduledMeeting?.schedId ?: -1L,
                                     timezone = state.scheduledMeeting?.timezone
                                         ?: ZoneId.systemDefault().id,
@@ -664,6 +670,17 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Enable or disable waiting room option
+     */
+    fun onWaitingRoomTap() =
+        _state.update { state ->
+            val newValue = !state.enabledWaitingRoomOption
+            state.copy(
+                enabledWaitingRoomOption = newValue,
+            )
+        }
 
     /**
      * Sets chatIdToOpenInfoScreen as consumed.

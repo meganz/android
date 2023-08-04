@@ -21,6 +21,11 @@ enum class ScheduledMeetingInfoAction {
     ChatNotifications,
 
     /**
+     * Enable or disable waiting room.
+     */
+    WaitingRoom,
+
+    /**
      * Allow non-hosts add participants to the chat.
      */
     AllowNonHostAddParticipants,

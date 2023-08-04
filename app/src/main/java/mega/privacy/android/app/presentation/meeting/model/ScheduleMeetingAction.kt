@@ -31,6 +31,11 @@ enum class ScheduleMeetingAction {
     SendCalendarInvite,
 
     /**
+     * Waiting room.
+     */
+    WaitingRoom,
+
+    /**
      * Allow non-hosts add participants to the chat.
      */
     AllowNonHostAddParticipants,

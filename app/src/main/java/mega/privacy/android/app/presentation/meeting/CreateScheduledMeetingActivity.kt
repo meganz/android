@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -19,11 +20,10 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
@@ -38,7 +38,6 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.time.Instant
@@ -51,7 +50,6 @@ import javax.inject.Inject
  *
  * @property passCodeFacade         [PasscodeCheck]
  * @property getThemeMode           [GetThemeMode]
- * @property getFeatureFlagUseCase  [getFeatureFlagUseCase]
  */
 @AndroidEntryPoint
 class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
@@ -61,9 +59,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    @Inject
-    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel by viewModels<CreateScheduledMeetingViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
@@ -76,6 +71,8 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     internal companion object {
         const val CREATE_SCHEDULED_MEETING_TAG = "createScheduledMeetingTag"
         const val CUSTOM_RECURRENCE_TAG = "customRecurrenceTag"
+        private const val LEARN_MORE_URI =
+            "https://help.mega.io/"
     }
 
     private lateinit var navController: NavHostController
@@ -114,8 +111,9 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.state) { (_, openAddContact, chatIdToOpenInfoScreen, finish) ->
+        collectFlow(viewModel.state) { (_, openAddContact, chatIdToOpenInfoScreen, finish, _, _, _, _, _, _, _, _, _, _, enabledWaitingRoomOption) ->
             if (finish) {
+                scheduledMeetingManagementViewModel.setWaitingRoom(enabledWaitingRoomOption)
                 finishCreateScheduledMeeting(RESULT_OK)
             }
 
@@ -152,13 +150,18 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        collectFlow(scheduledMeetingManagementViewModel.state) { (_, _, _, _, _, _, _, _, _, meetingLink) ->
+        collectFlow(scheduledMeetingManagementViewModel.state) { (_, _, _, _, _, _, _, _, _, meetingLink, enabledWaitingRoomOption) ->
             viewModel.updateInitialChatValues(
-                !meetingLink.isNullOrEmpty()
+                !meetingLink.isNullOrEmpty(), enabledWaitingRoomOption
             )
         }
     }
 
+    /**
+     * Finish create scheduled meeting with result
+     *
+     * @param result    Result: RESULT_CANCELED or RESULT_OK
+     */
     private fun finishCreateScheduledMeeting(result: Int) {
         setResult(result)
         finish()
@@ -172,10 +175,8 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
+        val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
         navController = rememberNavController()
-        val isWaitingRoomEnabled = runBlocking {
-            getFeatureFlagUseCase(AppFeatures.WaitingRoomSettings)
-        }
 
         AndroidTheme(isDark = isDark) {
             NavHost(
@@ -185,7 +186,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 composable(CREATE_SCHEDULED_MEETING_TAG) {
                     CreateScheduledMeetingView(
                         state = uiState,
-                        isWaitingRoomEnabled = isWaitingRoomEnabled,
+                        managementState = managementState,
                         onButtonClicked = ::onActionTap,
                         onDiscardClicked = viewModel::onDiscardMeetingTap,
                         onAcceptClicked = viewModel::onScheduleMeetingTap,
@@ -204,6 +205,8 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onDiscardMeetingDialog = { finishCreateScheduledMeeting(RESULT_CANCELED) },
                         onDescriptionValueChange = viewModel::onDescriptionChange,
                         onTitleValueChange = viewModel::onTitleChange,
+                        onLearnMoreWarningClicked = { openBrowser() },
+                        onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
                         onRecurrenceDialogOptionClicked = { optionSelected ->
                             viewModel.dismissDialog()
                             when {
@@ -254,6 +257,17 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 }
             }
         }
+    }
+
+    /**
+     * Open browser to see more information about waiting room setting
+     */
+    private fun openBrowser() {
+        startActivity(
+            Intent(
+                this@CreateScheduledMeetingActivity,
+                WebViewActivity::class.java
+            ).apply { data = LEARN_MORE_URI.toUri() })
     }
 
     /**
@@ -416,6 +430,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
             ScheduleMeetingAction.SendCalendarInvite -> viewModel.onSendCalendarInviteTap()
             ScheduleMeetingAction.AllowNonHostAddParticipants -> viewModel.onAllowNonHostAddParticipantsTap()
             ScheduleMeetingAction.AddDescription -> viewModel.onAddDescriptionTap()
+            ScheduleMeetingAction.WaitingRoom -> viewModel.onWaitingRoomTap()
         }
     }
 }

@@ -49,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -115,6 +116,8 @@ fun ScheduledMeetingInfoView(
     onLeaveGroupDialog: () -> Unit,
     onInviteParticipantsDialog: () -> Unit,
     onSnackbarShown: () -> Unit,
+    onLearnMoreWarningClicked: () -> Unit,
+    onCloseWarningClicked: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
@@ -125,8 +128,10 @@ fun ScheduledMeetingInfoView(
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
-                Snackbar(snackbarData = data,
-                    backgroundColor = black.takeIf { isLight() } ?: white)
+                Snackbar(
+                    snackbarData = data,
+                    backgroundColor = MaterialTheme.colors.onPrimary
+                )
             }
         },
         topBar = {
@@ -136,11 +141,10 @@ fun ScheduledMeetingInfoView(
                 onAddParticipantsClicked = onAddParticipantsClicked,
                 onBackPressed = onBackPressed,
                 titleId = R.string.general_info,
-                elevation = !firstItemVisible
+                elevation = !firstItemVisible,
             )
         }
     ) { paddingValues ->
-
         LeaveGroupAlertDialog(
             state = state,
             onDismiss = { onDismiss() },
@@ -151,59 +155,73 @@ fun ScheduledMeetingInfoView(
             onDismiss = { onDismiss() },
             onInvite = { onInviteParticipantsDialog() })
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
-
-            items(state.buttons) { button ->
-                ActionButton(
-                    state = state,
-                    action = button,
-                    enabledMeetingLinkOption = managementState.enabledMeetingLinkOption,
-                    onButtonClicked = onButtonClicked
+        Column {
+            if (state.enabledAllowNonHostAddParticipantsOption && managementState.enabledWaitingRoomOption && !managementState.isWarningClosed && managementState.isWaitingRoomFeatureFlagEnabled) {
+                WaitingRoomWarningDialog(
+                    onLearnMoreClicked = onLearnMoreWarningClicked,
+                    onCloseClicked = onCloseWarningClicked
                 )
             }
 
-            item(key = "Participants") { ParticipantsHeader(state = state) }
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                item(key = "Scheduled meeting title") {
+                    ScheduledMeetingTitleView(state = state)
+                }
 
-            item(key = "Add participants") {
-                AddParticipantsButton(
-                    state = state,
-                    onAddParticipantsClicked = onAddParticipantsClicked
-                )
-            }
+                items(state.buttons) { button ->
+                    ActionButton(
+                        state = state,
+                        action = button,
+                        isWaitingRoomFeatureFlagEnabled = managementState.isWaitingRoomFeatureFlagEnabled,
+                        enabledMeetingLinkOption = managementState.enabledMeetingLinkOption,
+                        enabledWaitingRoomOption = managementState.enabledWaitingRoomOption,
+                        onButtonClicked = onButtonClicked
+                    )
+                }
 
-            item(key = "Participants list") {
-                state.participantItemList.indices.forEach { i ->
-                    if (i < 4 || !state.seeMoreVisible) {
-                        val isLastOne =
-                            state.participantItemList.size <= 4 && i == state.participantItemList.size - 1
+                item(key = "Participants") { ParticipantsHeader(state = state) }
 
-                        ParticipantItemView(
-                            participant = state.participantItemList[i],
-                            !isLastOne, onParticipantClicked = onParticipantClicked
+                item(key = "Add participants") {
+                    AddParticipantsButton(
+                        state = state,
+                        onAddParticipantsClicked = onAddParticipantsClicked
+                    )
+                }
+
+                item(key = "Participants list") {
+                    state.participantItemList.indices.forEach { i ->
+                        if (i < 4 || !state.seeMoreVisible) {
+                            val isLastOne =
+                                state.participantItemList.size <= 4 && i == state.participantItemList.size - 1
+
+                            ParticipantItemView(
+                                participant = state.participantItemList[i],
+                                !isLastOne, onParticipantClicked = onParticipantClicked
+                            )
+                        }
+                    }
+
+                    if (state.participantItemList.size > 4) {
+                        SeeMoreOrLessParticipantsButton(
+                            state,
+                            onSeeMoreOrLessClicked = onSeeMoreOrLessClicked
                         )
                     }
                 }
 
-                if (state.participantItemList.size > 4) {
-                    SeeMoreOrLessParticipantsButton(
-                        state,
-                        onSeeMoreOrLessClicked = onSeeMoreOrLessClicked
-                    )
+                item(key = "Scheduled meeting description") {
+                    ScheduledMeetingDescriptionView(state = state)
+                }
+
+                item(key = "Leave group") {
+                    LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
                 }
             }
-
-            item(key = "Scheduled meeting description") {
-                ScheduledMeetingDescriptionView(state = state)
-            }
-
-            item(key = "Leave group") {
-                LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
-            }
         }
+
 
         if (state.snackBar != null) {
             val msg =
@@ -506,11 +524,14 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
 @Composable
 private fun ActionButton(
     state: ScheduledMeetingInfoState,
+    isWaitingRoomFeatureFlagEnabled: Boolean,
     enabledMeetingLinkOption: Boolean,
+    enabledWaitingRoomOption: Boolean,
     action: ScheduledMeetingInfoAction,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
 ) {
     Column(modifier = Modifier
+        .testTag(ACTION_BUTTON_OPTION_TAG)
         .fillMaxWidth()
         .clickable {
             if (action != ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation) {
@@ -551,7 +572,7 @@ private fun ActionButton(
                 }
             }
 
-            ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
+            ScheduledMeetingInfoAction.EnableEncryptedKeyRotation ->
                 if (state.isHost && state.isPublic) {
                     Text(
                         modifier = Modifier.padding(
@@ -578,50 +599,45 @@ private fun ActionButton(
 
                     CustomDivider(withStartPadding = false)
                 }
-            }
 
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation,
-            -> {
-                if (state.isHost && !state.isPublic) {
+            -> if (state.isHost && !state.isPublic) {
+                Text(modifier = Modifier.padding(
+                    start = 14.dp,
+                    end = 16.dp,
+                    top = 18.dp
+                ),
+                    style = MaterialTheme.typography.subtitle1,
+                    text = stringResource(id = action.title),
+                    color = black.takeIf { isLight() } ?: white)
+
+                action.description?.let { description ->
                     Text(modifier = Modifier.padding(
                         start = 14.dp,
                         end = 16.dp,
-                        top = 18.dp
+                        top = 10.dp,
+                        bottom = 8.dp
                     ),
-                        style = MaterialTheme.typography.subtitle1,
-                        text = stringResource(id = action.title),
-                        color = black.takeIf { isLight() } ?: white)
-
-                    action.description?.let { description ->
-                        Text(modifier = Modifier.padding(
-                            start = 14.dp,
-                            end = 16.dp,
-                            top = 10.dp,
-                            bottom = 8.dp
-                        ),
-                            style = MaterialTheme.typography.subtitle2,
-                            text = stringResource(id = description),
-                            color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
-                    }
-
-                    CustomDivider(withStartPadding = false)
+                        style = MaterialTheme.typography.subtitle2,
+                        text = stringResource(id = description),
+                        color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
                 }
+
+                CustomDivider(withStartPadding = false)
             }
 
             ScheduledMeetingInfoAction.MeetingLink,
-            -> {
-                if (state.isHost && state.isPublic) {
-                    ActionOption(
-                        state = state,
-                        action = action,
-                        isEnabled = enabledMeetingLinkOption,
-                        hasSwitch = true
-                    )
-                    CustomDivider(withStartPadding = true)
-                }
+            -> if (state.isHost && state.isPublic) {
+                ActionOption(
+                    state = state,
+                    action = action,
+                    isEnabled = enabledMeetingLinkOption,
+                    hasSwitch = true
+                )
+                CustomDivider(withStartPadding = true)
             }
 
-            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> {
+            ScheduledMeetingInfoAction.AllowNonHostAddParticipants ->
                 if (state.isHost) {
                     ActionOption(
                         state = state,
@@ -631,9 +647,32 @@ private fun ActionButton(
                     )
                     CustomDivider(withStartPadding = true)
                 }
+
+            ScheduledMeetingInfoAction.WaitingRoom -> {
+                if (state.isHost && isWaitingRoomFeatureFlagEnabled) {
+                    ActionOption(
+                        state = state,
+                        action = action,
+                        isEnabled = enabledWaitingRoomOption,
+                        hasSwitch = true
+                    )
+
+                    action.description?.let { description ->
+                        Text(modifier = Modifier.padding(
+                            start = 72.dp,
+                            end = 16.dp,
+                            top = 2.dp,
+                            bottom = 18.dp
+                        ),
+                            style = MaterialTheme.typography.subtitle2,
+                            text = stringResource(id = description),
+                            color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
+                    }
+                    CustomDivider(withStartPadding = true)
+                }
             }
 
-            ScheduledMeetingInfoAction.ManageChatHistory -> {
+            ScheduledMeetingInfoAction.ManageChatHistory ->
                 if (state.isHost) {
                     ActionOption(
                         state = state,
@@ -644,7 +683,6 @@ private fun ActionButton(
                     CustomDivider(withStartPadding = true)
 
                 }
-            }
 
             ScheduledMeetingInfoAction.ChatNotifications -> {
                 ActionOption(
@@ -1228,6 +1266,9 @@ fun getStringForDndTime(seconds: Long): String {
     )
 }
 
+
+internal const val ACTION_BUTTON_OPTION_TAG = "scheduled_meeting_info:action_button_option"
+
 /**
  * Meeting link action button View Preview
  */
@@ -1255,7 +1296,9 @@ fun PreviewActionButton() {
             )
         ),
             action = ScheduledMeetingInfoAction.MeetingLink,
+            isWaitingRoomFeatureFlagEnabled = true,
             enabledMeetingLinkOption = true,
+            enabledWaitingRoomOption = true,
             onButtonClicked = {})
     }
 }
@@ -1328,7 +1371,9 @@ fun PreviewScheduledMeetingInfoView() {
             onDismiss = {},
             onLeaveGroupDialog = {},
             onInviteParticipantsDialog = {},
-            onSnackbarShown = {}
+            onSnackbarShown = {},
+            onLearnMoreWarningClicked = {},
+            onCloseWarningClicked = {},
         )
     }
 }
