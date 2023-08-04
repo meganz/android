@@ -107,11 +107,6 @@ fun InputDialog(
                         .padding(horizontal = 8.dp, vertical = 2.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextMegaButton(
-                        modifier = Modifier.testTag(INPUT_DIALOG_CONFIRM_TAG),
-                        text = confirmButtonText,
-                        onClick = { onConfirm(textFieldValue.text) },
-                    )
                     cancelButtonText?.let {
                         TextMegaButton(
                             modifier = Modifier.testTag(INPUT_DIALOG_CANCEL_TAG),
@@ -119,6 +114,11 @@ fun InputDialog(
                             onClick = onDismiss,
                         )
                     }
+                    TextMegaButton(
+                        modifier = Modifier.testTag(INPUT_DIALOG_CONFIRM_TAG),
+                        text = confirmButtonText,
+                        onClick = { onConfirm(textFieldValue.text) },
+                    )
                 }
             },
             properties = DialogProperties(
@@ -144,7 +144,7 @@ private fun InputDialogPreview() {
                 InputDialog(
                     title = "Dialog title",
                     hint = "hint text",
-                    confirmButtonText = "Discard",
+                    confirmButtonText = "Accept",
                     cancelButtonText = "Cancel",
                     onConfirm = {},
                     onDismiss = {},
@@ -165,7 +165,7 @@ private fun InputDialogPreviewWithError() {
                     title = "Dialog title",
                     text = "Input text",
                     hint = "nick name",
-                    confirmButtonText = "Discard",
+                    confirmButtonText = "Accept",
                     cancelButtonText = "Cancel",
                     onConfirm = {},
                     onDismiss = {},
@@ -187,7 +187,7 @@ private fun InputDialogPreviewWithLargeButtonText() {
                     title = "Dialog title",
                     text = "Input text",
                     hint = "nick name",
-                    confirmButtonText = "Discard button with very large text",
+                    confirmButtonText = "Accept button with very large text",
                     cancelButtonText = "Cancel",
                     onConfirm = {},
                     onDismiss = {},
