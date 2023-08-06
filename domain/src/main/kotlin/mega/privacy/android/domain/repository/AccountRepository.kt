@@ -244,6 +244,14 @@ interface AccountRepository {
     suspend fun querySignupLink(signupLink: String): String
 
     /**
+     * Queries a reset password link.
+     *
+     * @param link Reset password link
+     * @return This: The link to reset password.
+     */
+    suspend fun queryResetPasswordLink(link: String): String
+
+    /**
      * Stops using the current authentication token, it's needed to explicitly call
      * set accountAuth as NULL as parameter. Otherwise, the value set would continue
      * being used despite this MegaApi object is logged in or logged out.s account

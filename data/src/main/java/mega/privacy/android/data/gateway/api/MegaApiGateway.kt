@@ -2166,6 +2166,23 @@ interface MegaApiGateway {
     fun querySignupLink(link: String, listener: MegaRequestListenerInterface)
 
     /**
+     * Get information about a recovery link created by MegaApi::resetPassword.
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_QUERY_RECOVERY_LINK
+     * Valid data in the MegaRequest object received on all callbacks:
+     * - MegaRequest::getLink - Returns the recovery link
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getEmail - Return the email associated with the link
+     * - MegaRequest::getFlag - Return whether the link requires masterkey to reset password.
+     *
+     * @param link     Recovery link (recover)
+     * @param listener MegaRequestListener to track this request
+     */
+    fun queryResetPasswordLink(link: String, listener: MegaRequestListenerInterface)
+
+    /**
      * Get MegaNode given the Node File Link
      *
      * @param nodeFileLink  Public link to a file in MEGA

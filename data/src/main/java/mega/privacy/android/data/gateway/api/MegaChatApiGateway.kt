@@ -38,6 +38,12 @@ interface MegaChatApiGateway {
     fun init(session: String?): Int
 
     /**
+     * Initializes API as anonymous user
+     * @return Init state.
+     */
+    fun initAnonymous(): Int
+
+    /**
      * Logouts API.
      */
     fun logout(listener: MegaChatRequestListenerInterface?)

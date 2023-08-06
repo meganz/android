@@ -67,6 +67,7 @@ import mega.privacy.android.domain.exception.NoLoggedInUserException
 import mega.privacy.android.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.domain.exception.QRCodeException
 import mega.privacy.android.domain.exception.QuerySignupLinkException
+import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaApiJava
@@ -723,6 +724,47 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun getPasswordStrength(password: String) = withContext(ioDispatcher) {
         passwordStrengthMapper(megaApiGateway.getPasswordStrength(password))
     }
+
+    override suspend fun queryResetPasswordLink(link: String): String =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { _, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK -> {
+                                Timber.d("MegaRequest.TYPE_QUERY_RECOVERY_LINK MegaError API_OK")
+                                continuation.resumeWith(Result.success(link))
+                            }
+
+                            MegaError.API_EEXPIRED -> {
+                                Timber.w("MegaRequest.TYPE_QUERY_RECOVERY_LINK link no longer available.")
+                                continuation.resumeWith(
+                                    Result.failure(ResetPasswordLinkException.LinkExpired)
+                                )
+                            }
+
+                            MegaError.API_EACCESS -> {
+                                Timber.w("MegaRequest.TYPE_QUERY_RECOVERY_LINK unrelated link $error")
+                                continuation.resumeWith(
+                                    Result.failure(ResetPasswordLinkException.LinkInvalid)
+                                )
+                            }
+
+                            else -> {
+                                Timber.w("MegaRequest.TYPE_QUERY_RECOVERY_LINK error $error")
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        ResetPasswordLinkException.Unknown(error.toException("queryResetPasswordLink"))
+                                    )
+                                )
+                            }
+                        }
+                    }
+                )
+
+                megaApiGateway.queryResetPasswordLink(link, listener)
+            }
+        }
 
     override suspend fun resetAccountInfo() = myAccountInfoFacade.resetAccountInfo()
     override suspend fun update2FADialogPreference(show2FA: Boolean) =

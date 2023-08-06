@@ -14,10 +14,10 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatGeolocationMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
+import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.chat.ContainsMetaMapper
 import mega.privacy.android.data.mapper.chat.GiphyMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.RichPreviewMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
@@ -77,6 +78,7 @@ class ChatRepositoryImplTest {
         HandleListMapper(),
         ContainsMetaMapper(RichPreviewMapper(), ChatGeolocationMapper(), GiphyMapper())
     )
+    private val chatInitStateMapper = mock<ChatInitStateMapper>()
     private val chatMessageNotificationBehaviourMapper = ChatMessageNotificationBehaviourMapper()
     private val chatId = Random.nextLong()
     private val userHandle = Random.nextLong()
@@ -113,6 +115,7 @@ class ChatRepositoryImplTest {
             chatMessageMapper = chatMessageMapper,
             appEventGateway = appEventGateway,
             chatHistoryLoadStatusMapper = chatHistoryLoadStatusMapper,
+            chatInitStateMapper = chatInitStateMapper
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)

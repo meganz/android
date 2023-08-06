@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.NotificationBehaviour
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
+import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -18,6 +19,18 @@ import mega.privacy.android.domain.entity.node.NodeId
  * Chat repository
  */
 interface ChatRepository {
+    /**
+     * Get chat init state
+     * @return Init state as [ChatInitState]
+     */
+    suspend fun getChatInitState(): ChatInitState
+
+    /**
+     * Init chat API as anonymous user
+     * @return Init state as [ChatInitState]
+     */
+    suspend fun initAnonymousChat(): ChatInitState
+
     /**
      * Notify chat logout
      *

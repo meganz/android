@@ -51,6 +51,8 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun init(session: String?): Int =
         chatApi.init(session)
 
+    override fun initAnonymous(): Int = chatApi.initAnonymous()
+
     override fun logout(listener: MegaChatRequestListenerInterface?) = chatApi.logout(listener)
 
     override fun setLogger(logger: MegaChatLoggerInterface) =

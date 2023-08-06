@@ -24,6 +24,7 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
+import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
@@ -38,6 +39,7 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
+import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -97,10 +99,19 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val chatMessageMapper: ChatMessageMapper,
     private val chatMessageNotificationBehaviourMapper: ChatMessageNotificationBehaviourMapper,
     private val chatHistoryLoadStatusMapper: ChatHistoryLoadStatusMapper,
+    private val chatInitStateMapper: ChatInitStateMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
 ) : ChatRepository {
+
+    override suspend fun getChatInitState(): ChatInitState = withContext(ioDispatcher) {
+        chatInitStateMapper(megaChatApiGateway.initState)
+    }
+
+    override suspend fun initAnonymousChat(): ChatInitState = withContext(ioDispatcher) {
+        chatInitStateMapper(megaChatApiGateway.initAnonymous())
+    }
 
     override fun notifyChatLogout(): Flow<Boolean> =
         callbackFlow {
