@@ -374,4 +374,18 @@ interface TransferRepository {
      * Delete all completed transfers
      */
     suspend fun deleteAllCompletedTransfers()
+
+    /**
+     * Get failed or cancel transfers
+     *
+     * @return the failed or cancelled transfer list
+     */
+    suspend fun getFailedOrCanceledTransfers(): List<CompletedTransfer>
+
+    /**
+     * Delete failed or canceled transfers
+     *
+     * @return the failed or cancelled transfer list was deleted
+     */
+    suspend fun deleteFailedOrCanceledTransfers(): List<CompletedTransfer>
 }

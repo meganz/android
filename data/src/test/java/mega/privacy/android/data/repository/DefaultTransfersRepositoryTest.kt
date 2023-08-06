@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaError
@@ -648,6 +649,30 @@ class DefaultTransfersRepositoryTest {
         underTest.deleteAllCompletedTransfers()
         verify(megaLocalRoomGateway).deleteAllCompletedTransfers()
     }
+
+    @Test
+    fun `test that getCompletedTransfersByState room gateway is called when getFailedOrCanceledTransfers is called`() =
+        runTest {
+            underTest.getFailedOrCanceledTransfers()
+            verify(megaLocalRoomGateway).getCompletedTransfersByState(
+                listOf(
+                    TransferState.STATE_FAILED,
+                    TransferState.STATE_CANCELLED
+                )
+            )
+        }
+
+    @Test
+    fun `test that deleteCompletedTransfersByState room gateway is called when deleteFailedOrCanceledTransfers is called`() =
+        runTest {
+            underTest.deleteFailedOrCanceledTransfers()
+            verify(megaLocalRoomGateway).deleteCompletedTransfersByState(
+                listOf(
+                    TransferState.STATE_FAILED,
+                    TransferState.STATE_CANCELLED
+                )
+            )
+        }
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)

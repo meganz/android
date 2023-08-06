@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
@@ -122,6 +123,19 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun deleteAllCompletedTransfers() =
         completedTransferDao.deleteAllCompletedTransfers()
+
+    override suspend fun getCompletedTransfersByState(states: List<TransferState>): List<CompletedTransfer> {
+        val encryptedStates = states.mapNotNull { encryptData(it.toString()) }
+        return completedTransferDao.getCompletedTransfersByState(encryptedStates)
+            .map { entity -> completedTransferModelMapper(entity) }
+    }
+
+    override suspend fun deleteCompletedTransfersByState(states: List<TransferState>): List<CompletedTransfer> {
+        val encryptedStates = states.mapNotNull { encryptData(it.toString()) }
+        val entities = completedTransferDao.getCompletedTransfersByState(encryptedStates)
+        completedTransferDao.deleteCompletedTransfer(entities)
+        return entities.map { entity -> completedTransferModelMapper(entity) }
+    }
 
     override suspend fun getActiveTransferByTag(tag: Int) =
         activeTransferDao.getActiveTransferByTag(tag)

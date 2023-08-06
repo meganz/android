@@ -1,6 +1,7 @@
 package mega.privacy.android.data.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -11,6 +12,9 @@ import mega.privacy.android.data.database.entity.CompletedTransferEntity
 internal interface CompletedTransferDao {
     @Query("SELECT * FROM completedtransfers")
     fun getAllCompletedTransfers(): Flow<List<CompletedTransferEntity>>
+
+    @Query("SELECT * FROM completedtransfers WHERE transferstate IN(:states)")
+    fun getCompletedTransfersByState(states: List<String>): List<CompletedTransferEntity>
 
     @Query("SELECT * FROM completedtransfers WHERE id = :id")
     suspend fun getCompletedTransferById(id: Int): CompletedTransferEntity?
@@ -26,4 +30,7 @@ internal interface CompletedTransferDao {
 
     @Query("SELECT COUNT(id) FROM completedtransfers")
     suspend fun getCompletedTransfersCount(): Int
+
+    @Delete
+    suspend fun deleteCompletedTransfer(entities: List<CompletedTransferEntity>)
 }

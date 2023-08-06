@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -438,4 +439,24 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun deleteAllCompletedTransfers() = withContext(ioDispatcher) {
         megaLocalRoomGateway.deleteAllCompletedTransfers()
     }
+
+    override suspend fun getFailedOrCanceledTransfers(): List<CompletedTransfer> =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getCompletedTransfersByState(
+                listOf(
+                    TransferState.STATE_FAILED,
+                    TransferState.STATE_CANCELLED
+                )
+            )
+        }
+
+    override suspend fun deleteFailedOrCanceledTransfers(): List<CompletedTransfer> =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteCompletedTransfersByState(
+                listOf(
+                    TransferState.STATE_FAILED,
+                    TransferState.STATE_CANCELLED
+                )
+            )
+        }
 }

@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 
 /**
@@ -127,6 +128,22 @@ interface MegaLocalRoomGateway {
      * Delete all completed transfers
      */
     suspend fun deleteAllCompletedTransfers()
+
+    /**
+     * Get completed transfers by state
+     *
+     * @param states
+     * @return list of transfers match the state
+     */
+    suspend fun getCompletedTransfersByState(states: List<TransferState>): List<CompletedTransfer>
+
+    /**
+     * Delete completed transfers by state
+     *
+     * @param states
+     * @return deleted completed transfer list
+     */
+    suspend fun deleteCompletedTransfersByState(states: List<TransferState>): List<CompletedTransfer>
 
     /**
      * Get active transfer by tag
