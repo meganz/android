@@ -316,38 +316,49 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param contacts list of contacts selected
      */
     fun addContactsSelected(contacts: ArrayList<String>) {
+        val currentList = state.value.participantItemList
         _state.update {
             it.copy(
                 numOfParticipants = contacts.size + 1,
-                allowAddParticipants = contacts.isEmpty()
             )
         }
+
         viewModelScope.launch {
-            val list = mutableListOf<ContactItem>()
+            val newList = mutableListOf<ContactItem>()
             contacts.forEach { email ->
                 runCatching {
                     getContactFromEmailUseCase(email, isOnline())
                 }.onSuccess { contactItem ->
                     contactItem?.let {
-                        list.add(it)
+                        newList.add(it)
                     }
                 }
             }
 
+            val participantsRemoved = currentList.minus(newList.toSet())
+            val participantsAdded = newList.minus(currentList.toSet())
+
             _state.update {
                 it.copy(
-                    participantItemList = list,
+                    participantItemList = newList,
                 )
             }
 
             if (state.value.participantItemList.isNotEmpty()) {
-                triggerSnackbarMessage(
-                    getPluralStringFromStringResMapper(
-                        R.plurals.meetings_schedule_meeting_snackbar_adding_participants_success,
-                        state.value.participantItemList.size,
-                        state.value.participantItemList.size,
-                    )
-                )
+                if (participantsAdded.isNotEmpty()) {
+                    updateParticipantsSnackbarMessage(isAdding = true, list = participantsAdded)
+                    _state.update {
+                        it.copy(
+                            participantsRemoved = participantsRemoved,
+                        )
+                    }
+
+                    return@launch
+                }
+
+                if (participantsRemoved.isNotEmpty()) {
+                    updateParticipantsSnackbarMessage(isAdding = false, list = participantsRemoved)
+                }
             }
         }
     }
@@ -366,42 +377,40 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Set start date and time
      *
-     * @param startDateTime     Start date and time
+     * @param selectedStartDate     Start date and time
      */
-    fun onStartDateTimeTap(startDateTime: ZonedDateTime) {
-        val now = Instant.now().atZone(ZoneOffset.UTC)
-        var selectedStartDateTime = startDateTime
-
-        if (selectedStartDateTime.isBefore(now)) {
-            selectedStartDateTime = selectedStartDateTime.plus(1, ChronoUnit.DAYS)
+    fun onStartDateTimeTap(selectedStartDate: ZonedDateTime) {
+        val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC)
+        if (selectedStartDate.isBefore(nowZonedDateTime)) {
+            return
         }
 
         val newWeekdayList: List<Weekday>? =
             if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Weekly && state.value.rulesSelected.interval == 1) listOf(
                 weekDayMapper(
-                    selectedStartDateTime.dayOfWeek
+                    selectedStartDate.dayOfWeek
                 )
             ) else state.value.rulesSelected.weekDayList
 
         val newMonthDayList: List<Int>? =
             if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Monthly && state.value.rulesSelected.interval == 1) listOf(
-                selectedStartDateTime.dayOfMonth
+                selectedStartDate.dayOfMonth
             ) else state.value.rulesSelected.monthDayList
 
         _state.update { state ->
             val newEndDate =
-                if ((state.endDate.isAfter(selectedStartDateTime))) state.endDate else selectedStartDateTime.plus(
+                if ((state.endDate.isAfter(selectedStartDate))) state.endDate else selectedStartDate.plus(
                     30,
                     ChronoUnit.MINUTES
                 )
 
             state.copy(
-                startDate = selectedStartDateTime,
+                startDate = selectedStartDate,
                 endDate = newEndDate,
                 rulesSelected = state.rulesSelected.copy(
                     weekDayList = newWeekdayList,
                     monthDayList = newMonthDayList,
-                    until = if (state.rulesSelected.until == 0L) state.rulesSelected.until else selectedStartDateTime.plusMonths(
+                    until = if (state.rulesSelected.until == 0L) state.rulesSelected.until else selectedStartDate.plusMonths(
                         6
                     ).toEpochSecond()
                 )
@@ -414,16 +423,16 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Set end date and time
      *
-     * @param endDateTime   End date and time
+     * @param selectedEndDate   End date and time
      */
-    fun onEndDateTimeTap(endDateTime: ZonedDateTime) {
-        if (endDateTime.isBefore(state.value.startDate)) {
+    fun onEndDateTimeTap(selectedEndDate: ZonedDateTime) {
+        if (selectedEndDate.isBefore(state.value.startDate)) {
             return
         }
 
         _state.update {
             it.copy(
-                endDate = endDateTime
+                endDate = selectedEndDate
             )
         }
     }
@@ -477,7 +486,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             state.copy(
                 showMonthlyRecurrenceWarning = shouldShownMonthWarning(
                     state.rulesSelected.freq,
-                    state.rulesSelected.monthDayList?.first()
+                    state.rulesSelected.monthDayList.takeIf { !it.isNullOrEmpty() }?.first()
                 )
             )
         }
@@ -1112,6 +1121,24 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         }
 
     /**
+     * Trigger event to show update participant Snackbar message
+     *
+     * @param isAdding     True, if is adding participants. False, if is removing participants.
+     * @param list         List of participants.
+     */
+    private fun updateParticipantsSnackbarMessage(isAdding: Boolean, list: List<ContactItem>) =
+        triggerSnackbarMessage(
+            getPluralStringFromStringResMapper(
+                if (isAdding)
+                    R.plurals.meetings_schedule_meeting_snackbar_adding_participants_success
+                else
+                    R.plurals.meetings_schedule_meeting_snackbar_removing_participants_success,
+                list.size,
+                list.size,
+            )
+        )
+
+    /**
      * Trigger event to show Snackbar message
      *
      * @param message     Content for snack bar
@@ -1122,10 +1149,18 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Reset and notify that snackbarMessage is consumed
      */
-    fun onSnackbarMessageConsumed() =
+    fun onSnackbarMessageConsumed() {
+        val participantsRemoved = state.value.participantsRemoved
+
         _state.update {
-            it.copy(snackbarMessageContent = consumed())
+            it.copy(snackbarMessageContent = consumed(), participantsRemoved = emptyList())
         }
+
+        if (participantsRemoved.isNotEmpty()) {
+            updateParticipantsSnackbarMessage(isAdding = false, list = participantsRemoved)
+        }
+    }
+
 
     /**
      * Dismiss alert dialogs

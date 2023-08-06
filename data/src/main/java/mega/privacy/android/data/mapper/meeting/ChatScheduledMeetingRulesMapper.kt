@@ -47,10 +47,12 @@ internal class ChatScheduledMeetingRulesMapper @Inject constructor(
                 }
             }
         }
+        val interval =
+            if (megaChatScheduledRules.interval() < 1) 1 else megaChatScheduledRules.interval()
 
         return ChatScheduledRules(
             freq = freq,
-            interval = megaChatScheduledRules.interval(),
+            interval = interval,
             until = megaChatScheduledRules.until(),
             weekDayList = weekDayList,
             monthDayList = monthDayList,

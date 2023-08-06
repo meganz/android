@@ -46,6 +46,8 @@ import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateOccurrenceUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -557,27 +559,27 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      */
     fun onNewStartTime(newStartTime: ZonedDateTime) =
         state.value.editedOccurrence?.getStartZoneDateTime()?.let { currentStartZonedDateTime ->
-            val newStartZonedDateTime =
-                currentStartZonedDateTime.withHour(newStartTime.hour)
-                    .withMinute(newStartTime.minute)
-
-            if (currentStartZonedDateTime.isEqual(newStartZonedDateTime)) {
+            val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC)
+            if (newStartTime.isBefore(nowZonedDateTime) || currentStartZonedDateTime.isEqual(
+                    newStartTime
+                )
+            ) {
                 return@let
             }
 
             state.value.editedOccurrence?.getEndZoneDateTime()?.let { currentEndZonedDateTime ->
                 var newEndZonedDateTime = currentEndZonedDateTime
-                if (newStartZonedDateTime.isEqual(currentEndZonedDateTime) || newStartZonedDateTime.isAfter(
+                if (newStartTime.isEqual(currentEndZonedDateTime) || newStartTime.isAfter(
                         currentEndZonedDateTime
                     )
                 ) {
-                    newEndZonedDateTime = newStartZonedDateTime.plusMinutes(30)
+                    newEndZonedDateTime = newStartTime.plusMinutes(30)
                 }
 
                 _state.update { state ->
                     state.copy(
                         editedOccurrence = state.editedOccurrence?.copy(
-                            startDateTime = newStartZonedDateTime.toEpochSecond(),
+                            startDateTime = newStartTime.toEpochSecond(),
                             endDateTime = newEndZonedDateTime.toEpochSecond()
                         )
                     )
@@ -592,28 +594,32 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      */
     fun onNewEndTime(newEndTime: ZonedDateTime) =
         state.value.editedOccurrence?.getEndZoneDateTime()?.let { currentEndZonedDateTime ->
-            val newEndZonedDateTime =
-                currentEndZonedDateTime.withHour(newEndTime.hour)
-                    .withMinute(newEndTime.minute)
-
-            if (currentEndZonedDateTime.isEqual(newEndZonedDateTime)) {
+            if (currentEndZonedDateTime.isEqual(newEndTime)) {
                 return@let
             }
 
             state.value.editedOccurrence?.getStartZoneDateTime()?.let { currentStartZonedDateTime ->
                 var newStartZonedDateTime = currentStartZonedDateTime
-                if (newEndZonedDateTime.isEqual(currentStartZonedDateTime) || newEndZonedDateTime.isBefore(
+                if (newEndTime.isEqual(currentStartZonedDateTime) || newEndTime.isBefore(
                         currentStartZonedDateTime
                     )
                 ) {
-                    newStartZonedDateTime = newEndZonedDateTime.minusMinutes(30)
+                    newStartZonedDateTime = newEndTime.minusMinutes(30)
+                }
+
+                val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC)
+                if (newStartZonedDateTime.isBefore(nowZonedDateTime) || newEndTime.isBefore(
+                        nowZonedDateTime
+                    )
+                ) {
+                    return@let
                 }
 
                 _state.update { state ->
                     state.copy(
                         editedOccurrence = state.editedOccurrence?.copy(
                             startDateTime = newStartZonedDateTime.toEpochSecond(),
-                            endDateTime = newEndZonedDateTime.toEpochSecond()
+                            endDateTime = newEndTime.toEpochSecond()
                         )
                     )
                 }
@@ -627,18 +633,18 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      */
     fun onNewStartDate(newStartDate: ZonedDateTime) =
         state.value.editedOccurrence?.getStartZoneDateTime()?.let { currentStartZonedDateTime ->
-            val newStartZonedDateTime =
-                newStartDate.withHour(currentStartZonedDateTime.hour)
-                    .withMinute(currentStartZonedDateTime.minute)
-
-            if (currentStartZonedDateTime.isEqual(newStartZonedDateTime)) {
+            val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC)
+            if (newStartDate.isBefore(nowZonedDateTime) || currentStartZonedDateTime.isEqual(
+                    newStartDate
+                )
+            ) {
                 return@let
             }
 
             _state.update { state ->
                 state.copy(
                     editedOccurrence = state.editedOccurrence?.copy(
-                        startDateTime = newStartZonedDateTime.toEpochSecond(),
+                        startDateTime = newStartDate.toEpochSecond(),
                     )
                 )
             }

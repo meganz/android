@@ -61,6 +61,7 @@ import java.time.temporal.WeekFields
  * @property initialSendCalendarInviteOption            True if is enabled the send calendar invite option, false otherwise.
  * @property initialWaitingRoomOption                   True if is enabled waiting room option, false otherwise.
  * @property initialParticipantsList                    List of participants handles.
+ * @property participantsRemoved                        List of participants removed.
  * @property weekList                                   List of [Weekday] in the week.
  */
 data class CreateScheduledMeetingState constructor(
@@ -97,6 +98,7 @@ data class CreateScheduledMeetingState constructor(
     val initialSendCalendarInviteOption: Boolean = false,
     val initialWaitingRoomOption: Boolean = false,
     val initialParticipantsList: List<ContactItem> = emptyList(),
+    val participantsRemoved: List<ContactItem> = emptyList(),
     val weekList: List<Weekday> =
         listOf(
             Weekday.Monday,

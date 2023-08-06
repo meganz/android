@@ -360,8 +360,9 @@ private fun ActionButton(
             .fillMaxWidth()
             .clickable {
                 onButtonClicked(action)
-            }) {
-            if ((action != ScheduleMeetingAction.AddDescription || !state.isEditingDescription)
+            }
+        ) {
+            if ((action != ScheduleMeetingAction.AddDescription || (!state.isEditingDescription && state.descriptionText.isEmpty()))
                 && (action != ScheduleMeetingAction.EndRecurrence || state.rulesSelected.freq != OccurrenceFrequencyType.Invalid)
             ) {
                 ActionOption(
@@ -483,7 +484,7 @@ private fun ScheduleMeetingAppBar(
                         .wrapContentSize(Alignment.CenterEnd)
                 ) {
                     IconButton(onClick = {
-                        if (!state.isCreatingMeeting) {
+                        if (!state.isCreatingMeeting && state.isValid()) {
                             onAcceptClicked()
                         }
                     }) {
