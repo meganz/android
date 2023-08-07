@@ -122,7 +122,7 @@ pipeline {
                 if (common.hasGitLabMergeRequest()) {
 
                     // download Jenkins console log
-                    downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                    common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
                     // upload Jenkins console log
                     String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
@@ -861,15 +861,6 @@ String getArtifactoryDevelopCodeCoverage(String coveragePath) {
             returnStdout: true).trim()
     print("artifactory develop coverage path(${coveragePath}): ${summary}")
     return summary
-}
-
-/**
- * download jenkins build console log and save to file.
- */
-private void downloadJenkinsConsoleLog(String downloaded) {
-    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-        sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
-    }
 }
 
 /**

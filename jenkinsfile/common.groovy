@@ -128,8 +128,13 @@ void sendToMR(String message) {
  * download jenkins build console log and save to file.
  */
 void downloadJenkinsConsoleLog(String downloaded) {
+    println("entering downloadJenkinsConsoleLog()")
     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-        sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
+        withEnv([
+                "DOWNLOADED=$downloaded"
+        ]) {
+            sh 'curl -u ${CREDENTIALS} ${BUILD_URL}consoleText -o ${DOWNLOADED}'
+        }
     }
 }
 
@@ -614,7 +619,6 @@ void downloadDependencyLibForSdk() {
                     """
     }
 }
-
 
 
 return this
