@@ -69,7 +69,7 @@ fun WaitingRoomWarningDialog(
                     value = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_warning),
                     baseStyle = MaterialTheme.typography.subtitle1.copy(
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colors.onPrimary
                     ),
                     styles = mapOf(SpanIndicator('A') to SpanStyle(textDecoration = TextDecoration.Underline)),

@@ -78,7 +78,7 @@ data class CreateScheduledMeetingState constructor(
     val customRecurrenceState: CustomRecurrenceState = CustomRecurrenceState(),
     val participantItemList: List<ContactItem> = emptyList(),
     val enabledMeetingLinkOption: Boolean = false,
-    val enabledAllowAddParticipantsOption: Boolean = true,
+    val enabledAllowAddParticipantsOption: Boolean = false,
     val enabledSendCalendarInviteOption: Boolean = false,
     val enabledWaitingRoomOption: Boolean = false,
     val descriptionText: String = "",
