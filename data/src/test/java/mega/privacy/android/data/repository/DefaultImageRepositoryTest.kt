@@ -270,7 +270,7 @@ class DefaultImageRepositoryTest {
             whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(null)
             whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
             whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
-            whenever(imageNodeMapper.invoke(any(), any())).thenReturn(imageNode)
+            whenever(imageNodeMapper.invoke(any(), any(), any())).thenReturn(imageNode)
             val result = underTest.getImageNodeByHandle(
                 handle = handle
             )
@@ -286,7 +286,7 @@ class DefaultImageRepositoryTest {
             underTest.getImageNodeByHandle(
                 handle = handle
             )
-            verify(imageNodeMapper).invoke(any(), any())
+            verify(imageNodeMapper).invoke(any(), any(), any())
         }
     }
 
@@ -356,7 +356,7 @@ class DefaultImageRepositoryTest {
                 )
             }
             underTest.getImageNodeForPublicLink(nodeFileLink)
-            verify(imageNodeMapper).invoke(any(), any())
+            verify(imageNodeMapper).invoke(any(), any(), any())
         }
     }
 
@@ -478,7 +478,7 @@ class DefaultImageRepositoryTest {
                 chatRoomId = chatRoomId,
                 chatMessageId = chatMessageId
             )
-            verify(imageNodeMapper).invoke(any(), any())
+            verify(imageNodeMapper).invoke(any(), any(), any())
         }
     }
 }

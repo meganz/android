@@ -51,6 +51,7 @@ class NodeMapperTest {
     private val expectedDuration = 100
     private val expectedPublicLink = "publicLink"
     private val expectedPublicLinkCreationTime = 456L
+    private val expectedSerializedString = "serializedString"
 
     @BeforeEach
     internal fun setUp() {
@@ -120,6 +121,20 @@ class NodeMapperTest {
         val actualAsFolder = actual as DefaultFolderNode
         assertThat(actualAsFolder.isInRubbishBin).isTrue()
         assertThat(actualAsFolder.isPendingShare).isTrue()
+    }
+
+    @Test
+    fun `test that serialized string is not null when requireSerializedString is true`() = runTest {
+        val megaNode = getMockNode(isFile = true)
+        val actual = underTest(megaNode, requireSerializedData = true)
+        assertThat(actual.serializedData).isEqualTo(expectedSerializedString)
+    }
+
+    @Test
+    fun `test that serialized string is null when requireSerializedString is false`() = runTest {
+        val megaNode = getMockNode(isFile = true)
+        val actual = underTest(megaNode, requireSerializedData = false)
+        assertThat(actual.serializedData).isNull()
     }
 
     @Nested
@@ -198,6 +213,7 @@ class NodeMapperTest {
             on { this.isExported }.thenReturn(isExported)
             on { this.publicLink }.thenReturn(publicLink)
             on { this.publicLinkCreationTime }.thenReturn(publicLinkCreationTime)
+            on { this.serialize() }.thenReturn(expectedSerializedString)
         }
         return node
     }

@@ -31,9 +31,13 @@ internal class FileNodeMapper @Inject constructor(
      * Invoke
      *
      * @param megaNode
+     * @param requireSerializedData
      * @return
      */
-    suspend operator fun invoke(megaNode: MegaNode): FileNode = DefaultFileNode(
+    suspend operator fun invoke(
+        megaNode: MegaNode,
+        requireSerializedData: Boolean,
+    ): FileNode = DefaultFileNode(
         id = NodeId(megaNode.handle),
         name = megaNode.name,
         size = megaNode.size,
@@ -67,6 +71,7 @@ internal class FileNodeMapper @Inject constructor(
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
         hasThumbnail = megaNode.hasThumbnail(),
         hasPreview = megaNode.hasPreview(),
+        serializedData = if (requireSerializedData) megaNode.serialize() else null,
     )
 
     private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: File?): String? =

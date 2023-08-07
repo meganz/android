@@ -24,11 +24,13 @@ internal class FolderNodeMapper @Inject constructor(
      * Invoke
      *
      * @param megaNode
+     * @param requireSerializedData
      * @return
      */
     suspend operator fun invoke(
         megaNode: MegaNode,
         fromFolderLink: Boolean,
+        requireSerializedData: Boolean,
     ): FolderNode = DefaultFolderNode(
         id = NodeId(megaNode.handle),
         name = megaNode.name,
@@ -57,5 +59,6 @@ internal class FolderNodeMapper @Inject constructor(
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
         creationTime = megaNode.creationTime,
         fetchChildren = fetChildrenMapper(megaNode),
+        serializedData = if (requireSerializedData) megaNode.serialize() else null,
     )
 }

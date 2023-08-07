@@ -18,7 +18,8 @@ internal class ImageNodeMapper @Inject constructor(
 ) {
     suspend operator fun invoke(
         megaNode: MegaNode,
-        hasVersion: suspend (MegaNode) -> Boolean
+        hasVersion: suspend (MegaNode) -> Boolean,
+        requireSerializedData: Boolean = false,
     ) = if (megaNode.isFolder) {
         throw IllegalStateException("Node is a folder")
     } else {
@@ -53,6 +54,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val downloadFullImage = fullImageFromServerMapper(megaNode)
             override val latitude = megaNode.latitude
             override val longitude = megaNode.longitude
+            override val serializedData = if (requireSerializedData) megaNode.serialize() else null
         }
     }
 }

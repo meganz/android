@@ -17,14 +17,17 @@ internal class NodeMapper @Inject constructor(
     /**
      * Invoke
      *
-     * @param megaNode
+     * @param megaNode  Mega node to map
+     * @param fromFolderLink    If the node mapping is from folder link
+     * @param requireSerializedData To se the serializedData only when required and not always
      */
     suspend operator fun invoke(
         megaNode: MegaNode,
         fromFolderLink: Boolean = false,
+        requireSerializedData: Boolean = false,
     ) = if (megaNode.isFolder) {
-        folderNodeMapper(megaNode, fromFolderLink)
+        folderNodeMapper(megaNode, fromFolderLink, requireSerializedData)
     } else {
-        fileNodeMapper(megaNode)
+        fileNodeMapper(megaNode, requireSerializedData)
     }
 }

@@ -28,4 +28,5 @@ internal data class DefaultFileNode(
     override val isNodeKeyDecrypted: Boolean,
     override val hasThumbnail: Boolean,
     override val hasPreview: Boolean,
+    override val serializedData: String?
 ) : FileNode

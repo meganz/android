@@ -65,5 +65,11 @@ interface Node {
      * Creation time
      */
     val creationTime: Long
+
+    /**
+     * Serialized string of the node
+     * This value should be set only if required and not always for all the nodes
+     */
+    val serializedData: String?
 }
 

@@ -75,6 +75,7 @@ class DefaultFavouritesRepositoryTest {
         whenever(
             nodeMapper(
                 any(),
+                any(),
                 any()
             )
         ).thenReturn(
@@ -112,6 +113,7 @@ class DefaultFavouritesRepositoryTest {
 
         whenever(
             nodeMapper(
+                any(),
                 any(),
                 any()
             )

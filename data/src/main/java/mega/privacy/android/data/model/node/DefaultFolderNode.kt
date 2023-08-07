@@ -26,4 +26,5 @@ internal data class DefaultFolderNode(
     override val isNodeKeyDecrypted: Boolean,
     override val creationTime: Long,
     override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode>,
+    override val serializedData: String?,
 ) : FolderNode
