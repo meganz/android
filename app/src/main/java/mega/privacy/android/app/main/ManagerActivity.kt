@@ -85,6 +85,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -164,6 +165,7 @@ import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
+import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
@@ -450,6 +452,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var managerRedirectIntentMapper: ManagerRedirectIntentMapper
+
+    @Inject
+    lateinit var inAppUpdateHandler: InAppUpdateHandler
 
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
@@ -1046,6 +1051,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             else -> {
                 Timber.d("Backup warning dialog is not show")
+            }
+        }
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.InAppUpdate)) {
+                runCatching {
+                    inAppUpdateHandler.checkForAppUpdates()
+                }.onSuccess { success ->
+                    if (success) {
+                        Snackbar.make(
+                            fragmentContainer,
+                            getString(R.string.general_app_update_message_download_success),
+                            Snackbar.LENGTH_LONG
+                        ).apply {
+                            setAction(getString(R.string.general_app_update_action_restart)) { inAppUpdateHandler.completeUpdate() }
+                            show()
+                        }
+                    }
+                }
             }
         }
     }

@@ -145,6 +145,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
     MeetingNotificationSettings("Enable Meeting notification settings", false),
 
     /**
+     * InAppUpdate toggle
+     */
+    InAppUpdate("Enable In-App Update", false),
+
+    /**
      * Meeting notification settings
      */
     WaitingRoomSettings("Enable Waiting room settings", false),

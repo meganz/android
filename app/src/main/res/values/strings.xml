@@ -5082,6 +5082,10 @@
     <string name="meetings_schedule_meeting_waiting_room_warning">Participants added by non-hosts during calls won’t be sent to the waiting room. [A]Learn more[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">Restart</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">Removed %1$d participant</item>
