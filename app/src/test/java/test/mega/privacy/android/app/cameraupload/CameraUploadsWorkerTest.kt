@@ -24,8 +24,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
-import mega.privacy.android.data.gateway.PermissionGateway
-import mega.privacy.android.data.wrapper.StringWrapper
+import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
@@ -59,7 +58,6 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
@@ -119,7 +117,6 @@ class CameraUploadsWorkerTest {
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
 
-    private val permissionsGateway: PermissionGateway = mock()
     private val isNotEnoughQuota: IsNotEnoughQuota = mock()
     private val ioDispatcher = UnconfinedTestDispatcher()
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase = mock()
@@ -140,7 +137,6 @@ class CameraUploadsWorkerTest {
     private val compressedVideoPending: CompressedVideoPending = mock()
     private val getVideoSyncRecordsByStatus: GetVideoSyncRecordsByStatus = mock()
     private val setSyncRecordPendingByPath: SetSyncRecordPendingByPath = mock()
-    private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase = mock()
     private val isChargingRequired: IsChargingRequired = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val processMediaForUploadUseCase: ProcessMediaForUploadUseCase = mock()
@@ -188,7 +184,6 @@ class CameraUploadsWorkerTest {
     private val completedTransferMapper: LegacyCompletedTransferMapper = mock()
     private val setCoordinatesUseCase: SetCoordinatesUseCase = mock()
     private val isChargingUseCase: IsChargingUseCase = mock()
-    private val stringWrapper: StringWrapper = mock()
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase = mock()
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase = mock()
     private val generatePreviewUseCase: GeneratePreviewUseCase = mock()
@@ -197,6 +192,7 @@ class CameraUploadsWorkerTest {
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val performanceReporter: PerformanceReporter = mock()
+    private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper = mock()
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
 
     @Before
@@ -231,7 +227,6 @@ class CameraUploadsWorkerTest {
                     override fun isEnqueuedInForeground(workSpecId: String): Boolean = true
                 }, workExecutor)
             ),
-            permissionsGateway = permissionsGateway,
             isNotEnoughQuota = isNotEnoughQuota,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
@@ -251,7 +246,6 @@ class CameraUploadsWorkerTest {
             compressedVideoPending = compressedVideoPending,
             getVideoSyncRecordsByStatus = getVideoSyncRecordsByStatus,
             setSyncRecordPendingByPath = setSyncRecordPendingByPath,
-            getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
             isChargingRequired = isChargingRequired,
             getNodeByIdUseCase = getNodeByIdUseCase,
             processMediaForUploadUseCase = processMediaForUploadUseCase,
@@ -294,7 +288,6 @@ class CameraUploadsWorkerTest {
             completedTransferMapper = completedTransferMapper,
             setCoordinatesUseCase = setCoordinatesUseCase,
             isChargingUseCase = isChargingUseCase,
-            stringWrapper = stringWrapper,
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
             broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
             generatePreviewUseCase = generatePreviewUseCase,
@@ -303,7 +296,8 @@ class CameraUploadsWorkerTest {
             deleteThumbnailUseCase = deleteThumbnailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             performanceReporter = performanceReporter,
-            hasMediaPermissionUseCase = hasMediaPermissionUseCase
+            hasMediaPermissionUseCase = hasMediaPermissionUseCase,
+            cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper
         )
     }
 

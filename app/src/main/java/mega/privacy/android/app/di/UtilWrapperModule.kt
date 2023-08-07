@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
+import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
@@ -34,6 +35,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
+import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
 
@@ -155,6 +157,23 @@ abstract class UtilWrapperModule {
                 override fun getIpAddress(): String? {
                     return (application as MegaApplication).localIpAddress
                 }
+            }
+
+        /**
+         * Provides the [CameraUploadsNotificationManagerWrapper]
+         */
+        @Provides
+        fun provideNotificationHelper(cameraUploadsNotificationManager: CameraUploadsNotificationManager) =
+            object : CameraUploadsNotificationManagerWrapper {
+                override fun getForegroundInfo() =
+                    cameraUploadsNotificationManager.getForegroundInfo()
+
+                override fun cancelNotifications() =
+                    cameraUploadsNotificationManager.cancelAllNotifications()
+
+                override fun cancelNotification() =
+                    cameraUploadsNotificationManager.cancelNotification()
+
             }
 
     }

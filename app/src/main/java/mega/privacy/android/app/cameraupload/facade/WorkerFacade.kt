@@ -1,5 +1,6 @@
 package mega.privacy.android.app.cameraupload.facade
 
+import androidx.lifecycle.asFlow
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
@@ -8,9 +9,14 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.await
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.data.gateway.WorkerGateway
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMapper
 import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -39,6 +45,7 @@ private const val CU_RESCHEDULE_INTERVAL: Long = 5000 // Milliseconds
  */
 class WorkerFacade @Inject constructor(
     private val workManager: WorkManager,
+    private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper,
 ) : WorkerGateway {
 
     /**
@@ -212,4 +219,12 @@ class WorkerFacade @Inject constructor(
             ?: false
     }
 
+    override fun monitorCameraUploadsStatusInfo(): Flow<CameraUploadsStatusInfo> {
+        val uploadFlow = workManager.getWorkInfosByTagLiveData(CAMERA_UPLOAD_TAG).asFlow()
+        val singleUploadFlow =
+            workManager.getWorkInfosByTagLiveData(SINGLE_CAMERA_UPLOAD_TAG).asFlow()
+        return merge(uploadFlow, singleUploadFlow).mapNotNull {
+            cameraUploadsStatusInfoMapper(it.first().progress)
+        }
+    }
 }

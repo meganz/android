@@ -37,8 +37,10 @@ class AppModule {
             // running Android 13 and above. For devices running below Android 13,
             // the normal getPackageInfo() is used
             packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(context.packageName,
-                    PackageManager.PackageInfoFlags.of(0))
+                context.packageManager.getPackageInfo(
+                    context.packageName,
+                    PackageManager.PackageInfoFlags.of(0)
+                )
             } else {
                 @Suppress("DEPRECATION")
                 context.packageManager.getPackageInfo(context.packageName, 0)
@@ -64,8 +66,10 @@ class AppModule {
             // running Android 13 and above. For devices running below Android 13,
             // the normal getPackageInfo() is used
             packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(context.packageName,
-                    PackageManager.PackageInfoFlags.of(0))
+                context.packageManager.getPackageInfo(
+                    context.packageName,
+                    PackageManager.PackageInfoFlags.of(0)
+                )
             } else {
                 @Suppress("DEPRECATION")
                 context.packageManager.getPackageInfo(context.packageName, 0)

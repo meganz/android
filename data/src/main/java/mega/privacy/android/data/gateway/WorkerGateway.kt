@@ -1,5 +1,8 @@
 package mega.privacy.android.data.gateway
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+
 /**
  * Worker Gateway
  */
@@ -36,4 +39,9 @@ interface WorkerGateway {
      * Cancel all camera upload sync heartbeat workers.
      */
     suspend fun cancelCameraUploadAndHeartbeatWorkRequest()
+
+    /**
+     * Get CameraUploadsWorker Info
+     */
+    fun monitorCameraUploadsStatusInfo(): Flow<CameraUploadsStatusInfo>
 }

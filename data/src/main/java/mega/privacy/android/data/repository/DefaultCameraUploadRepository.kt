@@ -5,6 +5,7 @@ import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -803,6 +804,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun setBackupAsOutdated(backupId: Long) = withContext(ioDispatcher) {
         localStorageGateway.setBackupAsOutdated(backupId)
     }
+
+    override fun monitorCameraUploadsStatusInfo() =
+        workerGateway.monitorCameraUploadsStatusInfo().catch {
+            Timber.e(it)
+        }.flowOn(ioDispatcher)
 
     private companion object {
         private const val STATE_NO_CHANGE = -1

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -754,5 +755,12 @@ interface CameraUploadRepository {
      * @param backupId backup folder id to be removed
      */
     suspend fun setBackupAsOutdated(backupId: Long)
+
+    /**
+     * monitor camera uploads status info
+     *
+     * @return flow of [CameraUploadsStatusInfo]
+     */
+    fun monitorCameraUploadsStatusInfo(): Flow<CameraUploadsStatusInfo>
 
 }
