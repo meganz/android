@@ -70,6 +70,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
@@ -92,6 +93,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -147,10 +149,10 @@ import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
-import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogFragment
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessGraceDialogFragment
 import mega.privacy.android.app.main.dialog.connect.ConfirmConnectDialogFragment
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
+import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
@@ -671,6 +673,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var versionsRemoved = 0
     private var errorVersionRemove = 0
     var viewInFolderNode: MegaNode? = null
+
+    private var showDialogStorageStatusJob: Job? = null
 
     private val contactUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -7166,8 +7170,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         overQuotaAlert: Boolean,
         preWarning: Boolean,
     ) {
-        StorageStatusDialogFragment.newInstance(storageState, overQuotaAlert, preWarning)
-            .show(supportFragmentManager, StorageStatusDialogFragment.TAG)
+        if (showDialogStorageStatusJob?.isActive == true) return
+        showDialogStorageStatusJob = lifecycleScope.launch {
+            lifecycle.withStarted {
+                StorageStatusDialogFragment.newInstance(storageState, overQuotaAlert, preWarning)
+                    .show(supportFragmentManager, StorageStatusDialogFragment.TAG)
+            }
+        }
     }
 
     private fun refreshOfflineNodes() {
