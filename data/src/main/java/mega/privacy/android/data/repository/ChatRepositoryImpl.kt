@@ -683,7 +683,7 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun getChatMessageNotificationBehaviour(
         beep: Boolean,
-        defaultSound: String,
+        defaultSound: String?,
     ) = withContext(ioDispatcher) {
         chatMessageNotificationBehaviourMapper(
             localStorageGateway.getChatSettings(),

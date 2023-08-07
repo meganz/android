@@ -4,8 +4,8 @@ import android.Manifest
 import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.RingtoneManager
 import android.os.Build
+import android.provider.Settings.System.DEFAULT_NOTIFICATION_URI
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.CoroutineScope
@@ -121,10 +121,7 @@ class MegaChatNotificationHandler @Inject constructor(
                         shouldBeep,
                         chatId,
                         msgId,
-                        RingtoneManager.getActualDefaultRingtoneUri(
-                            application,
-                            RingtoneManager.TYPE_NOTIFICATION
-                        ).toString()
+                        runCatching { DEFAULT_NOTIFICATION_URI.toString() }.getOrNull()
                     ) ?: return@launch
 
                     ChatMessageNotification.show(

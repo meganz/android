@@ -37,7 +37,7 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
         shouldBeep: Boolean,
         chatId: Long,
         msgId: Long,
-        defaultSound: String,
+        defaultSound: String?,
     ): ChatMessageNotificationData? = withContext(ioDispatcher) {
         getChatMessageUseCase(chatId, msgId)?.let { message ->
             if (message.isDeleted) {

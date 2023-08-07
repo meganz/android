@@ -21,7 +21,7 @@ class ChatMessageNotificationBehaviourMapper @Inject constructor() {
     operator fun invoke(
         chatSettings: ChatSettings?,
         beep: Boolean,
-        defaultSound: String,
+        defaultSound: String?,
     ) = NotificationBehaviour(
         sound = when {
             beep && chatSettings != null -> chatSettings.notificationsSound.ifEmpty { defaultSound }

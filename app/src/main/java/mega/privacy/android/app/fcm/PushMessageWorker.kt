@@ -121,7 +121,7 @@ class PushMessageWorker @AssistedInject constructor(
                             shouldBeep,
                             chatId,
                             msgId,
-                            DEFAULT_NOTIFICATION_URI.toString()
+                            runCatching { DEFAULT_NOTIFICATION_URI.toString() }.getOrNull()
                         ) ?: return@withContext Result.failure()
 
                         ChatMessageNotification.show(

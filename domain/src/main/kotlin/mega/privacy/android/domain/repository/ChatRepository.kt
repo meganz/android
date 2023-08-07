@@ -457,7 +457,7 @@ interface ChatRepository {
      */
     suspend fun getChatMessageNotificationBehaviour(
         beep: Boolean,
-        defaultSound: String,
+        defaultSound: String?,
     ): NotificationBehaviour
 
     /**
