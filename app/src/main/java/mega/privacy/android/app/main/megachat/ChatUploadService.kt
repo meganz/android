@@ -944,14 +944,16 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
             return
         }
 
-        val id = ChatUtil.getPendingMessageIdFromAppData(appData)
-        sendBroadcast(
-            Intent(BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START)
-                .putExtra(BroadcastConstants.PENDING_MESSAGE_ID, id)
-        )
+        transfer.pendingMessageId()?.let { id ->
+            sendBroadcast(
+                Intent(BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START)
+                    .putExtra(BroadcastConstants.PENDING_MESSAGE_ID, id)
+            )
 
-        //Update status and tag on db
-        dbH.updatePendingMessageOnTransferStart(id, tag)
+            //Update status and tag on db
+            dbH.updatePendingMessageOnTransferStart(id, tag)
+        }
+
         mapProgressTransfers[tag] = transfer
 
         if (!isFolderTransfer && !isVoiceClip()) {
@@ -1213,15 +1215,16 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                         isOverQuota = Constants.PRE_OVERQUOTA_STORAGE_STATE
                     }
 
-                    val id = ChatUtil.getPendingMessageIdFromAppData(appData)
-                    //Update status and tag on db
-                    dbH.updatePendingMessageOnTransferFinish(
-                        id,
-                        "-1",
-                        PendingMessageState.ERROR_UPLOADING.value
-                    )
+                    transfer.pendingMessageId()?.let { id ->
+                        //Update status and tag on db
+                        dbH.updatePendingMessageOnTransferFinish(
+                            id,
+                            "-1",
+                            PendingMessageState.ERROR_UPLOADING.value
+                        )
 
-                    launchErrorToChat(id)
+                        launchErrorToChat(id)
+                    }
 
                     if (totalUploadsCompleted == totalUploads && transfersCount == 0 && numberVideosPending <= 0 && requestSent <= 0) {
                         onQueueComplete()
@@ -1289,33 +1292,33 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
 
     fun attachNodes(transfer: Transfer) = with(transfer) {
         Timber.d("attachNodes()")
-        //Find the pending message
-        val appData = appData
-        val id = ChatUtil.getPendingMessageIdFromAppData(appData)
-        //Update status and nodeHandle on db
-        dbH.updatePendingMessageOnTransferFinish(
-            id,
-            nodeHandle.toString() + "",
-            PendingMessageState.ATTACHING.value
-        )
 
-        if (arePendingMessagesEmpty(id, transfer)) {
-            return
-        }
+        transfer.pendingMessageId()?.let { id ->
+            //Update status and nodeHandle on db
+            dbH.updatePendingMessageOnTransferFinish(
+                id,
+                nodeHandle.toString() + "",
+                PendingMessageState.ATTACHING.value
+            )
 
-        val fingerprint = megaApi.getFingerprint(localPath)
-        var msgNotFound = true
-
-        for (pendMsg in pendingMessages!!) {
-            if (pendMsg.id == id || pendMsg.fingerprint == fingerprint) {
-                attach(pendMsg, transfer)
-                msgNotFound = false
+            if (arePendingMessagesEmpty(id, transfer)) {
+                return@with
             }
-        }
 
-        if (msgNotFound) {
-            //Message not found, try to attach from DB
-            attachMessageFromDB(id, transfer)
+            val fingerprint = megaApi.getFingerprint(localPath)
+            var msgNotFound = true
+
+            for (pendMsg in pendingMessages!!) {
+                if (pendMsg.id == id || pendMsg.fingerprint == fingerprint) {
+                    attach(pendMsg, transfer)
+                    msgNotFound = false
+                }
+            }
+
+            if (msgNotFound) {
+                //Message not found, try to attach from DB
+                attachMessageFromDB(id, transfer)
+            }
         }
     }
 
@@ -1343,34 +1346,34 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
 
     fun attachVoiceClips(transfer: Transfer) = with(transfer) {
         Timber.d("attachVoiceClips()")
-        //Find the pending message
-        val id = ChatUtil.getPendingMessageIdFromAppData(appData)
-        //Update status and nodeHandle on db
-        dbH.updatePendingMessageOnTransferFinish(
-            id,
-            nodeHandle.toString() + "",
-            PendingMessageState.ATTACHING.value
-        )
+        transfer.pendingMessageId()?.let { id ->
+            //Update status and nodeHandle on db
+            dbH.updatePendingMessageOnTransferFinish(
+                id,
+                nodeHandle.toString() + "",
+                PendingMessageState.ATTACHING.value
+            )
 
-        if (arePendingMessagesEmpty(id, transfer)) {
-            return
-        }
-
-        for (pendMsg in pendingMessages!!) {
-            if (pendMsg.id == id) {
-                pendMsg.nodeHandle = nodeHandle
-                pendMsg.state = PendingMessageState.ATTACHING.value
-                megaChatApi.attachVoiceMessage(
-                    pendMsg.chatId,
-                    nodeHandle,
-                    this@ChatUploadService
-                )
-                return
+            if (arePendingMessagesEmpty(id, transfer)) {
+                return@with
             }
-        }
 
-        //Message not found, try to attach from DB
-        attachMessageFromDB(id, transfer)
+            for (pendMsg in pendingMessages!!) {
+                if (pendMsg.id == id) {
+                    pendMsg.nodeHandle = nodeHandle
+                    pendMsg.state = PendingMessageState.ATTACHING.value
+                    megaChatApi.attachVoiceMessage(
+                        pendMsg.chatId,
+                        nodeHandle,
+                        this@ChatUploadService
+                    )
+                    return@with
+                }
+            }
+
+            //Message not found, try to attach from DB
+            attachMessageFromDB(id, transfer)
+        }
     }
 
     fun updatePdfAttachStatus(transfer: Transfer) = with(transfer) {
@@ -1389,20 +1392,20 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
             }
         }
 
-        //Update node handle in db
-        val id = ChatUtil.getPendingMessageIdFromAppData(appData)
-        //Update status and nodeHandle on db
-        dbH.updatePendingMessageOnTransferFinish(
-            id,
-            nodeHandle.toString() + "",
-            PendingMessageState.ATTACHING.value
-        )
+        transfer.pendingMessageId()?.let { id ->
+            //Update status and nodeHandle on db
+            dbH.updatePendingMessageOnTransferFinish(
+                id,
+                nodeHandle.toString() + "",
+                PendingMessageState.ATTACHING.value
+            )
 
-        pendingMessages?.forEach { if (it.chatId == id) return@with }
+            pendingMessages?.forEach { if (it.chatId == id) return@with }
 
-        //Message not found, try to get it from DB.
-        dbH.findPendingMessageById(id)?.let { pendingMessages?.add(it) }
-            ?: Timber.e("Message not found, not added")
+            //Message not found, try to get it from DB.
+            dbH.findPendingMessageById(id)?.let { pendingMessages?.add(it) }
+                ?: Timber.e("Message not found, not added")
+        }
     }
 
     private fun attachPdfNode(nodeHandle: Long) {

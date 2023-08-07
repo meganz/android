@@ -82,7 +82,7 @@ class TransferAppDataMapperTest {
         joinParameters(APP_DATA_REPEATED_TRANSFER_SEPARATOR)
 
     companion object {
-        private const val FAKE_ID = "12345"
+        private const val FAKE_ID = 12345L
         private const val TARGET_PATH = "target"
         private const val TARGET_URI = "targetUri"
         private val wrongParameters = listOf(
@@ -96,7 +96,7 @@ class TransferAppDataMapperTest {
         )
 
         internal val correctParameters = listOf(
-            generateAppDataString(ChatUpload, FAKE_ID)
+            generateAppDataString(ChatUpload, FAKE_ID.toString())
                     to listOf(TransferAppData.ChatUpload(FAKE_ID)),
             generateAppDataString(VoiceClip)
                     to listOf(TransferAppData.VoiceClip),

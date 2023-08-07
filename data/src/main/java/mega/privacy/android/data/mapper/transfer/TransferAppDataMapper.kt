@@ -35,7 +35,7 @@ internal class TransferAppDataMapper @Inject constructor() {
                     VoiceClip -> TransferAppData.VoiceClip
                     CameraUpload -> TransferAppData.CameraUpload
                     ChatUpload -> values.firstIfNotBlank()
-                        ?.let { TransferAppData.ChatUpload(it) }
+                        ?.let { TransferAppData.ChatUpload(it.toLong()) }
 
                     SDCardDownload -> {
                         values.firstIfNotBlank()?.let {

@@ -23,7 +23,7 @@ sealed interface TransferAppData {
      * Identify a chat transfer and its message
      * @param pendingMessageId the chat message Id related to this transfer
      */
-    data class ChatUpload(val pendingMessageId: String) : TransferAppData
+    data class ChatUpload(val pendingMessageId: Long) : TransferAppData
 
     /**
      * Identify a download transfers that needs to be stored in the SD card.

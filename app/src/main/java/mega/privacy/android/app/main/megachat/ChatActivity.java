@@ -62,7 +62,6 @@ import static mega.privacy.android.app.utils.ChatUtil.createAttachmentPendingMes
 import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat;
 import static mega.privacy.android.app.utils.ChatUtil.getAudioFocus;
 import static mega.privacy.android.app.utils.ChatUtil.getNameContactAttachment;
-import static mega.privacy.android.app.utils.ChatUtil.getPendingMessageIdFromAppData;
 import static mega.privacy.android.app.utils.ChatUtil.getRequest;
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.ChatUtil.isEnableChatNotifications;
@@ -93,6 +92,7 @@ import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_L
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
 import static mega.privacy.android.app.utils.Constants.ACTION_UPDATE_ATTACHMENT;
 import static mega.privacy.android.app.utils.Constants.APP_DATA_CHAT;
+import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
 import static mega.privacy.android.app.utils.Constants.APP_DATA_VOICE_CLIP;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PROGRESS;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP;
@@ -7412,6 +7412,19 @@ public class ChatActivity extends PasscodeActivity
         }
 
         return null;
+    }
+
+    /**
+     * Gets the identifier of a pending message from the appData of its transfer.
+     *
+     * @param appData AppData of the transfer in question.
+     * @return The identifier of the pending message.
+     */
+    private long getPendingMessageIdFromAppData(String appData) {
+        String[] parts = appData.split(APP_DATA_INDICATOR);
+        String idFound = parts[parts.length - 1];
+
+        return Long.parseLong(idFound);
     }
 
     public void loadMessage(AndroidMegaChatMessage messageToShow, int currentIndex) {

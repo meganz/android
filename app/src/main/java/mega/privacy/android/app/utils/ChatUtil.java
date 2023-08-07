@@ -1616,19 +1616,6 @@ public class ChatUtil {
     }
 
     /**
-     * Gets the identifier of a pending message from the appData of its transfer.
-     *
-     * @param appData AppData of the transfer in question.
-     * @return The identifier of the pending message.
-     */
-    public static long getPendingMessageIdFromAppData(String appData) {
-        String[] parts = appData.split(APP_DATA_INDICATOR);
-        String idFound = parts[parts.length - 1];
-
-        return Long.parseLong(idFound);
-    }
-
-    /**
      * Method to share a message from the chat.
      *
      * @param context    Context of Activity.

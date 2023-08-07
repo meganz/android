@@ -119,7 +119,7 @@ class DownloadNodesUseCaseTest {
         TransferAppData.CameraUpload,
         TransferAppData.VoiceClip,
         TransferAppData.TextFileUpload(TransferAppData.TextFileUpload.Mode.Create, false),
-        TransferAppData.ChatUpload("id")
+        TransferAppData.ChatUpload(12345L)
     )
 
 

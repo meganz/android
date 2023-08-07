@@ -104,4 +104,13 @@ data class Transfer(
      */
     fun isBackgroundTransfer(): Boolean =
         transferAppData.contains(TransferAppData.BackgroundTransfer)
+
+    /**
+     * Gets the pending message id if the transfer is a chat upload. Null otherwise.
+     */
+    fun pendingMessageId() =
+        transferAppData
+            .filterIsInstance(TransferAppData.ChatUpload::class.java)
+            .firstOrNull()
+            ?.pendingMessageId
 }
