@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper
 
+import mega.privacy.android.data.mapper.useralert.UserAlertChangesMapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
 import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
@@ -18,7 +19,6 @@ import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
 import mega.privacy.android.domain.entity.RemovedFromShareByOwnerAlert
 import mega.privacy.android.domain.entity.RemovedSharedNodesAlert
-import mega.privacy.android.domain.entity.ScheduledMeetingChangeType
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
 import mega.privacy.android.domain.entity.UnknownAlert
@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTitleAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.useralert.UserAlertChange
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 import java.time.Instant
@@ -433,7 +434,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
     val changes = getScheduledMeetingChanges()
     return if (changes.size == 1) {
         when (changes.first()) {
-            ScheduledMeetingChangeType.Title -> {
+            UserAlertChange.Title -> {
                 UpdatedScheduledMeetingTitleAlert(
                     id = id,
                     seen = seen,
@@ -450,7 +451,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     scheduledMeeting = meeting?.takeIf { !isRecurring },
                 )
             }
-            ScheduledMeetingChangeType.Description -> {
+            UserAlertChange.Description -> {
                 UpdatedScheduledMeetingDescriptionAlert(
                     id = id,
                     seen = seen,
@@ -466,7 +467,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     scheduledMeeting = meeting,
                 )
             }
-            ScheduledMeetingChangeType.StartDate, ScheduledMeetingChangeType.EndDate -> {
+            UserAlertChange.StartDate, UserAlertChange.EndDate -> {
                 val dateTimeChanges = getDateTimeChanges()
                 UpdatedScheduledMeetingDateTimeAlert(
                     id = id,
@@ -485,7 +486,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     scheduledMeeting = meeting,
                 )
             }
-            ScheduledMeetingChangeType.Canceled -> {
+            UserAlertChange.Canceled -> {
                 UpdatedScheduledMeetingCancelAlert(
                     id = id,
                     seen = seen,
@@ -521,8 +522,8 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
     } else {
         if (changes.size == 2 && changes.containsAll(
                 listOf(
-                    ScheduledMeetingChangeType.StartDate,
-                    ScheduledMeetingChangeType.EndDate
+                    UserAlertChange.StartDate,
+                    UserAlertChange.EndDate
                 )
             )
         ) {
@@ -589,8 +590,10 @@ private fun getChildNodes(megaUserAlert: MegaUserAlert) =
         }
     }
 
-private fun MegaUserAlert.getScheduledMeetingChanges(): List<ScheduledMeetingChangeType> =
-    ScheduledMeetingChangeType.values().filter { hasSchedMeetingChanged(it.value.toLong()) }
+private fun MegaUserAlert.getScheduledMeetingChanges(): List<UserAlertChange> =
+    UserAlertChange.values().filter { alertChange ->
+        hasSchedMeetingChanged(UserAlertChangesMapper.userAlertChanges[alertChange] as Long)
+    }
 
 private fun MegaUserAlert.getDateTimeChanges(
     occurrence: ChatScheduledMeetingOccurr? = null,
