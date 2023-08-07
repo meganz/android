@@ -73,7 +73,6 @@ import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsM
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
-import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -99,7 +98,6 @@ import javax.inject.Inject
  * @property getCloudSortOrder
  * @property monitorConnectivityUseCase
  * @property getExtendedAccountDetail
- * @property getPricing
  * @property getFullAccountInfoUseCase
  * @property getActiveSubscriptionUseCase
  * @property getFeatureFlagValueUseCase
@@ -111,7 +109,6 @@ import javax.inject.Inject
  * @property stopCameraUploadsUseCase
  * @property deleteOldestCompletedTransfersUseCase
  * @property getIncomingContactRequestsUseCase
- * @property cancelTransfersUseCase
  * @param monitorNodeUpdates
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
  * @param monitorContactRequestUpdates
@@ -158,7 +155,6 @@ class ManagerViewModel @Inject constructor(
     private val createShareKey: CreateShareKey,
     private val deleteOldestCompletedTransfersUseCase: DeleteOldestCompletedTransfersUseCase,
     private val getIncomingContactRequestsUseCase: GetIncomingContactRequestsUseCase,
-    private val cancelTransfersUseCase: CancelTransfersUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     monitorOfflineNodeAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
@@ -339,28 +335,6 @@ class ManagerViewModel @Inject constructor(
                 }
         }
     }
-
-    /**
-     * Cancels all transfers, uploads and downloads
-     */
-    fun cancelAllTransfers() {
-        viewModelScope.launch {
-            runCatching {
-                cancelTransfersUseCase()
-            }.onSuccess {
-                _state.update { it.copy(cancelTransfersResult = Result.success(Unit)) }
-            }.onFailure { error ->
-                _state.update { it.copy(cancelTransfersResult = Result.failure(error)) }
-                Timber.e(error)
-            }
-        }
-    }
-
-    /**
-     * Resets the state of the cancelTransfersResult
-     */
-    fun onCancelTransfersResultConsumed() =
-        _state.update { state -> state.copy(cancelTransfersResult = null) }
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(

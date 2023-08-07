@@ -366,6 +366,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
         state: Int,
     ) = dbHandler.updatePendingMessage(idMessage, transferTag, nodeHandle, state)
 
+    override suspend fun setTransferQueueStatus(isPause: Boolean) {
+        dbHandler.transferQueueStatus = isPause
+    }
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }

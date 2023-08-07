@@ -98,7 +98,6 @@ class BackgroundRequestListener @Inject constructor(
             MegaRequest.TYPE_FETCH_NODES -> handleFetchNodeRequest(e)
             MegaRequest.TYPE_GET_ATTR_USER -> handleGetAttrUserRequest(request, e)
             MegaRequest.TYPE_SET_ATTR_USER -> handleSetAttrUserRequest(request, e)
-            MegaRequest.TYPE_PAUSE_TRANSFERS -> dbH.transferQueueStatus = request.flag
         }
     }
 

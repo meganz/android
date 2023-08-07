@@ -69,11 +69,6 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
         }
     }
 
-    /**
-     * Removes all completed transfers.
-     */
-    fun clearCompletedTransfers() = viewModel.clearCompletedTransfers()
-
     companion object {
 
         /**

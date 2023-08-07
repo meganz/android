@@ -696,4 +696,12 @@ interface MegaLocalStorageGateway {
         nodeHandle: String?,
         state: Int,
     )
+
+
+    /**
+     * Set transfer queue status
+     *
+     * @param isPause
+     */
+    suspend fun setTransferQueueStatus(isPause: Boolean)
 }

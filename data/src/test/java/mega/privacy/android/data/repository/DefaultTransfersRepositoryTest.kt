@@ -25,7 +25,6 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaError
@@ -656,8 +655,8 @@ class DefaultTransfersRepositoryTest {
             underTest.getFailedOrCanceledTransfers()
             verify(megaLocalRoomGateway).getCompletedTransfersByState(
                 listOf(
-                    TransferState.STATE_FAILED,
-                    TransferState.STATE_CANCELLED
+                    MegaTransfer.STATE_FAILED,
+                    MegaTransfer.STATE_CANCELLED
                 )
             )
         }
@@ -668,8 +667,8 @@ class DefaultTransfersRepositoryTest {
             underTest.deleteFailedOrCanceledTransfers()
             verify(megaLocalRoomGateway).deleteCompletedTransfersByState(
                 listOf(
-                    TransferState.STATE_FAILED,
-                    TransferState.STATE_CANCELLED
+                    MegaTransfer.STATE_FAILED,
+                    MegaTransfer.STATE_CANCELLED
                 )
             )
         }

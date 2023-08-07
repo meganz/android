@@ -366,6 +366,13 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     private fun disableDragAndDrop() =
         itemTouchHelper.attachToRecyclerView(null)
 
+    /**
+     * Refresh adapter
+     */
+    fun refresh() {
+        adapter?.notifyDataSetChanged()
+    }
+
     companion object {
 
         /**

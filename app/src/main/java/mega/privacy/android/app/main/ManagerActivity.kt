@@ -259,7 +259,6 @@ import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
@@ -311,12 +310,10 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -1954,24 +1951,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun handleAllTransfersCanceled(cancelTransfersResult: Result<Unit>) {
-        viewModel.onCancelTransfersResultConsumed()
-        if (cancelTransfersResult.isSuccess) {
-            hideTransfersWidget()
-            if (drawerItem === DrawerItem.TRANSFERS) {
-                pauseTransfersMenuIcon?.isVisible = false
-                playTransfersMenuIcon?.isVisible = false
-                cancelAllTransfersMenuItem?.isVisible = false
-            }
-        } else {
-            showSnackbar(
-                Constants.SNACKBAR_TYPE,
-                getString(R.string.error_general_nodes),
-                -1
-            )
-        }
-    }
-
     /**
      * collecting Flows from ViewModels
      */
@@ -1980,9 +1959,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             viewModel.state,
             Lifecycle.State.STARTED
         ) { managerState: ManagerState ->
-            if (managerState.cancelTransfersResult != null) {
-                handleAllTransfersCanceled(managerState.cancelTransfersResult)
-            }
             val nodeNameCollisionResult = managerState.nodeNameCollisionResult
             if (nodeNameCollisionResult != null) {
                 handleNodesNameCollisionResult(nodeNameCollisionResult)
@@ -2089,13 +2065,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.d("MonitorFinishActivity flow collected with Finish %s", finish)
             if (finish) {
                 finish()
-            }
-        }
-        collectFlow(transfersManagementViewModel.state) {
-            if (it.transfersInfo.status == TransfersStatus.NotTransferring) {
-                pauseTransfersMenuIcon?.isVisible = false
-                playTransfersMenuIcon?.isVisible = false
-                cancelAllTransfersMenuItem?.isVisible = false
             }
         }
         collectFlow(
@@ -4333,11 +4302,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb)
         archivedMenuItem = menu.findItem(R.id.action_menu_archived)
         clearRubbishBinMenuItem = menu.findItem(R.id.action_menu_clear_rubbish_bin)
-        cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers)
-        clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers)
-        retryTransfers = menu.findItem(R.id.action_menu_retry_transfers)
-        playTransfersMenuIcon = menu.findItem(R.id.action_play)
-        pauseTransfersMenuIcon = menu.findItem(R.id.action_pause)
         returnCallMenuItem = menu.findItem(R.id.action_return_call)
         val rootView = returnCallMenuItem?.actionView as? RelativeLayout
         layoutCallMenuItem = rootView?.findViewById(R.id.layout_menu_call)
@@ -4420,18 +4384,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.TRANSFERS -> if (transferPageViewModel.transferTab == TransfersTab.PENDING_TAB
                     && transfersViewModel.getActiveTransfers().isNotEmpty()
                 ) {
-                    if (dbH.transferQueueStatus) {
-                        playTransfersMenuIcon?.isVisible = true
-                    } else {
-                        pauseTransfersMenuIcon?.isVisible = true
-                    }
-                    cancelAllTransfersMenuItem?.isVisible = true
                     enableSelectMenuItem.isVisible = true
-                } else if ((transferPageViewModel.transferTab === TransfersTab.COMPLETED_TAB)
-                    && transfersViewModel.getCompletedTransfers().isNotEmpty()
-                ) {
-                    clearCompletedTransfers?.isVisible = true
-                    retryTransfers?.isVisible = thereAreFailedOrCancelledTransfers()
                 }
 
                 DrawerItem.CHAT -> if (searchExpand) {
@@ -4621,34 +4574,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 true
             }
 
-            R.id.action_menu_cancel_all_transfers -> {
-                showConfirmationCancelAllTransfers()
-                true
-            }
-
-            R.id.action_menu_clear_completed_transfers -> {
-                showConfirmationClearCompletedTransfers()
-                true
-            }
-
-            R.id.action_pause -> {
-                if (drawerItem === DrawerItem.TRANSFERS) {
-                    Timber.d("Click on action_pause - play visible")
-                    megaApi.pauseTransfers(true, this)
-                    pauseTransfersMenuIcon!!.isVisible = false
-                    playTransfersMenuIcon!!.isVisible = true
-                }
-                true
-            }
-
-            R.id.action_play -> {
-                Timber.d("Click on action_play - pause visible")
-                pauseTransfersMenuIcon!!.isVisible = true
-                playTransfersMenuIcon!!.isVisible = false
-                megaApi.pauseTransfers(false, this)
-                true
-            }
-
             R.id.action_menu_do_not_disturb -> {
                 if (drawerItem === DrawerItem.CHAT) {
                     if (ChatUtil.getGeneralNotification() == Constants.NOTIFICATIONS_ENABLED) {
@@ -4722,11 +4647,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             R.id.action_return_call -> {
                 Timber.d("Action menu return to call in progress pressed")
                 returnCall()
-                true
-            }
-
-            R.id.action_menu_retry_transfers -> {
-                retryAllTransfers()
                 true
             }
 
@@ -6302,7 +6222,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 transfersToImageViewer = true
             }
             drawerItem = DrawerItem.TRANSFERS
-            transferPageViewModel.setTransfersTab(intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE)
+            transferPageViewModel.setTransfersTab(
+                intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
+            )
             selectDrawerItem(drawerItem)
             return
         }
@@ -7734,27 +7656,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            MegaRequest.TYPE_PAUSE_TRANSFERS -> {
-                Timber.d("MegaRequest.TYPE_PAUSE_TRANSFERS")
-                //force update the pause notification to prevent missed onTransferUpdate
-                if (e.errorCode == MegaError.API_OK) {
-                    updateTransfersWidgetState()
-                    if (drawerItem === DrawerItem.TRANSFERS) {
-                        val areTransfersPaused = dbH.transferQueueStatus
-                        refreshFragment(FragmentTag.TRANSFERS_PAGE.tag)
-                        pauseTransfersMenuIcon?.isVisible = !areTransfersPaused
-                        playTransfersMenuIcon?.isVisible = areTransfersPaused
-
-                        // For Uploads, when the "Pause All" Button is Clicked, newBackupState = PAUSE_UPLOADS
-                        // Otherwise, when the "Resume All" Button is Clicked, newBackupState = ACTIVE
-                        val newBackupState: BackupState =
-                            if (areTransfersPaused) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE
-                        CameraUploadSyncManager.updatePrimaryFolderBackupState(newBackupState)
-                        CameraUploadSyncManager.updateSecondaryFolderBackupState(newBackupState)
-                    }
-                }
-            }
-
             MegaRequest.TYPE_PAUSE_TRANSFER -> {
                 Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER")
                 if (e.errorCode == MegaError.API_OK) {
@@ -8054,22 +7955,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Shows a warning to ensure if it is sure of remove all completed transfers.
-     */
-    private fun showConfirmationClearCompletedTransfers() {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
-            .setPositiveButton(R.string.general_clear) { _: DialogInterface?, _: Int ->
-                transfersViewModel.clearCompletedTransfers()
-                dbH.emptyCompletedTransfers()
-                supportInvalidateOptionsMenu()
-            }
-            .setNegativeButton(R.string.general_dismiss, null)
-        confirmationTransfersDialog = builder.create()
-        setConfirmationTransfersDialogNotCancellableAndShow()
-    }
-
-    /**
      * Shows a warning to ensure if it is sure of cancel selected transfers.
      */
     fun showConfirmationCancelSelectedTransfers(selectedTransfers: List<Transfer>) {
@@ -8093,24 +7978,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         })
                 }
                 transferPageFragment?.destroyActionMode()
-            }
-            .setNegativeButton(R.string.general_dismiss, null)
-        confirmationTransfersDialog = builder.create()
-        setConfirmationTransfersDialogNotCancellableAndShow()
-    }
-
-    /**
-     * Shows a warning to ensure if it is sure of cancel all transfers.
-     */
-    private fun showConfirmationCancelAllTransfers() {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setMessage(resources.getString(R.string.cancel_all_transfer_confirmation))
-            .setPositiveButton(
-                R.string.cancel_all_action
-            ) { _: DialogInterface?, _: Int ->
-                viewModel.cancelAllTransfers()
-                viewModel.stopCameraUploads(shouldReschedule = true)
-                refreshFragment(FragmentTag.TRANSFERS_PAGE.tag)
             }
             .setNegativeButton(R.string.general_dismiss, null)
         confirmationTransfersDialog = builder.create()
@@ -8637,7 +8504,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @param transfer the transfer to retry
      */
-    private fun retryTransfer(transfer: CompletedTransfer) {
+    fun retryTransfer(transfer: CompletedTransfer) {
         when (transfer.type) {
             MegaTransfer.TYPE_DOWNLOAD -> {
                 val node = megaApi.getNodeByHandle(transfer.handle) ?: return
@@ -8808,26 +8675,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Gets the failed and cancelled transfers.
-     *
-     * @return A list with the failed and cancelled transfers.
-     */
-    private val failedAndCancelledTransfers: ArrayList<CompletedTransfer>
-        get() = dbH.failedOrCancelledTransfers
-
-    /**
-     * Retries all the failed and cancelled transfers.
-     */
-    private fun retryAllTransfers() {
-        val retryTransfers = failedAndCancelledTransfers
-        dbH.removeFailedOrCancelledTransfers()
-        for (transfer in retryTransfers) {
-            transfersViewModel.completedTransferRemoved(transfer, false)
-            retryTransfer(transfer)
-        }
-    }
-
-    /**
      * Retry a single transfer.
      *
      * @param transfer CompletedTransfer to retry.
@@ -8835,15 +8682,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun retrySingleTransfer(transfer: CompletedTransfer) {
         removeCompletedTransfer(transfer, false)
         retryTransfer(transfer)
-    }
-
-    /**
-     * Checks if there are failed or cancelled transfers.
-     *
-     * @return True if there are failed or cancelled transfers, false otherwise.
-     */
-    private fun thereAreFailedOrCancelledTransfers(): Boolean {
-        return failedAndCancelledTransfers.size > 0
     }
 
     private fun getRubbishBinComposeFragment(): RubbishBinComposeFragment? {
@@ -8869,6 +8707,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         get() = (supportFragmentManager.findFragmentByTag(FragmentTag.RECENT_CHAT.tag) as? ChatTabsFragment).also {
             chatTabsFragment = it
         }
+
     private fun getPermissionsFragment(): PermissionsFragment? {
         return (supportFragmentManager.findFragmentByTag(FragmentTag.PERMISSIONS.tag) as? PermissionsFragment).also {
             permissionsFragment = it

@@ -33,7 +33,6 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -429,11 +428,14 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override suspend fun pauseTransfers(isPause: Boolean): Boolean = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
+        val isPauseResponse = suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("pauseTransfers") { it.flag }
             megaApiGateway.pauseTransfers(isPause, listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
+
+        localStorageGateway.setTransferQueueStatus(isPauseResponse)
+        return@withContext isPauseResponse
     }
 
     override suspend fun deleteAllCompletedTransfers() = withContext(ioDispatcher) {
@@ -444,8 +446,8 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getCompletedTransfersByState(
                 listOf(
-                    TransferState.STATE_FAILED,
-                    TransferState.STATE_CANCELLED
+                    MegaTransfer.STATE_FAILED,
+                    MegaTransfer.STATE_CANCELLED
                 )
             )
         }
@@ -454,8 +456,8 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteCompletedTransfersByState(
                 listOf(
-                    TransferState.STATE_FAILED,
-                    TransferState.STATE_CANCELLED
+                    MegaTransfer.STATE_FAILED,
+                    MegaTransfer.STATE_CANCELLED
                 )
             )
         }

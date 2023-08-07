@@ -84,7 +84,6 @@ import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsM
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
-import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -232,7 +231,6 @@ class ManagerViewModelTest {
     private val monitorOfflineNodeAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getIncomingContactRequestUseCase = mock<GetIncomingContactRequestsUseCase>()
-    private val cancelTransfersUseCase = mock<CancelTransfersUseCase>()
     private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
         onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
     }
@@ -295,7 +293,6 @@ class ManagerViewModelTest {
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
             monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
             getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
-            cancelTransfersUseCase = cancelTransfersUseCase,
             monitorChatArchivedUseCase = monitorChatArchivedUseCase,
             restoreNodesUseCase = restoreNodesUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
@@ -311,29 +308,6 @@ class ManagerViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
-
-    @Test
-    fun `test that initial state is returned`() = runTest {
-        underTest.state.test {
-            val initial = awaitItem()
-            assertThat(initial.isFirstNavigationLevel).isTrue()
-            assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
-            assertThat(initial.isFirstLogin).isFalse()
-            assertThat(initial.nodeUpdateReceived).isFalse()
-            assertThat(initial.shouldAlertUserAboutSecurityUpgrade).isFalse()
-            assertThat(initial.cancelTransfersResult).isNull()
-        }
-    }
-
-    @Test
-    fun `test that cancelTransfersResult is reset to null after all transfers get canceled`() =
-        runTest {
-            underTest.state.test {
-                underTest.onCancelTransfersResultConsumed()
-                val newValue = expectMostRecentItem()
-                assertThat(newValue.cancelTransfersResult).isNull()
-            }
-        }
 
     @Test
     fun `test that is first navigation level is updated if new value provided`() = runTest {

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -22,6 +21,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfer.GetAllCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfer.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorCompletedTransferEventUseCase
@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToLastByTagUseCase
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
@@ -43,7 +42,6 @@ import javax.inject.Inject
 @HiltViewModel
 class TransfersViewModel @Inject constructor(
     private val transfersManagement: TransfersManagement,
-    private val dbH: LegacyDatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorFailedTransfer: MonitorFailedTransfer,
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
@@ -54,6 +52,7 @@ class TransfersViewModel @Inject constructor(
     private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase,
+    private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -347,40 +346,16 @@ class TransfersViewModel @Inject constructor(
             }
         }
 
-    private fun areTheSameTransfer(
-        transfer1: CompletedTransfer,
-        transfer2: CompletedTransfer,
-    ) =
-        transfer1.id == transfer2.id ||
-                (isValidHandle(transfer1) && isValidHandle(transfer2) &&
-                        transfer1.handle == transfer2.handle) ||
-                (transfer1.error == transfer2.error && transfer1.fileName == transfer2.fileName &&
-                        transfer1.size == transfer2.size)
-
-    /**
-     * Checks if a transfer has a valid handle.
-     *
-     * @param transfer AndroidCompletedTransfer to check.
-     * @return True if the transfer has a valid handle, false otherwise.
-     */
-    private fun isValidHandle(transfer: CompletedTransfer) =
-        transfer.handle != MegaApiJava.INVALID_HANDLE
-
     /**
      * Removes all completed transfers.
      */
-    fun clearCompletedTransfers() = viewModelScope.launch(ioDispatcher) {
-        dbH.failedOrCancelledTransfers.map { transfer ->
-            File(transfer.originalPath)
-        }.forEach { cacheFile ->
-            if (cacheFile.exists()) {
-                if (cacheFile.delete()) {
-                    Timber.d("Deleted success, path is $cacheFile")
-                } else {
-                    Timber.d("Deleted failed, path is $cacheFile")
+    fun deleteFailedOrCancelledTransferFiles() = viewModelScope.launch(ioDispatcher) {
+        runCatching { getFailedOrCanceledTransfersUseCase() }
+            .onSuccess { transfers ->
+                transfers.forEach { transfer ->
+                    File(transfer.originalPath).takeIf { it.exists() }?.delete()
                 }
             }
-        }
     }
 
     /**
@@ -413,4 +388,10 @@ class TransfersViewModel @Inject constructor(
         }
         activeTransferFinishMovement(result.isSuccess, transfer.tag)
     }
+
+    /**
+     * Has failed or cancelled transfer
+     */
+    fun hasFailedOrCancelledTransfer() =
+        completedTransfers.value.any { it.state == MegaTransfer.STATE_FAILED || it.state == MegaTransfer.STATE_CANCELLED }
 }

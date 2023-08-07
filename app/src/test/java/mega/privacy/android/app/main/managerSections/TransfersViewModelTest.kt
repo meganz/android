@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.usecase.transfer.GetAllCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfer.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorCompletedTransferEventUseCase
@@ -41,7 +42,6 @@ import java.math.BigInteger
 internal class TransfersViewModelTest {
     private lateinit var underTest: TransfersViewModel
     private val transfersManagement: TransfersManagement = mock()
-    private val dbH: LegacyDatabaseHandler = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val monitorFailedTransfer: MonitorFailedTransfer = mock()
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase = mock()
@@ -52,6 +52,7 @@ internal class TransfersViewModelTest {
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase = mock()
     private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase = mock()
+    private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase = mock()
 
     @Before
     fun setUp() {
@@ -62,7 +63,6 @@ internal class TransfersViewModelTest {
     private fun initViewModel() {
         underTest = TransfersViewModel(
             transfersManagement = transfersManagement,
-            dbH = dbH,
             ioDispatcher = ioDispatcher,
             monitorFailedTransfer = monitorFailedTransfer,
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
@@ -73,6 +73,7 @@ internal class TransfersViewModelTest {
             getAllCompletedTransfersUseCase = getAllCompletedTransfersUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             monitorCompletedTransferEventUseCase = monitorCompletedTransferEventUseCase,
+            getFailedOrCanceledTransfersUseCase = getFailedOrCanceledTransfersUseCase
         )
     }
 
