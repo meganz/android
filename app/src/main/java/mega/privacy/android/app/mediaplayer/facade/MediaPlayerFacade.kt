@@ -271,11 +271,14 @@ class MediaPlayerFacade @Inject constructor(
             } else {
                 val oldIndexForCurrentItem = player.currentMediaItemIndex
                 val oldItemsCount = player.mediaItemCount
-                if (oldIndexForCurrentItem != oldItemsCount - 1) {
-                    player.removeMediaItems(oldIndexForCurrentItem + 1, oldItemsCount)
-                }
-                if (oldIndexForCurrentItem != 0) {
-                    player.removeMediaItems(0, oldIndexForCurrentItem)
+                // Check the parameters whether matched the required of removeMediaItems() function
+                if (oldIndexForCurrentItem >= -1 && oldItemsCount >= 0) {
+                    if (oldItemsCount > oldIndexForCurrentItem + 1) {
+                        player.removeMediaItems(oldIndexForCurrentItem + 1, oldItemsCount)
+                    }
+                    if (oldIndexForCurrentItem > 0) {
+                        player.removeMediaItems(0, oldIndexForCurrentItem)
+                    }
                 }
 
                 if (newIndexForCurrentItem != 0) {
