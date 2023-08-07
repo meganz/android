@@ -33,6 +33,7 @@ import mega.privacy.android.core.ui.model.SpanStyleWithAnnotation
  * @param styles the list of the tag and the custom style
  * key is [SpanIndicator] for open and close tags, value is the [SpanStyle]
  * @param modifier
+ * @param color the color apply for all text
  */
 @Composable
 fun MegaSpannedText(
@@ -40,11 +41,13 @@ fun MegaSpannedText(
     baseStyle: TextStyle,
     styles: Map<SpanIndicator, SpanStyle>,
     modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
 ) {
     Text(
         modifier = modifier,
         text = spannedText(value, styles),
-        style = baseStyle
+        style = baseStyle,
+        color = color,
     )
 }
 
@@ -163,7 +166,7 @@ fun MegaSpannedTextPreviewOne() {
         baseStyle = MaterialTheme.typography.subtitle1,
         styles = hashMapOf(
             SpanIndicator('A') to SpanStyle(color = Color.Red)
-        )
+        ),
     )
 }
 
@@ -197,6 +200,23 @@ fun MegaSpannedTextPreviewThree() {
             SpanIndicator('B') to SpanStyle(color = Color.Green),
             SpanIndicator('A') to SpanStyle(color = Color.Red)
         )
+    )
+}
+
+/**
+ * High light text with base colour preview
+ *
+ */
+@Preview(showBackground = true)
+@Composable
+fun MegaSpannedTextPreviewFour() {
+    MegaSpannedText(
+        value = "Choose [A]Google Pay[/A] (subscription)",
+        baseStyle = MaterialTheme.typography.subtitle1,
+        styles = hashMapOf(
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
+        ),
+        color = Color.Gray
     )
 }
 

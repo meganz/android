@@ -21,6 +21,8 @@ import mega.privacy.android.core.ui.theme.grey_100
 import mega.privacy.android.core.ui.theme.grey_100_alpha_060
 import mega.privacy.android.core.ui.theme.grey_200
 import mega.privacy.android.core.ui.theme.grey_300
+import mega.privacy.android.core.ui.theme.grey_400
+import mega.privacy.android.core.ui.theme.grey_500
 import mega.privacy.android.core.ui.theme.grey_600
 import mega.privacy.android.core.ui.theme.grey_700
 import mega.privacy.android.core.ui.theme.grey_800
@@ -37,6 +39,7 @@ import mega.privacy.android.core.ui.theme.orange_600
 import mega.privacy.android.core.ui.theme.red_200
 import mega.privacy.android.core.ui.theme.red_300
 import mega.privacy.android.core.ui.theme.red_400
+import mega.privacy.android.core.ui.theme.red_500
 import mega.privacy.android.core.ui.theme.red_600
 import mega.privacy.android.core.ui.theme.red_800
 import mega.privacy.android.core.ui.theme.teal_200
@@ -362,3 +365,21 @@ val Colors.white_transparent: Color
  */
 val Colors.dark_blue_tooltip_white: Color
     get() = if (isLight) dark_blue_tooltip else white
+
+/**
+ * Color [grey_600] when light and [grey_300] when dark
+ */
+val Colors.grey_600_grey_300: Color
+    get() = if (isLight) grey_600 else grey_300
+
+/**
+ * Color [grey_500] when light and [grey_400] when dark
+ */
+val Colors.grey_500_grey_400: Color
+    get() = if (isLight) grey_500 else grey_400
+
+/**
+ * Color [red_500] when light and [red_300] when dark
+ */
+val Colors.red_500_red_300: Color
+    get() = if (isLight) red_500 else red_300

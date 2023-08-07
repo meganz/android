@@ -36,3 +36,9 @@ val Typography.body2medium: TextStyle
  */
 val Typography.body3: TextStyle
     get() = body2.copy(fontSize = 13.sp, lineHeight = 17.sp, letterSpacing = 0.03.sp)
+
+/**
+ * Body 4
+ */
+val Typography.body4: TextStyle
+    get() = body2.copy(fontSize = 11.sp, lineHeight = 14.sp, letterSpacing = 0.01.sp)

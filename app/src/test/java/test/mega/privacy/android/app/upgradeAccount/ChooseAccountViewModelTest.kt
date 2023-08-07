@@ -222,7 +222,7 @@ class ChooseAccountViewModelTest {
 
     private val localisedSubscriptionProIII = LocalisedSubscription(
         accountType = AccountType.PRO_III,
-        storage = 16384,
+        storage = PRO_III_STORAGE_TRANSFER,
         monthlyTransfer = PRO_III_STORAGE_TRANSFER,
         yearlyTransfer = PRO_III_TRANSFER_YEARLY,
         monthlyAmount = CurrencyAmount(PRO_III_PRICE_MONTHLY, Currency("EUR")),
@@ -267,13 +267,13 @@ class ChooseAccountViewModelTest {
         const val PRO_I_TRANSFER_YEARLY = 24576
         const val PRO_II_TRANSFER_YEARLY = 98304
         const val PRO_III_TRANSFER_YEARLY = 196608
-        const val PRO_I_PRICE_MONTHLY = 9.99.toFloat()
-        const val PRO_II_PRICE_MONTHLY = 19.99.toFloat()
-        const val PRO_III_PRICE_MONTHLY = 29.99.toFloat()
-        const val PRO_LITE_PRICE_MONTHLY = 4.99.toFloat()
-        const val PRO_I_PRICE_YEARLY = 99.99.toFloat()
-        const val PRO_II_PRICE_YEARLY = 199.99.toFloat()
-        const val PRO_III_PRICE_YEARLY = 299.99.toFloat()
-        const val PRO_LITE_PRICE_YEARLY = 49.99.toFloat()
+        const val PRO_I_PRICE_MONTHLY = 9.99F
+        const val PRO_II_PRICE_MONTHLY = 19.99F
+        const val PRO_III_PRICE_MONTHLY = 29.99F
+        const val PRO_LITE_PRICE_MONTHLY = 4.99F
+        const val PRO_I_PRICE_YEARLY = 99.99F
+        const val PRO_II_PRICE_YEARLY = 199.99F
+        const val PRO_III_PRICE_YEARLY = 299.99F
+        const val PRO_LITE_PRICE_YEARLY = 49.99F
     }
 }
