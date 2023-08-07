@@ -120,6 +120,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
@@ -1166,9 +1167,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 // Sync the account info after changing account information settings to keep the data the same
                 updateAccountDetailsVisibleInfo()
+
+                LiveEventBus.get(EventConstants.EVENT_DRAWER_OPEN, Boolean::class.java).post(true)
             }
 
-            override fun onDrawerClosed(drawerView: View) {}
+            override fun onDrawerClosed(drawerView: View) {
+                LiveEventBus.get(EventConstants.EVENT_DRAWER_OPEN, Boolean::class.java).post(false)
+            }
+
             override fun onDrawerStateChanged(newState: Int) {}
 
             /**
@@ -3449,6 +3455,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         chatTabsFragment?.let { replaceFragment(it, FragmentTag.RECENT_CHAT.tag) }
         closeDrawer()
         PermissionUtils.checkNotificationsPermission(this)
+        hideFabButton()
     }
 
     private fun setBottomNavigationMenuItemChecked(item: Int) {
@@ -3836,6 +3843,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     bottomNavigationCurrentItem = CHAT_BNV
                 }
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
+                hideFabButton()
             }
 
             else -> {}

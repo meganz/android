@@ -8,6 +8,7 @@ object EventConstants {
     const val EVENT_MEETING_AVATAR_CHANGE = "meeting_avatar_change"
     const val EVENT_MEETING_GET_AVATAR = "meeting_get_avatar"
     const val EVENT_CHAT_OPEN_INVITE = "chat_open_invite"
+    const val EVENT_DRAWER_OPEN = "drawer_open"
 
     /** Event Keys related to calls*/
     const val EVENT_ERROR_STARTING_CALL = "error_starting_call"

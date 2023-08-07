@@ -120,11 +120,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     PermanentLogging("Permanently enable logging, removing functionality to turn it on/off", false),
 
     /**
-     * Schedule Meeting toggle
-     */
-    ScheduleMeeting("Enable schedule meetings feature", false),
-
-    /**
      * App Test toggle
      */
     AppTest("This is a test toggle. It does nothing", false),

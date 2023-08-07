@@ -36,7 +36,6 @@
         android:layout_height="1dp"
         android:layout_marginStart="72dp"
         android:background="@color/grey_012_white_012"
-        android:visibility="gone"
         tools:visibility="visible" />
 
     <TextView
@@ -45,7 +44,6 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:text="@string/chat_schedule_meeting"
-        android:visibility="gone"
         app:drawableStartCompat="@drawable/ic_calendar"
         tools:visibility="visible" />
 </LinearLayout>

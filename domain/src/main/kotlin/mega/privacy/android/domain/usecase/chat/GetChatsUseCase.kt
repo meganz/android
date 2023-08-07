@@ -1,16 +1,19 @@
 package mega.privacy.android.domain.usecase.chat
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
@@ -44,7 +47,7 @@ import javax.inject.Inject
 /**
  * Use case to retrieve Chat Rooms.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class GetChatsUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val pushesRepository: PushesRepository,
@@ -60,6 +63,10 @@ class GetChatsUseCase @Inject constructor(
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorScheduledMeetingOccurrencesUpdates: MonitorScheduledMeetingOccurrencesUpdates,
 ) {
+
+    companion object {
+        private const val MAX_CONCURRENT_JOBS = 8
+    }
 
     /**
      * Chat room request type
@@ -104,7 +111,7 @@ class GetChatsUseCase @Inject constructor(
             emit(chats.addChatRooms(chatRoomType))
 
             emitAll(
-                merge(
+                flowOf(
                     chats.updateFields(
                         mutex,
                         chatRoomType,
@@ -123,7 +130,7 @@ class GetChatsUseCase @Inject constructor(
                         lastTimeMapper,
                         meetingTimeMapper
                     ),
-                ).mapLatest {
+                ).flattenMerge().mapLatest {
                     it.sorted(chatRoomType).addHeaders(chatRoomType, headerTimeMapper)
                 }
             )
@@ -152,32 +159,23 @@ class GetChatsUseCase @Inject constructor(
         getLastMessage: suspend (Long) -> String,
         lastTimeMapper: (Long) -> String,
         meetingTimeMapper: (Long, Long) -> String,
-    ): Flow<List<ChatRoomItem>> = channelFlow {
-        coroutineScope {
-            values.map { currentItem ->
-                async {
-                    val newItem = currentItem.updateChatFields(getLastMessage, lastTimeMapper)
-                    if (currentItem != newItem) {
-                        mutex.withLock {
-                            put(currentItem.chatId, newItem)
-                        }
-                        send(values.toList())
-                    }
-
-                    if (currentItem is MeetingChatRoomItem) {
-                        val meetingItem =
-                            newItem.updateMeetingFields(chatRoomType, meetingTimeMapper)
-                        if (newItem != meetingItem) {
-                            mutex.withLock {
-                                put(currentItem.chatId, meetingItem)
-                            }
-                            send(values.toList())
-                        }
-                    }
+    ): Flow<List<ChatRoomItem>> =
+        values.asFlow().flatMapMerge(MAX_CONCURRENT_JOBS) { currentItem ->
+            flow {
+                val newItem = currentItem.updateChatFields(getLastMessage, lastTimeMapper)
+                val updatedItem = if (currentItem is MeetingChatRoomItem) {
+                    newItem.updateMeetingFields(chatRoomType, meetingTimeMapper)
+                } else {
+                    newItem
                 }
-            }.awaitAll()
+
+                mutex.withLock {
+                    put(currentItem.chatId, updatedItem)
+                }
+
+                emit(values.toList())
+            }
         }
-    }
 
     private suspend fun ChatRoomItem.updateChatFields(
         getLastMessage: suspend (Long) -> String,

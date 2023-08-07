@@ -73,7 +73,6 @@ import javax.inject.Inject
  * @property isParticipatingInChatCallUseCase
  * @property getMeetingTooltipsUseCase
  * @property setNextMeetingTooltipUseCase
- * @property getFeatureFlagValue
  * @property monitorScheduledMeetingCanceledUseCase
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -97,7 +96,6 @@ class ChatTabsViewModel @Inject constructor(
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase,
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase,
-    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val monitorScheduledMeetingCanceledUseCase: MonitorScheduledMeetingCanceledUseCase,
 ) : ViewModel() {
 
@@ -364,18 +362,19 @@ class ChatTabsViewModel @Inject constructor(
 
     /**
      * Retrieve Scheduled Meeting Tooltips to be shown
+     *
+     * @param delayShowing  Flag to delay the showing
      */
-    private fun retrieveTooltips() {
+    private fun retrieveTooltips(delayShowing: Boolean = true) {
         viewModelScope.launch {
-            val featureFlagEnabled = getFeatureFlagValue(AppFeatures.ScheduleMeeting)
-            if (featureFlagEnabled) {
-                runCatching {
+            runCatching {
+                if (delayShowing) {
                     delay(TimeUnit.SECONDS.toMillis(2)) // Delay required by design
-                    getMeetingTooltipsUseCase()
-                }.onSuccess { tooltips ->
-                    state.update { it.copy(tooltip = tooltips) }
-                }.onFailure(Timber.Forest::e)
-            }
+                }
+                getMeetingTooltipsUseCase()
+            }.onSuccess { tooltips ->
+                state.update { it.copy(tooltip = tooltips) }
+            }.onFailure(Timber.Forest::e)
         }
     }
 
@@ -493,4 +492,17 @@ class ChatTabsViewModel @Inject constructor(
      * Reset and notify that snackbarMessage is consumed
      */
     fun onSnackbarMessageConsumed() = state.update { it.copy(snackbarMessageContent = consumed()) }
+
+    /**
+     * Temporary show or hide tooltips
+     *
+     * @param show  True to show tooltips, false otherwise
+     */
+    fun showTooltips(show: Boolean) {
+        if (show) {
+            retrieveTooltips(false)
+        } else {
+            state.update { it.copy(tooltip = MeetingTooltipItem.NONE) }
+        }
+    }
 }

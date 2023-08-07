@@ -6,7 +6,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -14,8 +13,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.databinding.BottomSheetMeetingSimpleBinding
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
@@ -33,9 +30,6 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
             }
     }
 
-    @Inject
-    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
-
     private val showSimpleList by lazy { arguments?.getBoolean(SHOW_SIMPLE_LIST) ?: false }
     private var listener: MeetingBottomSheetDialogActionListener? = null
 
@@ -46,11 +40,9 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
         if (showSimpleList) {
             val binding =
                 BottomSheetMeetingSimpleBinding.inflate(LayoutInflater.from(context), null, false)
+            binding.btnScheduleMeeting.setOnClickListener(this)
             binding.btnStartMeeting.setOnClickListener(this)
             binding.btnJoinMeeting.setOnClickListener(this)
-            binding.dividerSchedule.isVisible = true
-            binding.btnScheduleMeeting.isVisible = true
-            binding.btnScheduleMeeting.setOnClickListener(this)
 
             dialog.setContentView(binding.root)
         } else {
