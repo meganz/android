@@ -60,7 +60,7 @@ class FileLinkRepositoryImplTest {
         }
         val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
-        whenever(nodeMapper(publicNode)).thenReturn(untypedPublicNode)
+        whenever(nodeMapper(publicNode, requireSerializedData = true)).thenReturn(untypedPublicNode)
         whenever(megaApiGateway.getPublicNode(any(), any())).thenAnswer {
             ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),
@@ -119,7 +119,7 @@ class FileLinkRepositoryImplTest {
         }
         val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
-        whenever(nodeMapper(publicNode)).thenReturn(untypedPublicNode)
+        whenever(nodeMapper(publicNode, requireSerializedData = true)).thenReturn(untypedPublicNode)
         whenever(untypedPublicNode.copy(previewPath = expectedPath)).thenReturn(expectedNode)
         whenever(megaApiGateway.getPublicNode(any(), any())).thenAnswer {
             ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(

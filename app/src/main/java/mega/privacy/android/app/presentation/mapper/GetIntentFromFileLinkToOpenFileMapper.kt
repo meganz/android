@@ -47,6 +47,7 @@ class GetIntentFromFileLinkToOpenFileMapper @Inject constructor(
         fileHandle: Long,
         fileName: String,
         fileSize: Long,
+        serializedData: String?,
         url: String,
     ): Intent? {
         val nameType = MimeTypeList.typeForName(fileName)
@@ -75,6 +76,7 @@ class GetIntentFromFileLinkToOpenFileMapper @Inject constructor(
                     putExtra(Constants.URL_FILE_LINK, url)
                     putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileHandle)
                     putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileName)
+                    putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
                 }
 
                 startHttpServer(mediaIntent, activity)
@@ -99,6 +101,7 @@ class GetIntentFromFileLinkToOpenFileMapper @Inject constructor(
                     putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileHandle)
                     putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileName)
                     putExtra(Constants.URL_FILE_LINK, url)
+                    putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
                     putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
                 }
                 startHttpServer(pdfIntent, activity)
@@ -110,6 +113,7 @@ class GetIntentFromFileLinkToOpenFileMapper @Inject constructor(
             nameType.isOpenableTextFile(fileSize) -> {
                 Intent(activity, TextEditorActivity::class.java).apply {
                     putExtra(Constants.URL_FILE_LINK, url)
+                    putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
                     putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
                     putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FILE_LINK_ADAPTER)
                 }

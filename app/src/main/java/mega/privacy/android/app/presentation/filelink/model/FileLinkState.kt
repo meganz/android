@@ -17,6 +17,7 @@ import mega.privacy.android.domain.exception.PublicNodeException
  * @property sizeInBytes            Size of the current file node
  * @property handle                 Handle of the current file node
  * @property previewPath            Path of the preview image
+ * @property serializedData         Serialized data of the file node
  * @property iconResource           the icon resource that represents this node
  * @property askForDecryptionDialog Whether to show AskForDecryptionDialog
  * @property collision              Node with existing names
@@ -35,6 +36,7 @@ data class FileLinkState(
     val sizeInBytes: Long = 0,
     val handle: Long = -1,
     val previewPath: String? = null,
+    val serializedData: String? = null,
     val iconResource: Int? = null,
     val askForDecryptionDialog: Boolean = false,
     val collision: NameCollision? = null,
@@ -53,6 +55,7 @@ data class FileLinkState(
         sizeInBytes = typedNode.size,
         previewPath = typedNode.previewPath,
         iconResource = if (typedNode.previewPath == null) iconResource else null,
-        handle = typedNode.id.longValue
+        handle = typedNode.id.longValue,
+        serializedData = typedNode.serializedData
     )
 }

@@ -224,7 +224,14 @@ class FileLinkViewModel @Inject constructor(
     fun onPreviewClick(activity: Activity) = viewModelScope.launch {
         runCatching {
             with(state.value) {
-                getIntentFromFileLinkToOpenFileMapper(activity, handle, title, sizeInBytes, url)
+                getIntentFromFileLinkToOpenFileMapper(
+                    activity,
+                    handle,
+                    title,
+                    sizeInBytes,
+                    serializedData,
+                    url
+                )
             }
         }.onSuccess { intent ->
             intent?.let { _state.update { it.copy(openFile = triggered(intent)) } }

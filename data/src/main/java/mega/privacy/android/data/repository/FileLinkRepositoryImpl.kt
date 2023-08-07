@@ -42,7 +42,7 @@ internal class FileLinkRepositoryImpl @Inject constructor(
         }
 
         val previewPath = getPreviewPath(publicNode)
-        val node = nodeMapper(publicNode)
+        val node = nodeMapper(publicNode, requireSerializedData = true)
         (node as? DefaultFileNode)?.copy(previewPath = previewPath) ?: node
     }
 
