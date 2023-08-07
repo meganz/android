@@ -1,10 +1,32 @@
 package mega.privacy.android.app.utils.wrapper
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.PIN_4
+import mega.privacy.android.app.utils.Constants.PIN_6
+import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
+import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_10S
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_1M
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_2M
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_30S
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_5M
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_5S
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_IMMEDIATE
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
+import mega.privacy.android.domain.entity.passcode.PasscodeType
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.security.PasscodeRepository
+import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,13 +41,21 @@ class PasscodePreferenceWrapper @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaApi: MegaApiGateway,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
+    private val passcodeRepository: PasscodeRepository,
+    private val accountRepository: AccountRepository,
 ) {
     /**
      * Is passcode enabled
      *
      */
     suspend fun isPasscodeEnabled() =
-        withContext(ioDispatcher) { databaseHandler.preferences?.passcodeLockEnabled.toBoolean() }
+        if (newImplementation()) {
+            monitorPasscodeLockPreferenceUseCase().first()
+        } else {
+            withContext(ioDispatcher) { databaseHandler.preferences?.passcodeLockEnabled.toBoolean() }
+        }
 
     /**
      * Get passcode
@@ -33,14 +63,40 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @return
      */
     suspend fun getPasscode(): String? =
-        withContext(ioDispatcher) { databaseHandler.preferences?.passcodeLockCode.takeUnless { it.isNullOrEmpty() } }
+        if (newImplementation()) {
+            passcodeRepository.getPasscode()
+        } else {
+            withContext(ioDispatcher) { databaseHandler.preferences?.passcodeLockCode.takeUnless { it.isNullOrEmpty() } }
+        }
 
     /**
      * Get passcode time out
      *
      */
     suspend fun getPasscodeTimeOut() =
-        withContext(ioDispatcher) { databaseHandler.passcodeRequiredTime }
+        if (newImplementation()) {
+            passcodeRepository.monitorPasscodeTimeOut().map {
+                when (it) {
+                    PasscodeTimeout.Immediate -> REQUIRE_PASSCODE_IMMEDIATE
+                    is PasscodeTimeout.TimeSpan -> getTimeoutTime(it.milliseconds.toInt())
+                    null -> Constants.REQUIRE_PASSCODE_INVALID
+                }
+            }.first()
+        } else {
+            withContext(ioDispatcher) { databaseHandler.passcodeRequiredTime }
+        }
+
+    private fun getTimeoutTime(milliseconds: Int): Int {
+        return when {
+            milliseconds < REQUIRE_PASSCODE_AFTER_10S -> REQUIRE_PASSCODE_AFTER_5S
+            milliseconds < REQUIRE_PASSCODE_AFTER_30S -> REQUIRE_PASSCODE_AFTER_10S
+            milliseconds < REQUIRE_PASSCODE_AFTER_1M -> REQUIRE_PASSCODE_AFTER_30S
+            milliseconds < REQUIRE_PASSCODE_AFTER_2M -> REQUIRE_PASSCODE_AFTER_1M
+            milliseconds < REQUIRE_PASSCODE_AFTER_5M -> REQUIRE_PASSCODE_AFTER_2M
+            else -> REQUIRE_PASSCODE_AFTER_5M
+        }
+    }
+
 
     /**
      * Set passcode time out
@@ -48,7 +104,18 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param passcodeRequireTime
      */
     suspend fun setPasscodeTimeOut(passcodeRequireTime: Int) {
-        withContext(ioDispatcher) { databaseHandler.passcodeRequiredTime = passcodeRequireTime }
+        if (newImplementation()) {
+            val timeout = getTimeout(passcodeRequireTime)
+            passcodeRepository.setPasscodeTimeOut(timeout)
+        } else {
+            withContext(ioDispatcher) { databaseHandler.passcodeRequiredTime = passcodeRequireTime }
+        }
+    }
+
+    private fun getTimeout(timeSpan: Int) = when (timeSpan) {
+        REQUIRE_PASSCODE_IMMEDIATE -> PasscodeTimeout.Immediate
+        REQUIRE_PASSCODE_INVALID -> PasscodeTimeout.TimeSpan(REQUIRE_PASSCODE_AFTER_30S.toLong())
+        else -> PasscodeTimeout.TimeSpan(timeSpan.toLong())
     }
 
     /**
@@ -57,17 +124,40 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param enabled
      */
     suspend fun setFingerprintLockEnabled(enabled: Boolean) {
-        withContext(ioDispatcher) {
-            databaseHandler.isFingerprintLockEnabled = enabled
+        if (newImplementation()) {
+            val current = getCurrentPasscodeTypeOrFallback()
+            if (enabled) {
+                passcodeRepository.setPasscodeType(PasscodeType.Biometric(current))
+            } else {
+                passcodeRepository.setPasscodeType(current)
+            }
+        } else {
+            withContext(ioDispatcher) {
+                databaseHandler.isFingerprintLockEnabled = enabled
+            }
         }
     }
+
+    private suspend fun getCurrentPasscodeTypeOrFallback() =
+        (passcodeRepository.monitorPasscodeType().map {
+            if (it is PasscodeType.Biometric) it.fallback else it
+        }.first()
+            ?: throw IllegalStateException("Cannot enable biometrics without a fallback passcode method"))
 
     /**
      * Is finger print lock enabled
      *
      */
     suspend fun isFingerPrintLockEnabled() =
-        withContext(ioDispatcher) { databaseHandler.isPasscodeLockEnabled }
+        if (newImplementation()) {
+            passcodeTypeIsBiometric()
+        } else {
+            withContext(ioDispatcher) { databaseHandler.isFingerprintLockEnabled }
+        }
+
+    private suspend fun passcodeTypeIsBiometric() = passcodeRepository.monitorPasscodeType().map {
+        it is PasscodeType.Biometric
+    }.first()
 
     /**
      * Set passcode enabled
@@ -75,7 +165,11 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param enable
      */
     suspend fun setPasscodeEnabled(enable: Boolean) {
-        withContext(ioDispatcher) { databaseHandler.isPasscodeLockEnabled = enable }
+        if (newImplementation()) {
+            passcodeRepository.setPasscodeEnabled(enable)
+        } else {
+            withContext(ioDispatcher) { databaseHandler.isPasscodeLockEnabled = enable }
+        }
     }
 
     /**
@@ -84,7 +178,23 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param type
      */
     suspend fun setPasscodeLockType(type: String) {
-        withContext(ioDispatcher) { databaseHandler.passcodeLockType = type }
+        if (newImplementation()) {
+            val newType = getNewPasscodeType(type)
+            passcodeRepository.setPasscodeType(newType)
+        } else {
+            withContext(ioDispatcher) { databaseHandler.passcodeLockType = type }
+        }
+    }
+
+    private suspend fun getNewPasscodeType(
+        type: String,
+    ): PasscodeType {
+        val passcodeType = when (type) {
+            PIN_6 -> PasscodeType.Pin(6)
+            PIN_ALPHANUMERIC -> PasscodeType.Password
+            else -> PasscodeType.Pin(4)
+        }
+        return if (passcodeTypeIsBiometric()) PasscodeType.Biometric(passcodeType) else passcodeType
     }
 
     /**
@@ -93,7 +203,11 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param passcode
      */
     suspend fun setPasscode(passcode: String) {
-        withContext(ioDispatcher) { databaseHandler.passcodeLockCode = passcode }
+        if (newImplementation()) {
+            passcodeRepository.setPasscode(passcode)
+        } else {
+            withContext(ioDispatcher) { databaseHandler.passcodeLockCode = passcode }
+        }
     }
 
     /**
@@ -101,9 +215,12 @@ class PasscodePreferenceWrapper @Inject constructor(
      *
      * @return
      */
-    suspend fun getFailedAttemptsCount(): Int {
-        return withContext(ioDispatcher) { databaseHandler.attributes?.attempts ?: 0 }
-    }
+    suspend fun getFailedAttemptsCount() =
+        if (newImplementation()) {
+            passcodeRepository.monitorFailedAttempts().firstOrNull() ?: 0
+        } else {
+            withContext(ioDispatcher) { databaseHandler.attributes?.attempts ?: 0 }
+        }
 
     /**
      * Get passcode type
@@ -111,9 +228,24 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @return
      */
     suspend fun getPasscodeType(): String =
-        withContext(ioDispatcher) {
-            databaseHandler.preferences?.passcodeLockType.takeUnless { it.isNullOrEmpty() } ?: "4"
+        if (newImplementation()) {
+            passcodeRepository.monitorPasscodeType().map {
+                getPasscodeTypeString(it)
+            }.first()
+        } else {
+            withContext(ioDispatcher) {
+                databaseHandler.preferences?.passcodeLockType.takeUnless { it.isNullOrEmpty() }
+                    ?: PIN_4
+            }
         }
+
+    private fun getPasscodeTypeString(it: PasscodeType?): String = when {
+        it is PasscodeType.Biometric -> getPasscodeTypeString(it.fallback)
+        it == PasscodeType.Password -> PIN_ALPHANUMERIC
+        it is PasscodeType.Pin && it.digits == 4 -> PIN_4
+        it is PasscodeType.Pin && it.digits == 6 -> PIN_6
+        else -> PIN_4
+    }
 
     /**
      * Set failed attempts count
@@ -121,7 +253,11 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param attempts
      */
     suspend fun setFailedAttemptsCount(attempts: Int) {
-        withContext(ioDispatcher) { databaseHandler.setAttrAttempts(attempts) }
+        if (newImplementation()) {
+            passcodeRepository.setFailedAttempts(attempts)
+        } else {
+            withContext(ioDispatcher) { databaseHandler.setAttrAttempts(attempts) }
+        }
     }
 
     /**
@@ -131,7 +267,12 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @return
      */
     suspend fun checkPassword(password: String): Boolean =
-        withContext(ioDispatcher){ megaApi.isCurrentPassword(password) }
+        if (newImplementation()) {
+            accountRepository.isCurrentPassword(password)
+        } else {
+            withContext(ioDispatcher) { megaApi.isCurrentPassword(password) }
+        }
 
-
+    private suspend fun newImplementation() =
+        getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)
 }
