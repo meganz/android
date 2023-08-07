@@ -303,6 +303,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private boolean isContactVerificationOn;
 
+    private boolean isWarningMessageShown;
+
     private final Observer<Boolean> fabChangeObserver = isShow -> {
         if (isShow) {
             showFabButton();
@@ -1455,7 +1457,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         outState.putBoolean(IS_ALLOWED_ADD_PARTICIPANTS, isAllowAddParticipantsEnabled);
         outState.putBoolean("newGroup", newGroup);
         outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
-
+        outState.putBoolean("warningBannerShown", isWarningMessageShown);
         saveContactsAdded(outState);
     }
 
@@ -1769,7 +1771,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             isAllowAddParticipantsEnabled = savedInstanceState.getBoolean(IS_ALLOWED_ADD_PARTICIPANTS, true);
             allowAddParticipantsSwitch.setChecked(isAllowAddParticipantsEnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
-
+            isWarningMessageShown = savedInstanceState.getBoolean("warningBannerShown", false);
+            mWarningMessage.setVisibility( isWarningMessageShown&& isContactVerificationOn ? View.VISIBLE : View.GONE);
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH) {
                 savedaddedContacts = savedInstanceState.getStringArrayList("savedaddedContacts");
 
@@ -1996,7 +1999,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             addedContactsShare.add(contact);
         }
         adapterShare.setContacts(addedContactsShare);
-        mWarningMessage.setVisibility(checkForUnVerifiedContacts() && isContactVerificationOn ? View.VISIBLE : View.GONE);
+        isWarningMessageShown = checkForUnVerifiedContacts();
+        mWarningMessage.setVisibility( isWarningMessageShown&& isContactVerificationOn ? View.VISIBLE : View.GONE);
         if (adapterShare.getItemCount() - 1 >= 0) {
             mLayoutManager.scrollToPosition(adapterShare.getItemCount() - 1);
         }
@@ -2222,7 +2226,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         setRecyclersVisibility();
         refreshKeyboard();
         setSearchVisibility();
-        mWarningMessage.setVisibility(checkForUnVerifiedContacts() && isContactVerificationOn ? View.VISIBLE : View.GONE);
+        isWarningMessageShown = checkForUnVerifiedContacts();
+        mWarningMessage.setVisibility(isWarningMessageShown && isContactVerificationOn ? View.VISIBLE : View.GONE);
     }
 
     public void showSnackbar(String message) {
