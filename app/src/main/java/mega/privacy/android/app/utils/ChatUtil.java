@@ -107,7 +107,7 @@ import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ManageReactionListener;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;

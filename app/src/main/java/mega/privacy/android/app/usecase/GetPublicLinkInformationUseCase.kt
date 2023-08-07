@@ -3,7 +3,7 @@ package mega.privacy.android.app.usecase
 import android.content.Context
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage
+import mega.privacy.android.data.model.chat.AndroidMegaRichLinkMessage
 import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid

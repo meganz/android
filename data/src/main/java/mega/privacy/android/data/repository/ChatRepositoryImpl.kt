@@ -32,6 +32,7 @@ import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.chat.PendingMessageListMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
@@ -103,6 +104,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
+    private val pendingMessageListMapper: PendingMessageListMapper,
 ) : ChatRepository {
 
     override suspend fun getChatInitState(): ChatInitState = withContext(ioDispatcher) {
@@ -687,6 +689,24 @@ internal class ChatRepositoryImpl @Inject constructor(
             localStorageGateway.getChatSettings(),
             beep,
             defaultSound
+        )
+    }
+
+    override suspend fun getPendingMessages(chatId: Long) = withContext(ioDispatcher) {
+        pendingMessageListMapper(localStorageGateway.findPendingMessagesNotSent(chatId))
+    }
+
+    override suspend fun updatePendingMessage(
+        idMessage: Long,
+        transferTag: Int,
+        nodeHandle: String?,
+        state: Int,
+    ) = withContext(ioDispatcher) {
+        localStorageGateway.updatePendingMessage(
+            idMessage,
+            transferTag,
+            nodeHandle,
+            state
         )
     }
 }

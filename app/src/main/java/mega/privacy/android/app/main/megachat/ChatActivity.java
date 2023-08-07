@@ -25,9 +25,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_OPEN_
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.isServiceRunning;
-import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.extractMegaLink;
-import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.isChatLink;
-import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.isFileLink;
 import static mega.privacy.android.app.main.megachat.MapsActivity.EDITING_MESSAGE;
 import static mega.privacy.android.app.main.megachat.MapsActivity.LATITUDE;
 import static mega.privacy.android.app.main.megachat.MapsActivity.LONGITUDE;
@@ -239,6 +236,7 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Pair;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -300,6 +298,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 
 import javax.inject.Inject;
 
@@ -412,6 +411,8 @@ import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import mega.privacy.android.domain.entity.chat.PendingMessage;
@@ -6253,6 +6254,29 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
+    private String extractMegaLink(String urlIn) {
+        try {
+            Matcher m = Patterns.WEB_URL.matcher(urlIn);
+            while (m.find()) {
+                String url = Util.decodeURL(m.group());
+
+                if (Util.matchRegexs(url, Constants.FILE_LINK_REGEXS)) {
+                    return url;
+                }
+                if (Util.matchRegexs(url, Constants.FOLDER_LINK_REGEXS)) {
+                    return url;
+                }
+                if (Util.matchRegexs(url, Constants.CHAT_LINK_REGEXS)) {
+                    return url;
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return null;
+    }
+
     public int checkMegaLink(MegaChatMessage msg) {
 
         //Check if it is a MEGA link
@@ -6260,7 +6284,7 @@ public class ChatActivity extends PasscodeActivity
 
         String link = extractMegaLink(msg.getContent());
 
-        if (isChatLink(link)) {
+        if (Util.matchRegexs(link, Constants.CHAT_LINK_REGEXS)) {
             ChatLinkInfoListener listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
             megaChatApi.checkChatLink(link, listener);
 
@@ -6272,7 +6296,7 @@ public class ChatActivity extends PasscodeActivity
         Timber.d("The link was found");
 
         ChatLinkInfoListener listener = null;
-        if (isFileLink(link)) {
+        if (Util.matchRegexs(link, Constants.FILE_LINK_REGEXS)) {
             Timber.d("isFileLink");
             internalComposite.add(getPublicNodeUseCase.get(link)
                     .subscribeOn(Schedulers.io())
@@ -7254,7 +7278,7 @@ public class ChatActivity extends PasscodeActivity
 
             if (messageToCheck.isUploading()) {
                 // Remove pending uploading messages.
-                megaApi.cancelTransferByTag(messageToCheck.pendingMessage.getTransferTag());
+                megaApi.cancelTransferByTag(messageToCheck.getPendingMessage().getTransferTag());
             } else {
                 break;
             }
@@ -7305,7 +7329,7 @@ public class ChatActivity extends PasscodeActivity
      * Gets the pending messages from DB and add them if needed to the UI.
      */
     public void loadPendingMessages() {
-        ArrayList<AndroidMegaChatMessage> pendMsgs = dbH.findPendingMessagesNotSent(idChat);
+        List<AndroidMegaChatMessage> pendMsgs = dbH.findPendingMessagesNotSent(idChat);
         Timber.d("Number of pending: %s", pendMsgs.size());
 
         for (AndroidMegaChatMessage msg : pendMsgs) {

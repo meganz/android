@@ -14,10 +14,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage
+import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 
 class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
@@ -71,7 +71,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
             // Meeting Link and Chat Link are exactly the same format.
             // Using extra approach(getMegaHandleList of openChatPreview())
             // to judge if its a meeting link later on
-            if (AndroidMegaRichLinkMessage.isChatLink(meetingLink)) {
+            if (Util.matchRegexs(meetingLink, Constants.CHAT_LINK_REGEXS)) {
                 // Need to call the async checkChatLink() to check if the chat has a call and
                 // get the meeting name
                 // Delegate the checking to OpenLinkActivity

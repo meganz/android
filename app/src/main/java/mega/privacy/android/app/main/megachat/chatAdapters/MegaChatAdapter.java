@@ -2,8 +2,6 @@ package mega.privacy.android.app.main.megachat.chatAdapters;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.components.textFormatter.TextFormatterViewCompat.getFormattedText;
-import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.extractContactLink;
-import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.getContactLinkHandle;
 import static mega.privacy.android.app.utils.AvatarUtil.getAvatarUri;
 import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
 import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
@@ -111,6 +109,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.util.Linkify;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -148,6 +147,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -168,7 +168,6 @@ import mega.privacy.android.app.main.adapters.ReactionAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.MessageVoiceClip;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
@@ -179,9 +178,11 @@ import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting;
 import mega.privacy.android.domain.entity.chat.PendingMessage;
 import mega.privacy.android.domain.entity.chat.PendingMessageState;
@@ -8627,5 +8628,45 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 notifyItemChanged(i + 1);
             }
         }
+    }
+
+    /**
+     * Extracts a contact link from a chat messages if exists.
+     *
+     * @param content Text of the chat message.
+     * @return The contact link if exists.
+     */
+    private String extractContactLink(String content) {
+        try {
+            if (content != null && !content.trim().isEmpty()) {
+                Matcher m = Patterns.WEB_URL.matcher(content);
+
+                while (m.find()) {
+                    String url = Util.decodeURL(m.group());
+
+                    if (Util.matchRegexs(url, Constants.CONTACT_LINK_REGEXS)) {
+                        return url;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the user handle of a contact link.
+     *
+     * @param link Contact link to check.
+     * @return The user handle.
+     */
+    private long getContactLinkHandle(String link) {
+        String[] s = link.split("C!");
+
+        return s.length > 0
+                ? MegaApiAndroid.base64ToHandle(s[1].trim())
+                : INVALID_HANDLE;
     }
 }

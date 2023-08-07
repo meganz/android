@@ -3,7 +3,7 @@ package mega.privacy.android.app.main.listeners;
 
 import android.content.Context;
 
-import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;

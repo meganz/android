@@ -9,7 +9,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.NodeController;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaChatApiAndroid;

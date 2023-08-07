@@ -3,6 +3,7 @@ package mega.privacy.android.data.database
 import android.database.sqlite.SQLiteDatabase
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.Contact
@@ -371,4 +372,12 @@ interface DatabaseHandler {
      * Deletes the oldest completed transfers
      */
     fun deleteOldestCompletedTransfers()
+
+    /**
+     * Gets pending messages.
+     *
+     * @param chatId Chat identifier from which the messages has to be get.
+     * @return A list of [AndroidMegaChatMessage].
+     */
+    fun findPendingMessagesNotSent(chatId: Long): List<AndroidMegaChatMessage>
 }

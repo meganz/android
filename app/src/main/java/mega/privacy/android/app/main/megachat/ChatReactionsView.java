@@ -19,6 +19,7 @@ import mega.privacy.android.app.components.twemoji.RecentEmoji;
 import mega.privacy.android.app.components.twemoji.RecentEmojiManager;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;

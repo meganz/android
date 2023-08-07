@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
+import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -458,4 +459,27 @@ interface ChatRepository {
         beep: Boolean,
         defaultSound: String,
     ): NotificationBehaviour
+
+    /**
+     * Gets pending messages.
+     *
+     * @param chatId Chat identifier from which the messages has to be get.
+     * @return A list of [PendingMessage].
+     */
+    suspend fun getPendingMessages(chatId: Long): List<PendingMessage>
+
+    /**
+     * Updates a pending message.
+     *
+     * @param idMessage   Identifier of the pending message.
+     * @param transferTag Identifier of the transfer.
+     * @param nodeHandle  Handle of the node already uploaded.
+     * @param state       State of the pending message.
+     */
+    suspend fun updatePendingMessage(
+        idMessage: Long,
+        transferTag: Int,
+        nodeHandle: String?,
+        state: Int,
+    )
 }

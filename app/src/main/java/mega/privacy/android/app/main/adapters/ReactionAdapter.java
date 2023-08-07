@@ -31,7 +31,7 @@ import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.reaction.ReactionImageView;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;

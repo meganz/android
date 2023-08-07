@@ -6,7 +6,7 @@ import mega.privacy.android.app.interfaces.AttachNodeToChatListener
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
@@ -31,7 +31,9 @@ class AttachNodesListener(
             if (e.errorCode == API_OK) {
                 successCount++
 
-                attachNodeToChatListener?.onSendSuccess(AndroidMegaChatMessage(request.megaChatMessage))
+                attachNodeToChatListener?.onSendSuccess(
+                    AndroidMegaChatMessage(request.megaChatMessage)
+                )
             } else {
                 failureCount++
             }

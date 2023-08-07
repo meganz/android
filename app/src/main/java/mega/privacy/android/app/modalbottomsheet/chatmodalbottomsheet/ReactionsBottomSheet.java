@@ -14,7 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import nz.mega.sdk.MegaChatMessage;
 

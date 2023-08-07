@@ -43,14 +43,15 @@ import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
-import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage;
+import mega.privacy.android.app.presentation.filelink.FileLinkActivity;
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.domain.entity.Feature;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -231,7 +232,7 @@ public class NodeController {
         Timber.d("url %s", url);
 
         // Download link
-        if (AndroidMegaRichLinkMessage.isFileLink(url)) {
+        if (Util.matchRegexs(url, Constants.FILE_LINK_REGEXS)) {
             Intent openFileIntent;
             if (enabledFeatureFlags.contains(AppFeatures.FileLinkCompose)) {
                 openFileIntent = new Intent(context, FileLinkComposeActivity.class);
@@ -243,16 +244,16 @@ public class NodeController {
             openFileIntent.setData(Uri.parse(url));
             ((ManagerActivity) context).startActivity(openFileIntent);
             return FILE_LINK;
-        } else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
+        } else if (Util.matchRegexs(url, Constants.FOLDER_LINK_REGEXS)) {
             Intent openFolderIntent = new Intent(context, FolderLinkComposeActivity.class);
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
             context.startActivity(openFolderIntent);
             return FOLDER_LINK;
-        } else if (AndroidMegaRichLinkMessage.isChatLink(url)) {
+        } else if (Util.matchRegexs(url, Constants.CHAT_LINK_REGEXS)) {
             return CHAT_LINK;
-        } else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
+        } else if (Util.matchRegexs(url, Constants.CONTACT_LINK_REGEXS)) {
             return CONTACT_LINK;
         }
 

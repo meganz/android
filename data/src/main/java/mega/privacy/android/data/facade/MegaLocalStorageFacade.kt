@@ -356,6 +356,16 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setBackupAsOutdated(backupId: Long) =
         dbHandler.setBackupAsOutdated(backupId)
 
+    override suspend fun findPendingMessagesNotSent(chatId: Long) =
+        dbHandler.findPendingMessagesNotSent(chatId)
+
+    override suspend fun updatePendingMessage(
+        idMessage: Long,
+        transferTag: Int,
+        nodeHandle: String?,
+        state: Int,
+    ) = dbHandler.updatePendingMessage(idMessage, transferTag, nodeHandle, state)
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }

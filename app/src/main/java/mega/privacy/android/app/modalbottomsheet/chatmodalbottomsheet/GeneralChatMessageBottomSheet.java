@@ -46,7 +46,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ChatReactionsView;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;

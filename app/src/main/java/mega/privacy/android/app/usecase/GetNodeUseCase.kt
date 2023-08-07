@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem

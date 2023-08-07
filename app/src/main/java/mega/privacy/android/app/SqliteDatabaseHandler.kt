@@ -15,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup

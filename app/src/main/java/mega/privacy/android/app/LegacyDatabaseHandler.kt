@@ -1,7 +1,6 @@
 package mega.privacy.android.app
 
 import android.database.sqlite.SQLiteDatabase
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.data.database.DatabaseHandler
@@ -64,7 +63,6 @@ interface LegacyDatabaseHandler : DatabaseHandler {
     ): Long
 
     fun findPendingMessageById(messageId: Long): PendingMessage?
-    fun findPendingMessagesNotSent(idChat: Long): ArrayList<AndroidMegaChatMessage>
     fun addSDTransfer(transfer: SDTransfer): Long
     fun saveBackup(backup: Backup): Boolean
 }

@@ -115,7 +115,8 @@ class ChatRepositoryImplTest {
             chatMessageMapper = chatMessageMapper,
             appEventGateway = appEventGateway,
             chatHistoryLoadStatusMapper = chatHistoryLoadStatusMapper,
-            chatInitStateMapper = chatInitStateMapper
+            chatInitStateMapper = chatInitStateMapper,
+            pendingMessageListMapper = mock()
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)

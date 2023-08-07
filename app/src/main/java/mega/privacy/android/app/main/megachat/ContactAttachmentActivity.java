@@ -44,6 +44,7 @@ import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaContactsAttachedAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;

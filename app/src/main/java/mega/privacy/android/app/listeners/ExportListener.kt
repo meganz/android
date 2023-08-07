@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent
 import mega.privacy.android.app.utils.Util
@@ -120,9 +120,9 @@ class ExportListener constructor(private val context: Context) :
         pendingExport = numberExport
         this.exportedLinks = exportedLinks
         for (msg in messages) {
-            val msgId = msg.message.msgId
-            val nodeHandle = msg.message.megaNodeList[0].handle
-            msgIdNodeHandle[nodeHandle] = msgId
+            msg.message?.let {
+                msgIdNodeHandle[it.megaNodeList[0].handle] = msg.message?.msgId ?: -1
+            }
         }
     }
 

@@ -55,7 +55,7 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.TruncateHistoryListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;

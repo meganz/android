@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import mega.privacy.android.data.model.MegaAttributes
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.Contact
@@ -672,4 +673,27 @@ interface MegaLocalStorageGateway {
      * @param backupId back up id to be removed
      */
     suspend fun setBackupAsOutdated(backupId: Long)
+
+    /**
+     * Gets pending messages.
+     *
+     * @param chatId Chat identifier from which the messages has to be get.
+     * @return A list of [AndroidMegaChatMessage].
+     */
+    suspend fun findPendingMessagesNotSent(chatId: Long): List<AndroidMegaChatMessage>
+
+    /**
+     * Updates a pending message.
+     *
+     * @param idMessage   Identifier of the pending message.
+     * @param transferTag Identifier of the transfer.
+     * @param nodeHandle  Handle of the node already uploaded.
+     * @param state       State of the pending message.
+     */
+    suspend fun updatePendingMessage(
+        idMessage: Long,
+        transferTag: Int,
+        nodeHandle: String?,
+        state: Int,
+    )
 }

@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaChatMessage;

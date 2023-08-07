@@ -36,7 +36,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;

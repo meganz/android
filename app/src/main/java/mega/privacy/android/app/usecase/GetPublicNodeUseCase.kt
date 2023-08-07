@@ -3,7 +3,7 @@ package mega.privacy.android.app.usecase
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage
+import mega.privacy.android.data.model.chat.AndroidMegaRichLinkMessage
 import mega.privacy.android.app.usecase.exception.toMegaException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError.API_OK
@@ -34,7 +34,9 @@ class GetPublicNodeUseCase @Inject constructor(
                             return@OptionalMegaRequestListenerInterface
                         }
                         error.errorCode == API_OK && publicNode != null -> {
-                            emitter.onSuccess(AndroidMegaRichLinkMessage(link, publicNode))
+                            emitter.onSuccess(
+                                AndroidMegaRichLinkMessage(link, publicNode)
+                            )
                         }
                         else -> {
                             emitter.onError(error.toMegaException())
