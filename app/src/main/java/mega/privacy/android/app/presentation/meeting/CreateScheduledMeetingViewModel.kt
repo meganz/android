@@ -381,6 +381,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      */
     fun onStartDateTimeTap(selectedStartDate: ZonedDateTime) {
         val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC)
+        Timber.d("Start date selected $selectedStartDate")
         if (selectedStartDate.isBefore(nowZonedDateTime)) {
             return
         }
@@ -399,10 +400,15 @@ class CreateScheduledMeetingViewModel @Inject constructor(
 
         _state.update { state ->
             val newEndDate =
-                if ((state.endDate.isAfter(selectedStartDate))) state.endDate else selectedStartDate.plus(
-                    30,
-                    ChronoUnit.MINUTES
-                )
+                if ((state.endDate.isAfter(selectedStartDate)))
+                    state.endDate
+                else
+                    selectedStartDate.plus(
+                        30,
+                        ChronoUnit.MINUTES
+                    )
+
+            Timber.d("Set start date $selectedStartDate, set end date $newEndDate")
 
             state.copy(
                 startDate = selectedStartDate,
@@ -423,16 +429,22 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Set end date and time
      *
-     * @param selectedEndDate   End date and time
+     * @param endDateTime   End date and time
      */
-    fun onEndDateTimeTap(selectedEndDate: ZonedDateTime) {
-        if (selectedEndDate.isBefore(state.value.startDate)) {
-            return
-        }
+    fun onEndDateTimeTap(endDateTime: ZonedDateTime) {
+        Timber.d("End date selected $endDateTime")
+        val newEndDateTime = if (endDateTime.isBefore(state.value.startDate))
+            state.value.startDate.plus(
+                30,
+                ChronoUnit.MINUTES
+            )
+        else
+            endDateTime
+        Timber.d("Set end date $newEndDateTime")
 
         _state.update {
             it.copy(
-                endDate = selectedEndDate
+                endDate = newEndDateTime
             )
         }
     }

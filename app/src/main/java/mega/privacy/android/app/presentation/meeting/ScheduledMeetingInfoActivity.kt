@@ -185,10 +185,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        val chatId = intent.getLongExtra(CHAT_ID, -1)
+        val chatId = intent.getLongExtra(CHAT_ID, -1L)
         val schedId = intent.getLongExtra(
             SCHEDULED_MEETING_ID,
-            -1
+            -1L
         )
 
         viewModel.setChatId(newChatId = chatId, newScheduledMeetingId = schedId)

@@ -372,10 +372,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 if (!isMainScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
                     return@collectLatest
                 }
-
                 Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
                 when (val changes = scheduledMeetReceived.changes) {
-                    ScheduledMeetingChanges.NewScheduledMeeting -> updateScheduledMeeting(
+                    ScheduledMeetingChanges.NewScheduledMeeting, ScheduledMeetingChanges.Unknown -> updateScheduledMeeting(
                         scheduledMeetReceived = scheduledMeetReceived
                     )
 

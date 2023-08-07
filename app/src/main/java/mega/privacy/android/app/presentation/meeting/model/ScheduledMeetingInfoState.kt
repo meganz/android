@@ -40,7 +40,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property is24HourFormat                             True, if it's 24 hour format.
  */
 data class ScheduledMeetingInfoState(
-    val chatId: Long = -1,
+    val chatId: Long = -1L,
     val scheduledMeeting: ChatScheduledMeeting? = null,
     val finish: Boolean = false,
     val openAddContact: Boolean? = null,

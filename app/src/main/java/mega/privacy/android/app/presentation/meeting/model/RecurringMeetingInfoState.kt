@@ -22,8 +22,8 @@ import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
  **/
 data class RecurringMeetingInfoState(
     val finish: Boolean = false,
-    val chatId: Long = -1,
-    val schedId: Long = -1,
+    val chatId: Long = -1L,
+    val schedId: Long = -1L,
     val schedTitle: String? = "",
     val schedUntil: Long = 0L,
     val typeOccurs: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
