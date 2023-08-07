@@ -2,6 +2,8 @@ package mega.privacy.android.core.ui.controls.dialogs
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.controls.preview.PreviewAlertDialogParametersProvider
+import mega.privacy.android.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -98,17 +103,29 @@ fun MegaAlertDialog(
 
 @CombinedThemeRtlPreviews
 @Composable
-private fun MegaAlertDialogPreview() {
+private fun MegaAlertDialogPreview(
+    @PreviewParameter(PreviewAlertDialogParametersProvider::class) texts: PreviewStringParameters,
+) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaAlertDialog(
-            text = "Discard draft?",
-            confirmButtonText = "Discard",
-            cancelButtonText = "Cancel",
-            onConfirm = {},
-            onDismiss = {},
-        )
+        PreviewBox {
+            MegaAlertDialog(
+                text = texts.text.getText(),
+                confirmButtonText = texts.confirmButtonText.getText(),
+                cancelButtonText = texts.cancelButtonText?.getText(),
+                title = texts.title?.getText(),
+                onConfirm = {},
+                onDismiss = {},
+            )
+        }
     }
 }
+
+
+@Composable
+private fun PreviewBox(content: @Composable BoxScope.() -> Unit) = Box(
+    modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
+    content = content
+)
 
 internal const val TITLE_TAG = "titleTag"
 internal const val CANCEL_TAG = "cancelTag"
