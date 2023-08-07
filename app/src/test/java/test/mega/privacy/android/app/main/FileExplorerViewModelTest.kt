@@ -9,6 +9,8 @@ import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.permisison.HasAudioPermissionUseCase
+import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.Before
 import org.junit.Test
@@ -20,6 +22,8 @@ class FileExplorerViewModelTest {
     private val getCopyLatestTargetPathUseCase = mock<GetCopyLatestTargetPathUseCase>()
     private val getMoveLatestTargetPathUseCase = mock<GetMoveLatestTargetPathUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
+    private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
+    private val hasAudioPermissionUseCase = mock<HasAudioPermissionUseCase>()
 
     @Before
     fun setUp() {
@@ -28,7 +32,9 @@ class FileExplorerViewModelTest {
             monitorStorageStateEventUseCase = mock(),
             getCopyLatestTargetPathUseCase = getCopyLatestTargetPathUseCase,
             getMoveLatestTargetPathUseCase = getMoveLatestTargetPathUseCase,
-            getNodeAccessPermission = getNodeAccessPermission
+            getNodeAccessPermission = getNodeAccessPermission,
+            hasMediaPermissionUseCase = hasMediaPermissionUseCase,
+            hasAudioPermissionUseCase = hasAudioPermissionUseCase,
         )
     }
 

@@ -4,14 +4,14 @@ import mega.privacy.android.domain.repository.PermissionRepository
 import javax.inject.Inject
 
 /**
- * Has media permission use case
+ * Has Audio permission use case
  *
  */
-class HasMediaPermissionUseCase @Inject constructor(
+class HasAudioPermissionUseCase @Inject constructor(
     private val permissionRepository: PermissionRepository,
 ) {
     /**
      * Invoke
      */
-    operator fun invoke() = permissionRepository.hasMediaPermission()
+    operator fun invoke() = permissionRepository.hasAudioPermission()
 }

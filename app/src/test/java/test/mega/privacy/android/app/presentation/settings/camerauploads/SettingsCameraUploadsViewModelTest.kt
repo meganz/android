@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
@@ -108,6 +109,7 @@ class SettingsCameraUploadsViewModelTest {
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
     private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
+    private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
 
     @Before
     fun setUp() {
@@ -162,6 +164,7 @@ class SettingsCameraUploadsViewModelTest {
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             rescheduleCameraUploadUseCase = rescheduleCameraUploadUseCase,
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
+            hasMediaPermissionUseCase = hasMediaPermissionUseCase,
         )
     }
 

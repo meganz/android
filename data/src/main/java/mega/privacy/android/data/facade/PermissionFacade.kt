@@ -4,6 +4,7 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_AUDIO
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Context
 import android.content.pm.PackageManager
@@ -107,4 +108,13 @@ internal class PermissionFacade @Inject constructor(
      */
     @RequiresApi(33)
     private fun getReadAudioPermission() = READ_MEDIA_AUDIO
+
+
+    /**
+     * Get READ_MEDIA_VISUAL_USER_SELECTED
+     *
+     * @return READ_MEDIA_VISUAL_USER_SELECTED
+     */
+    @RequiresApi(34)
+    override fun getPartialMediaPermission() = READ_MEDIA_VISUAL_USER_SELECTED
 }

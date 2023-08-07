@@ -130,7 +130,7 @@ class PhotosFragment : Fragment() {
                     shouldEnableCUPage(false)
                     managerActivity.refreshPhotosFragment()
                 }
-                handlePermissionsResult(permissions)
+                handlePermissionsResult()
             }
         }
 

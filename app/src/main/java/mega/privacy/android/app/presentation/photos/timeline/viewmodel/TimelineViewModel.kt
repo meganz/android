@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
@@ -95,6 +96,7 @@ class TimelineViewModel @Inject constructor(
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
     private val timelinePreferencesMapper: TimelinePreferencesMapper,
+    private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     monitorCameraUploadProgress: MonitorCameraUploadProgress,
 ) : ViewModel() {
 
@@ -175,30 +177,11 @@ class TimelineViewModel @Inject constructor(
 
     /**
      * Handle specific behavior when permissions are granted / denied
-     *
-     * @param permissions A [Map] of permissions that were requested
      */
-    fun handlePermissionsResult(permissions: Map<String, Boolean>) {
-        if (areMediaPermissionsGranted(permissions)) handleEnableCameraUploads()
+    fun handlePermissionsResult() {
+        if (hasMediaPermissionUseCase()) handleEnableCameraUploads()
         else setTriggerMediaPermissionsDeniedLogicState(shouldTrigger = true)
     }
-
-    /**
-     * Checks whether the Media Permissions have been granted. For devices running Android 13 and
-     * above, Granular Permissions are checked
-     *
-     * @param permissions A [Map] of permissions that were requested
-     *
-     * @return Boolean value
-     */
-    private fun areMediaPermissionsGranted(permissions: Map<String, Boolean>) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            permissions[READ_MEDIA_IMAGES] == true && permissions[READ_MEDIA_VIDEO] == true || permissions[READ_MEDIA_VISUAL_USER_SELECTED] == true
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions[READ_MEDIA_IMAGES] == true && permissions[READ_MEDIA_VIDEO] == true
-        } else {
-            permissions[READ_EXTERNAL_STORAGE] == true
-        }
 
     /**
      * Checks whether Camera Uploads can be enabled and handles the Status accordingly, as

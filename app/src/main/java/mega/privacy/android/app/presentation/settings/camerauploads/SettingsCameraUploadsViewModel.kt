@@ -56,6 +56,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
@@ -141,6 +142,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val rescheduleCameraUploadUseCase: RescheduleCameraUploadUseCase,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
+    private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -172,7 +174,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @param permissions A [Map] of permissions that were requested
      */
     fun handlePermissionsResult(permissions: Map<String, Boolean>) {
-        if (areMediaPermissionsGranted(permissions)) {
+        if (hasMediaPermissionUseCase()) {
             handleEnableCameraUploads()
         } else {
             setMediaPermissionsRationaleState(shouldShow = true)
@@ -181,23 +183,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             setNotificationPermissionRationaleState(shouldShow = true)
         }
     }
-
-    /**
-     * Checks whether the Media Permissions have been granted. The checking would vary depending
-     * on the user's Android OS
-     *
-     * @param permissions A [Map] of permissions that were requested
-     *
-     * @return Boolean value
-     */
-    private fun areMediaPermissionsGranted(permissions: Map<String, Boolean>) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            permissions[READ_MEDIA_IMAGES] == true && permissions[READ_MEDIA_VIDEO] == true || permissions[READ_MEDIA_VISUAL_USER_SELECTED] == true
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions[READ_MEDIA_IMAGES] == true && permissions[READ_MEDIA_VIDEO] == true
-        } else {
-            permissions[READ_EXTERNAL_STORAGE] == true
-        }
 
     /**
      * Checks whether the Notification Permission been granted. For Devices running Android 12

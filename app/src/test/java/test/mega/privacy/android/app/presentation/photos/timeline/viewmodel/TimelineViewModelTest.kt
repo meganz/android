@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
@@ -94,6 +95,8 @@ class TimelineViewModelTest {
 
     private val setTimelineFilterPreferencesUseCase = mock<SetTimelineFilterPreferencesUseCase>()
 
+    private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
+
     private val timelinePreferencesMapper = mock<TimelinePreferencesMapper>()
 
     @Before
@@ -116,6 +119,7 @@ class TimelineViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
+            hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             timelinePreferencesMapper = timelinePreferencesMapper,
         )
     }

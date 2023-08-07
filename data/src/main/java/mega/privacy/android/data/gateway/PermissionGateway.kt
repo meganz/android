@@ -24,4 +24,9 @@ interface PermissionGateway {
      * Provide getAudioPermissionByVersion implementation
      */
     fun getAudioPermissionByVersion(): String
+
+    /**
+     * Provide getPartialMediaPermission
+     */
+    fun getPartialMediaPermission(): String
 }
