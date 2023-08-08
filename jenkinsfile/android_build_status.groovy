@@ -107,11 +107,6 @@ pipeline {
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
-        // Google map api
-        GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
-        GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
-        GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
-
         IS_CI_BUILD = 'true'
     }
     post {

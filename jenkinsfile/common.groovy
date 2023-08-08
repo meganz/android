@@ -582,43 +582,35 @@ void downloadAndExtractNativeSymbols() {
 
 void downloadDependencyLibForSdk() {
     gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
-
         sh """
-                        # we still have to download webrtc file for lint check. :( 
-                        cd "${WORKSPACE}/jenkinsfile/"
-                        bash download_webrtc.sh
+            # we still have to download webrtc file for lint check. :( 
+            cd "${WORKSPACE}/jenkinsfile/"
+            bash download_webrtc.sh
 
-                        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
+            mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
+            cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
 
-                        pwd 
-                        ls -lh
+            pwd 
+            ls -lh
+        """
 
-                        ## check default Google API
-                        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
-                            echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
-                        else
-                            echo "downloading google map api"
-                            mega-get ${GOOGLE_MAP_API_URL}
-                
-                            echo "unzipping google map api"
-                            rm -fr ${GOOGLE_MAP_API_UNZIPPED}
-                            unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
-                        fi
-                
-                        ls -lh
-                
-                        cd ${WORKSPACE}
-                        pwd
+        println("applying default google map api config... ")
+        withCredentials([
+                file(credentialsId: 'ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG')
+        ]) {
+            String googleMapsApiFolder = "default_google_maps_api_unzipped"
 
-                        echo "Applying Google Map API patches"
-                        rm -fr app/src/debug/res/values/google_maps_api.xml
-                        rm -fr app/src/release/res/values/google_maps_api.xml
-                        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
+            sh """
+                cd ${WORKSPACE}
+                unzip ${ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG} -d ${googleMapsApiFolder}
                 
-                    """
+                mkdir -p app/src/debug/res/values
+                mkdir -p app/src/release/res/values
+                cp -fv ${googleMapsApiFolder}/debug/res/values/google_maps_api.xml app/src/debug/res/values/google_maps_api.xml
+                cp -fv ${googleMapsApiFolder}/release/res/values/google_maps_api.xml app/src/release/res/values/google_maps_api.xml
+            """
+        }
     }
 }
-
 
 return this

@@ -46,11 +46,6 @@ pipeline {
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
-        // Google map api
-        GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
-        GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
-        GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
-
         COMBINE_LINT_REPORTS = "true"
         DO_NOT_SUPPRESS_WARNINGS = "true"
     }
@@ -104,43 +99,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Download Dependency Lib for SDK"
-                }
-                gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
-
-                    sh """
-                        # we still have to download webrtc file for lint check. :( 
-                        cd "${WORKSPACE}/jenkinsfile/"
-                        bash download_webrtc.sh
-
-                        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-
-                        pwd 
-                        ls -lh
-
-                        ## check default Google API
-                        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
-                            echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
-                        else
-                            echo "downloading google map api"
-                            mega-get ${GOOGLE_MAP_API_URL}
-                
-                            echo "unzipping google map api"
-                            rm -fr ${GOOGLE_MAP_API_UNZIPPED}
-                            unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
-                        fi
-                
-                        ls -lh
-                
-                        cd ${WORKSPACE}
-                        pwd
-
-                        echo "Applying Google Map API patches"
-                        rm -fr app/src/debug/res/values/google_maps_api.xml
-                        rm -fr app/src/release/res/values/google_maps_api.xml
-                        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
-                
-                    """
+                    common.downloadDependencyLibForSdk()
                 }
             }
         }
@@ -169,7 +128,6 @@ pipeline {
                     BUILD_STEP = "Generate warning report"
 
                     generateWarningReport(BUILD_WARNING_FILE)
-
                 }
             }
         }
