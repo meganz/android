@@ -55,6 +55,7 @@ class GetScheduleMeetingDataUseCase @Inject constructor(
 
                 ScheduledMeetingData(
                     schedId = schedMeeting.schedId,
+                    title = schedMeeting.title,
                     scheduledStartTimestamp = startTimestamp,
                     scheduledEndTimestamp = endTimestamp,
                     scheduledTimestampFormatted = formattedTimestamp,

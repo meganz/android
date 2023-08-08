@@ -2,6 +2,7 @@ package mega.privacy.android.core.ui.controls.tooltips
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
@@ -12,10 +13,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.skydoves.balloon.ArrowOrientationRules
+import com.skydoves.balloon.ArrowPositionRules
 import com.skydoves.balloon.BalloonAnimation
 import com.skydoves.balloon.BalloonSizeSpec
 import com.skydoves.balloon.compose.Balloon
@@ -36,7 +41,6 @@ import mega.privacy.android.core.ui.theme.extensions.white_black
  * @param descriptionText
  * @param actionText
  * @param showOnTop
- * @param arrowPosition
  * @param onDismissed
  * @param content
  */
@@ -47,7 +51,6 @@ fun MegaTooltip(
     descriptionText: String,
     actionText: String,
     showOnTop: Boolean,
-    arrowPosition: Float,
     onDismissed: () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -61,11 +64,12 @@ fun MegaTooltip(
         setWidth(BalloonSizeSpec.WRAP)
         setHeight(BalloonSizeSpec.WRAP)
         setArrowSize(10)
-        setArrowPosition(arrowPosition)
         setMarginHorizontal(16)
         setMarginVertical(8)
         setPadding(16)
         setCornerRadius(8f)
+        setArrowOrientationRules(ArrowOrientationRules.ALIGN_ANCHOR)
+        setArrowPositionRules(ArrowPositionRules.ALIGN_ANCHOR)
         setBalloonAnimation(BalloonAnimation.FADE)
         passTouchEventToAnchor = true
         setBackgroundColor(bgColor)
@@ -75,7 +79,13 @@ fun MegaTooltip(
         modifier = modifier,
         builder = builder,
         balloonContent = {
-            Column(modifier = Modifier.width(216.dp)) {
+            Column(
+                modifier = if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
+                    Modifier.fillMaxWidth()
+                } else {
+                    Modifier.width(216.dp)
+                }
+            ) {
                 Text(
                     text = titleText,
                     color = MaterialTheme.colors.white_black,

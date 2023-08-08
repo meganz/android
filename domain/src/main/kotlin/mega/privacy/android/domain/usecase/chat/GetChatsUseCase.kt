@@ -207,6 +207,7 @@ class GetChatsUseCase @Inject constructor(
         if (chatRoomType == ChatRoomType.MEETINGS && this is MeetingChatRoomItem) {
             getMeetingScheduleData(chatId, meetingTimeMapper)?.let { schedMeetingData ->
                 copyChatRoomItem(
+                    title = schedMeetingData.title ?: title,
                     schedId = schedMeetingData.schedId,
                     isPending = schedMeetingData.isPending,
                     isRecurringDaily = schedMeetingData.isRecurringDaily,
@@ -291,6 +292,7 @@ class GetChatsUseCase @Inject constructor(
                             get(chatId)?.let { currentItem ->
                                 val newItem = currentItem.copyChatRoomItem(
                                     schedId = schedData.schedId,
+                                    title = schedData.title ?: currentItem.title,
                                     isPending = schedData.isPending,
                                     isRecurringDaily = schedData.isRecurringDaily,
                                     isRecurringWeekly = schedData.isRecurringWeekly,

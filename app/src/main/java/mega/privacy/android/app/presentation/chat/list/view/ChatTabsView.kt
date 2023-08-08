@@ -104,7 +104,6 @@ fun ChatTabsView(
                     descriptionText = stringResource(R.string.meeting_list_tooltip_fab_description),
                     actionText = stringResource(R.string.button_permission_info),
                     showOnTop = true,
-                    arrowPosition = 0.89f,
                     onDismissed = { onShowNextTooltip(MeetingTooltipItem.RECURRING_OR_PENDING) },
                 ) {
                     FabButton(true, onStartChatClick)

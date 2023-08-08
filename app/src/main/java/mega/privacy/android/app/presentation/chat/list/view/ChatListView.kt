@@ -202,7 +202,6 @@ private fun TooltipView(
                 descriptionText = stringResource(R.string.meeting_list_tooltip_recurring_description),
                 actionText = stringResource(R.string.button_permission_info),
                 showOnTop = false,
-                arrowPosition = 0.5f,
                 content = content,
                 onDismissed = {
                     if (tooltip == MeetingTooltipItem.RECURRING_OR_PENDING) {
@@ -223,7 +222,6 @@ private fun TooltipView(
                 descriptionText = stringResource(R.string.meeting_list_tooltip_sched_description),
                 actionText = stringResource(R.string.button_permission_info),
                 showOnTop = false,
-                arrowPosition = 0.5f,
                 content = content,
                 onDismissed = {
                     if (tooltip == MeetingTooltipItem.RECURRING_OR_PENDING) {
