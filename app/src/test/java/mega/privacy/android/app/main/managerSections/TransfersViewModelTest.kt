@@ -12,12 +12,12 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.usecase.transfer.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
@@ -53,6 +53,7 @@ internal class TransfersViewModelTest {
     private val monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase = mock()
     private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase = mock()
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase = mock()
+    private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase = mock()
 
     @Before
     fun setUp() {
@@ -73,7 +74,8 @@ internal class TransfersViewModelTest {
             getAllCompletedTransfersUseCase = getAllCompletedTransfersUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             monitorCompletedTransferEventUseCase = monitorCompletedTransferEventUseCase,
-            getFailedOrCanceledTransfersUseCase = getFailedOrCanceledTransfersUseCase
+            getFailedOrCanceledTransfersUseCase = getFailedOrCanceledTransfersUseCase,
+            deleteCompletedTransferUseCase = deleteCompletedTransferUseCase
         )
     }
 
@@ -164,5 +166,14 @@ internal class TransfersViewModelTest {
             underTest.completedTransfers.test {
                 assertThat(awaitItem()).isEqualTo(completedTransfers)
             }
+        }
+
+    @Test
+    fun `test that deleteCompletedTransferUseCase invoke success when deleteCompletedTransfer is called`() =
+        runTest {
+            val transfer = mock<CompletedTransfer>()
+            underTest.completedTransferRemoved(transfer, false)
+            advanceUntilIdle()
+            verify(deleteCompletedTransferUseCase).invoke(transfer, false)
         }
 }

@@ -388,4 +388,11 @@ interface TransferRepository {
      * @return the failed or cancelled transfer list was deleted
      */
     suspend fun deleteFailedOrCanceledTransfers(): List<CompletedTransfer>
+
+    /**
+     * Delete completed transfer
+     *
+     * @param transfer
+     */
+    suspend fun deleteCompletedTransfer(transfer: CompletedTransfer, isRemoveCache: Boolean)
 }

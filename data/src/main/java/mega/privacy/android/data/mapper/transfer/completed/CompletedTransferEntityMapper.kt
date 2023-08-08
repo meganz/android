@@ -9,6 +9,7 @@ internal class CompletedTransferEntityMapper @Inject constructor(
     private val encryptData: EncryptData,
 ) {
     suspend operator fun invoke(completedTransfer: CompletedTransfer) = CompletedTransferEntity(
+        id = completedTransfer.id?.takeIf { it > 0 },
         fileName = encryptData(completedTransfer.fileName),
         type = encryptData(completedTransfer.type.toString()),
         state = encryptData(completedTransfer.state.toString()),

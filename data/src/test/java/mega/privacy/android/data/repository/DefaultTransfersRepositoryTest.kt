@@ -673,6 +673,14 @@ class DefaultTransfersRepositoryTest {
             )
         }
 
+    @Test
+    fun `test that function invoke correctly when deleteCompletedTransfer is called`() =
+        runTest {
+            val completedTransfer = mock<CompletedTransfer>()
+            underTest.deleteCompletedTransfer(completedTransfer, false)
+            verify(megaLocalRoomGateway).deleteCompletedTransfer(any())
+        }
+
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class ActiveTransfersTest {

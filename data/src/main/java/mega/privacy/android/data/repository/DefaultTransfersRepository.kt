@@ -42,6 +42,8 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
+import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -461,4 +463,20 @@ internal class DefaultTransfersRepository @Inject constructor(
                 )
             )
         }
+
+    override suspend fun deleteCompletedTransfer(
+        transfer: CompletedTransfer,
+        isRemoveCache: Boolean,
+    ) = withContext(ioDispatcher) {
+        if (isRemoveCache) {
+            File(transfer.originalPath).takeIf { it.exists() }?.let { cacheFile ->
+                if (cacheFile.delete()) {
+                    Timber.d("Deleted success, path is $cacheFile")
+                } else {
+                    Timber.d("Deleted failed, path is $cacheFile")
+                }
+            }
+        }
+        megaLocalRoomGateway.deleteCompletedTransfer(transfer)
+    }
 }

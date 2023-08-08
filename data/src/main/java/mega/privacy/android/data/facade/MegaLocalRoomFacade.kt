@@ -136,6 +136,12 @@ internal class MegaLocalRoomFacade @Inject constructor(
         return entities.map { entity -> completedTransferModelMapper(entity) }
     }
 
+    override suspend fun deleteCompletedTransfer(completedTransfer: CompletedTransfer) {
+        completedTransferDao.deleteCompletedTransfer(
+            listOf(completedTransferEntityMapper(completedTransfer))
+        )
+    }
+
     override suspend fun getActiveTransferByTag(tag: Int) =
         activeTransferDao.getActiveTransferByTag(tag)
 

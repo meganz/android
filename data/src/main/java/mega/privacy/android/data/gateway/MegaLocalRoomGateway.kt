@@ -145,6 +145,13 @@ interface MegaLocalRoomGateway {
     suspend fun deleteCompletedTransfersByState(states: List<Int>): List<CompletedTransfer>
 
     /**
+     * Delete completed transfer
+     *
+     * @param completedTransfer
+     */
+    suspend fun deleteCompletedTransfer(completedTransfer: CompletedTransfer)
+
+    /**
      * Get active transfer by tag
      */
     suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?

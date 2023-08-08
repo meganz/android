@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.transfer.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
@@ -53,6 +54,7 @@ class TransfersViewModel @Inject constructor(
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase,
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase,
+    private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -329,21 +331,8 @@ class TransfersViewModel @Inject constructor(
      * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
     fun completedTransferRemoved(transfer: CompletedTransfer, isRemovedCache: Boolean) =
-        viewModelScope.launch(ioDispatcher) {
-            if (isRemovedCache) {
-                transfer.originalPath.let {
-                    File(it).let { cacheFile ->
-                        if (cacheFile.exists()) {
-                            if (cacheFile.delete()) {
-                                Timber.d("Deleted success, path is $cacheFile")
-                            } else {
-                                Timber.d("Deleted failed, path is $cacheFile")
-                            }
-                        }
-                    }
-                }
-
-            }
+        viewModelScope.launch {
+            deleteCompletedTransferUseCase(transfer, isRemovedCache)
         }
 
     /**

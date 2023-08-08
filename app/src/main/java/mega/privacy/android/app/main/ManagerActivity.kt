@@ -8495,7 +8495,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
     fun removeCompletedTransfer(transfer: CompletedTransfer, isRemovedCache: Boolean) {
-        dbH.deleteTransfer(transfer.id ?: return)
         transfersViewModel.completedTransferRemoved(transfer, isRemovedCache)
     }
 
@@ -8680,7 +8679,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param transfer CompletedTransfer to retry.
      */
     fun retrySingleTransfer(transfer: CompletedTransfer) {
-        removeCompletedTransfer(transfer, false)
         retryTransfer(transfer)
     }
 
