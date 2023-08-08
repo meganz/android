@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.util.TypedValue
@@ -19,6 +20,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -121,11 +123,11 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             sttFileManagement =
                 supportFragmentManager.findFragmentById(R.id.fragment_container) as? SettingsFileManagementFragment
         }
-        registerReceiver(
+        registerExportedReceiver(
             cacheSizeUpdateReceiver,
             IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING)
         )
-        registerReceiver(
+        registerExportedReceiver(
             offlineSizeUpdateReceiver,
             IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING)
         )
@@ -151,6 +153,27 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             )
         ) {
             showClearOfflineDialog()
+        }
+    }
+
+    /**
+     * Register Exported Broadcast Receiver
+     */
+    private fun registerExportedReceiver(
+        receiver: BroadcastReceiver?,
+        filter: IntentFilter,
+    ): Intent? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.registerReceiver(
+                    this, receiver, filter, ContextCompat.RECEIVER_EXPORTED
+                )
+            } else {
+                super.registerReceiver(receiver, filter)
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e, "IllegalStateException registering receiver")
+            null
         }
     }
 
