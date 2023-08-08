@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.domain.entity.UserAccount
@@ -26,13 +23,11 @@ import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
-import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -70,18 +65,6 @@ class SettingsViewModel @Inject constructor(
     private val isChatLoggedIn: IsChatLoggedIn,
     private val setSdkLogsEnabled: SetSdkLogsEnabled,
     private val setChatLoggingEnabled: SetChatLogsEnabled,
-    private val putStringPreference: PutPreference<String>,
-    private val putStringSetPreference: PutPreference<MutableSet<String>>,
-    private val putIntPreference: PutPreference<Int>,
-    private val putLongPreference: PutPreference<Long>,
-    private val putFloatPreference: PutPreference<Float>,
-    private val putBooleanPreference: PutPreference<Boolean>,
-    private val getStringPreference: GetPreference<String?>,
-    private val getStringSetPreference: GetPreference<MutableSet<String>?>,
-    private val getIntPreference: GetPreference<Int>,
-    private val getLongPreference: GetPreference<Long>,
-    private val getFloatPreference: GetPreference<Float>,
-    private val getBooleanPreference: GetPreference<Boolean>,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -279,48 +262,6 @@ class SettingsViewModel @Inject constructor(
     fun mediaDiscoveryView(state: Int) = viewModelScope.launch {
         setMediaDiscoveryView(state)
     }
-
-    fun putString(key: String?, value: String?) {
-        viewModelScope.launch { putStringPreference(key, value) }
-    }
-
-    fun putStringSet(key: String?, values: MutableSet<String>?) {
-        viewModelScope.launch { putStringSetPreference(key, values) }
-    }
-
-    fun putInt(key: String?, value: Int) {
-        viewModelScope.launch { putIntPreference(key, value) }
-    }
-
-    fun putLong(key: String?, value: Long) {
-        viewModelScope.launch { putLongPreference(key, value) }
-    }
-
-    fun putFloat(key: String?, value: Float) {
-        viewModelScope.launch { putFloatPreference(key, value) }
-    }
-
-    fun putBoolean(key: String?, value: Boolean) {
-        viewModelScope.launch { putBooleanPreference(key, value) }
-    }
-
-    fun getString(key: String?, defValue: String?) =
-        runBlocking { getStringPreference(key, defValue).firstOrNull() }
-
-    fun getStringSet(key: String?, defValue: MutableSet<String>?) =
-        runBlocking { getStringSetPreference(key, defValue).firstOrNull() }
-
-    fun getInt(key: String?, defValue: Int) =
-        runBlocking { getIntPreference(key, defValue).first() }
-
-    fun getLong(key: String?, defValue: Long) =
-        runBlocking { getLongPreference(key, defValue).first() }
-
-    fun getFloat(key: String?, defValue: Float) =
-        runBlocking { getFloatPreference(key, defValue).first() }
-
-    fun getBoolean(key: String?, defValue: Boolean) =
-        runBlocking { getBooleanPreference(key, defValue).first() }
 
     suspend fun fetchPasscodeEnabled() = refreshPasscodeLockPreference()
 }

@@ -93,18 +93,6 @@ class SettingsViewModelTest {
             isChatLoggedIn = isChatLoggedIn,
             setSdkLogsEnabled = mock(),
             setChatLoggingEnabled = mock(),
-            putStringPreference = mock(),
-            putStringSetPreference = mock(),
-            putIntPreference = mock(),
-            putLongPreference = mock(),
-            putFloatPreference = mock(),
-            putBooleanPreference = mock(),
-            getStringPreference = mock(),
-            getStringSetPreference = mock(),
-            getIntPreference = mock(),
-            getLongPreference = mock(),
-            getFloatPreference = mock(),
-            getBooleanPreference = mock(),
         )
     }
 

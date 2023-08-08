@@ -17,12 +17,10 @@ import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.GetChatImageQuality
-import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
-import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
@@ -62,54 +60,6 @@ abstract class SettingsUseCases {
     abstract fun bindMonitorMediaDiscoveryView(implementation: DefaultMonitorMediaDiscoveryView): MonitorMediaDiscoveryView
 
     companion object {
-
-        @Provides
-        fun providePutStringPreference(settingsRepository: SettingsRepository): PutPreference<String> =
-            PutPreference(settingsRepository::setStringPreference)
-
-        @Provides
-        fun providePutStringSetPreference(settingsRepository: SettingsRepository): PutPreference<MutableSet<String>> =
-            PutPreference(settingsRepository::setStringSetPreference)
-
-        @Provides
-        fun providePutIntPreference(settingsRepository: SettingsRepository): PutPreference<Int> =
-            PutPreference(settingsRepository::setIntPreference)
-
-        @Provides
-        fun providePutLongPreference(settingsRepository: SettingsRepository): PutPreference<Long> =
-            PutPreference(settingsRepository::setLongPreference)
-
-        @Provides
-        fun providePutFloatPreference(settingsRepository: SettingsRepository): PutPreference<Float> =
-            PutPreference(settingsRepository::setFloatPreference)
-
-        @Provides
-        fun providePutBooleanPreference(settingsRepository: SettingsRepository): PutPreference<Boolean> =
-            PutPreference(settingsRepository::setBooleanPreference)
-
-        @Provides
-        fun provideGetStringPreference(settingsRepository: SettingsRepository): GetPreference<String?> =
-            GetPreference(settingsRepository::monitorStringPreference)
-
-        @Provides
-        fun provideGetStringSetPreference(settingsRepository: SettingsRepository): GetPreference<MutableSet<String>?> =
-            GetPreference(settingsRepository::monitorStringSetPreference)
-
-        @Provides
-        fun provideGetIntPreference(settingsRepository: SettingsRepository): GetPreference<Int> =
-            GetPreference(settingsRepository::monitorIntPreference)
-
-        @Provides
-        fun provideGetLongPreference(settingsRepository: SettingsRepository): GetPreference<Long> =
-            GetPreference(settingsRepository::monitorLongPreference)
-
-        @Provides
-        fun provideGetFloatPreference(settingsRepository: SettingsRepository): GetPreference<Float> =
-            GetPreference(settingsRepository::monitorFloatPreference)
-
-        @Provides
-        fun provideGetBooleanPreference(settingsRepository: SettingsRepository): GetPreference<Boolean> =
-            GetPreference(settingsRepository::monitorBooleanPreference)
 
         @Provides
         fun provideFetchAutoAcceptQRLinks(settingsRepository: SettingsRepository): FetchAutoAcceptQRLinks =
