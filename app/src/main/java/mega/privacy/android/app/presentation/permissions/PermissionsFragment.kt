@@ -38,12 +38,19 @@ class PermissionsFragment : Fragment() {
     private lateinit var binding: FragmentPermissionsBinding
     private lateinit var permissionBinding: PermissionsImageLayoutBinding
 
-    private val readPermissions = arrayOf(
-        getImagePermissionByVersion(),
-        getAudioPermissionByVersion(),
-        getVideoPermissionByVersion(),
-        getReadExternalStoragePermission()
-    )
+    private val readPermissions =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            arrayOf(
+                getAudioPermissionByVersion(), getReadExternalStoragePermission()
+            )
+        } else {
+            arrayOf(
+                getImagePermissionByVersion(),
+                getAudioPermissionByVersion(),
+                getVideoPermissionByVersion(),
+                getReadExternalStoragePermission()
+            )
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,

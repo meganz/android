@@ -2265,12 +2265,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS))
         val writeStorageGranted: Boolean =
             hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        val permissions = arrayOf(
-            PermissionUtils.getImagePermissionByVersion(),
-            PermissionUtils.getAudioPermissionByVersion(),
-            PermissionUtils.getVideoPermissionByVersion(),
-            PermissionUtils.getReadExternalStoragePermission()
-        )
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            arrayOf(
+                PermissionUtils.getAudioPermissionByVersion(),
+                PermissionUtils.getReadExternalStoragePermission()
+            )
+        } else {
+            arrayOf(
+                PermissionUtils.getImagePermissionByVersion(),
+                PermissionUtils.getAudioPermissionByVersion(),
+                PermissionUtils.getVideoPermissionByVersion(),
+                PermissionUtils.getReadExternalStoragePermission()
+            )
+        }
         val readStorageGranted: Boolean = hasPermissions(this, *permissions)
         val cameraGranted: Boolean = hasPermissions(this, Manifest.permission.CAMERA)
         val microphoneGranted: Boolean = hasPermissions(this, Manifest.permission.RECORD_AUDIO)
