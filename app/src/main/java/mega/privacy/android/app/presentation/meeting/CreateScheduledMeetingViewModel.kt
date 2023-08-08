@@ -55,9 +55,7 @@ import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeeting
 import mega.privacy.android.domain.usecase.meeting.UpdateScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
-import java.time.Instant
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -380,9 +378,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param selectedStartDate     Start date and time
      */
     fun onStartDateTimeTap(selectedStartDate: ZonedDateTime) {
-        val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC)
-        Timber.d("Start date selected $selectedStartDate")
-        if (selectedStartDate.isBefore(nowZonedDateTime)) {
+        if (selectedStartDate.isBefore(ZonedDateTime.now())) {
             return
         }
 
@@ -432,15 +428,14 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param endDateTime   End date and time
      */
     fun onEndDateTimeTap(endDateTime: ZonedDateTime) {
-        Timber.d("End date selected $endDateTime")
-        val newEndDateTime = if (endDateTime.isBefore(state.value.startDate))
+        val newEndDateTime = if (endDateTime.isBefore(state.value.startDate)) {
             state.value.startDate.plus(
                 30,
                 ChronoUnit.MINUTES
             )
-        else
+        } else {
             endDateTime
-        Timber.d("Set end date $newEndDateTime")
+        }
 
         _state.update {
             it.copy(

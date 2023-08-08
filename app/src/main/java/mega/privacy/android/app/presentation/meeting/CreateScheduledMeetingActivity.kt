@@ -28,6 +28,9 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.END_DATE
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.START_DATE
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.UNTIL
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.view.CreateScheduledMeetingView
 import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
@@ -44,6 +47,8 @@ import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 
@@ -55,6 +60,8 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
+
+    private enum class DatePickerType { START_DATE, END_DATE, UNTIL }
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
@@ -193,9 +200,9 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onDiscardClicked = viewModel::onDiscardMeetingTap,
                         onAcceptClicked = viewModel::onScheduleMeetingTap,
                         onStartTimeClicked = { showTimePicker(true) },
-                        onStartDateClicked = { showDatePicker(true) },
+                        onStartDateClicked = { showDatePicker(START_DATE) },
                         onEndTimeClicked = { showTimePicker(false) },
-                        onEndDateClicked = { showDatePicker(false) },
+                        onEndDateClicked = { showDatePicker(END_DATE) },
                         onScrollChange = { scrolled ->
                             this@CreateScheduledMeetingActivity.changeStatusBarColor(
                                 scrolled,
@@ -252,7 +259,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onWeekOfMonthChanged = viewModel::onWeekOfMonthChanged,
                         onDateClicked = {
                             viewModel.onEndsRadioButtonClicked(EndsRecurrenceOption.CustomDate)
-                            showUntilDatePicker()
+                            showDatePicker(UNTIL)
                         },
                         onMonthDayChanged = viewModel::onMonthDayChanged,
                     )
@@ -288,70 +295,25 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
-     * Show until date picker
-     */
-    private fun showUntilDatePicker() {
-        if (materialDatePicker != null)
-            return
-
-        val currentState = viewModel.state.value
-        val currentDate = currentState.customRecurrenceState.endDateOccurrenceOption
-        val localDate = currentDate.withZoneSameInstant(ZoneId.systemDefault())
-
-        materialDatePicker = MaterialDatePicker.Builder.datePicker()
-            .setTheme(R.style.MaterialCalendarTheme)
-            .setPositiveButtonText(getString(R.string.general_ok))
-            .setNegativeButtonText(getString(R.string.button_cancel))
-            .setTitleText(getString(R.string.meetings_schedule_meeting_calendar_select_date_label))
-            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
-            .setSelection(localDate.toInstant().toEpochMilli())
-            .setCalendarConstraints(
-                CalendarConstraints.Builder().setValidator(DateValidatorPointForward.now()).build()
-            )
-            .build()
-            .apply {
-                addOnDismissListener {
-                    materialDatePicker = null
-                }
-                addOnPositiveButtonClickListener { selection ->
-                    var selectedDate = Instant.ofEpochMilli(selection)
-                        .atZone(ZoneOffset.UTC)
-                        .withHour(localDate.hour)
-                        .withMinute(localDate.minute)
-                    Timber.d("Selected until date in picker $selectedDate")
-
-                    if (currentState.type == ScheduledMeetingType.Edition) {
-                        selectedDate = selectedDate.withZoneSameLocal(currentDate.zone)
-                    }
-
-                    Timber.d("Selected until date $selectedDate")
-
-                    viewModel.onUntilDateTap(selectedDate)
-                }
-                show(supportFragmentManager, "DatePicker")
-            }
-    }
-
-    /**
-     * Show date picker
+     * Show date picker dialog
      *
-     * @param isStart
+     * @param type  [DatePickerType]
      */
-    private fun showDatePicker(isStart: Boolean) {
+    private fun showDatePicker(type: DatePickerType) {
         if (materialTimePicker != null || materialDatePicker != null)
             return
 
         val currentState = viewModel.state.value
-        val currentDate = if (isStart) currentState.startDate else currentState.endDate
+        val currentDate = when (type) {
+            START_DATE -> currentState.startDate
+            END_DATE -> currentState.endDate
+            UNTIL -> currentState.customRecurrenceState.endDateOccurrenceOption
+        }
 
-        val localDate = currentDate.withZoneSameInstant(ZoneId.systemDefault())
-
-        val dateValidator = if (isStart) {
-            DateValidatorPointForward.now()
+        val dateValidator = if (type == END_DATE) {
+            DateValidatorPointForward.from(currentState.startDate.getTruncatedUtcTimeInMillis())
         } else {
-            DateValidatorPointForward.from(
-                currentState.startDate.withHour(0).withMinute(0).toInstant().toEpochMilli()
-            )
+            DateValidatorPointForward.now()
         }
 
         materialDatePicker = MaterialDatePicker.Builder.datePicker()
@@ -367,32 +329,25 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
             .setNegativeButtonText(getString(R.string.button_cancel))
             .setTitleText(getString(R.string.meetings_schedule_meeting_calendar_select_date_label))
             .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
-            .setSelection(localDate.toInstant().toEpochMilli())
+            .setSelection(currentDate.getTruncatedUtcTimeInMillis())
             .setCalendarConstraints(
                 CalendarConstraints.Builder().setValidator(dateValidator).build()
             )
             .build()
             .apply {
-                addOnDismissListener {
-                    materialDatePicker = null
-                }
+                addOnDismissListener { materialDatePicker = null }
                 addOnPositiveButtonClickListener { selection ->
-                    var selectedDate = Instant.ofEpochMilli(selection)
-                        .atZone(ZoneOffset.UTC)
-                        .withHour(localDate.hour)
-                        .withMinute(localDate.minute)
-                    Timber.d("Selected date in picker $selectedDate")
+                    val selectedDate = Instant.ofEpochMilli(selection)
+                        .atZone(ZoneId.systemDefault())
+                        .withHour(currentDate.hour)
+                        .withMinute(currentDate.minute)
 
-                    if (currentState.type == ScheduledMeetingType.Edition) {
-                        selectedDate = selectedDate.withZoneSameLocal(currentDate.zone)
-                    }
+                    Timber.d("Selected until date $selectedDate")
 
-                    Timber.d("Selected date $selectedDate")
-
-                    if (isStart) {
-                        viewModel.onStartDateTimeTap(selectedDate)
-                    } else {
-                        viewModel.onEndDateTimeTap(selectedDate)
+                    when (type) {
+                        START_DATE -> viewModel.onStartDateTimeTap(selectedDate)
+                        END_DATE -> viewModel.onEndDateTimeTap(selectedDate)
+                        UNTIL -> viewModel.onUntilDateTap(selectedDate)
                     }
                 }
                 show(supportFragmentManager, "DatePicker")
@@ -472,4 +427,14 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
             ScheduleMeetingAction.WaitingRoom -> viewModel.onWaitingRoomTap()
         }
     }
+
+    /**
+     * Given a [ZonedDateTime], get truncated UTC time in millis required for [MaterialDatePicker]
+     *
+     * @return  Epoch time in millis
+     */
+    private fun ZonedDateTime.getTruncatedUtcTimeInMillis(): Long = toLocalDateTime()
+        .truncatedTo(ChronoUnit.DAYS)
+        .toInstant(ZoneOffset.UTC)
+        .toEpochMilli()
 }

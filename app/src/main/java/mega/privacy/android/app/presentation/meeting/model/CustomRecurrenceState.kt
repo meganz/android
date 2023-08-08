@@ -6,8 +6,6 @@ import mega.privacy.android.domain.entity.meeting.MonthWeekDayItem
 import mega.privacy.android.domain.entity.meeting.MonthlyRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
-import java.time.Instant
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 /**
@@ -35,7 +33,7 @@ data class CustomRecurrenceState constructor(
     ),
     val monthlyRadioButtonOptionSelected: MonthlyRecurrenceOption = MonthlyRecurrenceOption.MonthDay,
     val endsRadioButtonOptionSelected: EndsRecurrenceOption = EndsRecurrenceOption.Never,
-    val endDateOccurrenceOption: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC),
+    val endDateOccurrenceOption: ZonedDateTime = ZonedDateTime.now(),
     val isValidRecurrence: Boolean = true,
     val showMonthlyRecurrenceWarning: Boolean = false,
 )
