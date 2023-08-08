@@ -79,6 +79,7 @@ import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.Constants.BUFFER_COMP
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -482,6 +483,10 @@ class MediaDiscoveryFragment : Fragment() {
             putExtra(
                 Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                 mediaDiscoveryViewModel.getNodeParentHandle(nodeHandle)
+            )
+            putExtra(
+                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                SortOrder.ORDER_MODIFICATION_DESC
             )
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
