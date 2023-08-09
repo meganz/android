@@ -7,7 +7,9 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
@@ -203,4 +205,9 @@ object TestCameraUploadUseCases {
     @Provides
     fun provideNotificationHelper() = mock<CameraUploadsNotificationManagerWrapper>()
 
+    @Provides
+    fun provideApplicationWrapper() = mock<ApplicationWrapper>()
+
+    @Provides
+    fun provideCookieEnabledCheckWrapper() = mock<CookieEnabledCheckWrapper>()
 }

@@ -24,7 +24,9 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
+import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
@@ -192,8 +194,12 @@ class CameraUploadsWorkerTest {
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val performanceReporter: PerformanceReporter = mock()
-    private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper = mock()
+    private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper =
+        mock()
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
+    private val applicationWrapper: ApplicationWrapper = mock()
+    private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper = mock()
+
 
     @Before
     fun setUp() {
@@ -297,7 +303,9 @@ class CameraUploadsWorkerTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             performanceReporter = performanceReporter,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
-            cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper
+            cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper,
+            applicationWrapper = applicationWrapper,
+            cookieEnabledCheckWrapper = cookieEnabledCheckWrapper
         )
     }
 

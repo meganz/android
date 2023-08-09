@@ -13,9 +13,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
+import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -33,11 +33,14 @@ import mega.privacy.android.app.utils.wrapper.SetLogoutFlagWrapperImpl
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
+import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
+import mega.privacy.android.feature.sync.data.service.ApplicationLoggingInSetter
 
 /**
  * Util wrapper module
@@ -145,7 +148,7 @@ abstract class UtilWrapperModule {
         fun providesFileUtilWrapper() = object : FileUtilWrapper {}
 
         /**
-         * Provides the [StringWrapper]
+         * Provides the [ApplicationIpAddressWrapper]
          */
         @Provides
         fun provideApplicationIpAddressWrapper(application: Application) =
@@ -175,6 +178,44 @@ abstract class UtilWrapperModule {
                     cameraUploadsNotificationManager.cancelNotification()
 
             }
+
+        /**
+         * Provides the [ApplicationWrapper]
+         */
+        @Provides
+        fun provideApplicationWrapper() =
+            object : ApplicationWrapper {
+                override fun setLoggingIn(isLoggingIn: Boolean) {
+                    MegaApplication.isLoggingIn = isLoggingIn
+                }
+
+                override fun isLoggingIn() = MegaApplication.isLoggingIn
+            }
+
+        /**
+         * Provides the [ApplicationLoggingInSetter]
+         */
+        @Provides
+        fun provideApplicationLoggingInSetter(): ApplicationLoggingInSetter =
+            object : ApplicationLoggingInSetter {
+                override fun setLoggingIn(loggingIn: Boolean) {
+                    MegaApplication.isLoggingIn = loggingIn
+                }
+
+                override fun isLoggingIn(): Boolean = MegaApplication.isLoggingIn
+            }
+
+        /**
+         * Provides the [CookieEnabledCheckWrapper]
+         */
+        @Provides
+        fun provideCookieEnabledCheckWrapper(): CookieEnabledCheckWrapper =
+            object : CookieEnabledCheckWrapper {
+                override fun checkEnabledCookies() {
+                    MegaApplication.getInstance().checkEnabledCookies()
+                }
+            }
+
 
     }
 }

@@ -31,7 +31,6 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -57,7 +56,9 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -230,6 +231,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val performanceReporter: PerformanceReporter,
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
+    private val applicationWrapper: ApplicationWrapper,
+    private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -380,7 +383,8 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    override suspend fun getForegroundInfo() = cameraUploadsNotificationManagerWrapper.getForegroundInfo()
+    override suspend fun getForegroundInfo() =
+        cameraUploadsNotificationManagerWrapper.getForegroundInfo()
 
     private fun monitorUploadPauseStatus() {
         monitorUploadPauseStatusJob = scope?.launch(ioDispatcher) {
@@ -1004,23 +1008,23 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         // arbitrary retry value
         var retry = 3
-        while (MegaApplication.isLoggingIn && retry > 0) {
+        while (applicationWrapper.isLoggingIn() && retry > 0) {
             Timber.d("Wait for the isLoggingIn lock to be available")
             delay(1000)
             retry--
         }
 
-        if (!MegaApplication.isLoggingIn) {
+        if (!applicationWrapper.isLoggingIn()) {
             // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
             // app that a Login Procedure is occurring
-            MegaApplication.isLoggingIn = true
+            applicationWrapper.setLoggingIn(true)
             val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
                 Timber.e(it, "performCompleteFastLogin exception")
             }
-            MegaApplication.isLoggingIn = false
+            applicationWrapper.setLoggingIn(false)
             if (result.isSuccess) {
                 Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
-                MegaApplication.getInstance().checkEnabledCookies()
+                cookieEnabledCheckWrapper.checkEnabledCookies()
             }
             return result.isSuccess
         } else {

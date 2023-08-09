@@ -18,7 +18,6 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.DefaultGetThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.feature.sync.data.service.ApplicationLoggingInSetter
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Singleton
@@ -96,14 +95,4 @@ class AppModule {
     @Provides
     fun provideGetThemeModePreference(useCase: DefaultGetThemeMode): GetThemeMode =
         useCase
-
-    @Provides
-    fun provideApplicationLoggingInSetter(): ApplicationLoggingInSetter =
-        object : ApplicationLoggingInSetter {
-            override fun setLoggingIn(loggingIn: Boolean) {
-                MegaApplication.isLoggingIn = loggingIn
-            }
-
-            override fun isLoggingIn(): Boolean = MegaApplication.isLoggingIn
-        }
 }
