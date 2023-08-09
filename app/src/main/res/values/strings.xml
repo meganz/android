@@ -2353,6 +2353,8 @@
     <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Allow access to photos, media and files.</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Allow access to audio files.</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA needs your permission to access files for sharing.</string>
     <!-- Title of the screen asking permissions for camera -->
