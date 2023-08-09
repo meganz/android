@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.domain.entity.UserAccount
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
@@ -36,6 +38,7 @@ import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
@@ -65,6 +68,8 @@ class SettingsViewModel @Inject constructor(
     private val isChatLoggedIn: IsChatLoggedIn,
     private val setSdkLogsEnabled: SetSdkLogsEnabled,
     private val setChatLoggingEnabled: SetChatLogsEnabled,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -100,9 +105,7 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             merge(
-                flow { emit(refreshPasscodeLockPreference()) }.map { enabled ->
-                    { state: SettingsState -> state.copy(passcodeLock = enabled) }
-                },
+                monitorPasscodePreference(),
                 flow { emit(isCameraUploadsEnabledUseCase()) }.map { enabled ->
                     { state: SettingsState -> state.copy(cameraUploadsOn = enabled) }
                 },
@@ -170,6 +173,15 @@ class SettingsViewModel @Inject constructor(
         }
 
     }
+
+    private suspend fun monitorPasscodePreference() =
+        if (getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)) {
+            monitorPasscodeLockPreferenceUseCase()
+        } else {
+            flow { emit(refreshPasscodeLockPreference()) }
+        }.map { enabled ->
+            { state: SettingsState -> state.copy(passcodeLock = enabled) }
+        }
 
     /**
      * Refresh Camera Uploads On/Off state

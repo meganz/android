@@ -250,7 +250,9 @@ class SettingsFragment :
     private fun refreshSummaries() {
         viewModel.refreshCameraUploadsOn()
         viewLifecycleOwner.lifecycleScope.launch {
-            updatePasscodeLockSummary(viewModel.fetchPasscodeEnabled())
+            if (!getFeatureFlagUseCase(AppFeatures.PasscodeBackend)) {
+                updatePasscodeLockSummary(viewModel.fetchPasscodeEnabled())
+            }
         }
     }
 
