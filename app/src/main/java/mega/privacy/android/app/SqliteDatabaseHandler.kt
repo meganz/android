@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
@@ -40,6 +39,7 @@ import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapper
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.BackupState
@@ -56,7 +56,6 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
 import java.util.Collections
@@ -1632,15 +1631,6 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     /**
-     * Deletes a completed transfer.
-     *
-     * @param id the identifier of the transfer to delete
-     */
-    override fun deleteTransfer(id: Int) {
-        db.delete(TABLE_COMPLETED_TRANSFERS, "$KEY_ID=$id", null)
-    }
-
-    /**
      * Gets a completed transfer.
      *
      * @param id the identifier of the transfer to get
@@ -1684,35 +1674,6 @@ class SqliteDatabaseHandler @Inject constructor(
             id, filename, type, state, size, handle, path,
             offline, timestamp, error, originalPath, parentHandle
         )
-    }
-
-    override fun emptyCompletedTransfers() {
-        db.delete(TABLE_COMPLETED_TRANSFERS, null, null)
-    }
-
-    /**
-     * Gets the completed transfers which have as state cancelled or failed.
-     *
-     * @return The list the cancelled or failed transfers.
-     */
-    override val failedOrCancelledTransfers: ArrayList<CompletedTransfer>
-        get() {
-            val stateCancelled = encrypt(MegaTransfer.STATE_CANCELLED.toString())
-            val stateFailed = encrypt(MegaTransfer.STATE_FAILED.toString())
-            val selectQuery =
-                "SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_TRANSFER_STATE = '$stateCancelled' OR $KEY_TRANSFER_STATE = '$stateFailed' ORDER BY $KEY_TRANSFER_TIMESTAMP DESC"
-            return getCompletedTransfers(selectQuery)
-        }
-
-    /**
-     * Removes the completed transfers which have cancelled or failed as state .
-     */
-    override fun removeFailedOrCancelledTransfers() {
-        val whereCause =
-            "$KEY_TRANSFER_STATE = '${encrypt(MegaTransfer.STATE_CANCELLED.toString())}' OR $KEY_TRANSFER_STATE = '${
-                encrypt(MegaTransfer.STATE_FAILED.toString())
-            }'"
-        db.delete(TABLE_COMPLETED_TRANSFERS, whereCause, null)
     }
 
     /**
@@ -3649,11 +3610,6 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun clearOffline() {
         db.execSQL("DROP TABLE IF EXISTS $TABLE_OFFLINE")
-        onCreate(db)
-    }
-
-    override fun clearCompletedTransfers() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_COMPLETED_TRANSFERS")
         onCreate(db)
     }
 

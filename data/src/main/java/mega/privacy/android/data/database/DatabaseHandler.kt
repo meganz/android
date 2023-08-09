@@ -168,13 +168,6 @@ interface DatabaseHandler {
      */
     var attributes: MegaAttributes?
 
-    /**
-     * Gets the completed transfers which have as state cancelled or failed.
-     *
-     * @return The list the cancelled or failed transfers.
-     */
-    val failedOrCancelledTransfers: ArrayList<CompletedTransfer>
-
     fun saveCredentials(userCredentials: UserCredentials)
     fun shouldClearCamsyncRecords(): Boolean
     fun saveShouldClearCamsyncRecords(should: Boolean)
@@ -200,20 +193,6 @@ interface DatabaseHandler {
      * @return The completed transfer which has the id value as identifier.
      */
     fun getCompletedTransfer(id: Int): CompletedTransfer?
-
-    /**
-     * Deletes a completed transfer.
-     *
-     * @param id the identifier of the transfer to delete
-     */
-    fun deleteTransfer(id: Int)
-
-    fun emptyCompletedTransfers()
-
-    /**
-     * Removes the completed transfers which have cancelled or failed as state .
-     */
-    fun removeFailedOrCancelledTransfers()
 
     fun isPasscodeLockEnabled(db: SQLiteDatabase): Boolean
     fun setNonContactFirstName(name: String?, handle: String?): Int
@@ -274,7 +253,6 @@ interface DatabaseHandler {
     fun clearChatSettings()
     fun clearOffline(db: SQLiteDatabase)
     fun clearOffline()
-    fun clearCompletedTransfers()
 
     /**
      * Updates a pending message.

@@ -634,12 +634,12 @@ internal class DefaultAccountRepository @Inject constructor(
             clearContacts()
             clearNonContacts()
             clearChatItems()
-            clearCompletedTransfers()
             clearAttributes()
             clearChatSettings()
             clearBackups()
         }
         megaLocalRoomGateway.deleteAllSyncRecordsTypeAny()
+        megaLocalRoomGateway.deleteAllCompletedTransfers()
         callsPreferencesGateway.clearPreferences()
         chatPreferencesGateway.clearPreferences()
         accountPreferencesGateway.clearPreferences()

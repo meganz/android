@@ -323,8 +323,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun clearChatItems() = dbHandler.clearChatItems()
 
-    override suspend fun clearCompletedTransfers() = dbHandler.clearCompletedTransfers()
-
     override suspend fun clearAttributes() = dbHandler.clearAttributes()
 
     override suspend fun clearChatSettings() = dbHandler.clearChatSettings()

@@ -587,11 +587,6 @@ interface MegaLocalStorageGateway {
     suspend fun clearChatItems()
 
     /**
-     * Clears completed transfers.
-     */
-    suspend fun clearCompletedTransfers()
-
-    /**
      * clears attributes.
      */
     suspend fun clearAttributes()
