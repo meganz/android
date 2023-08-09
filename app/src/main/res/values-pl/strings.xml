@@ -5499,11 +5499,11 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Możesz teraz planować jednorazowe i cykliczne spotkania.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">Spotkanie można rozpocząć przed zaplanowanym czasem, dotykając opcji \“Rozpocznij spotkanie\“ w pokoju spotkań.</string>
+    <string name="meeting_list_tooltip_sched_description">Spotkanie można rozpocząć przed zaplanowanym czasem, dotykając przycisku [A]Rozpocznij spotkanie[/A] w pokoju spotkań.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Zarządzaj powtarzającymi się spotkaniami</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">Możesz wyświetlić, anulować lub edytować dowolne wystąpienie spotkania cyklicznego, dotykając trzech kropek po prawej stronie i wybierając \“Wystąpienia\“.</string>
+    <string name="meeting_list_tooltip_recurring_description">Możesz wyświetlić, anulować lub edytować dowolne wystąpienie spotkania cyklicznego, dotykając trzech kropek po prawej stronie i wybierając [A]Wystąpienia[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_send_calendar_invite_panel_title">Wyślij zaproszenie do kalendarza pocztą e-mail, aby uczestnicy mogli dodać spotkanie do swoich kalendarzy.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
@@ -5522,4 +5522,31 @@
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Czas zakończenia</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Zaktualizowano miejsce spotkania</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">Chronimy Twoje dane za pomocą szyfrowania bez wiedzy, dzięki czemu wszystkie informacje, które przechowujesz, udostępniasz i otrzymujesz w MEGA, są bezpieczne. Aby zapewnić dodatkowe bezpieczeństwo, prosimy o weryfikację kontaktów, którym udostępniasz informacje lub od których otrzymujesz dane.</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">Aby zweryfikować kontakt, upewnij się, że dane uwierzytelniające, które widzisz powyżej, odpowiadają danym uwierzytelniającym ich konta. Możesz poprosić ich o udostępnienie swoich danych uwierzytelniających.</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">Zatwierdź</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">Zweryfikuj uprawnienia</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">Poczekalnia</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">Tylko użytkownicy dopuszczeni przez gospodarza mogą dołączyć do spotkania.</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">Uczestnicy dodani przez osoby niebędące gospodarzami podczas połączeń nie będą wysyłani do poczekalni. [A]Dowiedz się więcej[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">Niektóre kontakty, którym udostępniasz informacje, nie zostały przez Ciebie zweryfikowane. Aby zapewnić dodatkowe bezpieczeństwo, zalecamy zweryfikowanie ich poświadczeń w aplikacji Kontakty. Wybierz trzy kropki obok kontaktu, który chcesz zweryfikować, a następnie wybierz opcję Informacje.</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="one">Usuń %1$d uczestnika</item>
+        <item quantity="few">Usuń %1$d uczestników</item>
+        <item quantity="many">Usuń %1$d uczestników</item>
+        <item quantity="other">Usuń %1$d uczestników</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">Aktualizacja została właśnie pobrana</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">Zrestartuj</string>
 </resources>

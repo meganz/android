@@ -543,7 +543,7 @@
     <!-- Calculating Size of files in offline or cache folders -->
     <string name="settings_advanced_features_calculating">Berechnung läuft</string>
     <!-- title of the setting to set the default download location -->
-    <string name="settings_storage_download_location">Standard Download Ordner</string>
+    <string name="settings_storage_download_location">Standard-Downloadziel</string>
     <!-- Whether to always ask the user each time. -->
     <string name="settings_storage_ask_me_always">Downloadziel immer abfragen</string>
     <!-- Label of button on account page that ask user to add their phone number -->
@@ -5049,27 +5049,52 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Sie können jetzt einmalige und wiederkehrende Meetings planen.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">Sie können das Meeting vor der geplanten Zeit starten, indem Sie im Meetingraum auf „Meeting starten“ tippen.</string>
+    <string name="meeting_list_tooltip_sched_description">Sie können das Meeting vor der geplanten Zeit starten, indem Sie im Meetingraum auf [A]Meeting starten[/A] tippen.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Wiederkehrende Meetings verwalten</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">Sie können alle Termine eines wiederkehrenden Meetings ansehen, absagen oder bearbeiten, indem Sie die drei Punkte auf der rechten Seite antippen und „Termine“ auswählen.</string>
+    <string name="meeting_list_tooltip_recurring_description">Sie können alle Termine eines wiederkehrenden Meetings ansehen, absagen oder bearbeiten, indem Sie die drei Punkte auf der rechten Seite antippen und [A]Termine[/A] auswählen.</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_send_calendar_invite_panel_title">Senden Sie per E-Mail eine Kalendereinladung an die Teilnehmer, damit diese das Meeting in ihrem Kalender speichern können.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Meeting aktualisiert</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Termin bearbeiten</string>
     <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Aktualisieren</string>
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Übernehmen</string>
     <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Datum</string>
     <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Startzeit</string>
     <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Startdatum wählen</string>
     <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Endzeit</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Meetingtermin aktualisiert</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">Wir schützen Ihre Daten mit einer Zero-Knowledge-Verschlüsselung, um die Sicherheit aller Informationen zu gewährleisten, die Sie auf MEGA speichern, freigeben oder empfangen. Um eine besonders hohe Sicherheit zu gewährleisten, bitten wir Sie, die Kontakte, für die Sie Informationen freigeben oder von denen Sie Daten erhalten, zu verifizieren.</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">Um Ihren Kontakt zu verifizieren, stellen Sie sicher, dass die oben angezeigten Identitätsdaten mit den Account-Identitätsdaten übereinstimmen. Sie können Ihren Kontakt bitten, Ihnen seine Identitätsdaten mitzuteilen.</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">Bestätigen</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">Identitätsdaten bestätigen</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">Warteraum</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">Nur vom Gastgeber zugelassene Benutzer können am Meeting teilnehmen.</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">Teilnehmer, die während einer Konferenz von Teilnehmern ohne Gastgeberrechte hinzugefügt werden, werden nicht in den Warteraum weitergeleitet.[A] Mehr erfahren[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">Sie haben einige Kontakte, mit denen Sie Informationen teilen, noch nicht verifiziert. Um eine besonders hohe Sicherheit zu gewährleisten, empfehlen wir Ihnen, ihre Anmeldedaten in Ihren Kontakten zu verifizieren. Tippen Sie dazu auf die drei Punkte neben dem Kontakt, den Sie verifizieren möchten, und tippen Sie auf Info.</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="one">Removed %1$d participant</item>
+        <item quantity="other">Removed %1$d participants</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">Ein Update wurde soeben heruntergeladen</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">Neu starten</string>
 </resources>

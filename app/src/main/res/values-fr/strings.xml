@@ -4831,7 +4831,7 @@
     <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
         <item quantity="one">%1$d&#160;participant a été ajouté</item>
         <item quantity="many">%1$d de participants ont été ajoutés</item>
-        <item quantity="other">%1$dparticipants ont été ajoutés</item>
+        <item quantity="other">%1$d&#160;participants ont été ajoutés</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
@@ -5274,11 +5274,11 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Vous pouvez désormais programmer des réunions uniques ou périodiques</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">Vous pouvez commencer la réunion avant l’heure prévue en touchant «&#160;Commencer la réunion&#160;» dans la salle de réunion.</string>
+    <string name="meeting_list_tooltip_sched_description">Vous pouvez commencer la réunion avant l’heure prévue en touchant [A]Commencer la réunion[/A] dans la salle de réunion.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Gérer les réunions récurrentes</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">Vous pouvez afficher, annuler ou modifier n’importe quelle occurrence d’une réunion récurrente en touchant les points sur la droite et sélectionnant «&#160;Occurrences&#160;».</string>
+    <string name="meeting_list_tooltip_recurring_description">Vous pouvez afficher, annuler ou modifier n’importe quelle occurrence d’une réunion récurrente en touchant les trois points sur la droite et sélectionnant [A]Occurrences[/A]».</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_send_calendar_invite_panel_title">Envoyez par courriel une invitation pour agenda aux participants afin qu’ils puissent ajouter la réunion à leur agenda.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
@@ -5297,4 +5297,30 @@
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Heure de fin</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">L’occurrence de la réunion a été mise à jour</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">Nous protégeons vos données par un chiffrement à divulgation nulle de connaissance afin que tout ce que vous stockez, partagez et recevez sur MEGA soit sécurisé. Pour garantir une sécurité accrue, nous vous demandons de confirmer les contacts avec lesquels vous partagez ou dont vous recevez des données.</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">Pour confirmer un contact, assurez-vous que le numéro d’identification que vous voyez ci-dessus correspond au numéro d’identification de leur compte. Vous pouvez demander à votre contact de partager son numéro d’identification avec vous.</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">Approuver</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">Approuver le numéro d’identification</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">Salle d’attente</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">Seuls les utilisateurs admis par l’hôte peuvent se joindre à la réunion.</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">Les participants ajoutés par des non-hôtes pendant les appels ne seront pas envoyés dans la salle d’attente. [A]En apprendre davantage[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">Certains des contacts avec lesquels vous partagez des données n’ont pas été confirmés par vous. Pour renforcer la sécurité, nous vous recommandons de confirmer leur numéro d’identification dans Contacts. Touchez les trois points à côté du contact que vous souhaitez confirmer et touchez Renseignements.</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="one">%1$d&#160;participant a été supprimé</item>
+        <item quantity="many">%1$d de participants ont été supprimés</item>
+        <item quantity="other">%1$d&#160;participants ont été supprimés</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">Une mise à jour vient d’être téléchargée.</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">Redémarrer</string>
 </resources>

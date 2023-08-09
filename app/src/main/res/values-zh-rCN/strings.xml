@@ -4824,27 +4824,51 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">您现在可以安排单次和定期会议。</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">您可以在会议室中点击“开始会议”按钮，即可在预定时间之前开始会议。</string>
+    <string name="meeting_list_tooltip_sched_description">您可以在会议室中点击[A]开始会议[/A]按钮，即可在预定时间之前开始会议。</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">管理定期会议</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <string name="meeting_list_tooltip_recurring_description">您可以通过点按右侧的三个点并选择[A]事件[/A]来查看、取消或编辑任何周期性会议事件。</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_send_calendar_invite_panel_title">通过电子邮件向参与者发送日历邀请，以便他们将会议添加到自己的日历中。</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">会议已更新</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">编辑事件</string>
     <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
     <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">更新</string>
     <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">日期</string>
     <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">开始时间</string>
     <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">选择开始日期</string>
     <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">结束时间</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">会议事件已更新</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">我们采用零知识加密技术来保护您的数据，因此您在MEGA上存储、共享和接收的所有信息都是安全的。为了确保额外的安全，我们要求您验证与您共享信息或接收数据的联系人。</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">为了验证您的联系人，请确保您在上面看到的凭证与他们的账户凭证相符。您可以要求他们与您分享他们的凭证。</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">同意</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">验证凭证</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">正在等候室</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">只有主持人允许的用户可以加入会议。</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">在通话期间，非主持人添加的参与者将不会被添加到等候室。[A]了解更多[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">某些您与之共享信息的联系人尚未经过您的验证。为确保额外的安全性，我们建议您在联系人中验证他们的凭据。点按您要验证的联系人旁边的三个点，然后点按信息。</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="other">已移除%1$d位参与者</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">刚刚下载了更新</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">重启</string>
 </resources>

@@ -383,7 +383,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Cerere retrimisă</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">Cerere trimisă la %s. Vezi în fila Cereri trimise.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contact eliminat</string>
     <!-- error message -->
@@ -399,19 +399,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Eroare. Folderul nu a fost creat</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renamed</string>
+    <string name="context_correctly_renamed">Redenumit</string>
     <!-- error message -->
     <string name="context_no_renamed">Eroare. Nu a fost redenumit</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copied</string>
+    <string name="context_correctly_copied">Copiat</string>
     <!-- error message -->
     <string name="context_no_copied">Eroare. Nu a fost copiat</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Te rugăm să selectezi un folder de destinație</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Moved</string>
+    <string name="context_correctly_moved">Mutat</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Moved to Rubbish bin</string>
+    <string name="context_correctly_moved_to_rubbish">Mutat în Coșul de gunoi</string>
     <!-- error message -->
     <string name="context_no_moved">Eroare. Nu a fost mutat</string>
     <!-- success message when sharing a folder -->
@@ -423,7 +423,7 @@
     <!-- error message -->
     <string name="context_no_removed">Eroare. Ștergerea a eșuat</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d items copied</string>
+    <string name="number_correctly_copied">%d elemente copiate</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d elemente nu au fost copiate</string>
     <!-- success message when emptying the RB -->
@@ -982,13 +982,13 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Istoricul chatului a fost șters</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
+    <string name="clear_history_error">S-a produs o eroare. Istoricul chatului nu a fost golit</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Adaugă participanți</string>
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">Elimină participantul</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">Protects your chat with zero-knowledge encryption, providing essential safety assurances:</string>
+    <string name="mega_info_empty_screen">Vă protejează chat-ul cu criptare tip zero cunoștințe, oferind asigurări esențiale de siguranță:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">Sistemul se asigură că datele primite sunt într-adevăr de la expeditorul specificat, iar conținutul său nu a fost manipulat în timpul tranzitului.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1052,9 +1052,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">Participantul este inclus deja în acest chat de grup</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d participants were invited</string>
+    <string name="number_correctly_add_participant">%d participanți au fost invitați</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d participants were invited but %2$d participants were not invited.</string>
+    <string name="number_no_add_participant_request">%1$d participanţii au fost invitaţi, dar %2$d participanții nu au fost invitați</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] s-a alăturat chatului de grup prin invitație de la [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1096,7 +1096,7 @@
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Eroare privind chatul</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Chat couldn’t be opened</string>
+    <string name="chat_error_open_message">Chat-ul nu a putut fi deschis</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contact</item>
@@ -1343,7 +1343,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">A apărut o eroare la schimbarea numelui</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Your name has been updated</string>
+    <string name="success_changing_user_attributes">Numele dvs. a fost actualizat</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Participant adăugat</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1433,7 +1433,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invită prieteni și obține recompense</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each invite. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$s spațiu de stocare pentru fiecare invitație completată. Valabili timp de 365 de zile.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s spațiu de stocare. Valabili timp de 365 de zile.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1447,7 +1447,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus de înregistrare</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install a MEGA Desktop App</string>
+    <string name="title_install_desktop">Instalează Aplicația Desktop MEGA</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d z rămase</string>
     <!-- State to indicate an achievement has expired -->
@@ -1459,21 +1459,21 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cum funcționează</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invită-ți prietenii să-și creeze un cont gratuit MEGA și să-și instaleze Aplicația Mobilă MEGA. Vei primi spațiu de stocare gratuit drept bonus pentru fiecare înscriere și instalare a aplicației.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Bonusul pentru spațiul de stocare gratuit se aplică numai la noile invitații și în cazul în care este instalată aplicația mobilă MEGA sau aplicația desktop MEGA.</string>
+    <string name="second_paragraph_achievement_invite_friends">Bonusul pentru spațiul de stocare gratuit se aplică numai la noile invitații și în cazul în care este instalată Aplicația Mobilă MEGA sau Aplicația Desktop MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Invitație trimisă</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">E-mailul este malformat</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Când instalezi aplicația desktop MEGA, primești %1$s spațiu de stocare complementar, valabil timp de 365 de zile. Aplicația desktop MEGA este disponibilă pentru Windows, macOS și majoritatea distribuțiilor Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">Când instalezi Aplicația Desktop MEGA, primești %1$s spațiu de stocare complementar, valabil timp de 365 de zile. Aplicația desktop MEGA este disponibilă pentru Windows, macOS și majoritatea distribuțiilor Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Când instalezi aplicația mobilă MEGA, primești %1$s spațiu de stocare complementar, valabil timp de 365 de zile. Oferim aplicații mobile pentru iOS și Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Când instalezi Aplicația Mobilă MEGA, primești %1$s spațiu de stocare complementar, valabil timp de 365 de zile. Oferim aplicații mobile pentru iOS și Android.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Ai primit %1$s spațiu de stocare pentru instalarea aplicației noastre desktop MEGA.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Ai primit %1$s spațiu de stocare pentru instalarea Aplicației noastre Desktop MEGA.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Ai primit %1$s spațiu de stocare pentru instalarea aplicației mobile MEGA.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Ai primit %1$s spațiu de stocare pentru instalarea Aplicației Mobile MEGA.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Ai primit %1$s spațiu de stocare ca bonus de înregistrare gratuită.</string>
     <!-- menu items -->
@@ -1545,7 +1545,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">A apărut o eroare și apelul nu poate fi conectat.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Îți place aplicația mobilă MEGA?</string>
+    <string name="title_evaluate_the_app_panel">Îți place Aplicația Mobilă MEGA?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Da, evaluează aplicația</string>
     <!-- Label to show send feedback -->
@@ -1577,9 +1577,9 @@
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">Link copiat în clipboard</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QR code reset</string>
+    <string name="qrcode_reset_successfully">Resetarea codului QR</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QR code deleted</string>
+    <string name="qrcode_delete_successfully">Codul QR a fost șters</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">Codul QR nu a fost resetat din cauza unei erori. Te rugăm să încerci din nou.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1597,7 +1597,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">A apărut o eroare la încercarea de descărcare a fișierului QR. Poate fișierul nu există. Te rugăm să încerci din nou mai târziu.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">The QR Code has been downloaded to %s</string>
+    <string name="success_download_qr">Codul QR a fost descărcat în %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Invitație netrimisă</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1761,8 +1761,9 @@
     <string name="messages_forwarded_success">Mesaje redirecționate</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Error. %1$d message not forwarded</item>
-        <item quantity="other">Error. %1$d messages not forwarded</item>
+        <item quantity="one">Eroare. %1$d mesaj nu a fost redirecționat</item>
+        <item quantity="few">Eroare. %1$d mesaje nu au fost redirecționate</item>
+        <item quantity="other">Eroare. %1$d de mesaje nu au fost redirecționate</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1849,7 +1850,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Printează</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Recovery key has been saved</string>
+    <string name="save_MK_confirmation">Cheia de recuperare a fost salvată</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(În așteptare)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1863,7 +1864,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Activează previzualizările îmbogățite ale URL-urilor</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Enhance the MEGA Chat experience. URL content will be retrieved without zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">Îmbunătățește experiența MEGA Chat. Conținutul URL-urilor va fi preluat fără criptare tip zero cunoștințe.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Te rugăm să introduci o parolă mai puternică</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -1913,7 +1914,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Data viitoare când te autentifici în cont ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">Te rugăm să salvezi <b>cheia de recuperare</b> într-o locație sigură, pentru a evita problemele în cazul în care pierzi accesul la aplicație sau vrei să dezactivezi autentificarea cu doi factori.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Cod nevalid</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2017,11 +2018,11 @@
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
     <string name="success_archive_chat">%s a fost arhivat</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
+    <string name="error_archive_chat">Eroare. %s Nu a fost arhivat. Încercați din nou.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
     <string name="success_unarchive_chat">%s a fost dezarhivat</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
+    <string name="error_unarchive_chat">Eroare. %s Nu a fost dezarhivat. Încercați din nou.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Chat inactiv</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2059,7 +2060,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">Ești pe cale să ștergi istoricul versiunilor tuturor fișierelor. Orice versiune a vreunui fișier partajat ție de la un contact trebuie să fie șters de către acesta.\n\nTe rugăm să reții că fișierele actuale nu vor fi șterse.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">File versions deleted</string>
+    <string name="success_delete_versions">Versiunile fișierelor au fost șterse</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">A apărut o eroare la încercarea de ștergere a tuturor versiunilor anterioare ale fișierelor, te rugăm să încerci din nou mai târziu.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2523,7 +2524,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">Conținutul nu a fost trimis către %d chaturi</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">New group chat created</string>
+    <string name="new_group_chat_created">A fost creat un nou chat de grup</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">Se pregătesc fișierele</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2540,8 +2541,9 @@
     <string name="version_history_deleted_erroneously">Versiunile anterioare nu au fost șterse.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d version deleted</item>
-        <item quantity="other">%d versions deleted</item>
+        <item quantity="one">%d versiune a fost ștearsă</item>
+        <item quantity="few">%d versiuni au fost șterse</item>
+        <item quantity="other">%d de versiuni au fost șterse</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2636,9 +2638,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Niciun link de chat disponibil.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Chat link deleted</string>
+    <string name="chat_link_deleted">Link-ul de chat șters</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Version restored</string>
+    <string name="version_restored">Versiunea a fost restaurată</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Atinge și ține pentru a înregistra</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2800,7 +2802,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">Nu ai permisiunile corecte pentru a modifica acest fișier. Dorești să creezi un fișier nou?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Version was created as a new file</string>
+    <string name="version_as_new_file_created">Versiunea a fost creată ca un fișier nou.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">în data de %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2882,7 +2884,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Se părăsește&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Phone number removed</string>
+    <string name="remove_phone_number_success">Numărul de telefon eliminat</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Eșec la eliminarea numărului de telefon.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3052,7 +3054,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Utilizatorii MEGA Pro au acces exclusiv la funcții suplimentare de siguranță pentru linkuri, făcând contul și mai securizat.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Our zero-knowledge encryption system requires a unique key automatically generated for this file or folder. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
+    <string name="decryption_key_explanation">Sistemul nostru de criptare tip zero cunoștințe necesită o cheie unică generată automat pentru acest fișier sau folder. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Resetează parola</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3237,23 +3239,27 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">%d item moved to Rubbish bin</item>
-        <item quantity="other">%d items moved to Rubbish bin</item>
+        <item quantity="one">%d element mutat în Coșul de gunoi</item>
+        <item quantity="few">%d elemente mutate în Coșul de gunoi</item>
+        <item quantity="other">%d de elemente mutate în Coșul de gunoi</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">%d item wasn’t moved to the Rubbish bin</item>
-        <item quantity="other">%d items weren’t moved to Rubbish bin</item>
+        <item quantity="one">%d element nu a fost mutat în Coșul de gunoi</item>
+        <item quantity="few">%d elemente nu au fost mutate în Coșul de gunoi</item>
+        <item quantity="other">%d de elemente nu au fost mutate în Coșul de gunoi</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">%d item restored</item>
-        <item quantity="other">%d items restored</item>
+        <item quantity="one">%d element a fost restaurat</item>
+        <item quantity="few">%d elemente au fost restaurate</item>
+        <item quantity="other">%d de elemente au fost restaurate</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item wasn’t restored</item>
-        <item quantity="other">%d items weren’t restored</item>
+        <item quantity="one">%d element nu a fost restaurat</item>
+        <item quantity="few">%d elemente nu au fost restaurate</item>
+        <item quantity="other">%d de elemente nu au fost restaurate</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Modifică oricum</string>
@@ -3301,13 +3307,15 @@
     <string name="action_copy_all">Copiază toate</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link sent</item>
-        <item quantity="other">Links sent</item>
+        <item quantity="one">Link trimis</item>
+        <item quantity="few">Link-uri trimise</item>
+        <item quantity="other">Link-uri trimise</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Copied link to clipboard</item>
-        <item quantity="other">Copied links to clipboard</item>
+        <item quantity="one">Link copiat în clipboard</item>
+        <item quantity="few">Link-uri copiate în clipboard</item>
+        <item quantity="other">Link-uri copiate în clipboard</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3406,7 +3414,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">Întâlnire MEGA</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">Zero-knowledge encrypted video meeting</string>
+    <string name="content_tour_five">Întâlnire video criptată cu zero cunoștințe</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Te rugăm să introduci un link valid al întâlnirii</string>
     <!-- Guest leave call-->
@@ -3478,7 +3486,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Ai invitat deja pe %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invite sent. See Sent requests.</string>
+    <string name="contact_invited">Invitație trimisă. Vezi Cererile trimise.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Fișier disponibil offline</string>
     <!-- Message when file removed from offline. -->
@@ -3524,13 +3532,13 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Configurează backupul</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Pentru a te asigura că aceste elemente adăugate în folderul de backup sunt sincronizate automat în unitatea cloud MEGA, te rugăm să le configurezi în aplicația desktop MEGA.</string>
+    <string name="backup_add_item_to_root_text">Pentru a te asigura că aceste elemente adăugate în folderul de backup sunt sincronizate automat în unitatea cloud MEGA, te rugăm să le configurezi în Aplicația Desktop MEGA.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Numai citire</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Acest folder poate fi partajat doar în modul numai citire; deoarece este un folder de backup, orice modificare a conținutului său ar putea dezactiva backupul.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Elementele din acest folder fac parte dintr-un backup configurat și sunt sincronizate cu un folder local. Efectuarea acestei acțiuni va întrerupe sincronizarea și va dezactiva backupul. Backupul poate fi reactivat în aplicația desktop MEGA. Sigur vrei să continui?</string>
+    <string name="backup_add_item_text">Elementele din acest folder fac parte dintr-un backup configurat și sunt sincronizate cu un folder local. Efectuarea acestei acțiuni va întrerupe sincronizarea și va dezactiva backupul. Backupul poate fi reactivat în Aplicația Desktop MEGA. Sigur vrei să continui?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Aceste foldere pot fi partajate doar în modul numai citire; deoarece sunt foldere de backup, orice modificare a conținutului lor ar putea dezactiva backupurile.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -3636,7 +3644,7 @@
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_left_call">%1$s a părăsit apelul.</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s și %2$s au părăsit apelul</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s și încă %2$d s-au alăturat</item>
@@ -3645,8 +3653,9 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and %2$d other left the call</item>
-        <item quantity="other">%1$s and %2$d others left the call</item>
+        <item quantity="one">%1$s și altul %2$d a părăsit apelul</item>
+        <item quantity="few">%1$s și alți %2$d au părăsit apelul</item>
+        <item quantity="other">%1$s și alți %2$d au părăsit apelul</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Șterge definitiv</string>
@@ -4011,9 +4020,9 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Vizualizare pentru descoperire media</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Automatically open folders that contain only images and videos in media discovery view. This lets you see media in gallery mode and filter by date.</string>
+    <string name="settings_media_discovery_view_context">Deschideți automat folderele care conțin numai imagini și videoclipuri în vizualizarea de descoperire media. Acest lucru vă permite să vedeți fișierele media în modul galerie și să filtrați după dată.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. This lets you see media in gallery mode and filter by date. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Deoarece acest folder conține doar imagini și videoclipuri, l-am deschis automat în vizualizarea de descoperire media. Acest lucru vă permite să vedeți fișierele media în modul galerie și să filtrați după dată. Puteți dezactiva acest lucru în Setări.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Setări</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4024,8 +4033,9 @@
     <string name="scheduled_meetings_meeting_link_copied">Link copiat în clipboard</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one">“%s” deleted</item>
-        <item quantity="other">%d albums deleted</item>
+        <item quantity="one">„%s” a fost ștearsă</item>
+        <item quantity="few">%d albume au fost șterse</item>
+        <item quantity="other">%d albume șterse</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
@@ -4042,7 +4052,7 @@
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Vezi mai puțini</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <string name="shared_items_verify_credentials_header_outgoing">Vă protejăm datele cu criptare tip zero cunoștințe. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații înainte de a putea accesa folderele partajate.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[folder nedecriptat]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4078,17 +4088,17 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Reiei videoclipul?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
+    <string name="video_playback_position_dialog_message">„%1$s” va fi reluat de la %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Reia</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Repornește</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
-    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]invited you to a meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]te-a invitat la o întâlnire programată pentru: [/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s cancelled[/A][B] the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s a anulat [/A][B] întâlnirea programată pentru: [/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s a actualizat [/A][B] numele întâlnirii din „%s” în [/B]„[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
     <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s updated[/A][B] the meeting date[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
@@ -4100,7 +4110,7 @@
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">Acces refuzat</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <string name="dialog_content_media_permissions_denied">Ați refuzat accesul MEGA la fișierele de stocare și media ale dispozitivului dvs. Dacă doriți să continuați partajarea, permiteți permisiunea MEGA.</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
     <string name="dialog_positive_button_allow_permission">Acordă permisiunea</string>
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
@@ -4644,19 +4654,19 @@
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">dum</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <string name="photos_album_selection_dialog_title">Nu se poate selecta mai mult</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="photos_album_selection_dialog_body">Poți adăuga doar până la 150 de elemente o dată într-un album</string>
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Nu se poate verifica contactul</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Nu poți confirma pe %s deoarece nu se află în lista de contacte. Așteaptă ca această persoană să îți accepte mai întâi invitația.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Pornește</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Acest dosar a fost eliminat în conformitate cu [A]Politica pentru ghidul de eliminare [/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">Acest folder a fost eliminat în conformitate cu [A]Politica pentru ghidul de eliminare [/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Alătură-te</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4665,44 +4675,51 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Alătură-te întâlnirii</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d invite request sent.&#160;</item>
-        <item quantity="other">%1$d invite requests sent.&#160;</item>
+        <item quantity="one">A fost trimisă %1$d cerere de invitație.&#160;</item>
+        <item quantity="few">Au fost trimise %1$d cereri de invitație.&#160;</item>
+        <item quantity="other">Au fost trimise %1$d de cereri de invitație.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
-        <item quantity="one">However, %1$d request wasn’t sent.</item>
-        <item quantity="other">However, %1$d requests weren’t sent.</item>
+        <item quantity="one">Cu toate acestea, %1$d cerere nu a fost trimisă.</item>
+        <item quantity="few">Cu toate acestea, %1$d cereri nu au fost trimise.</item>
+        <item quantity="other">Cu toate acestea, %1$d de cereri nu au fost trimise.</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
     <plurals name="general_copy_snackbar_success">
-        <item quantity="one">Copied %1$d item</item>
-        <item quantity="other">Copied %1$d items</item>
+        <item quantity="one">%1$d element a fost copiat</item>
+        <item quantity="few">%1$d elemente au fost copiate</item>
+        <item quantity="other">%1$d de elemente au fost copiate</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
     <plurals name="general_copy_snackbar_fail">
-        <item quantity="one">Couldn’t copy %1$d item</item>
-        <item quantity="other">Couldn’t copy %1$d items</item>
+        <item quantity="one">Nu a putut copia %1$d element</item>
+        <item quantity="few">Nu s-a putut copia %1$d elemente</item>
+        <item quantity="other">Nu s-a putut copia %1$d de elemente</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
     Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
     ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
     -->
     <plurals name="general_copy_snackbar_concat_success">
-        <item quantity="one">Copied %1$d item,&#160;</item>
-        <item quantity="other">Copied %1$d items,&#160;</item>
+        <item quantity="one">%1$d element a fost copiat,&#160;</item>
+        <item quantity="few">%1$d elemente au fost copiate,&#160;</item>
+        <item quantity="other">%1$d de elemente au fost copiate,&#160;</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
     this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
     ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
     -->
     <plurals name="general_copy_snackbar_concat_fail">
-        <item quantity="one">couldn’t copy %1$d item</item>
-        <item quantity="other">couldn’t copy %1$d items</item>
+        <item quantity="one">nu a putut copia %1$d element</item>
+        <item quantity="few">nu a putut copia %1$d elemente</item>
+        <item quantity="other">nu a putut copia %1$d de elemente</item>
     </plurals>
     <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
     <plurals name="settings_file_management_remove_files_older_than_days">
-        <item quantity="one">%1$d day</item>
-        <item quantity="other">%1$d days</item>
+        <item quantity="one">%1$d zi</item>
+        <item quantity="few">%1$d zile</item>
+        <item quantity="other">%1$d de zile</item>
     </plurals>
     <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
     <string name="media_player_video_enable_subtitle_dialog_title">Subtitrări</string>
@@ -4734,35 +4751,41 @@
     <string name="media_player_video_select_subtitle_file_empty_message">Nicio subtitrare găsită</string>
     <!-- Success message when left shared folders -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
-        <item quantity="one">Left %1$d shared folder</item>
-        <item quantity="other">Left %1$d shared folders</item>
+        <item quantity="one">Ați părăsit %1$d folder partajat</item>
+        <item quantity="few">Ați părăsit %1$d foldere partajate</item>
+        <item quantity="other">Ați părăsit %1$d de foldere partajate</item>
     </plurals>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="one">Couldn’t leave %1$d shared folder</item>
-        <item quantity="other">Couldn’t leave %1$d shared folders</item>
+        <item quantity="one">Nu ai putut să părăsești %1$d folder partajat</item>
+        <item quantity="few">Nu ai putut părăsi %1$d foldere partajate</item>
+        <item quantity="other">Nu ai putut părăsi %1$d de foldere partajate</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
-        <item quantity="one">Left %1$d shared folder,&#160;</item>
-        <item quantity="other">Left %1$d shared folders,&#160;</item>
+        <item quantity="one">Ați părăsit %1$d folder partajat,&#160;</item>
+        <item quantity="few">Ați părăsit %1$d dosare partajate,&#160;</item>
+        <item quantity="other">Ați părăsit %1$d de dosare partajate,&#160;</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="one">couldn’t leave %1$d shared folder</item>
-        <item quantity="other">couldn’t leave %1$d shared folders</item>
+        <item quantity="one">nu ai putut să părăsești %1$d folder partajat</item>
+        <item quantity="few">nu ai putut părăsi %1$d foldere partajate</item>
+        <item quantity="other">nu ai putut părăsi %1$d de foldere partajate</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
-    <string name="meetings_list_ongoing_call_message">Meeting in progress</string>
+    <string name="meetings_list_ongoing_call_message">Întâlnire în desfășurare</string>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
     <plurals name="general_move_node_snackbar_success">
-        <item quantity="one">Moved %1$d item</item>
-        <item quantity="other">Moved %1$d items</item>
+        <item quantity="one">%1$d element a fost mutat</item>
+        <item quantity="few">%1$d elemente au fost mutate</item>
+        <item quantity="other">%1$d de elemente au fost mutate</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
     <plurals name="general_move_node_snackbar_fail">
-        <item quantity="one">Couldn’t move %1$d item</item>
-        <item quantity="other">Couldn’t move %1$d items</item>
+        <item quantity="one">Nu m-am putut mișca %1$d articol</item>
+        <item quantity="few">Nu a putut muta %1$d element</item>
+        <item quantity="other">Nu a putut muta %1$d de elemente</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
     <plurals name="general_move_node_snackbar_concat_success">
@@ -4775,7 +4798,7 @@
         <item quantity="other">couldn’t move %1$d items</item>
     </plurals>
     <!-- Text hint of option to add meeting name in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_name_hint">Meeting name</string>
+    <string name="meetings_schedule_meeting_name_hint">Numele întâlnirii</string>
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">Recurrence</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
@@ -5222,11 +5245,11 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">You can now schedule one-off and recurring meetings.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">You can start the meeting before its scheduled time by tapping “Start meeting” in the meeting room.</string>
+    <string name="meeting_list_tooltip_sched_description">You can start the meeting before its scheduled time by tapping [A]Start meeting[/A] in the meeting room.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Manage recurring meetings</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting [A]Occurrences[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
@@ -5245,4 +5268,29 @@
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Meeting occurrence updated</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare tip zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații sau de la care primiți date.</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">Aprobă</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">Aprobă acreditările</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">Waiting room</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">Only users admitted by the host can join the meeting.</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">Participants added by non-hosts during calls won’t be sent to the waiting room. [A]Learn more[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="one">Removed %1$d participant</item>
+        <item quantity="other">Removed %1$d participants</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">Repornește</string>
 </resources>

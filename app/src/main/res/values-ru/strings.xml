@@ -5499,11 +5499,11 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Теперь вы можете планировать разовые и регулярные встречи.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">Вы можете начать встречу раньше запланированного времени, нажав «Начать встречу» в комнате встречи.</string>
+    <string name="meeting_list_tooltip_sched_description">Вы можете начать встречу раньше запланированного времени, нажав [A]«Начать встречу»[/A] в комнате встречи.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Управляйте регулярными встречами</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">Вы можете просмотреть, отменить или отредактировать любое повторение регулярной встречи, нажав на три точки справа, а затем выбрав «Повторения».</string>
+    <string name="meeting_list_tooltip_recurring_description">Вы можете просмотреть, отменить или отредактировать любое повторение регулярной встречи, нажав на три точки справа, а затем выбрав [A]«Повторения»[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_send_calendar_invite_panel_title">Отправьте событие календаря участникам по электронной почте, чтобы они могли добавить встречу в свои календари.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
@@ -5522,4 +5522,29 @@
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Время окончания</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Повторение встречи обновлено</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">Мы защищаем ваши данные с помощью шифрования с нулевым разглашением, поэтому вся информация, которую вы храните, делитесь и получаете в MEGA, находится в безопасности. Чтобы обеспечить дополнительную безопасность, мы просим вас подтвердить контакты, с которыми вы делитесь информацией или от которых получаете данные.</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">Чтобы подтвердить контакт, убедитесь, что учётные данные, которые вы видите выше, соответствуют его учётным данным. Вы можете попросить его поделиться с вами своими учётными данными.</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">Подтвердить</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">Подтвердите учётные данные</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">Зал ожидания</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">К встрече могут присоединиться только пользователи, допущенные организатором.</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">Участники, добавленные во время звонков не организаторами, не будут отправлены в комнату ожидания. [A]Подробнее[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">Некоторые контакты, с которыми вы делитесь информацией, не были вами подтверждены. Чтобы обеспечить дополнительную безопасность, мы рекомендуем вам подтвердить их учетные данные в «Контактах». Нажмите на три точки рядом с контактом, который хотите подтвердить, затем нажмите «Информация».</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="one">Removed %1$d participant</item>
+        <item quantity="other">Removed %1$d participants</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">Только что было скачано обновление</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">Перезапуск</string>
 </resources>

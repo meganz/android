@@ -1052,7 +1052,7 @@
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Lịch sử nội dung chat đã bị xóa bởi %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
-    <string name="non_format_message_add_participant">%2$s đã thêm %1$s vào nhóm chát</string>
+    <string name="non_format_message_add_participant">%1$s đã  được thêm vào nhóm chát từ lời mời của %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
     <string name="non_format_message_remove_participant">%2$s đã loại&#160;bỏ %1$s khỏi nhóm chát</string>
     <!-- Message shown when a participant change the title of a group chat. -->
@@ -1583,7 +1583,7 @@
     <!-- Error message shown when user tries to open a not valid MEGA link -->
     <string name="open_link_not_valid_link">Đường liên kết bạn đang muốn mở không phải là một liên kết MEGA hợp lệ.</string>
     <!-- Message shown when a link is being processing -->
-    <string name="processing_link">Đang xử lý đường liên kết&#8230;</string>
+    <string name="processing_link">Đang xử&#160;lý đường liên&#160;kết&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
     <string name="passwd_weak">Mật khẩu này quá dễ đoán. Hãy thử tạo một mật khẩu dài hơn. Bao gồm chữ thường và chữ in HOA. Thêm các ký tự đặc biệt. Đừng dùng tên hay những từ thông dụng.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
@@ -1978,7 +1978,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Kích hoạt hoặc tắt tính năng ghi nhớ lịch sử phên bản cho toàn bộ tài khoản.\nTắt đi tính năng ghi phiên bản sẽ không ngăn cản các tên liên lạc trong tài khoản của bạn tạo ra phiên bản mới của thư mục chia sẻ chung.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Chạm vào đây, nhập tên hay e-mail</string>
+    <string name="type_mail">Chạm vào đây, nhập tên hay email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Thêm %s vào sổ liên lạc?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2364,7 +2364,7 @@
     <!-- Title of the activity that sends a location -->
     <string name="title_activity_maps">Gửi vị trí</string>
     <!-- Label layout on maps activity that permits send current location -->
-    <string name="current_location_label">Gửi đi vị trí hiện tại</string>
+    <string name="current_location_label">Gửi vị&#160;trí hiện&#160;tại của bạn</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">Gửi đi vị trí hiện tại: [A]%1$s[/A]</string>
     <!-- Label layout on maps activity indicating nearby places -->
@@ -2404,7 +2404,7 @@
     <!-- Label shown when a new group chat has been created correctly -->
     <string name="new_group_chat_created">Nhóm chát mới đã được tạo</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="preparing_chats">Đang chuẩn bị cho tệp tin</string>
+    <string name="preparing_chats">Đang chuẩn bị tệp tin</string>
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">Đã được gửi đi bằng tin nhắn.</string>
     <!-- Action delete all file versions -->
@@ -2520,7 +2520,7 @@
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">Trượt để hủy bỏ</string>
     <!-- Error message when trying to play a voice message that it is not available -->
-    <string name="error_message_voice_clip">Tin nhắn thoại này không còn nữa</string>
+    <string name="error_message_voice_clip">Tin&#160;nhắn thoại này không còn nữa</string>
     <!-- Title of popup when user click ‘Share’ button on invite contact page -->
     <string name="invite_contact_chooser_title">Mời bạn bè bằng</string>
     <!-- Action button label -->
@@ -4824,27 +4824,51 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Bạn giờ đây có thể đặt lịch cuộc họp một&#160;lần và định&#160;kỳ.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">Bạn có thể bắt&#160;đầu cuộc họp trước thời&#160;gian dự&#160;kiến ​​bằng cách chạm vào \“Bắt&#160;đầu cuộc họp\“ khi ở trong phòng họp.</string>
+    <string name="meeting_list_tooltip_sched_description">Bạn có thể bắt&#160;đầu cuộc họp trước thời&#160;gian dự&#160;kiến ​​bằng cách chạm vào [A]Bắt&#160;đầu cuộc họp[/A] khi ở trong phòng họp.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Quản&#160;lý các cuộc họp định&#160;kỳ</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">Bạn có thể xem qua, hủy bỏ hoặc chỉnh&#160;sửa bất&#160;kỳ thời&#160;điểm tái&#160;diễn nào của cuộc họp định&#160;kỳ bằng cách chạm vào dấu ba chấm ngay bên phải, sau đó chọn Thời&#160;điểm tái&#160;diễn.</string>
+    <string name="meeting_list_tooltip_recurring_description">Bạn có thể xem qua, hủy bỏ hoặc chỉnh&#160;sửa bất&#160;kỳ thời&#160;điểm tái&#160;diễn nào của cuộc họp định&#160;kỳ bằng cách chạm vào dấu ba chấm ngay bên phải, sau đó chọn [A]Thời&#160;điểm tái&#160;diễn[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_send_calendar_invite_panel_title">Gửi email lời mời lịch hẹn cho những người tham&#160;gia biết và thêm cuộc họp vào lịch của họ.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Cuộc họp đã được cập&#160;nhật</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Chỉnh&#160;sửa thời&#160;điểm tái&#160;diễn</string>
     <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
     <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Cập nhật</string>
     <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Ngày</string>
     <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Thời&#160;gian bắt&#160;đầu</string>
     <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Chọn ngày bắt&#160;đầu</string>
     <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Thời&#160;gian kết&#160;thúc</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Thời&#160;điểm tái&#160;diễn cuộc họp đã được cập&#160;nhật</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">Chúng&#160;tôi bảo&#160;vệ dữ&#160;liệu của bạn bằng mô&#160;hình mã&#160;hóa vô&#160;kiến&#160;thức nên tất&#160;cả thông&#160;tin bạn lưu&#160;trữ, chia&#160;sẻ và nhận được trên MEGA đều bảo&#160;vệ an&#160;toàn. Để đảm&#160;bảo tính bảo&#160;mật cao hơn, chúng&#160;tôi có yêu&#160;cầu bạn xác&#160;thực các tên liên&#160;lạc mà bạn có chia&#160;sẻ thông&#160;tin hoặc nhận dữ&#160;liệu từ họ.</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">Để xác thực tên liên lạc, đảm bảo rằng chứng thực bạn thấy dưới đây trùng khớp với chứng thực tài khoản của họ. Bạn có thể hỏi người đó chia sẻ chứng thực cho bạn.</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">Chấp nhận</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">Chấp nhận các số chứng thực</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">Phòng chờ</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">Chỉ những người được người chủ&#160;trì thừa&#160;nhận mới có&#160;thể tham&#160;gia cuộc họp.</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">Những người tham&#160;gia cuộc gọi được thêm bởi người không phải là người chủ&#160;trì sẽ không được chuyển đến phòng chờ. [A]Tìm&#160;hiểu thêm[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">Một số tên liên&#160;lạc mà bạn đang chia&#160;sẻ thông&#160;tin chưa được bạn đã xác&#160;thực. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi khuyên bạn nên xác&#160;thực chứng&#160;chỉ đăng&#160;nhập của họ trong Sổ Liên&#160;Lạc. Nhấn vào ba dấu chấm bên cạnh tên liên&#160;lạc bạn muốn xác&#160;thực và nhấn vào Thông&#160;tin.</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="other">Đã loại bỏ %1$d thành&#160;viên</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">Một bản cập&#160;nhật vừa được tải&#160;xuống</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">Khởi động lại</string>
 </resources>

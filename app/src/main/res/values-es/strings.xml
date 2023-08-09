@@ -5236,7 +5236,7 @@
     <!--Description text from Meeting List screen empty view-->
     <string name="meeting_list_empty_description">Habla de forma segura y privada en llamadas y videollamadas con amigos y colegas de todo el mundo.</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_dialog_title">Cancel “%1$s”?</string>
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">¿Cancelar “%1$s”?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Esta reunión será archivada y todos los participantes serán notificados.</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
@@ -5252,21 +5252,21 @@
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Reunión cancelada</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Cancel the %1$s occurrence?</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">¿Cancelar el evento del %1$s?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Se cancelará solo este evento. Todos los demás eventos seguirán adelante según lo programado.</string>
     <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">¿Cancelar evento y reunión?</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be archived and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Este es el único evento de la reunión periódica. Cancelar este evento cancelará la reunión.\nSi lo cancelas, la reunión será archivada y todos los participantes serán notificados.</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be placed under Past meetings and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Este es el único evento de la reunión periódica. Cancelar este evento cancelará la reunión.\nSi lo cancelas, la reunión se moverá a Reuniones anteriores y todos los participantes serán notificados.</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s occurrence cancelled</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s eventos cancelados</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Cancelar evento</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
-    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] ha actualizado la reunión[/B]</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Esta reunión y todos sus eventos serán archivados y todos los participantes serán notificados.</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
@@ -5274,11 +5274,11 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Programa reuniones puntuales y periódicas.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">Puedes empezar la reunión antes de la hora programada tocando “Empezar reunión” en la sala de reuniones.</string>
+    <string name="meeting_list_tooltip_sched_description">You can start the meeting before its scheduled time by tapping [A]Start meeting[/A] in the meeting room.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Gestionar reuniones periódicas</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting [A]Occurrences[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
@@ -5297,4 +5297,29 @@
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Evento de la reunión actualizado</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to verify the contacts you share information with or receive data from.</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">Para verificar tu contacto, asegúrate de que las credenciales que ves arriba coincidan con las credenciales de su cuenta. Puedes pedirle que comparta sus credenciales contigo.</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">Aceptar</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">Aceptar las credenciales</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">Sala de espera</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">Only users admitted by the host can join the meeting.</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">Los participantes que han sido añadidos a las llamadas por usuarios que no son anfitriones no serán enviados a la sala de espera. [A]Más información[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="one">Removed %1$d participant</item>
+        <item quantity="other">Removed %1$d participants</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">Reiniciar</string>
 </resources>

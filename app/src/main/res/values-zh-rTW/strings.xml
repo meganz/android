@@ -2872,7 +2872,7 @@
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">無法更改傳輸「%1$s」的優先順序</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">單獨發送解密金鑰</string>
+    <string name="option_send_decryption_key_separately">各別發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
     <string name="explanation_send_decryption_key_separately">各別匯出連結與解密金鑰。</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
@@ -3908,11 +3908,11 @@
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">事件</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">每日發生</string>
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">每日重複</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
-    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">每週發生</string>
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">每週重複</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
-    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">每月發生</string>
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">每月重複</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
     <string name="meetings_recurring_meeting_info_see_more_occurrences_button">顯示更多</string>
     <!-- Label for scheduled monthly meetings -->
@@ -4582,9 +4582,9 @@
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_transfer">[B]傳輸：[/B][A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/月[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/年[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">推薦的</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
@@ -4600,7 +4600,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自動備份</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite最多可還原90天，Pro&#160;I、II和III最多可還原365天（即將推出）</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;垃圾筒清理排程7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4656,32 +4656,31 @@
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">儲存到雲端硬碟</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">Saving&#8230;</string>
+    <string name="album_import_saving">正在儲存⋯</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <string name="album_import_success_message">「%1$s」已儲存到雲端硬碟</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <string name="album_import_error_message">「%1$s」無法儲存到雲端硬碟。請稍後再試。如果問題仍然存在，請聯繫共享連結給您的人。</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_weekdays_button">Weekdays</string>
+    <string name="meetings_custom_recurrence_weekdays_button">平日</string>
     <!-- Title of occurs ever section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_occurs_every_section">每</string>
+    <string name="meetings_custom_recurrence_occurs_every_section">重複間隔</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
-    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Every weekday</string>
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">每個平日</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
     <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
-        <item quantity="one">Daily</item>
-        <item quantity="other">Every %1$d days</item>
+        <item quantity="other">每%1$d天</item>
     </plurals>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <plurals name="general_snackbar_link_created_and_copied">
         <item quantity="other">連結已建立並且複製到您的剪貼簿</item>
     </plurals>
     <!-- Title of occurs on section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_occurs_on_section">Occurs on</string>
+    <string name="meetings_custom_recurrence_occurs_on_section">重複日期</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
     <string name="meetings_custom_recurrence_monday_option">一</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
-    <string name="meetings_custom_recurrence_tuesday_option">四</string>
+    <string name="meetings_custom_recurrence_tuesday_option">二</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Wednesday -->
     <string name="meetings_custom_recurrence_wednesday_option">三</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Thursday -->
@@ -4689,25 +4688,23 @@
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Friday -->
     <string name="meetings_custom_recurrence_friday_option">五</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Saturday -->
-    <string name="meetings_custom_recurrence_saturday_option">日</string>
+    <string name="meetings_custom_recurrence_saturday_option">六</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Sunday -->
     <string name="meetings_custom_recurrence_sunday_option">日</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
-        <item quantity="one">%1$s, every week</item>
-        <item quantity="other">%1$s, every %2$d weeks</item>
+        <item quantity="other">每%2$d週的%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
-        <item quantity="one">%1$s and %2$s, every week</item>
-        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+        <item quantity="other">每%3$d週的%1$s和%2$s</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">您已經有此方案的定期訂閱</string>
     <!-- Album import storage exceeded title -->
-    <string name="album_import_storage_exceeded_title">Cannot save album</string>
+    <string name="album_import_storage_exceeded_title">無法儲存相簿</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <string name="album_import_storage_exceeded_description">您沒有足夠的儲存空間將此相簿儲存到您的雲端硬碟。立即升級以獲得更多儲存空間。</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">天</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -4739,69 +4736,61 @@
     <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
     <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">星期日</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
-    <string name="meetings_custom_recurrence_first_week_monthly_section">First</string>
+    <string name="meetings_custom_recurrence_first_week_monthly_section">第一個</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
-    <string name="meetings_custom_recurrence_second_week_monthly_section">Second</string>
+    <string name="meetings_custom_recurrence_second_week_monthly_section">第二個</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
-    <string name="meetings_custom_recurrence_third_week_monthly_section">Third</string>
+    <string name="meetings_custom_recurrence_third_week_monthly_section">第三個</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
-    <string name="meetings_custom_recurrence_fourth_week_monthly_section">Fourth</string>
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">第四個</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
     <string name="meetings_custom_recurrence_fifth_week_monthly_section">第五個</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
-        <item quantity="one">First %1$s of every month</item>
-        <item quantity="other">First %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d個月的第一個%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
-        <item quantity="one">Second %1$s of every month</item>
-        <item quantity="other">Second %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d個月的第二個%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
-        <item quantity="one">Third %1$s of every month</item>
-        <item quantity="other">Third %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d個月的第三個%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
-        <item quantity="one">Fourth %1$s of every month</item>
-        <item quantity="other">Fourth %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d個月的第四個%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
-        <item quantity="one">Fifth %1$s of every month</item>
-        <item quantity="other">Fifth %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d個月的第五個%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="other">每%1$s個月的第%2$d天</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="other">已開始%1$d個下載</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="other">已完成%1$d個下載</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_end_recurrence_label">結束重複</string>
+    <string name="meetings_schedule_meeting_end_recurrence_label">結束時間</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_ends_section">結束</string>
+    <string name="meetings_custom_recurrence_ends_section">結束時間</string>
     <!--Action text to start a conversation from Meeting List screen empty view-->
     <string name="meeting_list_empty_action">開始會議</string>
     <!--Description text from Meeting List screen empty view-->
     <string name="meeting_list_empty_description">透過語音或視訊與全世界的朋友和同事進行安全私密交談。</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_dialog_title">Cancel “%1$s”?</string>
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">是否取消「%1$s」？</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">此會議將被封存，所有與會者都會收到通知。</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">此會議將被放置在過去的會議底下，所有與會者都會收到通知。</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">此會議將被放在過去的會議中，所有與會者都會收到通知。</string>
     <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">不要取消</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
@@ -4813,49 +4802,74 @@
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">會議已取消</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Cancel the %1$s occurrence?</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">是否取消%1$s的事件？</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">只有此事件會被取消。所有其它事件將按照排程進行。</string>
     <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">要取消事件和會議？</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be archived and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">這是週期性會議的唯一事件。取消此事件將取消整個會議。\n如果取消，會議將被封存，而且所有參與者都將收到通知。</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be placed under Past meetings and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">這是週期性會議的唯一事件。取消此事件將取消整個會議。\n如果取消，會議將被放在過去的會議中，而且所有參與者都將收到通知。</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s occurrence cancelled</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s的事件已取消</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">取消事件</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
-    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B]已更新會議[/B]</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">此會議和其所有事件將被封存，所有與會者都會收到通知。</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">此會議和其所有事件將被放置在過去的會議底下，所有與會者都會收到通知。</string>
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">此會議和其所有事件將被放置在過去的會議中，所有與會者都會收到通知。</string>
     <!-- Meeting list tooltip description for start meeting fab button -->
-    <string name="meeting_list_tooltip_fab_description">You can now schedule one-off and recurring meetings.</string>
+    <string name="meeting_list_tooltip_fab_description">您現在可以安排一次性和週期性會議。</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">您可以點擊會議室中的「開始會議」，在預定時間之前開始會議。</string>
+    <string name="meeting_list_tooltip_sched_description">您現在可以在會議室中點選[A]開始會議[/A]，在預定時間之前開始會議。</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_title">管理定期性會議</string>
+    <string name="meeting_list_tooltip_recurring_title">管理週期性會議</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <string name="meeting_list_tooltip_recurring_description">您現在可以點選右側的三個小圓點並選擇[A]事件[/A]來查看、取消、或編輯週期性會的任何事件。</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">使用電子郵件發送行事曆邀請給與會者，以便他們可以將會議加到他們的行事曆。</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">會議已更新</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">編輯事件</string>
     <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
     <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">更新</string>
     <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">日期</string>
     <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">開始時間</string>
     <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">選擇開始日期</string>
     <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">結束時間</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">會議事件已更新</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密技術來保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您驗證您與之共享資訊，或從之接收資料的聯絡人。</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相符。您可以要求對方分享他們的憑證給您。</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">同意</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">驗證憑證</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">等候室</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">只有主持人允許的使用者才可以加入會議。</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">在通話期間由非主持人加入的與會者不會被傳送到等候室。[A]瞭解更多[/A]</string>
+    <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
+    <string name="contact_share_file_to_unverified_contact_warning_message">某些您與之共享資訊的聯絡人尚未經過您的驗證。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。點選您欲驗證的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
+    <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
+        <item quantity="one">Removed %1$d participant</item>
+        <item quantity="other">Removed %1$d participants</item>
+    </plurals>
+    <!-- Message to user when app update is downloaded -->
+    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <!-- Action allowing user to restart the app after downloading the update -->
+    <string name="general_app_update_action_restart">重頭播放</string>
 </resources>
