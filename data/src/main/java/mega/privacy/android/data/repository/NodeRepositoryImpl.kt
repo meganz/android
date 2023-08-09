@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -448,6 +449,29 @@ internal class NodeRepositoryImpl @Inject constructor(
         val node = getMegaNodeByHandle(nodeToCopy, true)
         val parent = getMegaNodeByHandle(newNodeParent, true)
         requireNotNull(node) { "Node to copy with handle $nodeToCopy not found" }
+        requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("copyNode") { NodeId(it.nodeHandle) }
+            megaApiGateway.copyNode(
+                nodeToCopy = node,
+                newNodeParent = parent,
+                newNodeName = newNodeName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun copyPublicNode(
+        publicNodeToCopy: Node,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        val node = MegaNode.unserialize(publicNodeToCopy.serializedData)
+        val parent = getMegaNodeByHandle(newNodeParent, true)
+        requireNotNull(node) { "Node to copy with handle $publicNodeToCopy not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("copyNode") { NodeId(it.nodeHandle) }

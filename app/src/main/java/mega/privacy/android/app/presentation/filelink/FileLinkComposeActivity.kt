@@ -5,6 +5,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
@@ -15,6 +18,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.main.DecryptAlertDialog
+import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -24,8 +28,10 @@ import mega.privacy.android.app.presentation.transfers.TransfersManagementActivi
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
 /**
@@ -42,6 +48,37 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
     private val nodeSaver = NodeSaver(
         this, this, this,
         AlertsAndWarnings.showSaveToDeviceConfirmDialog(this)
+    )
+
+    private val selectImportFolderResult =
+        ActivityResultCallback<ActivityResult> { activityResult ->
+            val resultCode = activityResult.resultCode
+            val intent = activityResult.data
+
+            if (resultCode != RESULT_OK || intent == null) {
+                return@ActivityResultCallback
+            }
+
+            if (!viewModel.isConnected) {
+                try {
+                    viewModel.resetJobInProgressState()
+                } catch (ex: Exception) {
+                    Timber.e(ex)
+                }
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    getString(R.string.error_server_connection_problem)
+                )
+                return@ActivityResultCallback
+            }
+
+            val toHandle = intent.getLongExtra("IMPORT_TO", 0)
+            viewModel.handleImportNode(toHandle)
+        }
+
+    private val selectImportFolderLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        selectImportFolderResult
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,14 +102,20 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                 action = ::onOpenFile
             )
 
+            EventEffect(
+                event = uiState.downloadFile,
+                onConsumed = viewModel::resetDownloadFile,
+                action = ::downloadFile
+            )
+
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 FileLinkView(
                     viewState = uiState,
                     onBackPressed = { onBackPressedDispatcher.onBackPressed() },
                     onShareClicked = ::onShareClicked,
                     onPreviewClick = { viewModel.onPreviewClick(this@FileLinkComposeActivity) },
-                    onSaveToDeviceClicked = { },
-                    onImportClicked = { },
+                    onSaveToDeviceClicked = viewModel::handleSaveFile,
+                    onImportClicked = ::onImportClicked,
                 )
             }
         }
@@ -135,6 +178,29 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
         MegaNodeUtil.shareLink(this, viewModel.state.value.url)
     }
 
+    /**
+     * Download the file
+     */
+    private fun downloadFile(node: MegaNode) {
+        checkNotificationsPermission(this)
+        nodeSaver.saveNode(
+            node = node,
+            highPriority = false,
+            isFolderLink = false,
+            fromMediaViewer = false,
+            needSerialize = true
+        )
+    }
+
+    /**
+     * Open folder selection for importing the node
+     */
+    private fun onImportClicked() {
+        val intent = Intent(this, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
+        selectImportFolderLauncher.launch(intent)
+    }
+
     private fun launchManagerActivity() {
         startActivity(
             Intent(this@FileLinkComposeActivity, ManagerActivity::class.java)
@@ -176,6 +242,16 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
 
     override fun onDialogNegativeClick() {
         finish()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        if (intent == null) {
+            return
+        }
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
+            return
+        }
     }
 
     companion object {

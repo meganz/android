@@ -12,6 +12,7 @@ package mega.privacy.android.domain.entity.node
  * @property lastModified
  * @property parentHandle
  * @property isFile
+ * @property serializedData
  */
 data class NodeNameCollision(
     val collisionHandle: Long,
@@ -23,4 +24,5 @@ data class NodeNameCollision(
     val lastModified: Long,
     val parentHandle: Long,
     val isFile: Boolean,
+    val serializedData: String? = null
 )

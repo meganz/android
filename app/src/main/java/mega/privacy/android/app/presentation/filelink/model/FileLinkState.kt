@@ -6,6 +6,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.PublicNodeException
+import nz.mega.sdk.MegaNode
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.filelink.FileLinkActivity]
@@ -13,6 +14,7 @@ import mega.privacy.android.domain.exception.PublicNodeException
  * @property shouldLogin            Whether to show login screen
  * @property url                    Url of the file
  * @property hasDbCredentials       Whether has db credentials
+ * @property fileNode               Current file node
  * @property title                  Title of the current node
  * @property sizeInBytes            Size of the current file node
  * @property handle                 Handle of the current file node
@@ -27,11 +29,13 @@ import mega.privacy.android.domain.exception.PublicNodeException
  * @property fetchPublicNodeError   Exception while fetching current public node
  * @property jobInProgressState     indicates if there are any job in progress that needs to be notified
  * @property openFile               State to handle file opening
+ * @property downloadFile           State to download file
  */
 data class FileLinkState(
     val shouldLogin: Boolean? = null,
     val hasDbCredentials: Boolean = false,
     val url: String = "",
+    val fileNode: TypedFileNode? = null,
     val title: String = "",
     val sizeInBytes: Long = 0,
     val handle: Long = -1,
@@ -46,11 +50,13 @@ data class FileLinkState(
     val fetchPublicNodeError: PublicNodeException? = null,
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,
     val openFile: StateEventWithContent<Intent> = consumed(),
+    val downloadFile: StateEventWithContent<MegaNode> = consumed()
 ) {
     /**
      * Creates a copy of this view state with the info that can be extracted directly from typedNode
      */
     fun copyWithTypedNode(typedNode: TypedFileNode, iconResource: Int) = this.copy(
+        fileNode = typedNode,
         title = typedNode.name,
         sizeInBytes = typedNode.size,
         previewPath = typedNode.previewPath,

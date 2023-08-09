@@ -311,6 +311,21 @@ interface NodeRepository {
     ): NodeId
 
     /**
+     * Copy a public [Node] and move it to a new [Node] while updating its name if set
+     *
+     * @param publicNodeToCopy the [Node] to copy
+     * @param newNodeParent the [NodeId] that [publicNodeToCopy] will be moved to
+     * @param newNodeName the new name for [publicNodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
+     *
+     * @return the [NodeId] handle of the new [Node] that was copied
+     */
+    suspend fun copyPublicNode(
+        publicNodeToCopy: Node,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId
+
+    /**
      * Move a [Node] to a new [Node] while updating its name if set
      *
      * @param nodeToMove the [NodeId] to move

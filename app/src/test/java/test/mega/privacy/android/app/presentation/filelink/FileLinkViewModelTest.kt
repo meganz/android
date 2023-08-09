@@ -20,12 +20,17 @@ import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentFromFileLinkToOpenFileMapper
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -47,8 +52,17 @@ class FileLinkViewModelTest {
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
+    private val copyPublicNodeUseCase = mock<CopyPublicNodeUseCase>()
+    private val checkPublicNodesNameCollisionUseCase = mock<CheckPublicNodesNameCollisionUseCase>()
     private val getIntentFromFileLinkToOpenFileMapper =
         mock<GetIntentFromFileLinkToOpenFileMapper>()
+
+    private val url = "https://mega.co.nz/abc"
+    private val filePreviewPath = "data/cache/xyz.jpg"
+    private val title = "abc"
+    private val fileSize = 100000L
+    private val serializedString = "serializedString"
+    private val parentNodeHandle = 123L
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -73,7 +87,9 @@ class FileLinkViewModelTest {
             checkNameCollisionUseCase = checkNameCollisionUseCase,
             getNodeByHandle = getNodeByHandle,
             getPublicNodeUseCase = getPublicNodeUseCase,
-            getIntentFromFileLinkToOpenFileMapper = getIntentFromFileLinkToOpenFileMapper
+            getIntentFromFileLinkToOpenFileMapper = getIntentFromFileLinkToOpenFileMapper,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase
         )
     }
 
@@ -84,6 +100,7 @@ class FileLinkViewModelTest {
             assertThat(initial.shouldLogin).isNull()
             assertThat(initial.hasDbCredentials).isFalse()
             assertThat(initial.url).isEmpty()
+            assertThat(initial.fileNode).isNull()
             assertThat(initial.title).isEmpty()
             assertThat(initial.sizeInBytes).isEqualTo(0)
             assertThat(initial.handle).isEqualTo(-1)
@@ -95,6 +112,7 @@ class FileLinkViewModelTest {
             assertThat(initial.copyThrowable).isNull()
             assertThat(initial.copySuccess).isFalse()
             assertThat(initial.openFile).isInstanceOf(consumed<Intent>().javaClass)
+            assertThat(initial.downloadFile).isInstanceOf(consumed<Intent>().javaClass)
         }
     }
 
@@ -234,14 +252,11 @@ class FileLinkViewModelTest {
 
     @Test
     fun `test that on getting valid public node correct values are set`() = runTest {
-        val url = "https://mega.co.nz/abc"
-        val expectedPath = "data/cache/xyz.jpg"
-        val title = "abc"
-        val fileSize = 100000L
         val publicNode = mock<TypedFileNode> {
-            on { previewPath }.thenReturn(expectedPath)
-            on { name }.thenReturn(title)
-            on { size }.thenReturn(fileSize)
+            on { this.previewPath }.thenReturn(filePreviewPath)
+            on { this.name }.thenReturn(title)
+            on { this.size }.thenReturn(fileSize)
+            on { this.serializedData }.thenReturn(serializedString)
         }
 
         whenever(getPublicNodeUseCase(any())).thenReturn(publicNode)
@@ -250,7 +265,7 @@ class FileLinkViewModelTest {
             val result = expectMostRecentItem()
             assertThat(result.title).isEqualTo(title)
             assertThat(result.sizeInBytes).isEqualTo(fileSize)
-            assertThat(result.previewPath).isEqualTo(expectedPath)
+            assertThat(result.previewPath).isEqualTo(filePreviewPath)
             assertThat(result.iconResource).isEqualTo(null)
         }
     }
@@ -325,4 +340,84 @@ class FileLinkViewModelTest {
             assertThat(newValue.openFile).isInstanceOf(consumed<Intent>().javaClass)
         }
     }
+
+    @Test
+    fun `test that collision value is not null on importing node with same name `() = runTest {
+        val nodeNameCollision = mock<NodeNameCollision> {
+            on { collisionHandle }.thenReturn(123)
+            on { nodeHandle }.thenReturn(1234)
+            on { name }.thenReturn("name")
+            on { size }.thenReturn(12345)
+            on { childFolderCount }.thenReturn(0)
+            on { childFileCount }.thenReturn(0)
+            on { lastModified }.thenReturn(12345)
+            on { parentHandle }.thenReturn(1235)
+            on { isFile }.thenReturn(false)
+            on { serializedData }.thenReturn("serializedData")
+        }
+        val publicNodeNameCollisionResult = PublicNodeNameCollisionResult(
+            listOf(), listOf(nodeNameCollision), NodeNameCollisionType.COPY
+        )
+        val publicNode = mock<TypedFileNode> {
+            on { this.previewPath }.thenReturn(filePreviewPath)
+            on { this.name }.thenReturn(title)
+            on { this.size }.thenReturn(fileSize)
+            on { this.serializedData }.thenReturn(serializedString)
+        }
+
+        whenever(getPublicNodeUseCase(any())).thenReturn(publicNode)
+        whenever(
+            checkPublicNodesNameCollisionUseCase(
+                listOf(publicNode),
+                parentNodeHandle,
+                NodeNameCollisionType.COPY
+            )
+        ).thenReturn(publicNodeNameCollisionResult)
+
+        underTest.state.test {
+            underTest.getPublicNode(url)
+            underTest.handleImportNode(parentNodeHandle)
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.collision).isNotNull()
+        }
+    }
+
+    @Test
+    fun `test that collision value is null on importing node without same name`() = runTest {
+        val publicNode = mock<TypedFileNode> {
+            on { this.previewPath }.thenReturn(filePreviewPath)
+            on { this.name }.thenReturn(title)
+            on { this.size }.thenReturn(fileSize)
+            on { this.serializedData }.thenReturn(serializedString)
+        }
+        val publicNodeNameCollisionResult = PublicNodeNameCollisionResult(
+            listOf(publicNode), listOf(), NodeNameCollisionType.COPY
+        )
+
+        whenever(getPublicNodeUseCase(any())).thenReturn(publicNode)
+        whenever(
+            checkPublicNodesNameCollisionUseCase(
+                listOf(publicNode),
+                parentNodeHandle,
+                NodeNameCollisionType.COPY
+            )
+        ).thenReturn(publicNodeNameCollisionResult)
+
+        underTest.state.test {
+            underTest.getPublicNode(url)
+            underTest.handleImportNode(parentNodeHandle)
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.collision).isNull()
+        }
+    }
+
+    @Test
+    fun `test that downloadFile should be reset to consumed when resetDownloadFile is invoked`() =
+        runTest {
+            underTest.state.test {
+                underTest.resetDownloadFile()
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.downloadFile).isInstanceOf(consumed<MegaNode>().javaClass)
+            }
+        }
 }

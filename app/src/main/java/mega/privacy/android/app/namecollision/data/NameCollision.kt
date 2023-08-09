@@ -199,6 +199,7 @@ sealed class NameCollision : Serializable {
                     lastModified = nameCollision.lastModified,
                     parentHandle = nameCollision.parentHandle,
                     isFile = nameCollision.isFile,
+                    serializedNode = nameCollision.serializedData
                 )
         }
     }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
@@ -21,11 +22,15 @@ import mega.privacy.android.app.presentation.mapper.GetIntentFromFileLinkToOpenF
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,6 +48,8 @@ class FileLinkViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val getIntentFromFileLinkToOpenFileMapper: GetIntentFromFileLinkToOpenFileMapper,
+    private val checkPublicNodesNameCollisionUseCase: CheckPublicNodesNameCollisionUseCase,
+    private val copyPublicNodeUseCase: CopyPublicNodeUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -184,6 +191,64 @@ class FileLinkViewModel @Inject constructor(
     }
 
     /**
+     * Handle import node
+     *
+     * @param targetHandle
+     */
+    fun handleImportNode(targetHandle: Long) {
+        checkNameCollision(targetHandle)
+    }
+
+    private fun checkNameCollision(targetHandle: Long) = viewModelScope.launch {
+        val fileNode = state.value.fileNode ?: run {
+            Timber.e("Invalid File node")
+            resetJobInProgressState()
+            return@launch
+        }
+        runCatching {
+            checkPublicNodesNameCollisionUseCase(
+                listOf(fileNode),
+                targetHandle,
+                NodeNameCollisionType.COPY
+            )
+        }.onSuccess { result ->
+            if (result.noConflictNodes.isNotEmpty()) {
+                copy(targetHandle)
+            } else if (result.conflictNodes.isNotEmpty()) {
+                val collision = NameCollision.Copy.getCopyCollision(result.conflictNodes[0])
+                _state.update {
+                    it.copy(collision = collision, jobInProgressState = null)
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
+
+    private fun copy(targetHandle: Long) = viewModelScope.launch {
+        val fileNode = state.value.fileNode ?: run {
+            Timber.e("Invalid File node")
+            resetJobInProgressState()
+            return@launch
+        }
+        runCatching { copyPublicNodeUseCase(fileNode, NodeId(targetHandle), null) }
+            .onSuccess { _state.update { it.copy(copySuccess = true, jobInProgressState = null) } }
+            .onFailure { copyThrowable ->
+                _state.update { it.copy(copyThrowable = copyThrowable, jobInProgressState = null) }
+            }
+    }
+
+    /**
+     * Handle save to device
+     */
+    fun handleSaveFile() {
+        viewModelScope.launch {
+            val publicNode = MegaNode.unserialize(state.value.serializedData)
+            _state.update { it.copy(downloadFile = triggered(publicNode)) }
+        }
+    }
+
+    /**
      * Reset copy node values
      */
     fun resetCopyError() {
@@ -214,7 +279,7 @@ class FileLinkViewModel @Inject constructor(
     /**
      * Reset the job in progress state value
      */
-    private fun resetJobInProgressState() {
+    fun resetJobInProgressState() {
         _state.update { it.copy(jobInProgressState = null) }
     }
 
@@ -244,4 +309,9 @@ class FileLinkViewModel @Inject constructor(
      * Reset and notify that openFile event is consumed
      */
     fun resetOpenFile() = _state.update { it.copy(openFile = consumed()) }
+
+    /**
+     * Reset and notify that downloadFile event is consumed
+     */
+    fun resetDownloadFile() = _state.update { it.copy(downloadFile = consumed()) }
 }
