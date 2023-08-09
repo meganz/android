@@ -24,6 +24,7 @@ internal class BackupInfoTypeMapper @Inject constructor() {
         MegaApiJava.BACKUP_TYPE_DOWN_SYNC -> BackupInfoType.DOWN_SYNC
         MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS -> BackupInfoType.CAMERA_UPLOADS
         MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS -> BackupInfoType.MEDIA_UPLOADS
+        MegaApiJava.BACKUP_TYPE_BACKUP_UPLOAD -> BackupInfoType.BACKUP_UPLOAD
         else -> throw IllegalArgumentException("The backup type value $sdkType is invalid")
     }
 }

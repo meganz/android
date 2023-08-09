@@ -34,4 +34,9 @@ enum class BackupInfoType {
      * Represents the Backup Type for the Secondary Folder (Media Uploads) in Camera Uploads
      */
     MEDIA_UPLOADS,
+
+    /**
+     * Represents the Backup Type for a Backup Folder made by a Non-Mobile Device
+     */
+    BACKUP_UPLOAD,
 }

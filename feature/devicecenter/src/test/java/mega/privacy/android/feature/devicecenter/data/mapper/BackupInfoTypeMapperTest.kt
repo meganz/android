@@ -42,5 +42,6 @@ internal class BackupInfoTypeMapperTest {
         Arguments.of(MegaApiJava.BACKUP_TYPE_DOWN_SYNC, BackupInfoType.DOWN_SYNC),
         Arguments.of(MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS, BackupInfoType.CAMERA_UPLOADS),
         Arguments.of(MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS, BackupInfoType.MEDIA_UPLOADS),
+        Arguments.of(MegaApiJava.BACKUP_TYPE_BACKUP_UPLOAD, BackupInfoType.BACKUP_UPLOAD),
     )
 }

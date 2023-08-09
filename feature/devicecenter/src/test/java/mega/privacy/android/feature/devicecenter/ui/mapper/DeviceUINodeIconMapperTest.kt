@@ -5,8 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceNode
-import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -27,30 +25,30 @@ internal class DeviceUINodeIconMapperTest {
         underTest = DeviceUINodeIconMapper()
     }
 
-    @ParameterizedTest(name = "device node: {0}, expected device icon: {1}")
+    @ParameterizedTest(name = "device folders: {0}, expected device icon: {1}")
     @MethodSource("provideParameters")
     fun `test that the correct device icon is returned`(
-        deviceNode: DeviceNode,
+        deviceFolders: List<DeviceFolderNode>,
         @DrawableRes expectedDeviceIconRes: Int,
     ) {
-        assertThat(underTest(deviceNode)).isEqualTo(expectedDeviceIconRes)
+        assertThat(underTest(deviceFolders)).isEqualTo(expectedDeviceIconRes)
     }
 
     private fun provideParameters() = Stream.of(
         Arguments.of(
-            mockDeviceNode(listOf(BackupInfoType.CAMERA_UPLOADS)),
+            mockDeviceFolders(listOf(BackupInfoType.CAMERA_UPLOADS)),
             R.drawable.ic_device_mobile
         ),
         Arguments.of(
-            mockDeviceNode(listOf(BackupInfoType.MEDIA_UPLOADS)),
+            mockDeviceFolders(listOf(BackupInfoType.MEDIA_UPLOADS)),
             R.drawable.ic_device_mobile
         ),
         Arguments.of(
-            mockDeviceNode(listOf(BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS)),
+            mockDeviceFolders(listOf(BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS)),
             R.drawable.ic_device_mobile,
         ),
         Arguments.of(
-            mockDeviceNode(
+            mockDeviceFolders(
                 listOf(
                     BackupInfoType.CAMERA_UPLOADS,
                     BackupInfoType.MEDIA_UPLOADS,
@@ -59,14 +57,12 @@ internal class DeviceUINodeIconMapperTest {
             ),
             R.drawable.ic_device_mobile,
         ),
-        Arguments.of(mockDeviceNode(emptyList()), R.drawable.ic_device_pc),
-        Arguments.of(mockDeviceNode(listOf(BackupInfoType.DOWN_SYNC)), R.drawable.ic_device_pc),
+        Arguments.of(mockDeviceFolders(emptyList()), R.drawable.ic_device_pc),
+        Arguments.of(mockDeviceFolders(listOf(BackupInfoType.DOWN_SYNC)), R.drawable.ic_device_pc),
     )
 
-    private fun mockDeviceNode(backupFolderTypes: List<BackupInfoType>): OwnDeviceNode {
-        val expectedFolders = backupFolderTypes.map { backupInfoType ->
+    private fun mockDeviceFolders(backupFolderTypes: List<BackupInfoType>) =
+        backupFolderTypes.map { backupInfoType ->
             mock<DeviceFolderNode> { on { type }.thenReturn(backupInfoType) }
         }
-        return mock { on { folders }.thenReturn(expectedFolders) }
-    }
 }
