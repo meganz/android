@@ -2,6 +2,9 @@ package mega.privacy.android.app.presentation.transfers.startdownload
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -17,9 +20,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
+import mega.privacy.android.app.transfers.DownloadsWorker
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
@@ -28,6 +33,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.transfer.StartDownloadUseCase
+import mega.privacy.android.domain.usecase.transfer.activetransfers.ClearActiveTransfersIfFinishedUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,7 +50,22 @@ class StartDownloadTransfersViewModel @Inject constructor(
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
+    private val workManager: WorkManager,
 ) : ViewModel() {
+
+    //This method will be converted into a use case in TRAN-194
+    private fun startWorkerUseCase() {
+        val request = OneTimeWorkRequest.Builder(DownloadsWorker::class.java)
+            .addTag(SINGLE_DOWNLOAD_TAG)
+            .build()
+        workManager
+            .enqueueUniqueWork(
+                SINGLE_DOWNLOAD_TAG,
+                ExistingWorkPolicy.KEEP,
+                request
+            )
+    }
 
     private var currentInProgressJob: Job? = null
 
@@ -98,12 +119,19 @@ class StartDownloadTransfersViewModel @Inject constructor(
         if (!checkAndHandleIsDeviceConnected()) {
             return
         }
+        clearActiveTransfersIfFinishedUseCase(TransferType.TYPE_DOWNLOAD)
         _uiState.update {
             it.copy(jobInProgressState = StartDownloadTransferJobInProgress.ProcessingFiles)
         }
         var lastError: Throwable? = null
-        val terminalEvent = runCatching { getPath() }
-            .onFailure { lastError = it }
+        val terminalEvent = runCatching {
+            getPath().also {
+                if (it.isNullOrBlank()) {
+                    // this will be checked in TRAN-196 and a proper error will be thrown or emitted
+                    throw NullPointerException("path not found!")
+                }
+            }
+        }.onFailure { lastError = it }
             .getOrNull()?.let { path ->
                 startDownloadUseCase(
                     destinationPath = path,
@@ -116,6 +144,8 @@ class StartDownloadTransfersViewModel @Inject constructor(
                 }.onCompletion {
                     if (it is CancellationException) {
                         _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+                    } else if (it == null) {
+                        startWorkerUseCase()
                     }
                 }.firstOrNull {
                     it == DownloadNodesEvent.FinishProcessingTransfers || it == DownloadNodesEvent.NotSufficientSpace
@@ -166,4 +196,8 @@ class StartDownloadTransfersViewModel @Inject constructor(
                 jobInProgressState = null,
             )
         }
+
+    companion object {
+        private const val SINGLE_DOWNLOAD_TAG = "MEGA_DOWNLOAD_TAG"
+    }
 }

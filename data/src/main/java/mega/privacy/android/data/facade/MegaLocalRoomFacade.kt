@@ -163,10 +163,14 @@ internal class MegaLocalRoomFacade @Inject constructor(
         activeTransferDao.deleteActiveTransferByTag(tags)
 
     override fun getActiveTransferTotalsByType(transferType: TransferType) =
-        activeTransferDao.getTotalsByType(transferType).map { activeTransferTotalsMapper(it) }
+        activeTransferDao.getTotalsByType(transferType)
+            .map { activeTransferTotalsMapper(transferType, it) }
 
     override suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType) =
-        activeTransferTotalsMapper(activeTransferDao.getCurrentTotalsByType(transferType))
+        activeTransferTotalsMapper(
+            transferType,
+            activeTransferDao.getCurrentTotalsByType(transferType)
+        )
 
     override suspend fun saveSyncRecord(record: SyncRecord) =
         syncRecordDao.insertOrUpdateSyncRecord(syncRecordEntityMapper(record))

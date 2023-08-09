@@ -6,6 +6,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
+import mega.privacy.android.domain.usecase.transfer.activetransfers.AddOrUpdateActiveTransferUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -34,6 +36,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.internal.verification.Times
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -52,6 +55,7 @@ class DownloadNodesUseCaseTest {
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
     private val transfer: Transfer = mock()
+    private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase = mock()
 
     private lateinit var underTest: DownloadNodesUseCase
 
@@ -59,10 +63,11 @@ class DownloadNodesUseCaseTest {
     fun setup() {
         underTest =
             DownloadNodesUseCase(
-                cancelCancelTokenUseCase,
-                invalidateCancelTokenUseCase,
-                transferRepository,
-                fileSystemRepository,
+                cancelCancelTokenUseCase = cancelCancelTokenUseCase,
+                invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
+                addOrUpdateActiveTransferUseCase = addOrUpdateActiveTransferUseCase,
+                transferRepository = transferRepository,
+                fileSystemRepository = fileSystemRepository,
             )
     }
 
@@ -70,7 +75,8 @@ class DownloadNodesUseCaseTest {
     fun resetMocks() {
         reset(
             transferRepository, cancelTokenRepository, fileSystemRepository,
-            fileNode, folderNode, invalidateCancelTokenUseCase, cancelCancelTokenUseCase, transfer,
+            addOrUpdateActiveTransferUseCase, fileNode, folderNode, invalidateCancelTokenUseCase,
+            cancelCancelTokenUseCase, transfer,
         )
     }
 
@@ -224,6 +230,36 @@ class DownloadNodesUseCaseTest {
                 }
                 awaitComplete()
             }
+        }
+
+    @Test
+    fun `test that addOrUpdateActiveTransferUseCase is invoked when each transfer is updated`() =
+        runTest {
+            whenever(transfer.isFolderTransfer).thenReturn(false)
+            val flow = flowOf(
+                mock<TransferEvent.TransferStartEvent> { on { it.transfer }.thenReturn(transfer) },
+                mock<TransferEvent.TransferUpdateEvent> { on { it.transfer }.thenReturn(transfer) },
+                mock<TransferEvent.TransferFinishEvent> { on { it.transfer }.thenReturn(transfer) },
+            )
+            nodeIds.forEach {
+                whenever(
+                    transferRepository.startDownload(
+                        it, DESTINATION_PATH_FOLDER, null, false,
+                    )
+                ).thenReturn(flow)
+            }
+            underTest(
+                nodeIds,
+                DESTINATION_PATH_FOLDER,
+                null,
+                false
+            ).filterIsInstance<DownloadNodesEvent.SingleTransferEvent>().test {
+                cancelAndConsumeRemainingEvents()
+            }
+            verify(
+                addOrUpdateActiveTransferUseCase,
+                Times(nodeIds.size * flow.count())
+            ).invoke(transfer)
         }
 
     @Test

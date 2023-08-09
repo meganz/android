@@ -9,10 +9,13 @@ import javax.inject.Inject
  * Mapper for converting [ActiveTransferTotalsEntity] into [ActiveTransferTotals].
  */
 internal class ActiveTransferTotalsMapper @Inject constructor() {
-    suspend operator fun invoke(activeTransferTotals: ActiveTransferTotalsEntity?) =
+    suspend operator fun invoke(
+        type: TransferType,
+        activeTransferTotals: ActiveTransferTotalsEntity?,
+    ) =
         with(activeTransferTotals) {
             ActiveTransferTotals(
-                transfersType = this?.transfersType ?: TransferType.NONE,
+                transfersType = type,
                 totalTransfers = this?.totalTransfers ?: 0,
                 totalFinishedTransfers = this?.totalFinishedTransfers ?: 0,
                 totalBytes = this?.totalBytes ?: 0L,

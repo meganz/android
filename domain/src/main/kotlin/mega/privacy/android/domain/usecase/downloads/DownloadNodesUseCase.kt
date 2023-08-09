@@ -16,6 +16,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
+import mega.privacy.android.domain.usecase.transfer.activetransfers.AddOrUpdateActiveTransferUseCase
 import javax.inject.Inject
 
 /**
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class DownloadNodesUseCase @Inject constructor(
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
+    private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
     private val transferRepository: TransferRepository,
     private val fileSystemRepository: FileSystemRepository,
 ) {
@@ -68,19 +70,25 @@ class DownloadNodesUseCase @Inject constructor(
             }
         }.transform { event ->
             emit(event)
-            //check if single node processing is finished
-            if ((event as? DownloadNodesEvent.SingleTransferEvent)?.isFinishProcessingEvent() == true) {
-                val nodeId = NodeId(event.transferEvent.transfer.nodeHandle)
-                if (!alreadyProcessed.contains(nodeId)) {
-                    //this node is already processed: save it and emit the event
-                    alreadyProcessed.add(nodeId)
-                    emit(DownloadNodesEvent.TransferFinishedProcessing(nodeId))
 
-                    //check if all nodes have finished processing
-                    if (!finishProcessingSend && alreadyProcessed.containsAll(nodeIds)) {
-                        finishProcessingSend = true
-                        invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
-                        emit(DownloadNodesEvent.FinishProcessingTransfers)
+            if (event is DownloadNodesEvent.SingleTransferEvent) {
+                //update active transfers db
+                addOrUpdateActiveTransferUseCase(event.transferEvent.transfer)
+
+                //check if single node processing is finished
+                if (event.isFinishProcessingEvent()) {
+                    val nodeId = NodeId(event.transferEvent.transfer.nodeHandle)
+                    if (!alreadyProcessed.contains(nodeId)) {
+                        //this node is already processed: save it and emit the event
+                        alreadyProcessed.add(nodeId)
+                        emit(DownloadNodesEvent.TransferFinishedProcessing(nodeId))
+
+                        //check if all nodes have finished processing
+                        if (!finishProcessingSend && alreadyProcessed.containsAll(nodeIds)) {
+                            finishProcessingSend = true
+                            invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
+                            emit(DownloadNodesEvent.FinishProcessingTransfers)
+                        }
                     }
                 }
             }

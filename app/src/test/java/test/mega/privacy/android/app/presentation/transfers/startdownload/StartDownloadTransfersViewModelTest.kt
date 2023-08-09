@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadTransfersViewModel
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
@@ -28,6 +30,8 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.transfer.StartDownloadUseCase
+import mega.privacy.android.domain.usecase.transfer.activetransfers.ClearActiveTransfersIfFinishedUseCase
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,6 +63,8 @@ class StartDownloadTransfersViewModelTest {
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase =
         mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val clearActiveTransfersIfFinishedUseCase =
+        mock<ClearActiveTransfersIfFinishedUseCase>()
     private val monitorConnectivityFlow: StateFlow<Boolean> = mock()
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -76,6 +82,8 @@ class StartDownloadTransfersViewModelTest {
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
             monitorConnectivityUseCase,
+            clearActiveTransfersIfFinishedUseCase,
+            workManager = mock(), //WorkManager will be replaced by a use case in TRAN-194, so no need to create tests related to it for now
         )
 
     }
@@ -93,9 +101,31 @@ class StartDownloadTransfersViewModelTest {
             monitorConnectivityUseCase,
             node,
             parentNode,
-            monitorConnectivityFlow
+            monitorConnectivityFlow,
+            clearActiveTransfersIfFinishedUseCase,
         )
     }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadNode is invoked`() =
+        runTest {
+            stubNodeForDownload()
+            underTest.startDownloadNode(nodes)
+            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.TYPE_DOWNLOAD)
+        }
+
+    @Test
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadForOffline is invoked`() =
+        runTest {
+            stubNodeForDownload()
+            underTest.startDownloadForOffline(node)
+            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.TYPE_DOWNLOAD)
+        }
 
     @Test
     fun `test that start download use case is invoked with correct parameters when startDownloadNode is invoked`() =

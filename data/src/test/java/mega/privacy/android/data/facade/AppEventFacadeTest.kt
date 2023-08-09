@@ -37,7 +37,7 @@ class AppEventFacadeTest {
     fun `test that broadcast upload pause state fires an event`(isPaused: Boolean) = runTest {
         underTest.monitorPausedTransfers().test {
             underTest.broadcastPausedTransfers(isPaused)
-            assertThat(awaitItem()).isEqualTo(isPaused)
+            assertThat(expectMostRecentItem()).isEqualTo(isPaused)
         }
     }
 

@@ -32,7 +32,7 @@ internal class AppEventFacade @Inject constructor(
     private val logout = MutableSharedFlow<Boolean>()
     private val fetchNodesFinish = MutableSharedFlow<Boolean>()
     private val accountUpdate = MutableSharedFlow<Boolean>()
-    private val pausedTransfers = MutableSharedFlow<Boolean>()
+    private val pausedTransfers = MutableSharedFlow<Boolean>(1)
     private val _transferFailed = MutableSharedFlow<Boolean>()
     private val transfersFinished = MutableSharedFlow<TransfersFinishedState>()
     private val pushNotificationSettingsUpdate = MutableSharedFlow<Boolean>()

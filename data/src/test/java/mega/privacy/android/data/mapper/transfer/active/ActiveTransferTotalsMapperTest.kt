@@ -7,7 +7,6 @@ import mega.privacy.android.data.database.entity.ActiveTransferTotalsEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -42,14 +41,15 @@ class ActiveTransferTotalsMapperTest {
                 TOTAL_BYTES,
                 TRANSFERRED_BYTES
             )
-            Truth.assertThat(underTest(entity)).isEqualTo(expected)
+            Truth.assertThat(underTest(transferType, entity)).isEqualTo(expected)
         }
 
-    @Test
-    fun `test that mapper returns empty entity when null entity is mapped`() =
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that mapper returns empty entity when null entity is mapped`(transferType: TransferType) =
         runTest {
-            val expected = ActiveTransferTotals(TransferType.NONE, 0, 0, 0, 0)
-            Truth.assertThat(underTest(null)).isEqualTo(expected)
+            val expected = ActiveTransferTotals(transferType, 0, 0, 0, 0)
+            Truth.assertThat(underTest(transferType, null)).isEqualTo(expected)
         }
 
     companion object {

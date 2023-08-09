@@ -16,5 +16,20 @@ data class ActiveTransferTotals(
     val totalBytes: Long,
     val transferredBytes: Long,
 ) {
+    /**
+     * @return true if there are ongoing transfers, false if all transfers are finished or there are no active transfers to transfer
+     */
+    fun hasOngoingTransfers() =
+        totalBytes > 0 && totalTransfers > 0 && transferredBytes < totalBytes
+
+    /**
+     * Similar to [!isTransferring()] but in this case it will return true if there are no active transfers
+     * @return true if all active transfers have finished or there are no active transfers.
+     */
+    fun hasCompleted() = transferredBytes == totalBytes
+
+    /**
+     * Represents the percentage (with base 100) of the already transferred bytes
+     */
     val progressPercent by lazy { if (totalBytes == 0L) 0 else ((transferredBytes * 100L) / totalBytes).toInt() }
 }
