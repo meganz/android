@@ -168,7 +168,18 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new FileLink compose screen
      */
-    FileLinkCompose("Enable compose for FileLink", false)
+    FileLinkCompose("Enable compose for FileLink", false),
+
+    /**
+     * This is an MVP implementation where we include chips to the existing search functionality
+     * This will later be replaced by the Clean implementation
+     */
+    SearchWithChipsMVP("Add chips for search MVP", false),
+
+    /**
+     * Clean refactored search implementation
+     */
+    SearchWithChips("Advanced search implementation in clean architecture", false)
 
     ;
 
