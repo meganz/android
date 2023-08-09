@@ -28,13 +28,6 @@ internal interface SyncGateway {
      */
     suspend fun getFolderPairs(): MegaSyncList
 
-    /**
-     * Removes all folder pairs
-     *
-     */
-    @Deprecated("Use removeFolderPair(..) instead to remove a single folder pair")
-    suspend fun removeFolderPairs()
-
     suspend fun removeFolderPair(folderPairId: Long)
 
     /**

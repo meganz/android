@@ -75,14 +75,6 @@ internal class SyncGatewayImpl @Inject constructor(
         TODO()
 //        megaApi.syncs
 
-    override suspend fun removeFolderPairs() {
-//        megaApi
-//            .syncs
-//            .forEach {
-//                megaApi.removeSync(it.backupId)
-//            }
-    }
-
     override suspend fun removeFolderPair(folderPairId: Long) {
 //        megaApi.removeSync(folderPairId)
     }
