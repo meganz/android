@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.layout.onSizeChanged
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -63,6 +64,7 @@ fun GenericDescriptionTextField(
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
     @StringRes titleId: Int? = null,
+    onSizeChange: () -> Unit = {},
 
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -142,7 +144,8 @@ fun GenericDescriptionTextField(
                         isError,
                         interactionSource,
                         textFieldColors
-                    ),
+                    )
+                    .onSizeChanged { onSizeChange() },
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.subtitle2.copy(
                     color = if (!isFocused && value.isNotEmpty()) MaterialTheme.colors.textColorSecondary else MaterialTheme.colors.onPrimary,

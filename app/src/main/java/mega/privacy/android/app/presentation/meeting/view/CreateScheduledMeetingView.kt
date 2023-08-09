@@ -35,6 +35,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
@@ -121,6 +123,7 @@ internal fun CreateScheduledMeetingView(
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -195,11 +198,19 @@ internal fun CreateScheduledMeetingView(
                     )
                 }
 
-                item(key = "Schedule meeting add description") {
+                val keyItemDescription = "Schedule meeting add description"
+                item(key = keyItemDescription) {
                     if (state.isEditingDescription || state.descriptionText.isNotEmpty()) {
                         AddDescriptionButton(
                             description = state.descriptionText,
-                            onValueChange = onDescriptionValueChange
+                            onValueChange = onDescriptionValueChange,
+                            onSizeChange = {
+                                coroutineScope.launch {
+                                    listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == keyItemDescription }?.index?.let { index ->
+                                        listState.scrollToItem(index = index)
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -297,6 +308,7 @@ private fun ScheduledMeetingDateAndTime(
 private fun AddDescriptionButton(
     description: String,
     onValueChange: (String) -> Unit,
+    onSizeChange: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -337,7 +349,8 @@ private fun AddDescriptionButton(
                         initiallyFocused = description.isEmpty(),
                         placeholderId = R.string.meetings_schedule_meeting_add_description_label,
                         charLimitErrorId = R.string.meetings_schedule_meeting_meeting_description_too_long_error,
-                        titleId = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label
+                        titleId = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label,
+                        onSizeChange = onSizeChange
                     )
                 }
             }
