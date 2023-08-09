@@ -575,7 +575,7 @@ void downloadAndExtractNativeSymbols() {
         curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -o ${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE} ${nativeSymbolLocation}
         rm -frv ${targetObjLocalLocation}
         mkdir -p ${targetObjLocalLocation}
-        unzip ${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE} -d ${targetObjLocalLocation}
+        unzip -o ${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE} -d ${targetObjLocalLocation}
     """
 }
 
@@ -602,7 +602,7 @@ void downloadDependencyLibForSdk() {
 
             sh """
                 cd ${WORKSPACE}
-                unzip ${ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG} -d ${googleMapsApiFolder}
+                unzip -o ${ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG} -d ${googleMapsApiFolder}
                 
                 mkdir -p app/src/debug/res/values
                 mkdir -p app/src/release/res/values
