@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotification
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -87,6 +89,9 @@ class ChatViewModelTest {
     }
     private val leaveChat = mock<LeaveChat>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val loadPendingMessagesUseCase = mock<LoadPendingMessagesUseCase> {
+        onBlocking { invoke(any()) }.thenReturn(flowOf())
+    }
 
     @Before
     fun setUp() {
@@ -118,7 +123,8 @@ class ChatViewModelTest {
             leaveChat = leaveChat,
             getContactLinkUseCase = getContactLinkUseCase,
             isContactRequestSentUseCase = isContactRequestSentUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            loadPendingMessagesUseCase = loadPendingMessagesUseCase,
         )
     }
 

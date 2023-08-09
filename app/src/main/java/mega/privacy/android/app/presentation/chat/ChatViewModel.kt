@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.chat
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,12 +33,14 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -50,6 +53,7 @@ import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
@@ -125,6 +129,7 @@ class ChatViewModel @Inject constructor(
     private val getContactLinkUseCase: GetContactLinkUseCase,
     private val isContactRequestSentUseCase: IsContactRequestSentUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val loadPendingMessagesUseCase: LoadPendingMessagesUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -156,6 +161,8 @@ class ChatViewModel @Inject constructor(
         get() = monitorConnectivityUseCase().value
 
     private val rxSubscriptions = CompositeDisposable()
+
+    private val newPendingMessage = SingleLiveEvent<PendingMessage>()
 
     init {
         viewModelScope.launch {
@@ -674,4 +681,21 @@ class ChatViewModel @Inject constructor(
     fun onContactInvitationConsumed() {
         _state.update { it.copy(contactInvitation = null) }
     }
+
+    /**
+     * Load pending messages.
+     *
+     */
+    fun loadPendingMessages() = viewModelScope.launch {
+        loadPendingMessagesUseCase(state.value.chatId)
+            .collect { pendingMessage -> newPendingMessage.value = pendingMessage }
+    }
+
+
+    /**
+     * On pending message loaded
+     *
+     * @return
+     */
+    fun onPendingMessageLoaded(): LiveData<PendingMessage> = newPendingMessage
 }

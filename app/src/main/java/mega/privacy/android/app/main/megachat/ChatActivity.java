@@ -91,8 +91,6 @@ import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_CHAT_LINK;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
 import static mega.privacy.android.app.utils.Constants.ACTION_UPDATE_ATTACHMENT;
-import static mega.privacy.android.app.utils.Constants.APP_DATA_CHAT;
-import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
 import static mega.privacy.android.app.utils.Constants.APP_DATA_VOICE_CLIP;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PROGRESS;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP;
@@ -126,7 +124,6 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_P
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_PENDING_MESSAGE_ID;
 import static mega.privacy.android.app.utils.Constants.INVALID_ID;
-import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE;
@@ -445,8 +442,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
@@ -2093,6 +2088,7 @@ public class ChatActivity extends PasscodeActivity
             }
             return Unit.INSTANCE;
         });
+        viewModel.onPendingMessageLoaded().observe(this, this::onPendingMessageLoaded);
     }
 
     public void checkScroll() {
@@ -6563,7 +6559,7 @@ public class ChatActivity extends PasscodeActivity
         //Load pending messages
         if (!pendingMessagesLoaded) {
             pendingMessagesLoaded = true;
-            loadPendingMessages();
+            viewModel.loadPendingMessages();
 
             if (positionToScroll <= 0) {
                 mLayoutManager.scrollToPosition(messages.size());
@@ -7325,106 +7321,21 @@ public class ChatActivity extends PasscodeActivity
         adapter.setMessages(messages);
     }
 
-    /**
-     * Gets the pending messages from DB and add them if needed to the UI.
-     */
-    public void loadPendingMessages() {
-        List<AndroidMegaChatMessage> pendMsgs = dbH.findPendingMessagesNotSent(idChat);
-        Timber.d("Number of pending: %s", pendMsgs.size());
-
-        for (AndroidMegaChatMessage msg : pendMsgs) {
-            if (msg == null || msg.getPendingMessage() == null) {
-                Timber.w("Null pending messages");
-                continue;
-            }
-
-            PendingMessage pendingMsg = msg.getPendingMessage();
-
-            if (pendingMsg.getTransferTag() != INVALID_ID) {
-                MegaTransfer transfer = megaApi.getTransferByTag(pendingMsg.getTransferTag());
-                if (transfer == null) {
-                    transfer = findTransferFromPendingMessage(pendingMsg);
-                }
-
-                if (transfer == null || transfer.getState() == MegaTransfer.STATE_FAILED) {
-                    int tag = transfer != null ? transfer.getTag() : INVALID_ID;
-                    dbH.updatePendingMessage(pendingMsg.getId(), tag, INVALID_OPTION, PendingMessageState.ERROR_UPLOADING.getValue());
-                    pendingMsg.setState(PendingMessageState.ERROR_UPLOADING.getValue());
-                    msg.setPendingMessage(pendingMsg);
-                } else if (transfer.getState() == MegaTransfer.STATE_COMPLETED || transfer.getState() == MegaTransfer.STATE_CANCELLED) {
-                    dbH.updatePendingMessage(pendingMsg.getId(), transfer.getTag(), INVALID_OPTION, PendingMessageState.SENT.getValue());
-                    continue;
-                }
-            } else if (pendingMsg.getState() == PendingMessageState.PREPARING_FROM_EXPLORER.getValue()) {
-                dbH.updatePendingMessage(pendingMsg.getId(), INVALID_ID, INVALID_OPTION, PendingMessageState.PREPARING.getValue());
-                pendingMsg.setState(PendingMessageState.PREPARING.getValue());
-                msg.setPendingMessage(pendingMsg);
-            } else if (pendingMsg.getState() == PendingMessageState.COMPRESSING.getValue()) {
-                if (isServiceRunning(ChatUploadService.class)) {
-                    startService(new Intent(this, ChatUploadService.class)
-                            .setAction(ACTION_CHECK_COMPRESSING_MESSAGE)
-                            .putExtra(CHAT_ID, pendingMsg.getChatId())
-                            .putExtra(INTENT_EXTRA_PENDING_MESSAGE_ID, pendingMsg.getId())
-                            .putExtra(INTENT_EXTRA_KEY_FILE_NAME, pendingMsg.getName()));
-                } else {
-                    retryPendingMessage(pendingMsg);
-                    continue;
-                }
-            }
-
-            appendMessagePosition(msg);
-        }
-    }
-
-    /**
-     * If a transfer has been resumed, its tag is not the same as the initial one.
-     * This method gets the transfer with the new tag if exists with the pending message identifier.
-     *
-     * @param pendingMsg Pending message from which the transfer has to be found.
-     * @return The transfer if exist, null otherwise.
-     */
-    private MegaTransfer findTransferFromPendingMessage(PendingMessage pendingMsg) {
-        if (megaApi.getNumPendingUploads() == 0) {
-            Timber.d("There is not any upload in progress.");
-            return null;
-        }
-
-        MegaTransferData transferData = megaApi.getTransferData(null);
-        if (transferData == null) {
-            Timber.d("transferData is null.");
-            return null;
-        }
-
-        for (int i = 0; i < transferData.getNumUploads(); i++) {
-            MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
-            if (transfer == null) {
-                continue;
-            }
-
-            String data = transfer.getAppData();
-            if (isTextEmpty(data) || !data.contains(APP_DATA_CHAT) || data.contains(APP_DATA_VOICE_CLIP)) {
-                continue;
-            }
-
-            if (pendingMsg.getId() == getPendingMessageIdFromAppData(data)) {
-                return transfer;
+    private void onPendingMessageLoaded(PendingMessage pendingMessage) {
+        if (pendingMessage.getState() == PendingMessageState.COMPRESSING.getValue()) {
+            if (isServiceRunning(ChatUploadService.class)) {
+                startService(new Intent(this, ChatUploadService.class)
+                        .setAction(ACTION_CHECK_COMPRESSING_MESSAGE)
+                        .putExtra(CHAT_ID, pendingMessage.getChatId())
+                        .putExtra(INTENT_EXTRA_PENDING_MESSAGE_ID, pendingMessage.getId())
+                        .putExtra(INTENT_EXTRA_KEY_FILE_NAME, pendingMessage.getName()));
+            } else {
+                retryPendingMessage(pendingMessage);
+                return;
             }
         }
 
-        return null;
-    }
-
-    /**
-     * Gets the identifier of a pending message from the appData of its transfer.
-     *
-     * @param appData AppData of the transfer in question.
-     * @return The identifier of the pending message.
-     */
-    private long getPendingMessageIdFromAppData(String appData) {
-        String[] parts = appData.split(APP_DATA_INDICATOR);
-        String idFound = parts[parts.length - 1];
-
-        return Long.parseLong(idFound);
+        appendMessagePosition(new AndroidMegaChatMessage(pendingMessage, true));
     }
 
     public void loadMessage(AndroidMegaChatMessage messageToShow, int currentIndex) {
