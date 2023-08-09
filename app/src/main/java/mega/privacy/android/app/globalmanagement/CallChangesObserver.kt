@@ -105,7 +105,7 @@ class CallChangesObserver @Inject constructor(
                     CallUtil.incomingCall(listAllCalls, chatId, callStatus)
                 } else {
                     val chatRoom = megaChatApi.getChatRoom(chatId)
-                    if (chatRoom != null && chatRoom.isGroup) {
+                    if (chatRoom != null && chatRoom.isGroup && !chatRoom.isMeeting) {
                         Timber.d("Check if the incoming group call notification should be displayed")
                         chatManagement.checkActiveGroupChat(chatId)
                     }
