@@ -35,8 +35,6 @@ import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_CONTACTS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapper
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
@@ -72,8 +70,6 @@ class SqliteDatabaseHandler @Inject constructor(
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-    private val syncRecordTypeMapper: SyncRecordTypeMapper,
-    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
 ) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), LegacyDatabaseHandler {
     private var db: SQLiteDatabase
     override fun onCreate(db: SQLiteDatabase) {
