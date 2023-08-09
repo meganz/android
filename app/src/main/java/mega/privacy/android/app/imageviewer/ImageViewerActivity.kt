@@ -416,7 +416,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
             binding.root.post {
                 dragToExit?.runEnterAnimation(intent, binding.root) { activate ->
-                    viewModel.showToolbar(!activate)
+                    viewModel.showToolbar(!activate, enableTransparency = true)
                     val color = if (activate) android.R.color.transparent else R.color.white_black
                     binding.imagesNavHostFragment.setBackgroundResource(color)
                 }
@@ -508,7 +508,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
         }
 
-        viewModel.onShowToolbar().observe(this, ::animateToolbar)
+        viewModel.onShowToolbar().observe(this) { toolbarState ->
+            animateToolbar(toolbarState.show)
+        }
         viewModel.onSnackBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
             showSnackbar(message)
@@ -548,11 +550,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             if (activate) {
                 dragStarted = true
                 binding.imagesNavHostFragment.setBackgroundResource(android.R.color.transparent)
-                viewModel.showToolbar(false)
+                viewModel.showToolbar(false, enableTransparency = true)
             } else if (dragStarted) {
                 dragStarted = false
                 binding.imagesNavHostFragment.setBackgroundResource(R.color.white_black)
-                viewModel.showToolbar(true)
+                viewModel.showToolbar(true, enableTransparency = true)
             }
         }) {
             finish()

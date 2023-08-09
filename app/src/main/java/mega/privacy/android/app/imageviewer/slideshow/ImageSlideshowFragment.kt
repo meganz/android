@@ -133,7 +133,9 @@ class ImageSlideshowFragment : Fragment() {
         }
 
         viewModel.onSlideshowState().observe(viewLifecycleOwner, ::updateSlideshowState)
-        viewModel.onShowToolbar().observe(viewLifecycleOwner, ::animateBottomBar)
+        viewModel.onShowToolbar().observe(viewLifecycleOwner) {
+            animateBottomBar(it.show)
+        }
     }
 
     /**
@@ -198,6 +200,7 @@ class ImageSlideshowFragment : Fragment() {
                 binding.btnPause.isVisible = true
                 viewModel.showToolbar(false)
             }
+
             NEXT -> {
                 binding.btnPlay.isVisible = false
                 binding.btnPause.isVisible = true
@@ -208,6 +211,7 @@ class ImageSlideshowFragment : Fragment() {
                     viewModel.stopSlideshow()
                 }
             }
+
             STOPPED -> {
                 binding.btnPause.isVisible = false
                 binding.btnPlay.isVisible = true

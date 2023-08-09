@@ -143,7 +143,7 @@ class ImageViewerViewModel @Inject constructor(
 
     val images = MutableLiveData<List<ImageItem>?>()
     private val currentImageId = MutableLiveData<Long?>()
-    private val showToolbar = MutableLiveData(true)
+    private val showToolbar = MutableLiveData(ToolbarState())
     private val snackBarMessage = SingleLiveEvent<String>()
     private val actionBarMessage = SingleLiveEvent<Int>()
     private val copyMoveException = SingleLiveEvent<Throwable>()
@@ -235,12 +235,15 @@ class ImageViewerViewModel @Inject constructor(
 
     fun onSlideshowState(): LiveData<ImageSlideshowState> = slideShowState
 
-    fun onShowToolbar(): LiveData<Boolean> = showToolbar
+    fun onShowToolbar(): LiveData<ToolbarState> = showToolbar
 
-    fun isToolbarShown(): Boolean = showToolbar.value ?: false
+    fun isToolbarShown(): Boolean = showToolbar.value?.show ?: false
 
-    fun showToolbar(show: Boolean) {
-        showToolbar.value = show
+    fun showToolbar(show: Boolean, enableTransparency: Boolean = false) {
+        showToolbar.value = ToolbarState(
+            show = show,
+            enableTransparency = enableTransparency
+        )
     }
 
     fun retrieveSingleImage(nodeHandle: Long, isOffline: Boolean = false) {
@@ -992,3 +995,14 @@ class ImageViewerViewModel @Inject constructor(
         slideShowState.value = STOPPED
     }
 }
+
+/**
+ * A toolbar state class to handle extra toolbar logic
+ *
+ * @param show handle toolbar visibility
+ * @param enableTransparency handle when should show black background
+ */
+data class ToolbarState(
+    val show: Boolean = true,
+    val enableTransparency: Boolean = false,
+)

@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -134,7 +135,9 @@ class ImageViewerFragment : Fragment() {
         }
 
         viewModel.onCurrentImageItem().observe(viewLifecycleOwner, ::showCurrentImageInfo)
-        viewModel.onShowToolbar().observe(viewLifecycleOwner, ::animateBottomBar)
+        viewModel.onShowToolbar().observe(viewLifecycleOwner) { toolbarState ->
+            animateBottomBar(toolbarState.show, toolbarState.enableTransparency)
+        }
     }
 
     /**
@@ -163,7 +166,7 @@ class ImageViewerFragment : Fragment() {
      *
      * @param show  Show or hide bottombar
      */
-    private fun animateBottomBar(show: Boolean) {
+    private fun animateBottomBar(show: Boolean, enableTransparency: Boolean) {
         binding.root.post {
             val newAlpha = if (show) 1f else 0f
             binding.bgBottom.apply {
@@ -190,6 +193,19 @@ class ImageViewerFragment : Fragment() {
                     .setDuration(250)
                     .start()
             }
+
+            val color = when {
+                enableTransparency -> android.R.color.transparent
+                show -> R.color.white_black
+                else -> android.R.color.black
+            }
+
+            binding.root.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    color
+                )
+            )
         }
     }
 }
