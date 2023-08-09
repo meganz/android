@@ -74,11 +74,11 @@ internal fun FileInfoScreen(
     onPublicLinkCopyClick: () -> Unit,
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
     modifier: Modifier = Modifier,
+    statusBarHeight: Float = Util.getStatusBarHeight().toFloat() / LocalDensity.current.density,
 ) {
     val scrollState = rememberScrollState()
     Box(modifier = modifier.fillMaxSize()) {
         val density = LocalDensity.current.density
-        val statusBarHeight = Util.getStatusBarHeight().toFloat() / density
         val tintColorBase = MaterialTheme.colors.onSurface
         val actionModeSelect = viewState.outShareContactsSelected.isNotEmpty()
         val headerHeight by remember {
@@ -121,26 +121,22 @@ internal fun FileInfoScreen(
                 }
             }
         }
-        FileInfoHeader(
-            title = viewState.title,
-            titleAlpha = longTitleAlpha,
-            titleDisplacement = titleDisplacement.dp,
-            tintColor = tintColor,
-            backgroundAlpha = headerBackgroundAlpha,
-            previewUri = viewState.actualPreviewUriString?.takeIf { viewState.hasPreview },
-            iconResource = viewState.iconResource,
-            accessPermissionDescription = viewState.accessPermission.description()
-                ?.takeIf { viewState.isIncomingSharedNode },
-            modifier = Modifier
-                .height(headerHeight.dp),
-            statusBarHeight = statusBarHeight.dp,
-        )
+        viewState.actualPreviewUriString?.takeIf { viewState.hasPreview }?.let { previewUri ->
+            //looks like automation tool (appium) doesn't see anything behind a scaffold,
+            // so we need to draw [FileInfoHeader] below the Scaffold. The preview needs to be drawn here to don't overlap other views.
+            PreviewWithShadow(
+                alpha = headerBackgroundAlpha,
+                previewUri = previewUri,
+                modifier = Modifier.height(headerHeight.dp),
+            )
+
+        }
         Scaffold(
             modifier = Modifier.systemBarsPadding(),
             backgroundColor = Color.Transparent,
             topBar = {
                 Crossfade(
-                    targetState = actionModeSelect,
+                    targetState = actionModeSelect, label = "CrossfadeFileInfoTopAppBar",
                 ) { actionModeSelect ->
                     if (actionModeSelect) {
                         FileInfoSelectActionModeTopBar(
@@ -198,6 +194,20 @@ internal fun FileInfoScreen(
                 }
             }
         }
+        FileInfoHeader(
+            title = viewState.title,
+            titleAlpha = longTitleAlpha,
+            titleDisplacement = titleDisplacement.dp,
+            tintColor = tintColor,
+            backgroundAlpha = headerBackgroundAlpha,
+            previewUri = null,
+            iconResource = viewState.iconResource?.takeIf { !viewState.hasPreview },
+            accessPermissionDescription = viewState.accessPermission.description()
+                ?.takeIf { viewState.isIncomingSharedNode },
+            modifier = Modifier
+                .height(headerHeight.dp),
+            statusBarHeight = statusBarHeight.dp,
+        )
         viewState.jobInProgressState?.progressMessage?.let {
             LoadingDialog(text = stringResource(id = it))
         }
