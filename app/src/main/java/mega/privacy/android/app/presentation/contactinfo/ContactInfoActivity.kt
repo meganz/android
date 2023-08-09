@@ -1401,10 +1401,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             if (!state.email.isNullOrEmpty()) {
                 verifyCredentialsLayout.isVisible = true
                 if (state.areCredentialsVerified) {
-                    verifyCredentialsInfo.setText(R.string.label_verified)
+                    verifyCredentialsInfo.setText(R.string.contact_approve_credentials_approved_text)
                     verifyCredentialsInfoIcon.isVisible = true
                 } else {
-                    verifyCredentialsInfo.setText(R.string.label_not_verified)
+                    verifyCredentialsInfo.setText(R.string.contact_approve_credentials_not_approved_text)
                     verifyCredentialsInfoIcon.isVisible = false
                 }
             } else {

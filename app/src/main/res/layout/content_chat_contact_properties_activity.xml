@@ -389,7 +389,7 @@
                     android:id="@+id/chat_contact_properties_verify_credentials"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_verify_credentials"
+                    android:text="@string/contact_approve_credentials_toolbar_title"
                     android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
                 <RelativeLayout
@@ -402,8 +402,9 @@
                         android:id="@+id/verify_credentials_info_icon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_marginEnd="8dp"
-                        android:src="@drawable/ic_verified" />
+                        android:padding="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_chat_avatar_select" />
 
                     <TextView
                         android:id="@+id/verify_credentials_info"
@@ -411,7 +412,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@+id/verify_credentials_info_icon"
-                        android:text="@string/label_not_verified"
+                        android:text="@string/contact_approve_credentials_not_approved_text"
                         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
                 </RelativeLayout>
