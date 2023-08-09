@@ -32,11 +32,13 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a stopped status`() {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(BackupInfoState.NOT_INITIALIZED)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -44,6 +46,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Stopped,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -54,12 +57,14 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has an overquota status`(backupState: BackupInfoState) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(backupState)
                 on { subState }.thenReturn(BackupInfoSubState.STORAGE_OVERQUOTA)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -67,6 +72,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Overquota,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -82,12 +88,14 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(BackupInfoState.FAILED)
                 on { subState }.thenReturn(backupSubState)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -95,6 +103,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Blocked(backupSubState),
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -110,12 +119,14 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(BackupInfoState.TEMPORARY_DISABLED)
                 on { subState }.thenReturn(backupSubState)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -123,6 +134,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Blocked(backupSubState),
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -132,11 +144,13 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a disabled status`() {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(BackupInfoState.DISABLED)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -144,6 +158,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Disabled,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -175,6 +190,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Offline,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -207,6 +223,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Offline,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -222,11 +239,12 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.TWO_WAY_SYNC
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
-                on { type }.thenReturn(BackupInfoType.TWO_WAY_SYNC)
+                on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
             },
         )
@@ -235,6 +253,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Paused,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -250,11 +269,12 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
-                on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+                on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
             },
         )
@@ -263,6 +283,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Paused,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -278,11 +299,12 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.MEDIA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
-                on { type }.thenReturn(BackupInfoType.MEDIA_UPLOADS)
+                on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
             },
         )
@@ -291,6 +313,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Paused,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -306,11 +329,12 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.DOWN_SYNC
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
-                on { type }.thenReturn(BackupInfoType.DOWN_SYNC)
+                on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
             },
         )
@@ -319,6 +343,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Paused,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -334,11 +359,12 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.UP_SYNC
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
-                on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+                on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
             },
         )
@@ -347,6 +373,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Paused,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -362,12 +389,14 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.INVALID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(backupState)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.UPTODATE)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -375,6 +404,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.UpToDate,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -390,12 +420,14 @@ internal class DeviceFolderNodeMapperTest {
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.INVALID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(backupState)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.INACTIVE)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -403,6 +435,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.UpToDate,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -412,11 +445,13 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has an initializing status`() {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.UNKNOWN)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -424,6 +459,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Initializing,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -433,6 +469,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a syncing status`() {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupProgress = 75
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -440,6 +477,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.SYNCING)
                 on { progress }.thenReturn(backupProgress)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -447,6 +485,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Syncing(backupProgress),
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -456,11 +495,13 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a scanning status`() {
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.PENDING)
+                on { type }.thenReturn(backupType)
             },
         )
         val expected = listOf(
@@ -468,6 +509,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Scanning,
+                type = backupType,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
