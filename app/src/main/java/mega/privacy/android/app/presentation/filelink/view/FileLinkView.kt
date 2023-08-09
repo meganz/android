@@ -1,5 +1,12 @@
 package mega.privacy.android.app.presentation.filelink.view
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -33,8 +40,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
+import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
@@ -51,14 +60,17 @@ import mega.privacy.android.core.ui.theme.white
 internal const val IMPORT_BUTTON_TAG = "file_link_view:button_import"
 internal const val SAVE_BUTTON_TAG = "file_link_view:button_save"
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun FileLinkView(
     viewState: FileLinkState,
+    transferState: TransferManagementUiState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
     onPreviewClick: () -> Unit,
     onSaveToDeviceClicked: () -> Unit,
     onImportClicked: () -> Unit,
+    onTransferWidgetClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -171,6 +183,22 @@ internal fun FileLinkView(
                     onImportClicked = onImportClicked,
                     onSaveToDeviceClicked = onSaveToDeviceClicked
                 )
+
+                AnimatedVisibility(
+                    visible = transferState.widgetVisible,
+                    enter = scaleIn(animationSpecs, initialScale = animationScale) +
+                            fadeIn(animationSpecs),
+                    exit = scaleOut(animationSpecs, targetScale = animationScale) +
+                            fadeOut(animationSpecs),
+                    modifier = Modifier
+                        .padding(bottom = 48.dp, end = 8.dp)
+                        .align(Alignment.BottomEnd)
+                ) {
+                    TransfersWidgetView(
+                        transfersData = transferState.transfersInfo,
+                        onClick = onTransferWidgetClick,
+                    )
+                }
             }
         }
         viewState.jobInProgressState?.progressMessage?.let {
@@ -230,15 +258,20 @@ private fun PreviewFileLinkView() {
             FileLinkState(hasDbCredentials = true, title = "Title", sizeInBytes = 10000L)
         FileLinkView(
             viewState = viewState,
+            transferState = TransferManagementUiState(),
             onBackPressed = {},
             onShareClicked = {},
             onPreviewClick = {},
             onSaveToDeviceClicked = {},
-            onImportClicked = {}
+            onImportClicked = {},
+            onTransferWidgetClick = {}
         )
     }
 }
 
+internal const val animationDuration = 300
+internal const val animationScale = 0.2f
+internal val animationSpecs = TweenSpec<Float>(durationMillis = animationDuration)
 internal const val appBarHeight = 56f
 private fun headerMinHeight(statusBarHeight: Float) = appBarHeight + statusBarHeight
 private fun headerMaxHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 128f

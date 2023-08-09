@@ -259,14 +259,17 @@ open class TransfersManagementActivity : PasscodeActivity() {
                 ) {
                     TransfersWidgetView(
                         transfersData = uiState.transfersInfo,
-                        onClick = this@TransfersManagementActivity::onWidgetClick,
+                        onClick = this@TransfersManagementActivity::onTransfersWidgetClick,
                     )
                 }
             }
         }
     }
 
-    private fun onWidgetClick() {
+    /**
+     * Handle widget click
+     */
+    protected fun onTransfersWidgetClick() {
         transfersManagement.setAreFailedTransfers(false)
         if (this is ManagerActivity) {
             drawerItem = DrawerItem.TRANSFERS

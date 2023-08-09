@@ -81,6 +81,9 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
         selectImportFolderResult
     )
 
+    override val isOnFileManagementManagerSection: Boolean
+        get() = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate()")
         super.onCreate(savedInstanceState)
@@ -95,6 +98,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.state.collectAsStateWithLifecycle()
+            val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
 
             EventEffect(
                 event = uiState.openFile,
@@ -111,11 +115,13 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 FileLinkView(
                     viewState = uiState,
+                    transferState = transferState,
                     onBackPressed = { onBackPressedDispatcher.onBackPressed() },
                     onShareClicked = ::onShareClicked,
                     onPreviewClick = { viewModel.onPreviewClick(this@FileLinkComposeActivity) },
                     onSaveToDeviceClicked = viewModel::handleSaveFile,
                     onImportClicked = ::onImportClicked,
+                    onTransferWidgetClick = ::onTransfersWidgetClick,
                 )
             }
         }
