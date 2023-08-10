@@ -33,7 +33,6 @@ import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.R
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_UPLOADS_PAUSED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
@@ -245,6 +244,8 @@ class CameraUploadsWorker @AssistedInject constructor(
         private const val PerfCompressVideosTrace = "camera_uploads_compress_videos"
         private const val PerfUploadCompressedVideosTrace =
             "camera_uploads_upload_compressed_videos"
+        private const val APP_DATA_CU = "CU_UPLOAD"
+        private const val INVALID_NON_NULL_VALUE = "-1"
     }
 
     /**
@@ -751,7 +752,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                             parentNodeId = parentNodeId,
                             fileName = record.fileName,
                             modificationTime = lastModified / 1000,
-                            appData = Constants.APP_DATA_CU,
+                            appData = APP_DATA_CU,
                             isSourceTemporary = false,
                             shouldStartFirst = false,
                         ).collect { globalTransfer ->
@@ -981,8 +982,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun handlePrimaryFolderDisabled() {
         showFolderUnavailableStatus(CameraUploadFolderType.Primary)
         disableCameraUploadsUseCase()
-        setPrimaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
-        setSecondaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
+        setPrimaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
+        setSecondaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
         // Refresh SettingsCameraUploadsFragment
         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.RefreshSettings)
     }

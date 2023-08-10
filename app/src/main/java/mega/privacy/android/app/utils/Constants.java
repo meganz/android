@@ -426,7 +426,6 @@ public class Constants {
     //Transfers app data parameters
     public static final String APP_DATA_VOICE_CLIP = "VOICE_CLIP";
     public static final String APP_DATA_CHAT = "CHAT_UPLOAD";
-    public static final String APP_DATA_CU = "CU_UPLOAD";
     public static final String APP_DATA_SD_CARD = "SD_CARD_DOWNLOAD";
     public static final String APP_DATA_TXT_FILE = "TXT_FILE_UPLOAD";
     //Indicates the data after it, is the value of a transfer parameter
