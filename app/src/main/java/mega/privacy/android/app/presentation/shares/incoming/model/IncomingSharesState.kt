@@ -16,6 +16,7 @@ import nz.mega.sdk.MegaNode
  * @property isInvalidHandle true if parent handle is invalid
  * @property isLoading true if the nodes are loading
  * @property sortOrder current sort order
+ * @property contactVerificationOn verification of contact is on or off
  */
 data class IncomingSharesState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -26,6 +27,7 @@ data class IncomingSharesState(
     val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
+    val contactVerificationOn: Boolean = false
 ) {
 
     /**

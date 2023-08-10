@@ -260,6 +260,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
+                    megaNodeAdapter?.setContactVerificationOn(it.contactVerificationOn)
                     updateNodes(it.nodes)
                     setEmptyView(it.isInvalidHandle)
                 }

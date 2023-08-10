@@ -151,6 +151,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int type = FILE_BROWSER_ADAPTER;
     private int adapterType;
 
+    private boolean isContactVerificationOn;
+
     private SortByHeaderViewModel sortByViewModel;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
@@ -992,6 +994,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     public void onBindViewHolderList(ViewHolderBrowserList holder, int position) {
         Timber.d("Position: %s", position);
 
+        holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
         MegaNode node = getItem(position);
         if (node == null) {
             return;
@@ -1089,11 +1092,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
                 //Show the owner of the shared folder
+                boolean isContactVerifiedByMega = false;
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for (int j = 0; j < sharesIncoming.size(); j++) {
                     MegaShare mS = sharesIncoming.get(j);
                     if (mS.getNodeHandle() == node.getHandle()) {
                         MegaUser user = megaApi.getContact(mS.getUser());
+                        isContactVerifiedByMega = megaApi.areCredentialsVerified(user);
                         if (user != null) {
                             holder.textViewFileSize.setText(getMegaUserNameDB(user));
                         } else {
@@ -1101,7 +1106,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         }
                     }
                 }
-
+                if (isContactVerificationOn && isContactVerifiedByMega) {
+                    holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_verified, 0);
+                } else {
+                    holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                }
                 if (((ManagerActivity) context).getDeepBrowserTreeIncoming() == 0) {
                     int accessLevel = megaApi.getAccess(node);
 
@@ -1542,5 +1551,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
         holder.permissionsIcon.setVisibility(View.VISIBLE);
         holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+    }
+
+    /**
+     * Sets contact verification value
+     * @param isContactVerificationOn boolean value of contact verification info
+     */
+    public void setContactVerificationOn(boolean isContactVerificationOn) {
+        this.isContactVerificationOn = isContactVerificationOn;
     }
 }

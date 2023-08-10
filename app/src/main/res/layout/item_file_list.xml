@@ -168,7 +168,9 @@
             android:layout_toEndOf="@id/file_list_versions_icon"
             android:maxLines="1"
             android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-            tools:text="4.6 MB" />
+            tools:text="4.6 MB"
+            android:gravity="center"
+            android:drawablePadding="8dp"/>
     </RelativeLayout>
 
 </RelativeLayout>

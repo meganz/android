@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
 import nz.mega.sdk.MegaNode
@@ -52,6 +53,8 @@ class IncomingSharesViewModelTest {
     private val authorizeNode = mock<AuthorizeNode>()
     private val getIncomingSharesChildrenNode = mock<GetIncomingSharesChildrenNode>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase = mock()
+
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
@@ -98,7 +101,8 @@ class IncomingSharesViewModelTest {
             { monitorContactUpdates },
             getUnverifiedIncomingShares,
             getVerifiedIncomingSharesUseCase,
-            monitorRefreshSessionUseCase
+            monitorRefreshSessionUseCase,
+            getFeatureFlagValue
         )
     }
 

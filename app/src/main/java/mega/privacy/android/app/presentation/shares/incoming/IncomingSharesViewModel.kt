@@ -12,7 +12,9 @@ import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -21,6 +23,7 @@ import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -47,6 +50,7 @@ class IncomingSharesViewModel @Inject constructor(
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getVerifiedIncomingSharesUseCase: GetVerifiedIncomingSharesUseCase,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase
 ) : ViewModel() {
 
     /** private UI state */
@@ -67,7 +71,7 @@ class IncomingSharesViewModel @Inject constructor(
 
     init {
         refreshIncomingSharesNode()
-
+        setContactVerification()
         viewModelScope.launch {
             monitorNodeUpdates().collect { list ->
                 Timber.d("Received node update")
@@ -264,5 +268,14 @@ class IncomingSharesViewModel @Inject constructor(
             .takeUnless { it == INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }
             ?: true
+    }
+
+    private fun setContactVerification() {
+        viewModelScope.launch {
+            val isContactVerificationOn = getFeatureFlagValue(AppFeatures.ContactVerification)
+            _state.update {
+                it.copy(contactVerificationOn = isContactVerificationOn)
+            }
+        }
     }
 }
