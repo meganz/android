@@ -68,6 +68,7 @@ import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
+import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
@@ -95,6 +96,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.PhotoScreenEvent
+import timber.log.Timber
 import javax.inject.Inject
 
 /** A temporary bridge to support compatibility between view and compose architecture. */
@@ -250,11 +252,7 @@ class PhotosFragment : Fragment() {
                         }
                     }
 
-                    if (
-                        timelineViewModel.state.value.enableCameraUploadPageShowing
-                        && timelineViewModel.state.value.currentShowingPhotos.isNotEmpty()
-                        || !timelineViewModel.state.value.loadPhotosDone
-                    ) {
+                    if (!timelineViewModel.state.value.loadPhotosDone) {
                         photosViewModel.setMenuShowing(false)
                     }
 
@@ -271,6 +269,7 @@ class PhotosFragment : Fragment() {
                                 timelineViewModel.onNavigateToSelectedPhoto()
                             }
                         }
+                        Timber.e("jizhe+" + state.enableZoomIn)
                         handleOptionsMenu(state)
                         handleActionMode(state)
                         handleActionsForCameraUploads(state)
@@ -645,6 +644,7 @@ class PhotosFragment : Fragment() {
      */
     fun isEnableCameraUploadsViewShown(): Boolean =
         timelineViewModel.state.value.enableCameraUploadPageShowing
+                && timelineViewModel.state.value.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
 
     fun onBackPressed(): Int {
         return if (isEnableCameraUploadsViewShown()) {

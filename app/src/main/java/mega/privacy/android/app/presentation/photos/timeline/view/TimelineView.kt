@@ -48,6 +48,7 @@ import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
+import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
@@ -77,7 +78,9 @@ fun TimelineView(
     }
     val isScrollingDown by lazyGridState.isScrollingDown()
 
-    if (timelineViewState.enableCameraUploadPageShowing) {
+    if (timelineViewState.enableCameraUploadPageShowing
+        && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
+    ) {
         enableCUView()
     } else {
         if (timelineViewState.loadPhotosDone) {

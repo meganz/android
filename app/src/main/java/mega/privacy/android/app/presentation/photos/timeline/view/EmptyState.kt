@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -42,12 +42,8 @@ fun EmptyState(
     onFABClick: () -> Unit = {},
     setEnableCUPage: (Boolean) -> Unit = {},
 ) {
-    if (
-        timelineViewState.loadPhotosDone
-        && timelineViewState.currentShowingPhotos.isEmpty()
-        && timelineViewState.enableCameraUploadButtonShowing
-        && (timelineViewState.currentMediaSource == TimelinePhotosSource.ALL_PHOTOS ||
-                timelineViewState.currentMediaSource == TimelinePhotosSource.CAMERA_UPLOAD)
+    if (timelineViewState.enableCameraUploadButtonShowing
+        && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
     ) {
         setEnableCUPage(true)
     }
@@ -63,21 +59,25 @@ fun EmptyState(
                 imageVector = when (timelineViewState.currentFilterMediaType) {
                     FilterMediaType.ALL_MEDIA, FilterMediaType.IMAGES ->
                         ImageVector.vectorResource(id = R.drawable.ic_no_images)
+
                     FilterMediaType.VIDEOS ->
                         ImageVector.vectorResource(id = R.drawable.ic_no_videos)
                 },
                 contentDescription = "Empty",
-                colorFilter = ColorFilter.tint(color = if (MaterialTheme.colors.isLight) {
-                    Color(0xFFDADADA)
-                } else {
-                    Color(0xFFEAEFEF)
-                }),
+                colorFilter = ColorFilter.tint(
+                    color = if (MaterialTheme.colors.isLight) {
+                        Color(0xFFDADADA)
+                    } else {
+                        Color(0xFFEAEFEF)
+                    }
+                ),
                 alpha = if (MaterialTheme.colors.isLight) 1F else 0.16F
             )
 
-            Row(modifier = Modifier
-                .wrapContentWidth()
-                .padding(top = 42.dp)
+            Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(top = 42.dp)
             ) {
 
                 val placeHolderStart = "[B]"
@@ -86,8 +86,10 @@ fun EmptyState(
                 val text: String = when (timelineViewState.currentFilterMediaType) {
                     FilterMediaType.ALL_MEDIA ->
                         stringResource(id = R.string.timeline_empty_media)
+
                     FilterMediaType.IMAGES ->
                         stringResource(id = R.string.timeline_empty_images)
+
                     FilterMediaType.VIDEOS ->
                         stringResource(id = R.string.timeline_empty_videos)
                 }.uppercase()

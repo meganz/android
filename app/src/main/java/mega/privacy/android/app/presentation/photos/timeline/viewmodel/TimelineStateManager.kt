@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 
 fun TimelineViewModel.updateZoomLevel(newZoomLevel: ZoomLevel) {
     _state.update {
@@ -32,7 +33,10 @@ fun TimelineViewModel.zoomOut() {
 }
 
 fun TimelineViewModel.handleEnableZoomAndSortOptions() {
-    if (_state.value.currentShowingPhotos.isEmpty() || _state.value.enableCameraUploadPageShowing) {
+    if (_state.value.currentShowingPhotos.isEmpty()
+        || (_state.value.enableCameraUploadPageShowing
+                && _state.value.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE)
+    ) {
         _state.update {
             it.copy(
                 enableZoomIn = false,
@@ -51,6 +55,7 @@ fun TimelineViewModel.handleEnableZoomAndSortOptions() {
                     )
                 }
             }
+
             ZoomLevel.values()[ZoomLevel.values().last().ordinal] -> {
                 _state.update {
                     it.copy(
@@ -60,6 +65,7 @@ fun TimelineViewModel.handleEnableZoomAndSortOptions() {
                     )
                 }
             }
+
             else -> {
                 _state.update {
                     it.copy(
@@ -101,10 +107,10 @@ fun TimelineViewModel.setEnableCUButtonShowing(show: Boolean) {
 }
 
 fun TimelineViewModel.shouldEnableCUPage(show: Boolean) {
-    if (show) {
+    if (show && _state.value.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE) {
         _state.update {
             it.copy(
-                enableCameraUploadPageShowing = show,
+                enableCameraUploadPageShowing = true,
                 enableZoomIn = false,
                 enableZoomOut = false,
                 enableSortOption = false,
@@ -112,7 +118,7 @@ fun TimelineViewModel.shouldEnableCUPage(show: Boolean) {
         }
     } else {
         _state.update {
-            it.copy(enableCameraUploadPageShowing = show)
+            it.copy(enableCameraUploadPageShowing = false)
         }
         handleEnableZoomAndSortOptions()
     }
