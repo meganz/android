@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -85,6 +86,9 @@ class ChatViewModelTest {
     private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase> {
         onBlocking { invoke() }.thenReturn(flowOf(1234L))
     }
+    private val monitorScheduledMeetingUpdates = mock<MonitorScheduledMeetingUpdates> {
+        onBlocking { invoke() }.thenReturn(flowOf())
+    }
     private val leaveChat = mock<LeaveChat>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
@@ -118,7 +122,8 @@ class ChatViewModelTest {
             leaveChat = leaveChat,
             getContactLinkUseCase = getContactLinkUseCase,
             isContactRequestSentUseCase = isContactRequestSentUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates
         )
     }
 

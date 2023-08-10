@@ -154,6 +154,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }
             scheduledMeetingId = newScheduledMeetingId
             getChat()
+            getScheduledMeeting()
         }
     }
 
@@ -184,13 +185,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         }
 
                         loadAllChatParticipants()
-
-                        getScheduledMeeting(chatId)
                         updateDndSeconds(chatId)
                         updateRetentionTimeSeconds(retentionTime)
-
                         getChatRoomUpdates(chatId)
-                        getScheduledMeetingUpdates()
                     } else {
                         Timber.d("Chat room is not active, finish")
                         finishActivity()
@@ -245,13 +242,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
 
     /**
      * Get scheduled meeting
-     *
-     * @param chatId Chat id.
      */
-    private fun getScheduledMeeting(chatId: Long) =
+    private fun getScheduledMeeting() =
         viewModelScope.launch {
             runCatching {
-                getScheduledMeetingByChat(chatId)
+                getScheduledMeetingByChat(state.value.chatId)
             }.onFailure { exception ->
                 Timber.e("Scheduled meeting does not exist, finish $exception")
                 finishActivity()
@@ -263,6 +258,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             return@forEach
                         }
                     }
+                    getScheduledMeetingUpdates()
                 }
             }
         }
@@ -372,66 +368,117 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 if (!isMainScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
                     return@collectLatest
                 }
-                Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
-                when (val changes = scheduledMeetReceived.changes) {
-                    ScheduledMeetingChanges.NewScheduledMeeting, ScheduledMeetingChanges.Unknown -> updateScheduledMeeting(
-                        scheduledMeetReceived = scheduledMeetReceived
-                    )
 
-                    ScheduledMeetingChanges.Title,
-                    ScheduledMeetingChanges.Description,
-                    ScheduledMeetingChanges.StartDate,
-                    ScheduledMeetingChanges.EndDate,
-                    -> state.value.scheduledMeeting?.let { schedMeet ->
-                        if (scheduledMeetReceived.schedId == schedMeet.schedId) {
-                            when (changes) {
-                                ScheduledMeetingChanges.Title -> {
-                                    _state.update { state ->
-                                        state.copy(
-                                            scheduledMeeting = state.scheduledMeeting?.copy(
-                                                title = scheduledMeetReceived.title
-                                            )
+                scheduledMeetReceived.changes?.let { changes ->
+                    changes.forEach {
+                        Timber.d("Monitor scheduled meeting updated, changes $changes")
+                        if (_state.value.scheduledMeeting == null) {
+                            updateScheduledMeeting(
+                                scheduledMeetReceived = scheduledMeetReceived
+                            )
+                            return@forEach
+                        }
+
+                        when (it) {
+                            ScheduledMeetingChanges.NewScheduledMeeting ->
+                                updateScheduledMeeting(
+                                    scheduledMeetReceived = scheduledMeetReceived
+                                )
+
+                            ScheduledMeetingChanges.Title ->
+                                _state.update { state ->
+                                    state.copy(
+                                        scheduledMeeting = state.scheduledMeeting?.copy(
+                                            title = scheduledMeetReceived.title
                                         )
-                                    }
+                                    )
                                 }
 
-                                ScheduledMeetingChanges.Description -> {
-                                    _state.update { state ->
-                                        state.copy(
-                                            scheduledMeeting = state.scheduledMeeting?.copy(
-                                                description = scheduledMeetReceived.description
-                                            )
+                            ScheduledMeetingChanges.Description ->
+                                _state.update { state ->
+                                    state.copy(
+                                        scheduledMeeting = state.scheduledMeeting?.copy(
+                                            description = scheduledMeetReceived.description
                                         )
-                                    }
+                                    )
                                 }
 
-                                ScheduledMeetingChanges.StartDate -> {
-                                    _state.update { state ->
-                                        state.copy(
-                                            scheduledMeeting = state.scheduledMeeting?.copy(
-                                                startDateTime = scheduledMeetReceived.startDateTime,
-                                            )
-                                        )
-                                    }
-                                }
-
-                                ScheduledMeetingChanges.EndDate -> {
-                                    _state.update { state ->
-                                        state.copy(
-                                            scheduledMeeting = state.scheduledMeeting?.copy(
-                                                endDateTime = scheduledMeetReceived.endDateTime,
-                                            )
-                                        )
-                                    }
-                                }
-
-                                else -> {}
+                            ScheduledMeetingChanges.StartDate -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        startDateTime = scheduledMeetReceived.startDateTime,
+                                    )
+                                )
                             }
 
+                            ScheduledMeetingChanges.EndDate,
+                            -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        startDateTime = scheduledMeetReceived.endDateTime,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.ParentScheduledMeetingId -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        parentSchedId = scheduledMeetReceived.parentSchedId,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.TimeZone -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        timezone = scheduledMeetReceived.timezone,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.Attributes -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        attributes = scheduledMeetReceived.attributes,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.OverrideDateTime -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        overrides = scheduledMeetReceived.overrides,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.ScheduledMeetingsFlags -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        flags = scheduledMeetReceived.flags,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.RepetitionRules -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        rules = scheduledMeetReceived.rules,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.CancelledFlag -> _state.update { state ->
+                                state.copy(
+                                    scheduledMeeting = state.scheduledMeeting?.copy(
+                                        isCanceled = scheduledMeetReceived.isCanceled,
+                                    )
+                                )
+                            }
+
+                            else -> {}
                         }
                     }
-
-                    else -> {}
                 }
             }
         }

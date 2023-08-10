@@ -49,6 +49,7 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_
  * @param placeholderId         Placeholder string resource Id
  * @param charLimitErrorId      Char limit error string resource Id
  * @param emptyValueErrorId     Empty value error string resource Id
+ * @param shouldInitialFocus    True, if the focus should be requested. False, if not.
  * @param isEmptyValueError     True if it's empty value error. False, if not.
  * @param charLimit             Char limit value
  */
@@ -61,6 +62,7 @@ fun GenericTitleTextField(
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
     isEmptyValueError: Boolean = false,
+    shouldInitialFocus: Boolean = true,
     @StringRes emptyValueErrorId: Int? = null,
     charLimit: Int,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -177,8 +179,10 @@ fun GenericTitleTextField(
             }
         }
 
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
+        if (shouldInitialFocus) {
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
         }
     }
 }

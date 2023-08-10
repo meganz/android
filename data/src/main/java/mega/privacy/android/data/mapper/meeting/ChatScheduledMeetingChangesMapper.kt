@@ -8,18 +8,54 @@ import javax.inject.Inject
  * Mapper to convert chat scheduled meeting changes to [ScheduledMeetingChanges]
  */
 internal class ChatScheduledMeetingChangesMapper @Inject constructor() {
-    operator fun invoke(schedMeet: MegaChatScheduledMeeting?): ScheduledMeetingChanges? = when {
-        schedMeet == null -> null
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_START.toLong()) -> ScheduledMeetingChanges.StartDate
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_END.toLong()) -> ScheduledMeetingChanges.EndDate
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_TITLE.toLong()) -> ScheduledMeetingChanges.Title
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_DESC.toLong()) -> ScheduledMeetingChanges.Description
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_ATTR.toLong()) -> ScheduledMeetingChanges.Attributes
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_OVERR.toLong()) -> ScheduledMeetingChanges.OverrideDateTime
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_CANC.toLong()) -> ScheduledMeetingChanges.CancelledFlag
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_FLAGS.toLong()) -> ScheduledMeetingChanges.ScheduledMeetingsFlags
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_RULES.toLong()) -> ScheduledMeetingChanges.RepetitionRules
-        schedMeet.hasChanged(MegaChatScheduledMeeting.SC_FLAGS_SIZE.toLong()) -> ScheduledMeetingChanges.ScheduledMeetingFlagsSize
-        else -> ScheduledMeetingChanges.Unknown
+    operator fun invoke(schedMeet: MegaChatScheduledMeeting?): List<ScheduledMeetingChanges>? {
+        if (schedMeet == null) return null
+
+        val changes = mutableListOf<ScheduledMeetingChanges>()
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_NEW_SCHED.toLong())) {
+            changes.add(ScheduledMeetingChanges.NewScheduledMeeting)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_START.toLong())) {
+            changes.add(ScheduledMeetingChanges.StartDate)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_END.toLong())) {
+            changes.add(ScheduledMeetingChanges.EndDate)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_TITLE.toLong())) {
+            changes.add(ScheduledMeetingChanges.Title)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_DESC.toLong())) {
+            changes.add(ScheduledMeetingChanges.Description)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_ATTR.toLong())) {
+            changes.add(ScheduledMeetingChanges.Attributes)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_OVERR.toLong())) {
+            changes.add(ScheduledMeetingChanges.OverrideDateTime)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_CANC.toLong())) {
+            changes.add(ScheduledMeetingChanges.CancelledFlag)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_FLAGS.toLong())) {
+            changes.add(ScheduledMeetingChanges.ScheduledMeetingsFlags)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_RULES.toLong())) {
+            changes.add(ScheduledMeetingChanges.RepetitionRules)
+        }
+
+        if (schedMeet.hasChanged(MegaChatScheduledMeeting.SC_FLAGS_SIZE.toLong())) {
+            changes.add(ScheduledMeetingChanges.ScheduledMeetingFlagsSize)
+        }
+
+        return changes
     }
 }

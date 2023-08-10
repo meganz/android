@@ -20,7 +20,7 @@ import java.time.ZonedDateTime
  * @property overrides
  * @property flags
  * @property rules
- * @property changes            Changes [ScheduledMeetingChanges].
+ * @property changes            List of [ScheduledMeetingChanges].
  * @property isCanceled
  */
 data class ChatScheduledMeeting constructor(
@@ -37,7 +37,7 @@ data class ChatScheduledMeeting constructor(
     val overrides: Long? = null,
     val flags: ChatScheduledFlags? = null,
     val rules: ChatScheduledRules? = null,
-    val changes: ScheduledMeetingChanges? = null,
+    val changes: List<ScheduledMeetingChanges>? = null,
     val isCanceled: Boolean = false,
 ) {
 

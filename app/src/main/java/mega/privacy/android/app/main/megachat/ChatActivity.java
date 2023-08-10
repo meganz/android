@@ -386,6 +386,7 @@ import mega.privacy.android.app.presentation.filelink.FileLinkActivity;
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
@@ -414,6 +415,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.data.model.chat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.domain.entity.StorageState;
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting;
 import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import mega.privacy.android.domain.entity.chat.PendingMessage;
 import mega.privacy.android.domain.entity.chat.PendingMessageState;
@@ -1431,11 +1433,19 @@ public class ChatActivity extends PasscodeActivity
         if (chatRoom == null)
             return;
 
-        Intent i = new Intent(this,
-                chatRoom.isGroup() ? GroupChatInfoActivity.class : ContactInfoActivity.class);
-        i.putExtra(HANDLE, chatRoom.getChatId());
-        i.putExtra(ACTION_CHAT_OPEN, true);
-        this.startActivity(i);
+        ChatScheduledMeeting schedMeet = viewModel.getMeeting();
+        if (chatRoom.isMeeting() && schedMeet != null && viewModel.isPendingMeeting() && chatRoom.isActive()) {
+            Intent i = new Intent(this, ScheduledMeetingInfoActivity.class);
+            i.putExtra(Constants.CHAT_ID, schedMeet.getChatId());
+            i.putExtra(Constants.SCHEDULED_MEETING_ID, schedMeet.getSchedId());
+            startActivity(i);
+        } else {
+            Intent i = new Intent(this,
+                    chatRoom.isGroup() ? GroupChatInfoActivity.class : ContactInfoActivity.class);
+            i.putExtra(HANDLE, chatRoom.getChatId());
+            i.putExtra(ACTION_CHAT_OPEN, true);
+            startActivity(i);
+        }
     }
 
     @Override
@@ -2040,6 +2050,11 @@ public class ChatActivity extends PasscodeActivity
                 startOrJoinMeetingBanner.setVisibility(View.GONE);
             }
 
+            ChatScheduledMeeting schedMeet = chatState.getScheduledMeeting();
+            if (schedMeet != null) {
+                setTitle(null);
+            }
+
             if (chatState.getSchedId() != null) {
                 updateCallBanner();
             }
@@ -2294,7 +2309,23 @@ public class ChatActivity extends PasscodeActivity
 
     private void updateTitle() {
         initializeInputText();
-        titleToolbar.setText(getTitleChat(chatRoom));
+        setTitle(null);
+    }
+
+    /**
+     * Set chat room title
+     */
+    private void setTitle(String newTitle) {
+        String title = viewModel.getSchedTitle();
+        if (title == null) {
+            if (newTitle != null) {
+                title = newTitle;
+            } else {
+                title = getTitleChat(chatRoom);
+            }
+        }
+
+        titleToolbar.setText(title);
     }
 
     /**
@@ -2398,7 +2429,7 @@ public class ChatActivity extends PasscodeActivity
         createAdapter();
 
         setPreviewersView();
-        titleToolbar.setText(getTitleChat(chatRoom));
+        setTitle(null);
         setChatSubtitle();
         privateIconToolbar.setVisibility((!chatRoom.isGroup() || chatRoom.isPublic()) ? View.GONE : View.VISIBLE);
         muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
@@ -6645,7 +6676,7 @@ public class ChatActivity extends PasscodeActivity
         if (msg.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
             String newTitle = msg.getContent();
             if (newTitle != null) {
-                titleToolbar.setText(newTitle);
+                setTitle(newTitle);
             }
         } else if (msg.getType() == MegaChatMessage.TYPE_TRUNCATE) {
             invalidateOptionsMenu();
@@ -8853,7 +8884,7 @@ public class ChatActivity extends PasscodeActivity
 
             activityVisible = true;
             if (aB != null && aB.getTitle() != null) {
-                titleToolbar.setText(titleToolbar.getText());
+                setTitle(titleToolbar.getText());
             }
             updateActionModeTitle();
 

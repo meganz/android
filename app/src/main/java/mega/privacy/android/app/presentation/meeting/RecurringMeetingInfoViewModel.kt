@@ -220,7 +220,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
      * @ return True, if it's same. False if not.
      */
     private fun isSameScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
-        state.value.chatId == scheduledMeet.chatId
+        state.value.chatId == scheduledMeet.chatId && state.value.schedId == scheduledMeet.schedId
 
     /**
      * Check if is main scheduled meeting
@@ -245,48 +245,42 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                     return@collectLatest
                 }
 
-                Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
-                when (val changes = scheduledMeetReceived.changes) {
-                    ScheduledMeetingChanges.NewScheduledMeeting -> updateScheduledMeeting(
-                        scheduledMeetReceived = scheduledMeetReceived
-                    )
+                scheduledMeetReceived.changes?.let { changes ->
+                    Timber.d("Monitor scheduled meeting updated, changes $changes")
 
-                    ScheduledMeetingChanges.Title,
-                    ScheduledMeetingChanges.RepetitionRules,
-                    ->
-                        if (scheduledMeetReceived.schedId == state.value.schedId) {
-                            when (changes) {
-                                ScheduledMeetingChanges.Title -> {
-                                    _state.update {
-                                        it.copy(
-                                            schedTitle = scheduledMeetReceived.title,
-                                        )
-                                    }
-                                }
+                    changes.forEach {
+                        when (it) {
+                            ScheduledMeetingChanges.NewScheduledMeeting ->
+                                updateScheduledMeeting(
+                                    scheduledMeetReceived = scheduledMeetReceived
+                                )
 
-                                ScheduledMeetingChanges.RepetitionRules -> {
-                                    var freq = OccurrenceFrequencyType.Invalid
-                                    var until = 0L
-
-                                    scheduledMeetReceived.rules?.let { rules ->
-                                        freq = rules.freq
-                                        until = rules.until
-                                    }
-
-                                    _state.update {
-                                        it.copy(
-                                            schedUntil = until,
-                                            typeOccurs = freq,
-                                        )
-                                    }
-                                }
-
-                                else -> {}
+                            ScheduledMeetingChanges.Title -> _state.update { state ->
+                                state.copy(
+                                    schedTitle = scheduledMeetReceived.title,
+                                )
                             }
 
-                        }
+                            ScheduledMeetingChanges.RepetitionRules -> {
+                                var freq = OccurrenceFrequencyType.Invalid
+                                var until = 0L
 
-                    else -> {}
+                                scheduledMeetReceived.rules?.let { rules ->
+                                    freq = rules.freq
+                                    until = rules.until
+                                }
+
+                                _state.update { state ->
+                                    state.copy(
+                                        schedUntil = until,
+                                        typeOccurs = freq,
+                                    )
+                                }
+                            }
+
+                            else -> {}
+                        }
+                    }
                 }
             }
         }

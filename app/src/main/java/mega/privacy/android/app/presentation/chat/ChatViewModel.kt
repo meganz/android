@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -94,6 +96,7 @@ import javax.inject.Inject
  * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
  * @property monitorJoinedSuccessfullyUseCase               [MonitorJoinedSuccessfullyUseCase]
  * @property monitorLeaveChatUseCase                        [MonitorLeaveChatUseCase]
+ * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
  * @property leaveChat                                      [LeaveChat]
  */
 @HiltViewModel
@@ -125,6 +128,7 @@ class ChatViewModel @Inject constructor(
     private val getContactLinkUseCase: GetContactLinkUseCase,
     private val isContactRequestSentUseCase: IsContactRequestSentUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -306,6 +310,7 @@ class ChatViewModel @Inject constructor(
             }
 
             getScheduledMeeting()
+            getScheduledMeetingUpdates()
         }
     }
 
@@ -372,6 +377,57 @@ class ChatViewModel @Inject constructor(
                 }
             }
         }
+
+    /**
+     * Get scheduled meeting updates
+     */
+    private fun getScheduledMeetingUpdates() =
+        viewModelScope.launch {
+            monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
+                if (state.value.chatId != scheduledMeetReceived.chatId) {
+                    return@collectLatest
+                }
+
+                if (scheduledMeetReceived.parentSchedId == megaChatApiGateway.getChatInvalidHandle()) {
+                    return@collectLatest
+                }
+
+                scheduledMeetReceived.changes?.let { changes ->
+                    Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
+                    changes.forEach {
+                        when (it) {
+                            ScheduledMeetingChanges.NewScheduledMeeting,
+                            ScheduledMeetingChanges.Title,
+                            ->
+                                _state.update { state ->
+                                    state.copy(
+                                        schedId = scheduledMeetReceived.schedId,
+                                        schedIsPending = !scheduledMeetReceived.isPast(),
+                                        scheduledMeeting = scheduledMeetReceived
+                                    )
+                                }
+
+                            else -> {}
+                        }
+                    }
+                }
+            }
+        }
+
+    /**
+     * Get scheduled meeting title
+     *
+     * @return title
+     */
+    fun getSchedTitle(): String? {
+        state.value.scheduledMeeting?.let { schedMeet ->
+            schedMeet.title.takeIf { !it.isNullOrEmpty() }?.let {
+                return it
+            }
+        }
+
+        return null
+    }
 
     /**
      * Get chat call updates
@@ -608,6 +664,14 @@ class ChatViewModel @Inject constructor(
      */
     fun getMeeting(): ChatScheduledMeeting? =
         _state.value.scheduledMeeting
+
+    /**
+     * Check if it's a pending scheduled meeting
+     *
+     * @return  True, if it's pending scheduled meeting. False, if not.
+     */
+    fun isPendingMeeting() =
+        _state.value.schedIsPending
 
     /**
      * Launch broadcast for a chat archived event
