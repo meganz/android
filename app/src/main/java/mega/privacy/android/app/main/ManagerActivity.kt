@@ -1784,7 +1784,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (intent?.action != null) {
                         if (intent.action == Constants.ACTION_SHOW_TRANSFERS) {
                             if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                                sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS))
+                                sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(applicationContext.packageName))
                             }
                             drawerItem = DrawerItem.TRANSFERS
                             transferPageViewModel.setTransfersTab(
@@ -2586,7 +2586,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 Constants.ACTION_SHOW_TRANSFERS -> {
                     if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                        sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS))
+                        sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(applicationContext.packageName))
                     }
                     drawerItem = DrawerItem.TRANSFERS
                     transferPageViewModel.setTransfersTab(
@@ -6223,7 +6223,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         } else if (Constants.ACTION_SHOW_TRANSFERS == intent.action) {
             if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS))
+                sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(applicationContext.packageName))
             }
             if (intent.getBooleanExtra(Constants.OPENED_FROM_IMAGE_VIEWER, false)) {
                 transfersToImageViewer = true

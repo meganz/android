@@ -82,12 +82,15 @@ class ShareListener(
             SHARE_LISTENER -> {
                 context.getString(R.string.context_correctly_shared)
             }
+
             CHANGE_PERMISSIONS_LISTENER -> {
                 context.getString(R.string.context_permissions_changed)
             }
+
             REMOVE_SHARE_LISTENER -> {
                 context.getString(R.string.context_share_correctly_removed)
             }
+
             else -> ""
         }
     }
@@ -106,12 +109,14 @@ class ShareListener(
                     numberErrors, numberErrors
                 )
             }
+
             CHANGE_PERMISSIONS_LISTENER -> {
                 context.resources.getQuantityString(
                     R.plurals.shared_items_outgoing_shares_update_contact_permission_failed,
                     numberErrors, numberErrors
                 )
             }
+
             REMOVE_SHARE_LISTENER -> {
                 context.resources.getQuantityString(
                     R.plurals.shared_items_outgoing_shares_snackbar_remove_contact_access_failed,
@@ -119,6 +124,7 @@ class ShareListener(
                     numberErrors
                 )
             }
+
             else -> ""
         }
     }
@@ -138,7 +144,10 @@ class ShareListener(
      */
     private fun sendManageSharesBroadcast() {
         Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE)
-            .apply { putExtra(BroadcastConstants.TYPE_SHARE, typeShare) }
+            .apply {
+                putExtra(BroadcastConstants.TYPE_SHARE, typeShare)
+                setPackage(context.applicationContext.packageName)
+            }
             .run { MegaApplication.getInstance().sendBroadcast(this) }
     }
 

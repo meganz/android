@@ -31,6 +31,7 @@ public class ChatRoomListener implements MegaChatRoomListenerInterface {
             Timber.d("CHANGE_TYPE_RETENTION_TIME for the chat: %s", chat.getChatId());
             Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
+            intentRetentionTime.setPackage(MegaApplication.getInstance().getApplicationContext().getPackageName());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
         }
 
@@ -74,6 +75,7 @@ public class ChatRoomListener implements MegaChatRoomListenerInterface {
         if (msg != null) {
             Intent intentRetentionTime = new Intent(BROADCAST_ACTION_UPDATE_HISTORY_BY_RT);
             intentRetentionTime.putExtra(MESSAGE_ID, msg.getMsgId());
+            intentRetentionTime.setPackage(MegaApplication.getInstance().getApplicationContext().getPackageName());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
         }
     }

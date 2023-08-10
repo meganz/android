@@ -137,7 +137,7 @@ class AccountInfoFacade @Inject constructor(
     private fun sendBroadcastUpdateAccountDetails() {
         context.sendBroadcast(
             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS)
+                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS).setPackage(context.packageName)
         )
     }
 

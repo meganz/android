@@ -37,6 +37,7 @@ public class ManageCacheTask extends AsyncTask<String, Void, Long> {
         Timber.d("ManageCacheTask::onPostExecute");
         Intent intent = new Intent(ACTION_UPDATE_CACHE_SIZE_SETTING);
         intent.putExtra(CACHE_SIZE, size);
+        intent.setPackage(MegaApplication.getInstance().getApplicationContext().getPackageName());
         MegaApplication.getInstance().sendBroadcast(intent);
     }
 }

@@ -326,7 +326,11 @@ class PhotosFragment : Fragment() {
             timelineViewModel.setTriggerCameraUploadsState(shouldTrigger = false)
         }
         if (state.shouldShowBusinessAccountSuspendedPrompt) {
-            requireContext().sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+            requireContext().sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).
+                setPackage(
+                    requireContext().applicationContext.packageName
+                )
+            )
             timelineViewModel.setBusinessAccountSuspendedPromptState(shouldShow = false)
         }
         if (state.shouldTriggerMediaPermissionsDeniedLogic) {

@@ -39,6 +39,7 @@ public class ManageOfflineTask extends AsyncTask<String, Void, String> {
         Timber.d("ManageOfflineTask::onPostExecute");
         Intent intent = new Intent(ACTION_UPDATE_OFFLINE_SIZE_SETTING);
         intent.putExtra(OFFLINE_SIZE, size);
+        intent.setPackage(MegaApplication.getInstance().getApplicationContext().getPackageName());
         MegaApplication.getInstance().sendBroadcast(intent);
     }
 }

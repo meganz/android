@@ -66,6 +66,7 @@ class RemoveListener(
                                 1, 1
                             )
                         )
+                        setPackage(context.applicationContext.packageName)
                         MegaApplication.getInstance().sendBroadcast(this)
                     }
                 } else {

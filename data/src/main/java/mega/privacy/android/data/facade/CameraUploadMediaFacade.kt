@@ -77,6 +77,7 @@ internal class CameraUploadMediaFacade @Inject constructor(
         val intent = Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE).apply {
             putExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary)
             putExtra(INTENT_EXTRA_NODE_HANDLE, nodeHandle)
+            setPackage(context.packageName)
         }
         context.sendBroadcast(intent)
     }
@@ -93,6 +94,7 @@ internal class CameraUploadMediaFacade @Inject constructor(
                 if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
                     putExtra(INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, isSecondary)
                     putExtra(INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE, nodeHandle)
+                    setPackage(context.packageName)
                 }
             }
         context.sendBroadcast(destinationIntent)

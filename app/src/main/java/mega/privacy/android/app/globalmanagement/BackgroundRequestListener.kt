@@ -90,7 +90,11 @@ class BackgroundRequestListener @Inject constructor(
             return
         }
         if (e.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            application.sendBroadcast(Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+            application.sendBroadcast(
+                Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
+                    application.applicationContext.packageName
+                )
+            )
             return
         }
         when (request.type) {
@@ -195,9 +199,7 @@ class BackgroundRequestListener @Inject constructor(
             if (request.paramType == MegaError.API_ESSL) {
                 Timber.w("SSL verification failed")
                 application.sendBroadcast(
-                    Intent(
-                        BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
-                    )
+                    Intent(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED).setPackage(application.applicationContext.packageName)
                 )
             }
         } else if (e.errorCode == MegaError.API_ESID) {

@@ -672,6 +672,6 @@ object CameraUploadSyncManager {
             Intent(BROADCAST_ACTION_REENABLE_CU_PREFERENCE).putExtra(
                 KEY_REENABLE_WHICH_PREFERENCE,
                 which
-            )
+            ).setPackage(megaApplication.applicationContext.packageName)
         )
 }

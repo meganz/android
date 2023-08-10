@@ -141,6 +141,7 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                             } else {
                                 putExtra(BroadcastConstants.DAYS_COUNT, number)
                             }
+                            setPackage(context.applicationContext.packageName)
                             MegaApplication.getInstance().sendBroadcast(this)
                         }
                     }
@@ -154,7 +155,7 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                         } else if (numDetails == 0) {
                             MegaApplication.isEnabledRichLinks = flag
                             MegaApplication.getInstance()
-                                .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE))
+                                .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE).setPackage(context.applicationContext.packageName))
                         }
                     }
                 }

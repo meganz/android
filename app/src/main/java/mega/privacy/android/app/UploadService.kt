@@ -802,7 +802,7 @@ internal class UploadService : LifecycleService() {
         Timber.d("Path: $localPath, Size: $transferredBytes")
 
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(applicationContext.packageName))
         }
 
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
@@ -821,7 +821,7 @@ internal class UploadService : LifecycleService() {
                     )
                 sendBroadcast(
                     Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
-                        .putExtra(SNACKBAR_TEXT, message)
+                        .putExtra(SNACKBAR_TEXT, message).setPackage(applicationContext.packageName)
                 )
             }
             if (state == TransferState.STATE_FAILED) {

@@ -868,7 +868,7 @@ object MegaNodeUtil {
                     leaveMultipleIncomingShares(activity, snackbarShower, handles!!)
                 }
                 MegaApplication.getInstance()
-                    .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE))
+                    .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE).setPackage(activity.applicationContext.packageName))
             }
             .setNegativeButton(activity.getString(R.string.general_cancel), null)
             .show()

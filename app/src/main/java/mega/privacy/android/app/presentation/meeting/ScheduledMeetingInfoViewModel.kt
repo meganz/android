@@ -301,7 +301,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             Timber.d("Changes in retention time")
                             getInstance().sendBroadcast(
                                 Intent(ACTION_UPDATE_RETENTION_TIME)
-                                    .putExtra(RETENTION_TIME, chat.retentionTime)
+                                    .putExtra(RETENTION_TIME, chat.retentionTime).setPackage(getInstance().applicationContext.packageName)
                             )
 
                             if (chat.retentionTime != Constants.DISABLED_RETENTION_TIME) chat.retentionTime

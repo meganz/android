@@ -123,11 +123,11 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             sttFileManagement =
                 supportFragmentManager.findFragmentById(R.id.fragment_container) as? SettingsFileManagementFragment
         }
-        registerExportedReceiver(
+        registerReceiver(
             cacheSizeUpdateReceiver,
             IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING)
         )
-        registerExportedReceiver(
+        registerReceiver(
             offlineSizeUpdateReceiver,
             IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING)
         )
@@ -153,27 +153,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             )
         ) {
             showClearOfflineDialog()
-        }
-    }
-
-    /**
-     * Register Exported Broadcast Receiver
-     */
-    private fun registerExportedReceiver(
-        receiver: BroadcastReceiver?,
-        filter: IntentFilter,
-    ): Intent? {
-        return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                ContextCompat.registerReceiver(
-                    this, receiver, filter, ContextCompat.RECEIVER_EXPORTED
-                )
-            } else {
-                super.registerReceiver(receiver, filter)
-            }
-        } catch (e: IllegalStateException) {
-            Timber.e(e, "IllegalStateException registering receiver")
-            null
         }
     }
 

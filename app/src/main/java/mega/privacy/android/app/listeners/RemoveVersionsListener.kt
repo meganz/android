@@ -51,7 +51,7 @@ class RemoveVersionsListener(private val context: Context) : MegaRequestListener
         if (request.type == MegaRequest.TYPE_REMOVE_VERSIONS) {
             if (e.errorCode == MegaError.API_OK) {
                 Util.showSnackbar(context, context.getString(R.string.success_delete_versions))
-                context.sendBroadcast(Intent(BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING))
+                context.sendBroadcast(Intent(BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING).setPackage(context.applicationContext.packageName))
             } else {
                 Util.showSnackbar(context, context.getString(R.string.error_delete_versions))
             }
