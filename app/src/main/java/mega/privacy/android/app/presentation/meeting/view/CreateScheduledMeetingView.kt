@@ -210,13 +210,16 @@ internal fun CreateScheduledMeetingView(
                             onSizeChange = {
                                 coroutineScope.launch {
                                     listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == keyItemDescription }?.index?.let { index ->
-                                        listState.scrollToItem(index = index)
+                                        listState.scrollToItem(index = index + 1)
                                     }
                                 }
                             }
                         )
                     }
                 }
+
+                // Empty item to allow auto scroll to bottom when the description text field size changes.
+                item(key = "Scroll to bottom") { }
             }
         }
 
