@@ -32,6 +32,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -56,9 +58,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
@@ -81,6 +87,9 @@ import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.mobile.analytics.event.AlbumImportInputDecryptionKeyDialogEvent
+import mega.privacy.mobile.analytics.event.AlbumImportScreenEvent
+import mega.privacy.mobile.analytics.event.ImportAlbumContentLoadedEvent
 import nz.mega.sdk.MegaNode
 
 private typealias ImageDownloader = (
@@ -103,8 +112,23 @@ internal fun AlbumImportScreen(
     val state by albumImportViewModel.stateFlow.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                Analytics.tracker.trackEvent(AlbumImportScreenEvent)
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     LaunchedEffect(state.isInitialized) {
         if (!state.isInitialized) {
@@ -128,6 +152,9 @@ internal fun AlbumImportScreen(
                 albumImportViewModel.closeInputDecryptionKeyDialog()
                 albumImportViewModel.decryptLink(key)
             },
+            onDialogDisplayed = {
+                Analytics.tracker.trackEvent(AlbumImportInputDecryptionKeyDialogEvent)
+            }
         )
     }
 
@@ -272,6 +299,9 @@ internal fun AlbumImportScreen(
                         albumImportViewModel.selectPhoto(photo)
                     }
                 },
+                onAlbumLoaded = {
+                    Analytics.tracker.trackEvent(ImportAlbumContentLoadedEvent)
+                }
             )
         },
     )
@@ -483,8 +513,15 @@ private fun AlbumImportContent(
     onDownloadImage: ImageDownloader,
     onClickPhoto: (Photo) -> Unit,
     onPhotoSelection: (Photo) -> Unit,
+    onAlbumLoaded: () -> Unit,
 ) {
     val context = LocalContext.current
+
+    LaunchedEffect(isLocalAlbumsLoaded) {
+        if (album != null && isLocalAlbumsLoaded) {
+            onAlbumLoaded()
+        }
+    }
 
     if (album != null && photos.isEmpty()) {
         MegaEmptyView(
@@ -540,7 +577,12 @@ private fun InputDecryptionKeyDialog(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     onDecrypt: (String) -> Unit,
+    onDialogDisplayed: () -> Unit,
 ) {
+    LaunchedEffect(onDialogDisplayed) {
+        onDialogDisplayed()
+    }
+
     val isLight = MaterialTheme.colors.isLight
     var text by rememberSaveable { mutableStateOf("") }
 
