@@ -83,6 +83,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasAccessMediaLocationPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -317,11 +318,13 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     includeLocationTags(false)
                 }
             }
+
             KEY_CAMERA_UPLOAD_CHARGING -> {
                 val chargingRequired = optionChargingOnVideoCompression?.isChecked ?: false
                 viewModel.changeChargingRequiredForVideoCompression(chargingRequired)
                 viewModel.rescheduleCameraUpload()
             }
+
             KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE -> showResetCompressionQueueSizeDialog()
             KEY_KEEP_FILE_NAMES -> {
                 val keepFileNames = optionKeepUploadFileNames?.isChecked ?: false
@@ -332,6 +335,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+
             KEY_CAMERA_UPLOAD_CAMERA_FOLDER -> {
                 intent = Intent(context, FileStorageActivity::class.java).apply {
                     action = FileStorageActivity.Mode.PICK_FOLDER.action
@@ -342,6 +346,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 }
                 startActivityForResult(intent, REQUEST_CAMERA_FOLDER)
             }
+
             KEY_CAMERA_UPLOAD_MEGA_FOLDER -> {
                 if (viewModel.isConnected.not()) return false
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
@@ -349,6 +354,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 }
                 startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER)
             }
+
             KEY_SECONDARY_MEDIA_FOLDER_ON -> {
                 if (viewModel.isConnected.not()) return false
                 secondaryUpload = !secondaryUpload
@@ -375,6 +381,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 checkIfSecondaryFolderExists()
                 viewModel.rescheduleCameraUpload()
             }
+
             KEY_LOCAL_SECONDARY_MEDIA_FOLDER -> {
                 intent = Intent(context, FileStorageActivity::class.java).apply {
                     action = FileStorageActivity.Mode.PICK_FOLDER.action
@@ -385,6 +392,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 }
                 startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER)
             }
+
             KEY_MEGA_SECONDARY_MEDIA_FOLDER -> {
                 if (viewModel.isConnected.not()) return false
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
@@ -411,20 +419,24 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     CAMERA_UPLOAD_WIFI -> {
                         viewModel.changeUploadConnectionType(wifiOnly = true)
                     }
+
                     CAMERA_UPLOAD_WIFI_OR_DATA_PLAN -> {
                         viewModel.changeUploadConnectionType(wifiOnly = false)
                     }
                 }
                 viewModel.rescheduleCameraUpload()
             }
+
             KEY_CAMERA_UPLOAD_WHAT_TO -> {
                 when (value) {
                     CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS -> {
                         viewModel.changeUploadOption(UploadOption.PHOTOS)
                     }
+
                     CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS -> {
                         viewModel.changeUploadOption(UploadOption.VIDEOS)
                     }
+
                     CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS -> {
                         viewModel.changeUploadOption(UploadOption.PHOTOS_AND_VIDEOS)
                     }
@@ -432,6 +444,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 viewModel.resetTimestampsAndCacheDirectory()
                 viewModel.rescheduleCameraUpload()
             }
+
             KEY_CAMERA_UPLOAD_VIDEO_QUALITY -> {
                 viewModel.changeUploadVideoQuality(value)
                 viewModel.rescheduleCameraUpload()
@@ -468,6 +481,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 // Update Sync when the Primary Local Folder has changed
                 updatePrimaryLocalFolder(newPrimaryFolderPath)
             }
+
             REQUEST_MEGA_CAMERA_FOLDER -> {
                 // Primary Folder to Sync
                 val handle = intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
@@ -493,6 +507,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     Timber.e("Error choosing the Mega folder for Primary Uploads")
                 }
             }
+
             REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER -> {
                 // Secondary Folder to Sync
                 val secondaryPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
@@ -527,6 +542,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 // Update Sync when the Secondary Local Folder has changed
                 updateSecondaryLocalFolder(secondaryPath)
             }
+
             REQUEST_MEGA_SECONDARY_MEDIA_FOLDER -> {
                 // Secondary Folder to Sync
                 val secondaryHandle =
@@ -615,6 +631,12 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 handleAccessMediaLocationPermissionRationale(it.accessMediaLocationRationaleText)
                 handleInvalidFolderSelectedPrompt(it.invalidFolderSelectedTextId)
                 handleShouldDisplayError(it.shouldShowError)
+            }
+            collectFlow(viewModel.monitorCameraUploadsSettingsActions) {
+                when (it) {
+                    CameraUploadsSettingsAction.DisableMediaUploads -> disableMediaUploadUIProcess()
+                    CameraUploadsSettingsAction.RefreshSettings -> refreshCameraUploadsSettings()
+                }
             }
         }
     }
@@ -1417,7 +1439,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Disable Media Uploads UI-related process
      */
-    fun disableMediaUploadUIProcess() {
+    private fun disableMediaUploadUIProcess() {
         Timber.d("Changes applied to Secondary Folder Only")
         secondaryUpload = false
         secondaryMediaFolderOn?.title =
@@ -1430,7 +1452,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Disable Camera Uploads UI-related process
      */
-    fun disableCameraUploadUIProcess() {
+    private fun disableCameraUploadUIProcess() {
         Timber.d("Camera Uploads Disabled")
         cameraUploadOnOff?.isChecked = false
 

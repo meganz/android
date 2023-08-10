@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -762,5 +763,19 @@ interface CameraUploadRepository {
      * @return flow of [CameraUploadsStatusInfo]
      */
     fun monitorCameraUploadsStatusInfo(): Flow<CameraUploadsStatusInfo>
+
+    /**
+     * Monitor CameraUploadSettingsAction.
+     *
+     * @return Flow [CameraUploadsSettingsAction]
+     */
+    fun monitorCameraUploadsSettingsActions(): Flow<CameraUploadsSettingsAction>
+
+    /**
+     * Broadcast CameraUploadSettingsAction.
+     *
+     * @param action [CameraUploadsSettingsAction]
+     */
+    suspend fun broadCastCameraUploadSettingsActions(action: CameraUploadsSettingsAction)
 
 }

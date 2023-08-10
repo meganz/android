@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
@@ -199,6 +200,8 @@ class CameraUploadsWorkerTest {
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
     private val applicationWrapper: ApplicationWrapper = mock()
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper = mock()
+    private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase =
+        mock()
 
 
     @Before
@@ -305,7 +308,8 @@ class CameraUploadsWorkerTest {
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper,
             applicationWrapper = applicationWrapper,
-            cookieEnabledCheckWrapper = cookieEnabledCheckWrapper
+            cookieEnabledCheckWrapper = cookieEnabledCheckWrapper,
+            broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase
         )
     }
 

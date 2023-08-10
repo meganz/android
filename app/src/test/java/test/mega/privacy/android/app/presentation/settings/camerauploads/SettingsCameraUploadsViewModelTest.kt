@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUs
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -110,6 +111,8 @@ class SettingsCameraUploadsViewModelTest {
     private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
     private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
     private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
+    private val monitorCameraUploadsSettingsActionsUseCase =
+        mock<MonitorCameraUploadsSettingsActionsUseCase>()
 
     @Before
     fun setUp() {
@@ -165,6 +168,7 @@ class SettingsCameraUploadsViewModelTest {
             rescheduleCameraUploadUseCase = rescheduleCameraUploadUseCase,
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
+            monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
         )
     }
 

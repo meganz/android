@@ -2,7 +2,6 @@ package mega.privacy.android.app.cameraupload
 
 
 import android.content.Context
-import android.content.Intent
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -31,8 +30,6 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
@@ -65,6 +62,7 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.Node
@@ -103,6 +101,7 @@ import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
@@ -233,6 +232,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     private val applicationWrapper: ApplicationWrapper,
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
+    private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -984,7 +984,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         setPrimaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
         setSecondaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
         // Refresh SettingsCameraUploadsFragment
-        context.sendBroadcast(Intent(BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING))
+        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.RefreshSettings)
     }
 
     /**
@@ -995,8 +995,9 @@ class CameraUploadsWorker @AssistedInject constructor(
         // Disable Media Uploads only
         resetMediaUploadTimeStamps()
         disableMediaUploadSettings()
-        setSecondaryFolderLocalPathUseCase(SettingsConstants.INVALID_PATH)
-        context.sendBroadcast(Intent(BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING))
+        // setting an invalid path
+        setSecondaryFolderLocalPathUseCase("")
+        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.DisableMediaUploads)
     }
 
     /**

@@ -6,12 +6,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED
 import mega.privacy.android.data.facade.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
 import mega.privacy.android.data.facade.BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
 import mega.privacy.android.data.facade.INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE
@@ -27,30 +24,6 @@ import timber.log.Timber
 class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
 
     private var settingsFragment: SettingsCameraUploadsFragment? = null
-
-    private val updateCameraUploadsSettingsReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null || intent.action == null || settingsFragment == null) {
-                return
-            }
-
-            settingsFragment?.let {
-                when (intent.action) {
-                    ACTION_REFRESH_CAMERA_UPLOADS_SETTING -> {
-                        Timber.d("Refresh Camera Uploads Settings Event Received")
-                        it.refreshCameraUploadsSettings()
-                    }
-
-                    ACTION_DISABLE_MEDIA_UPLOADS_SETTING -> {
-                        Timber.d("Disable Media Uploads UI Event Received")
-                        it.disableMediaUploadUIProcess()
-                    }
-
-                    else -> Unit
-                }
-            }
-        }
-    }
 
     private val cameraUploadsDestinationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -137,11 +110,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
                 BROADCAST_ACTION_REENABLE_CU_PREFERENCE
             )
         )
-
-        val filterUpdateCUSettings = IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED)
-        filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING)
-        filterUpdateCUSettings.addAction(ACTION_DISABLE_MEDIA_UPLOADS_SETTING)
-        registerReceiver(updateCameraUploadsSettingsReceiver, filterUpdateCUSettings)
     }
 
     /**
@@ -150,7 +118,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(cameraUploadsDestinationReceiver)
-        unregisterReceiver(updateCameraUploadsSettingsReceiver)
         unregisterReceiver(receiverCameraUploadsAttrChanged)
         unregisterReceiver(reEnableCameraUploadsPreferenceReceiver)
     }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
+import timber.log.Timber
 
 /**
  * CameraUploads Worker Notification Initializer
@@ -53,6 +54,7 @@ class CameraUploadsWorkerNotificationInitializer : Initializer<Unit> {
                 CameraUploadsWorkerNotificationInitializerEntryPoint::class.java
             )
         entryPoint.appScope().launch {
+            Timber.d("CameraUploadsWorkerNotificationInitializer launched")
             entryPoint.monitorCameraUploadsStatusInfoUseCase().invoke().collect {
                 entryPoint.cameraUploadsNotificationManager().showNotification(it)
             }

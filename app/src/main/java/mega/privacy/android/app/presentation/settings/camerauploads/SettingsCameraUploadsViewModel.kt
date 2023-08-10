@@ -1,10 +1,6 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
 import android.Manifest.permission.POST_NOTIFICATIONS
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_MEDIA_IMAGES
-import android.Manifest.permission.READ_MEDIA_VIDEO
-import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -41,6 +37,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUs
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -143,6 +140,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val rescheduleCameraUploadUseCase: RescheduleCameraUploadUseCase,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
+    private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -157,6 +155,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     val monitorConnectivityEvent =
         monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+    /**
+     * Monitor Camera Upload Settings Actions
+     */
+    val monitorCameraUploadsSettingsActions = monitorCameraUploadsSettingsActionsUseCase()
 
     /**
      * Is connected

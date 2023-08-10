@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 
@@ -324,4 +325,18 @@ internal interface AppEventGateway {
      * @param messageResId [Int]
      */
     suspend fun broadcastScheduledMeetingCanceled(messageResId: Int)
+
+    /**
+     * Monitor CameraUploadSettingsAction.
+     *
+     * @return Flow [CameraUploadsSettingsAction]
+     */
+    fun monitorCameraUploadsSettingsActions(): Flow<CameraUploadsSettingsAction>
+
+    /**
+     * Broadcast CameraUploadSettingsAction.
+     *
+     * @param action [CameraUploadsSettingsAction]
+     */
+    suspend fun broadCastCameraUploadSettingsActions(action: CameraUploadsSettingsAction)
 }

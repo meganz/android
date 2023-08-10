@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -809,6 +810,12 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         workerGateway.monitorCameraUploadsStatusInfo().catch {
             Timber.e(it)
         }.flowOn(ioDispatcher)
+
+    override fun monitorCameraUploadsSettingsActions() =
+        appEventGateway.monitorCameraUploadsSettingsActions()
+
+    override suspend fun broadCastCameraUploadSettingsActions(action: CameraUploadsSettingsAction) =
+        appEventGateway.broadCastCameraUploadSettingsActions(action)
 
     private companion object {
         private const val STATE_NO_CHANGE = -1
