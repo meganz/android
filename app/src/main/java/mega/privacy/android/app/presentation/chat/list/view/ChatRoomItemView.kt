@@ -319,8 +319,9 @@ internal fun ChatRoomItemView(
                         endGoneMargin = 6.dp,
                         bias = 0f
                     )
-                    bottom.linkTo(parent.bottom)
                     top.linkTo(middleText.bottom, 4.dp)
+                    bottom.linkTo(parent.bottom)
+                    width = Dimension.preferredWrapContent
                 }
                 .placeholder(
                     color = MaterialTheme.colors.grey_020_grey_900,

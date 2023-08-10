@@ -43,7 +43,7 @@ class DefaultGetChatParticipants @Inject constructor(
 
     override fun invoke(chatId: Long): Flow<List<ChatParticipant>> = flow {
         val participants = mutableListOf<ChatParticipant>().apply {
-            addAll(getParticipants(chatId))
+            addAll(getParticipants(chatId, true))
         }
         emit(participants)
         emit(participants.requestParticipantsInfo())
@@ -60,8 +60,14 @@ class DefaultGetChatParticipants @Inject constructor(
         )
     }.flowOn(defaultDispatcher)
 
-    private suspend fun getParticipants(chatId: Long): List<ChatParticipant> =
-        chatParticipantsRepository.getAllChatParticipants(chatId).toMutableList()
+    private suspend fun getParticipants(
+        chatId: Long,
+        preloadUserAttributes: Boolean = false,
+    ): List<ChatParticipant> =
+        chatParticipantsRepository.getAllChatParticipants(
+            chatId = chatId,
+            preloadUserAttributes = preloadUserAttributes
+        ).toMutableList()
 
     private suspend fun MutableList<ChatParticipant>.requestParticipantsInfo(): MutableList<ChatParticipant> {
         filter { !it.isMe }
@@ -129,8 +135,7 @@ class DefaultGetChatParticipants @Inject constructor(
             .map { item ->
                 apply {
                     if (item.changes == ChatListItemChanges.Participants) {
-                        val newList = chatParticipantsRepository.getAllChatParticipants(chatId)
-                            .toMutableList()
+                        val newList = getParticipants(chatId)
                         newList.forEach { newItem ->
                             apply {
                                 val newItemIndex = indexOfFirst { it.handle == newItem.handle }
@@ -172,8 +177,7 @@ class DefaultGetChatParticipants @Inject constructor(
                         return@map this
                     } else if (item.changes == ChatListItemChanges.LastMessage) {
                         if (item.lastMessageType == ChatRoomLastMessage.AlterParticipants) {
-                            val newList = chatParticipantsRepository.getAllChatParticipants(chatId)
-                                .toMutableList()
+                            val newList = getParticipants(chatId)
                             newList.forEach { newItem ->
                                 apply {
                                     val newItemIndex = indexOfFirst { it.handle == newItem.handle }

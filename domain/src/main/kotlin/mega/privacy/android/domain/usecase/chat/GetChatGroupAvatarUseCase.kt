@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.chat
 
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
+import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
@@ -32,11 +33,11 @@ class GetChatGroupAvatarUseCase @Inject constructor(
      * @return          List of [ChatAvatarItem]
      */
     suspend operator fun invoke(chatId: Long): List<ChatAvatarItem> {
-        val chatRoom = getCombinedChatRoomUseCase(chatId) ?: error("Chat room does not exist")
-        val participants = chatParticipantsRepository.getChatParticipantsHandles(chatId)
+        val avatars = mutableListOf<ChatAvatarItem>()
+        val chatRoom = getCombinedChatRoomUseCase(chatId) ?: throw ChatRoomDoesNotExistException()
+        val participants = chatParticipantsRepository.getChatParticipantsHandles(chatId, 2)
         val myAccount = accountRepository.getUserAccount()
         val myHandle = myAccount.userId?.id ?: -1
-        val avatars = mutableListOf<ChatAvatarItem>()
 
         when {
             !chatRoom.isActive || (chatRoom.isGroup && participants.isEmpty()) -> {
@@ -77,7 +78,7 @@ class GetChatGroupAvatarUseCase @Inject constructor(
             }
 
             else -> {
-                participants.subList(0, 2).forEach { userHandle ->
+                participants.forEach { userHandle ->
                     avatars.add(
                         if (userHandle == myHandle) {
                             ChatAvatarItem(

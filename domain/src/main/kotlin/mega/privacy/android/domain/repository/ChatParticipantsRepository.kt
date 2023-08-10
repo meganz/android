@@ -11,14 +11,25 @@ import java.io.File
 interface ChatParticipantsRepository {
 
     /**
-     * Get chat participants
+     * Get all chat participants and preload their UserAttributes
+     *
+     * @param chatId                Chat Room Id
+     * @param preloadUserAttributes Flag to preload UserAttributes
+     * @return                      List of [ChatParticipant]
      */
-    suspend fun getAllChatParticipants(chatId: Long): List<ChatParticipant>
+    suspend fun getAllChatParticipants(
+        chatId: Long,
+        preloadUserAttributes: Boolean = false,
+    ): List<ChatParticipant>
 
     /**
      * Get chat participants handles
+     *
+     * @param chatId                Chat Room Id
+     * @param limit                 Maximum number of participants to retrieve, -1 for no limit
+     * @return                      List of User Handles
      */
-    suspend fun getChatParticipantsHandles(chatId: Long): List<Long>
+    suspend fun getChatParticipantsHandles(chatId: Long, limit: Int = -1): List<Long>
 
     /**
      * Get status

@@ -1,6 +1,8 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
@@ -24,14 +26,9 @@ import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaHandleList
 import java.io.File
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default implementation of [ChatParticipantsRepository]
@@ -55,83 +52,86 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatParticipantsRepository {
 
-    override suspend fun getAllChatParticipants(chatId: Long): List<ChatParticipant> {
-        megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
-            val list: MutableList<ChatParticipant> = mutableListOf()
-            val peerHandles = getChatParticipantsHandles(chatId)
+    override suspend fun getAllChatParticipants(
+        chatId: Long,
+        preloadUserAttributes: Boolean,
+    ): List<ChatParticipant> =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
+                val participants = mutableListOf<ChatParticipant>()
+                val peerHandles = getChatParticipantsHandles(chatId)
 
-            megaChatApiGateway.getMyEmail()?.let {
-                val myName = megaChatApiGateway.getMyFullname()
-                val myParticipant = ChatParticipant(
-                    handle = megaChatApiGateway.getMyUserHandle(), data = ContactData(
-                        fullName = myName?.ifEmpty { it }, alias = null, avatarUri = null
-                    ),
-                    email = it,
-                    isMe = true,
-                    defaultAvatarColor = avatarRepository.getMyAvatarColor(),
-                    privilege = chatPermissionsMapper(chatRoom.ownPrivilege)
-                )
-                list.add(myParticipant)
-            }
-
-            peerHandles.forEach { handle ->
-                val participantPrivilege = chatRoom.getPeerPrivilegeByHandle(handle)
-                if (participantPrivilege != MegaChatRoom.PRIV_RM) {
-                    val alias = megaChatApiGateway.getUserAliasFromCache(handle)
-                    val participant = ChatParticipant(
-                        handle = handle,
-                        data = ContactData(
-                            fullName = contactsRepository.getUserFullName(handle),
-                            alias = alias,
-                            avatarUri = null
-                        ),
-                        email = contactsRepository.getUserEmail(handle),
-                        isMe = false,
-                        privilege = chatPermissionsMapper(participantPrivilege),
-                        defaultAvatarColor = avatarRepository.getAvatarColor(handle)
-                    )
-
-                    list.add(participant)
+                if (preloadUserAttributes) {
+                    peerHandles.map {
+                        async { loadUserAttributes(chatId, listOf(it)) }
+                    }.awaitAll() // Retrieve User Attributes in parallel
                 }
-            }
-            return list
+
+                megaChatApiGateway.getMyEmail()?.let { myEmail ->
+                    val myName = megaChatApiGateway.getMyFullname()
+                    participants.add(
+                        ChatParticipant(
+                            handle = megaChatApiGateway.getMyUserHandle(),
+                            data = ContactData(
+                                fullName = myName?.ifEmpty { myEmail },
+                                alias = null,
+                                avatarUri = null
+                            ),
+                            email = myEmail,
+                            isMe = true,
+                            defaultAvatarColor = avatarRepository.getMyAvatarColor(),
+                            privilege = chatPermissionsMapper(chatRoom.ownPrivilege)
+                        )
+                    )
+                }
+
+                peerHandles.forEach { handle ->
+                    val participantPrivilege = chatRoom.getPeerPrivilegeByHandle(handle)
+                    if (participantPrivilege != MegaChatRoom.PRIV_RM) {
+                        val alias = async { megaChatApiGateway.getUserAliasFromCache(handle) }
+                        val fullName = async { contactsRepository.getUserFullName(handle) }
+                        val email = async { contactsRepository.getUserEmail(handle) }
+                        val privilege = async { chatPermissionsMapper(participantPrivilege) }
+                        val avatarColor = async { avatarRepository.getAvatarColor(handle) }
+
+                        participants.add(
+                            ChatParticipant(
+                                handle = handle,
+                                data = ContactData(
+                                    fullName = fullName.await(),
+                                    alias = alias.await(),
+                                    avatarUri = null
+                                ),
+                                email = email.await(),
+                                isMe = false,
+                                privilege = privilege.await(),
+                                defaultAvatarColor = avatarColor.await()
+                            )
+                        )
+                    }
+                }
+
+                return@withContext participants
+            } ?: emptyList()
         }
 
-        return mutableListOf()
-    }
-
-    override suspend fun getChatParticipantsHandles(chatId: Long): List<Long> =
+    override suspend fun getChatParticipantsHandles(chatId: Long, limit: Int): List<Long> =
         withContext(ioDispatcher) {
             val chatRoom = megaChatApiGateway.getChatRoom(chatId)
                 ?: throw ChatRoomDoesNotExistException()
 
-            if (!chatRoom.isGroup || chatRoom.peerCount == 0L) {
-                return@withContext emptyList()
-            }
-
-            val megaHandleList = MegaHandleList.createInstance()
-            val peerList = mutableListOf<Long>().apply {
+            val peerHandles = mutableListOf<Long>()
+            if (chatRoom.isGroup && chatRoom.peerCount > 0) {
                 for (index in 0 until chatRoom.peerCount) {
                     val peerHandle = chatRoom.getPeerHandle(index)
-                    add(peerHandle)
-                    megaHandleList.addMegaHandle(peerHandle)
+                    if (peerHandle != megaChatApiGateway.getChatInvalidHandle()) {
+                        peerHandles.add(peerHandle)
+
+                        if (limit != -1 && limit == peerHandles.size) break
+                    }
                 }
             }
-
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.loadUserAttributes(
-                    chatId,
-                    megaHandleList,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
-                            if (error.errorCode == MegaError.API_OK) {
-                                continuation.resume(peerList)
-                            } else {
-                                continuation.failWithError(error, "getChatParticipantsHandles")
-                            }
-                        }
-                    ))
-            }
+            return@withContext peerHandles
         }
 
     override suspend fun getStatus(participant: ChatParticipant): UserStatus {

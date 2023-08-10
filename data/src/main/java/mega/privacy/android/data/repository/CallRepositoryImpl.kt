@@ -12,9 +12,9 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
@@ -229,11 +229,7 @@ internal class CallRepositoryImpl @Inject constructor(
                                 if (occursList.size() > 0) {
                                     for (i in 0 until occursList.size()) {
                                         occurrences.add(
-                                            chatScheduledMeetingOccurrMapper(
-                                                occursList.at(
-                                                    i
-                                                )
-                                            )
+                                            chatScheduledMeetingOccurrMapper(occursList.at(i))
                                         )
                                     }
                                 }
@@ -256,9 +252,7 @@ internal class CallRepositoryImpl @Inject constructor(
                 )
 
                 continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        callback
-                    )
+                    megaChatApiGateway.removeRequestListener(callback)
                 }
             }
         }
@@ -291,7 +285,7 @@ internal class CallRepositoryImpl @Inject constructor(
 
     override suspend fun getNextScheduledMeetingOccurrence(chatId: Long): ChatScheduledMeetingOccurr? =
         withContext(dispatcher) {
-            val now = Instant.now().atZone(ZoneOffset.UTC)
+            val now = ZonedDateTime.now()
             fetchScheduledMeetingOccurrencesByChat(
                 chatId,
                 now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
