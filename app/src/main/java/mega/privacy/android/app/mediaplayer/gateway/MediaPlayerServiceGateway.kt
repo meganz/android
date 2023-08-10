@@ -62,7 +62,7 @@ interface MediaPlayerServiceGateway {
      *
      * @return playback state
      */
-    fun getPlaybackState(): Int
+    fun getPlaybackState(): Int?
 
     /**
      * Get the current media item

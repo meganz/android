@@ -53,7 +53,7 @@ class MediaPlayerFacade @Inject constructor(
 ) : MediaPlayerGateway {
 
     private lateinit var exoPlayer: ExoPlayer
-    private lateinit var player: MediaMegaPlayer
+    private var player: MediaMegaPlayer? = null
     private lateinit var trackSelector: DefaultTrackSelector
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var notificationDismissed = false
@@ -74,7 +74,7 @@ class MediaPlayerFacade @Inject constructor(
             .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
             .build().apply {
                 addListener(MetadataExtractor { title, artist, album ->
-                    crashReporter.log("playing item: ${player.currentMediaItem?.mediaId}, title: $title")
+                    crashReporter.log("playing item: ${player?.currentMediaItem?.mediaId}, title: $title")
                     nameChangeCallback(title, artist, album)
                 })
                 addListener(object : Player.Listener {
@@ -205,18 +205,16 @@ class MediaPlayerFacade @Inject constructor(
         }
     }
 
-    override fun getMediaMegaPlayer(): MediaMegaPlayer = player
+    override fun getCurrentMediaItem(): MediaItem? = player?.currentMediaItem
 
-    override fun getCurrentMediaItem(): MediaItem? = player.currentMediaItem
-
-    override fun getCurrentItemDuration(): Long = player.duration
+    override fun getCurrentItemDuration(): Long = player?.duration ?: 0
 
     override fun mediaPlayerIsPlaying(): Boolean =
-        player.playWhenReady && player.playbackState != STATE_ENDED
+        player?.playWhenReady == true && player?.playbackState != STATE_ENDED
 
     override fun mediaPlayerRetry(isRetry: Boolean) {
-        if (isRetry && player.playbackState == STATE_IDLE) {
-            player.prepare()
+        if (isRetry && player?.playbackState == STATE_IDLE) {
+            player?.prepare()
         }
     }
 
@@ -227,73 +225,87 @@ class MediaPlayerFacade @Inject constructor(
     override fun getCurrentPlayingPosition(): Long = exoPlayer.currentPosition
 
     override fun setPlayWhenReady(playWhenReady: Boolean) {
-        player.playWhenReady = playWhenReady
+        player?.playWhenReady = playWhenReady
     }
 
-    override fun getPlayWhenReady(): Boolean = player.playWhenReady
+    override fun getPlayWhenReady(): Boolean = player?.playWhenReady ?: false
 
     override fun mediaItemRemoved(index: Int): String? {
-        crashReporter.log(
-            "playingItem: ${player.currentMediaItem?.mediaId} removed item: ${
-                player.getMediaItemAt(
-                    index
-                ).mediaId
-            }"
-        )
-        if (index < player.mediaItemCount) {
-            val nextIndex = player.nextMediaItemIndex
-            player.removeMediaItem(index)
-            if (nextIndex != C.INDEX_UNSET) {
-                return player.getMediaItemAt(nextIndex).mediaId
+        player?.let { player ->
+            crashReporter.log(
+                "playingItem: ${player.currentMediaItem?.mediaId} removed item: ${
+                    player.getMediaItemAt(
+                        index
+                    ).mediaId
+                }"
+            )
+
+            if (index < player.mediaItemCount) {
+                val nextIndex = player.nextMediaItemIndex
+                player.removeMediaItem(index)
+                if (nextIndex != C.INDEX_UNSET) {
+                    return player.getMediaItemAt(nextIndex).mediaId
+                }
             }
         }
         return null
     }
 
-    override fun playerPrepare() = player.prepare()
+    override fun playerPrepare() {
+        player?.prepare()
+    }
 
-    override fun playerStop() = player.stop()
-
+    override fun playerStop() {
+        player?.stop()
+    }
 
     override fun playerRelease() {
-        player.release()
+        player?.release()
         exoPlayer.release()
     }
 
-    override fun playerSeekTo(index: Int) = player.seekTo(index, 0)
+    override fun playerSeekTo(index: Int) {
+        player?.seekTo(index, 0)
+    }
 
-    override fun playerSeekToPositionInMs(positionInMs: Long) = player.seekTo(positionInMs)
+    override fun playerSeekToPositionInMs(positionInMs: Long) {
+        player?.seekTo(positionInMs)
+    }
 
     override fun buildPlaySources(mediaPlaySources: MediaPlaySources) {
         with(mediaPlaySources) {
             if (newIndexForCurrentItem == INVALID_VALUE) {
-                player.setMediaItems(mediaItems)
+                player?.setMediaItems(mediaItems)
             } else {
-                val oldIndexForCurrentItem = player.currentMediaItemIndex
-                val oldItemsCount = player.mediaItemCount
-                // Check the parameters whether matched the required of removeMediaItems() function
-                if (oldIndexForCurrentItem >= -1 && oldItemsCount >= 0) {
-                    if (oldItemsCount > oldIndexForCurrentItem + 1) {
-                        player.removeMediaItems(oldIndexForCurrentItem + 1, oldItemsCount)
+                player?.let { player ->
+                    val oldIndexForCurrentItem = player.currentMediaItemIndex
+                    val oldItemsCount = player.mediaItemCount
+                    // Check the parameters whether matched the required of removeMediaItems() function
+                    if (oldIndexForCurrentItem >= -1 && oldItemsCount >= 0) {
+                        if (oldItemsCount > oldIndexForCurrentItem + 1) {
+                            player.removeMediaItems(oldIndexForCurrentItem + 1, oldItemsCount)
+                        }
+                        if (oldIndexForCurrentItem > 0) {
+                            player.removeMediaItems(0, oldIndexForCurrentItem)
+                        }
                     }
-                    if (oldIndexForCurrentItem > 0) {
-                        player.removeMediaItems(0, oldIndexForCurrentItem)
-                    }
-                }
 
-                if (newIndexForCurrentItem != 0) {
-                    player.addMediaItems(0, mediaItems.subList(0, newIndexForCurrentItem))
-                }
-                if (newIndexForCurrentItem != mediaItems.size - 1) {
-                    player.addMediaItems(
-                        mediaItems.subList(newIndexForCurrentItem + 1, mediaItems.size)
-                    )
+                    if (newIndexForCurrentItem != 0) {
+                        player.addMediaItems(0, mediaItems.subList(0, newIndexForCurrentItem))
+                    }
+                    if (newIndexForCurrentItem != mediaItems.size - 1) {
+                        player.addMediaItems(
+                            mediaItems.subList(newIndexForCurrentItem + 1, mediaItems.size)
+                        )
+                    }
                 }
             }
         }
     }
 
-    override fun removeListener(listener: Player.Listener) = player.removeListener(listener)
+    override fun removeListener(listener: Player.Listener) {
+        player?.removeListener(listener)
+    }
 
     override fun invalidatePlayerNotification() {
         playerNotificationManager?.invalidate()
@@ -314,10 +326,11 @@ class MediaPlayerFacade @Inject constructor(
     private fun convertToRepeatMode(repeatToggleMode: RepeatToggleMode) =
         exoPlayerRepeatModeMapper(repeatToggleMode)
 
-    override fun addPlayerListener(listener: Player.Listener) =
-        player.wrappedPlayer.addListener(listener)
+    override fun addPlayerListener(listener: Player.Listener) {
+        player?.wrappedPlayer?.addListener(listener)
+    }
 
-    override fun getPlaybackState() = player.playbackState
+    override fun getPlaybackState() = player?.playbackState
 
     override fun setupPlayerView(
         playerView: StyledPlayerView,
@@ -343,27 +356,29 @@ class MediaPlayerFacade @Inject constructor(
     }
 
     override fun addSubtitle(subtitleFileUrl: String) {
-        val videoUri: Uri? = player.currentMediaItem?.localConfiguration?.uri
-        val mediaId = player.currentMediaItem?.mediaId
-        val uri = Uri.parse(subtitleFileUrl)
-        if (videoUri != null && mediaId != null && uri != null) {
-            val subtitle = MediaItem.SubtitleConfiguration.Builder(uri)
-                .setMimeType(MimeTypes.APPLICATION_SUBRIP)
-                .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                .build()
-            val mediaItem = MediaItem.Builder()
-                .setUri(videoUri)
-                .setMediaId(mediaId)
-                .setSubtitleConfigurations(ImmutableList.of(subtitle))
-                .build()
-            val oldPosition = player.currentPosition
-            // Stop player to set new media item that has subtitle
-            playerStop()
-            // Set new media item and start play video from the stop location
-            player.setMediaItem(mediaItem, oldPosition)
-            player.prepare()
-            player.play()
-            showSubtitle()
+        player?.let { player ->
+            val videoUri: Uri? = player.currentMediaItem?.localConfiguration?.uri
+            val mediaId = player.currentMediaItem?.mediaId
+            val uri = Uri.parse(subtitleFileUrl)
+            if (videoUri != null && mediaId != null && uri != null) {
+                val subtitle = MediaItem.SubtitleConfiguration.Builder(uri)
+                    .setMimeType(MimeTypes.APPLICATION_SUBRIP)
+                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                    .build()
+                val mediaItem = MediaItem.Builder()
+                    .setUri(videoUri)
+                    .setMediaId(mediaId)
+                    .setSubtitleConfigurations(ImmutableList.of(subtitle))
+                    .build()
+                val oldPosition = player.currentPosition
+                // Stop player to set new media item that has subtitle
+                playerStop()
+                // Set new media item and start play video from the stop location
+                player.setMediaItem(mediaItem, oldPosition)
+                player.prepare()
+                player.play()
+                showSubtitle()
+            }
         }
     }
 

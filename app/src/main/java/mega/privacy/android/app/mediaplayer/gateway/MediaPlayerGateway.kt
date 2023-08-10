@@ -4,11 +4,10 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ShuffleOrder
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
-import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 
 /**
  * The media player gateway
@@ -38,13 +37,6 @@ interface MediaPlayerGateway {
      * @param playerNotificationParams PlayerNotificationParams
      */
     fun createPlayerControlNotification(playerNotificationParams: PlayerNotificationCreatedParams)
-
-    /**
-     * Get MediaMegaPlayer
-     *
-     * @return MediaMegaPlayer
-     */
-    fun getMediaMegaPlayer(): MediaMegaPlayer
 
     /**
      * Get the current media item
@@ -101,7 +93,7 @@ interface MediaPlayerGateway {
      *
      * @return playback state
      */
-    fun getPlaybackState(): Int
+    fun getPlaybackState(): Int?
 
     /**
      * Player prepare

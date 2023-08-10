@@ -177,7 +177,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      *
      * @param playbackState the state of player
      */
-    fun updateLoadingAnimation(@Player.State playbackState: Int) {
+    fun updateLoadingAnimation(@Player.State playbackState: Int?) {
         binding.loading.isVisible = playbackState == Player.STATE_BUFFERING
     }
 }

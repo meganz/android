@@ -450,7 +450,7 @@ class VideoPlayerFragment : Fragment() {
         mediaPlayerGateway.addPlayerListener(playerListener)
     }
 
-    private fun updateLoadingAnimation(@Player.State playbackState: Int) =
+    private fun updateLoadingAnimation(@Player.State playbackState: Int?) =
         playerViewHolder?.updateLoadingAnimation(playbackState)
 
     private fun delayHideToolbar() {
