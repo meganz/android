@@ -12,6 +12,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import org.junit.Before
 import org.junit.Test
@@ -29,6 +30,7 @@ class FetchNodesUseCaseTest {
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val loginRepository = mock<LoginRepository>()
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
+    private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
 
     @Before
     fun setUp() {
@@ -36,6 +38,7 @@ class FetchNodesUseCaseTest {
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             loginRepository = loginRepository,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
+            getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             loginMutex = mock()
         )
     }
