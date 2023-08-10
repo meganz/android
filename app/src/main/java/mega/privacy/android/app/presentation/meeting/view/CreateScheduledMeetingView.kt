@@ -78,6 +78,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -520,6 +521,7 @@ private fun ScheduleMeetingAppBar(
                     value = state.meetingTitle.ifEmpty { "" },
                     isEmptyValueError = state.isEmptyTitleError,
                     placeholderId = R.string.meetings_schedule_meeting_name_hint,
+                    shouldInitialFocus = state.type == ScheduledMeetingType.Creation,
                     onValueChange = { text ->
                         onValueChange(text)
                     },

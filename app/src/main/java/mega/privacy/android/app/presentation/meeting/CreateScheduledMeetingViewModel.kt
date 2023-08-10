@@ -47,7 +47,6 @@ import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
-import mega.privacy.android.domain.usecase.chat.SetChatTitleUseCase
 import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactItem
@@ -78,7 +77,6 @@ import javax.inject.Inject
  * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
  * @property getPluralStringFromStringResMapper         [GetPluralStringFromStringResMapper]
  * @property setOpenInvite                              [SetOpenInvite]
- * @property setChatTitle                               [SetChatTitleUseCase]
  * @property removeParticipantFromChat                  [RemoveParticipantFromChatUseCase]
  * @property inviteParticipantToChat                    [InviteParticipantToChatUseCase]
  * @property state                                      Current view state as [CreateScheduledMeetingState]
@@ -101,7 +99,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
     private val setOpenInviteUseCase: SetOpenInviteUseCase,
-    private val setChatTitleUseCase: SetChatTitleUseCase,
     private val removeParticipantFromChat: RemoveParticipantFromChatUseCase,
     private val inviteParticipantToChat: InviteParticipantToChatUseCase,
 ) : ViewModel() {
@@ -142,13 +139,20 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * Get chat room of the scheduled meeting
      */
     fun getChatRoom(chatId: Long) {
+        if (state.value.scheduledMeeting?.chatId == chatId) {
+            return
+        }
+
         val isEdition = chatId != -1L
         _state.update { state ->
             state.copy(
                 type = if (isEdition) ScheduledMeetingType.Edition else ScheduledMeetingType.Creation,
             )
         }
+
         if (isEdition) {
+            getScheduledMeeting(chatId)
+
             viewModelScope.launch {
                 runCatching {
                     getChatRoomUseCase(chatId)
@@ -366,11 +370,16 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      *
      * @param selectedUntilDate     Until date
      */
-    fun onUntilDateTap(selectedUntilDate: ZonedDateTime) =
+    fun onUntilDateTap(selectedUntilDate: ZonedDateTime) {
+        if (selectedUntilDate.isBefore(ZonedDateTime.now()) || selectedUntilDate.isBefore(state.value.startDate)) {
+            return
+        }
+
         updateCustomRules(
             newEndDateOccurrenceOption = selectedUntilDate,
             newUntil = selectedUntilDate.toEpochSecond()
         )
+    }
 
     /**
      * Set start date and time
@@ -404,6 +413,15 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                         ChronoUnit.MINUTES
                     )
 
+            var newUntil = state.rulesSelected.until
+            state.rulesSelected.getUntilZonedDateTime()?.let {
+                if (it.isBefore(selectedStartDate)) {
+                    newUntil = selectedStartDate.plusMonths(
+                        6
+                    ).toEpochSecond()
+                }
+            }
+
             Timber.d("Set start date $selectedStartDate, set end date $newEndDate")
 
             state.copy(
@@ -412,9 +430,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 rulesSelected = state.rulesSelected.copy(
                     weekDayList = newWeekdayList,
                     monthDayList = newMonthDayList,
-                    until = if (state.rulesSelected.until == 0L) state.rulesSelected.until else selectedStartDate.plusMonths(
-                        6
-                    ).toEpochSecond()
+                    until = newUntil
                 )
             )
         }
@@ -425,21 +441,16 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Set end date and time
      *
-     * @param endDateTime   End date and time
+     * @param selectedEndDate   End date and time
      */
-    fun onEndDateTimeTap(endDateTime: ZonedDateTime) {
-        val newEndDateTime = if (endDateTime.isBefore(state.value.startDate)) {
-            state.value.startDate.plus(
-                30,
-                ChronoUnit.MINUTES
-            )
-        } else {
-            endDateTime
+    fun onEndDateTimeTap(selectedEndDate: ZonedDateTime) {
+        if (selectedEndDate.isBefore(ZonedDateTime.now()) || selectedEndDate.isBefore(state.value.startDate)) {
+            return
         }
 
         _state.update {
             it.copy(
-                endDate = newEndDateTime
+                endDate = selectedEndDate
             )
         }
     }
@@ -667,9 +678,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             }
 
                             ScheduledMeetingType.Edition -> {
-                                if (state.value.meetingTitle != state.value.scheduledMeeting?.title) {
-                                    setChatTitle(id, state.value.meetingTitle)
-                                }
                                 setOpenInvite(id, state.value.enabledAllowAddParticipantsOption)
                                 setParticipants(id)
                                 if (state.value.enabledMeetingLinkOption) {
@@ -772,21 +780,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 removeParticipantFromChat(chatId, handle)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
-        }
-
-    /**
-     * Set chat title
-     *
-     * @param chatId    Chat Id.
-     * @param title     Chat title.
-     */
-    private fun setChatTitle(chatId: Long, title: String) =
-        viewModelScope.launch {
-            runCatching {
-                setChatTitleUseCase(chatId, title)
             }.onFailure { exception ->
                 Timber.e(exception)
             }
