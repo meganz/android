@@ -287,7 +287,7 @@ class PasscodeLockActivity : BaseActivity() {
             showFingerprintUnlock()
         } else {
             binding.passcodeScrollView.isVisible = true
-            binding.passcodeOptionsButton.isVisible = !secondRound
+            binding.passcodeOptionsButton.isVisible = !secondRound && mode != UNLOCK_MODE
 
             if (mode == UNLOCK_MODE) {
                 attempts = passcodePreferenceWrapper.getFailedAttemptsCount()

@@ -27,7 +27,8 @@
         android:id="@+id/passcode_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/passcode_parent_view"
@@ -121,7 +122,8 @@
                 android:theme="@style/Widget.Mega.TextInputLayout.Password"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title_text">
+                app:layout_constraintTop_toBottomOf="@id/title_text"
+                android:visibility="gone">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password_field"
@@ -140,7 +142,8 @@
                 android:text="@string/pin_lock_not_match"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title_text" />
+                app:layout_constraintTop_toBottomOf="@id/title_text"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/failed_attempts_text"
@@ -157,7 +160,8 @@
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title_text" />
+                app:layout_constraintTop_toBottomOf="@id/title_text"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/failed_attempts_error_text"
@@ -166,7 +170,8 @@
                 android:text="@string/pin_lock_alert"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/failed_attempts_text" />
+                app:layout_constraintTop_toBottomOf="@id/failed_attempts_text"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/logout_button"
@@ -175,7 +180,8 @@
                 android:text="@string/action_logout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/failed_attempts_text" />
+                app:layout_constraintTop_toBottomOf="@id/failed_attempts_text"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/forget_passcode_button"
@@ -186,7 +192,8 @@
                 android:text="@string/settings_passcode_forgot_passcode_button"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/logout_button" />
+                app:layout_constraintTop_toBottomOf="@id/logout_button"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/passcode_options_button"
@@ -195,7 +202,8 @@
                 android:text="@string/settings_passcode_option"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                android:visibility="gone"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
