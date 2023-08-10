@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,24 +33,16 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
     private var adapter: ImportFilesAdapter? = null
     private var uploadFragment: Int = -1
 
-    private val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        arrayOf(
-            PermissionUtils.getImagePermissionByVersion(),
-            PermissionUtils.getAudioPermissionByVersion(),
-            PermissionUtils.getVideoPermissionByVersion(),
-            PermissionUtils.getPartialMediaPermission()
-        )
-    } else {
-        arrayOf(
-            PermissionUtils.getImagePermissionByVersion(),
-            PermissionUtils.getAudioPermissionByVersion(),
-            PermissionUtils.getVideoPermissionByVersion()
-        )
-    }
+    private val permissions = arrayOf(
+        PermissionUtils.getImagePermissionByVersion(),
+        PermissionUtils.getAudioPermissionByVersion(),
+        PermissionUtils.getVideoPermissionByVersion()
+    )
 
     private val permissionsLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
-            if (!viewModel.hasMediaPermission() || !viewModel.hasAudioPermission()) {
+            val notGrantedPermissions = map.filter { !it.value }
+            if (notGrantedPermissions.isNotEmpty()) {
                 showAccessDeniedDialog()
             } else {
                 confirmImport(uploadFragment)

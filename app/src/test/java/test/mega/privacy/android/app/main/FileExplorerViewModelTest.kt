@@ -22,8 +22,6 @@ class FileExplorerViewModelTest {
     private val getCopyLatestTargetPathUseCase = mock<GetCopyLatestTargetPathUseCase>()
     private val getMoveLatestTargetPathUseCase = mock<GetMoveLatestTargetPathUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
-    private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
-    private val hasAudioPermissionUseCase = mock<HasAudioPermissionUseCase>()
 
     @Before
     fun setUp() {
@@ -33,8 +31,6 @@ class FileExplorerViewModelTest {
             getCopyLatestTargetPathUseCase = getCopyLatestTargetPathUseCase,
             getMoveLatestTargetPathUseCase = getMoveLatestTargetPathUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            hasMediaPermissionUseCase = hasMediaPermissionUseCase,
-            hasAudioPermissionUseCase = hasAudioPermissionUseCase,
         )
     }
 
