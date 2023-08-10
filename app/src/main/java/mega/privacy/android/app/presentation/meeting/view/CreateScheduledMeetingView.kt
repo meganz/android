@@ -78,6 +78,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -160,7 +161,7 @@ internal fun CreateScheduledMeetingView(
         )
 
         Column {
-            if (state.enabledWaitingRoomOption && state.enabledAllowAddParticipantsOption && !managementState.isWarningClosed && managementState.isWaitingRoomFeatureFlagEnabled) {
+            if (state.enabledWaitingRoomOption && state.enabledAllowAddParticipantsOption && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled && managementState.isWaitingRoomFeatureFlagEnabled) {
                 WaitingRoomWarningDialog(
                     onLearnMoreClicked = onLearnMoreWarningClicked,
                     onCloseClicked = onCloseWarningClicked
@@ -194,6 +195,7 @@ internal fun CreateScheduledMeetingView(
                     ActionButton(
                         state = state,
                         isWaitingRoomFeatureFlagEnabled = managementState.isWaitingRoomFeatureFlagEnabled,
+                        isCallInProgress = managementState.isCallInProgress,
                         action = button,
                         onButtonClicked = onButtonClicked
                     )
@@ -365,6 +367,7 @@ private fun AddDescriptionButton(
 private fun ActionButton(
     state: CreateScheduledMeetingState,
     isWaitingRoomFeatureFlagEnabled: Boolean,
+    isCallInProgress: Boolean,
     action: ScheduleMeetingAction,
     onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
 ) {
@@ -373,7 +376,9 @@ private fun ActionButton(
             .testTag(ACTION_BUTTON_TAG)
             .fillMaxWidth()
             .clickable {
-                onButtonClicked(action)
+                if (action != ScheduleMeetingAction.WaitingRoom || !isCallInProgress) {
+                    onButtonClicked(action)
+                }
             }
         ) {
             if ((action != ScheduleMeetingAction.AddDescription || (!state.isEditingDescription && state.descriptionText.isEmpty()))
@@ -382,6 +387,7 @@ private fun ActionButton(
                 ActionOption(
                     state = state,
                     action = action,
+                    isEnabled = action != ScheduleMeetingAction.WaitingRoom || !isCallInProgress,
                     isChecked = when (action) {
                         ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
                         ScheduleMeetingAction.AllowNonHostAddParticipants -> state.enabledAllowAddParticipantsOption
@@ -540,6 +546,7 @@ private fun ScheduleMeetingAppBar(
  * @param state         [CreateScheduledMeetingState]
  * @param action        [ScheduleMeetingAction]
  * @param isChecked     True, if the option must be checked. False if not
+ * @param isEnabled     True, if the option must be enabled. False if not
  * @param hasSwitch     True, if the option has a switch. False if not
  */
 @Composable
@@ -547,6 +554,7 @@ private fun ActionOption(
     state: CreateScheduledMeetingState,
     action: ScheduleMeetingAction,
     isChecked: Boolean,
+    isEnabled: Boolean,
     hasSwitch: Boolean,
 ) {
     Row(
@@ -653,6 +661,7 @@ private fun ActionOption(
             ) {
                 MegaSwitch(
                     checked = isChecked,
+                    enabled = isEnabled,
                     onCheckedChange = null,
                     modifier = Modifier.align(Alignment.Center)
                 )

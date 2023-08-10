@@ -81,7 +81,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         const val CREATE_SCHEDULED_MEETING_TAG = "createScheduledMeetingTag"
         const val CUSTOM_RECURRENCE_TAG = "customRecurrenceTag"
         private const val LEARN_MORE_URI =
-            "https://help.mega.io/"
+            "https://help.mega.io/wp-admin/post.php?post=3005&action=edit"
     }
 
     private lateinit var navController: NavHostController
@@ -120,9 +120,8 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.state) { (_, openAddContact, chatIdToOpenInfoScreen, finish, _, _, _, _, _, _, _, _, _, _, enabledWaitingRoomOption) ->
+        collectFlow(viewModel.state) { (_, openAddContact, chatIdToOpenInfoScreen, finish) ->
             if (finish) {
-                scheduledMeetingManagementViewModel.setWaitingRoom(enabledWaitingRoomOption)
                 finishCreateScheduledMeeting(RESULT_OK)
             }
 
@@ -157,12 +156,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                     )
                 }
             }
-        }
-
-        collectFlow(scheduledMeetingManagementViewModel.state) { (_, _, _, _, _, _, _, _, _, meetingLink, enabledWaitingRoomOption) ->
-            viewModel.updateInitialChatValues(
-                !meetingLink.isNullOrEmpty(), enabledWaitingRoomOption
-            )
         }
     }
 

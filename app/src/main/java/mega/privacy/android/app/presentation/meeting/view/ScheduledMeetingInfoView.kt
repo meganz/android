@@ -93,6 +93,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -156,7 +157,9 @@ fun ScheduledMeetingInfoView(
             onInvite = { onInviteParticipantsDialog() })
 
         Column {
-            if (state.enabledAllowNonHostAddParticipantsOption && managementState.enabledWaitingRoomOption && !managementState.isWarningClosed && managementState.isWaitingRoomFeatureFlagEnabled) {
+            if (state.enabledAllowNonHostAddParticipantsOption && state.enabledWaitingRoomOption && state.isHost
+                && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled && managementState.isWaitingRoomFeatureFlagEnabled
+            ) {
                 WaitingRoomWarningDialog(
                     onLearnMoreClicked = onLearnMoreWarningClicked,
                     onCloseClicked = onCloseWarningClicked
@@ -177,7 +180,7 @@ fun ScheduledMeetingInfoView(
                         action = button,
                         isWaitingRoomFeatureFlagEnabled = managementState.isWaitingRoomFeatureFlagEnabled,
                         enabledMeetingLinkOption = managementState.enabledMeetingLinkOption,
-                        enabledWaitingRoomOption = managementState.enabledWaitingRoomOption,
+                        isCallInProgress = managementState.isCallInProgress,
                         onButtonClicked = onButtonClicked
                     )
                 }
@@ -526,7 +529,7 @@ private fun ActionButton(
     state: ScheduledMeetingInfoState,
     isWaitingRoomFeatureFlagEnabled: Boolean,
     enabledMeetingLinkOption: Boolean,
-    enabledWaitingRoomOption: Boolean,
+    isCallInProgress: Boolean,
     action: ScheduledMeetingInfoAction,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
 ) {
@@ -534,7 +537,7 @@ private fun ActionButton(
         .testTag(ACTION_BUTTON_OPTION_TAG)
         .fillMaxWidth()
         .clickable {
-            if (action != ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation) {
+            if (action != ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation && (action != ScheduledMeetingInfoAction.WaitingRoom || !isCallInProgress)) {
                 onButtonClicked(action)
             }
         }) {
@@ -563,7 +566,7 @@ private fun ActionButton(
                             ActionOption(
                                 state = state,
                                 action = action,
-                                isEnabled = true,
+                                isChecked = true,
                                 hasSwitch = false
                             )
                         }
@@ -631,7 +634,7 @@ private fun ActionButton(
                 ActionOption(
                     state = state,
                     action = action,
-                    isEnabled = enabledMeetingLinkOption,
+                    isChecked = enabledMeetingLinkOption,
                     hasSwitch = true
                 )
                 CustomDivider(withStartPadding = true)
@@ -642,7 +645,7 @@ private fun ActionButton(
                     ActionOption(
                         state = state,
                         action = action,
-                        isEnabled = state.enabledAllowNonHostAddParticipantsOption,
+                        isChecked = state.enabledAllowNonHostAddParticipantsOption,
                         hasSwitch = true
                     )
                     CustomDivider(withStartPadding = true)
@@ -653,7 +656,8 @@ private fun ActionButton(
                     ActionOption(
                         state = state,
                         action = action,
-                        isEnabled = enabledWaitingRoomOption,
+                        isEnabled = !isCallInProgress,
+                        isChecked = state.enabledWaitingRoomOption,
                         hasSwitch = true
                     )
 
@@ -677,7 +681,7 @@ private fun ActionButton(
                     ActionOption(
                         state = state,
                         action = action,
-                        isEnabled = true,
+                        isChecked = true,
                         hasSwitch = false
                     )
                     CustomDivider(withStartPadding = true)
@@ -688,7 +692,7 @@ private fun ActionButton(
                 ActionOption(
                     state = state,
                     action = action,
-                    isEnabled = state.dndSeconds == null,
+                    isChecked = state.dndSeconds == null,
                     hasSwitch = true
                 )
                 CustomDivider(withStartPadding = true)
@@ -698,7 +702,7 @@ private fun ActionButton(
                 ActionOption(
                     state = state,
                     action = action,
-                    isEnabled = true,
+                    isChecked = true,
                     hasSwitch = false
                 )
                 CustomDivider(withStartPadding = true)
@@ -897,7 +901,8 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
 private fun ActionOption(
     state: ScheduledMeetingInfoState,
     action: ScheduledMeetingInfoAction,
-    isEnabled: Boolean,
+    isChecked: Boolean,
+    isEnabled: Boolean = true,
     hasSwitch: Boolean,
 ) {
     Row(
@@ -950,7 +955,8 @@ private fun ActionOption(
             ) {
                 Switch(
                     modifier = Modifier.align(Alignment.Center),
-                    checked = isEnabled,
+                    checked = isChecked,
+                    enabled = isEnabled,
                     onCheckedChange = null,
                     colors = switchColors()
                 )
@@ -1298,7 +1304,7 @@ fun PreviewActionButton() {
             action = ScheduledMeetingInfoAction.MeetingLink,
             isWaitingRoomFeatureFlagEnabled = true,
             enabledMeetingLinkOption = true,
-            enabledWaitingRoomOption = true,
+            isCallInProgress = false,
             onButtonClicked = {})
     }
 }

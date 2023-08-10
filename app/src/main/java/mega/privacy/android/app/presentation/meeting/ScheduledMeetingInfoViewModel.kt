@@ -180,6 +180,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 isHost = ownPrivilege == ChatRoomPermission.Moderator,
                                 isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                                 enabledAllowNonHostAddParticipantsOption = isOpenInvite,
+                                enabledWaitingRoomOption = chat.isWaitingRoom,
                                 isPublic = isPublic
                             )
                         }
@@ -260,6 +261,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     }
                     getScheduledMeetingUpdates()
                 }
+
+                getScheduledMeetingUpdates()
             }
         }
 
@@ -291,6 +294,12 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         } else {
                             chatTitle
                         }
+                        val isWaitingRoom = if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
+                            Timber.d("Changes in waiting room")
+                            chat.isWaitingRoom
+                        } else {
+                            enabledWaitingRoomOption
+                        }
                         val isPublic = if (chat.hasChanged(ChatRoomChange.ChatMode)) {
                             Timber.d("Changes in chat mode, isPublic ${chat.isPublic}")
                             chat.isPublic
@@ -316,6 +325,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite,
                             chatTitle = title,
                             isPublic = isPublic,
+                            enabledWaitingRoomOption = isWaitingRoom,
                             retentionTimeSeconds = retentionTime
                         )
                     }
@@ -790,6 +800,24 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
+     * Enable or disable waiting room option
+     */
+    fun setWaitingRoom() =
+        viewModelScope.launch {
+            runCatching {
+                setWaitingRoomUseCase(state.value.chatId, !state.value.enabledWaitingRoomOption)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess {
+                _state.update { state ->
+                    state.copy(
+                        enabledWaitingRoomOption = !state.enabledWaitingRoomOption
+                    )
+                }
+            }
+        }
+
+    /**
      * Enable encrypted key rotation if there is internet connection, shows an error if not.
      */
     fun enableEncryptedKeyRotation() {
@@ -872,17 +900,18 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Scheduled meeting updated
      */
-    fun scheduledMeetingUpdated() =
+    fun scheduledMeetingUpdated() {
         showSnackBar(R.string.meetings_edit_scheduled_meeting_success_snackbar)
+        getChat()
+    }
 
     /**
      * Show snackBar with a text
      *
      * @param stringId String id.
      */
-    private fun showSnackBar(stringId: Int) {
+    private fun showSnackBar(stringId: Int) =
         _state.update { it.copy(snackBar = stringId) }
-    }
 
     /**
      * Updates state after shown snackBar.

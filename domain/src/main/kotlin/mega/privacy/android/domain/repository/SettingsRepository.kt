@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.preference.StartScreen
 import java.io.File
 
@@ -186,6 +187,20 @@ interface SettingsRepository {
      * @param callsMeetingReminders New Meeting reminders status
      */
     suspend fun setCallsMeetingReminders(callsMeetingReminders: CallsMeetingReminders)
+
+    /**
+     * Get  waiting room reminders
+     *
+     * @return Waiting room reminders status
+     */
+    fun getWaitingRoomReminders(): Flow<WaitingRoomReminders>
+
+    /**
+     * Set waiting room reminders status
+     *
+     * @param waitingRoomReminders New Waiting room reminders status
+     */
+    suspend fun setWaitingRoomReminders(waitingRoomReminders: WaitingRoomReminders)
 
     /**
      * Set string preference

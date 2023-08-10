@@ -222,6 +222,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     viewModel.scheduledMeetingUpdated()
+                    scheduledMeetingManagementViewModel.checkWaitingRoomWarning()
                 }
             }
     }
@@ -507,7 +508,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             ScheduledMeetingInfoAction.ManageChatHistory -> openManageChatHistory()
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> {}
-            ScheduledMeetingInfoAction.WaitingRoom -> scheduledMeetingManagementViewModel.setWaitingRoom()
+            ScheduledMeetingInfoAction.WaitingRoom -> viewModel.setWaitingRoom()
         }
     }
 
@@ -524,6 +525,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         private var enabledChatNotification: Boolean = false
         private var link: String? = null
         private const val LEARN_MORE_URI =
-            "https://help.mega.io/"
+            "https://help.mega.io/wp-admin/post.php?post=3005&action=edit"
     }
 }

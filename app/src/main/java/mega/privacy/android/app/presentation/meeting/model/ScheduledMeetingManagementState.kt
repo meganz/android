@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.extensions.getStartTimeFormatted
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import java.time.ZonedDateTime
 
 /**
@@ -29,9 +30,9 @@ import java.time.ZonedDateTime
  * @property editedOccurrence                   Edited [ChatScheduledMeetingOccurr]
  * @property editedOccurrenceDate               [ZonedDateTime]
  * @property chatRoomItem                       Selected [ChatRoomItem]
- * @property isWarningClosed                    True if waiting room warning was closed, false if not.
- * @property enabledWaitingRoomOption           True if is enabled the waiting room option, false otherwise.
+ * @property waitingRoomReminder                [WaitingRoomReminders]
  * @property isWaitingRoomFeatureFlagEnabled    True, if waiting room feature flag is enabled. False, if not.
+ * @property isCallInProgress                   True, if there is a call in progress. False, if not.
  * @constructor Create empty Scheduled meeting management state
  */
 data class ScheduledMeetingManagementState constructor(
@@ -45,14 +46,14 @@ data class ScheduledMeetingManagementState constructor(
     val displayDialog: Boolean = false,
     val enabledMeetingLinkOption: Boolean = true,
     val meetingLink: String? = null,
-    val enabledWaitingRoomOption: Boolean = false,
     val cancelOccurrenceTapped: Boolean = false,
     val editOccurrenceTapped: Boolean = false,
     val chatRoomItem: ChatRoomItem? = null,
     val editedOccurrence: ChatScheduledMeetingOccurr? = null,
     val editedOccurrenceDate: ZonedDateTime? = null,
-    val isWarningClosed: Boolean = false,
+    val waitingRoomReminder: WaitingRoomReminders = WaitingRoomReminders.Enabled,
     val isWaitingRoomFeatureFlagEnabled: Boolean = false,
+    val isCallInProgress: Boolean = false,
 ) {
 
     /**

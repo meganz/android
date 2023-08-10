@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManag
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.meeting.view.formatRetentionTimeInSecondsToString
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -240,7 +241,7 @@ class ScheduledMeetingInfoViewTest {
             ),
             ScheduledMeetingManagementState(
                 enabledMeetingLinkOption = true,
-                isWarningClosed = false
+                waitingRoomReminder = WaitingRoomReminders.Enabled
             )
         )
         composeRule.onNodeWithText(R.string.add_participants_menu_item)

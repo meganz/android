@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -26,13 +27,14 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
-import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -40,9 +42,12 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
-import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateOccurrenceUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
@@ -66,10 +71,12 @@ import javax.inject.Inject
  * @property monitorChatListItemUpdates                 [MonitorChatListItemUpdates]
  * @property megaChatApiGateway                         [MegaChatApiGateway]
  * @property updateOccurrenceUseCase                    [UpdateOccurrenceUseCase]
- * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
- * @property monitorChatRoomUpdates                     [MonitorChatRoomUpdates]
  * @property broadcastScheduledMeetingCanceledUseCase   [BroadcastScheduledMeetingCanceledUseCase]
  * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
+ * @property getWaitingRoomRemindersUseCase             [GetWaitingRoomRemindersUseCase]
+ * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
+ * @property monitorChatCallUpdates                     [MonitorChatCallUpdates]
+ * @property getChatCall                                [GetChatCall]
  * @property state                                      Current view state as [ScheduledMeetingManagementState]setWaitingRoom
  */
 @HiltViewModel
@@ -88,10 +95,12 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val updateOccurrenceUseCase: UpdateOccurrenceUseCase,
-    private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val broadcastScheduledMeetingCanceledUseCase: BroadcastScheduledMeetingCanceledUseCase,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
+    private val getWaitingRoomRemindersUseCase: GetWaitingRoomRemindersUseCase,
+    private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
+    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val getChatCall: GetChatCall,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScheduledMeetingManagementState())
     val state: StateFlow<ScheduledMeetingManagementState> = _state
@@ -106,14 +115,11 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _state.update { state ->
-                getFeatureFlagValue(AppFeatures.WaitingRoomSettings).let { flag ->
-                    state.copy(
-                        isWaitingRoomFeatureFlagEnabled = flag,
-                    )
-                }
+            getFeatureFlagValue(AppFeatures.WaitingRoomSettings).let { flag ->
+                _state.update { it.copy(isWaitingRoomFeatureFlagEnabled = flag) }
             }
         }
+        checkWaitingRoomWarning()
     }
 
     /**
@@ -329,27 +335,6 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     }
 
     /**
-     * Enable or disable waiting room option
-     */
-    fun setWaitingRoom(isWaitingRoom: Boolean = !state.value.enabledWaitingRoomOption) =
-        state.value.chatId?.let { chatId ->
-            viewModelScope.launch {
-                runCatching {
-                    setWaitingRoomUseCase(chatId, isWaitingRoom)
-                }.onFailure { exception ->
-                    Timber.e(exception)
-                    triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
-                }.onSuccess {
-                    _state.update { state ->
-                        state.copy(
-                            enabledWaitingRoomOption = isWaitingRoom
-                        )
-                    }
-                }
-            }
-        }
-
-    /**
      * Trigger event to show Snackbar message
      *
      * @param message     Content for snack bar
@@ -371,13 +356,30 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      * @param newChatId Chat ID.
      */
     fun setChatId(newChatId: Long) {
-        if (newChatId != megaChatApiGateway.getChatInvalidHandle() && newChatId != state.value.chatId) {
+        if (newChatId != megaChatApiGateway.getChatInvalidHandle()) {
             _state.update {
                 it.copy(
                     chatId = newChatId
                 )
             }
             getChatRoom()
+            getChatCall()
+        }
+    }
+
+    private fun getChatCall() = viewModelScope.launch {
+        runCatching {
+            _state.value.chatId?.let { chatId -> getChatCall(chatId) }
+        }.onSuccess { chatCall ->
+            chatCall?.let { call ->
+                call.status?.let {
+                    checkCallStatus(it)
+                }
+                getChatCallUpdates()
+            }
+
+        }.onFailure { exception ->
+            Timber.e(exception)
         }
     }
 
@@ -406,11 +408,9 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         chatRoom = chat,
-                        enabledWaitingRoomOption = chat.isWaitingRoom,
                     )
                 }
 
-                getChatRoomUpdates(chat.chatId)
                 queryChatLink()
                 getChatListItemUpdates()
             }
@@ -419,24 +419,6 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             Timber.e(exception)
         }
     }
-
-    /**
-     * Get chat room updates
-     *
-     * @param chatId Chat id.
-     */
-    private fun getChatRoomUpdates(chatId: Long) =
-        viewModelScope.launch {
-            monitorChatRoomUpdates(chatId).collectLatest { chat ->
-                if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
-                    _state.update {
-                        it.copy(
-                            enabledWaitingRoomOption = chat.isWaitingRoom,
-                        )
-                    }
-                }
-            }
-        }
 
     /**
      * Get chat list item updates
@@ -650,9 +632,64 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      * Close waiting room warning
      */
     fun closeWaitingRoomWarning() =
-        _state.update {
-            it.copy(isWarningClosed = true)
+        viewModelScope.launch {
+            runCatching {
+                setWaitingRoomRemindersUseCase(WaitingRoomReminders.Disabled)
+            }
+            _state.update {
+                it.copy(waitingRoomReminder = WaitingRoomReminders.Disabled)
+            }
         }
+
+    /**
+     * Check waiting room warning
+     */
+    fun checkWaitingRoomWarning() {
+        viewModelScope.launch {
+            getWaitingRoomRemindersUseCase().collectLatest { result ->
+                _state.update { it.copy(waitingRoomReminder = result) }
+            }
+        }
+    }
+
+    /**
+     *  Check call status
+     *
+     * @param status    [ChatCallStatus]
+     */
+    private fun checkCallStatus(status: ChatCallStatus) {
+        val isInProgress = when (status) {
+            ChatCallStatus.Connecting,
+            ChatCallStatus.Joining,
+            ChatCallStatus.InProgress,
+            -> true
+
+            else -> false
+        }
+        _state.update {
+            it.copy(
+                isCallInProgress = isInProgress
+            )
+        }
+    }
+
+    /**
+     * Get chat call updates
+     */
+    private fun getChatCallUpdates() =
+        viewModelScope.launch {
+            monitorChatCallUpdates()
+                .filter { it.chatId == _state.value.chatId }
+                .collectLatest { call ->
+                    Timber.d("Monitor chat call updated, changes ${call.changes}")
+                    if (call.changes == ChatCallChanges.Status) {
+                        call.status?.let {
+                            checkCallStatus(it)
+                        }
+                    }
+                }
+        }
+
 
     /**
      * Shares the link to chat

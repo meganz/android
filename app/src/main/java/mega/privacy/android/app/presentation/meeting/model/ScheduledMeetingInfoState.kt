@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property secondParticipant                          Second participant in the chat room.
  * @property numOfParticipants                          Number of participants.
  * @property is24HourFormat                             True, if it's 24 hour format.
+ * @property enabledWaitingRoomOption                   True if is enabled waiting room option, false otherwise.
  */
 data class ScheduledMeetingInfoState(
     val chatId: Long = -1L,
@@ -68,6 +69,7 @@ data class ScheduledMeetingInfoState(
     val secondParticipant: ChatParticipant? = null,
     val numOfParticipants: Int = 0,
     val is24HourFormat: Boolean = false,
+    val enabledWaitingRoomOption: Boolean = true,
 ) {
 
     /**

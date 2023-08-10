@@ -8,6 +8,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,6 +27,7 @@ import mega.privacy.android.app.presentation.meeting.mapper.WeekDayMapper
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -43,6 +45,8 @@ import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
+import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
@@ -51,6 +55,7 @@ import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
+import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
@@ -77,8 +82,11 @@ import javax.inject.Inject
  * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
  * @property getPluralStringFromStringResMapper         [GetPluralStringFromStringResMapper]
  * @property setOpenInvite                              [SetOpenInvite]
+ * @property queryChatLink                              [QueryChatLink]
  * @property removeParticipantFromChat                  [RemoveParticipantFromChatUseCase]
  * @property inviteParticipantToChat                    [InviteParticipantToChatUseCase]
+ * @property monitorChatRoomUpdates                     [MonitorChatRoomUpdates]
+ * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
  * @property state                                      Current view state as [CreateScheduledMeetingState]
  */
 @HiltViewModel
@@ -93,6 +101,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val updateScheduledMeetingUseCase: UpdateScheduledMeetingUseCase,
     private val createChatLink: CreateChatLink,
     private val removeChatLink: RemoveChatLink,
+    private val queryChatLink: QueryChatLink,
     private val recurrenceDialogOptionMapper: RecurrenceDialogOptionMapper,
     private val weekDayMapper: WeekDayMapper,
     private val deviceGateway: DeviceGateway,
@@ -101,6 +110,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val setOpenInviteUseCase: SetOpenInviteUseCase,
     private val removeParticipantFromChat: RemoveParticipantFromChatUseCase,
     private val inviteParticipantToChat: InviteParticipantToChatUseCase,
+    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
+    private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScheduledMeetingState())
@@ -152,7 +163,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
 
         if (isEdition) {
             getScheduledMeeting(chatId)
-
             viewModelScope.launch {
                 runCatching {
                     getChatRoomUseCase(chatId)
@@ -162,6 +172,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             it.copy(
                                 enabledAllowAddParticipantsOption = chat.isOpenInvite,
                                 initialAllowAddParticipantsOption = chat.isOpenInvite,
+                                enabledWaitingRoomOption = chat.isWaitingRoom,
+                                initialWaitingRoomOption = chat.isWaitingRoom,
                                 numOfParticipants = chat.peerHandlesList.size + 1,
                             )
                         }
@@ -185,7 +197,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             )
                         }
 
-                        getScheduledMeeting(chat.chatId)
+                        checkMeetingLink(chat.chatId)
+                        getChatRoomUpdates(chat.chatId)
                     }
 
                 }.onFailure { exception ->
@@ -211,61 +224,26 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                     ?.firstOrNull { !it.isCanceled && it.parentSchedId == -1L }
                     ?.let { schedMeet ->
                         Timber.d("Scheduled meeting recovered")
+                        val initialStartDate = schedMeet.getZoneStartTime()
+                        val initialEndDate = schedMeet.getZoneEndTime()
+                        val sendCalendarInvite = schedMeet.flags?.sendEmails ?: false
+                        val title = schedMeet.title ?: ""
+                        val description = schedMeet.description ?: ""
                         _state.update { state ->
                             state.copy(
                                 scheduledMeeting = schedMeet,
+                                meetingTitle = title,
+                                descriptionText = description,
+                                isEmptyTitleError = if (title.isNotEmpty()) false else state.isEmptyTitleError,
+                                enabledSendCalendarInviteOption = sendCalendarInvite,
+                                initialSendCalendarInviteOption = sendCalendarInvite,
+                                rulesSelected = schedMeet.rules ?: ChatScheduledRules(),
+                                startDate = initialStartDate ?: state.getInitialStartDate(),
+                                endDate = initialEndDate ?: state.getInitialEndDate(),
                             )
                         }
-                        updateInitialScheduledMeetingValues()
                     }
             }
-        }
-
-    /**
-     * Setting the initial relays when editing a scheduled meeting
-     */
-    private fun updateInitialScheduledMeetingValues() {
-        state.value.scheduledMeeting?.let {
-            onTitleChange(it.title ?: "")
-            onDescriptionChange(it.description ?: "")
-            val initialStartDate = it.getZoneStartTime()
-            val initialEndDate = it.getZoneEndTime()
-            val sendCalendarInvite = it.flags?.sendEmails ?: false
-            _state.update { state ->
-                state.copy(
-                    enabledSendCalendarInviteOption = sendCalendarInvite,
-                    initialSendCalendarInviteOption = sendCalendarInvite,
-                    rulesSelected = it.rules ?: ChatScheduledRules(),
-                    startDate = initialStartDate ?: state.getInitialStartDate(),
-                    endDate = initialEndDate ?: state.getInitialEndDate(),
-                )
-            }
-        }
-    }
-
-    /**
-     * Update initial value of meeting link
-     *
-     * @param hasMeetingLink    True, if it has meeting link. False, if not.
-     * @param isWaitingRoom     True, if it is waiting room. False, if not.
-     */
-    fun updateInitialChatValues(
-        hasMeetingLink: Boolean,
-        isWaitingRoom: Boolean,
-    ) =
-        when (state.value.type) {
-            ScheduledMeetingType.Edition -> {
-                _state.update { state ->
-                    state.copy(
-                        enabledMeetingLinkOption = hasMeetingLink,
-                        initialMeetingLinkOption = hasMeetingLink,
-                        enabledWaitingRoomOption = isWaitingRoom,
-                        initialWaitingRoomOption = isWaitingRoom
-                    )
-                }
-            }
-
-            else -> {}
         }
 
     /**
@@ -686,7 +664,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                                     removeMeetingLink(id)
                                 }
 
-                                _state.update { it.copy(finish = true) }
+                                if (state.value.initialWaitingRoomOption != state.value.enabledWaitingRoomOption) {
+                                    setWaitingRoom(id, state.value.enabledWaitingRoomOption)
+                                } else {
+                                    _state.update { it.copy(finish = true) }
+                                }
                             }
                         }
                     }
@@ -714,6 +696,24 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     }
 
     /**
+     * Get chat room updates
+     *
+     * @param chatId Chat id.
+     */
+    private fun getChatRoomUpdates(chatId: Long) =
+        viewModelScope.launch {
+            monitorChatRoomUpdates(chatId).collectLatest { chat ->
+                if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
+                    _state.update {
+                        it.copy(
+                            enabledWaitingRoomOption = chat.isWaitingRoom,
+                        )
+                    }
+                }
+            }
+        }
+
+    /**
      * Get participants emails
      */
     fun getEmails(): ArrayList<String> = ArrayList(_state.value.getParticipantsEmails())
@@ -730,6 +730,28 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 setOpenInviteUseCase(chatId, isEnabled)
             }.onFailure { exception ->
                 Timber.e(exception)
+            }
+        }
+
+    /**
+     * Enable or disable waiting room option
+     *
+     * @param chatId        Chat Id.
+     * @param isEnabled     True, enabled allow non-host add participants. False, otherwise.
+     */
+    private fun setWaitingRoom(chatId: Long, isEnabled: Boolean) =
+        viewModelScope.launch {
+            runCatching {
+                setWaitingRoomUseCase(chatId, isEnabled)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess {
+                _state.update { state ->
+                    state.copy(
+                        enabledWaitingRoomOption = isEnabled,
+                        finish = true
+                    )
+                }
             }
         }
 
@@ -810,6 +832,27 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 removeChatLink(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
+            }
+        }
+
+    /**
+     * Check if there is an existing chat-link for an public chat
+     */
+    private fun checkMeetingLink(chatId: Long) =
+        viewModelScope.launch {
+            runCatching {
+                queryChatLink(chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { request ->
+                Timber.d("Query chat link successfully")
+                val hastMeetingLink = request.text != null
+                _state.update {
+                    it.copy(
+                        enabledMeetingLinkOption = hastMeetingLink,
+                        initialMeetingLinkOption = hastMeetingLink
+                    )
+                }
             }
         }
 
