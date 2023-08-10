@@ -1751,9 +1751,10 @@ class VideoPlayerViewModel @Inject constructor(
             val subtitleName = subtitleFileInfo.name.let { name ->
                 name.substring(0, name.lastIndexOf("."))
             }
-            val mediaItemName = playlistItems[playingPosition].nodeName.let { name ->
-                name.substring(0, name.lastIndexOf("."))
-            }
+            val mediaItemName =
+                playlistItems.elementAtOrNull(playingPosition)?.nodeName?.let { name ->
+                    name.substring(0, name.lastIndexOf("."))
+                }
             subtitleName == mediaItemName
         }
 
