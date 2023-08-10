@@ -9,6 +9,7 @@ import com.google.accompanist.navigation.animation.composable
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 
 const val syncRoute = "sync"
@@ -27,11 +28,14 @@ internal fun NavGraphBuilder.syncNavGraph(navController: NavController) {
             }
         }
         composable(route = syncNewFolderRoute) {
-            SyncNewFolderScreenRoute(hiltViewModel(), openSelectMegaFolderScreen = {
-                navController.navigate(syncMegaPicker)
-            }, openNextScreen = {
-                navController.navigate(syncList)
-            })
+            SyncNewFolderScreenRoute(
+                hiltViewModel(),
+                SyncPermissionsManager(),
+                openSelectMegaFolderScreen = {
+                    navController.navigate(syncMegaPicker)
+                }, openNextScreen = {
+                    navController.navigate(syncList)
+                })
         }
         composable(route = syncMegaPicker) {
             MegaPickerRoute(viewModel = hiltViewModel(), folderSelected = {

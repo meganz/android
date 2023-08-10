@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 
 import android.content.res.Configuration
 import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.core.ui.controls.banners.TwoActionsBanner
+import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 
 @Composable
@@ -26,9 +28,11 @@ internal fun SyncNewFolderScreen(
     folderPairName: String,
     selectedLocalFolder: String,
     selectedMegaFolder: RemoteFolder?,
-    showPermissionBanner: Boolean,
-    permissionAllowButtonClicked: () -> Unit,
-    permissionLearnMoreButtonClicked: () -> Unit,
+    showDisableBatteryOptimizationsBanner: Boolean,
+    batteryOptimizationAllowButtonClicked: () -> Unit,
+    batteryOptimizationLearnMoreButtonClicked: () -> Unit,
+    showAllFilesAccessBanner: Boolean,
+    allFilesAccessBannerClicked: () -> Unit,
     localFolderSelected: (Uri) -> Unit,
     folderNameChanged: (String) -> Unit,
     selectMegaFolderClicked: () -> Unit,
@@ -40,7 +44,7 @@ internal fun SyncNewFolderScreen(
             localFolderSelected(it)
         }
 
-        if (showPermissionBanner) {
+        if (showDisableBatteryOptimizationsBanner) {
             TwoActionsBanner(
                 modifier = Modifier.padding(top = 20.dp),
                 mainText = "Battery optimisation permission allows MEGA to run " +
@@ -48,10 +52,18 @@ internal fun SyncNewFolderScreen(
                         "Settings -> Apps.",
                 leftActionText = "Learn more",
                 rightActionText = "Allow",
-                leftActionClicked = permissionLearnMoreButtonClicked,
-                rightActionClicked = permissionAllowButtonClicked,
+                leftActionClicked = batteryOptimizationLearnMoreButtonClicked,
+                rightActionClicked = batteryOptimizationAllowButtonClicked,
             )
             Divider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+
+        if (showAllFilesAccessBanner) {
+            WarningBanner(
+                textString = "We need to access your device storage in order to sync your local folder. Click here to grant access.",
+                onCloseClick = null,
+                modifier = Modifier.clickable { allFilesAccessBannerClicked() }
+            )
         }
 
         InputSyncInformationView(
@@ -74,7 +86,9 @@ internal fun SyncNewFolderScreen(
             Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
             val buttonEnabled =
-                selectedLocalFolder.isNotBlank() && selectedMegaFolder != null
+                selectedLocalFolder.isNotBlank()
+                        && selectedMegaFolder != null
+                        && !showAllFilesAccessBanner
 
             RaisedDefaultMegaButton(
                 modifier = Modifier
@@ -97,9 +111,11 @@ private fun PreviewSyncNewFolderScreen() {
             folderPairName = "",
             selectedLocalFolder = "",
             selectedMegaFolder = null,
-            showPermissionBanner = true,
-            permissionAllowButtonClicked = {},
-            permissionLearnMoreButtonClicked = {},
+            showDisableBatteryOptimizationsBanner = true,
+            batteryOptimizationAllowButtonClicked = {},
+            batteryOptimizationLearnMoreButtonClicked = {},
+            showAllFilesAccessBanner = true,
+            allFilesAccessBannerClicked = {},
             localFolderSelected = {},
             folderNameChanged = {},
             selectMegaFolderClicked = {},

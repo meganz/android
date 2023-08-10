@@ -12,6 +12,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +31,7 @@ class SyncNewFolderScreenRouteTest {
 
     private val viewModel: SyncNewFolderViewModel = mock()
     private val state: StateFlow<SyncNewFolderState> = mock()
+    private val syncPermissionsManager: SyncPermissionsManager = mock()
 
     @Test
     fun `test that all sync Sync New Folder components are visible`() {
@@ -38,6 +40,7 @@ class SyncNewFolderScreenRouteTest {
         composeTestRule.setContent {
             SyncNewFolderScreenRoute(
                 viewModel,
+                syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {}
             )
@@ -63,6 +66,7 @@ class SyncNewFolderScreenRouteTest {
         composeTestRule.setContent {
             SyncNewFolderScreenRoute(
                 viewModel,
+                syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {}
             )
@@ -80,6 +84,7 @@ class SyncNewFolderScreenRouteTest {
         composeTestRule.setContent {
             SyncNewFolderScreenRoute(
                 viewModel,
+                syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {}
             )
@@ -105,6 +110,7 @@ class SyncNewFolderScreenRouteTest {
             SyncNewFolderScreenRoute(
                 viewModel,
                 openNextScreen = {},
+                syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = {}
             )
         }
@@ -122,6 +128,7 @@ class SyncNewFolderScreenRouteTest {
         composeTestRule.setContent {
             SyncNewFolderScreenRoute(
                 viewModel,
+                syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = openNextScreenCallback,
                 openSelectMegaFolderScreen = {}
             )
@@ -143,6 +150,7 @@ class SyncNewFolderScreenRouteTest {
             SyncNewFolderScreenRoute(
                 viewModel,
                 openNextScreen = {},
+                syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = openSelectMegaFolderScreenLambda
             )
         }
@@ -151,5 +159,61 @@ class SyncNewFolderScreenRouteTest {
             .performClick()
 
         verify(openSelectMegaFolderScreenLambda).invoke()
+    }
+
+    @Test
+    fun `test that only all files access banner is shown when all files access permission is not granted`() {
+        val emptyState = SyncNewFolderState()
+        whenever(state.value).thenReturn(emptyState)
+        whenever(viewModel.state).thenReturn(state)
+        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())
+            .thenReturn(false)
+        whenever(syncPermissionsManager.isDisableBatteryOptimizationGranted(composeTestRule.activity))
+            .thenReturn(false)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                openNextScreen = {},
+                syncPermissionsManager = syncPermissionsManager,
+                openSelectMegaFolderScreen = { }
+            )
+        }
+
+        composeTestRule.onNodeWithText("We need to access your device storage in order to sync your local folder. Click here to grant access.")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            "Battery optimisation permission allows MEGA to run " +
+                    "in the background. You can change this any time by going to " +
+                    "Settings -> Apps."
+        )
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that only battery optimization banner is shown when disable battery optimization permission is not granted`() {
+        val emptyState = SyncNewFolderState()
+        whenever(state.value).thenReturn(emptyState)
+        whenever(viewModel.state).thenReturn(state)
+        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())
+            .thenReturn(true)
+        whenever(syncPermissionsManager.isDisableBatteryOptimizationGranted(composeTestRule.activity))
+            .thenReturn(false)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                openNextScreen = {},
+                syncPermissionsManager = syncPermissionsManager,
+                openSelectMegaFolderScreen = { }
+            )
+        }
+
+        composeTestRule.onNodeWithText("We need to access your device storage in order to sync your local folder. Click here to grant access.")
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithText(
+            "Battery optimisation permission allows MEGA to run " +
+                    "in the background. You can change this any time by going to " +
+                    "Settings -> Apps."
+        )
+            .assertIsDisplayed()
     }
 }

@@ -12,4 +12,6 @@ internal data class SyncNewFolderState(
     val folderPairName: String = "",
     val selectedLocalFolder: String = "",
     val selectedMegaFolder: RemoteFolder? = null,
+    val showDisableBatteryOptimizationsBanner: Boolean = false,
+    val showAllFilesAccesBanner: Boolean = false
 )
