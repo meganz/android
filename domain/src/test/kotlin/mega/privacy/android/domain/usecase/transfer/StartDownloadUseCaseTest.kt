@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.downloads.DownloadNodesUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
@@ -41,15 +42,17 @@ class StartDownloadUseCaseTest {
     private val downloadNodesUseCase: DownloadNodesUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
+    private val transferRepository: TransferRepository = mock()
 
     @BeforeAll
     fun setup() {
         underTest =
             StartDownloadUseCase(
-                doesPathHaveSufficientSpaceForNodesUseCase,
-                downloadNodesUseCase,
-                cancelCancelTokenUseCase,
-                fileSystemRepository,
+                doesPathHaveSufficientSpaceForNodesUseCase = doesPathHaveSufficientSpaceForNodesUseCase,
+                downloadNodesUseCase = downloadNodesUseCase,
+                cancelCancelTokenUseCase = cancelCancelTokenUseCase,
+                fileSystemRepository = fileSystemRepository,
+                transferRepository = transferRepository,
             )
     }
 
@@ -60,6 +63,7 @@ class StartDownloadUseCaseTest {
             downloadNodesUseCase,
             cancelCancelTokenUseCase,
             fileSystemRepository,
+            transferRepository,
         )
     }
 
@@ -109,6 +113,17 @@ class StartDownloadUseCaseTest {
             Truth.assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `test that download worker is started when start download finish correctly`() = runTest {
+        mockFlow(
+            flowOf(
+                DownloadNodesEvent.FinishProcessingTransfers,
+            )
+        )
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).collect()
+        verify(transferRepository).startDownloadWorker()
     }
 
     @Test

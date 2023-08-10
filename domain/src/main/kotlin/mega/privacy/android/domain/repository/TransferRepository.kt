@@ -238,6 +238,11 @@ interface TransferRepository {
     suspend fun deleteOldestCompletedTransfers()
 
     /**
+     * Starts the download worker to monitor the download transfers as a foreground service
+     */
+    fun startDownloadWorker()
+
+    /**
      * Monitors transfers finished.
      */
     fun monitorTransfersFinished(): Flow<TransfersFinishedState>

@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.downloads.DownloadNodesUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
@@ -34,6 +35,7 @@ class StartDownloadUseCase @Inject constructor(
     private val downloadNodesUseCase: DownloadNodesUseCase,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val transferRepository: TransferRepository,
 ) {
     /**
      * Invoke
@@ -81,7 +83,7 @@ class StartDownloadUseCase @Inject constructor(
                                     throw error
                                 }
                             } else {
-                                //to be done in TRAN-169: here the download worker will be started to monitor the download and show the notification
+                                transferRepository.startDownloadWorker()
                             }
                         }
                 } else {

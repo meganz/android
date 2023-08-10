@@ -769,5 +769,11 @@ class DefaultTransfersRepositoryTest {
             val actual = underTest.getCurrentActiveTransferTotalsByType(transferType)
             assertThat(actual).isEqualTo(expected)
         }
+
+        @Test
+        fun `test that workerManagerGateway enqueueDownloadsWorkerRequest is called when startDownloadWorker is called`() {
+            underTest.startDownloadWorker()
+            verify(workerManagerGateway).enqueueDownloadsWorkerRequest()
+        }
     }
 }

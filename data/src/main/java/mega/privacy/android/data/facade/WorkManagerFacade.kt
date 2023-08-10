@@ -5,6 +5,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
+import mega.privacy.android.data.worker.DownloadsWorker
 import javax.inject.Inject
 
 internal class WorkManagerFacade @Inject constructor(
@@ -22,6 +23,18 @@ internal class WorkManagerFacade @Inject constructor(
                 DeleteOldestCompletedTransfersWorker.DELETE_OLDEST_TRANSFERS_WORKER_TAG,
                 ExistingWorkPolicy.KEEP,
                 workRequest
+            )
+    }
+
+    override fun enqueueDownloadsWorkerRequest() {
+        val request = OneTimeWorkRequest.Builder(DownloadsWorker::class.java)
+            .addTag(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
+            .build()
+        workManager
+            .enqueueUniqueWork(
+                DownloadsWorker.SINGLE_DOWNLOAD_TAG,
+                ExistingWorkPolicy.REPLACE,
+                request
             )
     }
 }

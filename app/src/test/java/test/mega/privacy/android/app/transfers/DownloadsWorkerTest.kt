@@ -16,12 +16,16 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.transfers.DownloadsWorker
+import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
+import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -35,6 +39,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -57,6 +62,7 @@ class DownloadsWorkerTest {
     private val monitorActiveTransferTotalsUseCase = mock<MonitorActiveTransferTotalsUseCase>()
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
+    private val downloadNotificationMapper = mock<DownloadNotificationMapper>()
 
     @Before
     fun setup() {
@@ -96,6 +102,7 @@ class DownloadsWorkerTest {
             monitorActiveTransferTotalsUseCase = monitorActiveTransferTotalsUseCase,
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
+            downloadNotificationMapper = downloadNotificationMapper,
         )
     }
 
@@ -123,32 +130,88 @@ class DownloadsWorkerTest {
 
     @Test
     fun `test that worker finishes with success if last transfer is completed`() = runTest {
-        val transferTotal: ActiveTransferTotals = mock {
-            on { hasCompleted() }.thenReturn(true)
-        }
-        commonStub(transferTotal)
+        val transferTotal = mockActiveTransferTotals(true)
+        commonStub(transferTotal = transferTotal)
         Truth.assertThat(underTest.doWork()).isEqualTo(ListenableWorker.Result.success())
     }
 
     @Test
     fun `test that worker finishes with failure if last transfer is not completed`() = runTest {
-        val transferTotal: ActiveTransferTotals = mock {
-            on { hasCompleted() }.thenReturn(false)
-        }
+        val transferTotal = mockActiveTransferTotals(false)
         commonStub(transferTotal)
         Truth.assertThat(underTest.doWork()).isEqualTo(ListenableWorker.Result.failure())
     }
 
-    private fun commonStub(transferTotal: ActiveTransferTotals = mock()) = runTest {
-        val transfer = mock<Transfer>()
+    @Test
+    fun `test that notification is created when worker starts`() = runTest {
+        val transferTotal: ActiveTransferTotals = mockActiveTransferTotals(true)
+        commonStub(transferTotal)
+        underTest.doWork()
+        verify(downloadNotificationMapper).invoke(transferTotal, false)
+    }
+
+    @Test
+    fun `test that notification is updated when transfers are paused`() = runTest {
+        val initial: ActiveTransferTotals = mockActiveTransferTotals(false)
+        val transferTotal: ActiveTransferTotals = mockActiveTransferTotals(true)
+        commonStub(
+            monitorPauseFlow = flowOf(false, true),
+            initialTransferTotals = initial,
+            transferTotals = listOf(transferTotal)
+        )
+        underTest.doWork()
+        verify(downloadNotificationMapper, atLeastOnce()).invoke(initial, false)
+        verify(downloadNotificationMapper).invoke(transferTotal, true)
+    }
+
+    @Test
+    fun `test that notification is updated when transfer totals are updated`() = runTest {
+        val initial: ActiveTransferTotals = mockActiveTransferTotals(false)
+        val transferTotals = (0..10).map {
+            mockActiveTransferTotals(false)
+        }.plus(mockActiveTransferTotals(true))
+        commonStub(
+            initialTransferTotals = initial,
+            transferTotals = transferTotals,
+        )
+        underTest.doWork()
+        verify(downloadNotificationMapper, atLeastOnce()).invoke(initial, false)
+        transferTotals.forEach {
+            verify(downloadNotificationMapper).invoke(it, false)
+        }
+    }
+
+    private suspend fun commonStub(transferTotal: ActiveTransferTotals) = commonStub(
+        transferTotals = listOf(transferTotal)
+    )
+
+    private suspend fun commonStub(
+        monitorPauseFlow: Flow<Boolean> = flowOf(false),
+        initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
+        transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
+    ) = runTest {
+        val transfer: Transfer = mock()
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
         whenever(getActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
-            .thenReturn(transferTotal)
+            .thenReturn(initialTransferTotals)
         whenever(monitorPausedTransfersUseCase())
-            .thenReturn(flowOf(false))
+            .thenReturn(monitorPauseFlow)
         whenever(monitorTransferEventsUseCase())
             .thenReturn(flowOf(transferEvent))
         whenever(monitorActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
-            .thenReturn(flowOf(transferTotal))
+            .thenReturn(flow {
+                delay(100)//to be sure that other events are received
+                transferTotals.forEach {
+                    emit(it)
+                }
+            })
+    }
+
+    private fun mockActiveTransferTotals(
+        hasCompleted: Boolean,
+        hasOngoing: Boolean = !hasCompleted,
+    ) = mock<ActiveTransferTotals> {
+        on { hasCompleted() }.thenReturn(hasCompleted)
+        on { hasOngoingTransfers() }.thenReturn(hasOngoing)
     }
 }

@@ -372,6 +372,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.enqueueDeleteOldestCompletedTransfersWorkRequest()
     }
 
+    override fun startDownloadWorker() {
+        workerManagerGateway.enqueueDownloadsWorkerRequest()
+    }
+
     override fun monitorTransfersFinished() = appEventGateway.monitorTransfersFinished()
 
     override suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState) =

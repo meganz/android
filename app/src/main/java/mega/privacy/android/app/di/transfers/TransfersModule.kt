@@ -9,6 +9,8 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
+import mega.privacy.android.app.presentation.transfers.notification.DefaultDownloadNotificationMapper
+import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.DefaultMonitorTransfersSize
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
@@ -29,6 +31,14 @@ abstract class TransfersModule {
      */
     @Binds
     abstract fun bindMonitorTransfersSize(useCase: DefaultMonitorTransfersSize): MonitorTransfersSize
+
+    /**
+     * Binds [DownloadNotificationMapper] to its default implementation [DefaultDownloadNotificationMapper]
+     * @param mapper [DefaultDownloadNotificationMapper]
+     * @return default [DownloadNotificationMapper]
+     */
+    @Binds
+    abstract fun bindDownloadNotificationMapper(mapper: DefaultDownloadNotificationMapper): DownloadNotificationMapper
 
     companion object {
 

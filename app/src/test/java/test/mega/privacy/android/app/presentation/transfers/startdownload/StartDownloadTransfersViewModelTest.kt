@@ -83,7 +83,6 @@ class StartDownloadTransfersViewModelTest {
             broadcastOfflineFileAvailabilityUseCase,
             monitorConnectivityUseCase,
             clearActiveTransfersIfFinishedUseCase,
-            workManager = mock(), //WorkManager will be replaced by a use case in TRAN-194, so no need to create tests related to it for now
         )
 
     }
