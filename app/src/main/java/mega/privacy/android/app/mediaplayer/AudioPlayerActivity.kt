@@ -319,7 +319,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 R.id.properties -> {
                     serviceGateway?.getCurrentMediaItem()?.localConfiguration?.uri?.let { uri ->
                         navController.navigate(
-                            AudioPlayerFragmentDirections.actionPlayerToTrackInfo(
+                            AudioPlayerFragmentDirections.actionAudioPlayerToTrackInfo(
                                 adapterType = adapterType,
                                 fromIncomingShare = adapterType == INCOMING_SHARES_ADAPTER,
                                 handle = playingHandle,
@@ -505,10 +505,10 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         navController.addOnDestinationChangedListener { _, dest, args ->
             setupToolbarColors()
             when (dest.id) {
-                R.id.main_player,
+                R.id.audio_main_player,
                 R.id.playlist,
                 -> {
-                    if (dest.id == R.id.main_player) {
+                    if (dest.id == R.id.audio_main_player) {
                         supportActionBar?.title = ""
                     }
                     viewingTrackInfo = null
@@ -681,7 +681,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
     override fun setupToolbarColors(showElevation: Boolean) {
         val isDarkMode = isDarkMode(this)
-        val isMainPlayer = navController.currentDestination?.id == R.id.main_player
+        val isMainPlayer = navController.currentDestination?.id == R.id.audio_main_player
         @ColorRes val toolbarBackgroundColor: Int
         @ColorInt val statusBarColor: Int
         val toolbarElevation: Float
@@ -824,16 +824,16 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                             menu.findItem(R.id.select).isVisible = true
                         }
 
-                        R.id.main_player, R.id.track_info -> {
+                        R.id.audio_main_player, R.id.track_info -> {
                             when {
                                 adapterType == OFFLINE_ADAPTER -> {
                                     menu.toggleAllMenuItemsVisibility(false)
 
                                     menu.findItem(R.id.properties).isVisible =
-                                        currentFragmentId == R.id.main_player
+                                        currentFragmentId == R.id.audio_main_player
 
                                     menu.findItem(R.id.share).isVisible =
-                                        currentFragmentId == R.id.main_player
+                                        currentFragmentId == R.id.audio_main_player
                                 }
 
                                 adapterType == Constants.RUBBISH_BIN_ADAPTER || megaApi.isInRubbish(
@@ -844,7 +844,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     menu.toggleAllMenuItemsVisibility(false)
 
                                     menu.findItem(R.id.properties).isVisible =
-                                        currentFragmentId == R.id.main_player
+                                        currentFragmentId == R.id.audio_main_player
 
                                     val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
                                     moveToTrash.isVisible = true
@@ -907,10 +907,10 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     menu.findItem(R.id.remove).isVisible = false
 
                                     menu.findItem(R.id.properties).isVisible =
-                                        currentFragmentId == R.id.main_player
+                                        currentFragmentId == R.id.audio_main_player
 
                                     menu.findItem(R.id.share).isVisible =
-                                        currentFragmentId == R.id.main_player
+                                        currentFragmentId == R.id.audio_main_player
                                                 && MegaNodeUtil.showShareOption(
                                             adapterType = adapterType,
                                             isFolderLink = false,

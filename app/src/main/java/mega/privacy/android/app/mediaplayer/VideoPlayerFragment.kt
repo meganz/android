@@ -296,7 +296,11 @@ class VideoPlayerFragment : Fragment() {
                 // we need setup control buttons again, because reset player would reset PlayerControlView
                 setupPlaylistButton(viewModel.getPlaylistItems()) {
                     videoPlayerActivity?.setDraggable(false)
-                    findNavController().navigate(R.id.action_player_to_playlist)
+                    findNavController().let {
+                        if (it.currentDestination?.id == R.id.video_main_player) {
+                            it.navigate(VideoPlayerFragmentDirections.actionVideoPlayerToPlaylist())
+                        }
+                    }
                 }
 
                 setupLockUI(viewModel.screenLockState.value) { isLock ->

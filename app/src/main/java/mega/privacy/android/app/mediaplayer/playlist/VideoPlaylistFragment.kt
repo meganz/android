@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
+import mega.privacy.android.app.databinding.FragmentMediaPlaylistBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
@@ -46,7 +46,7 @@ class VideoPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
 
     private val videoViewModel: VideoPlayerViewModel by activityViewModels()
 
-    private var binding by autoCleared<FragmentAudioPlaylistBinding>()
+    private var binding by autoCleared<FragmentMediaPlaylistBinding>()
 
     private var adapter: PlaylistAdapter? = null
     private lateinit var listLayoutManager: LinearLayoutManager
@@ -65,7 +65,7 @@ class VideoPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentAudioPlaylistBinding.inflate(inflater, container, false)
+        binding = FragmentMediaPlaylistBinding.inflate(inflater, container, false)
         setupRecycleView()
         return binding.root
     }

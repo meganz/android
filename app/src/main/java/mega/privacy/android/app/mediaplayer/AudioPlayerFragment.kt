@@ -186,7 +186,11 @@ class AudioPlayerFragment : Fragment() {
 
             serviceViewModelGateway?.run {
                 viewHolder.setupPlaylistButton(requireContext(), getPlaylistItems()) {
-                    findNavController().navigate(R.id.action_player_to_playlist)
+                    findNavController().let {
+                        if (it.currentDestination?.id == R.id.audio_main_player) {
+                            it.navigate(AudioPlayerFragmentDirections.actionAudioPlayerToPlaylist())
+                        }
+                    }
                 }
             }
         }

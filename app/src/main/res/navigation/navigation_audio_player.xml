@@ -3,18 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/media_player"
-    app:startDestination="@id/main_player">
+    app:startDestination="@id/audio_main_player">
     <fragment
-        android:id="@+id/main_player"
+        android:id="@+id/audio_main_player"
         android:name="mega.privacy.android.app.mediaplayer.AudioPlayerFragment"
         android:label=""
         tools:layout="@layout/fragment_audio_player">
         <action
-            android:id="@+id/action_player_to_playlist"
+            android:id="@+id/action_audio_player_to_playlist"
             app:destination="@id/playlist" />
 
         <action
-            android:id="@+id/action_player_to_track_info"
+            android:id="@+id/action_audio_player_to_track_info"
             app:destination="@id/track_info" />
     </fragment>
 
@@ -22,9 +22,9 @@
         android:id="@+id/playlist"
         android:name="mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment"
         android:label=""
-        tools:layout="@layout/fragment_audio_playlist">
+        tools:layout="@layout/fragment_media_playlist">
         <action
-            android:id="@+id/action_playlist_to_track_info"
+            android:id="@+id/action_audio_playlist_to_track_info"
             app:destination="@id/track_info" />
     </fragment>
 
