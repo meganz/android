@@ -26,8 +26,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.permisison.HasAudioPermissionUseCase
-import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
@@ -45,8 +43,6 @@ class FileExplorerViewModel @Inject constructor(
     private val getCopyLatestTargetPathUseCase: GetCopyLatestTargetPathUseCase,
     private val getMoveLatestTargetPathUseCase: GetMoveLatestTargetPathUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
-    private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
-    private val hasAudioPermissionUseCase: HasAudioPermissionUseCase,
 ) : ViewModel() {
 
     private var dataAlreadyRequested = false
@@ -348,14 +344,4 @@ class FileExplorerViewModel @Inject constructor(
     fun resetMoveTargetPathState() {
         _moveTargetPathFlow.value = null
     }
-
-    /**
-     * Has Media Permission
-     */
-    fun hasMediaPermission() = hasMediaPermissionUseCase()
-
-    /**
-     * Has Audio Permission
-     */
-    fun hasAudioPermission() = hasAudioPermissionUseCase()
 }
