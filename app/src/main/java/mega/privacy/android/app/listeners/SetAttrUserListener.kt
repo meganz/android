@@ -119,6 +119,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
                     MegaApiJava.USER_ATTR_RUBBISH_TIME -> if (e.errorCode == MegaError.API_OK) {
                         Intent(BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER).run {
                             putExtra(BroadcastConstants.DAYS_COUNT, number)
+                            setPackage(context.applicationContext.packageName)
                             MegaApplication.getInstance().sendBroadcast(this)
                         }
                     } else {
@@ -127,7 +128,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
 
                     MegaApiJava.USER_ATTR_RICH_PREVIEWS -> if (e.errorCode != MegaError.API_OK) {
                         MegaApplication.getInstance()
-                            .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE))
+                            .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE).setPackage(context.applicationContext.packageName))
                     }
                 }
             }

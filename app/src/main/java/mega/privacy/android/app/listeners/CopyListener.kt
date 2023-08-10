@@ -160,6 +160,7 @@ class CopyListener(
                                         error
                                     )
                                 )
+                                setPackage(context.applicationContext.packageName)
                                 context.sendBroadcast(this)
                             }
                         } else {

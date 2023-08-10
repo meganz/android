@@ -485,7 +485,7 @@ class FileInfoActivity : BaseActivity() {
                     event.successMessage(this)?.let {
                         snackBarHostState.showSnackbar(it)
                     }
-                    sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
+                    sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN).setPackage(applicationContext.packageName))
                 } else {
                     Timber.e(event.exception)
                     if (!manageCopyMoveException(event.exception)) {

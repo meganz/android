@@ -577,7 +577,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                     if (dbH.transferQueueStatus
                         && !transfersManagement.hasResumeTransfersWarningAlreadyBeenShown
                     ) {
-                        sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS))
+                        sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS).setPackage(applicationContext.packageName))
                     }
 
                     this.cancel()
@@ -947,7 +947,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         transfer.pendingMessageId()?.let { id ->
             sendBroadcast(
                 Intent(BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START)
-                    .putExtra(BroadcastConstants.PENDING_MESSAGE_ID, id)
+                    .putExtra(BroadcastConstants.PENDING_MESSAGE_ID, id).setPackage(applicationContext.packageName)
             )
 
             //Update status and tag on db
@@ -1035,7 +1035,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
         error: MegaException?,
     ) = with(transfer) {
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(applicationContext.packageName))
         }
 
         Timber.d("onTransferFinish: $nodeHandle")
@@ -1688,6 +1688,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
             Intent(BroadcastConstants.BROADCAST_ACTION_RETRY_PENDING_MESSAGE)
                 .putExtra(Constants.INTENT_EXTRA_PENDING_MESSAGE_ID, pendingMsgId)
                 .putExtra(Constants.CHAT_ID, chatId)
+                .setPackage(applicationContext.packageName)
         )
     }
 

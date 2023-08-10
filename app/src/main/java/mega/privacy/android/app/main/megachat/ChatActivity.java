@@ -6108,6 +6108,7 @@ public class ChatActivity extends PasscodeActivity
             Timber.d("CHANGE_TYPE_RETENTION_TIME for the chat: %s", chat.getChatId());
             Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
+            intentRetentionTime.setPackage(getApplicationContext().getPackageName());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
         } else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_OPEN_INVITE)) {
             if (chat.isGroup()) {
@@ -9558,6 +9559,7 @@ public class ChatActivity extends PasscodeActivity
     private void galleryAddPic(Uri contentUri) {
         if (contentUri != null) {
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri);
+            mediaScanIntent.setPackage(getApplicationContext().getPackageName());
             sendBroadcast(mediaScanIntent);
         }
     }

@@ -733,6 +733,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         if (errorEBlocked <= 0) return
         val intent = Intent(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES)
         intent.putExtra(NUMBER_FILES, errorEBlocked)
+        intent.setPackage(applicationContext.packageName)
         sendBroadcast(intent)
     }
 
@@ -1362,7 +1363,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.transferType)
         if (transfer.isStreamingTransfer) return@withContext
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(applicationContext.packageName))
         }
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
         val isVoiceClip = transfer.isVoiceClip()
@@ -1508,6 +1509,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         val intent = Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED)
         intent.putExtra(INTENT_EXTRA_NODE_HANDLE, nodeHandle)
         intent.putExtra(Constants.EXTRA_RESULT_TRANSFER, result)
+        intent.setPackage(applicationContext.packageName)
         sendBroadcast(intent)
     }
 
@@ -1679,12 +1681,13 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
     }
 
     private fun refreshOfflineFragment() {
-        sendBroadcast(Intent(OfflineFragment.REFRESH_OFFLINE_FILE_LIST))
+        sendBroadcast(Intent(OfflineFragment.REFRESH_OFFLINE_FILE_LIST).setPackage(applicationContext.packageName))
     }
 
     private fun refreshSettingsFragment() {
         val intent = Intent(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED)
         intent.action = ACTION_REFRESH_CLEAR_OFFLINE_SETTING
+        intent.setPackage(applicationContext.packageName)
         sendBroadcast(intent)
     }
 

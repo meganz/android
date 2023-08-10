@@ -158,7 +158,7 @@ public class ContactUtil {
 
     public static void notifyUserNameUpdate(Context context, String action, long userHandle) {
         Intent intent = new Intent(action)
-                .putExtra(EXTRA_USER_HANDLE, userHandle);
+                .putExtra(EXTRA_USER_HANDLE, userHandle).setPackage(context.getApplicationContext().getPackageName());
         context.sendBroadcast(intent);
     }
 

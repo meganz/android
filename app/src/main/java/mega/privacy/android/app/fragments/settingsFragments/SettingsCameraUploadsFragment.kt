@@ -951,7 +951,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun handleBusinessAccountSuspendedPrompt(showPrompt: Boolean) {
         if (showPrompt) {
-            requireContext().sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+            requireContext().sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(requireContext().applicationContext.packageName))
             // After sending the broadcast, reset the Business Account suspended prompt state
             viewModel.resetBusinessAccountSuspendedPromptState()
         }

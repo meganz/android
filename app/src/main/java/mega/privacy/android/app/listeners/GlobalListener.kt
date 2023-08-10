@@ -249,6 +249,7 @@ class GlobalListener @Inject constructor(
                             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS).apply {
                                 action = Constants.ACTION_STORAGE_STATE_CHANGED
                                 putExtra(Constants.EXTRA_STORAGE_STATE, state)
+                                setPackage(appContext.packageName)
                             }
                         appContext.sendBroadcast(intent)
 
@@ -295,7 +296,7 @@ class GlobalListener @Inject constructor(
     private fun sendBroadcastUpdateAccountDetails() {
         appContext.sendBroadcast(
             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS)
+                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS).setPackage(appContext.packageName)
         )
 
         sendMyAccountUpdateBroadcast(Action.UPDATE_ACCOUNT_DETAILS, null)

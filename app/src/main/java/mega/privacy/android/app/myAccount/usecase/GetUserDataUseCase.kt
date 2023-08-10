@@ -28,7 +28,7 @@ class GetUserDataUseCase @Inject constructor(
                     when (error.errorCode) {
                         API_OK -> {
                             MegaApplication.getInstance()
-                                .sendBroadcast(Intent(BROADCAST_ACTION_INTENT_UPDATE_USER_DATA))
+                                .sendBroadcast(Intent(BROADCAST_ACTION_INTENT_UPDATE_USER_DATA).setPackage(MegaApplication.getInstance().applicationContext.packageName))
 
                             emitter.onComplete()
                         }

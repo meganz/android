@@ -1049,6 +1049,7 @@ public class FileUtil {
                 mediaScanIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
 
+            mediaScanIntent.setPackage(context.getApplicationContext().getPackageName());
             context.sendBroadcast(mediaScanIntent);
         } catch (Exception e) {
             Timber.w(e, "Exception sending mediaScanIntent.");

@@ -54,6 +54,7 @@ class UpdateCookieSettingsUseCase @Inject constructor(
             ))
         }.doOnComplete {
             val intent = Intent(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
+            intent.setPackage(MegaApplication.getInstance().applicationContext.packageName)
             MegaApplication.getInstance().sendBroadcast(intent)
         }
 

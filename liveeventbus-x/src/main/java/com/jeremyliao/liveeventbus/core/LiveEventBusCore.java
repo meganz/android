@@ -381,7 +381,7 @@ public final class LiveEventBusCore {
             if (foreground && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
             }
-            if (onlyInApp) {
+            if (onlyInApp || Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 intent.setPackage(application.getPackageName());
             }
             intent.putExtra(IpcConst.KEY, key);
