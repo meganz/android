@@ -19,7 +19,7 @@ import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
-import mega.privacy.android.data.repository.DefaultImageRepository
+import mega.privacy.android.data.repository.ImageRepositoryImpl
 import mega.privacy.android.data.repository.DefaultLoginRepository
 import mega.privacy.android.data.repository.DefaultMediaPlayerRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
@@ -51,6 +51,7 @@ import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
+import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRepositoryImpl
 import mega.privacy.android.data.repository.security.PasscodeRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
@@ -93,6 +94,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import javax.inject.Singleton
@@ -163,7 +165,7 @@ internal abstract class RepositoryModule {
     abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalStatesRepository): GlobalStatesRepository
 
     @Binds
-    abstract fun bindGetImageRepository(repository: DefaultImageRepository): ImageRepository
+    abstract fun bindGetImageRepository(repository: ImageRepositoryImpl): ImageRepository
 
     @Binds
     abstract fun bindFilesRepository(repository: MegaNodeRepositoryImpl): MegaNodeRepository
@@ -256,4 +258,7 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPermissionRepository(implementation: PermissionRepositoryImpl): PermissionRepository
+
+    @Binds
+    abstract fun bindThumbnailPreviewRepository(implementation: ThumbnailPreviewRepositoryImpl): ThumbnailPreviewRepository
 }

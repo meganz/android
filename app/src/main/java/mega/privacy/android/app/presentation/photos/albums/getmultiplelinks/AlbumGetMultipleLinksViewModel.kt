@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.DownloadThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
@@ -39,7 +39,7 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getUserAlbumUseCase: GetUserAlbum,
     private val getAlbumPhotosUseCase: GetAlbumPhotos,
-    private val downloadThumbnailUseCase: DownloadThumbnail,
+    private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val exportAlbumsUseCase: ExportAlbumsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

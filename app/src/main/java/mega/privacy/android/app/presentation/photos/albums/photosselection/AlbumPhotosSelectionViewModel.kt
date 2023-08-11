@@ -32,7 +32,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.AddPhotosToAlbum
-import mega.privacy.android.domain.usecase.DownloadThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
@@ -49,7 +49,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val getUserAlbum: GetUserAlbum,
     private val getAlbumPhotos: GetAlbumPhotos,
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
-    private val downloadThumbnail: DownloadThumbnail,
+    private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val filterCloudDrivePhotos: FilterCloudDrivePhotos,
     private val filterCameraUploadPhotos: FilterCameraUploadPhotos,
     private val addPhotosToAlbum: AddPhotosToAlbum,
@@ -197,7 +197,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         val thumbnailFilePath = photo.thumbnailFilePath ?: return@withContext
 
         if (File(thumbnailFilePath).exists()) callback(true)
-        else downloadThumbnail(nodeId = photo.id, callback)
+        else downloadThumbnailUseCase(nodeId = photo.id, callback)
     }
 
     fun selectAllPhotos() = viewModelScope.launch {

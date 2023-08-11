@@ -1,9 +1,9 @@
-package mega.privacy.android.domain.usecase.photos
+package mega.privacy.android.domain.usecase.thumbnailpreview
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -21,12 +21,12 @@ class DeleteThumbnailUseCaseTest {
 
     private lateinit var underTest: DeleteThumbnailUseCase
 
-    private val imageRepository = mock<ImageRepository>()
+    private val thumbnailPreviewRepository = mock<ThumbnailPreviewRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = DeleteThumbnailUseCase(
-            imageRepository = imageRepository,
+            thumbnailPreviewRepository = thumbnailPreviewRepository,
         )
     }
 
@@ -36,7 +36,7 @@ class DeleteThumbnailUseCaseTest {
     internal fun `test that thumbnail is deleted when invoked if exists`(result: Boolean?) =
         runTest {
             val handle = 1L
-            whenever(imageRepository.deleteThumbnail(handle)).thenReturn(result)
+            whenever(thumbnailPreviewRepository.deleteThumbnail(handle)).thenReturn(result)
             Truth.assertThat(underTest(handle)).isEqualTo(result ?: true)
         }
 }

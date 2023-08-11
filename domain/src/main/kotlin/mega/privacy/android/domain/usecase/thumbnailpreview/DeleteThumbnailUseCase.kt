@@ -1,13 +1,13 @@
-package mega.privacy.android.domain.usecase.photos
+package mega.privacy.android.domain.usecase.thumbnailpreview
 
-import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import javax.inject.Inject
 
 /**
  * UseCase for deleting thumbnail file for a image node
  */
 class DeleteThumbnailUseCase @Inject constructor(
-    private val imageRepository: ImageRepository,
+    private val thumbnailPreviewRepository: ThumbnailPreviewRepository,
 ) {
 
     /**
@@ -16,5 +16,6 @@ class DeleteThumbnailUseCase @Inject constructor(
      * @return [Boolean] if file doesn't exists it returns true else it returns true or false based
      * on the delete operation
      */
-    suspend operator fun invoke(handle: Long) = imageRepository.deleteThumbnail(handle) ?: true
+    suspend operator fun invoke(handle: Long) =
+        thumbnailPreviewRepository.deleteThumbnail(handle) ?: true
 }

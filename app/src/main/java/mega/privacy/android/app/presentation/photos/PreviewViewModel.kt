@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.GetPreview
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -18,13 +18,13 @@ import javax.inject.Inject
 /**
  * ViewModel for get thumbnail
  *
- * @property getPreview GetPreview
+ * @property getPreviewUseCase GetPreview
  * @property ioDispatcher CoroutineDispatcher
  * @property mainDispatcher CoroutineDispatcher
  */
 @HiltViewModel
 class PreviewViewModel @Inject constructor(
-    private val getPreview: GetPreview,
+    private val getPreviewUseCase: GetPreviewUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -38,7 +38,7 @@ class PreviewViewModel @Inject constructor(
         Timber.v("PreviewViewModel start to download thumbnail $handle")
         viewModelScope.launch(ioDispatcher) {
             runCatching {
-                flowOf(getPreview(handle)).collectLatest { file ->
+                flowOf(getPreviewUseCase(handle)).collectLatest { file ->
                     withContext(mainDispatcher) {
                         onFinished(file)
                     }

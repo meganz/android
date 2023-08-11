@@ -1,6 +1,6 @@
-package mega.privacy.android.domain.usecase.photos
+package mega.privacy.android.domain.usecase.thumbnailpreview
 
-import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import java.io.File
 import javax.inject.Inject
 
@@ -9,7 +9,7 @@ import javax.inject.Inject
  * UseCase for generating preview for a file
  */
 class GeneratePreviewUseCase @Inject constructor(
-    private val imageRepository: ImageRepository,
+    private val thumbnailPreviewRepository: ThumbnailPreviewRepository,
 ) {
 
     /**
@@ -18,6 +18,6 @@ class GeneratePreviewUseCase @Inject constructor(
      * @param file
      */
     suspend operator fun invoke(handle: Long, file: File) {
-        imageRepository.createPreview(handle, file)
+        thumbnailPreviewRepository.createPreview(handle, file)
     }
 }

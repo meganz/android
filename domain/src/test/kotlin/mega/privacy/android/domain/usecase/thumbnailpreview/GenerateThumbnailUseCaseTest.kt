@@ -1,8 +1,8 @@
-package mega.privacy.android.domain.usecase.photos
+package mega.privacy.android.domain.usecase.thumbnailpreview
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -19,12 +19,12 @@ class GenerateThumbnailUseCaseTest {
 
     private lateinit var underTest: GenerateThumbnailUseCase
 
-    private val imageRepository = mock<ImageRepository>()
+    private val thumbnailPreviewRepository = mock<ThumbnailPreviewRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = GenerateThumbnailUseCase(
-            imageRepository = imageRepository,
+            thumbnailPreviewRepository = thumbnailPreviewRepository,
         )
     }
 
@@ -34,6 +34,6 @@ class GenerateThumbnailUseCaseTest {
             val handle = 1L
             val file = mock<File>()
             underTest(handle, file)
-            verify(imageRepository).createThumbnail(handle, file)
+            verify(thumbnailPreviewRepository).createThumbnail(handle, file)
         }
 }

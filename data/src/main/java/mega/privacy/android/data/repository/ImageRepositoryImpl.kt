@@ -18,18 +18,13 @@ import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.extensions.encodeBase64
-import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
-import mega.privacy.android.data.extensions.getPreviewFileName
-import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getScreenSize
-import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
@@ -66,7 +61,7 @@ import kotlin.coroutines.resumeWithException
  * @param fileGateway FileGateway
  * @param imageNodeMapper ImageNodeMapper
  */
-internal class DefaultImageRepository @Inject constructor(
+internal class ImageRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
@@ -78,226 +73,6 @@ internal class DefaultImageRepository @Inject constructor(
     private val imageNodeMapper: ImageNodeMapper,
 ) : ImageRepository {
 
-    private var thumbnailFolderPath: String? = null
-
-    private var previewFolderPath: String? = null
-
-    init {
-        runBlocking(ioDispatcher) {
-            thumbnailFolderPath =
-                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
-            previewFolderPath =
-                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
-        }
-    }
-
-    override suspend fun getThumbnailFromLocal(handle: Long): File? =
-        withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(handle)?.run {
-                getThumbnailFile(this).takeIf {
-                    it?.exists() ?: false
-                }
-            }
-        }
-
-    override suspend fun getPublicNodeThumbnailFromLocal(handle: Long): File? =
-        withContext(ioDispatcher) {
-            megaApiFolderGateway.getMegaNodeByHandle(handle)?.run {
-                getThumbnailFile(this).takeIf {
-                    it?.exists() ?: false
-                }
-            }
-        }
-
-    private suspend fun getThumbnailFile(node: MegaNode): File? =
-        cacheGateway.getCacheFile(
-            CacheFolderConstant.THUMBNAIL_FOLDER,
-            "${node.base64Handle}${FileConstant.JPG_EXTENSION}"
-        )
-
-    override suspend fun getThumbnailFromServer(handle: Long): File? =
-        withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(handle)?.let { node ->
-                getThumbnailFile(node)?.let { thumbnail ->
-                    suspendCancellableCoroutine { continuation ->
-                        megaApiGateway.getThumbnail(node, thumbnail.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _, error ->
-                                    if (error.errorCode == MegaError.API_OK) {
-                                        continuation.resumeWith(Result.success(thumbnail))
-                                    } else {
-                                        continuation.failWithError(error, "getThumbnailFromServer")
-                                    }
-                                }
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-    override suspend fun getPublicNodeThumbnailFromServer(handle: Long): File? =
-        withContext(ioDispatcher) {
-            megaApiFolderGateway.getMegaNodeByHandle(handle)?.let { node ->
-                getThumbnailFile(node)?.let { thumbnail ->
-                    suspendCancellableCoroutine { continuation ->
-                        megaApiFolderGateway.getThumbnail(node, thumbnail.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _, error ->
-                                    if (error.errorCode == MegaError.API_OK) {
-                                        continuation.resumeWith(Result.success(thumbnail))
-                                    } else {
-                                        Timber.e(error.toException("getPublicNodeThumbnailFromServer"))
-                                        continuation.failWithError(
-                                            error,
-                                            "getPublicNodeThumbnailFromServer"
-                                        )
-                                    }
-                                }
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-    private suspend fun getPreviewFile(node: MegaNode): File? =
-        cacheGateway.getCacheFile(
-            CacheFolderConstant.PREVIEW_FOLDER,
-            "${node.base64Handle}${FileConstant.JPG_EXTENSION}"
-        )
-
-    private suspend fun getFullFile(node: MegaNode): File? =
-        cacheGateway.getCacheFile(
-            CacheFolderConstant.TEMPORARY_FOLDER,
-            "${node.base64Handle}.${MimeTypeList.typeForName(node.name).extension}"
-        )
-
-    override suspend fun getPreviewFromLocal(handle: Long): File? =
-        withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(handle)?.run {
-                getPreviewFile(this).takeIf {
-                    it?.exists() ?: false
-                }
-            }
-        }
-
-    override suspend fun getPreviewFromServer(handle: Long): File? =
-        withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(handle)?.let { node ->
-                getPreviewFile(node)?.let { preview ->
-                    suspendCancellableCoroutine { continuation ->
-                        megaApiGateway.getPreview(node, preview.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _, error ->
-                                    if (error.errorCode == MegaError.API_OK) {
-                                        continuation.resumeWith(Result.success(preview))
-                                    } else {
-                                        continuation.failWithError(error, "getPreviewFromServer")
-                                    }
-                                }
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-    override suspend fun downloadThumbnail(
-        handle: Long,
-        callback: (success: Boolean) -> Unit,
-    ) = withContext(ioDispatcher) {
-        val node = megaApiGateway.getMegaNodeByHandle(handle)
-        if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
-            callback(false)
-        } else {
-            megaApiGateway.getThumbnail(
-                node,
-                getThumbnailPath(thumbnailFolderPath ?: return@withContext, node),
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, error ->
-                        callback(error.errorCode == MegaError.API_OK)
-                    }
-                )
-            )
-        }
-    }
-
-    override suspend fun downloadPreview(
-        handle: Long,
-        callback: (success: Boolean) -> Unit,
-    ) = withContext(ioDispatcher) {
-        val node = megaApiGateway.getMegaNodeByHandle(handle)
-        if (node == null || previewFolderPath == null || !node.hasPreview()) {
-            callback(false)
-        } else {
-            megaApiGateway.getPreview(
-                node,
-                getPreviewPath(previewFolderPath ?: return@withContext, node),
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, error ->
-                        callback(error.errorCode == MegaError.API_OK)
-                    }
-                )
-            )
-        }
-    }
-
-    override suspend fun downloadPublicNodeThumbnail(
-        handle: Long,
-    ): Boolean = withContext(ioDispatcher) {
-        val node = megaApiFolderGateway.getMegaNodeByHandle(handle)
-        val thumbnailFolderPath = thumbnailFolderPath
-        if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
-            return@withContext false
-        } else {
-            return@withContext suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("getThumbnail") {
-                    true
-                }
-                megaApiGateway.getThumbnail(
-                    node,
-                    getThumbnailPath(thumbnailFolderPath, node),
-                    listener
-                )
-
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
-            }
-        }
-    }
-
-    override suspend fun downloadPublicNodePreview(
-        handle: Long,
-    ): Boolean = withContext(ioDispatcher) {
-        val node = megaApiFolderGateway.getMegaNodeByHandle(handle)
-        val previewFolderPath = previewFolderPath
-        if (node == null || previewFolderPath == null || !node.hasPreview()) {
-            return@withContext false
-        } else {
-            return@withContext suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("getThumbnail") {
-                    true
-                }
-                megaApiGateway.getPreview(
-                    node,
-                    getPreviewPath(previewFolderPath, node),
-                    listener
-                )
-
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
-            }
-        }
-    }
-
-    private fun getPreviewPath(previewFolderPath: String, megaNode: MegaNode) =
-        "$previewFolderPath${File.separator}${megaNode.getPreviewFileName()}"
-
-    private fun getThumbnailPath(thumbnailFolderPath: String, megaNode: MegaNode) =
-        "$thumbnailFolderPath${File.separator}${megaNode.getThumbnailFileName()}"
-
-    private suspend fun getThumbnailFile(fileName: String): File? =
-        cacheGateway.getCacheFile(CacheFolderConstant.THUMBNAIL_FOLDER, fileName)
-
     override suspend fun getImageByOfflineFile(
         offlineNodeInformation: OfflineNodeInformation,
         file: File,
@@ -307,7 +82,8 @@ internal class DefaultImageRepository @Inject constructor(
 
         val fileName =
             "${offlineNodeInformation.handle.encodeBase64()}${FileConstant.JPG_EXTENSION}"
-        val thumbnailFile = getThumbnailFile(fileName)
+        val thumbnailFile =
+            cacheGateway.getCacheFile(CacheFolderConstant.THUMBNAIL_FOLDER, fileName)
 
         val previewUri = getOrGeneratePreview(fileName, isVideo, file, highPriority)
 
@@ -335,18 +111,6 @@ internal class DefaultImageRepository @Inject constructor(
                 isFullyLoaded = true
             )
         }
-
-    override suspend fun getThumbnailCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getThumbnailCacheFolder()?.path
-    }
-
-    override suspend fun getPreviewCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getPreviewCacheFolder()?.path
-    }
-
-    override suspend fun getFullSizeCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getFullSizeCacheFolder()?.path
-    }
 
     override suspend fun getImageNodeByHandle(handle: Long): ImageNode =
         withContext(ioDispatcher) {
@@ -553,35 +317,6 @@ internal class DefaultImageRepository @Inject constructor(
                 }
             }
         }
-
-    override suspend fun createThumbnail(handle: Long, file: File) = withContext(ioDispatcher) {
-        val thumbnailFileName =
-            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
-        val thumbnailFile = getThumbnailFile(thumbnailFileName)
-        requireNotNull(thumbnailFile)
-        megaApiGateway.createThumbnail(file.absolutePath, thumbnailFile.absolutePath)
-    }
-
-
-    override suspend fun createPreview(handle: Long, file: File) = withContext(ioDispatcher) {
-        val previewFileName =
-            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
-        val previewFile = getPreviewFile(previewFileName)
-        requireNotNull(previewFile)
-        megaApiGateway.createPreview(file.absolutePath, previewFile.absolutePath)
-    }
-
-    override suspend fun deleteThumbnail(handle: Long) = withContext(ioDispatcher) {
-        val thumbnailFileName =
-            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
-        getThumbnailFile(thumbnailFileName)?.delete()
-    }
-
-    override suspend fun deletePreview(handle: Long) = withContext(ioDispatcher) {
-        val previewFileName =
-            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
-        getPreviewFile(previewFileName)?.delete()
-    }
 
     companion object {
         private const val SIZE_1_MB = 1024 * 1024 * 1L

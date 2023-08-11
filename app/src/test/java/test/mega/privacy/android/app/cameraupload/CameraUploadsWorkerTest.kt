@@ -83,10 +83,10 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
-import mega.privacy.android.domain.usecase.photos.DeletePreviewUseCase
-import mega.privacy.android.domain.usecase.photos.DeleteThumbnailUseCase
-import mega.privacy.android.domain.usecase.photos.GeneratePreviewUseCase
-import mega.privacy.android.domain.usecase.photos.GenerateThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GeneratePreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GenerateThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase

@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.usecase.filenode.IsValidNodeFileUseCase
 import java.io.File
 import javax.inject.Inject
@@ -16,7 +16,7 @@ import javax.inject.Inject
  * UseCase to get TypedImageNode from ImageNode
  */
 class AddImageTypeUseCase @Inject constructor(
-    private val imageRepository: ImageRepository,
+    private val thumbnailPreviewRepository: ThumbnailPreviewRepository,
     private val fileSystemRepository: FileSystemRepository,
     private val isValidNodeFileUseCase: IsValidNodeFileUseCase,
 ) {
@@ -39,7 +39,7 @@ class AddImageTypeUseCase @Inject constructor(
         nodeName: String,
     ): String? {
         val path =
-            "${imageRepository.getThumbnailCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
+            "${thumbnailPreviewRepository.getThumbnailCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             return path
         }
@@ -51,7 +51,7 @@ class AddImageTypeUseCase @Inject constructor(
         nodeName: String,
     ): String? {
         val path =
-            "${imageRepository.getPreviewCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
+            "${thumbnailPreviewRepository.getPreviewCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             return path
         }
@@ -61,7 +61,7 @@ class AddImageTypeUseCase @Inject constructor(
 
     private suspend fun getFullImagePath(node: ImageNode): String? {
         val path =
-            "${imageRepository.getFullSizeCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${node.base64Id}.${node.type.extension}"
+            "${thumbnailPreviewRepository.getFullSizeCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${node.base64Id}.${node.type.extension}"
         val fullSizeFile = File(path)
         if (!isValidNodeFileUseCase(node, fullSizeFile)) {
             fileSystemRepository.deleteFile(fullSizeFile)
@@ -77,7 +77,7 @@ class AddImageTypeUseCase @Inject constructor(
         nodeName: String,
     ): suspend () -> String = {
         val path =
-            "${imageRepository.getThumbnailCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
+            "${thumbnailPreviewRepository.getThumbnailCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             path
         } else {
@@ -90,7 +90,7 @@ class AddImageTypeUseCase @Inject constructor(
         nodeName: String,
     ): suspend () -> String = {
         val path =
-            "${imageRepository.getPreviewCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
+            "${thumbnailPreviewRepository.getPreviewCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             path
         } else {
@@ -102,7 +102,7 @@ class AddImageTypeUseCase @Inject constructor(
         { isPriority, resetDownloads ->
             flow {
                 val path =
-                    "${imageRepository.getFullSizeCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${node.base64Id}.${node.type.extension}"
+                    "${thumbnailPreviewRepository.getFullSizeCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${node.base64Id}.${node.type.extension}"
                 val fullSizeFile = File(path)
                 if (!isValidNodeFileUseCase(node, fullSizeFile)) {
                     fileSystemRepository.deleteFile(fullSizeFile)

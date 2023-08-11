@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.GetThumbnail
-import mega.privacy.android.domain.usecase.photos.GetPublicNodeThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -19,13 +19,13 @@ import javax.inject.Inject
 /**
  * ViewModel for get thumbnail
  *
- * @property getThumbnail GetThumbnailByFlow
+ * @property getThumbnailUseCase GetThumbnailByFlow
  * @property ioDispatcher CoroutineDispatcher
  * @property mainDispatcher CoroutineDispatcher
  */
 @HiltViewModel
 class ThumbnailViewModel @Inject constructor(
-    private val getThumbnail: GetThumbnail,
+    private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getPublicNodeThumbnailUseCase: GetPublicNodeThumbnailUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
@@ -40,7 +40,7 @@ class ThumbnailViewModel @Inject constructor(
         Timber.v("ThumbnailViewModel start to getThumbnail thumbnail $handle")
         viewModelScope.launch(ioDispatcher) {
             runCatching {
-                flowOf(getThumbnail(handle)).collectLatest { file ->
+                flowOf(getThumbnailUseCase(handle)).collectLatest { file ->
                     withContext(mainDispatcher) {
                         onFinished(file)
                     }

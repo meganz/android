@@ -26,7 +26,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.DownloadThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
@@ -40,7 +40,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getUserAlbum: GetUserAlbum,
     private val getAlbumPhotos: GetAlbumPhotos,
-    private val downloadThumbnail: DownloadThumbnail,
+    private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val updateAlbumCoverUseCase: UpdateAlbumCoverUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -110,7 +110,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         val thumbnailFilePath = photo.thumbnailFilePath ?: return@withContext
 
         if (File(thumbnailFilePath).exists()) callback(true)
-        else downloadThumbnail(nodeId = photo.id, callback)
+        else downloadThumbnailUseCase(nodeId = photo.id, callback)
     }
 
     fun selectPhoto(photo: Photo) {

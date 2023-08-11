@@ -9,7 +9,7 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,7 +18,7 @@ import javax.inject.Inject
  * Transform a [MegaNodeList] into a list of [NodeItem]
  */
 class DefaultGetRecentActionNodes @Inject constructor(
-    private val getThumbnail: GetThumbnail,
+    private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : GetRecentActionNodes {
@@ -52,7 +52,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
             val megaNode = getNodeByHandle.invoke(node.id.longValue)
             NodeItem(
                 node = megaNode,
-                thumbnail = getThumbnail(node.id.longValue),
+                thumbnail = getThumbnailUseCase(node.id.longValue),
                 index = -1,
                 isVideo = node.type is VideoFileTypeInfo,
                 modifiedDate = node.modificationTime.toString(),

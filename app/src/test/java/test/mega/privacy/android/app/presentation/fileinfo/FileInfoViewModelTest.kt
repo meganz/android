@@ -55,7 +55,6 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
@@ -84,6 +83,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.After
@@ -122,7 +122,7 @@ internal class FileInfoViewModelTest {
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase = mock()
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle = mock()
     private val node: MegaNode = mock()
-    private val getPreview: GetPreview = mock()
+    private val getPreviewUseCase: GetPreviewUseCase = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder = mock()
@@ -184,7 +184,7 @@ internal class FileInfoViewModelTest {
             moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
-            getPreview = getPreview,
+            getPreviewUseCase = getPreviewUseCase,
             getFolderTreeInfo = getFolderTreeInfo,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getContactItemFromInShareFolder = getContactItemFromInShareFolder,
@@ -234,7 +234,7 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.name).thenReturn("File name")
         whenever(typedFileNode.id).thenReturn(nodeId)
         whenever(getNodeAccessPermission.invoke(nodeId)).thenReturn(AccessPermission.READ)
-        whenever(getPreview.invoke(anyLong())).thenReturn(null)
+        whenever(getPreviewUseCase.invoke(anyLong())).thenReturn(null)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
         whenever(typedFileNode.hasPreview).thenReturn(false)
         whenever(isAvailableOffline.invoke(any())).thenReturn(true)
@@ -598,7 +598,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test preview is assigned when node is updated`() = runTest {
         whenever(typedFileNode.hasPreview).thenReturn(true)
-        whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
+        whenever(getPreviewUseCase.invoke(NODE_HANDLE)).thenReturn(previewFile)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
         underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
@@ -611,7 +611,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test exception from getPreview is not propagated`() = runTest {
         whenever(typedFileNode.hasPreview).thenReturn(true)
-        whenever(getPreview.invoke(NODE_HANDLE)).thenAnswer {
+        whenever(getPreviewUseCase.invoke(NODE_HANDLE)).thenAnswer {
             throw MegaException(
                 -5,
                 "Failed Permanently"
@@ -638,7 +638,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test preview has priority over thumbnail`() = runTest {
-        whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
+        whenever(getPreviewUseCase.invoke(NODE_HANDLE)).thenReturn(previewFile)
         whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
         whenever(typedFileNode.hasPreview).thenReturn(true)
         underTest.setNode(node.handle, true)

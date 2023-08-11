@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.usecase.filenode.IsValidNodeFileUseCase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -31,7 +31,7 @@ internal class AddImageTypeUseCaseTest {
 
     private lateinit var underTest: AddImageTypeUseCase
 
-    private val imageRepository: ImageRepository = mock()
+    private val thumbnailPreviewRepository: ThumbnailPreviewRepository = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
     private val isValidNodeFileUseCase: IsValidNodeFileUseCase = mock()
 
@@ -40,12 +40,16 @@ internal class AddImageTypeUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest =
-            AddImageTypeUseCase(imageRepository, fileSystemRepository, isValidNodeFileUseCase)
+            AddImageTypeUseCase(
+                thumbnailPreviewRepository,
+                fileSystemRepository,
+                isValidNodeFileUseCase
+            )
     }
 
     @BeforeEach
     fun resetMocks() = reset(
-        imageRepository,
+        thumbnailPreviewRepository,
         fileSystemRepository,
         isValidNodeFileUseCase,
         imageNode,
@@ -102,7 +106,9 @@ internal class AddImageTypeUseCaseTest {
             val thumbnailPath = "cache/previewsMEGA"
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
             whenever(imageNode.base64Id).thenReturn(nodeName)
-            whenever(imageRepository.getPreviewCacheFolderPath()).thenReturn(thumbnailPath)
+            whenever(thumbnailPreviewRepository.getPreviewCacheFolderPath()).thenReturn(
+                thumbnailPath
+            )
             whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
             val result = underTest(imageNode)
             assertThat(result.previewPath).isEqualTo("$thumbnailPath/$nodeName.jpg")
@@ -114,7 +120,9 @@ internal class AddImageTypeUseCaseTest {
             val thumbnailPath = "cache/previewsMEGA"
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
             whenever(imageNode.base64Id).thenReturn(nodeName)
-            whenever(imageRepository.getPreviewCacheFolderPath()).thenReturn(thumbnailPath)
+            whenever(thumbnailPreviewRepository.getPreviewCacheFolderPath()).thenReturn(
+                thumbnailPath
+            )
             whenever(fileSystemRepository.doesFileExist(any())).thenReturn(false)
             val result = underTest(imageNode)
             assertThat(result.previewPath).isNull()
@@ -173,7 +181,9 @@ internal class AddImageTypeUseCaseTest {
             val thumbnailPath = "cache/thumbMEGA"
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
             whenever(imageNode.base64Id).thenReturn(nodeName)
-            whenever(imageRepository.getThumbnailCacheFolderPath()).thenReturn(thumbnailPath)
+            whenever(thumbnailPreviewRepository.getThumbnailCacheFolderPath()).thenReturn(
+                thumbnailPath
+            )
             whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
             val result = underTest(imageNode)
             assertThat(result.thumbnailPath).isEqualTo("$thumbnailPath/$nodeName.jpg")
@@ -185,7 +195,9 @@ internal class AddImageTypeUseCaseTest {
             val thumbnailPath = "cache/thumbMEGA"
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
             whenever(imageNode.base64Id).thenReturn(nodeName)
-            whenever(imageRepository.getThumbnailCacheFolderPath()).thenReturn(thumbnailPath)
+            whenever(thumbnailPreviewRepository.getThumbnailCacheFolderPath()).thenReturn(
+                thumbnailPath
+            )
             whenever(fileSystemRepository.doesFileExist(any())).thenReturn(false)
             val result = underTest(imageNode)
             assertThat(result.thumbnailPath).isNull()
@@ -258,7 +270,9 @@ internal class AddImageTypeUseCaseTest {
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
             whenever(imageNode.base64Id).thenReturn(nodeName)
             whenever(imageNode.type).thenReturn(fileTypeInfo)
-            whenever(imageRepository.getFullSizeCacheFolderPath()).thenReturn(fullImagePath)
+            whenever(thumbnailPreviewRepository.getFullSizeCacheFolderPath()).thenReturn(
+                fullImagePath
+            )
             whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
             val result = underTest(imageNode)
             assertThat(result.fullSizePath).isEqualTo("$fullImagePath/$nodeName.$imageExtension")
@@ -275,7 +289,9 @@ internal class AddImageTypeUseCaseTest {
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
             whenever(imageNode.base64Id).thenReturn(nodeName)
             whenever(imageNode.type).thenReturn(fileTypeInfo)
-            whenever(imageRepository.getFullSizeCacheFolderPath()).thenReturn(fullImagePath)
+            whenever(thumbnailPreviewRepository.getFullSizeCacheFolderPath()).thenReturn(
+                fullImagePath
+            )
             whenever(fileSystemRepository.doesFileExist(any())).thenReturn(false)
             val result = underTest(imageNode)
             assertThat(result.fullSizePath).isNull()

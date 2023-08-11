@@ -52,7 +52,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
@@ -81,6 +80,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -105,7 +105,7 @@ class FileInfoViewModel @Inject constructor(
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
-    private val getPreview: GetPreview,
+    private val getPreviewUseCase: GetPreviewUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder,
@@ -758,7 +758,7 @@ class FileInfoViewModel @Inject constructor(
         viewModelScope.launch {
             if ((typedNode as? TypedFileNode)?.hasPreview == true && _uiState.value.previewUriString == null) {
                 runCatching {
-                    getPreview(typedNode.id.longValue)
+                    getPreviewUseCase(typedNode.id.longValue)
                 }.onSuccess { previewUri ->
                     _uiState.update {
                         it.copy(previewUriString = previewUri?.uriStringIfExists())

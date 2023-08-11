@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.time.LocalDateTime
@@ -105,7 +105,7 @@ class PhotoMapper @Inject constructor(
     private val videoMapper: VideoMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val dateUtilFacade: DateUtilWrapper,
-    private val imageRepository: ImageRepository,
+    private val thumbnailPreviewRepository: ThumbnailPreviewRepository,
 ) {
     suspend operator fun invoke(node: MegaNode, albumPhotoId: AlbumPhotoId?): Photo? {
         return when (val fileType = fileTypeInfoMapper(node)) {
@@ -148,13 +148,13 @@ class PhotoMapper @Inject constructor(
     }
 
     private suspend fun getThumbnailFilePath(node: MegaNode): String? {
-        return imageRepository.getThumbnailCacheFolderPath()?.let { path ->
+        return thumbnailPreviewRepository.getThumbnailCacheFolderPath()?.let { path ->
             "$path${File.separator}${node.getThumbnailFileName()}"
         }
     }
 
     private suspend fun getPreviewFilePath(node: MegaNode): String? {
-        return imageRepository.getPreviewCacheFolderPath()?.let { path ->
+        return thumbnailPreviewRepository.getPreviewCacheFolderPath()?.let { path ->
             "$path${File.separator}${node.getPreviewFileName()}"
         }
     }

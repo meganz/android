@@ -8,7 +8,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.GetThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -20,7 +20,7 @@ import java.io.IOException
 class DefaultGetRecentActionNodesTest {
     private lateinit var underTest: GetRecentActionNodes
 
-    private val getThumbnail = mock<GetThumbnail> {
+    private val getThumbnailUseCase = mock<GetThumbnailUseCase> {
         onBlocking { invoke(any()) }.thenReturn(null)
     }
     private val nodes = (0L..5L).map { value ->
@@ -32,7 +32,7 @@ class DefaultGetRecentActionNodesTest {
     @Before
     fun setUp() {
         underTest = DefaultGetRecentActionNodes(
-            getThumbnail = getThumbnail,
+            getThumbnailUseCase = getThumbnailUseCase,
             ioDispatcher = UnconfinedTestDispatcher(),
             getNodeByHandle = mock()
         )
@@ -48,7 +48,7 @@ class DefaultGetRecentActionNodesTest {
     @Test
     fun `test that if one of getThumbnail throws an exception when looping over the nodes, under test stills returns the list of nodes except the one who failed`() =
         runTest {
-            whenever(getThumbnail(3L)).thenAnswer {
+            whenever(getThumbnailUseCase(3L)).thenAnswer {
                 throw IOException("Error!")
             }
 

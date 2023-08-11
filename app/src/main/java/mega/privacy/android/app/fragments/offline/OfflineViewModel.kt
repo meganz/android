@@ -37,7 +37,7 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.GetThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import timber.log.Timber
 import java.io.File
 import java.util.Stack
@@ -49,7 +49,7 @@ class OfflineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo,
     monitorNodeUpdates: MonitorNodeUpdates,
-    private val getThumbnail: GetThumbnail,
+    private val getThumbnailUseCase: GetThumbnailUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
@@ -457,7 +457,7 @@ class OfflineViewModel @Inject constructor(
                     folderCount++
                 }
                 val thumbnail = kotlin.runCatching {
-                    getThumbnail(node.handle.toLong())
+                    getThumbnailUseCase(node.handle.toLong())
                 }.fold(
                     onSuccess = { it },
                     onFailure = { null }

@@ -2814,4 +2814,42 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun pauseTransfers(pause: Boolean, listener: MegaRequestListenerInterface)
+
+    /**
+     * Set the thumbnail of a MegaNode
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_FILE
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node
+     * - MegaRequest::getFile - Returns the source path
+     * - MegaRequest::getParamType - Returns MegaApi::ATTR_TYPE_THUMBNAIL
+     *
+     * @param node MegaNode handle to set the thumbnail
+     * @param srcFilePath Source path of the file that will be set as thumbnail
+     * @param listener    MegaRequestListener to track this request
+     */
+    fun setThumbnail(
+        node: MegaNode,
+        srcFilePath: String,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
+     * Set the preview of a MegaNode
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_FILE
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node
+     * - MegaRequest::getFile - Returns the source path
+     * - MegaRequest::getParamType - Returns MegaApi::ATTR_TYPE_PREVIEW
+     *
+     * @param node        MegaNode to set the preview
+     * @param srcFilePath Source path of the file that will be set as preview
+     * @param listener    MegaRequestListener to track this request
+     */
+    fun setPreview(
+        node: MegaNode,
+        srcFilePath: String,
+        listener: MegaRequestListenerInterface?,
+    )
 }

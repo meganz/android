@@ -1316,4 +1316,16 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun pauseTransfers(pause: Boolean, listener: MegaRequestListenerInterface) =
         megaApi.pauseTransfers(pause, listener)
+
+    override fun setThumbnail(
+        node: MegaNode,
+        srcFilePath: String,
+        listener: MegaRequestListenerInterface?,
+    ) = megaApi.setThumbnail(node, srcFilePath, listener)
+
+    override fun setPreview(
+        node: MegaNode,
+        srcFilePath: String,
+        listener: MegaRequestListenerInterface?,
+    ) = megaApi.setPreview(node, srcFilePath, listener)
 }

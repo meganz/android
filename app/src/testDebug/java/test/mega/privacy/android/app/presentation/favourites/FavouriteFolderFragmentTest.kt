@@ -167,7 +167,7 @@ class FavouriteFolderFragmentTest {
             ).thenReturn(
                 favourite
             )
-            whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
+            whenever(FavouritesTestModule.getThumbnailUseCase(1)).thenReturn(null)
 
             whenever(
                 FavouritesTestModule.megaUtilWrapper.availableOffline(

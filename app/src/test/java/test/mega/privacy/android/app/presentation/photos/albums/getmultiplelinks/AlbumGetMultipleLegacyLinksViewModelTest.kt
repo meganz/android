@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumIdLink
 import mega.privacy.android.domain.entity.photos.AlbumLink
-import mega.privacy.android.domain.usecase.DownloadThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
@@ -36,7 +36,7 @@ class AlbumGetMultipleLegacyLinksViewModelTest {
 
     private val getAlbumPhotosUseCase: GetAlbumPhotos = mock()
 
-    private val downloadThumbnailUseCase: DownloadThumbnail = mock()
+    private val downloadThumbnailUseCase: DownloadThumbnailUseCase = mock()
 
     private val exportAlbumsUseCase: ExportAlbumsUseCase = mock()
 

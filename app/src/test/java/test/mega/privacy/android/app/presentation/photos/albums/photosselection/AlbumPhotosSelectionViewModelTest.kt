@@ -25,7 +25,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.AddPhotosToAlbum
-import mega.privacy.android.domain.usecase.DownloadThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
@@ -47,7 +47,7 @@ class AlbumPhotosSelectionViewModelTest {
     private val getUserAlbum = mock<GetUserAlbum>()
     private val getAlbumPhotos = mock<GetAlbumPhotos>()
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
-    private val downloadThumbnail = mock<DownloadThumbnail>()
+    private val downloadThumbnailUseCase = mock<DownloadThumbnailUseCase>()
     private val filterCloudDrivePhotos = mock<FilterCloudDrivePhotos>()
     private val filterCameraUploadPhotos = mock<FilterCameraUploadPhotos>()
     private val addPhotosToAlbum = mock<AddPhotosToAlbum>()
@@ -190,7 +190,7 @@ class AlbumPhotosSelectionViewModelTest {
         getUserAlbum = getUserAlbum,
         getAlbumPhotos = getAlbumPhotos,
         getTimelinePhotosUseCase = getTimelinePhotosUseCase,
-        downloadThumbnail = downloadThumbnail,
+        downloadThumbnailUseCase = downloadThumbnailUseCase,
         filterCloudDrivePhotos = filterCloudDrivePhotos,
         filterCameraUploadPhotos = filterCameraUploadPhotos,
         addPhotosToAlbum = addPhotosToAlbum,

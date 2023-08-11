@@ -11,20 +11,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.DownloadPreview
-import mega.privacy.android.domain.usecase.DownloadPublicNodePreview
-import mega.privacy.android.domain.usecase.DownloadPublicNodeThumbnail
-import mega.privacy.android.domain.usecase.DownloadThumbnail
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPublicNodePreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPublicNodeThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class PhotoDownloaderViewModel @Inject constructor(
-    private val downloadThumbnail: DownloadThumbnail,
-    private val downloadPreview: DownloadPreview,
-    private val downloadPublicNodeThumbnail: DownloadPublicNodeThumbnail,
-    private val downloadPublicNodePreview: DownloadPublicNodePreview,
+    private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
+    private val downloadPreviewUseCase: DownloadPreviewUseCase,
+    private val downloadPublicNodeThumbnailUseCase: DownloadPublicNodeThumbnailUseCase,
+    private val downloadPublicNodePreviewUseCase: DownloadPublicNodePreviewUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val channel = Channel<PhotoCover>(
@@ -52,11 +52,11 @@ class PhotoDownloaderViewModel @Inject constructor(
         photoCover: PhotoCover,
     ) {
         if (photoCover.isPreview) {
-            downloadPreview(photoCover.photo.id) {
+            downloadPreviewUseCase(photoCover.photo.id) {
                 photoCover.callback(it)
             }
         } else {
-            downloadThumbnail(photoCover.photo.id) {
+            downloadThumbnailUseCase(photoCover.photo.id) {
                 photoCover.callback(it)
             }
         }
@@ -67,9 +67,9 @@ class PhotoDownloaderViewModel @Inject constructor(
     ) {
         runCatching {
             if (photoCover.isPreview) {
-                downloadPublicNodePreview(photoCover.photo.id)
+                downloadPublicNodePreviewUseCase(photoCover.photo.id)
             } else {
-                downloadPublicNodeThumbnail(photoCover.photo.id)
+                downloadPublicNodeThumbnailUseCase(photoCover.photo.id)
             }
         }.onSuccess {
             photoCover.callback(it)

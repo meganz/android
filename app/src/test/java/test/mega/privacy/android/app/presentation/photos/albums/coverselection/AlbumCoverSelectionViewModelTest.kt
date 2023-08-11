@@ -60,7 +60,7 @@ class AlbumCoverSelectionViewModelTest {
             savedStateHandle = SavedStateHandle(mapOf(ALBUM_ID to 1L)),
             getUserAlbum = { flowOf(expectedAlbum) },
             getAlbumPhotos = { flowOf(expectedPhotos) },
-            downloadThumbnail = { _, _ -> },
+            downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
@@ -83,7 +83,7 @@ class AlbumCoverSelectionViewModelTest {
             savedStateHandle = SavedStateHandle(),
             getUserAlbum = { flowOf() },
             getAlbumPhotos = { flowOf() },
-            downloadThumbnail = { _, _ -> },
+            downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
@@ -107,7 +107,7 @@ class AlbumCoverSelectionViewModelTest {
             savedStateHandle = SavedStateHandle(),
             getUserAlbum = { flowOf() },
             getAlbumPhotos = { flowOf() },
-            downloadThumbnail = { _, _ -> },
+            downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
