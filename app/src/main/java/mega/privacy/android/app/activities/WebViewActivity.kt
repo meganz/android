@@ -147,8 +147,9 @@ class WebViewActivity : BaseActivity() {
      * onDestroy
      */
     override fun onDestroy() {
-        super.onDestroy()
+        binding.webView.destroy()
         MegaApplication.setIsWebOpenDueToEmailVerification(false)
+        super.onDestroy()
     }
 
     /**

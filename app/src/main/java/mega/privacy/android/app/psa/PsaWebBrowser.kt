@@ -25,7 +25,7 @@ import mega.privacy.android.app.utils.isURLSanitized
 import timber.log.Timber
 
 class PsaWebBrowser : Fragment() {
-    private lateinit var binding: FragmentPsaWebBrowserBinding
+    private var binding: FragmentPsaWebBrowserBinding? = null
 
     private var psaId = Constants.INVALID_VALUE
 
@@ -36,14 +36,15 @@ class PsaWebBrowser : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentPsaWebBrowserBinding.inflate(inflater, container, false)
-        return binding.root
+        return FragmentPsaWebBrowserBinding.inflate(inflater, container, false).also {
+            binding = it
+        }.root
     }
 
     @SuppressLint("SetJavaScriptEnabled", "HardwareIds")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val binding = binding ?: return
         binding.webView.settings.javaScriptEnabled = true
         binding.webView.settings.loadWithOverviewMode = true
         binding.webView.settings.useWideViewPort = true
@@ -64,18 +65,23 @@ class PsaWebBrowser : Fragment() {
 
         binding.webView.addJavascriptInterface(this, JS_INTERFACE)
         loadPsa(
+            binding.webView,
             requireArguments().getString(ARGS_URL_KEY).orEmpty(),
             requireArguments().getInt(ARGS_ID_KEY)
         )
     }
 
     override fun onDestroyView() {
-        binding.webView.removeJavascriptInterface(JS_INTERFACE)
+        binding?.webView?.run {
+            removeJavascriptInterface(JS_INTERFACE)
+            destroy()
+        }
+        binding = null
         super.onDestroyView()
     }
 
-    private fun loadPsa(url: String, psaId: Int) {
-        binding.webView.visibility = View.INVISIBLE
+    private fun loadPsa(webView: WebView, url: String, psaId: Int) {
+        webView.visibility = View.INVISIBLE
         this.psaId = psaId
 
         try {
@@ -92,7 +98,7 @@ class PsaWebBrowser : Fragment() {
             val androidId =
                 Settings.Secure.getString(requireContext().contentResolver, "android_id")
             val finalUrl = "$url/$myUserHandle?$androidId"
-            binding.webView.loadUrl(finalUrl)
+            webView.loadUrl(finalUrl)
         } catch (e: Exception) {
             Timber.e(e)
         }
@@ -114,7 +120,7 @@ class PsaWebBrowser : Fragment() {
             viewLifecycleOwner, onBackPressedCallback
         )
         uiHandler.post {
-            binding.webView.visibility = View.VISIBLE
+            binding?.webView?.visibility = View.VISIBLE
             onBackPressedCallback.isEnabled = true
             if (psaId != Constants.INVALID_VALUE) {
                 dismissPsa(psaId)
@@ -137,7 +143,7 @@ class PsaWebBrowser : Fragment() {
     fun hidePSA() {
         uiHandler.post {
             val currentActivity = activity
-            if (currentActivity is BaseActivity && binding.webView.visibility == View.VISIBLE) {
+            if (currentActivity is BaseActivity && binding?.webView?.visibility == View.VISIBLE) {
                 onBackPressedCallback.isEnabled = false
                 onBackPressedCallback.remove()
                 currentActivity.supportFragmentManager
