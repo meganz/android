@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosSkeletonView
@@ -486,7 +487,11 @@ class MediaDiscoveryFragment : Fragment() {
             )
             putExtra(
                 Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                SortOrder.ORDER_MODIFICATION_DESC
+                if (mediaDiscoveryViewModel.state.value.currentSort == Sort.NEWEST) {
+                    SortOrder.ORDER_MODIFICATION_DESC
+                } else {
+                    SortOrder.ORDER_MODIFICATION_ASC
+                }
             )
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }

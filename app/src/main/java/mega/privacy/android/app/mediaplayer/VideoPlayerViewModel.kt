@@ -1661,7 +1661,7 @@ class VideoPlayerViewModel @Inject constructor(
     /**
      * Clear the state and flying task of this class, should be called in onDestroy.
      */
-    internal fun clear() {
+    private fun clear() {
         viewModelScope.launch {
             compositeDisposable.dispose()
 
@@ -1940,6 +1940,12 @@ class VideoPlayerViewModel @Inject constructor(
         viewModelScope.launch {
             sendStatisticsMediaPlayerUseCase(event)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        cancelSearch()
+        clear()
     }
 
     companion object {
