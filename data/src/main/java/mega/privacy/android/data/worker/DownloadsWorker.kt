@@ -1,10 +1,11 @@
 package mega.privacy.android.data.worker
 
+import android.annotation.SuppressLint
 import android.app.Notification
-import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -49,6 +50,8 @@ class DownloadsWorker @AssistedInject constructor(
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val downloadNotificationMapper: DownloadNotificationMapper,
+    private val notificationManager: NotificationManagerCompat,
+    private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork() = coroutineScope {
@@ -81,13 +84,6 @@ class DownloadsWorker @AssistedInject constructor(
         )
 
     /**
-     * Notification manager used to display notifications
-     */
-    private val notificationManager: NotificationManager by lazy {
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
-
-    /**
      * Monitors download transfer events and update the related active transfers
      */
     private fun monitorTransferEvents(scope: CoroutineScope) =
@@ -104,6 +100,7 @@ class DownloadsWorker @AssistedInject constructor(
         notificationManager.cancel(DOWNLOAD_NOTIFICATION_ID)
     }
 
+
     private fun updateNotificationWhileThereAreActiveTransfers() =
         //this will be converted to an use case with its tests in TRAN-195
         monitorActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD)
@@ -111,11 +108,9 @@ class DownloadsWorker @AssistedInject constructor(
             .catch { Timber.e("DownloadsWorker error: $it") }
             .combine(monitorPausedTransfersUseCase()) { transferTotals, paused ->
                 //update the notification
-                val notification = downloadNotificationMapper(transferTotals, paused)
-                notificationManager.notify(
-                    DOWNLOAD_NOTIFICATION_ID,
-                    notification,
-                )
+                if (areNotificationsEnabledUseCase()) {
+                    notify(downloadNotificationMapper(transferTotals, paused))
+                }
                 transferTotals
             }
             .transformWhile {
@@ -123,6 +118,14 @@ class DownloadsWorker @AssistedInject constructor(
                 Timber.d("DownloadsWorker totals updated (${it.progressPercent}):${it.hasOngoingTransfers()} $it")
                 it.hasOngoingTransfers()
             }
+
+    @SuppressLint("MissingPermission")
+    private fun notify(notification: Notification) {
+        notificationManager.notify(
+            DOWNLOAD_NOTIFICATION_ID,
+            notification,
+        )
+    }
 
     /**
      * Create a [ForegroundInfo] based on [Notification]

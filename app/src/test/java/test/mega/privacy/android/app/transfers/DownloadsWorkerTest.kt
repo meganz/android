@@ -13,7 +13,7 @@ import androidx.work.impl.utils.WorkForegroundUpdater
 import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
+import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -63,6 +64,7 @@ class DownloadsWorkerTest {
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val downloadNotificationMapper = mock<DownloadNotificationMapper>()
+    private val areNotificationsEnabledUseCase = mock<AreNotificationsEnabledUseCase>()
 
     @Before
     fun setup() {
@@ -103,6 +105,8 @@ class DownloadsWorkerTest {
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             downloadNotificationMapper = downloadNotificationMapper,
+            areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
+            notificationManager = mock()
         )
     }
 
@@ -132,14 +136,14 @@ class DownloadsWorkerTest {
     fun `test that worker finishes with success if last transfer is completed`() = runTest {
         val transferTotal = mockActiveTransferTotals(true)
         commonStub(transferTotal = transferTotal)
-        Truth.assertThat(underTest.doWork()).isEqualTo(ListenableWorker.Result.success())
+        assertThat(underTest.doWork()).isEqualTo(ListenableWorker.Result.success())
     }
 
     @Test
     fun `test that worker finishes with failure if last transfer is not completed`() = runTest {
         val transferTotal = mockActiveTransferTotals(false)
         commonStub(transferTotal)
-        Truth.assertThat(underTest.doWork()).isEqualTo(ListenableWorker.Result.failure())
+        assertThat(underTest.doWork()).isEqualTo(ListenableWorker.Result.failure())
     }
 
     @Test
@@ -205,6 +209,7 @@ class DownloadsWorkerTest {
                     emit(it)
                 }
             })
+        whenever(areNotificationsEnabledUseCase()).thenReturn(true)
     }
 
     private fun mockActiveTransferTotals(

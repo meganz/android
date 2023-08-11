@@ -25,7 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.fcm.CreateChatNotificationChannelsUseCase
+import mega.privacy.android.app.fcm.CreateNotificationChannelsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -133,7 +133,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var applicationScope: CoroutineScope
 
     @Inject
-    lateinit var createNotificationChannelsUseCase: CreateChatNotificationChannelsUseCase
+    internal lateinit var createNotificationChannelsUseCase: CreateNotificationChannelsUseCase
 
     @Inject
     lateinit var themeModeState: ThemeModeState
