@@ -813,6 +813,11 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         refreshMenuOptionsVisibility()
     }
 
+    override fun onStop() {
+        super.onStop()
+        videoViewModel.savePlaybackTimes()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
@@ -846,9 +851,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        videoViewModel.savePlaybackTimes()
-        videoViewModel.cancelSearch()
-        videoViewModel.clear()
         contentResolver.unregisterContentObserver(rotationContentObserver)
         if (isFinishing) {
             mediaPlayerGateway.playerStop()
