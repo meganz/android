@@ -12,12 +12,16 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
+import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetAlbumPhotoFileUrlByNodeIdUseCase
+import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
@@ -35,6 +39,8 @@ class AlbumImportPreviewProvider @Inject constructor(
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getAlbumPhotoFileUrlByNodeIdUseCase: GetAlbumPhotoFileUrlByNodeIdUseCase,
+    private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
+    private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
 ) {
 
     /**
@@ -46,17 +52,60 @@ class AlbumImportPreviewProvider @Inject constructor(
     ) {
         if (photo is Photo.Video) {
             (activity as LifecycleOwner).lifecycleScope.launch {
-                launchVideoScreen(activity, photo)
+                launchVideoScreenFromAlbumSharing(activity = activity, photo = photo)
             }
         } else {
-            ImageViewerActivity.getIntentForAlbumSharing(
-                activity,
-                photo.id,
-            ).run {
-                activity.startActivity(this)
-            }
-            activity.overridePendingTransition(0, 0)
+            startImagePreviewFromAlbumSharing(activity = activity, photo = photo)
         }
+    }
+
+    fun onPreviewPhotoFromMD(
+        activity: Activity,
+        photo: Photo,
+        photoIds: List<Long>,
+        currentSort: Sort,
+        isFolderLink: Boolean = false,
+    ) {
+        if (photo is Photo.Video) {
+            (activity as LifecycleOwner).lifecycleScope.launch {
+                launchVideoScreenFromMD(
+                    activity = activity,
+                    photo = photo,
+                    currentSort = currentSort,
+                    isFolderLink = isFolderLink,
+                )
+            }
+        } else {
+            startImagePreviewFromMD(activity = activity, photoIds = photoIds, photo = photo)
+        }
+    }
+
+    private fun startImagePreviewFromMD(
+        activity: Activity,
+        photoIds: List<Long>,
+        photo: Photo,
+    ) {
+        ImageViewerActivity.getIntentForChildren(
+            activity,
+            photoIds.toLongArray(),
+            photo.id,
+        ).run {
+            activity.startActivity(this)
+        }
+        activity.overridePendingTransition(0, 0)
+    }
+
+    private fun startImagePreviewFromAlbumSharing(
+        activity: Activity,
+        photo: Photo,
+    ) {
+        ImageViewerActivity.getIntentForAlbumSharing(
+            activity,
+            photo.id,
+        ).run {
+            activity.startActivity(this)
+        }
+        activity.overridePendingTransition(0, 0)
     }
 
     /**
@@ -65,7 +114,7 @@ class AlbumImportPreviewProvider @Inject constructor(
      * @param activity
      * @param photo Photo item
      */
-    private suspend fun launchVideoScreen(activity: Activity, photo: Photo) {
+    private suspend fun launchVideoScreenFromAlbumSharing(activity: Activity, photo: Photo) {
         val nodeHandle = photo.id
         val nodeName = photo.name
         val intent = Util.getMediaIntent(activity, nodeName).apply {
@@ -111,6 +160,66 @@ class AlbumImportPreviewProvider @Inject constructor(
                     name = nodeName,
                     isNeedsMoreBufferSize = memoryInfo.totalMem > Constants.BUFFER_COMP,
                     intent = intent,
+                    isAlbumSharing = true
+                )
+            }
+        )
+    }
+
+    private suspend fun launchVideoScreenFromMD(
+        activity: Activity,
+        photo: Photo,
+        currentSort: Sort,
+        isFolderLink: Boolean = false,
+    ) {
+        val nodeHandle = photo.id
+        val nodeName = photo.name
+        val intent = Util.getMediaIntent(activity, nodeName).apply {
+            putExtra(Constants.INTENT_EXTRA_KEY_POSITION, 0)
+            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
+            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_MEDIA_DISCOVERY)
+            putExtra(
+                Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                getNodeParentHandle(nodeHandle)
+            )
+            putExtra(
+                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                if (currentSort == Sort.NEWEST) {
+                    SortOrder.ORDER_MODIFICATION_DESC
+                } else {
+                    SortOrder.ORDER_MODIFICATION_ASC
+                }
+            )
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+        activity.startActivity(
+            isLocalFile(nodeHandle)?.let { localPath ->
+                File(localPath).let { mediaFile ->
+                    kotlin.runCatching {
+                        FileProvider.getUriForFile(
+                            activity,
+                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                            mediaFile
+                        )
+                    }.onFailure {
+                        Uri.fromFile(mediaFile)
+                    }.map { mediaFileUri ->
+                        intent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(nodeName).type)
+                        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    }
+                }
+                intent
+            } ?: let {
+                val memoryInfo = ActivityManager.MemoryInfo()
+                (activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+                    .getMemoryInfo(memoryInfo)
+                updateIntent(
+                    handle = nodeHandle,
+                    name = nodeName,
+                    isNeedsMoreBufferSize = memoryInfo.totalMem > Constants.BUFFER_COMP,
+                    intent = intent,
+                    isFolderLink = isFolderLink,
                 )
             }
         )
@@ -161,6 +270,8 @@ class AlbumImportPreviewProvider @Inject constructor(
         name: String,
         isNeedsMoreBufferSize: Boolean,
         intent: Intent,
+        isFolderLink: Boolean = false,
+        isAlbumSharing: Boolean = false,
     ): Intent {
         if (megaApiHttpServerIsRunningUseCase() == 0) {
             megaApiHttpServerStartUseCase()
@@ -174,11 +285,25 @@ class AlbumImportPreviewProvider @Inject constructor(
                 Constants.MAX_BUFFER_16MB
             }
         )
-        getAlbumPhotoFileUrlByNodeIdUseCase(NodeId(handle))?.let { url ->
+
+        when {
+            isAlbumSharing -> {
+                getAlbumPhotoFileUrlByNodeIdUseCase(NodeId(handle))
+            }
+
+            isFolderLink -> {
+                getLocalFolderLinkFromMegaApiUseCase(handle)
+            }
+
+            else -> {
+                getFileUrlByNodeHandleUseCase(handle)
+            }
+        }?.let { url ->
             Uri.parse(url)?.let { uri ->
                 intent.setDataAndType(uri, MimeTypeList.typeForName(name).type)
             }
         }
+
         return intent
     }
 }

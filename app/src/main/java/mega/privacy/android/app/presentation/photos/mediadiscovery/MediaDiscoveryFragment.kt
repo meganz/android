@@ -1,9 +1,6 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery
 
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -13,35 +10,9 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.appcompat.view.ActionMode
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
-import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -50,41 +21,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
+import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
-import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryView
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
-import mega.privacy.android.app.presentation.photos.timeline.view.PhotosSkeletonView
-import mega.privacy.android.app.presentation.photos.view.CardListView
-import mega.privacy.android.app.presentation.photos.view.EmptyView
-import mega.privacy.android.app.presentation.photos.view.FilterDialog
-import mega.privacy.android.app.presentation.photos.view.PhotosGridView
-import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
-import mega.privacy.android.app.presentation.photos.view.SortByDialog
-import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.app.utils.Constants.BUFFER_COMP
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -93,7 +46,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MediaDiscoveryFragment : Fragment() {
 
-    private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
     internal val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
     private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by activityViewModels()
 
@@ -105,6 +57,9 @@ class MediaDiscoveryFragment : Fragment() {
     // Action mode
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: MediaDiscoveryActionModeCallback
+
+    @Inject
+    lateinit var albumImportPreviewProvider: AlbumImportPreviewProvider
 
     companion object {
         @JvmStatic
@@ -141,8 +96,22 @@ class MediaDiscoveryFragment : Fragment() {
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val uiState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
+
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    MDContentBody(mediaDiscoveryViewModel)
+                    MediaDiscoveryView(
+                        mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
+                        mediaDiscoveryViewModel = mediaDiscoveryViewModel,
+                        onOKButtonClicked = this@MediaDiscoveryFragment::onOKButtonClicked,
+                        onSettingButtonClicked = this@MediaDiscoveryFragment::onSettingButtonClicked,
+                        showSettingDialog = showSettingDialog(uiState.mediaDiscoveryViewSettings),
+                        onZoomIn = this@MediaDiscoveryFragment::handleZoomIn,
+                        onZoomOut = this@MediaDiscoveryFragment::handleZoomOut,
+                        onPhotoClicked = this@MediaDiscoveryFragment::onClick,
+                        onPhotoLongPressed = this@MediaDiscoveryFragment::onLongPress,
+                        onCardClick = mediaDiscoveryViewModel::onCardClick,
+                        onTimeBarTabSelected = mediaDiscoveryViewModel::onTimeBarTabSelected,
+                    )
                 }
             }
         }
@@ -216,314 +185,44 @@ class MediaDiscoveryFragment : Fragment() {
         }
     }
 
-    @Composable
-    private fun Back() {
-        val onBackPressedDispatcher =
-            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-        LaunchedEffect(key1 = true) {
-            onBackPressedDispatcher?.onBackPressed()
-        }
+    private fun onOKButtonClicked() {
+        mediaDiscoveryViewModel.setMediaDiscoveryViewSettings(
+            MediaDiscoveryViewSettings.ENABLED.ordinal
+        )
     }
 
-    @Composable
-    fun MDContentBody(
-        viewModel: MediaDiscoveryViewModel = viewModel(),
-    ) {
-        val uiState by viewModel.state.collectAsStateWithLifecycle()
-        if (uiState.shouldBack)
-            Back()
-
-        if (uiState.showSortByDialog) {
-            SortByDialog(
-                onDialogDismissed = {
-                    viewModel.showSortByDialog(showSortByDialog = false)
-                },
-                selectedOption = uiState.currentSort,
-                onOptionSelected = {
-                    viewModel.setCurrentSort(it)
-                }
+    private fun onSettingButtonClicked() {
+        mediaDiscoveryViewModel.setMediaDiscoveryViewSettings(
+            MediaDiscoveryViewSettings.ENABLED.ordinal
+        )
+        requireContext().startActivity(
+            Intent(
+                requireActivity(),
+                SettingsActivity::class.java
             )
-        }
-
-        if (uiState.showFilterDialog) {
-            FilterDialog(
-                onDialogDismissed = {
-                    viewModel.showFilterDialog(showFilterDialog = false)
-                },
-                selectedOption = uiState.currentMediaType,
-                onOptionSelected = {
-                    mediaDiscoveryGlobalStateViewModel.storeCurrentMediaType(it)
-                }
-            )
-        }
-
-        if (uiState.loadPhotosDone) {
-            if (uiState.uiPhotoList.isNotEmpty()) {
-                MDView(uiState)
-            } else {
-                EmptyView(uiState.currentMediaType)
-            }
-        } else {
-            PhotosSkeletonView()
-        }
-    }
-
-    @Composable
-    private fun MDView(
-        uiState: MediaDiscoveryViewState,
-    ) {
-        val lazyGridState: LazyGridState =
-            rememberSaveable(
-                uiState.scrollStartIndex,
-                uiState.scrollStartOffset,
-                saver = LazyGridState.Saver,
-            ) {
-                LazyGridState(
-                    uiState.scrollStartIndex,
-                    uiState.scrollStartOffset,
-                )
-            }
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                if (uiState.mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal
-                    && arguments?.getBoolean(
-                        INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON,
-                        false
-                    ) == false
-                ) {
-                    MediaDiscoveryDialog()
-                }
-                if (uiState.selectedTimeBarTab == TimeBarTab.All) {
-                    PhotosGridView(
-                        uiState = uiState,
-                        lazyGridState = lazyGridState,
-                        modifier = Modifier
-                            .photosZoomGestureDetector(
-                                onZoomIn = this@MediaDiscoveryFragment::handleZoomIn,
-                                onZoomOut = this@MediaDiscoveryFragment::handleZoomOut,
-                            )
-                    )
-                } else {
-                    val dateCards = when (uiState.selectedTimeBarTab) {
-                        TimeBarTab.Years -> uiState.yearsCardList
-                        TimeBarTab.Months -> uiState.monthsCardList
-                        TimeBarTab.Days -> uiState.daysCardList
-                        else -> uiState.daysCardList
-                    }
-                    CardListView(dateCards = dateCards, lazyGridState = lazyGridState)
-                }
-            }
-            if (uiState.selectedPhotoIds.isEmpty()) {
-                TimeSwitchBar(uiState = uiState)
-            }
-        }
-    }
-
-    @Composable
-    fun CardListView(
-        dateCards: List<DateCard>,
-        lazyGridState: LazyGridState,
-    ) = CardListView(
-        dateCards = dateCards,
-        photoDownload = photoDownloaderViewModel::downloadPhoto,
-        onCardClick = mediaDiscoveryViewModel::onCardClick,
-        state = lazyGridState,
-    )
-
-    @Composable
-    fun PhotosGridView(
-        uiState: MediaDiscoveryViewState,
-        lazyGridState: LazyGridState,
-        modifier: Modifier,
-    ) =
-        PhotosGridView(
-            modifier = modifier,
-            currentZoomLevel = uiState.currentZoomLevel,
-            photoDownland = photoDownloaderViewModel::downloadPhoto,
-            lazyGridState = lazyGridState,
-            onClick = this::onClick,
-            onLongPress = this::onLongPress,
-            selectedPhotoIds = uiState.selectedPhotoIds,
-            uiPhotoList = uiState.uiPhotoList,
-        )
-
-    @Composable
-    fun TimeSwitchBar(uiState: MediaDiscoveryViewState) = TimeSwitchBar(
-        selectedTimeBarTab = uiState.selectedTimeBarTab,
-        onTimeBarTabSelected = mediaDiscoveryViewModel::onTimeBarTabSelected
-    )
-
-    /**
-     * Media discovery view dialog
-     */
-    @Composable
-    fun MediaDiscoveryDialog() {
-        Divider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 3.dp)
-                .shadow(
-                    elevation = 10.dp,
-                    ambientColor = colorResource(id = R.color.black),
-                    spotColor = colorResource(id = R.color.black)
-                )
-                .zIndex(2f),
-            color = Color.Transparent
-        )
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 30.dp, end = 20.dp),
-            text = getString(R.string.cloud_drive_media_discovery_banner_context),
-            color = colorResource(id = R.color.grey_alpha_087_white)
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            SettingsButton()
-            OKButton()
-        }
-        Divider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            color = colorResource(id = R.color.grey_012_white_015)
         )
     }
 
-    /**
-     * Settings button for media discovery view dialog
-     */
-    @Composable
-    fun SettingsButton() {
-        TextButton(modifier = Modifier.padding(end = 10.dp),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = MaterialTheme.colors.secondary,
-                backgroundColor = Color.Transparent
-            ),
-            onClick = {
-                mediaDiscoveryViewModel.setMediaDiscoveryViewSettings(
-                    MediaDiscoveryViewSettings.ENABLED.ordinal
-                )
-                requireContext().startActivity(
-                    Intent(
-                        requireActivity(),
-                        SettingsActivity::class.java
-                    )
-                )
-            }) {
-            Text(
-                text = getString(R.string.cloud_drive_media_discovery_banner_settings),
-                fontSize = 16.sp
-            )
-        }
-    }
 
-    /**
-     * Ok button for media discovery view dialog
-     */
-    @Composable
-    fun OKButton() {
-        TextButton(modifier = Modifier.padding(end = 8.dp),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = MaterialTheme.colors.secondary,
-                backgroundColor = Color.Transparent
-            ),
-            onClick = {
-                mediaDiscoveryViewModel.setMediaDiscoveryViewSettings(
-                    MediaDiscoveryViewSettings.ENABLED.ordinal
-                )
-            }) {
-            Text(text = getString(R.string.cloud_drive_media_discovery_banner_ok), fontSize = 16.sp)
-        }
-    }
-
-    private fun openPhoto(photo: Photo) {
-        ImageViewerActivity.getIntentForChildren(
-            requireContext(),
-            mediaDiscoveryViewModel.getAllPhotoIds().toLongArray(),
-            photo.id,
-        ).run {
-            startActivity(this)
-        }
-        managerActivity.overridePendingTransition(0, 0)
+    private fun showSettingDialog(mediaDiscoveryViewSettings: Int?): Boolean {
+        return mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal
+                && arguments?.getBoolean(
+            INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON,
+            false
+        ) == false
     }
 
     private fun onClick(photo: Photo) {
         if (mediaDiscoveryViewModel.state.value.selectedPhotoIds.isEmpty()) {
-            if (photo is Photo.Video) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    launchVideoScreen(photo)
-                }
-            } else {
-                openPhoto(photo)
-            }
+            albumImportPreviewProvider.onPreviewPhotoFromMD(
+                activity = this.requireActivity(),
+                photo = photo,
+                photoIds = mediaDiscoveryViewModel.getAllPhotoIds(),
+                currentSort = mediaDiscoveryViewModel.state.value.currentSort,
+            )
         } else if (actionMode != null) {
             mediaDiscoveryViewModel.togglePhotoSelection(photo.id)
         }
-    }
-
-    /**
-     * Launch video player
-     *
-     * @param photo Photo item
-     */
-    private suspend fun launchVideoScreen(photo: Photo) {
-        val nodeHandle = photo.id
-        val nodeName = photo.name
-        val intent = Util.getMediaIntent(requireActivity(), nodeName).apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_POSITION, 0)
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
-            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_MEDIA_DISCOVERY)
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                mediaDiscoveryViewModel.getNodeParentHandle(nodeHandle)
-            )
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                if (mediaDiscoveryViewModel.state.value.currentSort == Sort.NEWEST) {
-                    SortOrder.ORDER_MODIFICATION_DESC
-                } else {
-                    SortOrder.ORDER_MODIFICATION_ASC
-                }
-            )
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
-        startActivity(
-            mediaDiscoveryViewModel.isLocalFile(nodeHandle)?.let { localPath ->
-                File(localPath).let { mediaFile ->
-                    kotlin.runCatching {
-                        FileProvider.getUriForFile(
-                            requireActivity(),
-                            AUTHORITY_STRING_FILE_PROVIDER,
-                            mediaFile
-                        )
-                    }.onFailure {
-                        Uri.fromFile(mediaFile)
-                    }.map { mediaFileUri ->
-                        intent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(nodeName).type)
-                        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    }
-                }
-                intent
-            } ?: let {
-                val memoryInfo = ActivityManager.MemoryInfo()
-                (requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-                    .getMemoryInfo(memoryInfo)
-                mediaDiscoveryViewModel.updateIntent(
-                    handle = nodeHandle,
-                    name = nodeName,
-                    isNeedsMoreBufferSize = memoryInfo.totalMem > BUFFER_COMP,
-                    intent = intent,
-                )
-            }
-        )
     }
 
     private fun onLongPress(photo: Photo) {
