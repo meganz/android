@@ -32,7 +32,7 @@ import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.core.R as CoreUiR
-
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 
 @Composable
 internal fun InputSyncInformationView(
@@ -137,7 +137,11 @@ private fun TwoLinesItem(
         Column {
             Text(
                 text = topText,
-                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorSecondary),
+                style = if (bottomText.isEmpty()) {
+                    MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorSecondary)
+                } else {
+                    MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.grey_alpha_087_white_alpha_087)
+                },
             )
             Text(
                 text = bottomText.ifEmpty {
