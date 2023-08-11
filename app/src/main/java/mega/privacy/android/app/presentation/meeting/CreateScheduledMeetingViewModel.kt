@@ -391,28 +391,10 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             return
         }
 
-        val newWeekdayList: List<Weekday>? =
-            if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Weekly && state.value.rulesSelected.interval == 1) listOf(
-                weekDayMapper(
-                    selectedStartDate.dayOfWeek
-                )
-            ) else state.value.rulesSelected.weekDayList
-
-        val newMonthDayList: List<Int>? =
-            if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Monthly && state.value.rulesSelected.interval == 1) listOf(
-                selectedStartDate.dayOfMonth
-            ) else state.value.rulesSelected.monthDayList
+        val newWeekdayList = newWeekdayList(selectedStartDate)
+        val newMonthDayList = newMonthDayList(selectedStartDate)
 
         _state.update { state ->
-            val newEndDate =
-                if ((state.endDate.isAfter(selectedStartDate)))
-                    state.endDate
-                else
-                    selectedStartDate.plus(
-                        30,
-                        ChronoUnit.MINUTES
-                    )
-
             var newUntil = state.rulesSelected.until
             state.rulesSelected.getUntilZonedDateTime()?.let {
                 if (it.isBefore(selectedStartDate)) {
@@ -422,11 +404,13 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 }
             }
 
-            Timber.d("Set start date $selectedStartDate, set end date $newEndDate")
+            val rightEndDate = getRightEndDate(selectedStartDate)
+
+            Timber.d("Set start date $selectedStartDate and update end date $rightEndDate")
 
             state.copy(
                 startDate = selectedStartDate,
-                endDate = newEndDate,
+                endDate = rightEndDate,
                 rulesSelected = state.rulesSelected.copy(
                     weekDayList = newWeekdayList,
                     monthDayList = newMonthDayList,
@@ -439,20 +423,130 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     }
 
     /**
+     * Get month day list with a new start date
+     *
+     * @param newStartDate  [ZonedDateTime]
+     * @return Month day List
+     */
+    private fun newMonthDayList(newStartDate: ZonedDateTime) =
+        if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Monthly && state.value.rulesSelected.interval == 1) listOf(
+            newStartDate.dayOfMonth
+        ) else state.value.rulesSelected.monthDayList
+
+    /**
+     * Get weekday list with a new start date
+     *
+     * @param newStartDate  [ZonedDateTime]
+     * @return Weekday List
+     */
+    private fun newWeekdayList(newStartDate: ZonedDateTime) =
+        if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Weekly && state.value.rulesSelected.interval == 1) listOf(
+            weekDayMapper(
+                newStartDate.dayOfWeek
+            )
+        ) else state.value.rulesSelected.weekDayList
+
+    /**
+     * Get the right end date when I change the start date
+     *
+     * @param newStartDate  [ZonedDateTime]
+     * @return newEndDate   [ZonedDateTime]
+     */
+    private fun getRightEndDate(newStartDate: ZonedDateTime): ZonedDateTime {
+        val startDate = getOnlyDate(newStartDate)
+        val endDate = getOnlyDate(state.value.endDate)
+
+        val startDateWithEndTime =
+            newStartDate
+                .withHour(state.value.endDate.hour)
+                .withMinute(state.value.endDate.minute)
+                .withSecond(state.value.endDate.second)
+
+        return when {
+            state.value.endDate.isAfter(newStartDate) -> state.value.endDate
+            state.value.endDate.isEqual(newStartDate) ||
+                    endDate.isEqual(startDate) -> newStartDate.plus(30, ChronoUnit.MINUTES)
+
+            startDateWithEndTime.isAfter(newStartDate) -> startDateWithEndTime
+            else -> newStartDate.plus(30, ChronoUnit.MINUTES)
+
+        }
+    }
+
+    /**
+     * Get only date of ZonedDateTime
+     *
+     * @return [ZonedDateTime]
+     */
+    private fun getOnlyDate(zonedDateTime: ZonedDateTime) = zonedDateTime
+        .withHour(0)
+        .withMinute(0)
+        .withSecond(0)
+
+    /**
+     * Get the right start date when I change the end date
+     *
+     * @param newEndDate  [ZonedDateTime]
+     * @return newStartDate   [ZonedDateTime]
+     */
+    private fun getRightStartDate(newEndDate: ZonedDateTime): ZonedDateTime {
+        val startDate = getOnlyDate(state.value.startDate)
+        val endDate = getOnlyDate(newEndDate)
+
+        val endDateWithStartTime = newEndDate
+            .withHour(state.value.startDate.hour)
+            .withMinute(state.value.startDate.minute)
+            .withSecond(state.value.startDate.second)
+
+        return when {
+            state.value.startDate.isBefore(newEndDate) -> state.value.startDate
+            state.value.startDate.isEqual(newEndDate) ||
+                    endDate.isEqual(startDate) -> newEndDate.minus(30, ChronoUnit.MINUTES)
+
+            endDateWithStartTime.isBefore(newEndDate) -> endDateWithStartTime
+            else -> newEndDate.minus(30, ChronoUnit.MINUTES)
+        }
+    }
+
+    /**
      * Set end date and time
      *
      * @param selectedEndDate   End date and time
      */
     fun onEndDateTimeTap(selectedEndDate: ZonedDateTime) {
-        if (selectedEndDate.isBefore(ZonedDateTime.now()) || selectedEndDate.isBefore(state.value.startDate)) {
+        if (selectedEndDate.isBefore(ZonedDateTime.now())) {
             return
         }
 
-        _state.update {
-            it.copy(
-                endDate = selectedEndDate
+        val rightStartDate = getRightStartDate(selectedEndDate)
+
+        val newWeekdayList = newWeekdayList(rightStartDate)
+        val newMonthDayList = newMonthDayList(rightStartDate)
+
+        _state.update { state ->
+            var newUntil = state.rulesSelected.until
+            state.rulesSelected.getUntilZonedDateTime()?.let {
+                if (it.isBefore(rightStartDate)) {
+                    newUntil = rightStartDate.plusMonths(
+                        6
+                    ).toEpochSecond()
+                }
+            }
+
+            Timber.d("Set end date $selectedEndDate and update start date $rightStartDate")
+
+            state.copy(
+                startDate = rightStartDate,
+                endDate = selectedEndDate,
+                rulesSelected = state.rulesSelected.copy(
+                    weekDayList = newWeekdayList,
+                    monthDayList = newMonthDayList,
+                    until = newUntil
+                )
             )
         }
+
+        checkMonthWarning()
     }
 
     /**
