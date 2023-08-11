@@ -39,9 +39,9 @@ include("liveeventbus-x")
 include(":xray")
 include(":analytics")
 include(":core-ui-test")
+include(":baselineprofile")
 
 println("isServerBuild = ${isServerBuild()}")
-
 buildCache {
     local {
         isEnabled = !isServerBuild()

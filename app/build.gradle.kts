@@ -13,6 +13,7 @@ plugins {
     id("de.mannodermaus.android-junit5")
     id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
+    id("androidx.baselineprofile")
 }
 
 apply(from = "${project.rootDir}/tools/util.gradle")
@@ -209,6 +210,11 @@ android {
                 testers = readTesters()
             }
         }
+
+        create("benchmark") {
+            initWith(buildTypes["release"])
+            proguardFiles("benchmark-rules.pro")
+        }
     }
 
     compileOptions {
@@ -287,6 +293,8 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":core-ui"))
     implementation(project(":data"))
+    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
+    "baselineProfile"(project(":baselineprofile"))
     debugImplementation(project(":nocturn"))
     debugImplementation(project(":xray"))
     "qaImplementation"(project(":screenshot"))
