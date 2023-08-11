@@ -1,17 +1,27 @@
 package mega.privacy.android.feature.sync.di
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncGatewayImpl
+import mega.privacy.android.feature.sync.data.gateway.SyncPreferencesDatastore
+import mega.privacy.android.feature.sync.data.gateway.SyncPreferencesDatastoreImpl
+import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStore
+import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStoreName
 import mega.privacy.android.feature.sync.data.repository.SyncNewFolderParamsRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncPreferencesRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncRepositoryImpl
 import mega.privacy.android.feature.sync.domain.repository.SyncNewFolderParamsRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -33,4 +43,16 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindSyncGateway(implementation: SyncGatewayImpl): SyncGateway
+
+    @Binds
+    @Singleton
+    fun bindSyncPrefsDatastore(implementation: SyncPreferencesDatastoreImpl): SyncPreferencesDatastore
+
+    companion object {
+        @Provides
+        @Named(syncPrefsDataStoreName)
+        @Singleton
+        fun provideSyncPrefsDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+            context.syncPrefsDataStore
+    }
 }

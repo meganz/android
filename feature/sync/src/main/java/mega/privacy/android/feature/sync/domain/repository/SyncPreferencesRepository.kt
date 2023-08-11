@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Repository for storing user preference regarding Sync
  */
-interface SyncPreferencesRepository {
+internal interface SyncPreferencesRepository {
 
     /**
      * Sets if sync should be done only when connected to WiFi
@@ -16,4 +16,8 @@ interface SyncPreferencesRepository {
      * Gets if sync should be done only when connected to WiFi
      */
     fun monitorSyncByWiFi(): StateFlow<Boolean>
+
+    suspend fun setOnboardingShown(shown: Boolean)
+
+    suspend fun getOnboardingShown(): Boolean
 }

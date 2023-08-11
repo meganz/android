@@ -20,8 +20,18 @@ private const val syncMegaPicker = "sync/mega-picker"
 private const val syncList = "sync/list"
 
 @OptIn(ExperimentalAnimationApi::class)
-internal fun NavGraphBuilder.syncNavGraph(navController: NavController) {
-    navigation(startDestination = syncEmptyRoute, route = syncRoute) {
+internal fun NavGraphBuilder.syncNavGraph(
+    showOnboardingScreen: Boolean,
+    navController: NavController,
+) {
+    navigation(
+        startDestination = if (showOnboardingScreen) {
+            syncEmptyRoute
+        } else {
+            syncList
+        },
+        route = syncRoute
+    ) {
         composable(route = syncEmptyRoute) {
             SyncEmptyScreen {
                 navController.navigate(syncNewFolderRoute)

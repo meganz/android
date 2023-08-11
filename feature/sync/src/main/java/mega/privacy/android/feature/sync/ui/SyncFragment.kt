@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -45,6 +46,8 @@ class SyncFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    private val viewModel by viewModels<SyncViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -56,16 +59,22 @@ class SyncFragment : Fragment() {
                 val animatedNavController = rememberAnimatedNavController()
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-                AndroidTheme(isDark = themeMode.isDarkMode()) {
-                    AnimatedNavHost(
-                        navController = animatedNavController,
-                        startDestination = syncRoute,
-                        enterTransition = { EnterTransition.None },
-                        exitTransition = { ExitTransition.None },
-                        popEnterTransition = { EnterTransition.None },
-                        popExitTransition = { ExitTransition.None },
-                    ) {
-                        syncNavGraph(animatedNavController)
+                val state by viewModel.state.collectAsStateWithLifecycle()
+
+                state.showOnboarding?.let { showOnboarding ->
+                    AndroidTheme(isDark = themeMode.isDarkMode()) {
+                        AnimatedNavHost(
+                            navController = animatedNavController,
+                            startDestination = syncRoute,
+                            enterTransition = { EnterTransition.None },
+                            exitTransition = { ExitTransition.None },
+                            popEnterTransition = { EnterTransition.None },
+                            popExitTransition = { ExitTransition.None },
+                        ) {
+                            syncNavGraph(
+                                showOnboarding, animatedNavController
+                            )
+                        }
                     }
                 }
             }

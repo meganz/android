@@ -81,6 +81,7 @@ dependencies {
     implementation(lib.logging.timber)
 
     implementation(google.hilt.android)
+    implementation(androidx.datastore.preferences)
     implementation(androidx.hilt.navigation)
     kapt(google.hilt.android.compiler)
     kapt(androidx.hilt.compiler)

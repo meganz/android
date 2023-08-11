@@ -15,6 +15,7 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
+import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -38,6 +39,7 @@ class SyncListViewModelTest {
     private val syncUiItemMapper: SyncUiItemMapper = mock()
     private val removeFolderPairUseCase: RemoveFolderPairUseCase = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
+    private val setOnboardingShownUseCase: SetOnboardingShownUseCase = mock()
 
     private lateinit var underTest: SyncListViewModel
 
@@ -74,7 +76,8 @@ class SyncListViewModelTest {
         reset(
             monitorSyncsUseCase,
             syncUiItemMapper,
-            removeFolderPairUseCase
+            removeFolderPairUseCase,
+            setOnboardingShownUseCase
         )
     }
 
@@ -131,11 +134,23 @@ class SyncListViewModelTest {
         verify(removeFolderPairUseCase).invoke(folderPairId)
     }
 
+    @Test
+    fun `test that view model initialization sets onboarding shown to true`() = runTest {
+        whenever(monitorSyncsUseCase()).thenReturn(flow {
+            emit(folderPairs)
+            awaitCancellation()
+        })
+        initViewModel()
+
+        verify(setOnboardingShownUseCase).invoke(true)
+    }
+
     private fun initViewModel() {
         underTest = SyncListViewModel(
             syncUiItemMapper,
             removeFolderPairUseCase,
-            monitorSyncsUseCase
+            monitorSyncsUseCase,
+            setOnboardingShownUseCase
         )
     }
 }

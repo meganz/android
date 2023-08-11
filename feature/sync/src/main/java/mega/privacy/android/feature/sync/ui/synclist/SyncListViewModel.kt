@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
+import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction.CardExpanded
 import javax.inject.Inject
@@ -20,6 +21,7 @@ internal class SyncListViewModel @Inject constructor(
     private val syncUiItemMapper: SyncUiItemMapper,
     private val removeFolderPairUseCase: RemoveFolderPairUseCase,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
+    private val setOnboardingShownUseCase: SetOnboardingShownUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncListState(emptyList()))
@@ -27,6 +29,7 @@ internal class SyncListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            setOnboardingShownUseCase(true)
             monitorSyncsUseCase()
                 .map(syncUiItemMapper::invoke)
                 .collectLatest { syncs ->
