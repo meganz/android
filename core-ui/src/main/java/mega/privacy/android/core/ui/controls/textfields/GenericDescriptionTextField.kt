@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -72,6 +73,7 @@ fun GenericDescriptionTextField(
     var isFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     var isCharLimitError by remember { mutableStateOf(false) }
+    var size by remember { mutableStateOf(IntSize(0, 0)) }
 
     fun validate(text: String) {
         isCharLimitError = text.length > charLimit
@@ -145,7 +147,12 @@ fun GenericDescriptionTextField(
                         interactionSource,
                         textFieldColors
                     )
-                    .onSizeChanged { onSizeChange() },
+                    .onSizeChanged { newSize ->
+                        if (newSize != size) {
+                            onSizeChange()
+                        }
+                        size = newSize
+                    },
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.subtitle2.copy(
                     color = if (!isFocused && value.isNotEmpty()) MaterialTheme.colors.textColorSecondary else MaterialTheme.colors.onPrimary,
