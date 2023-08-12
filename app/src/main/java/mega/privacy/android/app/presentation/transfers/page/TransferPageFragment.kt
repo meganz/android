@@ -182,6 +182,11 @@ internal class TransferPageFragment : Fragment() {
                 viewModel.markDeleteAllCompletedTransfersResultConsumed()
             }
         }
+        viewLifecycleOwner.collectFlow(transfersViewModel.completedTransfers) { completedTransfers ->
+            if (viewModel.transferTab == TransfersTab.COMPLETED_TAB) {
+                clearCompletedTransfers?.isVisible = completedTransfers.isNotEmpty()
+            }
+        }
     }
 
     private fun handleDeleteFailedOrCancelledTransfersResult(transfers: List<CompletedTransfer>) {
