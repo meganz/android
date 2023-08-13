@@ -227,8 +227,12 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
             requirePasscodeDialog =
                 passcodeUtil.showRequirePasscodeDialog(selectedPosition, requireContext())
             requirePasscodeDialog.setOnDismissListener {
-                requirePasscode?.summary =
-                    passcodeUtil.getRequiredPasscodeText(requiredTime)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val newTime = passcodePreferencesWrapper.getPasscodeTimeOut()
+                    requirePasscode?.summary =
+                        passcodeUtil.getRequiredPasscodeText(newTime)
+                }
+
             }
         }
     }
