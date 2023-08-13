@@ -9,11 +9,17 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -52,28 +58,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
 
     private val selectImportFolderResult =
         ActivityResultCallback<ActivityResult> { activityResult ->
-            val resultCode = activityResult.resultCode
-            val intent = activityResult.data
-
-            if (resultCode != RESULT_OK || intent == null) {
-                return@ActivityResultCallback
-            }
-
-            if (!viewModel.isConnected) {
-                try {
-                    viewModel.resetJobInProgressState()
-                } catch (ex: Exception) {
-                    Timber.e(ex)
-                }
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getString(R.string.error_server_connection_problem)
-                )
-                return@ActivityResultCallback
-            }
-
-            val toHandle = intent.getLongExtra("IMPORT_TO", 0)
-            viewModel.handleImportNode(toHandle)
+            viewModel.handleSelectImportFolderResult(activityResult)
         }
 
     private val selectImportFolderLauncher = registerForActivityResult(
@@ -122,6 +107,8 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                     onSaveToDeviceClicked = viewModel::handleSaveFile,
                     onImportClicked = ::onImportClicked,
                     onTransferWidgetClick = ::onTransfersWidgetClick,
+                    onConfirmErrorDialogClick = ::onConfirmErrorDialogClick,
+                    onErrorMessageConsumed = viewModel::resetErrorMessage
                 )
             }
         }
@@ -144,20 +131,8 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                     viewModel.resetCollision()
                 }
 
-                it.collisionCheckThrowable != null -> {
-                    viewModel.resetCollisionError()
-                }
-
                 it.copySuccess -> {
                     launchManagerActivity()
-                }
-
-                it.copyThrowable != null -> {
-                    if (!manageCopyMoveException(it.copyThrowable)) {
-                        launchManagerActivity()
-                    } else {
-                        viewModel.resetCopyError()
-                    }
                 }
             }
         }
@@ -182,6 +157,13 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
 
     private fun onShareClicked() {
         MegaNodeUtil.shareLink(this, viewModel.state.value.url)
+    }
+
+    private fun onConfirmErrorDialogClick() {
+        if (isClosedChat) {
+            startActivity(Intent(this@FileLinkComposeActivity, ManagerActivity::class.java))
+        }
+        finish()
     }
 
     /**

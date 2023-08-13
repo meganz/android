@@ -30,6 +30,7 @@ import nz.mega.sdk.MegaNode
  * @property jobInProgressState     indicates if there are any job in progress that needs to be notified
  * @property openFile               State to handle file opening
  * @property downloadFile           State to download file
+ * @property errorMessage           State to show error message
  */
 data class FileLinkState(
     val shouldLogin: Boolean? = null,
@@ -50,7 +51,8 @@ data class FileLinkState(
     val fetchPublicNodeError: PublicNodeException? = null,
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,
     val openFile: StateEventWithContent<Intent> = consumed(),
-    val downloadFile: StateEventWithContent<MegaNode> = consumed()
+    val downloadFile: StateEventWithContent<MegaNode> = consumed(),
+    val errorMessage: StateEventWithContent<Int> = consumed()
 ) {
     /**
      * Creates a copy of this view state with the info that can be extracted directly from typedNode

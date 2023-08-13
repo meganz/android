@@ -35,18 +35,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
+import mega.privacy.android.app.presentation.extensions.errorDialogContentId
+import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -71,10 +76,20 @@ internal fun FileLinkView(
     onSaveToDeviceClicked: () -> Unit,
     onImportClicked: () -> Unit,
     onTransferWidgetClick: () -> Unit,
+    onConfirmErrorDialogClick: () -> Unit,
+    onErrorMessageConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
+
+    EventEffect(
+        event = viewState.errorMessage,
+        onConsumed = onErrorMessageConsumed
+    ) {
+        snackBarHostState.showSnackbar(context.resources.getString(it))
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         val density = LocalDensity.current.density
@@ -204,6 +219,19 @@ internal fun FileLinkView(
         viewState.jobInProgressState?.progressMessage?.let {
             LoadingDialog(text = stringResource(id = it))
         }
+
+        viewState.fetchPublicNodeError?.let {
+            MegaAlertDialog(
+                title = stringResource(id = it.errorDialogTitleId),
+                text = stringResource(id = it.errorDialogContentId),
+                confirmButtonText = stringResource(id = android.R.string.ok),
+                cancelButtonText = null,
+                onConfirm = onConfirmErrorDialogClick,
+                onDismiss = {},
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        }
     }
 }
 
@@ -264,7 +292,9 @@ private fun PreviewFileLinkView() {
             onPreviewClick = {},
             onSaveToDeviceClicked = {},
             onImportClicked = {},
-            onTransferWidgetClick = {}
+            onTransferWidgetClick = {},
+            onConfirmErrorDialogClick = {},
+            onErrorMessageConsumed = {}
         )
     }
 }

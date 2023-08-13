@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.clouddrive
 
 import android.app.Activity
 import android.content.Intent
+import androidx.activity.result.ActivityResult
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -191,6 +194,27 @@ class FileLinkViewModel @Inject constructor(
     }
 
     /**
+     * Handle select import folder result
+     */
+    fun handleSelectImportFolderResult(result: ActivityResult) {
+        val resultCode = result.resultCode
+        val intent = result.data
+
+        if (resultCode != AppCompatActivity.RESULT_OK || intent == null) {
+            return
+        }
+
+        if (!isConnected) {
+            resetJobInProgressState()
+            setErrorMessage(R.string.error_server_connection_problem)
+            return
+        }
+
+        val toHandle = intent.getLongExtra("IMPORT_TO", 0)
+        handleImportNode(toHandle)
+    }
+
+    /**
      * Handle import node
      *
      * @param targetHandle
@@ -220,8 +244,10 @@ class FileLinkViewModel @Inject constructor(
                     it.copy(collision = collision, jobInProgressState = null)
                 }
             }
-        }.onFailure {
-            Timber.e(it)
+        }.onFailure { throwable ->
+            resetJobInProgressState()
+            setErrorMessage(R.string.general_error)
+            Timber.e(throwable)
         }
     }
 
@@ -234,7 +260,9 @@ class FileLinkViewModel @Inject constructor(
         runCatching { copyPublicNodeUseCase(fileNode, NodeId(targetHandle), null) }
             .onSuccess { _state.update { it.copy(copySuccess = true, jobInProgressState = null) } }
             .onFailure { copyThrowable ->
-                _state.update { it.copy(copyThrowable = copyThrowable, jobInProgressState = null) }
+                resetJobInProgressState()
+                setErrorMessage(R.string.context_no_copied)
+                Timber.e(copyThrowable)
             }
     }
 
@@ -279,7 +307,7 @@ class FileLinkViewModel @Inject constructor(
     /**
      * Reset the job in progress state value
      */
-    fun resetJobInProgressState() {
+    private fun resetJobInProgressState() {
         _state.update { it.copy(jobInProgressState = null) }
     }
 
@@ -314,4 +342,15 @@ class FileLinkViewModel @Inject constructor(
      * Reset and notify that downloadFile event is consumed
      */
     fun resetDownloadFile() = _state.update { it.copy(downloadFile = consumed()) }
+
+    /**
+     * Set and notify that errorMessage event is triggered
+     */
+    private fun setErrorMessage(message: Int) =
+        _state.update { it.copy(errorMessage = triggered(message)) }
+
+    /**
+     * Reset and notify that errorMessage event is consumed
+     */
+    fun resetErrorMessage() = _state.update { it.copy(errorMessage = consumed()) }
 }
