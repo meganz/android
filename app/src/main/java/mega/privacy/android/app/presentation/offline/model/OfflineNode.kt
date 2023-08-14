@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline.model
 
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.utils.Constants.INVALID_ID

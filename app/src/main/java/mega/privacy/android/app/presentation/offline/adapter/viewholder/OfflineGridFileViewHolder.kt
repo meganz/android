@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline.adapter.viewholder
 
 import android.net.Uri
 import android.view.View
@@ -10,6 +10,7 @@ import com.facebook.drawee.generic.RoundingParams
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
 
 class OfflineGridFileViewHolder(
     private val binding: OfflineItemGridFileBinding,

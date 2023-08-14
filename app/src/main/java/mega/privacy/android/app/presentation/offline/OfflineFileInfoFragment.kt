@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline
 
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter

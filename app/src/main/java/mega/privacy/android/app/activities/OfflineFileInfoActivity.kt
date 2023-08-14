@@ -3,8 +3,8 @@ package mega.privacy.android.app.activities
 import android.os.Bundle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragment
-import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragmentArgs
+import mega.privacy.android.app.presentation.offline.OfflineFileInfoFragment
+import mega.privacy.android.app.presentation.offline.OfflineFileInfoFragmentArgs
 import mega.privacy.android.app.utils.Constants.HANDLE
 import timber.log.Timber
 

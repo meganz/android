@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline.adapter
 
 import mega.privacy.android.app.MegaOffline
 

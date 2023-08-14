@@ -131,7 +131,7 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
-import mega.privacy.android.app.fragments.offline.OfflineFragment
+import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler

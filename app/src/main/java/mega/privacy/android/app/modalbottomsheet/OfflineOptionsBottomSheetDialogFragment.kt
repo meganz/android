@@ -15,7 +15,7 @@ import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.databinding.BottomSheetOfflineItemBinding
-import mega.privacy.android.app.fragments.offline.OfflineNodeListener
+import mega.privacy.android.app.presentation.offline.adapter.OfflineNodeListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.utils.Constants

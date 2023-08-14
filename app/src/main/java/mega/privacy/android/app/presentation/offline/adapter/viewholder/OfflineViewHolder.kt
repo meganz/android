@@ -1,7 +1,8 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline.adapter.viewholder
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
 
 abstract class OfflineViewHolder(
     itemView: View,

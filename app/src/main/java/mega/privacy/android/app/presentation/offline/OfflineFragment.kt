@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline
 
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
@@ -56,6 +56,10 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.offline.adapter.OfflineAdapter
+import mega.privacy.android.app.presentation.offline.adapter.OfflineNodeListener
+import mega.privacy.android.app.presentation.offline.adapter.viewholder.OfflineListViewHolder
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline.adapter.viewholder
 
 import android.net.Uri
 import android.view.View
@@ -9,6 +9,7 @@ import com.facebook.drawee.generic.RoundingParams
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.databinding.OfflineItemListBinding
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.utils.Util.dp2px
 
 class OfflineListViewHolder(

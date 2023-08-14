@@ -37,7 +37,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_IN
 import mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
-import mega.privacy.android.app.fragments.offline.OfflineFragment
+import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification

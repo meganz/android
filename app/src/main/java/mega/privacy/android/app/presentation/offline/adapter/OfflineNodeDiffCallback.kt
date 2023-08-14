@@ -1,6 +1,7 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline.adapter
 
 import androidx.recyclerview.widget.DiffUtil
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
 
 class OfflineNodeDiffCallback : DiffUtil.ItemCallback<OfflineNode>() {
     override fun areItemsTheSame(oldItem: OfflineNode, newItem: OfflineNode) =

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
 import mega.privacy.android.app.utils.FileUtil.getTotalSize

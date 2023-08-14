@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline
 
 import android.content.Context
 import androidx.collection.SparseArrayCompat
@@ -23,6 +23,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
 import mega.privacy.android.app.utils.Constants.BACK_PRESS_NOT_HANDLED

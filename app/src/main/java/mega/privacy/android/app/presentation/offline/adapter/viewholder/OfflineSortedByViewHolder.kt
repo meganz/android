@@ -1,8 +1,9 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline.adapter.viewholder
 
 import androidx.core.view.isVisible
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
 
 class OfflineSortedByViewHolder(
     private val binding: SortByHeaderBinding,

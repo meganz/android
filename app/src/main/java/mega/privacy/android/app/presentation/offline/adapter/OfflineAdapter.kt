@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.offline
+package mega.privacy.android.app.presentation.offline.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,6 +11,12 @@ import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 import mega.privacy.android.app.databinding.OfflineItemListBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.presentation.offline.adapter.viewholder.OfflineGridFileViewHolder
+import mega.privacy.android.app.presentation.offline.adapter.viewholder.OfflineGridFolderViewHolder
+import mega.privacy.android.app.presentation.offline.adapter.viewholder.OfflineListViewHolder
+import mega.privacy.android.app.presentation.offline.model.OfflineNode
+import mega.privacy.android.app.presentation.offline.adapter.viewholder.OfflineSortedByViewHolder
+import mega.privacy.android.app.presentation.offline.adapter.viewholder.OfflineViewHolder
 
 class OfflineAdapter(
     var isList: Boolean,
