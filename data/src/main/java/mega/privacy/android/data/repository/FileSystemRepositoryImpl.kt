@@ -47,7 +47,6 @@ import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import java.io.File
 import java.net.URLConnection
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default implementation of [FileSystemRepository]
@@ -231,12 +230,13 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLocalFile(fileNode: FileNode) =
+    override suspend fun getLocalFile(fileNode: FileNode) = withContext(ioDispatcher) {
         fileGateway.getLocalFile(
             fileName = fileNode.name,
             fileSize = fileNode.size,
             lastModifiedDate = fileNode.modificationTime,
         )
+    }
 
     override suspend fun getFileStreamingUri(node: Node) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let {
