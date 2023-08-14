@@ -142,7 +142,7 @@ class RubbishBinViewModel @Inject constructor(
         return nodeList.mapIndexed { index, it ->
             val isSelected =
                 state.value.selectedNodeHandles.contains(it.id.longValue)
-            NodeUIItem<TypedNode>(
+            NodeUIItem(
                 node = it,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
@@ -233,21 +233,9 @@ class RubbishBinViewModel @Inject constructor(
      * @param nodeUIItem [NodeUIItem]
      */
     fun onLongItemClicked(nodeUIItem: NodeUIItem<TypedNode>) {
-        nodeUIItem.isSelected = true
         val index =
             _state.value.nodeList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
-        val newNodesList = _state.value.nodeList.updateItemAt(index = index, item = nodeUIItem)
-        val selectedNodeList = _state.value.selectedNodeHandles.toMutableList()
-        selectedNodeList.add(nodeUIItem.id.longValue)
-        _state.update {
-            it.copy(
-                selectedFileNodes = if (nodeUIItem.node is FileNode) it.selectedFileNodes + 1 else it.selectedFileNodes,
-                selectedFolderNodes = if (nodeUIItem.node is FolderNode) it.selectedFolderNodes + 1 else it.selectedFolderNodes,
-                nodeList = newNodesList,
-                isInSelection = true,
-                selectedNodeHandles = selectedNodeList
-            )
-        }
+        updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
     }
 
     /**

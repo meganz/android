@@ -27,6 +27,7 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
@@ -100,6 +101,9 @@ class FileBrowserComposeFragment : Fragment() {
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val thumbnailViewModel: ThumbnailViewModel by viewModels()
 
+    /**
+     * onAttach
+     */
     override fun onAttach(context: Context) {
         Timber.d("onAttach")
         super.onAttach(context)
@@ -119,6 +123,9 @@ class FileBrowserComposeFragment : Fragment() {
         )
     }
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -137,10 +144,12 @@ class FileBrowserComposeFragment : Fragment() {
                         onItemClick = fileBrowserViewModel::onItemClicked,
                         onLongClick = {
                             fileBrowserViewModel.onLongItemClicked(it)
-                            actionMode =
-                                (requireActivity() as AppCompatActivity).startSupportActionMode(
-                                    ActionBarCallBack()
-                                )
+                            if (actionMode == null) {
+                                actionMode =
+                                    (requireActivity() as AppCompatActivity).startSupportActionMode(
+                                        ActionBarCallBack()
+                                    )
+                            }
                         },
                         onMenuClick = ::showOptionsMenuForItem,
                         sortOrder = getString(
@@ -173,6 +182,9 @@ class FileBrowserComposeFragment : Fragment() {
         }
     }
 
+    /**
+     * onResume
+     */
     override fun onResume() {
         super.onResume()
         Analytics.tracker.trackEvent(CloudDriveScreenEvent)
@@ -230,6 +242,10 @@ class FileBrowserComposeFragment : Fragment() {
         }
     }
 
+    /**
+     * onViewCreated
+     */
+    @OptIn(FlowPreview::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.collectFlow(fileBrowserViewModel.state.map { it.isPendingRefresh }
@@ -358,6 +374,7 @@ class FileBrowserComposeFragment : Fragment() {
             (requireActivity() as ManagerActivity).let {
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
+                actionMode = null
             }
         }
     }
@@ -373,10 +390,14 @@ class FileBrowserComposeFragment : Fragment() {
                         fromMediaViewer = false,
                         fromChat = false,
                     )
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.RENAME_CLICKED -> {
                     (requireActivity() as ManagerActivity).showRenameDialog(it.selectedMegaNode[0])
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.SHARE_FOLDER_CLICKED -> {
@@ -396,24 +417,34 @@ class FileBrowserComposeFragment : Fragment() {
                                 }
                             }
                         }
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.SHARE_OUT_CLICKED -> {
                     MegaNodeUtil.shareNodes(requireContext(), it.selectedMegaNode)
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.SHARE_EDIT_LINK_CLICKED -> {
                     (requireActivity() as ManagerActivity).showGetLinkActivity(it.selectedMegaNode)
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.REMOVE_LINK_CLICKED -> {
                     (requireActivity() as ManagerActivity).showConfirmationRemovePublicLink(
                         it.selectedMegaNode[0]
                     )
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.SEND_TO_CHAT_CLICKED -> {
                     (requireActivity() as ManagerActivity).attachNodesToChats(it.selectedMegaNode)
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.MOVE_TO_RUBBISH_CLICKED -> {
@@ -439,16 +470,21 @@ class FileBrowserComposeFragment : Fragment() {
 
                 OptionItems.CLEAR_ALL_CLICKED -> {
                     fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.COPY_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToCopyNodes(fileBrowserViewModel.state.value.selectedNodeHandles)
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.MOVE_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToMoveNodes(fileBrowserViewModel.state.value.selectedNodeHandles)
+                    fileBrowserViewModel.clearAllNodes()
+                    actionMode?.finish()
                 }
 
                 OptionItems.DISPUTE_CLICKED -> {
@@ -459,7 +495,6 @@ class FileBrowserComposeFragment : Fragment() {
                     )
                 }
             }
-            fileBrowserViewModel.clearAllNodes()
         }
     }
 

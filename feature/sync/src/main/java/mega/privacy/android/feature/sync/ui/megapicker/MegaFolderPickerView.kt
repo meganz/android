@@ -2,8 +2,11 @@ package mega.privacy.android.feature.sync.ui.megapicker
 
 import mega.privacy.android.core.R as CoreUIR
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
@@ -11,12 +14,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -70,14 +75,14 @@ internal fun MegaFolderPickerView(
                 // In future, instead of this line we will get icon based on the file extension
                     ?: CoreUIR.drawable.ic_generic_list,
                 fileSize = (nodeEntity as? FileNode)
-                    ?.let { formatFileSize(it.size, LocalContext.current) },
+                    ?.let { node -> formatFileSize(node.size, LocalContext.current) },
                 modifiedDate = (nodeEntity as? FileNode)
-                    ?.let {
+                    ?.let { node ->
                         formatModifiedDate(
                             java.util.Locale(
                                 Locale.current.language, Locale.current.region
                             ),
-                            it.modificationTime
+                            node.modificationTime
                         )
                     },
                 name = nodeEntity.name,
@@ -88,6 +93,12 @@ internal fun MegaFolderPickerView(
                 imageState = imageState,
                 onClick = { onFolderClick(nodesList[it]) },
                 isEnabled = nodeEntity is FolderNode,
+            )
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                thickness = 1.dp
             )
         }
     }

@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -60,6 +61,8 @@ import javax.inject.Inject
  * @param monitorRefreshSessionUseCase [MonitorRefreshSessionUseCase]
  * @param getBandWidthOverQuotaDelayUseCase [GetBandWidthOverQuotaDelayUseCase]
  * @param transfersManagement [TransfersManagement]
+ * @param containsMediaItemUseCase [ContainsMediaItemUseCase]
+ * @param isAvailableOfflineUseCase [IsAvailableOfflineUseCase]
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -79,6 +82,7 @@ class FileBrowserViewModel @Inject constructor(
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase,
     private val transfersManagement: TransfersManagement,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -260,14 +264,15 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
+    private suspend fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
         val existingNodeList = state.value.nodesList
         return nodeList.mapIndexed { index, node ->
             val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
-            NodeUIItem<TypedNode>(
+            NodeUIItem(
                 node = node,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
-                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
+                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
+                isAvailableOffline = isAvailableOfflineUseCase(node)
             )
         }
     }
@@ -451,21 +456,9 @@ class FileBrowserViewModel @Inject constructor(
      * @param nodeUIItem [NodeUIItem]
      */
     fun onLongItemClicked(nodeUIItem: NodeUIItem<TypedNode>) {
-        nodeUIItem.isSelected = true
         val index =
             _state.value.nodesList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
-        val newNodesList = _state.value.nodesList.updateItemAt(index = index, item = nodeUIItem)
-        val selectedNodeList = _state.value.selectedNodeHandles.toMutableList()
-        selectedNodeList.add(nodeUIItem.id.longValue)
-        _state.update {
-            it.copy(
-                selectedFileNodes = if (nodeUIItem.node is FileNode) it.selectedFileNodes + 1 else it.selectedFileNodes,
-                selectedFolderNodes = if (nodeUIItem.node is FolderNode) it.selectedFolderNodes + 1 else it.selectedFolderNodes,
-                nodesList = newNodesList,
-                isInSelection = true,
-                selectedNodeHandles = selectedNodeList
-            )
-        }
+        updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
     }
 
     /**
@@ -490,7 +483,8 @@ class FileBrowserViewModel @Inject constructor(
                 selectedFolderNodes = pair.second,
                 nodesList = newNodesList,
                 isInSelection = pair.first > 0 || pair.second > 0,
-                selectedNodeHandles = selectedNodeHandle
+                selectedNodeHandles = selectedNodeHandle,
+                optionsItemInfo = null
             )
         }
     }

@@ -21,6 +21,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
@@ -97,10 +98,12 @@ class RubbishBinComposeFragment : Fragment() {
                         onItemClicked = viewModel::onItemClicked,
                         onLongClick = {
                             viewModel.onLongItemClicked(it)
-                            actionMode =
-                                (requireActivity() as AppCompatActivity).startSupportActionMode(
-                                    ActionBarCallback()
-                                )
+                            if (actionMode == null) {
+                                actionMode =
+                                    (requireActivity() as AppCompatActivity).startSupportActionMode(
+                                        ActionBarCallback()
+                                    )
+                            }
                         },
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
@@ -140,7 +143,7 @@ class RubbishBinComposeFragment : Fragment() {
         selectedNodes: List<MegaNode>?,
         selectedNodeHandles: List<Long>,
     ) {
-        restoreType?.let { it ->
+        restoreType?.let {
             when (it) {
                 RestoreType.MOVE -> {
                     NodeController(requireActivity()).chooseLocationToMoveNodes(selectedNodeHandles)
@@ -287,6 +290,7 @@ class RubbishBinComposeFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode?) {
             Timber.d("onDestroyActionMode")
             viewModel.clearAllSelectedNodes()
+            actionMode = null
         }
     }
 
@@ -348,6 +352,7 @@ class RubbishBinComposeFragment : Fragment() {
         }
     }
 
+    @OptIn(FlowPreview::class)
     private fun setupObserver() {
         viewLifecycleOwner.collectFlow(viewModel.state.map { it.isPendingRefresh }
             .sample(500L)) { isPendingRefresh ->
