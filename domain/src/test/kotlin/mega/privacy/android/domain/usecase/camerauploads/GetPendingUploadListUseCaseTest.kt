@@ -33,7 +33,6 @@ class GetPendingUploadListUseCaseTest {
     private val getParentNodeUseCase: GetParentNodeUseCase = mock()
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
-    private val updateTimeStamp: UpdateCameraUploadTimeStamp = mock()
     private val getFingerprintUseCase: GetFingerprintUseCase = mock()
     private val mediaLocalPathExists: MediaLocalPathExists = mock()
     private val shouldCompressVideo: ShouldCompressVideo = mock()
@@ -118,7 +117,6 @@ class GetPendingUploadListUseCaseTest {
             getParentNodeUseCase,
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
-            updateTimeStamp,
             getFingerprintUseCase,
             mediaLocalPathExists,
             shouldCompressVideo,

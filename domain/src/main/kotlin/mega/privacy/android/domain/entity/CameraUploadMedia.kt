@@ -7,7 +7,7 @@ data class CameraUploadMedia(
     /**
      * File path retrieved from media store
      */
-    val filePath: String?,
+    val filePath: String,
     /**
      * Time stamp retrieved from media store
      */

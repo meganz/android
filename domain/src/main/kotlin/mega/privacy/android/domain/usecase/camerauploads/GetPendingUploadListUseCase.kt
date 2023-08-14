@@ -1,18 +1,19 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import java.io.File
 import java.util.Queue
 import javax.inject.Inject
@@ -25,7 +26,6 @@ class GetPendingUploadListUseCase @Inject constructor(
     private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
-    private val updateTimeStamp: UpdateCameraUploadTimeStamp,
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val mediaLocalPathExists: MediaLocalPathExists,
     private val shouldCompressVideo: ShouldCompressVideo,
@@ -34,82 +34,93 @@ class GetPendingUploadListUseCase @Inject constructor(
     private val getNodeGPSCoordinatesUseCase: GetNodeGPSCoordinatesUseCase,
 ) {
 
+    /**
+     *  Format the [CameraUploadMedia] queue to a [SyncRecord] list
+     *
+     * @param mediaList a queue of [CameraUploadMedia] retrieved from the MediaStore
+     * @param isSecondary true if the media comes from the secondary media folder
+     * @param isVideo true if the media are videos
+     * @return a list of [SyncRecord]
+     */
     suspend operator fun invoke(
         mediaList: Queue<CameraUploadMedia>,
         isSecondary: Boolean,
         isVideo: Boolean,
-    ): List<SyncRecord> {
-        val pendingList = mutableListOf<SyncRecord>()
+    ): List<SyncRecord> = coroutineScope {
         val parentNodeHandle =
             if (isSecondary) getSecondarySyncHandleUseCase() else getPrimarySyncHandleUseCase()
         val type = if (isVideo) SyncRecordType.TYPE_VIDEO else SyncRecordType.TYPE_PHOTO
 
-        while (mediaList.size > 0) {
-            yield()
-            val media = mediaList.poll() ?: continue
-            if (media.filePath?.let { mediaLocalPathExists(it, isSecondary) } == true) {
-                continue
-            }
+        mediaList.toList().map { media ->
+            async {
+                yield()
+                runCatching {
+                    // Check if the file is already inserted in the database
+                    if (mediaLocalPathExists(media.filePath, isSecondary))
+                        return@async null
 
-            val sourceFile = media.filePath?.let { File(it) }
-            val localFingerPrint = media.filePath?.let { getFingerprintUseCase(it) }
-            val nodeExists = localFingerPrint?.let { fingerprint ->
-                getNodeFromCloudUseCase(fingerprint, NodeId(parentNodeHandle))
-            }
+                    val localFingerPrint =
+                        getFingerprintUseCase(media.filePath) ?: return@runCatching null
 
-            if (nodeExists == null) {
-                val gpsData = sourceFile?.let { getGPSCoordinatesUseCase(it.absolutePath, isVideo) }
-                val record = SyncRecord(
-                    0,
-                    sourceFile?.absolutePath,
-                    null,
-                    localFingerPrint,
-                    null,
-                    media.timestamp,
-                    sourceFile?.name,
-                    gpsData?.second,
-                    gpsData?.first,
-                    if (shouldCompressVideo() && type == SyncRecordType.TYPE_VIDEO)
-                        SyncStatus.STATUS_TO_COMPRESS.value
-                    else
-                        SyncStatus.STATUS_PENDING.value,
-                    type,
-                    null,
-                    false,
-                    isSecondary
-                )
-                pendingList.add(record)
-            } else {
-                if (!isNodeInRubbish(nodeExists.id.longValue) && getParentNodeUseCase(nodeExists.id)?.id?.longValue != parentNodeHandle) {
-                    val (latitude, longitude) = getNodeGPSCoordinatesUseCase(nodeExists.id)
-                    val record = SyncRecord(
-                        0,
-                        media.filePath,
-                        null,
-                        nodeExists.originalFingerprint,
-                        nodeExists.fingerprint,
-                        media.timestamp,
-                        sourceFile?.name,
-                        latitude.toFloat(),
-                        longitude.toFloat(),
-                        SyncStatus.STATUS_PENDING.value,
-                        type,
-                        nodeExists.id.longValue,
-                        true,
-                        isSecondary
-                    )
-                    pendingList.add(record)
-                } else {
-                    if (isVideo) {
-                        updateTimeStamp(media.timestamp, SyncTimeStamp.PRIMARY_VIDEO)
-                        updateTimeStamp(media.timestamp, SyncTimeStamp.SECONDARY_VIDEO)
-                    } else {
-                        updateTimeStamp(media.timestamp, SyncTimeStamp.PRIMARY_PHOTO)
-                        updateTimeStamp(media.timestamp, SyncTimeStamp.SECONDARY_PHOTO)
+                    // Check if the file already exists somewhere in the cloud drive
+                    val nodeExists =
+                        getNodeFromCloudUseCase(localFingerPrint, NodeId(parentNodeHandle))
+
+                    val sourceFile = File(media.filePath)
+
+                    return@runCatching nodeExists?.let { node ->
+                        val isNodeInRubbish = isNodeInRubbish(node.id.longValue)
+                        val isNodeNotInCameraUploadsFolder =
+                            getParentNodeUseCase(node.id)?.id?.longValue != parentNodeHandle
+
+                        // Check if node exists somewhere else than the camera upload folder
+                        // If already in camera upload folder, skip, else copy is needed
+                        if (!isNodeInRubbish && isNodeNotInCameraUploadsFolder) {
+                            val (latitude, longitude) = getNodeGPSCoordinatesUseCase(nodeExists.id)
+                            SyncRecord(
+                                localPath = media.filePath,
+                                newPath = null,
+                                originFingerprint = nodeExists.originalFingerprint,
+                                newFingerprint = nodeExists.fingerprint,
+                                timestamp = media.timestamp,
+                                fileName = sourceFile.name,
+                                latitude = latitude.toFloat(),
+                                longitude = longitude.toFloat(),
+                                status = SyncStatus.STATUS_PENDING.value,
+                                type = type,
+                                nodeHandle = nodeExists.id.longValue,
+                                isCopyOnly = true,
+                                isSecondary = isSecondary
+                            )
+                        } else {
+                            null
+                        }
+                    } ?: run {
+                        // The node does not exist, upload is needed
+                        val gpsData = getGPSCoordinatesUseCase(sourceFile.absolutePath, isVideo)
+
+                        SyncRecord(
+                            localPath = sourceFile.absolutePath,
+                            newPath = null,
+                            originFingerprint = localFingerPrint,
+                            newFingerprint = null,
+                            timestamp = media.timestamp,
+                            fileName = sourceFile.name,
+                            latitude = gpsData.first,
+                            longitude = gpsData.second,
+                            status =
+                            if (shouldCompressVideo() && type == SyncRecordType.TYPE_VIDEO)
+                                SyncStatus.STATUS_TO_COMPRESS.value
+                            else
+                                SyncStatus.STATUS_PENDING.value,
+                            type = type,
+                            nodeHandle = null,
+                            isCopyOnly = false,
+                            isSecondary = isSecondary
+                        )
                     }
-                }
+                }.getOrNull()
             }
-        }
-        return pendingList
+        }.awaitAll().filterNotNull()
     }
 }
