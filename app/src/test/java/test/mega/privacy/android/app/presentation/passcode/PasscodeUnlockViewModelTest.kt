@@ -4,19 +4,26 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
+import mega.privacy.android.app.presentation.passcode.mapper.PasscodeTypeMapper
+import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
+import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.domain.entity.passcode.PasscodeType
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
+import mega.privacy.android.domain.exception.security.NoPasscodeTypeSetException
+import mega.privacy.android.domain.usecase.passcode.GetPasscodeTypeUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeAttemptsUseCase
 import mega.privacy.android.domain.usecase.passcode.UnlockPasscodeUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
@@ -24,6 +31,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.extensions.asHotFlow
 import test.mega.privacy.android.app.extensions.withCoroutineExceptions
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -32,24 +40,22 @@ internal class PasscodeUnlockViewModelTest {
     private lateinit var underTest: PasscodeUnlockViewModel
     private val unlockPasscodeUseCase = mock<UnlockPasscodeUseCase>()
     private val monitorPasscodeAttemptsUseCase = mock<MonitorPasscodeAttemptsUseCase>()
+    private val getPasscodeTypeUseCase = mock<GetPasscodeTypeUseCase>()
+    private val passcodeTypeMapper = mock<PasscodeTypeMapper>()
 
     @BeforeAll
     internal fun initialise() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
-
-    @BeforeEach
-    internal fun setUp() {
-        underTest = PasscodeUnlockViewModel(
-            monitorPasscodeAttemptsUseCase = monitorPasscodeAttemptsUseCase,
-            unlockPasscodeUseCase = unlockPasscodeUseCase,
-        )
-    }
-
     @AfterEach
     internal fun cleanup() {
-        Mockito.reset(monitorPasscodeAttemptsUseCase)
+        Mockito.reset(
+            unlockPasscodeUseCase,
+            monitorPasscodeAttemptsUseCase,
+            getPasscodeTypeUseCase,
+            passcodeTypeMapper,
+        )
     }
 
     @AfterAll
@@ -58,12 +64,17 @@ internal class PasscodeUnlockViewModelTest {
     }
 
     @Test
-    internal fun `test that initial state has no attempts and does not show the logout warning`() =
+    internal fun `test that initial state is loading`() =
         runTest {
+            initViewModel(
+                monitorPasscodeAttemptsUseCaseStub = monitorPasscodeAttemptsUseCase.stub {
+                    on { invoke() }.thenReturn(
+                        flow { awaitCancellation() })
+                },
+            )
             underTest.state.test {
                 val actual = awaitItem()
-                assertThat(actual.failedAttempts).isEqualTo(0)
-                assertThat(actual.logoutWarning).isFalse()
+                assertThat(actual).isInstanceOf(PasscodeUnlockState.Loading::class.java)
             }
         }
 
@@ -71,24 +82,27 @@ internal class PasscodeUnlockViewModelTest {
     internal fun `test that failed attempts count is updated when the count changes`() =
         runTest {
             val expected = 1
-            monitorPasscodeAttemptsUseCase.stub {
-                on { invoke() }.thenReturn(flow { emit(expected) })
-            }
-            setUp()
 
-            underTest.state.test {
+            initViewModel(
+                monitorPasscodeAttemptsUseCaseStub = monitorPasscodeAttemptsUseCase.stub {
+                    on { invoke() }.thenReturn(expected.asHotFlow())
+                }
+            )
+
+            underTest.state.filterIsInstance<PasscodeUnlockState.Data>().test {
                 assertThat(awaitItem().failedAttempts).isEqualTo(expected)
             }
         }
 
     @Test
     internal fun `test that logout warning becomes true after 5 incorrect attempts`() = runTest {
-        monitorPasscodeAttemptsUseCase.stub {
-            on { invoke() }.thenReturn(flow { emit(5) })
-        }
-        setUp()
+        initViewModel(
+            monitorPasscodeAttemptsUseCaseStub = monitorPasscodeAttemptsUseCase.stub {
+                on { invoke() }.thenReturn(5.asHotFlow())
+            }
+        )
 
-        underTest.state.test {
+        underTest.state.filterIsInstance<PasscodeUnlockState.Data>().test {
             assertThat(awaitItem().logoutWarning).isEqualTo(true)
         }
     }
@@ -115,6 +129,8 @@ internal class PasscodeUnlockViewModelTest {
             Mockito.clearInvocations(unlockPasscodeUseCase)
             val expected = "correct"
 
+            initViewModel()
+
             underTest.unlockWithPassword(expected)
 
             verify(unlockPasscodeUseCase).invoke(UnlockPasscodeRequest.PasswordRequest(expected))
@@ -124,13 +140,14 @@ internal class PasscodeUnlockViewModelTest {
     internal fun `test that an exception from the monitor attempts use case does not get propagated`() =
         withCoroutineExceptions {
             runTest {
-                monitorPasscodeAttemptsUseCase.stub {
-                    on { invoke() }.thenAnswer { throw Exception("Monitor threw an exception") }
-                }
-                underTest = PasscodeUnlockViewModel(
-                    monitorPasscodeAttemptsUseCase = monitorPasscodeAttemptsUseCase,
-                    unlockPasscodeUseCase = unlockPasscodeUseCase
+
+
+                initViewModel(
+                    monitorPasscodeAttemptsUseCaseStub = monitorPasscodeAttemptsUseCase.stub {
+                        on { invoke() }.thenAnswer { throw Exception("Monitor threw an exception") }
+                    }
                 )
+
                 underTest.state.test {
                     awaitItem()
                     val events = cancelAndConsumeRemainingEvents()
@@ -138,4 +155,58 @@ internal class PasscodeUnlockViewModelTest {
                 }
             }
         }
+
+    @Test
+    internal fun `test that passcode type is mapped and returned`() = runTest {
+        val expected = PasscodeUIType.Alphanumeric(false)
+
+        initViewModel(
+            passcodeTypeMapperStub = passcodeTypeMapper.stub {
+                on { invoke(any()) }.thenReturn(expected)
+            }
+        )
+
+        underTest.state.filterIsInstance<PasscodeUnlockState.Data>().test {
+            assertThat(awaitItem().passcodeType).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    internal fun `test that an exception from the get passcode type is not propagated`() =
+        withCoroutineExceptions {
+            runTest {
+                initViewModel(
+                    getPasscodeTypeUseCaseStub = getPasscodeTypeUseCase.stub {
+                        onBlocking { invoke() }.thenAnswer { throw NoPasscodeTypeSetException() }
+                    }
+                )
+
+                underTest.state.test {
+                    assertThat(awaitItem()).isEqualTo(PasscodeUnlockState.Loading)
+                }
+            }
+        }
+
+
+    private fun initViewModel(
+        monitorPasscodeAttemptsUseCaseStub: MonitorPasscodeAttemptsUseCase =
+            monitorPasscodeAttemptsUseCase.stub {
+                on { invoke() }.thenReturn(0.asHotFlow())
+            },
+        unlockPasscodeUseCaseStub: UnlockPasscodeUseCase = unlockPasscodeUseCase,
+        getPasscodeTypeUseCaseStub: GetPasscodeTypeUseCase =
+            getPasscodeTypeUseCase.stub {
+                onBlocking { invoke() }.thenReturn(PasscodeType.Password)
+            },
+        passcodeTypeMapperStub: PasscodeTypeMapper = passcodeTypeMapper.stub {
+            on { invoke(any()) }.thenReturn(PasscodeUIType.Alphanumeric(false))
+        },
+    ) {
+        underTest = PasscodeUnlockViewModel(
+            monitorPasscodeAttemptsUseCase = monitorPasscodeAttemptsUseCaseStub,
+            unlockPasscodeUseCase = unlockPasscodeUseCaseStub,
+            getPasscodeTypeUseCase = getPasscodeTypeUseCaseStub,
+            passcodeTypeMapper = passcodeTypeMapperStub,
+        )
+    }
 }

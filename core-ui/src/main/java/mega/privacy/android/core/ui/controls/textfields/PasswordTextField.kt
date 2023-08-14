@@ -66,6 +66,7 @@ fun PasswordTextField(
     modifier: Modifier = Modifier,
     text: String = "",
     errorText: String? = null,
+    hint: String? = null,
 ) = Column(modifier = modifier) {
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
@@ -112,6 +113,7 @@ fun PasswordTextField(
             interactionSource = interactionSource,
             singleLine = true,
         ) {
+            val hintString = hint ?: stringResource(id = R.string.password_text)
             TextFieldDefaults.TextFieldDecorationBox(
                 value = text,
                 innerTextField = it,
@@ -122,7 +124,7 @@ fun PasswordTextField(
                 isError = isError,
                 label = {
                     Text(
-                        text = stringResource(id = R.string.password_text),
+                        text = hintString,
                         modifier = Modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
                         style = when {
                             isError && isFocused -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)

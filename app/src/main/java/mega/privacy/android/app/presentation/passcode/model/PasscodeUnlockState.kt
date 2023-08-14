@@ -1,12 +1,26 @@
 package mega.privacy.android.app.presentation.passcode.model
 
+
 /**
  * Passcode unlock state
- *
- * @property failedAttempts
- * @property logoutWarning
  */
-data class PasscodeUnlockState(
-    val failedAttempts: Int,
-    val logoutWarning: Boolean,
-)
+sealed interface PasscodeUnlockState {
+
+    /**
+     * Loading
+     */
+    object Loading : PasscodeUnlockState
+
+    /**
+     * Data
+     *
+     * @property passcodeType
+     * @property failedAttempts
+     * @property logoutWarning
+     */
+    data class Data(
+        val passcodeType: PasscodeUIType,
+        val failedAttempts: Int,
+        val logoutWarning: Boolean,
+    ) : PasscodeUnlockState
+}

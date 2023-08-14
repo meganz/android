@@ -1,13 +1,21 @@
 package test.mega.privacy.android.app.presentation.passcode.view
 
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasImeAction
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.text.input.ImeAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
+import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
 import mega.privacy.android.app.presentation.passcode.view.FAILED_ATTEMPTS_TAG
 import mega.privacy.android.app.presentation.passcode.view.FORGOT_PASSCODE_BUTTON_TAG
@@ -15,11 +23,16 @@ import mega.privacy.android.app.presentation.passcode.view.LOGOUT_BUTTON_TAG
 import mega.privacy.android.app.presentation.passcode.view.PASSCODE_FIELD_TAG
 import mega.privacy.android.app.presentation.passcode.view.PASSWORD_FIELD_TAG
 import mega.privacy.android.app.presentation.passcode.view.PasscodeDialog
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 internal class PasscodeDialogTest {
@@ -28,10 +41,22 @@ internal class PasscodeDialogTest {
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val passcodeUnlockViewModel: PasscodeUnlockViewModel = mock()
+    private val biometricAuthIsAvailable = mock<() -> Boolean>()
+
+    private val showBiometricAuth =
+        mock<(onSuccess: () -> Unit, onError: () -> Unit, onFail: () -> Unit, context: Context) -> Unit>()
+
+    @Before
+    internal fun setUp() {
+        Mockito.clearInvocations(
+            passcodeUnlockViewModel,
+        )
+    }
 
     @Test
     fun `test that passcode field is shown`() {
-        val uiState = PasscodeUnlockState(
+        val uiState = PasscodeUnlockState.Data(
+            passcodeType = PasscodeUIType.Pin(false, 4),
             failedAttempts = 0,
             logoutWarning = false
         )
@@ -45,7 +70,8 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that attempts are displayed if above 0`() {
         displayDialogWithState(
-            PasscodeUnlockState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
                 logoutWarning = false
             )
@@ -58,7 +84,8 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that attempts are not displayed if 0`() {
         displayDialogWithState(
-            PasscodeUnlockState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 0,
                 logoutWarning = false
             )
@@ -71,7 +98,8 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that logout button is displayed if attempts are greater than 0`() {
         displayDialogWithState(
-            PasscodeUnlockState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
                 logoutWarning = false
             )
@@ -84,7 +112,8 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that forgot passcode button is displayed if attempts are greater than 0`() {
         displayDialogWithState(
-            PasscodeUnlockState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
                 logoutWarning = false
             )
@@ -97,7 +126,8 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that password field is displayed instead of passcode field when forgot password is tapped`() {
         displayDialogWithState(
-            PasscodeUnlockState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
                 logoutWarning = false
             )
@@ -116,7 +146,8 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that logout and forgot passcode is not displayed when password field is displayed`() {
         displayDialogWithState(
-            PasscodeUnlockState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
                 logoutWarning = false
             )
@@ -132,6 +163,120 @@ internal class PasscodeDialogTest {
             .assertDoesNotExist()
     }
 
+    @Test
+    fun `test that verify with password is called if password is entered for forgotten passcode`() {
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
+                failedAttempts = 1,
+                logoutWarning = false
+            )
+        )
+
+        composeTestRule.onNodeWithTag(FORGOT_PASSCODE_BUTTON_TAG)
+            .performClick()
+
+        val expected = "Expected"
+
+        val passwordField =
+            composeTestRule.onNode(
+                hasAnyAncestor(hasTestTag(PASSWORD_FIELD_TAG)) and hasImeAction(
+                    ImeAction.Done
+                )
+            )
+
+        passwordField.performTextInput(expected)
+        passwordField.performImeAction()
+
+        verify(passcodeUnlockViewModel).unlockWithPassword(expected)
+
+    }
+
+    @Test
+    fun `test that alphanumeric passcode type displays password field`() {
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Alphanumeric(false),
+                failedAttempts = 1,
+                logoutWarning = false
+            )
+        )
+
+        composeTestRule.onNodeWithTag(PASSWORD_FIELD_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that verify with passcode is called if alphanumeric passcode is entered`() {
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Alphanumeric(false),
+                failedAttempts = 1,
+                logoutWarning = false
+            )
+        )
+
+        val expected = "Expected"
+
+        val passwordField =
+            composeTestRule.onNode(
+                hasAnyAncestor(hasTestTag(PASSWORD_FIELD_TAG)) and hasImeAction(
+                    ImeAction.Done
+                )
+            )
+
+        passwordField.performTextInput(expected)
+        passwordField.performImeAction()
+
+        verify(passcodeUnlockViewModel).unlockWithPasscode(expected)
+
+    }
+
+    @Test
+    fun `test that biometric auth is launched if available and enabled`() {
+        biometricAuthIsAvailable.stub {
+            on { invoke() }.thenReturn(true)
+        }
+
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Alphanumeric(true),
+                failedAttempts = 0,
+                logoutWarning = false
+            )
+        )
+
+        verify(showBiometricAuth).invoke(any(), any(), any(), any())
+
+    }
+
+    @Test
+    fun `test that biometric error falls back to passcode`() {
+        biometricAuthIsAvailable.stub {
+            on { invoke() }.thenReturn(true)
+        }
+
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(true, 4),
+                failedAttempts = 0,
+                logoutWarning = false
+            )
+        )
+
+        val onError = argumentCaptor<() -> Unit>()
+
+        verify(showBiometricAuth).invoke(any(), onError.capture(), any(), any())
+
+        composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+
+        onError.firstValue.invoke()
+
+        composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
     private fun displayDialogWithState(uiState: PasscodeUnlockState) {
         passcodeUnlockViewModel.stub {
             on { state }.thenReturn(
@@ -142,7 +287,11 @@ internal class PasscodeDialogTest {
         }
 
         composeTestRule.setContent {
-            PasscodeDialog(passcodeUnlockViewModel)
+            PasscodeDialog(
+                passcodeUnlockViewModel = passcodeUnlockViewModel,
+                biometricAuthIsAvailable = biometricAuthIsAvailable,
+                showBiometricAuth = showBiometricAuth
+            )
         }
     }
 }

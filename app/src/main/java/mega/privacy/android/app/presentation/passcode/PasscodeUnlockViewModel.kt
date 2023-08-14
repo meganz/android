@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.passcode.mapper.PasscodeTypeMapper
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
+import mega.privacy.android.domain.usecase.passcode.GetPasscodeTypeUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeAttemptsUseCase
 import mega.privacy.android.domain.usecase.passcode.UnlockPasscodeUseCase
 import timber.log.Timber
@@ -21,16 +23,15 @@ import javax.inject.Inject
  * @property unlockPasscodeUseCase
  */
 @HiltViewModel
-class PasscodeUnlockViewModel @Inject constructor(
+internal class PasscodeUnlockViewModel @Inject constructor(
     private val monitorPasscodeAttemptsUseCase: MonitorPasscodeAttemptsUseCase,
     private val unlockPasscodeUseCase: UnlockPasscodeUseCase,
+    private val getPasscodeTypeUseCase: GetPasscodeTypeUseCase,
+    private val passcodeTypeMapper: PasscodeTypeMapper,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(
-        PasscodeUnlockState(
-            failedAttempts = 0,
-            logoutWarning = false
-        )
+    private val _state: MutableStateFlow<PasscodeUnlockState> = MutableStateFlow(
+        PasscodeUnlockState.Loading
     )
 
     /**
@@ -41,15 +42,24 @@ class PasscodeUnlockViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             runCatching {
+                val passCodeType = passcodeTypeMapper(getPasscodeTypeUseCase())
                 monitorPasscodeAttemptsUseCase()
                     .catch {
                         Timber.e(it)
                     }.collect { count ->
                         _state.update {
-                            it.copy(
-                                failedAttempts = count,
-                                logoutWarning = count >= 5
-                            )
+                            if (it is PasscodeUnlockState.Data) {
+                                it.copy(
+                                    failedAttempts = count,
+                                    logoutWarning = count >= 5
+                                )
+                            } else {
+                                PasscodeUnlockState.Data(
+                                    passcodeType = passCodeType,
+                                    failedAttempts = count,
+                                    logoutWarning = count >= 5
+                                )
+                            }
                         }
                     }
             }.onFailure { Timber.e(it) }
@@ -81,6 +91,10 @@ class PasscodeUnlockViewModel @Inject constructor(
             }
         }
     }
+
+    fun unlockWithBiometrics() {}
+
+    fun onBiometricAuthFailed() {}
 
 
 }

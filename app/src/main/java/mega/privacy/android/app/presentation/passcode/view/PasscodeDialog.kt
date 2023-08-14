@@ -1,6 +1,10 @@
 package mega.privacy.android.app.presentation.passcode.view
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricPrompt.AuthenticationCallback
+import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -15,6 +19,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -35,8 +41,11 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.findFragmentActivity
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
+import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
+import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.textfields.PasscodeField
@@ -50,27 +59,89 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  * @param passcodeUnlockViewModel
  */
 @Composable
-fun PasscodeDialog(
+internal fun PasscodeDialog(
     passcodeUnlockViewModel: PasscodeUnlockViewModel = viewModel(),
+    biometricAuthIsAvailable: () -> Boolean,
+    showBiometricAuth: (
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        onFail: () -> Unit,
+        context: Context,
+    ) -> Unit = ::LaunchBiometricPrompt,
 ) {
     val uiState by passcodeUnlockViewModel.state.collectAsStateWithLifecycle()
 
-    Dialog(
-        onDismissRequest = {},
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false,
-            usePlatformDefaultWidth = false,
-        )
-    ) {
-        DialogContent(
-            onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
-            onPasscodeEntered = passcodeUnlockViewModel::unlockWithPasscode,
-            failedAttemptCount = uiState.failedAttempts,
-            showLogoutWarning = uiState.logoutWarning
-        )
+    var showBiometricPrompt: Boolean by rememberSaveable {
+        mutableStateOf(biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable())
+    }
+
+    if (showBiometricPrompt) {
+        val context = LocalContext.current
+        LaunchedEffect(key1 = Unit) {
+            showBiometricAuth(
+                passcodeUnlockViewModel::unlockWithBiometrics,
+                { showBiometricPrompt = false },
+                passcodeUnlockViewModel::onBiometricAuthFailed,
+                context
+            )
+        }
+
+    } else {
+        Dialog(
+            onDismissRequest = {},
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = false,
+            )
+        ) {
+            when (val currentState = uiState) {
+                PasscodeUnlockState.Loading -> TODO()
+                is PasscodeUnlockState.Data -> {
+                    DialogContent(
+                        onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
+                        onPasscodeEntered = passcodeUnlockViewModel::unlockWithPasscode,
+                        failedAttemptCount = currentState.failedAttempts,
+                        showLogoutWarning = currentState.logoutWarning,
+                        passcodeType = currentState.passcodeType,
+                    )
+                }
+            }
+
+        }
     }
 }
+
+private fun LaunchBiometricPrompt(
+    onSuccess: () -> Unit,
+    onError: () -> Unit,
+    onFail: () -> Unit,
+    context: Context,
+) {
+    val activity = context.findFragmentActivity()
+    if (activity == null) onError()
+    val callback = object : AuthenticationCallback() {
+        override fun onAuthenticationFailed() {
+            onFail()
+        }
+
+        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+            if (errorCode == ERROR_USER_CANCELED) {
+                activity?.finish()
+            } else {
+                onError()
+            }
+        }
+
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            onSuccess()
+        }
+    }
+    activity?.let { BiometricPrompt(it, callback) }
+}
+
+private fun biometricPreferenceIsEnabled(uiState: PasscodeUnlockState) =
+    (uiState as? PasscodeUnlockState.Data)?.passcodeType?.biometricEnabled == true
 
 @Composable
 private fun DialogContent(
@@ -78,6 +149,7 @@ private fun DialogContent(
     onPasscodeEntered: (String) -> Unit,
     failedAttemptCount: Int,
     showLogoutWarning: Boolean,
+    passcodeType: PasscodeUIType,
     usePasswordField: Boolean = false,
 ) {
     var logoutDialog by rememberSaveable { mutableStateOf(false) }
@@ -102,24 +174,17 @@ private fun DialogContent(
             )
             Spacer(modifier = Modifier.height(8.dp))
             if (usePassword) {
-                var password by remember { mutableStateOf("") }
-                PasswordTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .testTag(PASSWORD_FIELD_TAG),
-                    onTextChange = { password = it },
-                    imeAction = ImeAction.Done,
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            onPasswordEntered(password)
-                        }
-                    )
-                )
+                ShowPasswordField(onPasswordEntered)
             } else {
-                PasscodeField(
-                    onComplete = onPasscodeEntered,
-                    modifier = Modifier.testTag(PASSCODE_FIELD_TAG)
-                )
+                if (passcodeType is PasscodeUIType.Alphanumeric) {
+                    ShowPasswordField(onPasscodeEntered, "")
+                } else if (passcodeType is PasscodeUIType.Pin) {
+                    PasscodeField(
+                        onComplete = onPasscodeEntered,
+                        modifier = Modifier.testTag(PASSCODE_FIELD_TAG),
+                        numberOfCharacters = passcodeType.digits
+                    )
+                }
             }
             if (failedAttemptCount > 0) {
                 Spacer(modifier = Modifier.height(20.dp))
@@ -161,11 +226,23 @@ private fun DialogContent(
     }
 }
 
-internal const val PASSCODE_FIELD_TAG = "passcode_dialog:passcode_field"
-internal const val PASSWORD_FIELD_TAG = "passcode_dialog:password_text_field"
-internal const val FAILED_ATTEMPTS_TAG = "passcode_dialog:text_field:failed_attempts"
-internal const val LOGOUT_BUTTON_TAG = "passcode_dialog:button:log_out"
-internal const val FORGOT_PASSCODE_BUTTON_TAG = "passcode_dialog:button:forgot_passcode"
+@Composable
+private fun ShowPasswordField(onPasswordEntered: (String) -> Unit, hintText: String? = null) {
+    var password by remember { mutableStateOf("") }
+    PasswordTextField(
+        modifier = Modifier
+            .fillMaxWidth(0.5f)
+            .testTag(PASSWORD_FIELD_TAG),
+        onTextChange = { password = it },
+        imeAction = ImeAction.Done,
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onPasswordEntered(password)
+            }
+        ),
+        hint = hintText
+    )
+}
 
 @Composable
 private fun FailedAttemptsView(
@@ -188,6 +265,12 @@ private fun FailedAttemptsView(
     )
 }
 
+internal const val PASSCODE_FIELD_TAG = "passcode_dialog:passcode_field"
+internal const val PASSWORD_FIELD_TAG = "passcode_dialog:password_text_field"
+internal const val FAILED_ATTEMPTS_TAG = "passcode_dialog:text_field:failed_attempts"
+internal const val LOGOUT_BUTTON_TAG = "passcode_dialog:button:log_out"
+internal const val FORGOT_PASSCODE_BUTTON_TAG = "passcode_dialog:button:forgot_passcode"
+
 @CombinedThemePreviews
 @Composable
 private fun PasscodeDialogPreview(
@@ -200,6 +283,7 @@ private fun PasscodeDialogPreview(
             failedAttemptCount = previewParameters.attempts,
             showLogoutWarning = previewParameters.showWarning,
             usePasswordField = previewParameters.usePassword,
+            passcodeType = previewParameters.passcodeType,
         )
     }
 }
@@ -208,6 +292,7 @@ private class PreviewParameters(
     val attempts: Int = 0,
     val showWarning: Boolean = false,
     val usePassword: Boolean = false,
+    val passcodeType: PasscodeUIType = PasscodeUIType.Pin(false, 4),
 )
 
 private class PasscodeDialogParameterProvider : PreviewParameterProvider<PreviewParameters> {
@@ -218,5 +303,17 @@ private class PasscodeDialogParameterProvider : PreviewParameterProvider<Preview
             PreviewParameters(usePassword = true),
             PreviewParameters(attempts = 3, usePassword = true),
             PreviewParameters(attempts = 6, showWarning = true, usePassword = true),
+            PreviewParameters(attempts = 3, passcodeType = PasscodeUIType.Alphanumeric(false)),
+            PreviewParameters(
+                attempts = 6,
+                showWarning = true,
+                passcodeType = PasscodeUIType.Alphanumeric(false)
+            ),
+            PreviewParameters(attempts = 3, passcodeType = PasscodeUIType.Pin(false, 6)),
+            PreviewParameters(
+                attempts = 6,
+                showWarning = true,
+                passcodeType = PasscodeUIType.Pin(false, 6)
+            ),
         )
 }

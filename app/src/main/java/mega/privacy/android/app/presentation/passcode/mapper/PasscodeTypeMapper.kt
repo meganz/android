@@ -2,11 +2,12 @@ package mega.privacy.android.app.presentation.passcode.mapper
 
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
 import mega.privacy.android.domain.entity.passcode.PasscodeType
+import javax.inject.Inject
 
 /**
  * Passcode type mapper
  */
-internal class PasscodeTypeMapper {
+internal class PasscodeTypeMapper @Inject constructor() {
     /**
      * Invoke
      *

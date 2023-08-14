@@ -24,11 +24,4 @@ sealed interface PasscodeUIType {
      */
     data class Pin(override val biometricEnabled: Boolean, val digits: Int) : PasscodeUIType
 
-
-    /**
-     * None
-     */
-    object None : PasscodeUIType {
-        override val biometricEnabled = false
-    }
 }
