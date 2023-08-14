@@ -95,7 +95,15 @@ fun MediaDiscoveryView(
         onClickFilterDropdownMenuItem = {
             mediaDiscoveryViewModel.showFilterDialog(true)
             mediaDiscoveryViewModel.showSlidersPopup(false)
-        }
+        },
+        onClickZoomInDropdownMenuItem = {
+            onZoomIn()
+            mediaDiscoveryViewModel.showSlidersPopup(false)
+        },
+        onClickZoomOutDropdownMenuItem = {
+            onZoomOut()
+            mediaDiscoveryViewModel.showSlidersPopup(false)
+        },
     )
 
 
@@ -129,6 +137,8 @@ private fun SlidersDropDownMenu(
     onDismissDropdownMenu: () -> Unit,
     onClickSortByDropdownMenuItem: () -> Unit,
     onClickFilterDropdownMenuItem: () -> Unit,
+    onClickZoomInDropdownMenuItem: () -> Unit,
+    onClickZoomOutDropdownMenuItem: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -150,6 +160,16 @@ private fun SlidersDropDownMenu(
                 onClick = onClickFilterDropdownMenuItem
             ) {
                 Text(stringResource(id = R.string.photos_action_filter))
+            }
+            DropdownMenuItem(
+                onClick = onClickZoomInDropdownMenuItem
+            ) {
+                Text(stringResource(id = R.string.photos_action_zoom_in))
+            }
+            DropdownMenuItem(
+                onClick = onClickZoomOutDropdownMenuItem
+            ) {
+                Text(stringResource(id = R.string.photos_action_zoom_out))
             }
         }
     }
@@ -270,14 +290,22 @@ private fun MDView(
                 Column(
                     horizontalAlignment = Alignment.End
                 ) {
-                    ListViewIconButton(
-                        onSwitchListView = onSwitchListView
-                    )
                     CardListView(
                         dateCards = dateCards,
                         photoDownload = photoDownloaderViewModel::downloadPhoto,
                         onCardClick = onCardClick,
                         state = lazyGridState,
+                        cardListViewHeaderView = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentSize(Alignment.TopEnd)
+                            ) {
+                                ListViewIconButton(
+                                    onSwitchListView = onSwitchListView
+                                )
+                            }
+                        }
                     )
                 }
             }

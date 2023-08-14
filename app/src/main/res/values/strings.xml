@@ -1587,7 +1587,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]No files [/B][A]Saved for Offline[/A]</string>
+    <string name="context_empty_offline">[B]No files [/B][A]saved for Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]No [/B][A]contacts[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -1911,7 +1911,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">No network connection. Please reconnect to open the file.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">File already exists in Saved for Offline</string>
+    <string name="file_already_exists">File already saved for Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Message not forwarded</item>
@@ -2342,7 +2342,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Allow access to photos, media and files.</string>
+    <string name="allow_acces_media_title">Allow access to photos, media and files</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA needs your permission to access files for sharing.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -4755,7 +4755,7 @@
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <string name="album_import_error_access_confirmation">OK, got it</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4793,13 +4793,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Terms of Service</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -5076,9 +5076,13 @@
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Restart</string>
     <!-- Title of the screen asking permissions for Audio files -->
-    <string name="allow_access_audio_title">Allow access to audio files.</string>
+    <string name="allow_access_audio_title">Allow access to audio files</string>
     <!-- Approved text under Approve credentials from contact info screen-->
     <string name="contact_approve_credentials_approved_text">Approved</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
     <string name="contact_approve_credentials_not_approved_text">Not approved</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Zoom in</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Zoom out</string>
 </resources>

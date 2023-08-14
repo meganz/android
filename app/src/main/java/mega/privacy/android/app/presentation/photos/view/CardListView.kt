@@ -44,6 +44,7 @@ fun CardListView(
     dateCards: List<DateCard>,
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
+    cardListViewHeaderView: @Composable () -> Unit = {},
 ) {
     val spanCount =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -58,12 +59,19 @@ fun CardListView(
             .fillMaxSize(),
         state = state
     ) {
+        item(
+            span = { GridItemSpan(currentLineSpan = 1) }
+        ) {
+            cardListViewHeaderView()
+        }
+
         itemsIndexed(
             items = dateCards,
             key = { _, item ->
                 item.key
             }
         ) { _, dateCard ->
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
