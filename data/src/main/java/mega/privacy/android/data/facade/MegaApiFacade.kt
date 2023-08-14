@@ -1328,4 +1328,10 @@ internal class MegaApiFacade @Inject constructor(
         srcFilePath: String,
         listener: MegaRequestListenerInterface?,
     ) = megaApi.setPreview(node, srcFilePath, listener)
+
+    override fun pauseTransferByTag(
+        transferTag: Int,
+        pause: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.pauseTransferByTag(transferTag, pause, listener)
 }

@@ -483,4 +483,13 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
         megaLocalRoomGateway.deleteCompletedTransfer(transfer)
     }
+
+    override suspend fun pauseTransferByTag(transferTag: Int, isPause: Boolean) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("pauseTransferByTag") { it.flag }
+                megaApiGateway.pauseTransferByTag(transferTag, isPause, listener)
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
 }

@@ -400,4 +400,12 @@ interface TransferRepository {
      * @param transfer
      */
     suspend fun deleteCompletedTransfer(transfer: CompletedTransfer, isRemoveCache: Boolean)
+
+    /**
+     * Pause transfer by tag
+     *
+     * @param transferTag
+     * @param isPause
+     */
+    suspend fun pauseTransferByTag(transferTag: Int, isPause: Boolean): Boolean
 }

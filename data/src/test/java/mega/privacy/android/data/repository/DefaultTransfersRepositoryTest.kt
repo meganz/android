@@ -642,6 +642,51 @@ class DefaultTransfersRepositoryTest {
             }
         }
 
+    @ParameterizedTest(name = "pauseTransferByTag: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that pauseTransferByTag returns success when MegaApi returns API_OK`(isPause: Boolean) =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { flag }.thenReturn(isPause)
+            }
+
+            whenever(megaApiGateway.pauseTransferByTag(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            assertThat(underTest.pauseTransferByTag(1, isPause)).isEqualTo(isPause)
+        }
+
+    @Test
+    fun `test that pauseTransferByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EFAILED)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.pauseTransferByTag(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.pauseTransferByTag(1, true)
+            }
+        }
+
     @Test
     fun `test that deleteAllCompletedTransfers room gateway is called when deleteAllCompletedTransfers is called`(
     ) = runTest {

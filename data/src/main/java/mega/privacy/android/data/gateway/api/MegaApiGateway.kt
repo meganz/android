@@ -2852,4 +2852,29 @@ interface MegaApiGateway {
         srcFilePath: String,
         listener: MegaRequestListenerInterface?,
     )
+
+    /**
+     * Pause/resume a transfer
+     *
+     *
+     * The request finishes with MegaError::API_OK if the state of the transfer is the
+     * desired one at that moment. That means that the request succeed when the transfer
+     * is successfully paused or resumed, but also if the transfer was already in the
+     * desired state and it wasn't needed to change anything.
+     *
+     *
+     * Resumed transfers don't necessarily continue just after the resumption. They
+     * are tagged as queued and are processed according to its position on the request queue.
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PAUSE_TRANSFER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getTransferTag - Returns the tag of the transfer to pause or resume
+     * - MegaRequest::getFlag - Returns true if the transfer has to be pause or false if it has to be resumed
+     *
+     * @param transferTag Tag of the transfer to pause or resume
+     * @param pause       True to pause the transfer or false to resume it
+     * @param listener    MegaRequestListener to track this request
+     */
+    fun pauseTransferByTag(transferTag: Int, pause: Boolean, listener: MegaRequestListenerInterface)
 }
