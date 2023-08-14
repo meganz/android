@@ -10,12 +10,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -40,6 +42,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
@@ -74,6 +77,7 @@ import javax.inject.Inject
  * @property startCameraUploadUseCase
  * @property ioDispatcher
  * @property mainDispatcher
+ * @property defaultDispatcher
  * @property checkEnableCameraUploadsStatus
  * @property stopCameraUploadAndHeartbeatUseCase
  * @param monitorCameraUploadProgress
@@ -90,6 +94,7 @@ class TimelineViewModel @Inject constructor(
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -112,23 +117,25 @@ class TimelineViewModel @Inject constructor(
             getTimelinePhotosUseCase()
                 .catch { throwable ->
                     Timber.e(throwable)
-                }.collectLatest { photos ->
-                    Timber.v("TimelineViewModel photos flow=>" + photos.size)
-                    if (getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)) {
-                        handleTimelinePhotosUseCase()
-                    }
-                    val showingPhotos = filterMedias(photos)
-                    handleAndUpdatePhotosUIState(
-                        sourcePhotos = photos,
-                        showingPhotos = showingPhotos
-                    )
-                }
+                }.collectLatest(::handlePhotos)
         }
         viewModelScope.launch {
             monitorCameraUploadProgress().collectLatest {
                 updateCameraUploadProgressIfNeeded(progress = it.first, pending = it.second)
             }
         }
+    }
+
+    private suspend fun handlePhotos(photos: List<Photo>) {
+        Timber.v("TimelineViewModel photos flow=>" + photos.size)
+        if (getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)) {
+            handleTimelinePhotosUseCase()
+        }
+        val showingPhotos = withContext(defaultDispatcher) { filterMedias(photos) }
+        handleAndUpdatePhotosUIState(
+            sourcePhotos = photos,
+            showingPhotos = showingPhotos
+        )
     }
 
     private suspend fun handleTimelinePhotosUseCase() {
@@ -240,23 +247,44 @@ class TimelineViewModel @Inject constructor(
     internal fun handleAndUpdatePhotosUIState(
         sourcePhotos: List<Photo>,
         showingPhotos: List<Photo>,
-    ) {
+    ) = viewModelScope.launch(defaultDispatcher) {
         val sortedPhotos = sortPhotos(showingPhotos)
-        val photosListItems = handleAllPhotoItems(showingPhotos = sortedPhotos)
+
+        async {
+            val items = handleAllPhotoItems(showingPhotos = sortedPhotos)
+            _state.update {
+                it.copy(photosListItems = items)
+            }
+        }
+
         val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
-        val yearCardList = createYearsCardList(dayPhotos = dayPhotos)
-        val monthCardList = createMonthsCardList(dayPhotos = dayPhotos)
-        val dayCardList = createDaysCardList(dayPhotos = dayPhotos)
+
+        async {
+            val items = createYearsCardList(dayPhotos = dayPhotos)
+            _state.update {
+                it.copy(yearsCardPhotos = items)
+            }
+        }
+
+        async {
+            val items = createMonthsCardList(dayPhotos = dayPhotos)
+            _state.update {
+                it.copy(monthsCardPhotos = items)
+            }
+        }
+
+        async {
+            val items = createDaysCardList(dayPhotos = dayPhotos)
+            _state.update {
+                it.copy(daysCardPhotos = items)
+            }
+        }
 
         _state.update {
             it.copy(
                 photos = sourcePhotos,
-                photosListItems = photosListItems,
                 loadPhotosDone = true,
                 currentShowingPhotos = sortedPhotos,
-                yearsCardPhotos = yearCardList,
-                monthsCardPhotos = monthCardList,
-                daysCardPhotos = dayCardList,
             )
         }
         handleEnableZoomAndSortOptions()

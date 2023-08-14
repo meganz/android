@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -113,6 +114,7 @@ class TimelineViewModelTest {
             startCameraUploadUseCase = startCameraUploadUseCase,
             ioDispatcher = StandardTestDispatcher(),
             mainDispatcher = StandardTestDispatcher(),
+            defaultDispatcher = UnconfinedTestDispatcher(),
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             monitorCameraUploadProgress = monitorCameraUploadProgress,
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,

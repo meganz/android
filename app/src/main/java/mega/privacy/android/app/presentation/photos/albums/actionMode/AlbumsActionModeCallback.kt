@@ -3,8 +3,11 @@ package mega.privacy.android.app.presentation.photos.albums.actionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.domain.entity.photos.Album
@@ -17,8 +20,15 @@ import mega.privacy.mobile.analytics.event.AlbumSelectAllEvent
  */
 class AlbumsActionModeCallback(
     private val fragment: PhotosFragment,
-    private val isAlbumSharingEnabled: Boolean,
 ) : ActionMode.Callback {
+    private var isAlbumSharingEnabled: Boolean = false
+
+    init {
+        fragment.lifecycleScope.launch {
+            isAlbumSharingEnabled = fragment.getFeatureFlagUseCase(AppFeatures.AlbumSharing)
+        }
+    }
+
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         val inflater = mode?.menuInflater
         inflater?.inflate(R.menu.photos_albums_action, menu)

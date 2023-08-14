@@ -147,15 +147,7 @@ class PhotosFragment : Fragment() {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
         timelineActionModeCallback = TimelineActionModeCallback(this)
-
-        val isAlbumSharingEnabled = runBlocking {
-            getFeatureFlagUseCase(AppFeatures.AlbumSharing)
-        }
-
-        albumsActionModeCallback = AlbumsActionModeCallback(
-            fragment = this,
-            isAlbumSharingEnabled = isAlbumSharingEnabled,
-        )
+        albumsActionModeCallback = AlbumsActionModeCallback(this)
     }
 
     override fun onCreateView(
