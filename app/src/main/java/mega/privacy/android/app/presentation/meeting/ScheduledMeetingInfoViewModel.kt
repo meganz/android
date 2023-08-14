@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
@@ -50,6 +51,7 @@ import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -84,6 +86,7 @@ import javax.inject.Inject
  * @property cameraGateway                                  [CameraGateway]
  * @property deviceGateway                                  [DeviceGateway]
  * @property setWaitingRoomUseCase                          [SetWaitingRoomUseCase]
+ * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
  * @property state                    Current view state as [ScheduledMeetingInfoState]
 
  */
@@ -114,6 +117,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
+    private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -296,6 +300,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         }
                         val isWaitingRoom = if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
                             Timber.d("Changes in waiting room")
+                            if (chat.isWaitingRoom) {
+                                setWaitingRoomReminderEnabled()
+                            }
+
                             chat.isWaitingRoom
                         } else {
                             enabledWaitingRoomOption
@@ -310,7 +318,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             Timber.d("Changes in retention time")
                             getInstance().sendBroadcast(
                                 Intent(ACTION_UPDATE_RETENTION_TIME)
-                                    .putExtra(RETENTION_TIME, chat.retentionTime).setPackage(getInstance().applicationContext.packageName)
+                                    .putExtra(RETENTION_TIME, chat.retentionTime)
+                                    .setPackage(getInstance().applicationContext.packageName)
                             )
 
                             if (chat.retentionTime != Constants.DISABLED_RETENTION_TIME) chat.retentionTime
@@ -804,18 +813,31 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun setWaitingRoom() =
         viewModelScope.launch {
+            val isEnabled = !state.value.enabledWaitingRoomOption
             runCatching {
-                setWaitingRoomUseCase(state.value.chatId, !state.value.enabledWaitingRoomOption)
+                setWaitingRoomUseCase(state.value.chatId, isEnabled)
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess {
                 _state.update { state ->
                     state.copy(
-                        enabledWaitingRoomOption = !state.enabledWaitingRoomOption
+                        enabledWaitingRoomOption = isEnabled
                     )
+                }
+                if (isEnabled) {
+                    setWaitingRoomReminderEnabled()
                 }
             }
         }
+
+    /**
+     * Enable waiting room reminder
+     */
+    private fun setWaitingRoomReminderEnabled() = viewModelScope.launch {
+        runCatching {
+            setWaitingRoomRemindersUseCase(WaitingRoomReminders.Enabled)
+        }
+    }
 
     /**
      * Enable encrypted key rotation if there is internet connection, shows an error if not.

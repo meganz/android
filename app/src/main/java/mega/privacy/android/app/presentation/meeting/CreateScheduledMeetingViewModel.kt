@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.meeting.MonthlyRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.entity.user.UserId
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
+import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -87,6 +89,7 @@ import javax.inject.Inject
  * @property inviteParticipantToChat                    [InviteParticipantToChatUseCase]
  * @property monitorChatRoomUpdates                     [MonitorChatRoomUpdates]
  * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
+ * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
  * @property state                                      Current view state as [CreateScheduledMeetingState]
  */
 @HiltViewModel
@@ -112,6 +115,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val inviteParticipantToChat: InviteParticipantToChatUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
+    private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScheduledMeetingState())
@@ -177,6 +181,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                                 numOfParticipants = chat.peerHandlesList.size + 1,
                             )
                         }
+
+                        if (chat.isWaitingRoom) {
+                            setWaitingRoomReminderEnabled()
+                        }
+
                         val list = mutableListOf<ContactItem>()
                         chat.peerHandlesList.forEach { id ->
                             runCatching {
@@ -777,6 +786,9 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     fun onWaitingRoomTap() =
         _state.update { state ->
             val newValue = !state.enabledWaitingRoomOption
+            if (newValue) {
+                setWaitingRoomReminderEnabled()
+            }
             state.copy(
                 enabledWaitingRoomOption = newValue,
             )
@@ -803,9 +815,22 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             enabledWaitingRoomOption = chat.isWaitingRoom,
                         )
                     }
+
+                    if (chat.isWaitingRoom) {
+                        setWaitingRoomReminderEnabled()
+                    }
                 }
             }
         }
+
+    /**
+     * Enable waiting room reminder
+     */
+    private fun setWaitingRoomReminderEnabled() = viewModelScope.launch {
+        runCatching {
+            setWaitingRoomRemindersUseCase(WaitingRoomReminders.Enabled)
+        }
+    }
 
     /**
      * Get participants emails
@@ -842,7 +867,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             }.onSuccess {
                 _state.update { state ->
                     state.copy(
-                        enabledWaitingRoomOption = isEnabled,
                         finish = true
                     )
                 }
