@@ -206,6 +206,24 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.createChat(isGroup, peers, listener)
 
+    override fun createGroupChat(
+        peers: MegaChatPeerList,
+        title: String?,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.createGroupChat(peers, title, speakRequest, waitingRoom, openInvite, listener)
+
+    override fun createPublicChat(
+        peers: MegaChatPeerList,
+        title: String?,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.createPublicChat(peers, title, speakRequest, waitingRoom, openInvite, listener)
+
     override fun leaveChat(
         chatId: Long,
         listener: MegaChatRequestListenerInterface,

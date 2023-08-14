@@ -29,9 +29,10 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
+import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
-import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -56,6 +57,7 @@ class StartConversationViewModel @Inject constructor(
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val getContactDataUseCase: GetContactDataUseCase,
     private val startConversationUseCase: StartConversationUseCase,
+    private val createGroupChatRoomUseCase: CreateGroupChatRoomUseCase,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val applyContactUpdates: ApplyContactUpdates,
     private val monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase,
@@ -275,6 +277,41 @@ class StartConversationViewModel @Inject constructor(
             }
         } else {
             _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
+    }
+
+    /**
+     * On Start group conversation tap
+     *
+     * @param emails
+     * @param title
+     * @param addParticipants
+     * @param isEkr
+     * @param chatLink
+     */
+    fun onStartGroupConversation(
+        emails: List<String>?,
+        title: String?,
+        addParticipants: Boolean,
+        isEkr: Boolean,
+        chatLink: Boolean,
+    ) {
+        if (!emails.isNullOrEmpty()) {
+            viewModelScope.launch {
+                runCatching {
+                    createGroupChatRoomUseCase(
+                        emails = emails,
+                        title = title,
+                        isEkr = isEkr,
+                        addParticipants = addParticipants,
+                        chatLink = chatLink,
+                    )
+                }.onSuccess { chatId ->
+                    _state.update { it.copy(result = chatId) }
+                }.onFailure(Timber.Forest::e)
+            }
+        } else {
+            Timber.e("onStartGroupConversation() missing parameters")
         }
     }
 

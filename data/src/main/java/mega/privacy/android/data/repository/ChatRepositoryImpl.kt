@@ -643,6 +643,65 @@ internal class ChatRepositoryImpl @Inject constructor(
 
         }
 
+    override suspend fun createGroupChat(
+        title: String?,
+        userHandles: List<Long>,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+    ): Long = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("createGroupChat") {
+                it.chatHandle
+            }
+
+            megaChatApiGateway.createGroupChat(
+                title = title,
+                peers = megaChatPeerListMapper(userHandles),
+                speakRequest = speakRequest,
+                waitingRoom = waitingRoom,
+                openInvite = openInvite,
+                listener = listener
+            )
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeChatRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun createPublicChat(
+        title: String?,
+        userHandles: List<Long>,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+    ): Long = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("createPublicChat") {
+                it.chatHandle
+            }
+
+            megaChatApiGateway.createPublicChat(
+                title = title,
+                peers = megaChatPeerListMapper(userHandles),
+                speakRequest = speakRequest,
+                waitingRoom = waitingRoom,
+                openInvite = openInvite,
+                listener = listener
+            )
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeChatRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun getContactHandle(email: String): Long? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getContact(email)?.handle
+        }
+
     override suspend fun getConnectionState() = withContext(ioDispatcher) {
         connectionStateMapper(megaChatApiGateway.getConnectedState())
     }

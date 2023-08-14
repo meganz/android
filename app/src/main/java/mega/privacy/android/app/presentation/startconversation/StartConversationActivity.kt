@@ -50,6 +50,7 @@ class StartConversationActivity : ComponentActivity() {
     private val viewModel by viewModels<StartConversationViewModel>()
 
     lateinit var resultLauncher: ActivityResultLauncher<Intent?>
+    private lateinit var addContactActivityLauncher: ActivityResultLauncher<Intent?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +64,23 @@ class StartConversationActivity : ComponentActivity() {
                 }
 
                 finish()
+            }
+
+        addContactActivityLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                val data = result.data
+                if (result.resultCode == RESULT_OK && data != null) {
+                    viewModel.onStartGroupConversation(
+                        title = data.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE),
+                        isEkr = data.getBooleanExtra(AddContactActivity.EXTRA_EKR, false),
+                        chatLink = data.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false),
+                        addParticipants = data.getBooleanExtra(AddContactActivity.ALLOW_ADD_PARTICIPANTS, false),
+                        emails = data.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                    )
+                } else {
+                    setResult(RESULT_CANCELED)
+                    finish()
+                }
             }
 
         lifecycleScope.launch {
@@ -119,10 +137,12 @@ class StartConversationActivity : ComponentActivity() {
     }
 
     private fun onNewGroup() {
-        resultLauncher.launch(Intent(this, AddContactActivity::class.java)
-            .putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-            .putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
-            .putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true))
+        addContactActivityLauncher.launch(
+            Intent(this, AddContactActivity::class.java)
+                .putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
+                .putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
+                .putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true)
+        )
     }
 
     private fun onNewMeeting() {

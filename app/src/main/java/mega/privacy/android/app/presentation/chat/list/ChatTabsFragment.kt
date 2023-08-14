@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.chat.list
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -11,7 +12,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -62,7 +62,8 @@ import mega.privacy.mobile.analytics.event.ChatScreenEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -86,10 +87,9 @@ class ChatTabsFragment : Fragment() {
     private var actionMode: ActionMode? = null
     private var currentTab: ChatTab = ChatTab.CHATS
 
-    private lateinit var resultLauncher: ActivityResultLauncher<Intent?>
-
     private val viewModel by viewModels<ChatTabsViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
+    private val onDrawerObserver: Observer<Boolean> = Observer { viewModel.showTooltips(!it) }
 
     private val bluetoothPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGrant ->
@@ -104,27 +104,16 @@ class ChatTabsFragment : Fragment() {
             }
         }
 
-    private val onDrawerObserver: Observer<Boolean> = Observer { viewModel.showTooltips(!it) }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        resultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == ComponentActivity.RESULT_OK
-                && result.data?.hasExtra(EXTRA_NEW_CHAT_ID) == true
-            ) {
-                val chatId = result.data?.getLongExtra(EXTRA_NEW_CHAT_ID, -1L)
-                    ?: return@registerForActivityResult
-
-                startActivity(
-                    Intent(requireContext(), ChatActivity::class.java)
-                        .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
-                        .putExtra(Constants.CHAT_ID, chatId)
-                )
+    private val startConversationLauncher: ActivityResultLauncher<Intent?> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val intentData = result.data
+            if (result.resultCode == Activity.RESULT_OK && intentData?.hasExtra(EXTRA_NEW_CHAT_ID) == true) {
+                val chatId = intentData.getLongExtra(EXTRA_NEW_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                launchChatScreen(chatId)
+            } else {
+                Timber.w("StartConversationActivity invalid result: $result")
             }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -185,9 +174,9 @@ class ChatTabsFragment : Fragment() {
                 (activity as? AppCompatActivity?)?.supportActionBar?.setSubtitle(subtitle)
             }
 
-            state.currentCallChatId?.let {
+            state.currentCallChatId?.let { chatId ->
+                launchChatCallScreen(chatId)
                 viewModel.removeCurrentCall()
-                launchChatCallScreen(state.currentCallChatId)
             }
 
             state.snackBar?.let { snackBar ->
@@ -195,7 +184,7 @@ class ChatTabsFragment : Fragment() {
                     snackBar.type,
                     view,
                     snackBar.getMessage(resources),
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                    MEGACHAT_INVALID_HANDLE
                 )
                 viewModel.updateSnackBar(null)
             }
@@ -331,7 +320,7 @@ class ChatTabsFragment : Fragment() {
      * @param chatId    Chat id to be shown
      */
     private fun launchChatCallScreen(chatId: Long) {
-        activity?.startActivity(
+        startActivity(
             Intent(context, MeetingActivity::class.java).apply {
                 action = MeetingActivity.MEETING_ACTION_IN
                 putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
@@ -342,6 +331,19 @@ class ChatTabsFragment : Fragment() {
         )
     }
 
+    /**
+     * Launch chat screen
+     *
+     * @param chatId    Chat id
+     */
+    private fun launchChatScreen(chatId: Long) {
+        startActivity(
+            Intent(requireContext(), ChatActivity::class.java)
+                .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
+                .putExtra(Constants.CHAT_ID, chatId)
+        )
+    }
+
     private fun startChatAction() {
         if (isMeetingTabShown()) {
             MeetingBottomSheetDialogFragment.newInstance(true).show(
@@ -349,7 +351,7 @@ class ChatTabsFragment : Fragment() {
                 MeetingBottomSheetDialogFragment.TAG
             )
         } else {
-            resultLauncher.launch(StartConversationActivity.getChatIntent(requireContext()))
+            startConversationLauncher.launch(StartConversationActivity.getChatIntent(requireContext()))
         }
     }
 

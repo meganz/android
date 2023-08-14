@@ -359,6 +359,52 @@ interface ChatRepository {
     suspend fun createChat(isGroup: Boolean, userHandles: List<Long>): Long
 
     /**
+     * Creates a groupal chat for one or more participants
+     *
+     * @param title Null-terminated character string with the chat title. If the title
+     * is longer than 30 characters, it will be truncated to that maximum length.
+     * @param userHandles List of user handles
+     * @param speakRequest True to set that during calls non moderator users, must request permission to speak
+     * @param waitingRoom True to set that during calls, non moderator members will be placed into a waiting room.
+     * A moderator user must grant each user access to the call.
+     * @param openInvite to set that users with MegaChatRoom::PRIV_STANDARD privilege, can invite other users into the chat
+     */
+    suspend fun createGroupChat(
+        title: String?,
+        userHandles: List<Long>,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean
+    ): Long
+
+    /**
+     * Creates a public chatroom for multiple participants (groupchat)
+     *
+     * @param title Null-terminated character string with the chat title. If the title
+     * is longer than 30 characters, it will be truncated to that maximum length.
+     * @param userHandles List of user handles
+     * @param speakRequest True to set that during calls non moderator users, must request permission to speak
+     * @param waitingRoom True to set that during calls, non moderator members will be placed into a waiting room.
+     * A moderator user must grant each user access to the call.
+     * @param openInvite to set that users with MegaChatRoom::PRIV_STANDARD privilege, can invite other users into the chat
+     */
+    suspend fun createPublicChat(
+        title: String?,
+        userHandles: List<Long>,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean
+    ): Long
+
+    /**
+     * Get user handle given an contact Email
+     *
+     * @param email Contact email
+     * @return      User handle
+     */
+    suspend fun getContactHandle(email: String): Long?
+
+    /**
      * Returns the current state of the connection
      *
      * @return [ConnectionState]
