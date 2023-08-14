@@ -12,7 +12,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +26,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -80,6 +82,8 @@ internal fun PhotosGridView(
     selectedPhotoIds: Set<Long>,
     uiPhotoList: List<UIPhoto>,
     isBlurUnselectItem: Boolean = false,
+    separatorRightPlaceHolderView: @Composable () -> Unit = {},
+    showSeparatorRightView: (index: Int) -> Boolean = { false },
 ) {
 
     val configuration = LocalConfiguration.current
@@ -98,23 +102,26 @@ internal fun PhotosGridView(
         state = lazyGridState,
     ) {
 
-        this.items(
+        this.itemsIndexed(
             items = uiPhotoList,
-            key = {
-                it.key
+            key = { _, item ->
+                item.key
             },
-            span = {
-                if (it is UIPhoto.Separator)
+            span = { _, item ->
+                if (item is UIPhoto.Separator)
                     GridItemSpan(maxLineSpan)
                 else GridItemSpan(1)
             },
-        ) { item ->
+        ) { index, item ->
+
 
             when (item) {
                 is UIPhoto.Separator -> {
                     Separator(
                         currentZoomLevel = currentZoomLevel,
                         modificationTime = item.modificationTime,
+                        separatorRightPlaceHolderView = separatorRightPlaceHolderView,
+                        showSeparatorRightView = showSeparatorRightView(index)
                     )
                 }
 
@@ -266,19 +273,29 @@ internal fun PhotoView(
 internal fun Separator(
     currentZoomLevel: ZoomLevel,
     modificationTime: LocalDateTime,
+    separatorRightPlaceHolderView: @Composable () -> Unit = {},
+    showSeparatorRightView: Boolean = false,
 ) {
-    Text(
-        text = dateText(
-            currentZoomLevel = currentZoomLevel,
-            modificationTime = modificationTime,
-            locale = LocalContext.current.resources.configuration.locales[0],
-        ),
-        textAlign = TextAlign.Start,
-        color = colorResource(id = R.color.grey_087_white_087),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
-    )
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = dateText(
+                currentZoomLevel = currentZoomLevel,
+                modificationTime = modificationTime,
+                locale = LocalContext.current.resources.configuration.locales[0],
+            ),
+            textAlign = TextAlign.Start,
+            color = colorResource(id = R.color.grey_087_white_087),
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
+        )
+        if (showSeparatorRightView) {
+            separatorRightPlaceHolderView()
+        }
+    }
 }
 
 private fun dateText(

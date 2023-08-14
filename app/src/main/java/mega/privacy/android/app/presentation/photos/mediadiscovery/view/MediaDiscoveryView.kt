@@ -8,9 +8,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -23,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +52,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.photos.Photo
 
 @Composable
@@ -59,6 +68,7 @@ fun MediaDiscoveryView(
     onPhotoLongPressed: (Photo) -> Unit,
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
+    onSwitchListView: () -> Unit,
 ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
     if (mediaDiscoveryViewState.shouldBack)
@@ -75,6 +85,20 @@ fun MediaDiscoveryView(
         mediaDiscoveryViewState = mediaDiscoveryViewState,
     )
 
+    SlidersDropDownMenu(
+        expanded = mediaDiscoveryViewState.showSlidersPopup,
+        onDismissDropdownMenu = { mediaDiscoveryViewModel.showSlidersPopup(false) },
+        onClickSortByDropdownMenuItem = {
+            mediaDiscoveryViewModel.showSortByDialog(true)
+            mediaDiscoveryViewModel.showSlidersPopup(false)
+        },
+        onClickFilterDropdownMenuItem = {
+            mediaDiscoveryViewModel.showFilterDialog(true)
+            mediaDiscoveryViewModel.showSlidersPopup(false)
+        }
+    )
+
+
     if (mediaDiscoveryViewState.loadPhotosDone) {
         if (mediaDiscoveryViewState.uiPhotoList.isNotEmpty()) {
             MDView(
@@ -88,12 +112,46 @@ fun MediaDiscoveryView(
                 onPhotoLongPressed = onPhotoLongPressed,
                 onCardClick = onCardClick,
                 onTimeBarTabSelected = onTimeBarTabSelected,
+                onSwitchListView = onSwitchListView,
             )
         } else {
             EmptyView(mediaDiscoveryViewState.currentMediaType)
         }
     } else {
         PhotosSkeletonView()
+    }
+}
+
+@Composable
+private fun SlidersDropDownMenu(
+    modifier: Modifier = Modifier,
+    expanded: Boolean,
+    onDismissDropdownMenu: () -> Unit,
+    onClickSortByDropdownMenuItem: () -> Unit,
+    onClickFilterDropdownMenuItem: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.TopEnd)
+            .padding(end = 58.dp)
+    ) {
+        DropdownMenu(
+            modifier = modifier.width(173.dp),
+            expanded = expanded,
+            onDismissRequest = onDismissDropdownMenu
+        ) {
+            DropdownMenuItem(
+                onClick = onClickSortByDropdownMenuItem
+            ) {
+                Text(stringResource(id = R.string.action_sort_by))
+            }
+            DropdownMenuItem(
+                onClick = onClickFilterDropdownMenuItem
+            ) {
+                Text(stringResource(id = R.string.photos_action_filter))
+            }
+        }
     }
 }
 
@@ -156,6 +214,7 @@ private fun MDView(
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
+    onSwitchListView: () -> Unit,
 ) {
     val lazyGridState: LazyGridState =
         rememberSaveable(
@@ -194,6 +253,12 @@ private fun MDView(
                     onLongPress = onPhotoLongPressed,
                     selectedPhotoIds = mediaDiscoveryViewState.selectedPhotoIds,
                     uiPhotoList = mediaDiscoveryViewState.uiPhotoList,
+                    showSeparatorRightView = { index -> index == 0 },
+                    separatorRightPlaceHolderView = {
+                        ListViewIconButton(
+                            onSwitchListView = onSwitchListView
+                        )
+                    }
                 )
             } else {
                 val dateCards = when (mediaDiscoveryViewState.selectedTimeBarTab) {
@@ -202,12 +267,19 @@ private fun MDView(
                     TimeBarTab.Days -> mediaDiscoveryViewState.daysCardList
                     else -> mediaDiscoveryViewState.daysCardList
                 }
-                CardListView(
-                    dateCards = dateCards,
-                    photoDownload = photoDownloaderViewModel::downloadPhoto,
-                    onCardClick = onCardClick,
-                    state = lazyGridState,
-                )
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    ListViewIconButton(
+                        onSwitchListView = onSwitchListView
+                    )
+                    CardListView(
+                        dateCards = dateCards,
+                        photoDownload = photoDownloaderViewModel::downloadPhoto,
+                        onCardClick = onCardClick,
+                        state = lazyGridState,
+                    )
+                }
             }
         }
         if (mediaDiscoveryViewState.selectedPhotoIds.isEmpty()) {
@@ -216,6 +288,24 @@ private fun MDView(
                 onTimeBarTabSelected = onTimeBarTabSelected
             )
         }
+    }
+}
+
+@Composable
+private fun ListViewIconButton(
+    onSwitchListView: () -> Unit,
+) {
+    IconButton(
+        modifier = Modifier
+            .padding(end = 16.dp)
+            .size(16.dp),
+        onClick = onSwitchListView,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_list_view),
+            contentDescription = "",
+            tint = MaterialTheme.colors.textColorSecondary
+        )
     }
 }
 

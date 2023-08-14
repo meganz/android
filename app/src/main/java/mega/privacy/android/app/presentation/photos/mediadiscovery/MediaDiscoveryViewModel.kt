@@ -408,6 +408,13 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
+
+    fun showSlidersPopup(showSlidersPopup: Boolean) {
+        _state.update {
+            it.copy(showSlidersPopup = showSlidersPopup)
+        }
+    }
+
     /**
      * Set media discovery view is enabled
      */

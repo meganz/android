@@ -2,36 +2,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_zoom_out"
-        android:icon="@drawable/ic_zoom_out"
-        android:orderInCategory="85"
-        android:title="@string/action_grid"
-        android:visible="true"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_zoom_in"
-        android:icon="@drawable/ic_zoom_in"
-        android:orderInCategory="90"
-        android:title="@string/action_grid"
-        android:visible="true"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_menu_sort_by"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="105"
-        android:title="@string/action_sort_by"
-        android:visible="true"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_filter"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="110"
+        android:id="@+id/action_menu_sliders"
+        android:icon="@drawable/ic_sliders_vertical"
+        android:orderInCategory="91"
         android:title="@string/photos_action_filter"
         android:visible="true"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 </menu>

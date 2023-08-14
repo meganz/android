@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property shouldBack handle empty state, when no photos then back to file list page, eg, delete.
  * @property showSortByDialog
  * @property showFilterDialog
+ * @property showSlidersPopup
  * @property collisions
  * @property copyThrowable
  * @property copyResultText
@@ -52,6 +53,7 @@ data class MediaDiscoveryViewState(
     val shouldBack: Boolean = false,
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
+    val showSlidersPopup: Boolean = false,
     val collisions: ArrayList<NameCollision>? = null,
     val copyThrowable: Throwable? = null,
     val copyResultText: String? = null,

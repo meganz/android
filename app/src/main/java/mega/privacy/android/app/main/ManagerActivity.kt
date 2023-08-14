@@ -1784,7 +1784,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (intent?.action != null) {
                         if (intent.action == Constants.ACTION_SHOW_TRANSFERS) {
                             if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                                sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(applicationContext.packageName))
+                                sendBroadcast(
+                                    Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(
+                                        applicationContext.packageName
+                                    )
+                                )
                             }
                             drawerItem = DrawerItem.TRANSFERS
                             transferPageViewModel.setTransfersTab(
@@ -2586,7 +2590,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 Constants.ACTION_SHOW_TRANSFERS -> {
                     if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                        sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(applicationContext.packageName))
+                        sendBroadcast(
+                            Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(
+                                applicationContext.packageName
+                            )
+                        )
                     }
                     drawerItem = DrawerItem.TRANSFERS
                     transferPageViewModel.setTransfersTab(
@@ -3220,9 +3228,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 badgeDrawable?.text = totalNotifications.toString() + ""
             }
             supportActionBar?.setHomeAsUpIndicator(badgeDrawable)
-        }
-        if (drawerItem === DrawerItem.CLOUD_DRIVE && isInMDMode) {
-            supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white))
         }
         if (drawerItem === DrawerItem.PHOTOS && isInAlbumContent) {
             supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white))
@@ -4332,10 +4337,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         CallUtil.setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem)
         if (viewModel.isConnected) {
             when (drawerItem) {
-                DrawerItem.CLOUD_DRIVE -> if (!isInMDMode) {
+                DrawerItem.CLOUD_DRIVE -> {
                     openLinkMenuItem?.isVisible = isFirstNavigationLevel
                     moreMenuItem.isVisible = !isFirstNavigationLevel
-                    if (isCloudAdded && fileBrowserState().nodes.isNotEmpty()) {
+                    if (!isInMDMode && isCloudAdded && fileBrowserState().nodes.isNotEmpty()) {
                         searchMenuItem?.isVisible = true
                     }
                 }
@@ -5373,7 +5378,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         Constants.CONTACT_LINK -> {
                             Timber.d("Open contact link: correct contact link")
                             val s =
-                                link.split("C!".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                                link.split("C!".toRegex()).dropLastWhile { it.isEmpty() }
+                                    .toTypedArray()
                             if (s.size > 1) {
                                 val handle: Long =
                                     MegaApiAndroid.base64ToHandle(s[1].trim { it <= ' ' })
@@ -6223,7 +6229,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         } else if (Constants.ACTION_SHOW_TRANSFERS == intent.action) {
             if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(applicationContext.packageName))
+                sendBroadcast(
+                    Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(
+                        applicationContext.packageName
+                    )
+                )
             }
             if (intent.getBooleanExtra(Constants.OPENED_FROM_IMAGE_VIEWER, false)) {
                 transfersToImageViewer = true

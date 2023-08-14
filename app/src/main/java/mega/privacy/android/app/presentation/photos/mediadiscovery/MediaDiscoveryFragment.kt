@@ -14,6 +14,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -97,7 +98,6 @@ class MediaDiscoveryFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
-
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     MediaDiscoveryView(
                         mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
@@ -111,6 +111,7 @@ class MediaDiscoveryFragment : Fragment() {
                         onPhotoLongPressed = this@MediaDiscoveryFragment::onLongPress,
                         onCardClick = mediaDiscoveryViewModel::onCardClick,
                         onTimeBarTabSelected = mediaDiscoveryViewModel::onTimeBarTabSelected,
+                        onSwitchListView = { activity?.onBackPressedDispatcher?.onBackPressed() }
                     )
                 }
             }
@@ -119,9 +120,9 @@ class MediaDiscoveryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
         setupFlow()
         setupParentActivityUI()
+        setupMenu()
     }
 
     /**
@@ -288,25 +289,27 @@ class MediaDiscoveryFragment : Fragment() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_zoom_in -> {
-                handleZoomIn()
+    private fun setupMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
             }
 
-            R.id.action_zoom_out -> {
-                handleZoomOut()
-            }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    R.id.action_menu_sliders -> {
+                        mediaDiscoveryViewModel.showSlidersPopup(
+                            !mediaDiscoveryViewModel.state.value.showSlidersPopup
+                        )
+                        true
+                    }
 
-            R.id.action_menu_sort_by -> {
-                mediaDiscoveryViewModel.showSortByDialog(showSortByDialog = true)
+                    else -> true
+                }
             }
-
-            R.id.action_menu_filter -> {
-                mediaDiscoveryViewModel.showFilterDialog(showFilterDialog = true)
-            }
-        }
-        return super.onOptionsItemSelected(item)
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun handleZoomOut() {
