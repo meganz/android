@@ -125,6 +125,50 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Creates a groupal chat for one or more participants, allowing you to specify their
+     * permissions and creation chat options
+     *
+     * @param title Null-terminated character string with the chat title. If the title
+     * is longer than 30 characters, it will be truncated to that maximum length.
+     * @param peers MegaChatPeerList including other users and their privilege level
+     * @param speakRequest True to set that during calls non moderator users, must request permission to speak
+     * @param waitingRoom True to set that during calls, non moderator members will be placed into a waiting room.
+     * A moderator user must grant each user access to the call.
+     * @param openInvite to set that users with MegaChatRoom::PRIV_STANDARD privilege, can invite other users into the chat
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun createGroupChat(
+        peers: MegaChatPeerList,
+        title: String?,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+        listener: MegaChatRequestListenerInterface
+    )
+
+    /**
+     * Creates an public chatroom for multiple participants (groupchat) allowing
+     * you to specify creation chat options
+     *
+     * @param title Null-terminated character string with the chat title. If the title
+     * is longer than 30 characters, it will be truncated to that maximum length.
+     * @param peers MegaChatPeerList including other users and their privilege level
+     * @param speakRequest True to set that during calls non moderator users, must request permission to speak
+     * @param waitingRoom True to set that during calls, non moderator members will be placed into a waiting room.
+     * A moderator user must grant each user access to the call.
+     * @param openInvite to set that users with MegaChatRoom::PRIV_STANDARD privilege, can invite other users into the chat
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun createPublicChat(
+        peers: MegaChatPeerList,
+        title: String?,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+        listener: MegaChatRequestListenerInterface
+    )
+
+    /**
      *  Leave a chat room
      *
      * @param chatId    Chat id
