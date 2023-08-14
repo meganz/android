@@ -32,13 +32,13 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -77,6 +78,9 @@ class FileBrowserViewModelTest {
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase = mock()
     private val transfersManagement: TransfersManagement = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase = mock {
+        onBlocking { invoke(any()) }.thenReturn(false)
+    }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -104,7 +108,8 @@ class FileBrowserViewModelTest {
             monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
             getBandWidthOverQuotaDelayUseCase = getBandWidthOverQuotaDelayUseCase,
             transfersManagement = transfersManagement,
-            containsMediaItemUseCase = containsMediaItemUseCase
+            containsMediaItemUseCase = containsMediaItemUseCase,
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase
         )
     }
 
@@ -299,9 +304,9 @@ class FileBrowserViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem1,
-                    isSelected = true,
+                    isSelected = false,
                     isInvisible = false
                 )
             )
@@ -330,14 +335,14 @@ class FileBrowserViewModelTest {
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem1,
-                    isSelected = true,
+                    isSelected = false,
                     isInvisible = false
                 )
             )
             underTest.onItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem1,
                     isSelected = true,
                     isInvisible = false
@@ -358,6 +363,7 @@ class FileBrowserViewModelTest {
             val nodesListItem2 = mock<TypedFolderNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
+
             whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(
                 listOf(mock(), mock())
             )
@@ -365,17 +371,16 @@ class FileBrowserViewModelTest {
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem1,
-                    isSelected = true,
+                    isSelected = false,
                     isInvisible = false
                 )
             )
             underTest.onItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem2,
                     isSelected = false,
                     isInvisible = false
@@ -462,4 +467,29 @@ class FileBrowserViewModelTest {
                 Truth.assertThat(awaitItem().shouldShowBannerVisibility).isFalse()
             }
         }
+
+    @Test
+    fun `test that when node is available offilne, it should be updated in node`() = runTest {
+        val nodesListItem1 = mock<TypedFileNode>()
+        val nodesListItem2 = mock<TypedFolderNode>()
+        whenever(nodesListItem1.id.longValue).thenReturn(1L)
+        whenever(nodesListItem2.id.longValue).thenReturn(2L)
+
+        whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(
+            listOf(mock(), mock())
+        )
+        whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+            listOf(nodesListItem1, nodesListItem2)
+        )
+        whenever(isAvailableOfflineUseCase(nodesListItem1)).thenReturn(false)
+        whenever(isAvailableOfflineUseCase(nodesListItem2)).thenReturn(true)
+
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        underTest.refreshNodes()
+        underTest.state.test {
+            val state = awaitItem()
+            Truth.assertThat(state.nodesList[0].isAvailableOffline).isFalse()
+            Truth.assertThat(state.nodesList[1].isAvailableOffline).isTrue()
+        }
+    }
 }

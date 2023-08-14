@@ -3,18 +3,22 @@ package mega.privacy.android.core.ui.controls.lists
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -32,12 +37,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -52,11 +57,11 @@ import java.io.File
  * @param fileSize file size
  * @param modifiedDate modified date
  * @param name name
+ * @param labelColor labelColor
  * @param isTakenDown is taken down
  * @param isFavourite is favourite
  * @param isSharedWithPublicLink is shared with public link
  * @param onLongClick onLongItemClick
- * @param onItemClicked itemClick
  * @param onMenuClick three dots click
  * @param imageState Thumbnail state
  */
@@ -70,6 +75,7 @@ fun NodeListViewItem(
     fileSize: String?,
     modifiedDate: String?,
     name: String,
+    labelColor: Color? = null,
     showMenuButton: Boolean,
     isTakenDown: Boolean,
     isFavourite: Boolean,
@@ -79,6 +85,7 @@ fun NodeListViewItem(
     onLongClick: (() -> Unit)? = null,
     isEnabled: Boolean = true,
     onMenuClick: () -> Unit = {},
+    nodeAvailableOffline: Boolean = false
 ) {
     Column(
         modifier = if (isEnabled) {
@@ -94,7 +101,8 @@ fun NodeListViewItem(
                 .clickable(enabled = false) { }
         }
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .height(72.dp),
+        verticalArrangement = Arrangement.Center
     ) {
         Row(
             modifier = Modifier
@@ -132,94 +140,125 @@ fun NodeListViewItem(
                     )
                 }
             }
-            Column(
-                modifier = Modifier.padding(start = 16.dp)
+            ConstraintLayout(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .fillMaxWidth()
             ) {
-                ConstraintLayout(
-                    modifier = Modifier.fillMaxWidth()
+                val (nodeInfo, threeDots, titleText, infoText, availableOffline) = createRefs()
+                Image(
+                    painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+                    contentDescription = "3 dots",
+                    modifier = Modifier
+                        .constrainAs(threeDots) {
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            visibility =
+                                if (showMenuButton) Visibility.Visible else Visibility.Gone
+                        }
+                        .clickable { onMenuClick() }
+                )
+                Row(modifier = Modifier
+                    .constrainAs(nodeInfo) {
+                        top.linkTo(parent.top)
+                        end.linkTo(threeDots.start)
+                    }
+                    .padding(end = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    val (nodeInfo, threeDots) = createRefs()
-                    if (showMenuButton) {
+                    val iconModifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .absolutePadding(left = 4.dp)
+
+
+                    labelColor?.let {
+                        Box(
+                            modifier = iconModifier
+                                .size(10.dp)
+                                .background(
+                                    shape = CircleShape, color = it
+                                )
+                        ) {}
+                    }
+                    if (isFavourite) {
                         Image(
-                            painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
-                            contentDescription = "3 dots",
-                            modifier = Modifier
-                                .constrainAs(threeDots) {
-                                    end.linkTo(parent.end)
-                                    top.linkTo(parent.top)
-                                    bottom.linkTo(parent.bottom)
-                                }
-                                .clickable { onMenuClick() }
+                            alignment = Alignment.Center,
+                            modifier = iconModifier
+                                .testTag(FAVORITE_TEST_TAG),
+                            painter = painterResource(id = R.drawable.ic_favorite),
+                            contentDescription = "Favorite",
+
+                            )
+                    }
+                    if (isSharedWithPublicLink) {
+                        Image(
+                            alignment = Alignment.Center,
+                            modifier = iconModifier
+                                .testTag(EXPORTED_TEST_TAG),
+                            painter = painterResource(id = R.drawable.link_ic),
+                            contentDescription = "Link",
+                            colorFilter = ColorFilter.tint(
+                                MaterialTheme.colors.textColorSecondary
+                            )
                         )
                     }
-                    Row(modifier = Modifier
-                        .constrainAs(nodeInfo) {
-                            top.linkTo(parent.top)
-                            end.linkTo(threeDots.start)
-                            start.linkTo(parent.start)
-                            width = Dimension.fillToConstraints
-                        }
-                        .padding(end = 4.dp)) {
-                        val iconModifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .absolutePadding(left = 4.dp)
-                        MiddleEllipsisText(
-                            text = name,
-                            style = MaterialTheme.typography.subtitle1,
-                            color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
+                    if (isTakenDown) {
+                        Image(
+                            alignment = Alignment.Center,
+                            modifier = iconModifier
+                                .testTag(TAKEN_TEST_TAG),
+                            painter = painterResource(id = R.drawable.ic_taken_down),
+                            contentDescription = "Taken Down",
                         )
-
-                        if (isFavourite) {
-                            Image(
-                                alignment = Alignment.Center,
-                                modifier = iconModifier
-                                    .testTag(FAVORITE_TEST_TAG),
-                                painter = painterResource(id = R.drawable.ic_favorite),
-                                contentDescription = "Favorite",
-
-                                )
-                        }
-                        if (isSharedWithPublicLink) {
-                            Image(
-                                alignment = Alignment.Center,
-                                modifier = iconModifier
-                                    .testTag(EXPORTED_TEST_TAG),
-                                painter = painterResource(id = R.drawable.link_ic),
-                                contentDescription = "Link",
-                                colorFilter = ColorFilter.tint(
-                                    MaterialTheme.colors.textColorSecondary
-                                )
-                            )
-                        }
-                        if (isTakenDown) {
-                            Image(
-                                alignment = Alignment.Center,
-                                modifier = iconModifier
-                                    .testTag(TAKEN_TEST_TAG),
-                                painter = painterResource(id = R.drawable.ic_taken_down),
-                                contentDescription = "Taken Down",
-                            )
-                        }
                     }
                 }
+                MiddleEllipsisText(
+                    modifier = Modifier.constrainAs(titleText) {
+                        start.linkTo(parent.start)
+                        end.linkTo(nodeInfo.start)
+                        top.linkTo(parent.top)
+                        width = Dimension.fillToConstraints
+                    },
+                    text = name,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
+                )
+
                 Text(
                     text = folderInfo ?: "$fileSize · $modifiedDate",
+                    modifier = Modifier
+                        .constrainAs(infoText) {
+                            top.linkTo(titleText.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(threeDots.start)
+                            width = Dimension.fillToConstraints
+                        }
+                        .testTag(INFO_TEXT_TEST_TAG)
+                        .padding(top = 4.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.textColorSecondary,
+                )
+                Image(
                     modifier = Modifier
-                        .testTag(INFO_TEXT_TEST_TAG)
-                        .padding(top = 2.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                        .constrainAs(availableOffline) {
+                            top.linkTo(infoText.top)
+                            bottom.linkTo(infoText.bottom)
+                            end.linkTo(threeDots.start)
+                            visibility =
+                                if (nodeAvailableOffline) Visibility.Visible else Visibility.Gone
+                        },
+                    colorFilter = ColorFilter.tint(
+                        MaterialTheme.colors.textColorSecondary
+                    ),
+                    painter = painterResource(id = R.drawable.ic_offline_indicator),
+                    contentDescription = "Available Offline"
                 )
             }
         }
-        Divider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 64.dp, top = 8.dp),
-            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012, thickness = 1.dp
-        )
     }
 }
 
@@ -279,7 +318,8 @@ private fun FilePreview() {
             isSharedWithPublicLink = false,
             isTakenDown = false,
             onClick = {},
-            imageState = imageState
+            imageState = imageState,
+            nodeAvailableOffline = false
         )
     }
 }
@@ -304,7 +344,8 @@ private fun FolderPreview() {
             isSharedWithPublicLink = false,
             isTakenDown = false,
             onClick = {},
-            imageState = imageState
+            imageState = imageState,
+            nodeAvailableOffline = true
         )
     }
 }

@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -179,6 +180,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
                 putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
                 putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)
+                putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, getCloudSortOrder.invoke())
             }
             getLocalFileForNode(fileNode)?.let {
                 val path = it.path

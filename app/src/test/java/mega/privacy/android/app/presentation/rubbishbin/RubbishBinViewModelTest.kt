@@ -165,9 +165,9 @@ class RubbishBinViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem1,
-                    isSelected = true,
+                    isSelected = false,
                     isInvisible = false
                 )
             )
@@ -193,14 +193,14 @@ class RubbishBinViewModelTest {
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem1,
-                    isSelected = true,
+                    isSelected = false,
                     isInvisible = false
                 )
             )
             underTest.onItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem1,
                     isSelected = true,
                     isInvisible = false
@@ -228,14 +228,14 @@ class RubbishBinViewModelTest {
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem1,
-                    isSelected = true,
+                    isSelected = false,
                     isInvisible = false
                 )
             )
             underTest.onItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     nodesListItem2,
                     isSelected = false,
                     isInvisible = false
@@ -315,7 +315,7 @@ class RubbishBinViewModelTest {
 
             underTest.refreshNodes()
             underTest.onItemClicked(
-                NodeUIItem<TypedNode>(
+                NodeUIItem(
                     node = nodesListItem2,
                     isSelected = false,
                     isInvisible = false
