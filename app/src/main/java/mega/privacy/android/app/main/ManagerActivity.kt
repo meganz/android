@@ -131,7 +131,6 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
-import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -215,6 +214,7 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActiv
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
+import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
@@ -728,6 +728,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var canVerifyPhoneNumber = false
 
     /**
+     * Feature Flag for FileBrowserCompose
+     */
+    private var enableFileBrowserCompose: Boolean = true
+
+    /**
      * Method for updating the visible elements related to a call.
      *
      * @param chatIdReceived The chat ID of a call.
@@ -1068,6 +1073,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+        }
+
+        lifecycleScope.launch {
+            enableFileBrowserCompose =
+                getFeatureFlagValueUseCase(AppFeatures.FileBrowserCompose)
         }
     }
 
@@ -2855,7 +2865,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         fragmentContainer.visibility = View.VISIBLE
 
         lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.FileBrowserCompose)) {
+            if (enableFileBrowserCompose) {
                 fileBrowserComposeFragment =
                     (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
                         ?: FileBrowserComposeFragment.newInstance()).also {
@@ -4809,18 +4819,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             if (isInMDMode) {
                 isInMDMode = false
-                backToDrawerItem(bottomNavigationCurrentItem)
-            } else {
-                if (isFileBrowserComposeEnabled()) {
-                    if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
-                        performOnBack()
-                    }
-                } else {
-                    if (!isCloudAdded || fileBrowserFragment?.onBackPressed() == 0) {
-                        performOnBack()
-                    }
+                selectDrawerItemCloudDrive()
+            }
+            if (isFileBrowserComposeEnabled()) {
+                if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
+                    performOnBack()
                 }
-
+            } else {
+                if (!isCloudAdded || fileBrowserFragment?.onBackPressed() == 0) {
+                    performOnBack()
+                }
             }
         } else if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER) {
             backToDrawerItem(bottomNavigationCurrentItem)
@@ -8889,6 +8897,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun isInMDMode(): Boolean {
         return drawerItem === DrawerItem.CLOUD_DRIVE && isInMDMode
+    }
+
+    /**
+     * switch to Cloud Drive file list from media discovery
+     */
+    fun switchToCDFromMD() {
+        isInMDMode = false
+        backToDrawerItem(bottomNavigationCurrentItem)
     }
 
     /**

@@ -362,12 +362,12 @@ private fun greyColor() = MaterialTheme.colors.grey_alpha_050_white_alpha_050
 private fun blackWhiteIconTint() = MaterialTheme.colors.black_white
 
 @Composable
-private fun isZoomInValid(currentZoomLevel: ZoomLevel) =
+internal fun isZoomInValid(currentZoomLevel: ZoomLevel) =
     currentZoomLevel != ZoomLevel.values()
         .first()
 
 @Composable
-private fun isZoomOutValid(currentZoomLevel: ZoomLevel) =
+internal fun isZoomOutValid(currentZoomLevel: ZoomLevel) =
     currentZoomLevel != ZoomLevel.values()
         .last()
 

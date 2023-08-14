@@ -2,8 +2,6 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -30,11 +28,8 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryView
-import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
@@ -111,7 +106,12 @@ class MediaDiscoveryFragment : Fragment() {
                         onPhotoLongPressed = this@MediaDiscoveryFragment::onLongPress,
                         onCardClick = mediaDiscoveryViewModel::onCardClick,
                         onTimeBarTabSelected = mediaDiscoveryViewModel::onTimeBarTabSelected,
-                        onSwitchListView = { activity?.onBackPressedDispatcher?.onBackPressed() }
+                        onSwitchListView = {
+                            lifecycleScope.launch {
+                                mediaDiscoveryViewModel.setListViewTypeClicked()
+                                (activity as ManagerActivity).switchToCDFromMD()
+                            }
+                        }
                     )
                 }
             }
@@ -152,21 +152,6 @@ class MediaDiscoveryFragment : Fragment() {
                                 enterActionMode()
                             }
                             actionMode?.title = state.selectedPhotoIds.size.toString()
-                        }
-                        menu?.let {
-                            handleKebabMenuIconsVisibility(
-                                isShowing = state.selectedTimeBarTab == TimeBarTab.All
-                            )
-                            handleZoomMenuIconsVisibility(
-                                isShowing = state.selectedTimeBarTab == TimeBarTab.All
-                                        && state.uiPhotoList.isNotEmpty()
-                            )
-                            if (state.selectedTimeBarTab == TimeBarTab.All && state.uiPhotoList.isNotEmpty()) {
-                                handleZoomMenuEnableStatus()
-                            }
-                            if (state.selectedTimeBarTab == TimeBarTab.All) {
-                                handleSortByMenuItemEnableStatus()
-                            }
                         }
                     }
                 }
@@ -254,45 +239,13 @@ class MediaDiscoveryFragment : Fragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if (!managerActivity.isInMDMode()) {
-            return
-        }
-        inflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-        this.menu = menu
-        mediaDiscoveryViewModel.state.value.apply {
-            handleKebabMenuIconsVisibility(
-                isShowing = selectedTimeBarTab == TimeBarTab.All
-            )
-            handleZoomMenuIconsVisibility(
-                isShowing = selectedTimeBarTab == TimeBarTab.All
-                        && uiPhotoList.isNotEmpty()
-            )
-            if (selectedTimeBarTab == TimeBarTab.All) {
-                handleSortByMenuItemEnableStatus()
-            }
-        }
-    }
-
-    private fun handleZoomMenuIconsVisibility(isShowing: Boolean) {
-        this.menu?.apply {
-            findItem(R.id.action_zoom_in)?.isVisible = isShowing
-            findItem(R.id.action_zoom_out)?.isVisible = isShowing
-        }
-    }
-
-    private fun handleKebabMenuIconsVisibility(isShowing: Boolean) {
-        this.menu?.apply {
-            findItem(R.id.action_menu_sort_by)?.isVisible = isShowing
-            findItem(R.id.action_menu_filter)?.isVisible = isShowing
-        }
-    }
-
     private fun setupMenu() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
+                if (!managerActivity.isInMDMode()) {
+                    return
+                }
                 menuInflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
             }
 
@@ -329,53 +282,6 @@ class MediaDiscoveryFragment : Fragment() {
                 sortAndFilterPhotos(state.value.sourcePhotos),
                 state.value.sourcePhotos
             )
-        }
-    }
-
-    private fun handleZoomMenuEnableStatus() {
-        val isZoomInValid =
-            mediaDiscoveryViewModel.state.value.currentZoomLevel != ZoomLevel.values()
-                .first()
-        val isZoomOutValid =
-            mediaDiscoveryViewModel.state.value.currentZoomLevel != ZoomLevel.values()
-                .last()
-        this.menu?.let { menu ->
-            menu.findItem(R.id.action_zoom_in)?.let {
-                it.isEnabled = isZoomInValid
-                it.icon?.alpha = if (isZoomInValid) 255 else 125
-            }
-            menu.findItem(R.id.action_zoom_out)?.let {
-                it.isEnabled = isZoomOutValid
-                it.icon?.alpha = if (isZoomOutValid) 255 else 125
-            }
-        }
-    }
-
-    private fun handleSortByMenuItemEnableStatus() {
-        mediaDiscoveryViewModel.state.value.apply {
-            this@MediaDiscoveryFragment.menu?.findItem(R.id.action_menu_sort_by)?.let {
-                val isSortByValid = uiPhotoList.isNotEmpty()
-                it.isEnabled = isSortByValid
-                val color = if (Util.isDarkMode(requireContext())) {
-                    android.graphics.Color.argb(38, 255, 255, 255)
-                } else {
-                    android.graphics.Color.argb(38, 0, 0, 0)
-                }
-                it.isEnabled = isSortByValid
-                val title = it.title.toString()
-                val s = SpannableString(title)
-                if (!isSortByValid) {
-                    s.setSpan(
-                        ForegroundColorSpan(color),
-                        0,
-                        s.length,
-                        0
-                    )
-                    it.title = s
-                } else {
-                    it.title = s
-                }
-            }
         }
     }
 }

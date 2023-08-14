@@ -42,6 +42,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -56,6 +57,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.io.File
@@ -85,6 +87,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentials: HasCredentials,
     private val getPublicNodeListByIds: GetPublicNodeListByIds,
+    private val setViewType: SetViewType,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
@@ -563,5 +566,9 @@ class MediaDiscoveryViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    suspend fun setListViewTypeClicked() {
+        setViewType(ViewType.LIST)
     }
 }

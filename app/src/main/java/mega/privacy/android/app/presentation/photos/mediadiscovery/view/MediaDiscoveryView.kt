@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -71,6 +72,8 @@ fun MediaDiscoveryView(
     onSwitchListView: () -> Unit,
 ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
+    val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
+
     if (mediaDiscoveryViewState.shouldBack)
         Back()
 
@@ -104,6 +107,9 @@ fun MediaDiscoveryView(
             onZoomOut()
             mediaDiscoveryViewModel.showSlidersPopup(false)
         },
+        enableSortBy = hasUIPhoto,
+        enableZoomIn = isZoomInValid(mediaDiscoveryViewState.currentZoomLevel) && hasUIPhoto,
+        enableZoomOut = isZoomOutValid(mediaDiscoveryViewState.currentZoomLevel) && hasUIPhoto,
     )
 
 
@@ -139,6 +145,9 @@ private fun SlidersDropDownMenu(
     onClickFilterDropdownMenuItem: () -> Unit,
     onClickZoomInDropdownMenuItem: () -> Unit,
     onClickZoomOutDropdownMenuItem: () -> Unit,
+    enableSortBy: Boolean,
+    enableZoomIn: Boolean,
+    enableZoomOut: Boolean,
 ) {
     Box(
         modifier = Modifier
@@ -152,9 +161,15 @@ private fun SlidersDropDownMenu(
             onDismissRequest = onDismissDropdownMenu
         ) {
             DropdownMenuItem(
-                onClick = onClickSortByDropdownMenuItem
+                onClick = onClickSortByDropdownMenuItem,
+                enabled = enableSortBy
             ) {
-                Text(stringResource(id = R.string.action_sort_by))
+                Text(
+                    text = stringResource(id = R.string.action_sort_by),
+                    modifier = if (enableSortBy)
+                        Modifier.alpha(1.0f)
+                    else Modifier.alpha(0.5f),
+                )
             }
             DropdownMenuItem(
                 onClick = onClickFilterDropdownMenuItem
@@ -162,14 +177,26 @@ private fun SlidersDropDownMenu(
                 Text(stringResource(id = R.string.photos_action_filter))
             }
             DropdownMenuItem(
-                onClick = onClickZoomInDropdownMenuItem
+                onClick = onClickZoomInDropdownMenuItem,
+                enabled = enableZoomIn,
             ) {
-                Text(stringResource(id = R.string.photos_action_zoom_in))
+                Text(
+                    stringResource(id = R.string.photos_action_zoom_in),
+                    modifier = if (enableZoomIn)
+                        Modifier.alpha(1.0f)
+                    else Modifier.alpha(0.5f),
+                )
             }
             DropdownMenuItem(
-                onClick = onClickZoomOutDropdownMenuItem
+                onClick = onClickZoomOutDropdownMenuItem,
+                enabled = enableZoomOut,
             ) {
-                Text(stringResource(id = R.string.photos_action_zoom_out))
+                Text(
+                    stringResource(id = R.string.photos_action_zoom_out),
+                    modifier = if (enableZoomOut)
+                        Modifier.alpha(1.0f)
+                    else Modifier.alpha(0.5f),
+                )
             }
         }
     }
