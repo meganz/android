@@ -172,9 +172,19 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      */
     private suspend fun isSaveToTextFileSuccessful(key: String, result: Intent): Boolean =
         withContext(Dispatchers.IO) {
+            val uri = result.data ?: return@withContext false
+            runCatching {
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }.onFailure {
+                Timber.e(it, "Failed to take persistable permission for uri: $uri")
+            }
             FileUtil.saveTextOnContentUri(
                 this@ExportRecoveryKeyActivity.contentResolver,
-                result.data,
+                uri,
                 key
             )
         }
