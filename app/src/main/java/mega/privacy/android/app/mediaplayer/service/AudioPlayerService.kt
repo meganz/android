@@ -92,6 +92,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     private var isForeground = true
 
+    private var audioClosable = true
+
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
     private val resumePlayRunnable = Runnable {
@@ -99,6 +101,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             setPlayWhenReady(true)
             needPlayWhenReceiveResumeCommand = false
         }
+        audioClosable = true
     }
 
     private var audioManager: AudioManager? = null
@@ -272,6 +275,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             }
 
             COMMAND_RESUME -> {
+                audioClosable = false
                 requestAudioFocus()
                 mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
             }
@@ -367,10 +371,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     }
 
     override fun stopPlayer() {
-        mediaPlayerGateway.playerStop()
+        if (audioClosable) {
+            mediaPlayerGateway.playerStop()
 
-        MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
-        stopSelf()
+            MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
+            stopSelf()
+        }
     }
 
     /**
