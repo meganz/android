@@ -60,7 +60,7 @@ fun CardListView(
         state = state
     ) {
         item(
-            span = { GridItemSpan(currentLineSpan = 1) }
+            span = { GridItemSpan(currentLineSpan = maxCurrentLineSpan) }
         ) {
             cardListViewHeaderView()
         }

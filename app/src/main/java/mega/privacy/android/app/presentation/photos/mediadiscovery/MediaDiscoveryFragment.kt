@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryView
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -153,6 +154,8 @@ class MediaDiscoveryFragment : Fragment() {
                             }
                             actionMode?.title = state.selectedPhotoIds.size.toString()
                         }
+
+                        handleSlidersMenuIconVisibility()
                     }
                 }
 
@@ -247,6 +250,8 @@ class MediaDiscoveryFragment : Fragment() {
                     return
                 }
                 menuInflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
+                this@MediaDiscoveryFragment.menu = menu
+                handleSlidersMenuIconVisibility()
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -263,6 +268,11 @@ class MediaDiscoveryFragment : Fragment() {
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun handleSlidersMenuIconVisibility() {
+        menu?.findItem(R.id.action_menu_sliders)?.isVisible =
+            mediaDiscoveryViewModel.state.value.selectedTimeBarTab == TimeBarTab.All
     }
 
     private fun handleZoomOut() {

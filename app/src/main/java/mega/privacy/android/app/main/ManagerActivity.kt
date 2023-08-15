@@ -2858,18 +2858,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         viewPagerShares.visibility = View.GONE
         fragmentContainer.visibility = View.VISIBLE
 
-        lifecycleScope.launch {
-            if (enableFileBrowserCompose) {
-                fileBrowserComposeFragment =
-                    (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
-                        ?: FileBrowserComposeFragment.newInstance()).also {
-                        replaceFragment(it, FragmentTag.CLOUD_DRIVE_COMPOSE.tag)
-                    }
-            } else {
-                (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE.tag) as? FileBrowserFragment
-                    ?: FileBrowserFragment.newInstance()).also {
-                    replaceFragment(it, FragmentTag.CLOUD_DRIVE.tag)
+        if (enableFileBrowserCompose) {
+            fileBrowserComposeFragment =
+                (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
+                    ?: FileBrowserComposeFragment.newInstance()).also {
+                    replaceFragment(it, FragmentTag.CLOUD_DRIVE_COMPOSE.tag)
                 }
+        } else {
+            (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE.tag) as? FileBrowserFragment
+                ?: FileBrowserFragment.newInstance()).also {
+                replaceFragment(it, FragmentTag.CLOUD_DRIVE.tag)
             }
         }
     }

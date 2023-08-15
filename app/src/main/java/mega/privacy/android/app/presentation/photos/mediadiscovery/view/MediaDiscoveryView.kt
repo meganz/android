@@ -161,6 +161,11 @@ private fun SlidersDropDownMenu(
             onDismissRequest = onDismissDropdownMenu
         ) {
             DropdownMenuItem(
+                onClick = onClickFilterDropdownMenuItem
+            ) {
+                Text(stringResource(id = R.string.photos_action_filter))
+            }
+            DropdownMenuItem(
                 onClick = onClickSortByDropdownMenuItem,
                 enabled = enableSortBy
             ) {
@@ -170,11 +175,6 @@ private fun SlidersDropDownMenu(
                         Modifier.alpha(1.0f)
                     else Modifier.alpha(0.5f),
                 )
-            }
-            DropdownMenuItem(
-                onClick = onClickFilterDropdownMenuItem
-            ) {
-                Text(stringResource(id = R.string.photos_action_filter))
             }
             DropdownMenuItem(
                 onClick = onClickZoomInDropdownMenuItem,

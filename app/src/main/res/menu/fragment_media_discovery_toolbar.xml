@@ -7,5 +7,6 @@
         android:orderInCategory="91"
         android:title="@string/photos_action_filter"
         android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 </menu>
