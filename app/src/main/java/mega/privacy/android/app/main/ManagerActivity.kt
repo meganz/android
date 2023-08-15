@@ -2923,6 +2923,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem == null) {
             return@launch
         }
+        if (drawerItem != DrawerItem.SYNC) {
+            supportActionBar?.show()
+        } else {
+            supportActionBar?.hide()
+        }
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
                 supportActionBar?.subtitle = null
@@ -2960,8 +2965,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.SYNC -> {
-                supportActionBar?.subtitle = null
-                supportActionBar?.title = "Sync"
                 viewModel.setIsFirstNavigationLevel(false)
             }
 

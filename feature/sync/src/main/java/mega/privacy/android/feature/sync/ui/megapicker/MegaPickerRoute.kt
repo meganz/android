@@ -17,6 +17,7 @@ internal fun MegaPickerRoute(
 
     state.value.nodes?.let { nodes ->
         MegaPickerScreen(
+            currentFolder = state.value.currentFolder,
             nodes = nodes,
             folderClicked = { viewModel.handleAction(FolderClicked(it)) },
             currentFolderSelected = {

@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 
 import android.content.res.Configuration
 import android.net.Uri
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -9,11 +10,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.controls.appbar.TopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -38,8 +43,57 @@ internal fun SyncNewFolderScreen(
     selectMegaFolderClicked: () -> Unit,
     syncClicked: () -> Unit,
 ) {
+    val onBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-    Column {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier.testTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR),
+                title = stringResource(R.string.sync_toolbar_title),
+                subtitle = "Choose folders",
+                elevation = false,
+                onBackPressed = {
+                    onBackPressedDispatcher?.onBackPressed()
+                }
+            )
+        }, content = { paddingValues ->
+            SyncNewFolderScreenContent(
+                localFolderSelected,
+                showDisableBatteryOptimizationsBanner,
+                batteryOptimizationLearnMoreButtonClicked,
+                batteryOptimizationAllowButtonClicked,
+                showAllFilesAccessBanner,
+                allFilesAccessBannerClicked,
+                selectMegaFolderClicked,
+                folderNameChanged,
+                folderPairName,
+                selectedLocalFolder,
+                selectedMegaFolder,
+                syncClicked,
+                Modifier.padding(paddingValues)
+            )
+        }
+    )
+}
+
+@Composable
+private fun SyncNewFolderScreenContent(
+    localFolderSelected: (Uri) -> Unit,
+    showDisableBatteryOptimizationsBanner: Boolean,
+    batteryOptimizationLearnMoreButtonClicked: () -> Unit,
+    batteryOptimizationAllowButtonClicked: () -> Unit,
+    showAllFilesAccessBanner: Boolean,
+    allFilesAccessBannerClicked: () -> Unit,
+    selectMegaFolderClicked: () -> Unit,
+    folderNameChanged: (String) -> Unit,
+    folderPairName: String,
+    selectedLocalFolder: String,
+    selectedMegaFolder: RemoteFolder?,
+    syncClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier) {
         val folderPicker = launchFolderPicker {
             localFolderSelected(it)
         }
@@ -83,7 +137,10 @@ internal fun SyncNewFolderScreen(
         )
 
         Box(
-            Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+            Modifier
+                .fillMaxWidth()
+                .testTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON),
+            contentAlignment = Alignment.Center
         ) {
             val buttonEnabled =
                 selectedLocalFolder.isNotBlank()
@@ -101,6 +158,11 @@ internal fun SyncNewFolderScreen(
         }
     }
 }
+
+internal const val TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR =
+    "sync_new_folder_screen_toolbar_test_tag"
+internal const val TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON =
+    "sync_new_folder_screen_sync_button_test_tag"
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)

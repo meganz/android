@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="sync_toolbar_title">Sync</string>
     <string name="start_screen_setting" />
     <string name="general_select" />
     <string name="sync_button_label">Sync</string>

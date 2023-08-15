@@ -45,14 +45,19 @@ internal fun NavGraphBuilder.syncNavGraph(
                     navController.navigate(syncMegaPicker)
                 }, openNextScreen = {
                     navController.navigate(syncList)
-                })
+                }, onBackClicked = {
+                    navController.popBackStack()
+                }
+            )
         }
         composable(route = syncMegaPicker) {
-            MegaPickerRoute(viewModel = hiltViewModel(), folderSelected = {
-                navController.popBackStack()
-            }, backClicked = {
-                navController.popBackStack()
-            }
+            MegaPickerRoute(
+                hiltViewModel(),
+                folderSelected = {
+                    navController.popBackStack()
+                }, backClicked = {
+                    navController.popBackStack()
+                }
             )
         }
         composable(route = syncList) {

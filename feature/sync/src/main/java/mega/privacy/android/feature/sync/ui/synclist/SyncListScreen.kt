@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,10 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.controls.appbar.TopAppBar
 import mega.privacy.android.core.ui.controls.chips.PhotoChip
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -44,7 +48,42 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip.COMPLETED
 
 @Composable
 internal fun SyncListScreen(
-    modifier: Modifier = Modifier,
+    syncUiItems: List<SyncUiItem>,
+    cardExpanded: (SyncUiItem, Boolean) -> Unit,
+    removeFolderClicked: (folderPairId: Long) -> Unit,
+    addFolderClicked: () -> Unit,
+) {
+    val onBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(R.string.sync_toolbar_title),
+                subtitle = null,
+                elevation = false,
+                onBackPressed = {
+                    onBackPressedDispatcher?.onBackPressed()
+                }
+            )
+        }, content = { paddingValues ->
+            SyncListScreenContent(
+                Modifier
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                syncUiItems,
+                cardExpanded,
+                removeFolderClicked,
+                addFolderClicked
+            )
+        }
+    )
+
+}
+
+@Composable
+private fun SyncListScreenContent(
+    modifier: Modifier,
     syncUiItems: List<SyncUiItem>,
     cardExpanded: (SyncUiItem, Boolean) -> Unit,
     removeFolderClicked: (folderPairId: Long) -> Unit,
@@ -169,7 +208,7 @@ internal const val TAG_SYNC_LIST_SCREEN_NO_ITEMS = "sync_list_screen_no_items"
 @Composable
 private fun PreviewSyncListScreen() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        SyncListScreen(Modifier.padding(16.dp), listOf(
+        SyncListScreen(listOf(
             SyncUiItem(
                 1,
                 folderPairName = "folderPair 1",
@@ -205,10 +244,11 @@ private fun PreviewSyncListScreen() {
 @Composable
 private fun PreviewEmptyScreen() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        SyncListScreen(Modifier.padding(16.dp),
+        SyncListScreen(
             listOf(),
             cardExpanded = { _, _ -> },
             removeFolderClicked = {},
-            addFolderClicked = {})
+            addFolderClicked = {}
+        )
     }
 }

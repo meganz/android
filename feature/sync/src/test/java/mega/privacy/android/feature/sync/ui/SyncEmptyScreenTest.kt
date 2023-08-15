@@ -25,9 +25,11 @@ internal class SyncEmptyScreenTest {
             SyncEmptyScreen({})
         }
 
+        composeTestRule.onNodeWithTag(TAG_SYNC_EMPTY_SCREEN_TOOLBAR)
+            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TAG_SYNC_EMPTY_SCREEN_ILLUSTRATION)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sync")
+        composeTestRule.onNodeWithTag(TAG_SYNC_EMPTY_ONBOARDING_TITLE)
             .assertIsDisplayed()
         composeTestRule.onNodeWithText("You will need to set up a local folder on your \n" + "device that would pair with a chosen folder on \n" + "your Cloud Drive.")
             .assertIsDisplayed()

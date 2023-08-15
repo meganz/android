@@ -3,15 +3,17 @@ package mega.privacy.android.feature.sync.ui
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
+import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON
+import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Rule
 import org.junit.Test
@@ -42,10 +44,13 @@ class SyncNewFolderScreenRouteTest {
                 viewModel,
                 syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = {},
-                openSelectMegaFolderScreen = {}
+                openSelectMegaFolderScreen = {},
+                onBackClicked = {}
             )
         }
 
+        composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR)
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText("Device folder")
             .assertIsDisplayed()
         composeTestRule.onNodeWithText("MEGA folder")
@@ -54,7 +59,7 @@ class SyncNewFolderScreenRouteTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText("Two way sync")
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sync")
+        composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON)
             .assertIsDisplayed()
     }
 
@@ -68,7 +73,8 @@ class SyncNewFolderScreenRouteTest {
                 viewModel,
                 syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = {},
-                openSelectMegaFolderScreen = {}
+                openSelectMegaFolderScreen = {},
+                onBackClicked = {}
             )
         }
 
@@ -86,7 +92,8 @@ class SyncNewFolderScreenRouteTest {
                 viewModel,
                 syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = {},
-                openSelectMegaFolderScreen = {}
+                openSelectMegaFolderScreen = {},
+                onBackClicked = {}
             )
         }
 
@@ -111,7 +118,8 @@ class SyncNewFolderScreenRouteTest {
                 viewModel,
                 openNextScreen = {},
                 syncPermissionsManager = syncPermissionsManager,
-                openSelectMegaFolderScreen = {}
+                openSelectMegaFolderScreen = {},
+                onBackClicked = {}
             )
         }
 
@@ -130,11 +138,12 @@ class SyncNewFolderScreenRouteTest {
                 viewModel,
                 syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = openNextScreenCallback,
-                openSelectMegaFolderScreen = {}
+                openSelectMegaFolderScreen = {},
+                onBackClicked = {}
             )
         }
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_button_label))
+        composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON)
             .performClick()
 
         verifyNoInteractions(openNextScreenCallback)
@@ -151,7 +160,8 @@ class SyncNewFolderScreenRouteTest {
                 viewModel,
                 openNextScreen = {},
                 syncPermissionsManager = syncPermissionsManager,
-                openSelectMegaFolderScreen = openSelectMegaFolderScreenLambda
+                openSelectMegaFolderScreen = openSelectMegaFolderScreenLambda,
+                onBackClicked = {}
             )
         }
 
@@ -175,7 +185,8 @@ class SyncNewFolderScreenRouteTest {
                 viewModel,
                 openNextScreen = {},
                 syncPermissionsManager = syncPermissionsManager,
-                openSelectMegaFolderScreen = { }
+                openSelectMegaFolderScreen = { },
+                onBackClicked = {}
             )
         }
 
@@ -203,7 +214,8 @@ class SyncNewFolderScreenRouteTest {
                 viewModel,
                 openNextScreen = {},
                 syncPermissionsManager = syncPermissionsManager,
-                openSelectMegaFolderScreen = { }
+                openSelectMegaFolderScreen = { },
+                onBackClicked = {}
             )
         }
 

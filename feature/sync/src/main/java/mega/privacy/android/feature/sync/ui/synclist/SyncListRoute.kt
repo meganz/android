@@ -16,7 +16,6 @@ internal fun SyncListRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     SyncListScreen(
-        Modifier.padding(16.dp),
         syncUiItems = state.syncUiItems,
         cardExpanded = { syncUiItem, expanded ->
             viewModel.handleAction(CardExpanded(syncUiItem, expanded))

@@ -1,29 +1,77 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.controls.appbar.TopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.R
+import nz.mega.sdk.MegaApiJava
 
 @Composable
 internal fun MegaPickerScreen(
+    currentFolder: Node?,
     nodes: List<TypedNode>,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
 ) {
 
-    Column {
+    val onBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    val showCurrentFolderName =
+        currentFolder != null &&
+                currentFolder.parentId != NodeId(MegaApiJava.INVALID_HANDLE)
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = currentFolder?.name?.takeIf { showCurrentFolderName }
+                    ?: stringResource(R.string.sync_toolbar_title),
+                subtitle = if (showCurrentFolderName) {
+                    null
+                } else {
+                    "Select folder"
+                },
+                elevation = false,
+                onBackPressed = {
+                    onBackPressedDispatcher?.onBackPressed()
+                }
+            )
+        }, content = { paddingValues ->
+            MegaPickerScreenContent(
+                nodes,
+                folderClicked,
+                currentFolderSelected,
+                Modifier.padding(paddingValues)
+            )
+        }
+    )
+}
+
+@Composable
+private fun MegaPickerScreenContent(
+    nodes: List<TypedNode>,
+    folderClicked: (TypedNode) -> Unit,
+    currentFolderSelected: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier) {
         MegaFolderPickerView(
             modifier =
             Modifier
@@ -64,6 +112,7 @@ internal fun MegaPickerScreen(
 private fun PreviewSyncNewFolderScreen() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MegaPickerScreen(
+            null,
             SampleNodeDataProvider.values,
             {},
             {}
