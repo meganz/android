@@ -17,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +35,8 @@ import mega.privacy.android.core.ui.model.SpanStyleWithAnnotation
  * key is [SpanIndicator] for open and close tags, value is the [SpanStyle]
  * @param modifier
  * @param color the color apply for all text
+ * @param maxLines Maximum number of lines for the text to span
+ * @param overflow How visual overflow should be handled
  */
 @Composable
 fun MegaSpannedText(
@@ -42,12 +45,16 @@ fun MegaSpannedText(
     styles: Map<SpanIndicator, SpanStyle>,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
 ) {
     Text(
         modifier = modifier,
         text = spannedText(value, styles),
         style = baseStyle,
         color = color,
+        maxLines = maxLines,
+        overflow = overflow,
     )
 }
 
@@ -123,32 +130,50 @@ private fun spannedTextWithAnnotation(
 ) =
     buildAnnotatedString {
         var temp = value
-        styles.toSortedMap(compareBy { value.indexOf(it.openTag) }).forEach { item ->
-            val start = temp.indexOf(string = item.key.openTag)
-            val end = temp.indexOf(string = item.key.closeTag, startIndex = start)
-            if (start > 0) {
-                append(temp.substring(0, start))
-            }
-            if (start >= 0 && (start + item.key.openTag.length < end)) {
-                item.value.annotation?.let {
-                    withAnnotation(ANNOTATION_TAG, it) {
-                        withStyle(item.value.spanStyle) {
-                            append(temp.substring(start + item.key.openTag.length, end))
+        while (temp.isNotEmpty()) {
+            val nextTag = styles.keys.mapNotNull { tag ->
+                val start = temp.indexOf(tag.openTag)
+                if (start >= 0) start to tag else null
+            }.minByOrNull { it.first }
+
+            if (nextTag != null) {
+                val (start, tag) = nextTag
+                val end = temp.indexOf(tag.closeTag, startIndex = start)
+
+                if (start > 0) {
+                    append(temp.substring(0, start))
+                }
+
+                if (start in 0 until end) {
+                    val contentStart = start + tag.openTag.length
+                    if (contentStart < end) {
+                        val spanStyleWithAnnotation = styles[tag]
+                        spanStyleWithAnnotation?.annotation?.let {
+                            withAnnotation(ANNOTATION_TAG, it) {
+                                withStyle(spanStyleWithAnnotation.spanStyle) {
+                                    append(temp.substring(contentStart, end))
+                                }
+                            }
+                        } ?: run {
+                            spanStyleWithAnnotation?.spanStyle?.let { style ->
+                                withStyle(style) {
+                                    append(temp.substring(contentStart, end))
+                                }
+                            }
                         }
                     }
-                } ?: run {
-                    withStyle(item.value.spanStyle) {
-                        append(temp.substring(start + item.key.openTag.length, end))
-                    }
                 }
-                val index = end + item.key.closeTag.length
-                if (index < temp.length + 1) {
-                    temp = temp.substring(index)
+
+                val index = end + tag.closeTag.length
+                temp = if (index <= temp.length) {
+                    temp.substring(index)
+                } else {
+                    ""
                 }
+            } else {
+                append(temp)
+                temp = ""
             }
-        }
-        if (temp.isNotEmpty()) {
-            append(temp)
         }
     }
 

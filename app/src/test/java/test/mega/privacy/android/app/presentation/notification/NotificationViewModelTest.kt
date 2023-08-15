@@ -1,6 +1,6 @@
 package test.mega.privacy.android.app.presentation.notification
 
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.notification.NotificationViewModel
 import mega.privacy.android.app.presentation.notification.model.Notification
-import mega.privacy.android.app.presentation.notification.model.SchedMeetingNotification
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.UserAlert
@@ -76,10 +75,8 @@ class NotificationViewModelTest {
             sectionColour = 0,
             sectionIcon = null,
             title = { "" },
-            titleTextSize = 16.dp,
-            titleMaxWidth = { 200 },
+            titleTextSize = 16.sp,
             description = { "" },
-            descriptionMaxWidth = { 300 },
             schedMeetingNotification = null,
             dateText = { "" },
             isNew = true,
@@ -108,10 +105,8 @@ class NotificationViewModelTest {
             sectionColour = 0,
             sectionIcon = null,
             title = { "Initial" },
-            titleTextSize = 16.dp,
-            titleMaxWidth = { 200 },
+            titleTextSize = 16.sp,
             description = { "" },
-            descriptionMaxWidth = { 300 },
             schedMeetingNotification = null,
             dateText = { "" },
             isNew = true,

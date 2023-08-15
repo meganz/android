@@ -1,9 +1,7 @@
 package mega.privacy.android.app.presentation.notification.view
 
+import android.content.Context
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.text.TextUtils
-import android.util.TypedValue
-import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,23 +22,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
-import mega.privacy.android.app.utils.StyleUtils.setTextStyle
+import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.core.ui.theme.extensions.grey_500_grey_400
+import mega.privacy.android.core.ui.theme.extensions.grey_900_grey_100
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
-import mega.privacy.android.core.ui.utils.dpToSp
 import mega.privacy.android.core.ui.utils.intToDp
 
 @Composable
@@ -66,11 +67,17 @@ internal fun NotificationItemView(
 
         NotificationSectionRow(notification)
 
-        val showDescription = !notification.description(LocalContext.current).isNullOrBlank()
-        NotificationTitleRow(showDescription, notification)
+        val description = notification.description(LocalContext.current)
 
-        if (showDescription) {
-            NotificationDescription(notification)
+        NotificationTitleRow(
+            notification.title,
+            notification.titleTextSize,
+            notification.isNew,
+            !description.isNullOrBlank()
+        )
+
+        if (!description.isNullOrBlank()) {
+            NotificationDescription(description)
         }
 
         if (notification.schedMeetingNotification?.scheduledMeeting != null) {
@@ -128,81 +135,74 @@ private fun NotificationSectionRow(
 
 @Composable
 private fun NotificationTitleRow(
-    showDescription: Boolean,
-    notification: Notification,
+    title: (Context) -> String,
+    textSize: TextUnit,
+    showNewIcon: Boolean,
+    reducedLines: Boolean,
 ) {
-    val titleMaxLines = if (showDescription) 1 else 3
-    val titleText = notification.title(LocalContext.current)
-    val titleTextSize = dpToSp(dp = notification.titleTextSize).value
-    val titleMaxWidth = notification.titleMaxWidth(LocalContext.current)
+    val titleText = title(LocalContext.current)
+    val titleMaxLines = if (reducedLines) 1 else 3
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, end = 16.dp)) {
-
-        AndroidView(
-            factory = { context ->
-                TextView(context).apply {
-                    maxLines = titleMaxLines
-                    ellipsize = TextUtils.TruncateAt.END
-                    setTextStyle(
-                        textAppearance = R.style.TextAppearance_Mega_Subtitle1_Medium_Variant,
-                    )
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, titleTextSize)
-                    titleMaxWidth?.let {
-                        maxWidth = it
-                    }
-                }
-            },
-            update = { it.text = titleText },
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp)
+    ) {
+        MegaSpannedText(
+            value = titleText,
+            baseStyle = MaterialTheme.typography.subtitle1.copy(
+                fontWeight = FontWeight.Medium,
+                fontSize = textSize,
+            ),
+            styles = mapOf(
+                SpanIndicator('A') to SpanStyle(color = MaterialTheme.colors.grey_900_grey_100),
+                SpanIndicator('B') to SpanStyle(color = MaterialTheme.colors.grey_500_grey_400)
+            ),
+            maxLines = titleMaxLines,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .padding(top = 2.dp)
                 .weight(1f)
                 .testTag("Title")
         )
 
-        if (notification.isNew) {
-            Box(modifier = Modifier
-                .padding(start = 12.dp)
-                .background(
-                    color = MaterialTheme.colors.secondary,
-                    shape = RoundedCornerShape(12.dp)
-                )) {
-                Text(text = stringResource(id = R.string.new_label_notification_item),
+        if (showNewIcon) {
+            Box(
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .background(
+                        color = MaterialTheme.colors.secondary,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            ) {
+                Text(
+                    text = stringResource(id = R.string.new_label_notification_item),
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 3.dp)
                         .testTag("IsNew"),
                     color = if (MaterialTheme.colors.isLight) white_alpha_087 else grey_alpha_087,
                     fontSize = 12.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }
 }
 
 @Composable
-private fun NotificationDescription(
-    notification: Notification,
-) {
-    val descriptionText = notification.description(LocalContext.current)
-    val descriptionMaxWidth = notification.descriptionMaxWidth(LocalContext.current)
-
-    AndroidView(
-        factory = { context ->
-            TextView(context).apply {
-                maxLines = 3
-                ellipsize = TextUtils.TruncateAt.END
-                setTextStyle(
-                    textAppearance = R.style.TextAppearance_Mega_Subtitle2_Medium,
-                )
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                descriptionMaxWidth?.let {
-                    maxWidth = it
-                }
-            }
-        },
-        update = { it.text = descriptionText },
+private fun NotificationDescription(description: String) {
+    MegaSpannedText(
+        value = description,
+        baseStyle = MaterialTheme.typography.subtitle2.copy(
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+        ),
+        styles = mapOf(
+            SpanIndicator('A') to SpanStyle(color = MaterialTheme.colors.grey_900_grey_100),
+            SpanIndicator('B') to SpanStyle(color = MaterialTheme.colors.grey_500_grey_400)
+        ),
+        overflow = TextOverflow.Ellipsis,
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp, top = 3.dp)
             .testTag("Description")
@@ -234,7 +234,6 @@ private fun NotificationDivider(horizontalPadding: Int) {
         thickness = 1.dp)
 }
 
-
 @Preview
 @Preview(uiMode = UI_MODE_NIGHT_YES, name = "PreviewNotificationItemViewDark")
 @Composable
@@ -244,10 +243,8 @@ private fun PreviewNotificationItemView() {
         sectionColour = R.color.orange_400_orange_300,
         sectionIcon = null,
         title = { "New Contact" },
-        titleTextSize = 16.dp,
-        titleMaxWidth = { 200 },
+        titleTextSize = 16.sp,
         description = { "xyz@gmail.com is now a contact" },
-        descriptionMaxWidth = { 300 },
         schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
         isNew = true,

@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.notification.model.extensions
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
 import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
@@ -31,7 +30,7 @@ import mega.privacy.android.domain.entity.UserAlert
  * Description
  *
  */
-internal fun UserAlert.description(): (Context) -> CharSequence? =
+internal fun UserAlert.description(): (Context) -> String? =
     when (this) {
         is ContactAlert -> getDescriptionFunction()
         is ScheduledMeetingAlert -> getDescriptionFunction()
@@ -63,19 +62,17 @@ private fun ContactAlert.getDescriptionId(): Int? = when (this) {
  * Get description function
  *
  */
-private fun ContactAlert.getDescriptionFunction(): (Context) -> CharSequence? =
-    { context ->
-        this.getDescriptionId()?.let {
-            context.getString(it, this.contact.getNicknameStringOrEmail(context))
-                .spanABTextFontColour(context)
-        }
+private fun ContactAlert.getDescriptionFunction(): (Context) -> String? = { context ->
+    this.getDescriptionId()?.let {
+        context.getString(it, contact.getNicknameStringOrEmail(context))
     }
+}
 
 /**
  * Get description function
  *
  */
-private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSequence? =
+private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> String? =
     { context ->
         val user = email ?: context.getString(R.string.unknown_name_label)
         when (this) {
@@ -85,32 +82,36 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                 } else {
                     R.string.notification_subtitle_scheduled_meeting_new
                 }
-                context.getString(stringRes, user).spanABTextFontColour(context)
+                context.getString(stringRes, user)
             }
+
             is UpdatedScheduledMeetingCancelAlert, is DeletedScheduledMeetingAlert -> {
                 val stringRes = when {
                     isOccurrence -> R.string.notification_subtitle_scheduled_recurring_meeting_occurrence_canceled
                     isRecurring -> R.string.notification_subtitle_scheduled_recurring_meeting_canceled
                     else -> R.string.notification_subtitle_scheduled_meeting_canceled
                 }
-                context.getString(stringRes, user).spanABTextFontColour(context)
+                context.getString(stringRes, user)
             }
+
             is UpdatedScheduledMeetingTitleAlert -> {
                 context.getString(
                     R.string.notification_subtitle_scheduled_meeting_updated_title,
                     user,
                     oldTitle,
                     title
-                ).spanABTextFontColour(context)
+                )
             }
+
             is UpdatedScheduledMeetingDescriptionAlert -> {
                 val stringRes = if (isRecurring) {
                     R.string.notification_subtitle_scheduled_recurring_meeting_updated_description
                 } else {
                     R.string.notification_subtitle_scheduled_meeting_updated_description
                 }
-                context.getString(stringRes, user).spanABTextFontColour(context)
+                context.getString(stringRes, user)
             }
+
             is UpdatedScheduledMeetingDateTimeAlert -> {
                 val stringRes = when {
                     isOccurrence -> R.string.notification_subtitle_scheduled_recurring_meeting_updated_occurrence
@@ -121,18 +122,18 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                         R.string.notification_subtitle_scheduled_meeting_updated_time
                     }
                 }
-                context.getString(stringRes, user).spanABTextFontColour(context)
+                context.getString(stringRes, user)
             }
+
             is UpdatedScheduledMeetingFieldsAlert -> {
                 val stringRes = if (isRecurring) {
                     R.string.notification_subtitle_scheduled_recurring_meeting_updated_multiple
                 } else {
                     R.string.notification_subtitle_scheduled_meeting_updated_multiple
                 }
-                context.getString(stringRes, user).spanABTextFontColour(context)
+                context.getString(stringRes, user)
             }
-            else -> {
-                null
-            }
+
+            else -> null
         }
     }

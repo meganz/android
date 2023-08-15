@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.notification.model
 import android.content.Context
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 
 /**
  * Notification
@@ -13,9 +13,7 @@ import androidx.compose.ui.unit.Dp
  * @property sectionIcon
  * @property title
  * @property titleTextSize
- * @property titleMaxWidth
  * @property description
- * @property descriptionMaxWidth
  * @property schedMeetingNotification
  * @property dateText
  * @property isNew
@@ -28,11 +26,9 @@ data class Notification constructor(
     val sectionTitle: (Context) -> String,
     @ColorRes val sectionColour: Int,
     @DrawableRes val sectionIcon: Int?,
-    val title: (Context) -> CharSequence,
-    val titleTextSize: Dp,
-    val titleMaxWidth: (Context) -> Int?,
-    val description: (Context) -> CharSequence?,
-    val descriptionMaxWidth: (Context) -> Int?,
+    val title: (Context) -> String,
+    val titleTextSize: TextUnit,
+    val description: (Context) -> String?,
     val schedMeetingNotification: SchedMeetingNotification?,
     val dateText: (Context) -> String,
     val isNew: Boolean,

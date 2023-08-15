@@ -5,7 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
@@ -40,10 +40,8 @@ class NotificationViewTest {
                 sectionColour = R.color.orange_400_orange_300,
                 sectionIcon = null,
                 title = { "New Contact" },
-                titleTextSize = 16.dp,
-                titleMaxWidth = { 200 },
+                titleTextSize = 16.sp,
                 description = { "xyz@gmail.com is now a contact" },
-                descriptionMaxWidth = { 300 },
                 schedMeetingNotification = null,
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
@@ -64,10 +62,8 @@ class NotificationViewTest {
                     sectionColour = R.color.orange_400_orange_300,
                     sectionIcon = null,
                     title = { "New Contact" },
-                    titleTextSize = 16.dp,
-                    titleMaxWidth = { 200 },
+                    titleTextSize = 16.sp,
                     description = { "xyz@gmail.com is now a contact" },
-                    descriptionMaxWidth = { 300 },
                     schedMeetingNotification = null,
                     dateText = { "11 October 2022 6:46 pm" },
                     isNew = true,
@@ -79,10 +75,8 @@ class NotificationViewTest {
                     sectionColour = R.color.orange_400_orange_300,
                     sectionIcon = null,
                     title = { "New Incoming Share" },
-                    titleTextSize = 16.dp,
-                    titleMaxWidth = { 200 },
+                    titleTextSize = 16.sp,
                     description = { "Access to the folders shared by xyz@gmail.com were removed" },
-                    descriptionMaxWidth = { 300 },
                     schedMeetingNotification = null,
                     dateText = { "13 May 2022 5:46 am" },
                     isNew = true,
@@ -102,10 +96,8 @@ class NotificationViewTest {
                 sectionColour = R.color.orange_400_orange_300,
                 sectionIcon = null,
                 title = { "New Contact" },
-                titleTextSize = 16.dp,
-                titleMaxWidth = { 200 },
+                titleTextSize = 16.sp,
                 description = { "xyz@gmail.com is now a contact" },
-                descriptionMaxWidth = { 300 },
                 schedMeetingNotification = null,
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
@@ -125,10 +117,8 @@ class NotificationViewTest {
                 sectionColour = R.color.orange_400_orange_300,
                 sectionIcon = null,
                 title = { "New Contact" },
-                titleTextSize = 16.dp,
-                titleMaxWidth = { 200 },
+                titleTextSize = 16.sp,
                 description = { "xyz@gmail.com is now a contact" },
-                descriptionMaxWidth = { 300 },
                 schedMeetingNotification = null,
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
@@ -137,7 +127,7 @@ class NotificationViewTest {
             ) {}
             )))
         }
-        composeRule.onNodeWithTag("Title").assertIsDisplayed()
+        composeRule.onNodeWithTag("Title", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -148,10 +138,8 @@ class NotificationViewTest {
                 sectionColour = R.color.orange_400_orange_300,
                 sectionIcon = null,
                 title = { "New Contact" },
-                titleTextSize = 16.dp,
-                titleMaxWidth = { 200 },
+                titleTextSize = 16.sp,
                 description = { "xyz@gmail.com is now a contact" },
-                descriptionMaxWidth = { 300 },
                 schedMeetingNotification = null,
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
@@ -160,7 +148,7 @@ class NotificationViewTest {
             ) {}
             )))
         }
-        composeRule.onNodeWithTag("Description").assertIsDisplayed()
+        composeRule.onNodeWithTag("Description", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -171,10 +159,8 @@ class NotificationViewTest {
                 sectionColour = R.color.orange_400_orange_300,
                 sectionIcon = null,
                 title = { "New Contact" },
-                titleTextSize = 16.dp,
-                titleMaxWidth = { 200 },
+                titleTextSize = 16.sp,
                 description = { null },
-                descriptionMaxWidth = { 300 },
                 schedMeetingNotification = null,
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
@@ -194,10 +180,8 @@ class NotificationViewTest {
                 sectionColour = R.color.orange_400_orange_300,
                 sectionIcon = null,
                 title = { "New Contact" },
-                titleTextSize = 16.dp,
-                titleMaxWidth = { 200 },
+                titleTextSize = 16.sp,
                 description = { "xyz@gmail.com is now a contact" },
-                descriptionMaxWidth = { 300 },
                 schedMeetingNotification = null,
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
@@ -217,10 +201,8 @@ class NotificationViewTest {
                 sectionColour = R.color.orange_400_orange_300,
                 sectionIcon = null,
                 title = { "New Contact" },
-                titleTextSize = 16.dp,
-                titleMaxWidth = { 200 },
+                titleTextSize = 16.sp,
                 description = { "xyz@gmail.com is now a contact" },
-                descriptionMaxWidth = { 300 },
                 schedMeetingNotification = null,
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
@@ -240,10 +222,8 @@ class NotificationViewTest {
                 sectionColour = R.color.orange_400_orange_300,
                 sectionIcon = null,
                 title = { "New Contact" },
-                titleTextSize = 16.dp,
-                titleMaxWidth = { 200 },
+                titleTextSize = 16.sp,
                 description = { "xyz@gmail.com is now a contact" },
-                descriptionMaxWidth = { 300 },
                 schedMeetingNotification = null,
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = false,

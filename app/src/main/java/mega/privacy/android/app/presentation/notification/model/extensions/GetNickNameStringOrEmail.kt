@@ -13,7 +13,7 @@ internal fun Contact.getNicknameStringOrEmail(context: Context): String {
     val emailOrDefault = email ?: context.getString(R.string.unknown_name_label)
     return nickname?.let {
         String.format(
-            format = context.getString(R.string.section_notification_user_with_nickname),
+            format = context.getString(R.string.location_label),
             it,
             emailOrDefault
         )

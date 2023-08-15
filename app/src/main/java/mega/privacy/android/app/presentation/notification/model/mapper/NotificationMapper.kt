@@ -4,7 +4,6 @@ import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.extensions.backgroundColor
 import mega.privacy.android.app.presentation.notification.model.extensions.dateText
 import mega.privacy.android.app.presentation.notification.model.extensions.description
-import mega.privacy.android.app.presentation.notification.model.extensions.descriptionMaxWidth
 import mega.privacy.android.app.presentation.notification.model.extensions.onClick
 import mega.privacy.android.app.presentation.notification.model.extensions.schedMeetingNotification
 import mega.privacy.android.app.presentation.notification.model.extensions.sectionColour
@@ -12,7 +11,6 @@ import mega.privacy.android.app.presentation.notification.model.extensions.secti
 import mega.privacy.android.app.presentation.notification.model.extensions.sectionTitle
 import mega.privacy.android.app.presentation.notification.model.extensions.separatorMargin
 import mega.privacy.android.app.presentation.notification.model.extensions.title
-import mega.privacy.android.app.presentation.notification.model.extensions.titleMaxWidth
 import mega.privacy.android.app.presentation.notification.model.extensions.titleTextSize
 import mega.privacy.android.domain.entity.UserAlert
 
@@ -31,9 +29,7 @@ internal fun getNotification(alert: UserAlert) = Notification(
     sectionIcon = alert.sectionIcon(),
     title = alert.title(),
     titleTextSize = alert.titleTextSize(),
-    titleMaxWidth = alert.titleMaxWidth(),
     description = alert.description(),
-    descriptionMaxWidth = alert.descriptionMaxWidth(),
     schedMeetingNotification = alert.schedMeetingNotification(),
     dateText = alert.dateText(),
     isNew = !alert.seen,
