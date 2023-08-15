@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.managerSections
 
+import android.content.DialogInterface
 import android.graphics.Canvas
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -147,9 +149,7 @@ internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
 
     override fun cancelTransfers() {
         adapter?.run {
-            (requireActivity() as ManagerActivity).showConfirmationCancelSelectedTransfers(
-                getSelectedTransfers()
-            )
+            showConfirmationCancelSelectedTransfers(getSelectedTransfers())
         }
     }
 
@@ -275,6 +275,18 @@ internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                 }
                 viewModel.markHandledPauseOrResumeTransferResult()
             }
+            uiState.cancelTransfersResult?.let {
+                if (it.isSuccess) {
+                    requireActivity().invalidateOptionsMenu()
+                } else {
+                    (activity as? ManagerActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        getString(R.string.error_general_nodes),
+                        -1
+                    )
+                }
+                viewModel.markHandledCancelTransfersResult()
+            }
         }
     }
 
@@ -393,6 +405,26 @@ internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
      */
     fun refresh() {
         adapter?.notifyDataSetChanged()
+    }
+
+    private fun showConfirmationCancelSelectedTransfers(selectedTransfers: List<Transfer>) {
+        if (selectedTransfers.isEmpty()) return
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage(
+                resources.getQuantityString(
+                    R.plurals.cancel_selected_transfers,
+                    selectedTransfers.size
+                )
+            )
+            .setPositiveButton(
+                R.string.button_continue
+            ) { _: DialogInterface?, _: Int ->
+                viewModel.cancelTransfersByTag(selectedTransfers.map { it.tag })
+                destroyActionMode()
+            }
+            .setNegativeButton(R.string.general_dismiss, null)
+            .setCancelable(false)
+            .show()
     }
 
     companion object {

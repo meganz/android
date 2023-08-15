@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +22,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetFailedOrCanceledTransfersUseCase
@@ -57,6 +60,7 @@ class TransfersViewModel @Inject constructor(
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase,
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -417,5 +421,31 @@ class TransfersViewModel @Inject constructor(
      */
     fun markHandledPauseOrResumeTransferResult() {
         _uiState.update { it.copy(pauseOrResumeTransferResult = null) }
+    }
+
+    /**
+     * Cancel transfers by tag
+     *
+     * @param tags
+     */
+    fun cancelTransfersByTag(tags: List<Int>) {
+        viewModelScope.launch {
+            val result = runCatching {
+                tags.map {
+                    async {
+                        cancelTransferByTagUseCase(it)
+                    }
+                }.awaitAll()
+                Unit
+            }
+            _uiState.update { it.copy(cancelTransfersResult = result) }
+        }
+    }
+
+    /**
+     * Mark handled cancel transfer result
+     */
+    fun markHandledCancelTransfersResult() {
+        _uiState.update { it.copy(cancelTransfersResult = null) }
     }
 }

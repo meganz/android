@@ -502,7 +502,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var storageStateFromBroadcast: StorageState = StorageState.Unknown //Default value
     private var showStorageAlertWithDelay = false
 
-    private var confirmationTransfersDialog: AlertDialog? = null
     private var reconnectDialog: AlertDialog? = null
 
     private lateinit var navigationDrawerAddPhoneContainer: RelativeLayout
@@ -2777,7 +2776,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             .removeObserver(fabChangeObserver)
         cancelSearch()
         reconnectDialog?.cancel()
-        confirmationTransfersDialog?.dismiss()
         dismissAlertDialogIfExists(processFileDialog)
         dismissAlertDialogIfExists(openLinkDialog)
         nodeSaver.destroy()
@@ -7671,19 +7669,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            MegaRequest.TYPE_CANCEL_TRANSFER -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    updateTransfersWidget()
-                    supportInvalidateOptionsMenu()
-                } else {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_general_nodes),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-
             MegaRequest.TYPE_CREATE_FOLDER -> {
                 dismissAlertDialogIfExists(statusDialog)
                 if (e.errorCode == MegaError.API_OK) {
@@ -7939,44 +7924,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("onNodesSharedUpdate")
         refreshSharesFragments()
         refreshSharesPageAdapter()
-    }
-
-    /**
-     * Shows a warning to ensure if it is sure of cancel selected transfers.
-     */
-    fun showConfirmationCancelSelectedTransfers(selectedTransfers: List<Transfer>) {
-        if (selectedTransfers.isEmpty()) {
-            return
-        }
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setMessage(
-            resources.getQuantityString(
-                R.plurals.cancel_selected_transfers,
-                selectedTransfers.size
-            )
-        )
-            .setPositiveButton(
-                R.string.button_continue
-            ) { _: DialogInterface?, _: Int ->
-                for (transfer in selectedTransfers) {
-                    megaApi.cancelTransferByTag(
-                        transfer.tag,
-                        object : OptionalMegaRequestListenerInterface() {
-                        })
-                }
-                transferPageFragment?.destroyActionMode()
-            }
-            .setNegativeButton(R.string.general_dismiss, null)
-        confirmationTransfersDialog = builder.create()
-        setConfirmationTransfersDialogNotCancellableAndShow()
-    }
-
-    private fun setConfirmationTransfersDialogNotCancellableAndShow() {
-        if (confirmationTransfersDialog != null) {
-            confirmationTransfersDialog?.setCancelable(false)
-            confirmationTransfersDialog?.setCanceledOnTouchOutside(false)
-            confirmationTransfersDialog?.show()
-        }
     }
 
     fun setFirstLogin(isFirst: Boolean) {

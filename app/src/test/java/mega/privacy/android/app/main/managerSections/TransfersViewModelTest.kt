@@ -17,6 +17,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetFailedOrCanceledTransfersUseCase
@@ -56,6 +57,7 @@ internal class TransfersViewModelTest {
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase = mock()
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase = mock()
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase = mock()
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
 
     @Before
     fun setUp() {
@@ -79,6 +81,7 @@ internal class TransfersViewModelTest {
             getFailedOrCanceledTransfersUseCase = getFailedOrCanceledTransfersUseCase,
             deleteCompletedTransferUseCase = deleteCompletedTransferUseCase,
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
+            cancelTransferByTagUseCase = cancelTransferByTagUseCase
         )
     }
 
@@ -230,6 +233,45 @@ internal class TransfersViewModelTest {
             underTest.uiState.test {
                 val newItem = awaitItem()
                 assertThat(newItem.pauseOrResumeTransferResult).isNull()
+            }
+        }
+
+    @Test
+    fun `test that cancelTransferResult update correctly when call cancelTransfersByTag success`() =
+        runTest {
+            val tags = listOf(1, 2, 3, 4)
+            whenever(cancelTransferByTagUseCase(any())).thenReturn(Unit)
+            underTest.cancelTransfersByTag(tags)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val newItem = awaitItem()
+                assertThat(newItem.cancelTransfersResult?.isSuccess).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that cancelTransferResult update correctly when call cancelTransfersByTag failed`() =
+        runTest {
+            val tags = listOf(1, 2, 3, 4)
+            tags.take(3).forEach { tag ->
+                whenever(cancelTransferByTagUseCase(tag)).thenReturn(Unit)
+            }
+            whenever(cancelTransferByTagUseCase(4)).thenThrow(RuntimeException::class.java)
+            underTest.cancelTransfersByTag(tags)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val newItem = awaitItem()
+                assertThat(newItem.cancelTransfersResult?.isFailure).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that cancelTransferResult update correctly when call markHandledCancelTransfersResult`() =
+        runTest {
+            underTest.markHandledCancelTransfersResult()
+            underTest.uiState.test {
+                val newItem = awaitItem()
+                assertThat(newItem.cancelTransfersResult).isNull()
             }
         }
 }
