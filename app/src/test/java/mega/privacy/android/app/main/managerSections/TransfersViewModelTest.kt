@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToLastByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.PauseTransferByTagUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -54,6 +55,7 @@ internal class TransfersViewModelTest {
     private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase = mock()
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase = mock()
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase = mock()
+    private val pauseTransferByTagUseCase: PauseTransferByTagUseCase = mock()
 
     @Before
     fun setUp() {
@@ -75,7 +77,8 @@ internal class TransfersViewModelTest {
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             monitorCompletedTransferEventUseCase = monitorCompletedTransferEventUseCase,
             getFailedOrCanceledTransfersUseCase = getFailedOrCanceledTransfersUseCase,
-            deleteCompletedTransferUseCase = deleteCompletedTransferUseCase
+            deleteCompletedTransferUseCase = deleteCompletedTransferUseCase,
+            pauseTransferByTagUseCase = pauseTransferByTagUseCase,
         )
     }
 
@@ -160,7 +163,9 @@ internal class TransfersViewModelTest {
         runTest {
             val completedTransfer = mock<CompletedTransfer>()
             val completedTransfers = listOf(completedTransfer)
-            whenever(getAllCompletedTransfersUseCase(DatabaseHandler.MAX_TRANSFERS)).thenReturn(flowOf(completedTransfers))
+            whenever(getAllCompletedTransfersUseCase(DatabaseHandler.MAX_TRANSFERS)).thenReturn(
+                flowOf(completedTransfers)
+            )
             initViewModel()
             advanceUntilIdle()
             underTest.completedTransfers.test {
@@ -175,5 +180,56 @@ internal class TransfersViewModelTest {
             underTest.completedTransferRemoved(transfer, false)
             advanceUntilIdle()
             verify(deleteCompletedTransferUseCase).invoke(transfer, false)
+        }
+
+    @Test
+    fun `test that pauseOrResumeTransferResult update correctly when call pauseTransferByTagUseCase success`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { tag }.thenReturn(1)
+            }
+            whenever(
+                pauseTransferByTagUseCase.invoke(
+                    transfer.tag,
+                    true
+                )
+            ).thenReturn(true)
+            underTest.pauseOrResumeTransfer(transfer)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val newItem = awaitItem()
+                assertThat(newItem.pauseOrResumeTransferResult?.isSuccess).isTrue()
+                assertThat(newItem.pauseOrResumeTransferResult?.getOrThrow()).isEqualTo(transfer)
+            }
+        }
+
+    @Test
+    fun `test that pauseOrResumeTransferResult update correctly when call pauseTransferByTagUseCase failed`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { tag }.thenReturn(1)
+            }
+            whenever(
+                pauseTransferByTagUseCase.invoke(
+                    transfer.tag,
+                    false
+                )
+            ).thenThrow(RuntimeException::class.java)
+            underTest.pauseOrResumeTransfer(transfer)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val newItem = awaitItem()
+                assertThat(newItem.pauseOrResumeTransferResult?.isFailure).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that pauseOrResumeTransferResult update correctly when call markHandledPauseOrResumeTransferResult`() =
+        runTest {
+            underTest.markHandledPauseOrResumeTransferResult()
+            underTest.uiState.test {
+                val newItem = awaitItem()
+                assertThat(newItem.pauseOrResumeTransferResult).isNull()
+            }
         }
 }

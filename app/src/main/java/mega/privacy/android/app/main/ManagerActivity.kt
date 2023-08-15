@@ -322,7 +322,6 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
-import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
@@ -591,11 +590,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var doNotDisturbMenuItem: MenuItem? = null
     private var archivedMenuItem: MenuItem? = null
     private var clearRubbishBinMenuItem: MenuItem? = null
-    private var cancelAllTransfersMenuItem: MenuItem? = null
-    private var playTransfersMenuIcon: MenuItem? = null
-    private var pauseTransfersMenuIcon: MenuItem? = null
-    private var retryTransfers: MenuItem? = null
-    private var clearCompletedTransfers: MenuItem? = null
     private var returnCallMenuItem: MenuItem? = null
     private var openLinkMenuItem: MenuItem? = null
     private var chronometerMenuItem: Chronometer? = null
@@ -4722,10 +4716,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (searchMenuItem != null) {
             doNotDisturbMenuItem?.isVisible = false
             archivedMenuItem?.isVisible = false
-            cancelAllTransfersMenuItem?.isVisible = false
-            clearCompletedTransfers?.isVisible = false
-            pauseTransfersMenuIcon?.isVisible = false
-            playTransfersMenuIcon?.isVisible = false
             clearRubbishBinMenuItem?.isVisible = false
             searchMenuItem?.isVisible = false
             openLinkMenuItem?.isVisible = false
@@ -7681,20 +7671,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            MegaRequest.TYPE_PAUSE_TRANSFER -> {
-                Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER")
-                if (e.errorCode == MegaError.API_OK) {
-                    updateTransfersWidgetState()
-                    transfersViewModel.activeTransferChangeStatus(request.transferTag)
-                } else {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_general_nodes),
-                        -1
-                    )
-                }
-            }
-
             MegaRequest.TYPE_CANCEL_TRANSFER -> {
                 if (e.errorCode == MegaError.API_OK) {
                     updateTransfersWidget()
@@ -7963,20 +7939,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("onNodesSharedUpdate")
         refreshSharesFragments()
         refreshSharesPageAdapter()
-    }
-
-    /**
-     * Pauses a transfer.
-     *
-     * @param mT the transfer to pause
-     */
-    fun pauseIndividualTransfer(mT: Transfer?) {
-        if (mT == null) {
-            Timber.w("Transfer object is null.")
-            return
-        }
-        Timber.d("Resume transfer - Node handle: %s", mT.nodeHandle)
-        megaApi.pauseTransferByTag(mT.tag, mT.state != TransferState.STATE_PAUSED, this)
     }
 
     /**

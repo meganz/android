@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
@@ -27,6 +26,7 @@ import mega.privacy.android.app.main.adapters.MegaTransfersAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.adapters.SelectModeInterface
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
@@ -43,9 +43,8 @@ import javax.inject.Inject
 /**
  * The Fragment is used for displaying the transfer list.
  */
-@OptIn(FlowPreview::class)
 @AndroidEntryPoint
-class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
+internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     TransfersActionBarCallBack.TransfersActionCallback {
 
     /**
@@ -110,7 +109,8 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                 transfersViewModel = viewModel,
                 megaApi = megaApi,
                 megaApiFolder = megaApiFolder,
-                dbH = dbH
+                dbH = dbH,
+                onPauseTransfer = ::handlePauseTransfers
             )
 
             adapter?.submitList(activeTransfers)
@@ -120,6 +120,10 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         }
 
         enableDragAndDrop()
+    }
+
+    private fun handlePauseTransfers(transfer: Transfer) {
+        viewModel.pauseOrResumeTransfer(transfer)
     }
 
     /**
@@ -236,6 +240,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                         )
                     }
                 }
+
                 is ActiveTransfersState.TransferFinishedUpdated -> {
                     val transfers = transfersState.newTransfers
                     Timber.d("new transfer is ${transfers.joinToString { it.fileName }}")
@@ -246,6 +251,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                         requireActivity().invalidateOptionsMenu()
                     }
                 }
+
                 else -> {}
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -253,6 +259,22 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         viewLifecycleOwner.collectFlow(viewModel.activeTransfer.sample(500L)) {
             adapter?.submitList(it)
             setEmptyView(it.size)
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.uiState) { uiState ->
+            uiState.pauseOrResumeTransferResult?.let { result ->
+                if (result.isSuccess) {
+                    transfersManagementViewModel.checkTransfersState()
+                    viewModel.activeTransferChangeStatus(result.getOrThrow().tag)
+                } else {
+                    (activity as? ManagerActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        getString(R.string.error_general_nodes),
+                        -1
+                    )
+                }
+                viewModel.markHandledPauseOrResumeTransferResult()
+            }
         }
     }
 

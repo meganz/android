@@ -22,6 +22,7 @@ import mega.privacy.android.app.main.managerSections.ActiveTransfersState
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.main.managerSections.WrapContentLinearLayoutManager
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
 
@@ -35,6 +36,11 @@ open class TransfersBaseFragment : RotatableFragment() {
      * [TransfersViewModel] instance
      */
     protected val viewModel by activityViewModels<TransfersViewModel>()
+
+    /**
+     * Transfers management view model
+     */
+    protected val transfersManagementViewModel by activityViewModels<TransfersManagementViewModel>()
 
     /**
      * LayoutManager

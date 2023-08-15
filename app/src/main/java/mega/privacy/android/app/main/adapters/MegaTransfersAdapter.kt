@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.adapters
 
+import mega.privacy.android.core.R as CoreUiR
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,9 +13,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -41,6 +40,7 @@ class MegaTransfersAdapter(
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
     private val dbH: LegacyDatabaseHandler,
+    private val onPauseTransfer: (Transfer) -> Unit,
 ) : ListAdapter<Transfer, TransferViewHolder>(TRANSFER_DIFF_CALLBACK), RotatableAdapter {
 
     private var multipleSelect: Boolean = false
@@ -87,7 +87,7 @@ class MegaTransfersAdapter(
         holder.optionPause.setOnClickListener {
             (view?.tag as? TransferViewHolder)?.let { holder ->
                 getTransferItem(holder.absoluteAdapterPosition)?.let { transfer ->
-                    (context as? ManagerActivity)?.pauseIndividualTransfer(transfer)
+                    onPauseTransfer(transfer)
                 }
             } ?: Timber.w("Holder is NULL- not action performed")
         }

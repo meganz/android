@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToLastByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
@@ -55,7 +56,15 @@ class TransfersViewModel @Inject constructor(
     monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase,
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase,
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase,
+    private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
 ) : ViewModel() {
+    private val _uiState = MutableStateFlow(TransfersUiState())
+
+    /**
+     * Ui state
+     */
+    val uiState = _uiState.asStateFlow()
+
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
     /**
@@ -383,4 +392,30 @@ class TransfersViewModel @Inject constructor(
      */
     fun hasFailedOrCancelledTransfer() =
         completedTransfers.value.any { it.state == MegaTransfer.STATE_FAILED || it.state == MegaTransfer.STATE_CANCELLED }
+
+    /**
+     * Pause or resume transfer
+     *
+     * @param transfer
+     */
+    fun pauseOrResumeTransfer(transfer: Transfer) {
+        viewModelScope.launch {
+            val result = runCatching {
+                pauseTransferByTagUseCase(
+                    transfer.tag,
+                    transfer.state != TransferState.STATE_PAUSED
+                )
+            }.onFailure {
+                Timber.e(it)
+            }.map { transfer }
+            _uiState.update { it.copy(pauseOrResumeTransferResult = result) }
+        }
+    }
+
+    /**
+     * Mark handled pause or resume transfer result
+     */
+    fun markHandledPauseOrResumeTransferResult() {
+        _uiState.update { it.copy(pauseOrResumeTransferResult = null) }
+    }
 }
