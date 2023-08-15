@@ -126,7 +126,6 @@ internal class PasscodeUnlockViewModelTest {
     @Test
     internal fun `test that calling unlock with a password also calls the unlock use case`() =
         runTest {
-            Mockito.clearInvocations(unlockPasscodeUseCase)
             val expected = "correct"
 
             initViewModel()
@@ -187,6 +186,16 @@ internal class PasscodeUnlockViewModelTest {
             }
         }
 
+    @Test
+    internal fun `test that calling unlock with a biometrics calls the unlock use case`() =
+        runTest {
+
+            initViewModel()
+
+            underTest.unlockWithBiometrics()
+
+            verify(unlockPasscodeUseCase).invoke(UnlockPasscodeRequest.BiometricRequest)
+        }
 
     private fun initViewModel(
         monitorPasscodeAttemptsUseCaseStub: MonitorPasscodeAttemptsUseCase =

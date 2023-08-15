@@ -92,9 +92,12 @@ internal class PasscodeUnlockViewModel @Inject constructor(
         }
     }
 
-    fun unlockWithBiometrics() {}
+    fun unlockWithBiometrics() {
+        unlock(UnlockPasscodeRequest.BiometricRequest)
+    }
 
-    fun onBiometricAuthFailed() {}
-
+    fun onBiometricAuthFailed() {
+        Timber.w("Biometric Authentication failed")
+    }
 
 }

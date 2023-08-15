@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -41,6 +42,16 @@ internal class UnlockPasscodeUseCaseTest {
         )
     }
 
+    @AfterEach
+    internal fun reset() {
+        Mockito.reset(
+            passcodeRepository,
+            logoutUseCase,
+            checkPasscodeUseCase,
+            accountRepository,
+        )
+    }
+
     @Test
     internal fun `test that passcode requests call the passcode check`() = runTest {
         checkPasscodeUseCase.stub {
@@ -65,7 +76,6 @@ internal class UnlockPasscodeUseCaseTest {
     @MethodSource("getArgs")
     internal fun `test that a failed check increments the failed attempts`(request: UnlockPasscodeRequest) =
         runTest {
-            Mockito.clearInvocations(passcodeRepository)
             val initialCount = 1
             passcodeRepository.stub {
                 on { monitorFailedAttempts() }.thenReturn(flow {
@@ -93,7 +103,6 @@ internal class UnlockPasscodeUseCaseTest {
     @MethodSource("getArgs")
     internal fun `test that a successful check sets failed attempts to 0`(request: UnlockPasscodeRequest) =
         runTest {
-            Mockito.clearInvocations(passcodeRepository)
             val initialCount = 1
             passcodeRepository.stub {
                 on { monitorFailedAttempts() }.thenReturn(flow {
@@ -119,7 +128,6 @@ internal class UnlockPasscodeUseCaseTest {
     @MethodSource("getArgs")
     internal fun `test that a successful check sets the passcode state to unlocked`(request: UnlockPasscodeRequest) =
         runTest {
-            Mockito.clearInvocations(passcodeRepository)
             val initialCount = 1
             passcodeRepository.stub {
                 on { monitorFailedAttempts() }.thenReturn(flow {
@@ -146,7 +154,6 @@ internal class UnlockPasscodeUseCaseTest {
     @MethodSource("getArgs")
     internal fun `test that a tenth failed check calls the logout use case`(request: UnlockPasscodeRequest) =
         runTest {
-            Mockito.clearInvocations(passcodeRepository, logoutUseCase)
             val initialCount = 9
             passcodeRepository.stub {
                 on { monitorFailedAttempts() }.thenReturn(flow {
@@ -166,6 +173,15 @@ internal class UnlockPasscodeUseCaseTest {
 
             verifyBlocking(logoutUseCase) { invoke() }
         }
+
+    @Test
+    internal fun `test that a biometric request sets the state to unlocked`() = runTest {
+        underTest.invoke(UnlockPasscodeRequest.BiometricRequest)
+
+        verifyBlocking(passcodeRepository) {
+            passcodeRepository.setLocked(false)
+        }
+    }
 
     private fun getArgs(): Stream<UnlockPasscodeRequest> = Stream.of(
         UnlockPasscodeRequest.PasscodeRequest("A passcode"),

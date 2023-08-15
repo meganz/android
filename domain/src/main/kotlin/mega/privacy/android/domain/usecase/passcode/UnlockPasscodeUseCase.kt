@@ -25,6 +25,7 @@ class UnlockPasscodeUseCase @Inject constructor(
         val correct = when (request) {
             is UnlockPasscodeRequest.PasscodeRequest -> checkPasscodeUseCase(request.value)
             is UnlockPasscodeRequest.PasswordRequest -> accountRepository.isCurrentPassword(request.value)
+            UnlockPasscodeRequest.BiometricRequest -> true
         }
 
         if (correct) {

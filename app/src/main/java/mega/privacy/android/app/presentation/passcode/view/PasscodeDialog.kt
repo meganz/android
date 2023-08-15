@@ -122,6 +122,7 @@ private fun LaunchBiometricPrompt(
     if (activity == null) onError()
     val callback = object : AuthenticationCallback() {
         override fun onAuthenticationFailed() {
+            super.onAuthenticationFailed()
             onFail()
         }
 
