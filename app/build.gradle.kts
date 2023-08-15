@@ -210,11 +210,6 @@ android {
                 testers = readTesters()
             }
         }
-
-        create("benchmark") {
-            initWith(buildTypes["release"])
-            proguardFiles("benchmark-rules.pro")
-        }
     }
 
     compileOptions {
