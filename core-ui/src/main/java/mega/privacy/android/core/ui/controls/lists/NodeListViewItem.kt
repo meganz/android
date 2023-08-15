@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -49,14 +51,19 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import java.io.File
 
 /**
- * List view item for file/folder info
+ * A Composable UI that serves as a base Node List View UI in which all other Node UIs are
+ * derived from
+ *
  * @param modifier [Modifier]
- * @param isSelected is item selected
+ * @param isSelected true if the item is selected, and false if otherwise
  * @param folderInfo folder info, if null the item is a File
  * @param icon icon resource
  * @param fileSize file size
  * @param modifiedDate modified date
  * @param name name
+ * @param infoColor The Info Text Color
+ * @param infoIcon The Info Icon
+ * @param infoIconTint The Info Icon Tint
  * @param labelColor labelColor
  * @param isTakenDown is taken down
  * @param isFavourite is favourite
@@ -75,6 +82,9 @@ fun NodeListViewItem(
     fileSize: String?,
     modifiedDate: String?,
     name: String,
+    infoColor: Color? = null,
+    @DrawableRes infoIcon: Int? = null,
+    infoIconTint: Color? = null,
     labelColor: Color? = null,
     showMenuButton: Boolean,
     isTakenDown: Boolean,
@@ -85,7 +95,7 @@ fun NodeListViewItem(
     onLongClick: (() -> Unit)? = null,
     isEnabled: Boolean = true,
     onMenuClick: () -> Unit = {},
-    nodeAvailableOffline: Boolean = false
+    nodeAvailableOffline: Boolean = false,
 ) {
     Column(
         modifier = if (isEnabled) {
@@ -145,7 +155,7 @@ fun NodeListViewItem(
                     .padding(start = 16.dp)
                     .fillMaxWidth()
             ) {
-                val (nodeInfo, threeDots, titleText, infoText, availableOffline) = createRefs()
+                val (nodeInfo, threeDots, titleText, infoRow, availableOffline) = createRefs()
                 Image(
                     painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                     contentDescription = "3 dots",
@@ -225,28 +235,40 @@ fun NodeListViewItem(
                     style = MaterialTheme.typography.subtitle1,
                     color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
                 )
-
-                Text(
-                    text = folderInfo ?: "$fileSize · $modifiedDate",
+                Row(
                     modifier = Modifier
-                        .constrainAs(infoText) {
+                        .padding(top = 1.dp)
+                        .constrainAs(infoRow) {
                             top.linkTo(titleText.bottom)
                             start.linkTo(parent.start)
-                            end.linkTo(threeDots.start)
-                            width = Dimension.fillToConstraints
-                        }
-                        .testTag(INFO_TEXT_TEST_TAG)
-                        .padding(top = 4.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.textColorSecondary,
-                )
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (infoIcon != null) {
+                        Icon(
+                            modifier = Modifier
+                                .testTag(INFO_ICON_TEST_TAG)
+                                .size(16.dp),
+                            painter = painterResource(infoIcon),
+                            tint = infoIconTint ?: Color.Unspecified,
+                            contentDescription = "Info Icon"
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text(
+                        text = folderInfo ?: "$fileSize · $modifiedDate",
+                        modifier = Modifier.testTag(INFO_TEXT_TEST_TAG),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.body2,
+                        color = infoColor ?: MaterialTheme.colors.textColorSecondary,
+                    )
+                }
                 Image(
                     modifier = Modifier
                         .constrainAs(availableOffline) {
-                            top.linkTo(infoText.top)
-                            bottom.linkTo(infoText.bottom)
+                            top.linkTo(infoRow.top)
+                            bottom.linkTo(infoRow.bottom)
                             end.linkTo(threeDots.start)
                             visibility =
                                 if (nodeAvailableOffline) Visibility.Visible else Visibility.Gone
@@ -296,6 +318,11 @@ const val EXPORTED_TEST_TAG = "exported Tag"
  * Test tag for taken item
  */
 const val TAKEN_TEST_TAG = "taken Tag"
+
+/**
+ * Test tag for the Info Icon
+ */
+const val INFO_ICON_TEST_TAG = "node_list_view_item:icon_info_icon"
 
 
 @CombinedThemePreviews
