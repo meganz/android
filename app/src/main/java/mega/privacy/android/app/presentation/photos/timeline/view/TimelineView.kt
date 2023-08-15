@@ -52,6 +52,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
+import mega.privacy.android.app.presentation.photos.view.isScrolledToEnd
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -77,6 +78,7 @@ fun TimelineView(
         derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
     }
     val isScrollingDown by lazyGridState.isScrollingDown()
+    val isScrolledToEnd by lazyGridState.isScrolledToEnd()
 
     if (timelineViewState.enableCameraUploadPageShowing
         && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
@@ -93,6 +95,7 @@ fun TimelineView(
                     onTextButtonClick = onTextButtonClick,
                     isBarVisible = isBarVisible,
                     isScrollingDown = isScrollingDown,
+                    isScrolledToEnd = isScrolledToEnd,
                     photosGridView = photosGridView,
                     photoDownload = photoDownload,
                     onFABClick = onFABClick,
@@ -114,6 +117,7 @@ private fun HandlePhotosGridView(
     onTextButtonClick: () -> Unit,
     isBarVisible: Boolean,
     isScrollingDown: Boolean,
+    isScrolledToEnd: Boolean,
     photosGridView: @Composable () -> Unit,
     photoDownload: PhotoDownload,
     onFABClick: () -> Unit,
@@ -136,13 +140,13 @@ private fun HandlePhotosGridView(
                 Column {
                     if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0) {
                         EnableCameraUploadButton(onClick = onTextButtonClick) {
-                            isBarVisible || !isScrollingDown
+                            isBarVisible || (!isScrollingDown && !isScrolledToEnd)
                         }
                     }
 
                     if (timelineViewState.progressBarShowing) {
                         CameraUploadProgressBar(timelineViewState = timelineViewState) {
-                            isBarVisible || !isScrollingDown
+                            isBarVisible || (!isScrollingDown && !isScrolledToEnd)
                         }
                     }
 
@@ -188,7 +192,7 @@ private fun HandlePhotosGridView(
                     onTimeBarTabSelected = onTimeBarTabSelected,
                     selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
                 ) {
-                    isBarVisible || !isScrollingDown
+                    isBarVisible || (!isScrollingDown && !isScrolledToEnd)
                 }
             }
         }

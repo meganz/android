@@ -59,6 +59,7 @@ fun PhotosBodyView(
         }
     }
     val isScrollingDownTimeline by timelineLazyGridState.isScrollingDown()
+    val isScrolledToEndTimeline by timelineLazyGridState.isScrolledToEnd()
 
     val isBarVisibleAlbums by remember {
         derivedStateOf {
@@ -66,7 +67,7 @@ fun PhotosBodyView(
         }
     }
     val isScrollingDownAlbums by albumsLazyGridState.isScrollingDown()
-
+    val isScrolledToEndAlbums by albumsLazyGridState.isScrolledToEnd()
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (timelineViewState.selectedPhotoCount == 0) {
@@ -77,8 +78,8 @@ fun PhotosBodyView(
                 onTabSelected = onTabSelected,
             ) {
                 when (selectedTab) {
-                    PhotosTab.Timeline -> isBarVisibleTimeline || !isScrollingDownTimeline
-                    PhotosTab.Albums -> isBarVisibleAlbums || !isScrollingDownAlbums
+                    PhotosTab.Timeline -> isBarVisibleTimeline || (!isScrollingDownTimeline && !isScrolledToEndTimeline)
+                    PhotosTab.Albums -> isBarVisibleAlbums || (!isScrollingDownAlbums && !isScrolledToEndAlbums)
                 }
             }
         }
@@ -189,3 +190,11 @@ internal fun LazyGridState.isScrollingDown(): State<Boolean> {
         }
     }
 }
+
+@Composable
+fun LazyGridState.isScrolledToEnd() = remember(this) {
+    derivedStateOf {
+        layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+    }
+}
+
