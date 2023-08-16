@@ -517,7 +517,7 @@ private fun AlbumImportContent(
 ) {
     val context = LocalContext.current
 
-    LaunchedEffect(isLocalAlbumsLoaded) {
+    LaunchedEffect(album != null && isLocalAlbumsLoaded) {
         if (album != null && isLocalAlbumsLoaded) {
             onAlbumLoaded()
         }
