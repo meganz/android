@@ -157,7 +157,7 @@ class SlideshowFragment : Fragment() {
             }
         }
         imageViewerViewModel.onShowToolbar().observe(viewLifecycleOwner) {
-            WindowCompat.setDecorFitsSystemWindows(requireActivity().window, it.show)
+            WindowCompat.setDecorFitsSystemWindows(requireActivity().window, it)
         }
     }
 
