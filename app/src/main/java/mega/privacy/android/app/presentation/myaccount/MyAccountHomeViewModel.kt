@@ -25,7 +25,7 @@ import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetMyAvatarFile
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -56,7 +56,7 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getInSharesUseCase: GetInSharesUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
-    private val getMyAvatarFile: GetMyAvatarFile,
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MyAccountHomeUIState())
 
@@ -98,7 +98,7 @@ class MyAccountHomeViewModel @Inject constructor(
         }
         viewModelScope.launch {
             flow {
-                emit(getMyAvatarFile(isForceRefresh = false))
+                emit(getMyAvatarFileUseCase(isForceRefresh = false))
                 emitAll(monitorMyAvatarFile())
             }.collectLatest { file ->
                 _uiState.update {

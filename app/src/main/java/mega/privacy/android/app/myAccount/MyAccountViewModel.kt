@@ -81,7 +81,7 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.GetMyAvatarFile
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -121,7 +121,7 @@ import javax.inject.Inject
  * @property checkVersionsUseCase
  * @property killSessionUseCase
  * @property cancelSubscriptionsUseCase
- * @property getMyAvatarFile
+ * @property getMyAvatarFileUseCase
  * @property checkPasswordReminderUseCase
  * @property resetSMSVerifiedPhoneNumber
  * @property getUserDataUseCase
@@ -154,7 +154,7 @@ class MyAccountViewModel @Inject constructor(
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val killSessionUseCase: KillSessionUseCase,
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
-    private val getMyAvatarFile: GetMyAvatarFile,
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val resetSMSVerifiedPhoneNumber: ResetSMSVerifiedPhoneNumber,
     private val getUserDataUseCase: GetUserDataUseCase,

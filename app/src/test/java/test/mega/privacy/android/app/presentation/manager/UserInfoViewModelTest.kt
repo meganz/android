@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetMyAvatarFile
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -65,7 +65,7 @@ internal class UserInfoViewModelTest {
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
     private val avatarContentMapper: AvatarContentMapper = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
-    private val getMyAvatarFile: GetMyAvatarFile = mock()
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock()
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase = mock()
 
@@ -91,7 +91,7 @@ internal class UserInfoViewModelTest {
             applicationScope = applicationScope,
             avatarContentMapper = avatarContentMapper,
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
-            getMyAvatarFile = getMyAvatarFile,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             monitorMyAvatarFile = monitorMyAvatarFile,
             checkPasswordReminderUseCase = checkPasswordReminderUseCase
         )

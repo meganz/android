@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetMyAvatarFile
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -48,7 +48,7 @@ internal class UserInfoViewModel @Inject constructor(
     private val getCurrentUserAliases: GetCurrentUserAliases,
     private val reloadContactDatabase: ReloadContactDatabase,
     private val getContactEmail: GetContactEmail,
-    private val getMyAvatarFile: GetMyAvatarFile,
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val avatarContentMapper: AvatarContentMapper,
@@ -101,7 +101,7 @@ internal class UserInfoViewModel @Inject constructor(
     }
 
     private suspend fun getUserAvatarOrDefault(isForceRefresh: Boolean) {
-        val avatarFile = runCatching { getMyAvatarFile(isForceRefresh) }
+        val avatarFile = runCatching { getMyAvatarFileUseCase(isForceRefresh) }
             .onFailure { Timber.e(it) }.getOrNull()
         val avatarContent = avatarContentMapper(
             fullName = _state.value.fullName,

@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetMyAvatarFile
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
@@ -42,7 +42,7 @@ internal class EditProfileViewModelTest {
     private lateinit var underTest: EditProfileViewModel
 
     private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
-    private val getMyAvatarFile = mock<GetMyAvatarFile>()
+    private val getMyAvatarFileUseCase = mock<GetMyAvatarFileUseCase>()
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val colorMyAvatar = Color.RED
     private val monitorMyAvatarFileFlow = MutableSharedFlow<File?>()
@@ -77,7 +77,7 @@ internal class EditProfileViewModelTest {
         underTest = EditProfileViewModel(
             ioDispatcher = UnconfinedTestDispatcher(),
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
-            getMyAvatarFile = getMyAvatarFile,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             monitorMyAvatarFile = monitorMyAvatarFile,
             getCurrentUserFirstName = getCurrentUserFirstName,
             getCurrentUserLastName = getCurrentUserLastName,

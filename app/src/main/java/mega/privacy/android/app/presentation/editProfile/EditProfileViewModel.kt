@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetMyAvatarFile
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
@@ -28,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val getMyAvatarFile: GetMyAvatarFile,
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getCurrentUserFirstName: GetCurrentUserFirstName,
@@ -50,7 +50,7 @@ class EditProfileViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch(ioDispatcher) {
-            updateMyAvatarFile(getMyAvatarFile(isForceRefresh = false))
+            updateMyAvatarFile(getMyAvatarFileUseCase(isForceRefresh = false))
         }
         viewModelScope.launch {
             monitorUserUpdates()

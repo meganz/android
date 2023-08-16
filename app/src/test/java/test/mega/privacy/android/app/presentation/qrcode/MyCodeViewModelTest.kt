@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetMyAvatarFile
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import org.junit.Before
@@ -54,7 +54,7 @@ class MyCodeViewModelTest {
     private val qrCodeMapper: QRCodeMapper = mock()
     private val avatarMapper: AvatarMapper = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
-    private val getMyAvatarFile: GetMyAvatarFile = mock()
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val getCurrentUserFullName: GetCurrentUserFullName = mock()
     private val context: Context = mock()
     private val loadBitmapFromFileMapper: LoadBitmapFromFileMapper = mock()
@@ -87,7 +87,7 @@ class MyCodeViewModelTest {
             qrCodeMapper = qrCodeMapper,
             avatarMapper = avatarMapper,
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
-            getMyAvatarFile = getMyAvatarFile,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             getCurrentUserFullName = getCurrentUserFullName,
             loadBitmapFromFile = loadBitmapFromFileMapper,
             saveBitmapToFile = saveBitmapToFileMapper,
@@ -266,7 +266,7 @@ class MyCodeViewModelTest {
         whenever(combineQRCodeAndAvatarMapper(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(expectedQrCodeBitmap)
         whenever(context.getString(any())).thenReturn("first name").thenReturn("last name")
-        whenever(getMyAvatarFile(isForceRefresh = false)).thenReturn(localAvatarFile)
+        whenever(getMyAvatarFileUseCase(isForceRefresh = false)).thenReturn(localAvatarFile)
 
         // start real testing
         underTest.resetQRCode(
@@ -364,7 +364,7 @@ class MyCodeViewModelTest {
         whenever(combineQRCodeAndAvatarMapper(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(expectedQrCodeBitmap)
         whenever(context.getString(any())).thenReturn("first name").thenReturn("last name")
-        whenever(getMyAvatarFile(isForceRefresh = false)).thenReturn(localAvatarFile)
+        whenever(getMyAvatarFileUseCase(isForceRefresh = false)).thenReturn(localAvatarFile)
         underTest.createQRCode(
             width = qrCodeWidth,
             height = qrCodeHeight,

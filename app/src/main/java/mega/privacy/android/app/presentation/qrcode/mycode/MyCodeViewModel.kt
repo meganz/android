@@ -24,7 +24,7 @@ import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetMyAvatarFile
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import timber.log.Timber
@@ -45,7 +45,7 @@ class MyCodeViewModel @Inject constructor(
     private val qrCodeMapper: QRCodeMapper,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getCurrentUserFullName: GetCurrentUserFullName,
-    private val getMyAvatarFile: GetMyAvatarFile,
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val loadBitmapFromFile: LoadBitmapFromFileMapper,
     private val saveBitmapToFile: SaveBitmapToFileMapper,
     private val getCircleBitmap: GetCircleBitmapMapper,
@@ -184,7 +184,7 @@ class MyCodeViewModel @Inject constructor(
             defaultLastName = context.getString(R.string.lastname_text)
         )
 
-        return getMyAvatarFile(isForceRefresh = false)?.takeIf { it.exists() && it.length() > 0 }
+        return getMyAvatarFileUseCase(isForceRefresh = false)?.takeIf { it.exists() && it.length() > 0 }
             ?.let { avatarFile ->
                 loadBitmapFromFile(avatarFile)
                     ?.let { getCircleBitmap(it) }
