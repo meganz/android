@@ -62,6 +62,7 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.InAppUpdatePreferencesGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.MediaPlayerPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferencesGateway
@@ -77,6 +78,7 @@ import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore
 import mega.privacy.android.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
 import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
+import mega.privacy.android.data.preferences.InAppUpdatePreferencesDatastore
 import mega.privacy.android.data.preferences.LoggingPreferencesDataStore
 import mega.privacy.android.data.preferences.MediaPlayerPreferencesDatastore
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore
@@ -253,5 +255,8 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindPasscodeStoreGateway(implementation: PasscodeDataStore): PasscodeStoreGateway
+
+    @Binds
+    abstract fun bindInAppUpdatePreferencesGateway(implementation: InAppUpdatePreferencesDatastore): InAppUpdatePreferencesGateway
 
 }

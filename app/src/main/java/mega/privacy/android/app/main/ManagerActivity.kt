@@ -1050,21 +1050,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.d("Backup warning dialog is not show")
             }
         }
+        checkForInAppUpdate()
+    }
+
+    private fun checkForInAppUpdate() {
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.InAppUpdate)) {
                 runCatching {
                     inAppUpdateHandler.checkForAppUpdates()
-                }.onSuccess { success ->
-                    if (success) {
-                        Snackbar.make(
-                            fragmentContainer,
-                            getString(R.string.general_app_update_message_download_success),
-                            Snackbar.LENGTH_LONG
-                        ).apply {
-                            setAction(getString(R.string.general_app_update_action_restart)) { inAppUpdateHandler.completeUpdate() }
-                            show()
-                        }
-                    }
                 }
             }
         }

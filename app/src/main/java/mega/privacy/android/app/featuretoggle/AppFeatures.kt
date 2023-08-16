@@ -153,6 +153,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
     InAppUpdate("Enable In-App Update", false),
 
     /**
+     * InAppUpdate Incremental Prompt toggle
+     */
+    InAppUpdateIncrementalPrompt("Enable In-App Update Incremental Prompt", false),
+
+    /**
      * Meeting notification settings
      */
     WaitingRoomSettings("Enable Waiting room settings", false),

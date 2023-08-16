@@ -40,6 +40,7 @@ import mega.privacy.android.data.repository.FileLinkRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
 import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
@@ -73,6 +74,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.InAppUpdateRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NodeRepository
@@ -261,4 +263,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindThumbnailPreviewRepository(implementation: ThumbnailPreviewRepositoryImpl): ThumbnailPreviewRepository
+
+    @Binds
+    abstract fun bindInAppUpdateRepository(implementation: InAppUpdateRepositoryImpl): InAppUpdateRepository
 }

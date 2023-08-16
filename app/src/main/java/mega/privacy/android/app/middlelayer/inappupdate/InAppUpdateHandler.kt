@@ -7,7 +7,7 @@ interface InAppUpdateHandler {
     /**
      * Check for App Updates
      */
-    suspend fun checkForAppUpdates(): Boolean
+    suspend fun checkForAppUpdates()
 
     /**
      * Complete the update
