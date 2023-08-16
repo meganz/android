@@ -1121,7 +1121,8 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
                     val pageNumber = 0
                     var out: FileOutputStream? = null
                     try {
-                        val pdfiumCore = PdfiumCore(this@ChatUploadService)
+                        val pdfiumCore =
+                            PdfiumCore(this@ChatUploadService)
                         val pdfNode = megaApi.getNodeByHandle(nodeHandle)
 
                         if (pdfNode == null) {

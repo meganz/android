@@ -89,7 +89,6 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser

@@ -961,7 +961,8 @@ internal class UploadService : LifecycleService() {
                     val pageNumber = 0
                     var out: FileOutputStream? = null
                     try {
-                        val pdfiumCore = PdfiumCore(this@UploadService)
+                        val pdfiumCore =
+                            PdfiumCore(this@UploadService)
                         val pdfNode = megaApi.getNodeByHandle(transfer.nodeHandle)
                             ?: run {
                                 Timber.e("pdf is NULL")
