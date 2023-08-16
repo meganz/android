@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.MenuProvider
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -155,6 +156,9 @@ class SlideshowFragment : Fragment() {
                 }
             }
         }
+        imageViewerViewModel.onShowToolbar().observe(viewLifecycleOwner) {
+            WindowCompat.setDecorFitsSystemWindows(requireActivity().window, it.show)
+        }
     }
 
     override fun onStop() {
@@ -162,6 +166,11 @@ class SlideshowFragment : Fragment() {
             slideshowViewModel.updateIsPlaying(false)
         }
         super.onStop()
+    }
+
+    override fun onDestroyView() {
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
+        super.onDestroyView()
     }
 
     @Composable
