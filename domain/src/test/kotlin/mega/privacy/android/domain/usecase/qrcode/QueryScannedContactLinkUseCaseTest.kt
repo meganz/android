@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.qrcode
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -6,8 +6,6 @@ import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
-import mega.privacy.android.domain.usecase.qrcode.DefaultQueryScannedContactLink
-import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -16,14 +14,14 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultQueryScannedContactLinkTest {
-    private lateinit var underTest: QueryScannedContactLink
+class QueryScannedContactLinkUseCaseTest {
+    private lateinit var underTest: QueryScannedContactLinkUseCase
     private val qrCodeRepository = mock<QRCodeRepository>()
     private val avatarRepository = mock<AvatarRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultQueryScannedContactLink(qrCodeRepository, avatarRepository)
+        underTest = QueryScannedContactLinkUseCase(qrCodeRepository, avatarRepository)
     }
 
     @Test

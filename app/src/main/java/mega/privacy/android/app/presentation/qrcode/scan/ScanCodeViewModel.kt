@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
-import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
+import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ScanCodeViewModel @Inject constructor(
-    private val queryScannedContactLink: QueryScannedContactLink,
+    private val queryScannedContactLinkUseCase: QueryScannedContactLinkUseCase,
     private val inviteContactUseCase: InviteContactUseCase,
 ) : ViewModel() {
 
@@ -104,7 +104,7 @@ class ScanCodeViewModel @Inject constructor(
      */
     fun queryContactLink(scannedHandle: String) {
         viewModelScope.launch {
-            with(queryScannedContactLink(scannedHandle)) {
+            with(queryScannedContactLinkUseCase(scannedHandle)) {
                 updateMyEmail(email)
 
                 if (state.value.finishActivityOnScanComplete) {

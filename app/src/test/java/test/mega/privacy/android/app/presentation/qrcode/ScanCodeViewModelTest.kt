@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
-import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
+import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,7 +30,7 @@ import java.io.File
 class ScanCodeViewModelTest {
 
     private lateinit var underTest: ScanCodeViewModel
-    private val queryScannedContactLink = mock<QueryScannedContactLink>()
+    private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
     private val inviteContactUseCase = mock<InviteContactUseCase>()
 
     @get:Rule
@@ -43,7 +43,7 @@ class ScanCodeViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = ScanCodeViewModel(queryScannedContactLink, inviteContactUseCase)
+        underTest = ScanCodeViewModel(queryScannedContactLinkUseCase, inviteContactUseCase)
     }
 
     @Test
@@ -192,7 +192,7 @@ class ScanCodeViewModelTest {
                 avatarColor
             )
 
-            whenever(queryScannedContactLink(handle)).thenReturn(result)
+            whenever(queryScannedContactLinkUseCase(handle)).thenReturn(result)
             underTest.state.test {
                 awaitItem()
                 underTest.queryContactLink(handle)
@@ -217,7 +217,7 @@ class ScanCodeViewModelTest {
                 QRCodeQueryResults.CONTACT_QUERY_EEXIST
             )
 
-            whenever(queryScannedContactLink(handle)).thenReturn(result)
+            whenever(queryScannedContactLinkUseCase(handle)).thenReturn(result)
             underTest.state.test {
                 awaitItem()
                 underTest.queryContactLink(handle)
@@ -243,7 +243,7 @@ class ScanCodeViewModelTest {
                 QRCodeQueryResults.CONTACT_QUERY_DEFAULT
             )
 
-            whenever(queryScannedContactLink(handle)).thenReturn(result)
+            whenever(queryScannedContactLinkUseCase(handle)).thenReturn(result)
             underTest.state.test {
                 awaitItem()
                 underTest.queryContactLink(handle)

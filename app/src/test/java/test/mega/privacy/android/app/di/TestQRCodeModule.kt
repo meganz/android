@@ -11,8 +11,6 @@ import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMap
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
-import mega.privacy.android.domain.di.QRCodeModule
-import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import org.mockito.kotlin.mock
 
 /**
@@ -20,7 +18,6 @@ import org.mockito.kotlin.mock
  */
 @TestInstallIn(
     replaces = [
-        QRCodeModule::class,
         QRCodeMapperModule::class
     ],
     components = [SingletonComponent::class]
@@ -28,7 +25,6 @@ import org.mockito.kotlin.mock
 @Module
 class TestQRCodeModule {
     private val qrCodeMapper = mock<QRCodeMapper>()
-    private val queryScannedContactLink = mock<QueryScannedContactLink>()
     private val loadBitmapFromFileMapper = mock<LoadBitmapFromFileMapper>()
     private val saveBitmapToFileMapper = mock<SaveBitmapToFileMapper>()
     private val getCircleBitmapMapper = mock<GetCircleBitmapMapper>()
@@ -37,9 +33,6 @@ class TestQRCodeModule {
 
     @Provides
     fun provideCreateQRCodeMapper() = qrCodeMapper
-
-    @Provides
-    fun provideQueryScannedContactLink() = queryScannedContactLink
 
     @Provides
     fun provideLoadBitmapFromFileMapper() = loadBitmapFromFileMapper

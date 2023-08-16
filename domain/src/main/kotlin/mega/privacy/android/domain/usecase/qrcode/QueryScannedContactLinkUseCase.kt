@@ -7,14 +7,20 @@ import mega.privacy.android.domain.repository.QRCodeRepository
 import javax.inject.Inject
 
 /**
- * Use case implementation for getting contact details for scanned qr code
+ * Use case for getting contact link for scanned qr code
  */
-class DefaultQueryScannedContactLink @Inject constructor(
+class QueryScannedContactLinkUseCase @Inject constructor(
     private val repository: QRCodeRepository,
     private val avatarRepository: AvatarRepository,
-) : QueryScannedContactLink {
+) {
 
-    override suspend fun invoke(scannedHandle: String): ScannedContactLinkResult {
+    /**
+     * Invoke
+     *
+     * @param scannedHandle Base 64 handle of the scanned qr code
+     * @return Details of the scanned contact
+     */
+    suspend operator fun invoke(scannedHandle: String): ScannedContactLinkResult {
         val result = repository.queryScannedContactLink(scannedHandle)
 
         if (result.qrCodeQueryResult == QRCodeQueryResults.CONTACT_QUERY_OK) {
