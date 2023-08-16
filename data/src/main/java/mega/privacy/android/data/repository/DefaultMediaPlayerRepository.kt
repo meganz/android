@@ -349,24 +349,39 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun megaApiHttpServerStop() = megaApi.httpServerStop()
+    override suspend fun megaApiHttpServerStop() = withContext(ioDispatcher) {
+        megaApi.httpServerStop()
+    }
 
-    override suspend fun megaApiFolderHttpServerStop() = megaApiFolder.httpServerStop()
+    override suspend fun megaApiFolderHttpServerStop() = withContext(ioDispatcher) {
+        megaApiFolder.httpServerStop()
+    }
 
-    override suspend fun megaApiHttpServerIsRunning(): Int = megaApi.httpServerIsRunning()
+    override suspend fun megaApiHttpServerIsRunning(): Int = withContext(ioDispatcher) {
+        megaApi.httpServerIsRunning()
+    }
 
-    override suspend fun megaApiFolderHttpServerIsRunning(): Int =
+    override suspend fun megaApiFolderHttpServerIsRunning(): Int = withContext(ioDispatcher) {
         megaApiFolder.httpServerIsRunning()
+    }
 
-    override suspend fun megaApiHttpServerStart() = megaApi.httpServerStart()
+    override suspend fun megaApiHttpServerStart() = withContext(ioDispatcher) {
+        megaApi.httpServerStart()
+    }
 
-    override suspend fun megaApiFolderHttpServerStart() = megaApiFolder.httpServerStart()
+    override suspend fun megaApiFolderHttpServerStart() = withContext(ioDispatcher) {
+        megaApiFolder.httpServerStart()
+    }
 
     override suspend fun megaApiHttpServerSetMaxBufferSize(bufferSize: Int) =
-        megaApi.httpServerSetMaxBufferSize(bufferSize)
+        withContext(ioDispatcher) {
+            megaApi.httpServerSetMaxBufferSize(bufferSize)
+        }
 
     override suspend fun megaApiFolderHttpServerSetMaxBufferSize(bufferSize: Int) =
-        megaApiFolder.httpServerSetMaxBufferSize(bufferSize)
+        withContext(ioDispatcher) {
+            megaApiFolder.httpServerSetMaxBufferSize(bufferSize)
+        }
 
     override suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String? =
         typedFileNode?.let {
@@ -425,10 +440,11 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getFileUrlByNodeHandle(handle: Long): String? =
+    override suspend fun getFileUrlByNodeHandle(handle: Long): String? = withContext(ioDispatcher) {
         megaApi.getMegaNodeByHandle(handle)?.let { node ->
             megaApi.httpServerGetLocalLink(node)
         }
+    }
 
     override suspend fun getSubtitleFileInfoList(fileSuffix: String) =
         withContext(ioDispatcher) {
