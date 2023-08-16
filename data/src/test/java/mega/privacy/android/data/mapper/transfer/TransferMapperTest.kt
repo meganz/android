@@ -20,8 +20,12 @@ internal class TransferMapperTest {
         val transferAppDataMapper = mock<TransferAppDataMapper> {
             on { invoke("appData") }.thenReturn(appDataList)
         }
-        val transferTypeMapper = mock<TransferTypeMapper>() {
+        val transferTypeMapper = mock<TransferTypeMapper> {
             on { invoke(MegaTransfer.TYPE_DOWNLOAD) }.thenReturn(TransferType.TYPE_DOWNLOAD)
+        }
+
+        val transferStateMapper = mock<TransferStateMapper> {
+            on { invoke(MegaTransfer.STATE_COMPLETED) }.thenReturn(TransferState.STATE_COMPLETED)
         }
         val megaTransfer = mock<MegaTransfer> {
             on { type }.thenReturn(MegaTransfer.TYPE_DOWNLOAD)
@@ -67,7 +71,7 @@ internal class TransferMapperTest {
             notificationNumber = megaTransfer.notificationNumber,
         )
         Truth.assertThat(
-            TransferMapper(transferAppDataMapper, transferTypeMapper).invoke(
+            TransferMapper(transferAppDataMapper, transferTypeMapper, transferStateMapper).invoke(
                 megaTransfer
             )
         )
