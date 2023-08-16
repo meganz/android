@@ -36,6 +36,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
+import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.black
@@ -184,13 +185,7 @@ fun LegacyBillingWarning(hideBillingWarning: () -> Unit) {
 fun CurrentSubscriptionPlanBox(state: UpgradeAccountState) {
     val isLight = MaterialTheme.colors.isLight
 
-    val uiAccountType = when (state.currentSubscriptionPlan) {
-        AccountType.PRO_I -> UIAccountType.PRO_I
-        AccountType.PRO_II -> UIAccountType.PRO_II
-        AccountType.PRO_III -> UIAccountType.PRO_III
-        AccountType.PRO_LITE -> UIAccountType.PRO_LITE
-        else -> UIAccountType.DEFAULT
-    }
+    val uiAccountType = state.currentSubscriptionPlan!!.toUIAccountType()
     val text: String =
         stringResource(
             id = R.string.type_of_my_account,
@@ -238,13 +233,7 @@ fun SubscriptionPlansInfoRow(
             subscription.formatTransferSize(true).size
         )
 
-    val uiAccountType = when (proPlan) {
-        AccountType.PRO_I -> UIAccountType.PRO_I
-        AccountType.PRO_II -> UIAccountType.PRO_II
-        AccountType.PRO_III -> UIAccountType.PRO_III
-        AccountType.PRO_LITE -> UIAccountType.PRO_LITE
-        else -> UIAccountType.PRO_LITE
-    }
+    val uiAccountType = proPlan.toUIAccountType()
 
     val storageString = stringResource(
         id = R.string.account_upgrade_storage_label,

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.upgradeAccount.view
 
-import android.content.res.Configuration
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -11,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -57,16 +57,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
-import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.model.UserSubscription
+import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
@@ -77,6 +78,8 @@ import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.model.SpanStyleWithAnnotation
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.body2
@@ -114,6 +117,10 @@ internal const val CURRENT_PLAN_TAG = "upgrade_account_screen:label_current_plan
 internal const val RECOMMENDED_PLAN_TAG = "upgrade_account_screen:label_recommended_plan"
 internal const val PRICING_PAGE_LINK_TAG = "upgrade_account_screen:text_pricing_page_link"
 
+/**
+ * Screen is shown when user taps on Upgrade button
+ * where user can view Pro plans and check the features available for these plans
+ */
 @Composable
 fun UpgradeAccountView(
     modifier: Modifier = Modifier,
@@ -148,7 +155,7 @@ fun UpgradeAccountView(
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             if (!hideFloatButton && chosenPlan != AccountType.FREE) {
-                val uiAccountType = mapUIAccountType(chosenPlan)
+                val uiAccountType = chosenPlan.toUIAccountType()
                 FloatingActionButton(
                     onClick = onBuyClicked,
                     content = {
@@ -491,7 +498,7 @@ fun LoadingShimmerEffect() {
         MaterialTheme.colors.grey_100_alpha_060_dark_grey,
     )
 
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "upgrade_account_screen_shimmer")
 
     val translateAnimation = transition.animateFloat(
         initialValue = 0f,
@@ -501,7 +508,8 @@ fun LoadingShimmerEffect() {
                 durationMillis = 800,
                 easing = FastOutLinearInEasing
             )
-        )
+        ),
+        label = "upgrade_account_screen_shimmer"
     )
     val brush = linearGradient(
         colors = gradient,
@@ -651,7 +659,7 @@ fun SubscriptionPlansInfoCard(
             subscription.formatTransferSize(isMonthly).size
         )
 
-    val uiAccountType = mapUIAccountType(proPlan)
+    val uiAccountType = proPlan.toUIAccountType()
 
     val storageString = stringResource(
         id = R.string.account_upgrade_account_pro_plan_info_storage,
@@ -923,96 +931,31 @@ private fun PricingPageLinkText(
     )
 }
 
-private fun mapUIAccountType(plan: AccountType) = when (plan) {
-    AccountType.PRO_I -> UIAccountType.PRO_I
-    AccountType.PRO_II -> UIAccountType.PRO_II
-    AccountType.PRO_III -> UIAccountType.PRO_III
-    AccountType.PRO_LITE -> UIAccountType.PRO_LITE
-    else -> UIAccountType.PRO_LITE
+
+@CombinedThemePreviews
+@Composable
+fun PreviewUpgradeAccountView(
+    @PreviewParameter(UpgradeAccountPreviewProvider::class) state: UpgradeAccountState,
+) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        UpgradeAccountView(
+            state = state
+        )
+    }
 }
 
-
-@Preview
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun PreviewUpgradeAccountView() {
-    val localisedPriceStringMapper = LocalisedPriceStringMapper()
-    val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
-    val formattedSizeMapper = FormattedSizeMapper()
-    val localisedSubscriptionsList: List<LocalisedSubscription>
-
-    val subscriptionProI = LocalisedSubscription(
-        accountType = AccountType.PRO_I,
-        storage = 2048,
-        monthlyTransfer = 2048,
-        yearlyTransfer = 24576,
-        monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            99.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    val subscriptionProII = LocalisedSubscription(
-        accountType = AccountType.PRO_II,
-        storage = 8192,
-        monthlyTransfer = 8192,
-        yearlyTransfer = 98304,
-        monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            199.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    val subscriptionProIII = LocalisedSubscription(
-        accountType = AccountType.PRO_III,
-        storage = 16384,
-        monthlyTransfer = 16384,
-        yearlyTransfer = 196608,
-        monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            299.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    val subscriptionProLite = LocalisedSubscription(
-        accountType = AccountType.PRO_LITE,
-        storage = 400,
-        monthlyTransfer = 1024,
-        yearlyTransfer = 12288,
-        monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            49.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    localisedSubscriptionsList = listOf(
+private class UpgradeAccountPreviewProvider :
+    PreviewParameterProvider<UpgradeAccountState> {
+    val localisedSubscriptionsList: List<LocalisedSubscription> = listOf(
         subscriptionProLite,
         subscriptionProI,
         subscriptionProII,
         subscriptionProIII
     )
 
-    MaterialTheme {
-        UpgradeAccountView(
-            state = UpgradeAccountState(
+    override val values: Sequence<UpgradeAccountState>
+        get() = sequenceOf(
+            UpgradeAccountState(
                 localisedSubscriptionsList = localisedSubscriptionsList,
                 currentSubscriptionPlan = AccountType.PRO_II,
                 showBillingWarning = false,
@@ -1022,6 +965,71 @@ fun PreviewUpgradeAccountView() {
                     currentPayment = null,
                 ),
             )
+        )
+
+    companion object {
+        val localisedPriceStringMapper = LocalisedPriceStringMapper()
+        val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+        val formattedSizeMapper = FormattedSizeMapper()
+
+        val subscriptionProI = LocalisedSubscription(
+            accountType = AccountType.PRO_I,
+            storage = 2048,
+            monthlyTransfer = 2048,
+            yearlyTransfer = 24576,
+            monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                99.99.toFloat(),
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val subscriptionProII = LocalisedSubscription(
+            accountType = AccountType.PRO_II,
+            storage = 8192,
+            monthlyTransfer = 8192,
+            yearlyTransfer = 98304,
+            monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                199.99.toFloat(),
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val subscriptionProIII = LocalisedSubscription(
+            accountType = AccountType.PRO_III,
+            storage = 16384,
+            monthlyTransfer = 16384,
+            yearlyTransfer = 196608,
+            monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                299.99.toFloat(),
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val subscriptionProLite = LocalisedSubscription(
+            accountType = AccountType.PRO_LITE,
+            storage = 400,
+            monthlyTransfer = 1024,
+            yearlyTransfer = 12288,
+            monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                49.99.toFloat(),
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
         )
     }
 }

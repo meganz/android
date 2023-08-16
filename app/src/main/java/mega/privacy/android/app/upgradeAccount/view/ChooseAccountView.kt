@@ -36,6 +36,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
+import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
@@ -178,7 +179,7 @@ fun FreePlanRow(
                     SpanIndicator('B') to SpanStyle(
                         baselineShift = BaselineShift.Superscript,
                         color = MaterialTheme.colors.red_500_red_300,
-                        fontSize = 10.sp
+                        fontSize = 12.sp
                     )
                 ),
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -201,7 +202,7 @@ fun FreePlanRow(
                     SpanIndicator('A') to SpanStyle(
                         baselineShift = BaselineShift.Superscript,
                         color = MaterialTheme.colors.red_500_red_300,
-                        fontSize = 8.sp
+                        fontSize = 10.sp
                     )
                 ),
                 modifier = Modifier.padding(top = 5.dp, end = 20.dp),
@@ -234,13 +235,7 @@ fun ChooseSubscriptionPlansInfoRow(
             subscription.formatTransferSize(true).size
         )
 
-    val uiAccountType = when (proPlan) {
-        AccountType.PRO_I -> UIAccountType.PRO_I
-        AccountType.PRO_II -> UIAccountType.PRO_II
-        AccountType.PRO_III -> UIAccountType.PRO_III
-        AccountType.PRO_LITE -> UIAccountType.PRO_LITE
-        else -> UIAccountType.PRO_LITE
-    }
+    val uiAccountType = proPlan.toUIAccountType()
 
     val storageString = stringResource(
         id = R.string.account_upgrade_storage_label,

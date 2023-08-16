@@ -42,9 +42,7 @@ class ChooseAccountViewModelTest {
 
     private lateinit var underTest: ChooseAccountViewModel
 
-    private val myAccountInfo = mock<MyAccountInfo>()
     private val getPricing = mock<GetPricing>()
-    private val getLocalPricingUseCase = mock<GetLocalPricingUseCase>()
     private val getMonthlySubscriptionsUseCase = mock<GetMonthlySubscriptionsUseCase>()
     private val getYearlySubscriptionsUseCase = mock<GetYearlySubscriptionsUseCase>()
     private val localisedPriceStringMapper = mock<LocalisedPriceStringMapper>()
@@ -76,9 +74,7 @@ class ChooseAccountViewModelTest {
 
     private fun initViewModel() {
         underTest = ChooseAccountViewModel(
-            myAccountInfo = myAccountInfo,
             getPricing = getPricing,
-            getLocalPricingUseCase = getLocalPricingUseCase,
             getMonthlySubscriptionsUseCase = getMonthlySubscriptionsUseCase,
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
