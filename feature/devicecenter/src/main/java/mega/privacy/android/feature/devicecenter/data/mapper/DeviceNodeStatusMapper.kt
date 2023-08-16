@@ -5,32 +5,58 @@ import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import javax.inject.Inject
 
 /**
- * Given a list of [DeviceFolderNode] objects, this Mapper that returns a specific Device Status
- * based on a given priority number
+ * Mapper that returns the appropriate [DeviceCenterNodeStatus] for a Backup Device
+ *
+ * The order for detecting the appropriate Device Status is:
+ *
+ * 1. No Camera uploads (only applicable for the User's Current Device)
+ * 2. Syncing
+ * 3. Scanning
+ * 4. Initializing
+ * 5. Paused
+ * 6. Overquota
+ * 7. Blocked
+ * 8. Up to Date
+ * 9. Offline
+ * 10. Disabled
+ * 11. Stopped
+ * 12. Unknown (if no matching Device Status)
  */
 internal class DeviceNodeStatusMapper @Inject constructor() {
+
     /**
      * Invocation function
      *
-     * The order for detecting the appropriate Device Status is:
-     * 1. Syncing
-     * 2. Scanning
-     * 3. Initializing
-     * 4. Paused
-     * 5. Overquota
-     * 6. Blocked
-     * 7. Up to Date
-     * 8. Offline
-     * 9. Disabled
-     * 10. Stopped
-     *
-     * If there is no matching Device Status, [DeviceCenterNodeStatus.Unknown] is returned
-     *
      * @param folders the list of [DeviceFolderNode] objects of a Device
+     * @param isCameraUploadsEnabled true if Camera Uploads is enabled on the User's Current Device,
+     * and false if otherwise
+     * @param isCurrentDevice true if the Device is the User's Current Device, and false if otherwise
+     *
      * @return the appropriate [DeviceCenterNodeStatus] for the Device
      */
-    operator fun invoke(folders: List<DeviceFolderNode>) =
-        when (folders.maxOfOrNull { it.status.priority }) {
+    operator fun invoke(
+        folders: List<DeviceFolderNode>,
+        isCameraUploadsEnabled: Boolean,
+        isCurrentDevice: Boolean,
+    ) = if (isCurrentDevice && isCameraUploadsEnabled.not()) {
+        DeviceCenterNodeStatus.NoCameraUploads
+    } else {
+        folders.calculateDeviceStatus()
+    }
+
+    /**
+     * Retrieves the Device Status based on the highest priority found from the Device's Backup
+     * Folders
+     *
+     * This is called on either condition:
+     *
+     * 1. When the Device is a Current Device and Camera Uploads is enabled, or
+     * 2. When the Device is an Other Device
+     *
+     * @return The appropriate [DeviceCenterNodeStatus]
+     */
+    private fun List<DeviceFolderNode>.calculateDeviceStatus(): DeviceCenterNodeStatus =
+        when (this.maxOfOrNull { folder -> folder.status.priority }) {
             // Devices do not need to display the syncing progress in the UI
             10 -> DeviceCenterNodeStatus.Syncing(0)
             9 -> DeviceCenterNodeStatus.Scanning

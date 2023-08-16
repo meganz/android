@@ -19,17 +19,19 @@ internal class DeviceNodeMapper @Inject constructor(
     /**
      * Invocation function
      *
-     * @param currentDeviceId The ID of the User's Current Device
      * @param backupInfoList A list of [BackupInfo] objects
+     * @param currentDeviceId The ID of the User's Current Device
      * @param deviceIdAndNameMap A String map of the User's backed up Device IDs and Device Names.
      * Each Key-Value entry corresponds to the User's Device ID and Device Name
+     * @param isCameraUploadsEnabled true if Camera Uploads is enabled, and false if otherwise
      *
      * @return A list of [DeviceNode] objects
      */
     operator fun invoke(
-        currentDeviceId: String,
         backupInfoList: List<BackupInfo>,
+        currentDeviceId: String,
         deviceIdAndNameMap: Map<String, String>,
+        isCameraUploadsEnabled: Boolean,
     ): List<DeviceNode> {
         val deviceNodeList = mutableListOf<DeviceNode>()
 
@@ -40,7 +42,11 @@ internal class DeviceNodeMapper @Inject constructor(
             OwnDeviceNode(
                 id = currentDeviceId,
                 name = deviceIdAndNameMap[currentDeviceId].orEmpty(),
-                status = deviceNodeStatusMapper(currentDeviceFolders),
+                status = deviceNodeStatusMapper(
+                    folders = currentDeviceFolders,
+                    isCameraUploadsEnabled = isCameraUploadsEnabled,
+                    isCurrentDevice = true,
+                ),
                 folders = currentDeviceFolders,
             )
         )
@@ -54,7 +60,11 @@ internal class DeviceNodeMapper @Inject constructor(
                     OtherDeviceNode(
                         id = otherDeviceId,
                         name = otherDeviceName,
-                        status = deviceNodeStatusMapper(otherDeviceFolders),
+                        status = deviceNodeStatusMapper(
+                            folders = otherDeviceFolders,
+                            isCameraUploadsEnabled = isCameraUploadsEnabled,
+                            isCurrentDevice = false,
+                        ),
                         folders = otherDeviceFolders,
                     )
                 )

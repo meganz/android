@@ -12,62 +12,68 @@ import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState
 sealed class DeviceCenterNodeStatus(val priority: Int) {
 
     /**
-     * The default value assigned when prioritizing what Status should be displayed and none
+     * The default value assigned when prioritizing what Device Status should be displayed and none
      * is found
      */
     object Unknown : DeviceCenterNodeStatus(0)
 
     /**
-     * The Node is Stopped
+     * The Device is Stopped
      */
     object Stopped : DeviceCenterNodeStatus(1)
 
     /**
-     * The Node is Disabled by the User
+     * The Device is Disabled by the User
      */
     object Disabled : DeviceCenterNodeStatus(2)
 
     /**
-     * The Node is Offline
+     * The Device is Offline
      */
     object Offline : DeviceCenterNodeStatus(3)
 
     /**
-     * The Node is Up to Date
+     * The Device is Up to Date
      */
     object UpToDate : DeviceCenterNodeStatus(4)
 
     /**
-     * The Node is Blocked
+     * The Device is Blocked
      *
      * @property errorSubState The corresponding Error Sub State
      */
     data class Blocked(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(5)
 
     /**
-     * The Node is Overquota
+     * The Device is Overquota
      */
     object Overquota : DeviceCenterNodeStatus(6)
 
     /**
-     * The Node is Paused
+     * The Device is Paused
      */
     object Paused : DeviceCenterNodeStatus(7)
 
     /**
-     * The Node is Initializing
+     * The Device is Initializing
      */
     object Initializing : DeviceCenterNodeStatus(8)
 
     /**
-     * The Node is Scanning
+     * The Device is Scanning
      */
     object Scanning : DeviceCenterNodeStatus(9)
 
     /**
-     * The Node is Syncing
+     * The Device is Syncing
      *
      * @property progress The progress value
      */
     data class Syncing(val progress: Int) : DeviceCenterNodeStatus(10)
+
+    /**
+     * The Device is found to have its Camera Uploads disabled. This is only applicable for the
+     * User's Current Device, and has the highest priority amongst all Device Statuses
+     */
+    object NoCameraUploads : DeviceCenterNodeStatus(11)
 }

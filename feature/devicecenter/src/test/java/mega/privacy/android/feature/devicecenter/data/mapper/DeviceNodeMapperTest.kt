@@ -49,17 +49,24 @@ internal class DeviceNodeMapperTest {
             mock { on { deviceId }.thenReturn(currentDeviceId) },
             mock { on { deviceId }.thenReturn(otherDeviceId) },
         )
+        val isCameraUploadsEnabled = false
 
         // Current Device
         val currentDeviceBackupInfo = backupInfoList.filterBackupInfoByDeviceId(currentDeviceId)
         val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Current Device Folder One") }
         )
-        val currentDeviceStatus = DeviceCenterNodeStatus.UpToDate
+        val currentDeviceStatus = DeviceCenterNodeStatus.NoCameraUploads
         whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
             currentDeviceFolderNodes
         )
-        whenever(deviceNodeStatusMapper(currentDeviceFolderNodes)).thenReturn(currentDeviceStatus)
+        whenever(
+            deviceNodeStatusMapper(
+                folders = currentDeviceFolderNodes,
+                isCameraUploadsEnabled = isCameraUploadsEnabled,
+                isCurrentDevice = true
+            )
+        ).thenReturn(currentDeviceStatus)
 
         // Other Device/s
         val otherDeviceBackupInfo = backupInfoList.filterBackupInfoByDeviceId(otherDeviceId)
@@ -68,7 +75,13 @@ internal class DeviceNodeMapperTest {
         )
         val otherDeviceStatus = DeviceCenterNodeStatus.Overquota
         whenever(deviceFolderNodeMapper(otherDeviceBackupInfo)).thenReturn(otherDeviceFolderNodes)
-        whenever(deviceNodeStatusMapper(otherDeviceFolderNodes)).thenReturn(otherDeviceStatus)
+        whenever(
+            deviceNodeStatusMapper(
+                folders = otherDeviceFolderNodes,
+                isCameraUploadsEnabled = isCameraUploadsEnabled,
+                isCurrentDevice = false,
+            )
+        ).thenReturn(otherDeviceStatus)
 
         val deviceNodes = listOf(
             OwnDeviceNode(
@@ -86,9 +99,10 @@ internal class DeviceNodeMapperTest {
         )
         assertThat(
             underTest(
-                currentDeviceId = currentDeviceId,
                 backupInfoList = backupInfoList,
+                currentDeviceId = currentDeviceId,
                 deviceIdAndNameMap = deviceIdAndNameMap,
+                isCameraUploadsEnabled = isCameraUploadsEnabled,
             )
         ).isEqualTo(deviceNodes)
     }

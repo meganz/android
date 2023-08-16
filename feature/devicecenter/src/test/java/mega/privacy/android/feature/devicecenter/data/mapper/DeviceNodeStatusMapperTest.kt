@@ -5,6 +5,7 @@ import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -24,13 +25,45 @@ internal class DeviceNodeStatusMapperTest {
         underTest = DeviceNodeStatusMapper()
     }
 
-    @ParameterizedTest(name = "prioritized device status: {1}")
+    @Test
+    fun `test that a no camera uploads device status is returned if the current device camera uploads is disabled`() {
+        assertThat(
+            underTest(
+                folders = listOf(mock(), mock()),
+                isCameraUploadsEnabled = false,
+                isCurrentDevice = true
+            )
+        ).isEqualTo(DeviceCenterNodeStatus.NoCameraUploads)
+    }
+
+    @ParameterizedTest(name = "expected current device status: {1}")
     @MethodSource("provideParameters")
-    fun `test that the prioritized device status is returned`(
+    fun `test that the calculated device status is returned if the current device camera uploads is enabled`(
         folders: List<DeviceFolderNode>,
         expectedDeviceStatus: DeviceCenterNodeStatus,
     ) {
-        assertThat(underTest(folders)).isEqualTo(expectedDeviceStatus)
+        assertThat(
+            underTest(
+                folders = folders,
+                isCameraUploadsEnabled = true,
+                isCurrentDevice = true,
+            )
+        ).isEqualTo(expectedDeviceStatus)
+    }
+
+    @ParameterizedTest(name = "expected other device status: {1}")
+    @MethodSource("provideParameters")
+    fun `test that the calculated device status is returned for other devices`(
+        folders: List<DeviceFolderNode>,
+        expectedDeviceStatus: DeviceCenterNodeStatus,
+    ) {
+        assertThat(
+            underTest(
+                folders = folders,
+                isCameraUploadsEnabled = false,
+                isCurrentDevice = false,
+            )
+        ).isEqualTo(expectedDeviceStatus)
     }
 
     private fun provideParameters() = Stream.of(

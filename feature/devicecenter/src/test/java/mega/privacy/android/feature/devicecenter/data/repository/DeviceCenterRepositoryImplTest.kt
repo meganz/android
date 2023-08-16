@@ -95,33 +95,37 @@ internal class DeviceCenterRepositoryImplTest {
         assertThrows<MegaException> { underTest.getBackupInfo() }
     }
 
-    @Test
-    fun `test that get devices returns the list of backup devices`() = runTest {
-        val currentDeviceId = "12345-6789"
-        val backupInfoList = listOf<BackupInfo>(
-            mock()
-        )
-        val deviceIdAndNameMap = mapOf(currentDeviceId to "Device Name One")
-        val deviceNodes = listOf(
-            mock<OwnDeviceNode>(),
-            mock<OtherDeviceNode>()
-        )
+    @ParameterizedTest(name = "is camera uploads enabled")
+    @ValueSource(booleans = [true, false])
+    fun `test that get devices returns the list of backup devices`(isCameraUploadsEnabled: Boolean) =
+        runTest {
+            val backupInfoList = listOf<BackupInfo>(
+                mock()
+            )
+            val currentDeviceId = "12345-6789"
+            val deviceIdAndNameMap = mapOf(currentDeviceId to "Device Name One")
+            val deviceNodes = listOf(
+                mock<OwnDeviceNode>(),
+                mock<OtherDeviceNode>()
+            )
 
-        whenever(
-            deviceNodeMapper(
-                currentDeviceId = currentDeviceId,
-                backupInfoList = backupInfoList,
-                deviceIdAndNameMap = deviceIdAndNameMap,
-            )
-        ).thenReturn(deviceNodes)
-        assertThat(
-            underTest.getDevices(
-                currentDeviceId = currentDeviceId,
-                backupInfoList = backupInfoList,
-                deviceIdAndNameMap = deviceIdAndNameMap,
-            )
-        ).isEqualTo(deviceNodes)
-    }
+            whenever(
+                deviceNodeMapper(
+                    backupInfoList = backupInfoList,
+                    currentDeviceId = currentDeviceId,
+                    deviceIdAndNameMap = deviceIdAndNameMap,
+                    isCameraUploadsEnabled = isCameraUploadsEnabled,
+                )
+            ).thenReturn(deviceNodes)
+            assertThat(
+                underTest.getDevices(
+                    backupInfoList = backupInfoList,
+                    currentDeviceId = currentDeviceId,
+                    deviceIdAndNameMap = deviceIdAndNameMap,
+                    isCameraUploadsEnabled = isCameraUploadsEnabled,
+                )
+            ).isEqualTo(deviceNodes)
+        }
 
     @ParameterizedTest(name = "deviceId: \"{0}\"")
     @NullAndEmptySource

@@ -43,14 +43,16 @@ internal class DeviceCenterRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getDevices(
-        currentDeviceId: String,
         backupInfoList: List<BackupInfo>,
+        currentDeviceId: String,
         deviceIdAndNameMap: Map<String, String>,
+        isCameraUploadsEnabled: Boolean,
     ) = withContext(ioDispatcher) {
         deviceNodeMapper(
-            currentDeviceId = currentDeviceId,
             backupInfoList = backupInfoList,
+            currentDeviceId = currentDeviceId,
             deviceIdAndNameMap = deviceIdAndNameMap,
+            isCameraUploadsEnabled = isCameraUploadsEnabled,
         )
     }
 
