@@ -3,7 +3,6 @@ package mega.privacy.android.data.mapper.transfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
-import mega.privacy.android.domain.entity.transfer.TransferType
 import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
 
@@ -12,6 +11,7 @@ import javax.inject.Inject
  */
 internal class TransferMapper @Inject constructor(
     private val transferAppDataMapper: TransferAppDataMapper,
+    private val transferTypeMapper: TransferTypeMapper,
 ) {
     /**
      * Invoke
@@ -19,7 +19,7 @@ internal class TransferMapper @Inject constructor(
      * @param transfer [MegaTransfer]
      */
     operator fun invoke(transfer: MegaTransfer) = Transfer(
-        transferType = transfer.type.mapTransferType(),
+        transferType = transferTypeMapper(transfer.type),
         transferredBytes = transfer.transferredBytes,
         totalBytes = transfer.totalBytes,
         localPath = transfer.path.orEmpty(),
@@ -40,12 +40,6 @@ internal class TransferMapper @Inject constructor(
         priority = transfer.priority,
         notificationNumber = transfer.notificationNumber,
     )
-
-    private fun Int.mapTransferType(): TransferType = when (this) {
-        MegaTransfer.TYPE_DOWNLOAD -> TransferType.TYPE_DOWNLOAD
-        MegaTransfer.TYPE_UPLOAD -> TransferType.TYPE_UPLOAD
-        else -> TransferType.NONE
-    }
 
     private fun Int.mapTransferState(): TransferState = when (this) {
         MegaTransfer.STATE_NONE -> TransferState.STATE_NONE
