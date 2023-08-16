@@ -9,16 +9,11 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -108,7 +103,9 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                     onImportClicked = ::onImportClicked,
                     onTransferWidgetClick = ::onTransfersWidgetClick,
                     onConfirmErrorDialogClick = ::onConfirmErrorDialogClick,
-                    onErrorMessageConsumed = viewModel::resetErrorMessage
+                    onErrorMessageConsumed = viewModel::resetErrorMessage,
+                    onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
+                    onForeignNodeErrorConsumed = viewModel::resetForeignNodeError
                 )
             }
         }

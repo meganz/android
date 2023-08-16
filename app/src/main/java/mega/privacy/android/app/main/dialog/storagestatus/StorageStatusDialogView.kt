@@ -62,6 +62,7 @@ internal fun StorageStatusDialogView(
     onAchievementsClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    usePlatformDefaultWidth: Boolean = true,
     viewModel: StorageStatusViewModel = viewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -77,6 +78,7 @@ internal fun StorageStatusDialogView(
 
     StorageStatusDialogView(
         modifier = modifier,
+        usePlatformDefaultWidth = usePlatformDefaultWidth,
         dismissClickListener = onClose,
         state = dialogState,
         actionButtonClickListener = {

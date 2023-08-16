@@ -25,9 +25,13 @@ import mega.privacy.android.app.presentation.mapper.GetIntentFromFileLinkToOpenF
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.PublicNodeException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -261,9 +265,29 @@ class FileLinkViewModel @Inject constructor(
             .onSuccess { _state.update { it.copy(copySuccess = true, jobInProgressState = null) } }
             .onFailure { copyThrowable ->
                 resetJobInProgressState()
-                setErrorMessage(R.string.context_no_copied)
+                handleCopyError(copyThrowable)
                 Timber.e(copyThrowable)
             }
+    }
+
+    private fun handleCopyError(throwable: Throwable) {
+        when (throwable) {
+            is QuotaExceededMegaException -> {
+                _state.update { it.copy(overQuotaError = triggered(StorageState.Red)) }
+            }
+
+            is NotEnoughQuotaMegaException -> {
+                _state.update { it.copy(overQuotaError = triggered(StorageState.Orange)) }
+            }
+
+            is ForeignNodeException -> {
+                _state.update { it.copy(foreignNodeError = triggered) }
+            }
+
+            else -> {
+                setErrorMessage(R.string.context_no_copied)
+            }
+        }
     }
 
     /**
@@ -353,4 +377,14 @@ class FileLinkViewModel @Inject constructor(
      * Reset and notify that errorMessage event is consumed
      */
     fun resetErrorMessage() = _state.update { it.copy(errorMessage = consumed()) }
+
+    /**
+     * Reset and notify that overQuotaError event is consumed
+     */
+    fun resetOverQuotaError() = _state.update { it.copy(overQuotaError = consumed()) }
+
+    /**
+     * Reset and notify that foreignNodeError event is consumed
+     */
+    fun resetForeignNodeError() = _state.update { it.copy(foreignNodeError = consumed) }
 }

@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.filelink.model
 
 import android.content.Intent
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.PublicNodeException
 import nz.mega.sdk.MegaNode
@@ -31,6 +33,8 @@ import nz.mega.sdk.MegaNode
  * @property openFile               State to handle file opening
  * @property downloadFile           State to download file
  * @property errorMessage           State to show error message
+ * @property overQuotaError         State to show over quota error
+ * @property foreignNodeError       State to show foreign node error
  */
 data class FileLinkState(
     val shouldLogin: Boolean? = null,
@@ -52,7 +56,9 @@ data class FileLinkState(
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,
     val openFile: StateEventWithContent<Intent> = consumed(),
     val downloadFile: StateEventWithContent<MegaNode> = consumed(),
-    val errorMessage: StateEventWithContent<Int> = consumed()
+    val errorMessage: StateEventWithContent<Int> = consumed(),
+    val overQuotaError: StateEventWithContent<StorageState> = consumed(),
+    val foreignNodeError: StateEvent = consumed,
 ) {
     /**
      * Creates a copy of this view state with the info that can be extracted directly from typedNode

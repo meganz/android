@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.filelink.view
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.TweenSpec
@@ -30,6 +31,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +45,16 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
+import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
+import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
@@ -57,6 +64,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.domain.entity.StorageState
 
 /**
  * View to render the File Link Screen, including toolbar, content, etc.
@@ -78,17 +86,29 @@ internal fun FileLinkView(
     onTransferWidgetClick: () -> Unit,
     onConfirmErrorDialogClick: () -> Unit,
     onErrorMessageConsumed: () -> Unit,
+    onOverQuotaErrorConsumed: () -> Unit,
+    onForeignNodeErrorConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
+    val showForeignNodeErrorDialog = remember { mutableStateOf(false) }
 
     EventEffect(
         event = viewState.errorMessage,
         onConsumed = onErrorMessageConsumed
     ) {
         snackBarHostState.showSnackbar(context.resources.getString(it))
+    }
+
+    EventEffect(event = viewState.overQuotaError, onConsumed = onOverQuotaErrorConsumed) {
+        showQuotaExceededDialog.value = it
+    }
+
+    EventEffect(event = viewState.foreignNodeError, onConsumed = onForeignNodeErrorConsumed) {
+        showForeignNodeErrorDialog.value = true
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -232,6 +252,40 @@ internal fun FileLinkView(
                 dismissOnClickOutside = false
             )
         }
+
+        showQuotaExceededDialog.value?.let {
+            StorageStatusDialogView(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                usePlatformDefaultWidth = false,
+                storageState = it,
+                preWarning = it != StorageState.Red,
+                overQuotaAlert = true,
+                onUpgradeClick = {
+                    context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
+                },
+                onCustomizedPlanClick = { email, accountType ->
+                    AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
+                },
+                onAchievementsClick = {
+                    context.startActivity(
+                        Intent(context, MyAccountActivity::class.java)
+                            .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+                    )
+                },
+                onClose = { showQuotaExceededDialog.value = null }
+            )
+        }
+
+        if (showForeignNodeErrorDialog.value) {
+            MegaAlertDialog(
+                text = stringResource(id = R.string.warning_share_owner_storage_quota),
+                confirmButtonText = stringResource(id = R.string.general_ok),
+                cancelButtonText = null,
+                onConfirm = { showForeignNodeErrorDialog.value = false },
+                onDismiss = {},
+                dismissOnClickOutside = false
+            )
+        }
     }
 }
 
@@ -294,7 +348,9 @@ private fun PreviewFileLinkView() {
             onImportClicked = {},
             onTransferWidgetClick = {},
             onConfirmErrorDialogClick = {},
-            onErrorMessageConsumed = {}
+            onErrorMessageConsumed = {},
+            onOverQuotaErrorConsumed = {},
+            onForeignNodeErrorConsumed = {}
         )
     }
 }

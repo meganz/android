@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentFromFileLinkToOpenFileMapper
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -418,6 +419,26 @@ class FileLinkViewModelTest {
                 underTest.resetDownloadFile()
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.downloadFile).isInstanceOf(consumed<MegaNode>().javaClass)
+            }
+        }
+
+    @Test
+    fun `test that overQuotaError should be reset to consumed when resetDownloadFile is invoked`() =
+        runTest {
+            underTest.state.test {
+                underTest.resetDownloadFile()
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.overQuotaError).isInstanceOf(consumed<StorageState>().javaClass)
+            }
+        }
+
+    @Test
+    fun `test that foreignNodeError should be reset to consumed when resetDownloadFile is invoked`() =
+        runTest {
+            underTest.state.test {
+                underTest.resetDownloadFile()
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.foreignNodeError).isEqualTo(consumed)
             }
         }
 }
