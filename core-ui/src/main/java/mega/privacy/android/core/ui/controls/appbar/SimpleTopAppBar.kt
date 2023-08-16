@@ -1,6 +1,6 @@
 package mega.privacy.android.core.ui.controls.appbar
 
-import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
@@ -15,14 +15,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+
+/**
+ * Top app bar with title.
+ */
+@Composable
+fun SimpleTopAppBar(
+    modifier: Modifier = Modifier,
+    @StringRes titleId: Int,
+    elevation: Boolean,
+    isEnabled: Boolean = true,
+    onBackPressed: () -> Unit,
+) {
+    SimpleTopAppBar(
+        modifier,
+        stringResource(titleId),
+        elevation,
+        isEnabled,
+        onBackPressed
+    )
+}
 
 @Composable
 fun SimpleTopAppBar(
     modifier: Modifier = Modifier,
-    titleId: Int,
+    title: String,
     elevation: Boolean,
     isEnabled: Boolean = true,
     onBackPressed: () -> Unit,
@@ -31,7 +51,7 @@ fun SimpleTopAppBar(
         modifier = modifier,
         title = {
             Text(
-                text = stringResource(id = titleId),
+                text = title,
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Medium
             )
@@ -50,11 +70,13 @@ fun SimpleTopAppBar(
     )
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
+@CombinedThemePreviews
 @Composable
-fun PreviewSimpleTopAppBar() {
+private fun PreviewSimpleTopAppBar() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        SimpleTopAppBar(titleId = 0, elevation = false, onBackPressed = {})
+        SimpleTopAppBar(titleId = 0,
+            elevation = false,
+            onBackPressed = {}
+        )
     }
 }
