@@ -182,10 +182,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             )
                         }
 
-                        if (chat.isWaitingRoom) {
-                            setWaitingRoomReminderEnabled()
-                        }
-
                         val list = mutableListOf<ContactItem>()
                         chat.peerHandlesList.forEach { id ->
                             runCatching {
@@ -610,9 +606,12 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      */
     fun onAllowNonHostAddParticipantsTap() =
         _state.update { state ->
-            val newValue = !state.enabledAllowAddParticipantsOption
+            val newValueForAllowAddParticipantsOption = !state.enabledAllowAddParticipantsOption
+            if (state.enabledWaitingRoomOption && newValueForAllowAddParticipantsOption) {
+                setWaitingRoomReminderEnabled()
+            }
             state.copy(
-                enabledAllowAddParticipantsOption = newValue,
+                enabledAllowAddParticipantsOption = newValueForAllowAddParticipantsOption,
             )
         }
 
@@ -785,12 +784,12 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      */
     fun onWaitingRoomTap() =
         _state.update { state ->
-            val newValue = !state.enabledWaitingRoomOption
-            if (newValue) {
+            val newValueForWaitingRoomOption = !state.enabledWaitingRoomOption
+            if (newValueForWaitingRoomOption && state.enabledAllowAddParticipantsOption) {
                 setWaitingRoomReminderEnabled()
             }
             state.copy(
-                enabledWaitingRoomOption = newValue,
+                enabledWaitingRoomOption = newValueForWaitingRoomOption,
             )
         }
 
@@ -809,14 +808,15 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private fun getChatRoomUpdates(chatId: Long) =
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
-                if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
+                if (chat.hasChanged(ChatRoomChange.WaitingRoom) || chat.hasChanged(ChatRoomChange.OpenInvite)) {
                     _state.update {
                         it.copy(
                             enabledWaitingRoomOption = chat.isWaitingRoom,
+                            enabledAllowAddParticipantsOption = chat.isOpenInvite
                         )
                     }
 
-                    if (chat.isWaitingRoom) {
+                    if (chat.isWaitingRoom && chat.isOpenInvite) {
                         setWaitingRoomReminderEnabled()
                     }
                 }

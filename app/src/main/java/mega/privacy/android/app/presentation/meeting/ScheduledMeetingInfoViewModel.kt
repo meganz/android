@@ -86,7 +86,7 @@ import javax.inject.Inject
  * @property cameraGateway                                  [CameraGateway]
  * @property deviceGateway                                  [DeviceGateway]
  * @property setWaitingRoomUseCase                          [SetWaitingRoomUseCase]
- * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
+ * @property setWaitingRoomRemindersUseCase                 [SetWaitingRoomRemindersUseCase]
  * @property state                    Current view state as [ScheduledMeetingInfoState]
 
  */
@@ -288,7 +288,12 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         }
                         val isOpenInvite = if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
                             Timber.d("Changes in open invite")
-                            chat.isOpenInvite || isHost
+
+                            if (chat.isWaitingRoom && chat.isOpenInvite) {
+                                setWaitingRoomReminderEnabled()
+                            }
+
+                            chat.isOpenInvite
                         } else {
                             isOpenInvite
                         }
@@ -300,7 +305,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         }
                         val isWaitingRoom = if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
                             Timber.d("Changes in waiting room")
-                            if (chat.isWaitingRoom) {
+                            if (chat.isWaitingRoom && chat.isOpenInvite) {
                                 setWaitingRoomReminderEnabled()
                             }
 
@@ -330,8 +335,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
 
                         copy(
                             isHost = isHost,
-                            isOpenInvite = isOpenInvite,
-                            enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite,
+                            isOpenInvite = isOpenInvite || isHost,
+                            enabledAllowNonHostAddParticipantsOption = isOpenInvite,
                             chatTitle = title,
                             isPublic = isPublic,
                             enabledWaitingRoomOption = isWaitingRoom,
@@ -794,12 +799,16 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }.onFailure { exception ->
                     Timber.e(exception)
                     showSnackBar(R.string.general_text_error)
-                }.onSuccess { result ->
+                }.onSuccess { isAllowAddParticipantsEnabled ->
                     _state.update { state ->
                         state.copy(
-                            isOpenInvite = result || state.isHost,
-                            enabledAllowNonHostAddParticipantsOption = result,
+                            isOpenInvite = isAllowAddParticipantsEnabled || state.isHost,
+                            enabledAllowNonHostAddParticipantsOption = isAllowAddParticipantsEnabled,
                         )
+                    }
+
+                    if (state.value.enabledWaitingRoomOption && isAllowAddParticipantsEnabled) {
+                        setWaitingRoomReminderEnabled()
                     }
                 }
             }
@@ -813,18 +822,19 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun setWaitingRoom() =
         viewModelScope.launch {
-            val isEnabled = !state.value.enabledWaitingRoomOption
+            val newValueForWaitingRoomOption = !state.value.enabledWaitingRoomOption
             runCatching {
-                setWaitingRoomUseCase(state.value.chatId, isEnabled)
+                setWaitingRoomUseCase(state.value.chatId, newValueForWaitingRoomOption)
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess {
                 _state.update { state ->
                     state.copy(
-                        enabledWaitingRoomOption = isEnabled
+                        enabledWaitingRoomOption = newValueForWaitingRoomOption
                     )
                 }
-                if (isEnabled) {
+
+                if (newValueForWaitingRoomOption && state.value.enabledAllowNonHostAddParticipantsOption) {
                     setWaitingRoomReminderEnabled()
                 }
             }
