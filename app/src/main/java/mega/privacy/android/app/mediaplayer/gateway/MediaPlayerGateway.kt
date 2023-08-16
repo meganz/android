@@ -204,8 +204,9 @@ interface MediaPlayerGateway {
      * Add subtitle for video
      *
      * @param subtitleFileUrl the subtitle file link
+     * @return true is success, otherwise is failed
      */
-    fun addSubtitle(subtitleFileUrl: String)
+    fun addSubtitle(subtitleFileUrl: String): Boolean
 
     /**
      * For show subtitle after the subtitle file has been set

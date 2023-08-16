@@ -470,15 +470,20 @@ class VideoPlayerViewModel @Inject constructor(
      * The function is for the adding subtitle file
      *
      * @param info the added subtitle file info
+     * @param isReset true is reset data and set the state to off, otherwise keep previous data and state
      */
-    internal fun onAddSubtitleFile(info: SubtitleFileInfo?) {
+    internal fun onAddSubtitleFile(info: SubtitleFileInfo?, isReset: Boolean = false) {
         info?.let {
             it.url?.let {
+                _isSubtitleShown.update { true }
                 updateSubtitleInfoByAddSubtitles(info)
                 selectOptionState = SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
             } ?: Timber.d("The subtitle file url is null")
-            _isSubtitleShown.update { true }
         } ?: let {
+            if (isReset) {
+                selectOptionState = SUBTITLE_SELECTED_STATE_OFF
+                updateSubtitleInfoByAddSubtitles(null)
+            }
             _addSubtitleState.update { false }
             _isSubtitleShown.update {
                 selectOptionState != SUBTITLE_SELECTED_STATE_OFF

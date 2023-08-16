@@ -38,7 +38,7 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
             if (viewModel.searchState == SearchWidgetState.EXPANDED) {
                 viewModel.closeSearch()
             } else {
-                setResult(RESULT_OK)
+                setResult(RESULT_CANCELED)
                 this@SelectSubtitleFileActivity.finish()
             }
         }
@@ -55,21 +55,19 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 SelectSubtitleComposeView(
                     onAddSubtitle = { info ->
-                        info?.let {
-                            viewModel.sendAddSubtitleClickedEvent()
-                            setResult(
-                                RESULT_OK,
-                                Intent().putExtra(
-                                    INTENT_KEY_SUBTITLE_FILE_INFO,
-                                    it
-                                )
+                        viewModel.sendAddSubtitleClickedEvent()
+                        setResult(
+                            RESULT_OK,
+                            Intent().putExtra(
+                                INTENT_KEY_SUBTITLE_FILE_INFO,
+                                info
                             )
-                            this.finish()
-                        }
+                        )
+                        this.finish()
                     },
                     onBackPressed = {
                         viewModel.sendSelectSubtitleCancelledEvent()
-                        setResult(RESULT_OK)
+                        setResult(RESULT_CANCELED)
                         this.finish()
                     })
             }

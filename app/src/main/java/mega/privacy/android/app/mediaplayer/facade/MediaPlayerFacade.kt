@@ -355,7 +355,7 @@ class MediaPlayerFacade @Inject constructor(
         }
     }
 
-    override fun addSubtitle(subtitleFileUrl: String) {
+    override fun addSubtitle(subtitleFileUrl: String) =
         player?.let { player ->
             val videoUri: Uri? = player.currentMediaItem?.localConfiguration?.uri
             val mediaId = player.currentMediaItem?.mediaId
@@ -378,9 +378,12 @@ class MediaPlayerFacade @Inject constructor(
                 player.prepare()
                 player.play()
                 showSubtitle()
+                true
+            } else {
+                false
             }
-        }
-    }
+        } ?: false
+
 
     override fun showSubtitle() {
         trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)

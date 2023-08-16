@@ -5085,4 +5085,6 @@
     <string name="photos_action_zoom_in">Zoom in</string>
     <!-- Photos action menu zoom out -->
     <string name="photos_action_zoom_out">Zoom out</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
 </resources>

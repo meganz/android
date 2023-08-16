@@ -187,6 +187,30 @@ internal class VideoPlayerViewModelTest {
     }
 
     @Test
+    internal fun `test that onAddSubtitleFile function is invoked and state is reset when info is null`() =
+        runTest {
+            underTest.onAddSubtitleFile(
+                SubtitleFileInfo(
+                    id = expectedId,
+                    name = expectedName,
+                    url = expectedUrl,
+                    parentName = null
+                )
+            )
+            assertThat(underTest.selectOptionState).isEqualTo(
+                SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
+            )
+            underTest.onAddSubtitleFile(null, true)
+            underTest.subtitleDisplayState.test {
+                val actual = awaitItem()
+                assertThat(actual.isSubtitleShown).isFalse()
+                assertThat(actual.isAddSubtitle).isFalse()
+                assertThat(actual.isSubtitleDialogShown).isFalse()
+            }
+            assertThat(underTest.selectOptionState).isEqualTo(SUBTITLE_SELECTED_STATE_OFF)
+        }
+
+    @Test
     internal fun `test that onAutoMatchItemClicked function is invoked`() = runTest {
         underTest.onAutoMatchItemClicked(
             SubtitleFileInfo(

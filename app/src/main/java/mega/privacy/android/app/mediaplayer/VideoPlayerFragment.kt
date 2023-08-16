@@ -46,6 +46,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import org.jetbrains.anko.configuration
 import timber.log.Timber
 import java.io.File
@@ -102,12 +103,20 @@ class VideoPlayerFragment : Fragment() {
 
     private val selectSubtitleFileActivityLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                viewModel.onAddSubtitleFile(
-                    result.data?.serializable(
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    (result.data?.serializable(
                         INTENT_KEY_SUBTITLE_FILE_INFO
-                    )
-                )
+                    ) as? SubtitleFileInfo?).let { info ->
+                        viewModel.onAddSubtitleFile(info)
+                        if (info?.url == null) {
+                            showAddingSubtitleFailedMessage()
+                        }
+                    }
+                }
+
+                Activity.RESULT_CANCELED ->
+                    viewModel.onAddSubtitleFile(null)
             }
         }
 
@@ -564,6 +573,9 @@ class VideoPlayerFragment : Fragment() {
                             viewModel.onAddedSubtitleOptionClicked()
                         },
                         onAutoMatch = { info ->
+                            if (info.url == null) {
+                                showAddingSubtitleFailedMessage()
+                            }
                             viewModel.onAutoMatchItemClicked(info)
                         },
                         onToSelectSubtitle = {
@@ -634,7 +646,10 @@ class VideoPlayerFragment : Fragment() {
     }
 
     private fun addSubtitle(subtitleFileUrl: String) {
-        mediaPlayerGateway.addSubtitle(subtitleFileUrl)
+        if (!mediaPlayerGateway.addSubtitle(subtitleFileUrl)) {
+            showAddingSubtitleFailedMessage()
+            viewModel.onAddSubtitleFile(info = null, isReset = true)
+        }
         // Don't recreate play sources if the playlist is unavailable,
         // to avoid the subtitle not working for a single item played.
         if (activity?.intent?.getBooleanExtra(
@@ -669,6 +684,12 @@ class VideoPlayerFragment : Fragment() {
             )
             setVideoPlayType(type)
         }
+    }
+
+    private fun showAddingSubtitleFailedMessage() {
+        (activity as? VideoPlayerActivity)?.showSnackbarForVideoPlayer(
+            getString(R.string.media_player_video_message_adding_subtitle_failed)
+        )
     }
 
     /**
