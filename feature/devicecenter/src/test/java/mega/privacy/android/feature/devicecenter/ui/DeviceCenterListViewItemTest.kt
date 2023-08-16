@@ -5,7 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.feature.devicecenter.ui.entity.status.DeviceCenterUINodeStatus
+import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

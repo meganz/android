@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.ui.entity.status
+package mega.privacy.android.feature.devicecenter.ui.model.status
 
 import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.feature.devicecenter.R as DeviceCenterR

@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.ui.entity.status
+package mega.privacy.android.feature.devicecenter.ui.model.status
 
 import androidx.compose.ui.graphics.Color
 

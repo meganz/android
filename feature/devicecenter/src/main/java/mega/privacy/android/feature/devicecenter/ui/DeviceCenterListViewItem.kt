@@ -16,7 +16,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
-import mega.privacy.android.feature.devicecenter.ui.entity.status.DeviceCenterUINodeStatus
+import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import java.io.File
 
 /**
