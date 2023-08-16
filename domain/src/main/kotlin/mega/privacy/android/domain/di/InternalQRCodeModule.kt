@@ -3,10 +3,6 @@ package mega.privacy.android.domain.di
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.migration.DisableInstallInCheck
-import mega.privacy.android.domain.usecase.DefaultDeleteQRCode
-import mega.privacy.android.domain.usecase.DefaultResetContactLink
-import mega.privacy.android.domain.usecase.DeleteQRCode
-import mega.privacy.android.domain.usecase.ResetContactLink
 import mega.privacy.android.domain.usecase.qrcode.DefaultQueryScannedContactLink
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 
@@ -19,12 +15,6 @@ import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 @Module
 @DisableInstallInCheck
 internal abstract class InternalQRCodeModule {
-
-    @Binds
-    abstract fun bindDeleteQRCode(implementation: DefaultDeleteQRCode): DeleteQRCode
-
-    @Binds
-    abstract fun bindResetContactLink(implementation: DefaultResetContactLink): ResetContactLink
 
     /**
      * Provides GetScannedContactLink use case implementation

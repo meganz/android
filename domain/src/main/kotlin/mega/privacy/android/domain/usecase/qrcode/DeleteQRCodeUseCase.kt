@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.qrcode
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -9,16 +9,21 @@ import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import javax.inject.Inject
 
 /**
- * [DeleteQRCode] implementation
+ * Use case to delete QR Code and file
  */
-class DefaultDeleteQRCode @Inject constructor(
+class DeleteQRCodeUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val nodeRepository: NodeRepository,
     private val getQRCodeFileUseCase: GetQRCodeFileUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : DeleteQRCode {
-
-    override suspend fun invoke(contactLink: String) {
+) {
+    /**
+     * Invoke method
+     *
+     * @param contactLink handle – Contact link to be deleted. It is the URL starts with "https://"
+     *
+     */
+    suspend operator fun invoke(contactLink: String) {
         withContext(ioDispatcher) {
             val handle = getHandleByContactLink(contactLink)
             accountRepository.deleteContactLink(handle)

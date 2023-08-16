@@ -12,8 +12,6 @@ import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapp
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import mega.privacy.android.domain.di.QRCodeModule
-import mega.privacy.android.domain.usecase.DeleteQRCode
-import mega.privacy.android.domain.usecase.ResetContactLink
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import org.mockito.kotlin.mock
 
@@ -29,8 +27,6 @@ import org.mockito.kotlin.mock
 )
 @Module
 class TestQRCodeModule {
-    private val deleteQrCode = mock<DeleteQRCode>()
-    private val resetContactLink = mock<ResetContactLink>()
     private val qrCodeMapper = mock<QRCodeMapper>()
     private val queryScannedContactLink = mock<QueryScannedContactLink>()
     private val loadBitmapFromFileMapper = mock<LoadBitmapFromFileMapper>()
@@ -38,12 +34,6 @@ class TestQRCodeModule {
     private val getCircleBitmapMapper = mock<GetCircleBitmapMapper>()
     private val combineQRCodeAndAvatarMapper = mock<CombineQRCodeAndAvatarMapper>()
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
-
-    @Provides
-    fun provideDeleteQRCode() = deleteQrCode
-
-    @Provides
-    fun provideResetQRCode() = resetContactLink
 
     @Provides
     fun provideCreateQRCodeMapper() = qrCodeMapper

@@ -20,12 +20,12 @@ import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyQRCodeUIState
 import mega.privacy.android.domain.usecase.CopyToClipBoard
-import mega.privacy.android.domain.usecase.CreateContactLink
-import mega.privacy.android.domain.usecase.DeleteQRCode
+import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
+import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
-import mega.privacy.android.domain.usecase.ResetContactLink
+import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,10 +37,10 @@ import javax.inject.Inject
 class MyCodeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val copyToClipBoard: CopyToClipBoard,
-    private val createContactLink: CreateContactLink,
+    private val createContactLinkUseCase: CreateContactLinkUseCase,
     private val getQRCodeFileUseCase: GetQRCodeFileUseCase,
-    private val deleteQRCode: DeleteQRCode,
-    private val resetContactLink: ResetContactLink,
+    private val deleteQRCodeUseCase: DeleteQRCodeUseCase,
+    private val resetContactLinkUseCase: ResetContactLinkUseCase,
     private val avatarMapper: AvatarMapper,
     private val qrCodeMapper: QRCodeMapper,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
@@ -107,7 +107,7 @@ class MyCodeViewModel @Inject constructor(
                     it.copy(isInProgress = true)
                 }
 
-                createContactLink(renew = false)?.let { newContactLink ->
+                createContactLinkUseCase(renew = false)?.let { newContactLink ->
                     Timber.d("contact link created $newContactLink")
                     generateQRCodeBitmap(
                         contactLink = newContactLink,
@@ -222,7 +222,7 @@ class MyCodeViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             runCatching {
-                resetContactLink().let { contactLink ->
+                resetContactLinkUseCase().let { contactLink ->
                     Timber.d("contact link created $contactLink")
 
                     generateQRCodeBitmap(
@@ -297,7 +297,7 @@ class MyCodeViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 uiState.value.contactLink?.let { contactLink ->
-                    deleteQRCode(contactLink = contactLink)
+                    deleteQRCodeUseCase(contactLink = contactLink)
                 }
             }.fold(
                 onSuccess = {

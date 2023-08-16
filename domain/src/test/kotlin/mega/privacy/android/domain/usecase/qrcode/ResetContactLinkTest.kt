@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.qrcode
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -10,14 +10,14 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultResetContactLinkTest {
+class ResetContactLinkUseCaseTest {
 
-    private lateinit var underTest: DefaultResetContactLink
+    private lateinit var underTest: ResetContactLinkUseCase
     private val accountRepository: AccountRepository = mock()
 
     @Before
     fun setup() {
-        underTest = DefaultResetContactLink(
+        underTest = ResetContactLinkUseCase(
             accountRepository = accountRepository,
         )
     }
@@ -27,6 +27,5 @@ class DefaultResetContactLinkTest {
         underTest()
         verify(accountRepository).createContactLink(true)
     }
-
 
 }

@@ -19,12 +19,12 @@ import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeViewModel
 import mega.privacy.android.domain.usecase.CopyToClipBoard
-import mega.privacy.android.domain.usecase.CreateContactLink
-import mega.privacy.android.domain.usecase.DeleteQRCode
+import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
+import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
-import mega.privacy.android.domain.usecase.ResetContactLink
+import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import org.junit.Before
 import org.junit.Rule
@@ -47,10 +47,10 @@ class MyCodeViewModelTest {
     private lateinit var underTest: MyCodeViewModel
 
     private val copyToClipBoard = mock<CopyToClipBoard>()
-    private val createContactLink: CreateContactLink = mock()
-    private val deleteQRCode: DeleteQRCode = mock()
+    private val createContactLinkUseCase: CreateContactLinkUseCase = mock()
+    private val deleteQRCodeUseCase: DeleteQRCodeUseCase = mock()
     private val getQRCodeFileUseCase: GetQRCodeFileUseCase = mock()
-    private val resetContactLink: ResetContactLink = mock()
+    private val resetContactLinkUseCase: ResetContactLinkUseCase = mock()
     private val qrCodeMapper: QRCodeMapper = mock()
     private val avatarMapper: AvatarMapper = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
@@ -80,10 +80,10 @@ class MyCodeViewModelTest {
         underTest = MyCodeViewModel(
             context = context,
             copyToClipBoard = copyToClipBoard,
-            createContactLink = createContactLink,
+            createContactLinkUseCase = createContactLinkUseCase,
             getQRCodeFileUseCase = getQRCodeFileUseCase,
-            deleteQRCode = deleteQRCode,
-            resetContactLink = resetContactLink,
+            deleteQRCodeUseCase = deleteQRCodeUseCase,
+            resetContactLinkUseCase = resetContactLinkUseCase,
             qrCodeMapper = qrCodeMapper,
             avatarMapper = avatarMapper,
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
@@ -174,7 +174,7 @@ class MyCodeViewModelTest {
         val contactLink = "https://contact_link"
         whenever(getQRCodeFileUseCase()).thenReturn(localQRCodeFile)
         whenever(loadBitmapFromFileMapper(localQRCodeFile)).thenReturn(bitmap)
-        whenever(createContactLink(any())).thenReturn(contactLink)
+        whenever(createContactLinkUseCase(any())).thenReturn(contactLink)
         underTest.createQRCode(
             width = qrCodeWidth,
             height = qrCodeHeight,
@@ -202,7 +202,7 @@ class MyCodeViewModelTest {
         val bitmap = Bitmap.createBitmap(qrCodeWidth, qrCodeHeight, Bitmap.Config.ARGB_8888)
         val contactLink = "https://contact_link"
         whenever(getQRCodeFileUseCase()).thenReturn(localQRCodeFile)
-        whenever(createContactLink(any())).thenReturn(contactLink)
+        whenever(createContactLinkUseCase(any())).thenReturn(contactLink)
         whenever(combineQRCodeAndAvatarMapper(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(bitmap)
         underTest.createQRCode(
@@ -228,7 +228,7 @@ class MyCodeViewModelTest {
     fun `test that ui state can be re-used when creating QR code`() = runTest {
         prepareQRCode()
         whenever(getQRCodeFileUseCase()).thenReturn(null)
-        whenever(createContactLink(any())).thenReturn(null)
+        whenever(createContactLinkUseCase(any())).thenReturn(null)
         underTest.createQRCode(
             width = qrCodeWidth,
             height = qrCodeHeight,
@@ -258,7 +258,7 @@ class MyCodeViewModelTest {
         val expectedQrCodeBitmap =
             Bitmap.createBitmap(qrCodeWidth, qrCodeHeight, Bitmap.Config.ARGB_8888)
         val contactLink = "https://contact_link2"
-        whenever(resetContactLink()).thenReturn(contactLink)
+        whenever(resetContactLinkUseCase()).thenReturn(contactLink)
         whenever(qrCodeMapper(any(), any(), any(), any(), any())).thenReturn(tmpBitmap)
         whenever(getCurrentUserFullName(any(), any(), any())).thenReturn("fullname")
         whenever(loadBitmapFromFileMapper(any())).thenReturn(tmpBitmap)
@@ -308,7 +308,7 @@ class MyCodeViewModelTest {
     fun `test that error message is shown when delete QR code fails`() = runTest {
         prepareQRCode()
 
-        whenever(deleteQRCode(any())).thenAnswer { throw Exception() }
+        whenever(deleteQRCodeUseCase(any())).thenAnswer { throw Exception() }
 
         underTest.deleteQR()
         underTest.uiState.test {
@@ -323,7 +323,7 @@ class MyCodeViewModelTest {
     fun `test that QRCode reset fails when resetContactLink use case throws exception`() = runTest {
         prepareQRCode()
 
-        whenever(resetContactLink()).thenAnswer { throw Exception() }
+        whenever(resetContactLinkUseCase()).thenAnswer { throw Exception() }
         underTest.resetQRCode(
             width = qrCodeWidth,
             height = qrCodeHeight,
@@ -356,7 +356,7 @@ class MyCodeViewModelTest {
         val contactLink = "https://contact_link1"
         whenever(getQRCodeFileUseCase()).thenReturn(localQRCodeFile)
         whenever(loadBitmapFromFileMapper(localQRCodeFile)).thenReturn(bitmap)
-        whenever(createContactLink(any())).thenReturn(contactLink)
+        whenever(createContactLinkUseCase(any())).thenReturn(contactLink)
         whenever(qrCodeMapper(any(), any(), any(), any(), any())).thenReturn(tmpBitmap)
         whenever(getCurrentUserFullName(any(), any(), any())).thenReturn("fullname")
         whenever(loadBitmapFromFileMapper(any())).thenReturn(tmpBitmap)

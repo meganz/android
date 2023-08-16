@@ -8,7 +8,6 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.data.mapper.ReferralBonusAchievementsMapper
 import mega.privacy.android.domain.di.AccountModule
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
-import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
@@ -55,9 +54,6 @@ object TestAccountModule {
         on { runBlocking { invoke() } }.thenReturn(mock<AccountCredentials.MyAccountCredentials>())
     }
 
-
-    private val createContactLink = mock<CreateContactLink>()
-
     private val getAccountAchievementsOverviewUseCase =
         mock<GetAccountAchievementsOverviewUseCase>()
 
@@ -80,9 +76,6 @@ object TestAccountModule {
 
     @Provides
     fun provideGetMyCredentials() = getMyCredentials
-
-    @Provides
-    fun provideCreateContactLink() = createContactLink
 
     @Provides
     fun provideMonitorUserUpdate() = mock<MonitorUserUpdates>()

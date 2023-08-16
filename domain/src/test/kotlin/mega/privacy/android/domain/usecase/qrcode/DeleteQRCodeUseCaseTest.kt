@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.qrcode
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,9 +16,9 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultDeleteQRCodeTest {
+class DeleteQRCodeUseCaseTest {
 
-    private lateinit var underTest: DefaultDeleteQRCode
+    private lateinit var underTest: DeleteQRCodeUseCase
 
     private val accountRepository: AccountRepository = mock()
     private val nodeRepository: NodeRepository = mock()
@@ -26,7 +26,7 @@ class DefaultDeleteQRCodeTest {
 
     @Before
     fun setup() {
-        underTest = DefaultDeleteQRCode(
+        underTest = DeleteQRCodeUseCase(
             accountRepository = accountRepository,
             nodeRepository = nodeRepository,
             ioDispatcher = UnconfinedTestDispatcher(),

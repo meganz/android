@@ -6,7 +6,6 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BusinessRepository
-import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultIsUserLoggedIn
 import mega.privacy.android.domain.usecase.DeleteContactLink
@@ -57,13 +56,6 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideGetMyCredentials(accountRepository: AccountRepository): GetMyCredentials =
             GetMyCredentials(accountRepository::getMyCredentials)
-
-        /**
-         * Provides the use case [CreateContactLink]
-         */
-        @Provides
-        fun provideCreateContactLink(accountRepository: AccountRepository): CreateContactLink =
-            CreateContactLink(accountRepository::createContactLink)
 
         /**
          * Provides the use case [DeleteContactLink]
