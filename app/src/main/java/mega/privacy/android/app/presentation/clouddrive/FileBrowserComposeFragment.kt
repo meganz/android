@@ -167,6 +167,7 @@ class FileBrowserComposeFragment : Fragment() {
                             (requireActivity() as? ManagerActivity)?.navigateToUpgradeAccount()
                         },
                         onEnterMediaDiscoveryClick = {
+                            disableSelectMode()
                             showMediaDiscovery(isOpenByMDIcon = true)
                         }
                     )
@@ -390,14 +391,12 @@ class FileBrowserComposeFragment : Fragment() {
                         fromMediaViewer = false,
                         fromChat = false,
                     )
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.RENAME_CLICKED -> {
                     (requireActivity() as ManagerActivity).showRenameDialog(it.selectedMegaNode[0])
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.SHARE_FOLDER_CLICKED -> {
@@ -417,34 +416,29 @@ class FileBrowserComposeFragment : Fragment() {
                                 }
                             }
                         }
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.SHARE_OUT_CLICKED -> {
                     MegaNodeUtil.shareNodes(requireContext(), it.selectedMegaNode)
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.SHARE_EDIT_LINK_CLICKED -> {
                     (requireActivity() as ManagerActivity).showGetLinkActivity(it.selectedMegaNode)
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.REMOVE_LINK_CLICKED -> {
                     (requireActivity() as ManagerActivity).showConfirmationRemovePublicLink(
                         it.selectedMegaNode[0]
                     )
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.SEND_TO_CHAT_CLICKED -> {
                     (requireActivity() as ManagerActivity).attachNodesToChats(it.selectedMegaNode)
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.MOVE_TO_RUBBISH_CLICKED -> {
@@ -469,22 +463,19 @@ class FileBrowserComposeFragment : Fragment() {
                 }
 
                 OptionItems.CLEAR_ALL_CLICKED -> {
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.COPY_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToCopyNodes(fileBrowserViewModel.state.value.selectedNodeHandles)
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.MOVE_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToMoveNodes(fileBrowserViewModel.state.value.selectedNodeHandles)
-                    fileBrowserViewModel.clearAllNodes()
-                    actionMode?.finish()
+                    disableSelectMode()
                 }
 
                 OptionItems.DISPUTE_CLICKED -> {
@@ -555,5 +546,10 @@ class FileBrowserComposeFragment : Fragment() {
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             .setData(uriUrl)
         startActivity(launchBrowser)
+    }
+
+    private fun disableSelectMode() {
+        fileBrowserViewModel.clearAllNodes()
+        actionMode?.finish()
     }
 }
