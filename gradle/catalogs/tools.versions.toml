@@ -1,5 +1,5 @@
 [versions]
-lint = "31.0.2"
+lint = "31.1.0"
 
 [libraries]
 lint = { module = "com.android.tools.lint:lint", version.ref = "lint" }
