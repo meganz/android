@@ -3066,12 +3066,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     } else {
                         supportActionBar?.setTitle(getString(R.string.title_favourites_album))
                     }
+                    viewModel.setIsFirstNavigationLevel(false)
                 } else if (isInFilterPage) {
                     supportActionBar?.setTitle(getString(R.string.photos_action_filter))
+                    viewModel.setIsFirstNavigationLevel(false)
                 } else if (getPhotosFragment() != null) {
                     supportActionBar?.title = getString(R.string.sortby_type_photo_first)
-                    isFirstNavigationLevel =
-                        photosFragment?.isEnableCameraUploadsViewShown() == false || photosFragment?.doesAccountHavePhotos() == false
+                    viewModel.setIsFirstNavigationLevel(!canPhotosEnableCUViewBack())
                 }
             }
 
@@ -3190,22 +3191,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             R.drawable.ic_arrow_back_white
                         )
                     )
-                } else if (drawerItem === DrawerItem.PHOTOS) {
-                    setPhotosNavigationToolbarIcon()
                 } else {
                     supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white))
                 }
             } else {
-                if (drawerItem === DrawerItem.PHOTOS) {
-                    setPhotosNavigationToolbarIcon()
-                } else {
-                    supportActionBar?.setHomeAsUpIndicator(
-                        tintIcon(
-                            this,
-                            R.drawable.ic_arrow_back_white
-                        )
+                supportActionBar?.setHomeAsUpIndicator(
+                    tintIcon(
+                        this,
+                        R.drawable.ic_arrow_back_white
                     )
-                }
+                )
             }
         } else {
             if (isFirstNavigationLevel) {
@@ -3224,11 +3219,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             supportActionBar?.setHomeAsUpIndicator(badgeDrawable)
         }
-        if (drawerItem === DrawerItem.PHOTOS && isInAlbumContent) {
-            supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white))
-        }
-        if (drawerItem === DrawerItem.PHOTOS && isInFilterPage) {
-            supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white))
+        if (drawerItem === DrawerItem.PHOTOS) {
+            setPhotosNavigationToolbarIcon()
         }
     }
 
@@ -3240,27 +3232,47 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * This is only called when there are no unread notifications
      */
     private fun setPhotosNavigationToolbarIcon() {
-        if (getPhotosFragment() != null) {
-            // Enable Camera Uploads Page is shown
-            if (photosFragment?.isEnableCameraUploadsViewShown() == true) {
-                if (photosFragment?.doesAccountHavePhotos() == true) {
-                    // Photos has content
-                    supportActionBar?.setHomeAsUpIndicator(
-                        tintIcon(
-                            this,
-                            R.drawable.ic_arrow_back_white
-                        )
+        when {
+            isInAlbumContent -> {
+                supportActionBar?.setHomeAsUpIndicator(
+                    tintIcon(
+                        this,
+                        R.drawable.ic_arrow_back_white
                     )
-                } else {
-                    // Photos is in an empty state
-                    supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white))
+                )
+            }
+
+            isInFilterPage -> {
+                supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white))
+            }
+
+            else -> {
+                if (getPhotosFragment() != null) {
+                    if (canPhotosEnableCUViewBack()) {
+                        supportActionBar?.setHomeAsUpIndicator(
+                            tintIcon(
+                                this,
+                                R.drawable.ic_arrow_back_white
+                            )
+                        )
+                    } else {
+                        supportActionBar?.setHomeAsUpIndicator(
+                            tintIcon(
+                                this,
+                                R.drawable.ic_menu_white
+                            )
+                        )
+                    }
                 }
-            } else {
-                // Enable Camera Uploads Page is hidden
-                supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white))
             }
         }
     }
+
+    private fun canPhotosEnableCUViewBack() =
+        viewModel.state.value.isFirstLogin
+                && photosFragment?.isEnableCameraUploadsViewShown() == true
+                && photosFragment?.doesAccountHavePhotos() == true
+                && photosFragment?.isInTimeline() == true
 
     private fun showOnlineMode() {
         Timber.d("showOnlineMode")
@@ -4527,7 +4539,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     } else if (drawerItem === DrawerItem.PHOTOS) {
                         if (getPhotosFragment() != null) {
-                            if (photosFragment?.isEnableCameraUploadsViewShown() == true) {
+                            if (canPhotosEnableCUViewBack()) {
                                 photosFragment?.onBackPressed()
                             }
                             setToolbarTitle()
@@ -4800,7 +4812,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             if (isInMDMode) {
                 isInMDMode = false
-                selectDrawerItemCloudDrive()
+                backToDrawerItem(bottomNavigationCurrentItem)
             }
             if (isFileBrowserComposeEnabled()) {
                 if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
@@ -4843,9 +4855,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 fromAlbumContent = true
                 isInAlbumContent = false
                 backToDrawerItem(bottomNavigationCurrentItem)
-                if (photosFragment != null) {
-                    photosFragment?.switchToAlbum()
-                }
             } else if (isInFilterPage) {
                 isInFilterPage = false
                 backToDrawerItem(bottomNavigationCurrentItem)

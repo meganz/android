@@ -224,15 +224,11 @@ class PhotosFragment : Fragment() {
                             if (timelineViewModel.state.value.enableCameraUploadPageShowing) {
                                 managerActivity.refreshPhotosFragment()
                             }
-                            when (timelineViewModel.state.value.selectedTimeBarTab) {
-                                TimeBarTab.All -> {
-                                    photosViewModel.setMenuShowing(true)
-                                }
 
-                                else -> {
-                                    photosViewModel.setMenuShowing(false)
-                                }
-                            }
+                            val isShowMenu =
+                                timelineViewModel.state.value.selectedTimeBarTab == TimeBarTab.All
+                                        || timelineViewModel.state.value.enableCameraUploadPageShowing
+                            photosViewModel.setMenuShowing(isShowMenu)
                         }
 
                         PhotosTab.Albums -> {
@@ -261,7 +257,6 @@ class PhotosFragment : Fragment() {
                                 timelineViewModel.onNavigateToSelectedPhoto()
                             }
                         }
-                        Timber.e("jizhe+" + state.enableZoomIn)
                         handleOptionsMenu(state)
                         handleActionMode(state)
                         handleActionsForCameraUploads(state)
@@ -317,8 +312,8 @@ class PhotosFragment : Fragment() {
             timelineViewModel.setTriggerCameraUploadsState(shouldTrigger = false)
         }
         if (state.shouldShowBusinessAccountSuspendedPrompt) {
-            requireContext().sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).
-                setPackage(
+            requireContext().sendBroadcast(
+                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
                     requireContext().applicationContext.packageName
                 )
             )
@@ -348,15 +343,11 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleOptionsMenu(state: TimelineViewState) {
-        when (state.selectedTimeBarTab) {
-            TimeBarTab.All -> {
-                photosViewModel.setMenuShowing(true)
-            }
+        val isShowMenu =
+            state.selectedTimeBarTab == TimeBarTab.All
+                    || timelineViewModel.state.value.enableCameraUploadPageShowing
+        photosViewModel.setMenuShowing(isShowMenu)
 
-            else -> {
-                photosViewModel.setMenuShowing(false)
-            }
-        }
         menu?.findItem(R.id.action_zoom_in)?.let {
             it.isEnabled = state.enableZoomIn
             it.icon?.alpha = if (state.enableZoomIn) 255 else 125
@@ -656,7 +647,7 @@ class PhotosFragment : Fragment() {
         }
     }
 
-    fun switchToAlbum() {}
+    fun isInTimeline(): Boolean = photosViewModel.state.value.selectedTab == PhotosTab.Timeline
 
     fun refreshViewLayout() {
         handleMenuIcons(!timelineViewModel.state.value.enableCameraUploadPageShowing)
