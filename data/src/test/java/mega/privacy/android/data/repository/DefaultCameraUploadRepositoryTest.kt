@@ -93,12 +93,12 @@ class DefaultCameraUploadRepositoryTest {
 
     private val fakeRecord = SyncRecord(
         id = 0,
-        localPath = null,
+        localPath = "localPath",
         newPath = null,
         originFingerprint = null,
         newFingerprint = null,
-        timestamp = null,
-        fileName = null,
+        timestamp = 0L,
+        fileName = "fileName.jpg",
         longitude = null,
         latitude = null,
         status = SyncStatus.STATUS_PENDING.value,

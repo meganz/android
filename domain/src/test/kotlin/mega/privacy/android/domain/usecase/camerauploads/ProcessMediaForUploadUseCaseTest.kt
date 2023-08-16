@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
@@ -110,7 +111,7 @@ class ProcessMediaForUploadUseCaseTest {
             )
         )
         whenever(isSecondaryFolderEnabled.invoke()).thenReturn(false)
-        underTest(null, null, null)
+        underTest(NodeId(123L), null, "")
         verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
     }
 
@@ -124,7 +125,7 @@ class ProcessMediaForUploadUseCaseTest {
                 )
             )
             whenever(isSecondaryFolderEnabled.invoke()).thenReturn(true)
-            underTest(null, null, null)
+            underTest(NodeId(123L), NodeId(321L), "")
             verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
             verify(updateTimeStamp).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
         }
@@ -141,7 +142,7 @@ class ProcessMediaForUploadUseCaseTest {
                 )
             )
             whenever(isSecondaryFolderEnabled.invoke()).thenReturn(false)
-            underTest(null, null, null)
+            underTest(NodeId(123L), null, "")
             verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
             verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_VIDEO)
         }
@@ -158,7 +159,7 @@ class ProcessMediaForUploadUseCaseTest {
                 )
             )
             whenever(isSecondaryFolderEnabled.invoke()).thenReturn(true)
-            underTest(null, null, null)
+            underTest(NodeId(123L), NodeId(321L), "")
             verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
             verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_VIDEO)
             verify(updateTimeStamp).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
@@ -190,7 +191,7 @@ class ProcessMediaForUploadUseCaseTest {
                     }
                 }
                 try {
-                    underTest(null, null, null)
+                    underTest(NodeId(123L), null, "")
                 } catch (e: Exception) {
                     Truth.assertThat(e).isInstanceOf(CancellationException::class.java)
                 }

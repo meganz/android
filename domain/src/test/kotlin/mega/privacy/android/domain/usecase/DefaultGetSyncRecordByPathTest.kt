@@ -27,12 +27,12 @@ class DefaultGetSyncRecordByPathTest {
     fun `test that local path is returned if new path is null`() = runTest {
         val expected = SyncRecord(
             id = 0,
-            localPath = null,
+            localPath = "path",
             newPath = null,
             originFingerprint = null,
             newFingerprint = null,
-            timestamp = null,
-            fileName = null,
+            timestamp = 0L,
+            fileName = "fileName.jpg",
             longitude = null,
             latitude = null,
             status = 0,

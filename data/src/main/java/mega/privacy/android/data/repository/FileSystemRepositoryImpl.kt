@@ -247,7 +247,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun createTempFile(root: String, syncRecord: SyncRecord) =
         withContext(ioDispatcher) {
             val localPath = syncRecord.localPath
-                ?: throw IllegalArgumentException("Source path doesn't exist on sync record: $syncRecord")
             val destinationPath = syncRecord.newPath
                 ?: throw IllegalArgumentException("Destination path doesn't exist on sync record: $syncRecord")
             fileGateway.createTempFile(root, localPath, destinationPath)

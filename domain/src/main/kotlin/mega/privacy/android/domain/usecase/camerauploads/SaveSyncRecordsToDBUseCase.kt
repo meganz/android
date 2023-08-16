@@ -42,14 +42,12 @@ class SaveSyncRecordsToDBUseCase @Inject constructor(
     /**
      * invoke
      * @param list of [SyncRecord]
-     * @param primaryUploadNodeId [NodeId]
-     * @param secondaryUploadNodeId [NodeId]
+     * @param uploadNodeId [NodeId]
      * @param rootPath
      */
     suspend operator fun invoke(
         list: List<SyncRecord>,
-        primaryUploadNodeId: NodeId?,
-        secondaryUploadNodeId: NodeId?,
+        uploadNodeId: NodeId,
         rootPath: String?,
     ) {
         for (file in list) {
@@ -61,28 +59,19 @@ class SaveSyncRecordsToDBUseCase @Inject constructor(
                     file.isSecondary,
                     file.isCopyOnly
                 )
-                if (exist != null) {
-                    exist.timestamp?.let { existTime ->
-                        file.timestamp?.let { fileTime ->
-                            if (existTime < fileTime) {
-                                exist.localPath?.let {
-                                    deleteSyncRecordByLocalPath(it, exist.isSecondary)
-                                }
-                            } else {
-                                return@run
-                            }
-                        }
+                exist?.timestamp?.let { existTime ->
+                    if (existTime < file.timestamp) {
+                        deleteSyncRecordByLocalPath(exist.localPath, exist.isSecondary)
+                    } else {
+                        return@run
                     }
                 }
 
                 val isSecondary = file.isSecondary
-                val parentNodeId = if (isSecondary) secondaryUploadNodeId else primaryUploadNodeId
                 if (!file.isCopyOnly) {
-                    val resFile = file.localPath?.let { File(it) }
-                    if (resFile != null && !resFile.exists()) {
-                        file.localPath?.let {
-                            deleteSyncRecordByLocalPath(it, isSecondary)
-                        }
+                    val resFile = File(file.localPath)
+                    if (!resFile.exists()) {
+                        deleteSyncRecordByLocalPath(file.localPath, isSecondary)
                         return@run
                     }
                 }
@@ -99,7 +88,7 @@ class SaveSyncRecordsToDBUseCase @Inject constructor(
                         fileName = getNoneDuplicatedDeviceFileName(tempFileName, photoIndex)
                         photoIndex++
                         inCloud = getChildNodeUseCase(
-                            parentNodeId,
+                            uploadNodeId,
                             fileName
                         ) != null
                         fileName?.let {
@@ -116,7 +105,7 @@ class SaveSyncRecordsToDBUseCase @Inject constructor(
                         )
                         photoIndex++
                         inCloud = getChildNodeUseCase(
-                            parentNodeId,
+                            uploadNodeId,
                             fileName
                         ) != null
                         inDatabase = fileNameExists(fileName, isSecondary)
@@ -130,17 +119,19 @@ class SaveSyncRecordsToDBUseCase @Inject constructor(
                         extension = splitName[splitName.size - 1]
                     }
                 }
-                file.fileName = fileName
-                val newPath = "$rootPath${getDeviceCurrentNanoTimeUseCase()}.$extension"
-                file.newPath = newPath
-                saveSyncRecord(file)
+                file.copy(
+                    fileName = fileName ?: "",
+                    newPath = "$rootPath${getDeviceCurrentNanoTimeUseCase()}.$extension"
+                ).let {
+                    saveSyncRecord(it)
+                }
             }
         }
     }
 
     private fun getLastModifiedTime(file: SyncRecord): Long {
-        val source = file.localPath?.let { File(it) }
-        return source?.lastModified() ?: 0
+        val source = File(file.localPath)
+        return source.lastModified()
     }
 
     private fun getNoneDuplicatedDeviceFileName(fileName: String?, index: Int): String? {

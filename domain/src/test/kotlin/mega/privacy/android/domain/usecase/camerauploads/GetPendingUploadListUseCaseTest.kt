@@ -10,12 +10,11 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any

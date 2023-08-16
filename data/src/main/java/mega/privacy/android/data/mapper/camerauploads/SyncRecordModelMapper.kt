@@ -11,12 +11,12 @@ internal class SyncRecordModelMapper @Inject constructor(
 ) {
     suspend operator fun invoke(syncRecordEntity: SyncRecordEntity) = SyncRecord(
         id = syncRecordEntity.id ?: -1,
-        localPath = decryptData(syncRecordEntity.originalPath),
+        localPath = decryptData(syncRecordEntity.originalPath) ?: "",
         newPath = decryptData(syncRecordEntity.newPath),
         originFingerprint = decryptData(syncRecordEntity.originalFingerPrint),
         newFingerprint = decryptData(syncRecordEntity.newFingerprint),
-        timestamp = decryptData(syncRecordEntity.timestamp)?.toLongOrNull(),
-        fileName = decryptData(syncRecordEntity.fileName),
+        timestamp = decryptData(syncRecordEntity.timestamp)?.toLong() ?: 0L,
+        fileName = decryptData(syncRecordEntity.fileName) ?: "",
         longitude = decryptData(syncRecordEntity.longitude)?.toFloatOrNull(),
         latitude = decryptData(syncRecordEntity.latitude)?.toFloatOrNull(),
         status = syncRecordEntity.state ?: -1,

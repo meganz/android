@@ -14,7 +14,7 @@ internal class SyncRecordEntityMapper @Inject constructor(
         newPath = encryptData(syncRecord.newPath),
         originalFingerPrint = encryptData(syncRecord.originFingerprint),
         newFingerprint = encryptData(syncRecord.newFingerprint),
-        timestamp = encryptData(syncRecord.timestamp?.toString()),
+        timestamp = encryptData(syncRecord.timestamp.toString()),
         fileName = encryptData(syncRecord.fileName),
         nodeHandle = encryptData(syncRecord.nodeHandle?.toString()),
         isCopyOnly = encryptData(syncRecord.isCopyOnly.toString()),

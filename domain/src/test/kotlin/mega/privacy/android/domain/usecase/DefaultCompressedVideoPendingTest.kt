@@ -61,12 +61,12 @@ class DefaultCompressedVideoPendingTest {
         runTest {
             val record = SyncRecord(
                 id = 0,
-                localPath = null,
+                localPath = "path",
                 newPath = null,
                 originFingerprint = null,
                 newFingerprint = null,
-                timestamp = null,
-                fileName = null,
+                timestamp = 0L,
+                fileName = "fileName.mp4",
                 longitude = null,
                 latitude = null,
                 status = 0,

@@ -764,9 +764,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         }
                     } ?: run {
                         Timber.d("Local file is unavailable, delete record from database.")
-                        record.localPath?.let {
-                            deleteSyncRecord(it, record.isSecondary)
-                        }
+                        deleteSyncRecord(record.localPath, record.isSecondary)
                         semaphore.release()
                     }
                 })
@@ -780,9 +778,9 @@ class CameraUploadsWorker @AssistedInject constructor(
             || record.type == SyncRecordType.TYPE_VIDEO && shouldCompressVideo()
         ) {
             record.newPath?.let { File(it).takeIf { newFile -> newFile.exists() } }
-                ?: record.localPath?.let { File(it).takeIf { localFile -> localFile.exists() } }
+                ?: File(record.localPath).takeIf { localFile -> localFile.exists() }
         } else {
-            record.localPath?.let { File(it).takeIf { localFile -> localFile.exists() } }
+            File(record.localPath).takeIf { localFile -> localFile.exists() }
         }
     }
 
@@ -828,9 +826,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }.catch {
                     Timber.e("Temporary File creation exception $it")
                     if (it is FileNotFoundException) {
-                        record.localPath?.let { newPath ->
-                            deleteSyncRecord(newPath, isSecondary = record.isSecondary)
-                        }
+                        deleteSyncRecord(record.localPath, isSecondary = record.isSecondary)
                     }
                     shouldBeSkipped = true
                 }.collect()
@@ -938,7 +934,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                     val nodeId = copyNodeUseCase(
                         nodeToCopy = nodeToCopy.id,
                         newNodeParent = parentNodeId,
-                        newNodeName = record.fileName.orEmpty(),
+                        newNodeName = record.fileName,
                     )
                     (getNodeByIdUseCase(nodeId) as? TypedFileNode)?.let { retrievedNode ->
                         val fingerprint = retrievedNode.fingerprint
@@ -965,10 +961,8 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     }
 
-    private fun getLastModifiedTime(file: SyncRecord): Long {
-        val source = file.localPath?.let { File(it) }
-        return source?.lastModified() ?: 0
-    }
+    private fun getLastModifiedTime(file: SyncRecord): Long =
+        File(file.localPath).lastModified()
 
     private suspend fun onQueueComplete() {
         Timber.d("onQueueComplete")
@@ -1228,7 +1222,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                             )
                         }
                     }
-                    record.localPath?.let { File(it) }?.takeIf { it.exists() }?.let {
+                    File(record.localPath).takeIf { it.exists() }?.let {
                         if (deleteThumbnailUseCase(nonNullNode.id.longValue)) {
                             generateThumbnailUseCase(nonNullNode.id.longValue, it)
                         }
@@ -1277,7 +1271,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun updateToUploadCount(
         record: SyncRecord,
     ) {
-        val bytes = record.localPath?.let { File(it).length() } ?: 0L
+        val bytes = File(record.localPath).length()
         increaseTotalToUpload(
             cameraUploadFolderType =
             if (record.isSecondary) CameraUploadFolderType.Secondary
@@ -1302,7 +1296,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             isFinished = true,
             nodeHandle = record.nodeHandle,
             recordId = record.id,
-            bytesUploaded = record.localPath?.let { File(it).length() } ?: 0L,
+            bytesUploaded = File(record.localPath).length(),
         )
     }
 
@@ -1425,7 +1419,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private fun getTotalVideoSizeInMB(records: List<SyncRecord>) =
-        records.sumOf { it.localPath?.let { path -> File(path).length() } ?: 0 } / (1024 * 1024)
+        records.sumOf { File(it.localPath).length() } / (1024 * 1024)
 
     private suspend fun shouldStartVideoCompression(queueSize: Long): Boolean {
         if (isChargingRequired(queueSize) && !isChargingUseCase()) {
@@ -1475,8 +1469,8 @@ class CameraUploadsWorker @AssistedInject constructor(
         val localPath = record.localPath
         val isSecondary = record.isSecondary
         Timber.w("Compression failed for file with timestamp: ${record.timestamp}")
-        val srcFile = localPath?.let { File(it) }
-        if (srcFile != null && srcFile.exists()) {
+        val srcFile = File(localPath)
+        if (srcFile.exists()) {
             try {
                 setSyncRecordPendingByPath(localPath, isSecondary)
                 Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
@@ -1491,9 +1485,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             }
         } else {
             Timber.w("Compressed video not exists, remove from DB")
-            localPath?.let {
-                deleteSyncRecordByLocalPath(localPath, isSecondary)
-            }
+            deleteSyncRecordByLocalPath(localPath, isSecondary)
         }
     }
 

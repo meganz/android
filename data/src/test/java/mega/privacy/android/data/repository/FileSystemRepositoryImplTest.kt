@@ -220,8 +220,8 @@ internal class FileSystemRepositoryImplTest {
             newPath = newPath,
             originFingerprint = null,
             newFingerprint = null,
-            timestamp = null,
-            fileName = null,
+            timestamp = 0L,
+            fileName = "fileName.jpg",
             longitude = null,
             latitude = null,
             status = 0,
@@ -236,34 +236,6 @@ internal class FileSystemRepositoryImplTest {
     }
 
     @Test
-    fun `test that file not found exception is thrown when local path is null`() = runTest {
-        val localPath = "/path/to/local"
-        val newPath = "/path/to/new"
-        val rootPath = "/path/to/root"
-        val syncRecord = SyncRecord(
-            id = 0,
-            localPath = null,
-            newPath = newPath,
-            originFingerprint = null,
-            newFingerprint = null,
-            timestamp = null,
-            fileName = null,
-            longitude = null,
-            latitude = null,
-            status = 0,
-            type = SyncRecordType.TYPE_ANY,
-            nodeHandle = null,
-            isCopyOnly = false,
-            isSecondary = false,
-        )
-        whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenReturn(Unit)
-        assertFailsWith(
-            exceptionClass = IllegalArgumentException::class,
-            block = { underTest.createTempFile(rootPath, syncRecord) }
-        )
-    }
-
-    @Test
     fun `test that not enough storage exception is thrown when there is not enough storage`() =
         runTest {
             val localPath = "/path/to/local"
@@ -275,8 +247,8 @@ internal class FileSystemRepositoryImplTest {
                 newPath = newPath,
                 originFingerprint = null,
                 newFingerprint = null,
-                timestamp = null,
-                fileName = null,
+                timestamp = 0L,
+                fileName = "fileName.jpg",
                 longitude = null,
                 latitude = null,
                 status = 0,
@@ -306,8 +278,8 @@ internal class FileSystemRepositoryImplTest {
                 newPath = newPath,
                 originFingerprint = null,
                 newFingerprint = null,
-                timestamp = null,
-                fileName = null,
+                timestamp = 0L,
+                fileName = "fileName.jpg",
                 longitude = null,
                 latitude = null,
                 status = 0,

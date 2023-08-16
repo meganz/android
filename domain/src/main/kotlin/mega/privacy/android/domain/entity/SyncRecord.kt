@@ -2,62 +2,35 @@ package mega.privacy.android.domain.entity
 
 /**
  * These records are saved into the database and used for camera upload
+ *
+ * @property id record ID from the database
+ * @property localPath
+ * @property newPath a new path in case we need to create a temporary file for extracting the gps data or a compressed video
+ * @property originFingerprint the original fingerprint retrieved from a Node or calculated locally
+ * @property newFingerprint the current fingerprint retrieved from a Node
+ * @property timestamp a timestamp corresponding to the max of added / modified time of the file
+ * @property fileName
+ * @property longitude GPS longitude coordinate
+ * @property latitude GPS latitude coordinate
+ * @property status ready for upload or need compression
+ * @property type photo or video
+ * @property nodeHandle the possible nodeHandle in case we need to copy the file from another Node
+ * @property isCopyOnly true if the node already exists in the cloud drive
+ * @property isSecondary true if secondary media
  */
 data class SyncRecord(
-    /**
-     * record ID
-     */
     val id: Int = 0,
-    /**
-     * record path locally
-     */
-    val localPath: String?,
-    /**
-     * new record path
-     */
+    val localPath: String,
     var newPath: String?,
-    /**
-     * fingerprint locally
-     */
     val originFingerprint: String?,
-    /**
-     * new record fingerprint
-     */
     val newFingerprint: String?,
-    /**
-     * timestamp of media
-     */
-    val timestamp: Long?,
-    /**
-     * name of record
-     */
-    var fileName: String?,
-    /**
-     * GPS longitude coordinate
-     */
+    val timestamp: Long,
+    val fileName: String,
     val longitude: Float?,
-    /**
-     * GPS latitude coordinate
-     */
     val latitude: Float?,
-    /**
-     * record status (ready for upload or compression)
-     */
     val status: Int,
-    /**
-     * record type (photo or video or anything)
-     */
     val type: SyncRecordType,
-    /**
-     * node handle of record
-     */
     val nodeHandle: Long?,
-    /**
-     * if node exists or not
-     */
     val isCopyOnly: Boolean,
-    /**
-     * secondary media or not
-     */
     val isSecondary: Boolean,
 )

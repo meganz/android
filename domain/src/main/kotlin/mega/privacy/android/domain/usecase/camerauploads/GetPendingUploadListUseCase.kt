@@ -15,7 +15,6 @@ import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import java.io.File
-import java.util.Queue
 import javax.inject.Inject
 
 /**
@@ -43,7 +42,7 @@ class GetPendingUploadListUseCase @Inject constructor(
      * @return a list of [SyncRecord]
      */
     suspend operator fun invoke(
-        mediaList: Queue<CameraUploadMedia>,
+        mediaList: List<CameraUploadMedia>,
         isSecondary: Boolean,
         isVideo: Boolean,
     ): List<SyncRecord> = coroutineScope {
@@ -51,7 +50,7 @@ class GetPendingUploadListUseCase @Inject constructor(
             if (isSecondary) getSecondarySyncHandleUseCase() else getPrimarySyncHandleUseCase()
         val type = if (isVideo) SyncRecordType.TYPE_VIDEO else SyncRecordType.TYPE_PHOTO
 
-        mediaList.toList().map { media ->
+        mediaList.map { media ->
             async {
                 yield()
                 runCatching {
