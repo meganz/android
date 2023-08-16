@@ -296,7 +296,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         } else {
             checkSeparatorsVisibility();
         }
-        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
 
         super.onViewCreated(view, savedInstanceState);
     }
@@ -503,6 +502,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                         } else if (!chatC.isInAnonymousMode()) {
                             offlineSwitch.setChecked(availableOffline(requireContext(), node));
                             optionSaveOffline.setVisibility(View.VISIBLE);
+                            offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
                         }
 
                         checkSeparatorsVisibility();
