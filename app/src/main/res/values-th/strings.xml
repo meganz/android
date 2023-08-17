@@ -486,12 +486,6 @@
     <string name="menu_cancel_all_transfers">ยกเลิกการถ่ายโอนทั้งหมด</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">ถ่ายภาพ</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">อนุญาตให้แจ้งเตือนเมื่อมีสายโทรเข้าจากแอป MEGA</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">กรุณาให้สิทธิ์ MEGA เพื่อแสดงทับแอปอื่น ๆ สำหรับโทร</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">คุณสามารถตั้งค่าสิทธิ์ด้วยตนเองได้ที่ การตั้งค่าอุปกรณ์</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Wi-Fi เท่านั้น</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1737,8 +1731,6 @@
     <string name="option_save_on_filesystem">บันทึกในระบบไฟล์</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">สายเรียกเข้า</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">ป๊อปอัพพื้นหลัง MEGA ถูกปิดใช้งาน\nแตะเพื่อเปลี่ยนการตั้งค่า</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s ข้อความที่ยังไม่ได้อ่าน</item>
@@ -1818,8 +1810,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">กรุณากรอกรหัส 6 หลักที่สร้างโดยแอปตัวรับรองความถูกต้องของคุณ</string>
     <!-- Text button -->
-    <string name="general_verify">ตรวจสอบ</string>
-    <!-- Text button -->
     <string name="general_next">ต่อไป</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">เกิดข้อผิดพลาดในการสร้างรหัสหรือคิวอาร์โค้ด กรุณาลองอีกครั้ง</string>
@@ -1878,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">ไม่มีการเชื่อมต่อกับเครือข่าย กรุณาเชื่อมต่อใหม่เพื่อเปิดไฟล์</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">ไฟล์มีอยู่แล้วในบันทึกแบบออฟไลน์</string>
+    <string name="file_already_exists">File already available Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">ไม่ได้ส่งต่อข้อความ</item>
@@ -2729,8 +2719,6 @@
     <string name="label_verified">ตรวจสอบแล้ว</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">ความถูกต้องของข้อมูลประจำตัว</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">สิ่งนี้ทำได้ดีที่สุดในชีวิตจริงโดยการพบปะแบบเห็นหน้า หากคุณมีช่องอื่นที่ผ่านการตรวจสอบแล้ว เช่น OTR ที่ตรวจสอบแล้วหรือ PGP คุณอาจใช้ช่องดังกล่าวได้</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">ข้อมูลรับรองของคุณ</string>
     <!-- Button to reset credentials -->
@@ -2765,8 +2753,6 @@
     <string name="remove_phone_number_message">การดำเนินการนี้จะลบหมายเลขโทรศัพท์ที่เกี่ยวข้องออกจากบัญชีของคุณ หากคุณเลือกที่จะเพิ่มหมายเลขโทรศัพท์ในภายหลัง คุณจะต้องตรวจสอบหมายเลขนั้น</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">ดู</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">ข้อมูลประจำตัวของ %s</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">เอกสาร</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3736,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ \“อ่านอย่างเดียว\“ เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">บัญชีถูกระงับเนื่องจากละเมิดลิขสิทธิ์ เราได้ส่งอีเมลถึงคุณพร้อมข้อมูลเพิ่มเติมเกี่ยวกับเรื่องนี้แล้ว</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">บัญชีถูกยุติการใช้งานเนื่องจากการละเมิดเงื่อนไขการให้บริการของ MEGA เช่น การสวมสิทธิผู้อื่นในทางที่ผิด การแชร์และการนำเข้าข้อมูลอันเป็นเท็จ หรือการละเมิดระบบ</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">การประชุม</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3845,8 +3831,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">แสดงน้อยลง</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">เราปกป้องข้อมูลของคุณด้วยกระบวนการเข้ารหัส zero-knowledge และเพื่อความปลอดภัยมากยิ่งขึ้น เราขอให้คุณตรวจสอบผู้ติดต่อที่คุณแชร์ข้อมูลอยู่ด้วยนั้น ก่อนที่จะให้สิทธิ์ในการเข้าถึงโฟลเดอร์ที่แชร์ได้</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[โฟลเดอร์ที่ไม่ได้ถอดรหัส]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4604,13 +4588,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;สร้างกำหนดการล้างถังขยะได้ตั้งแต่ 7 วันถึง 10 ปี</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">ซื้อ Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">ซื้อ Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">ซื้อ Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">ซื้อ Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">เงื่อนไขการให้บริการ</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4872,4 +4856,16 @@
     <string name="general_app_update_message_download_success">An update has just been downloaded</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">เริ่มใหม่ตั้งแต่ต้น</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Allow access to audio files</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Approved</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Not approved</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">ขยาย</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">ย่อ</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
 </resources>

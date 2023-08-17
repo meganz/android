@@ -510,12 +510,6 @@
     <string name="menu_cancel_all_transfers">Usuń wszystkie transfery</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Zrób zdjęcie</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">Zezwalaj na powiadomienia o przychodzących połączeniach MEGA</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Prosimy o udzielenie MEGA pozwolenia na wyświetlanie nad innymi aplikacjami do połączeń.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Nadal możesz ręcznie nadawać uprawnienia w Ustawieniach urządzenia.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Tylko Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1661,7 +1655,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Brak plików w twoim [/B][A]Dysku w chmurze[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Brak plików [/B][A]Zapisane dla Offline[/A]</string>
+    <string name="context_empty_offline">[B]Brak plików [/B][A]zapisane dla Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Brak [/B][A]kontaktów[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -1860,8 +1854,6 @@
     <string name="option_save_on_filesystem">Zapisz w systemie plików</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Nadchodzące połączenie</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">Wyskakujące okienka w tle MEGA są wyłączone. \nNaciśnij, aby zmienić ustawienia.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s nieprzeczytana wiadomość</item>
@@ -1947,8 +1939,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Wprowadź 6-cyfrowy kod wygenerowany przez aplikację uwierzytelniającego.</string>
     <!-- Text button -->
-    <string name="general_verify">Weryfikacja</string>
-    <!-- Text button -->
     <string name="general_next">Dalej</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Wystąpił błąd podczas generowania kodu źródłowego lub kodu QR. Spróbuj ponownie.</string>
@@ -2007,7 +1997,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Brak połączenia z siecią. Proszę połączyć się ponownie, aby otworzyć plik.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Plik już istnieje w Zapisane dla trybu offline</string>
+    <string name="file_already_exists">File already available Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Wiadomość nie została przesłana dalej</item>
@@ -2460,7 +2450,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA potrzebuje twojej zgody na dostęp do twoich mediów i plików w celu ich udostępnienia. Inne uprawnienia dostępu mogą być potrzebne do wymiany zaszyfrowanych wiadomości i do wykonywania bezpiecznych połączeń.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Zezwalaj na dostęp do zdjęć, multimediów i plików.</string>
+    <string name="allow_acces_media_title">Zezwalaj na dostęp do zdjęć, multimediów i plików</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA potrzebuje Twojej zgody na dostęp do plików w celu ich udostępnienia.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2942,8 +2932,6 @@
     <string name="label_verified">Zweryfikowany</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Poświadczenia autentyczności</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">Najlepiej to zrobić w prawdziwym życiu spotykając się twarzą w twarz. Jeśli masz inny już sprawdzony kanał takich jak weryfikować OTR lub PGP, możesz także użyć.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">Twoje uprawnienia</string>
     <!-- Button to reset credentials -->
@@ -2978,8 +2966,6 @@
     <string name="remove_phone_number_message">Spowoduje to usunięcie powiązanego numeru telefonu z konta. Jeśli później zdecydujesz się dodać numer telefonu, będziesz musiał go zweryfikować.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Zobacz</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">%s uprawnienia</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Dokumenty</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -4033,9 +4019,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">W tym miejscu są przechowywane pliki i foldery, których kopie zapasowe zostały utworzone. Kopie zapasowe są dostępne „tylko do odczytu”, co chroni je przed przypadkową modyfikacją na dysku w chmurze.Kopię zapasową elementów z komputera możesz utworzyć na MEGA za pomocą naszej aplikacji desktopowej.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Konto zawieszone z powodu naruszenia praw autorskich. Wysłaliśmy do Ciebie maila z większą ilością informacji na ten temat.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Konto zostało usunięte z powodu naruszenia warunków korzystania z usług firmy MEGA, takich jak nadużywanie praw innych osób, udostępnianie i importowanie nielegalnych danych lub nadużywanie systemu.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Twoje konto zostało zamknięte z powodu naruszenia Warunków świadczenia usług MEGA. \nNie będziesz w stanie odzyskać dostępu do przechowywanych danych ani uzyskać autoryzacji do rejestracji nowego konta MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Spotkania</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4154,8 +4140,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Zobacz mniej</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Chronimy Twoje dane za pomocą szyfrowania z zerową świadomością. Aby zapewnić dodatkowe bezpieczeństwo, prosimy o weryfikację kontaktów, którym udostępniasz informacje, zanim uzyskają one dostęp do udostępnionych katalogów.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Katalog niezaszyfrowany]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -5199,7 +5183,7 @@
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">Link do albumu został usunięty lub album został usunięty. Skontaktuj się z osobą, która udostępniła Ci łącze.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, rozumiem</string>
+    <string name="album_import_error_access_confirmation">OK, rozumiem</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Dzwięk</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -5237,13 +5221,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">-&#160;Zaplanuj czyszczenie pojemnika na śmieci od 7 dni do 10 lat</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Kup Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Kup Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Kup Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Kup Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Kup Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Kup Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Kup Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Kup Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Regulamin serwisu</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -5549,4 +5533,16 @@
     <string name="general_app_update_message_download_success">Aktualizacja została właśnie pobrana</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Zrestartuj</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Zezwalaj na dostęp do plików audio</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Zatwierdzone</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Nie zatwierdzone</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Zmniejsz</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Powiększ</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Nie można dodać elementu</string>
 </resources>

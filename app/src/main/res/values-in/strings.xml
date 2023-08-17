@@ -486,12 +486,6 @@
     <string name="menu_cancel_all_transfers">Batalkan semua transfer</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Tangkap</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">Izinkan pemberitahuan untuk panggilan MEGA yang masuk</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Berikan izin kepada MEGA untuk ditampilkan di atas aplikasi lain untuk panggilan.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Anda masih dapat memberikan izin secara manual di Pengaturan perangkat.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Hanya Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1559,7 +1553,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Tidak ada file di [/B][A]Cloud drive[/A] anda</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Tidak ada file [/B][A]Disimpan untuk Offline[/A]</string>
+    <string name="context_empty_offline">[B]Tidak ada file [/B][A]disimpan untuk Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Tidak ada [/B][A]kontak[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -1737,8 +1731,6 @@
     <string name="option_save_on_filesystem">Simpan pada sistem file</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Panggilan masuk</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">Pop-up latar belakang MEGA dinonaktifkan. \nKetuk untuk mengubah pengaturan.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s pesan yang belum dibaca</item>
@@ -1818,8 +1810,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Masukkan kode 6-digit yang dihasilkan oleh aplikasi otentikasi anda.</string>
     <!-- Text button -->
-    <string name="general_verify">Verifikasi</string>
-    <!-- Text button -->
     <string name="general_next">Berikutnya</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Terjadi kesalahan saat membuat benih atau kode QR, coba lagi.</string>
@@ -1878,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Tidak ada koneksi jaringan. Sambungkan kembali untuk membuka file.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">File sudah ada di Disimpan untuk Offline</string>
+    <string name="file_already_exists">File already available Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">Pesan tidak diteruskan</item>
@@ -2298,7 +2288,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA memerlukan izin anda untuk mengakses media dan file anda untuk dibagikan. Izin akses lain mungkin diperlukan untuk bertukar pesan terenkripsi dan untuk melakukan panggilan aman.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Izinkan akses ke foto, media, dan file.</string>
+    <string name="allow_acces_media_title">Izinkan akses ke foto, media, dan file</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA memerlukan izin anda untuk mengakses file untuk dibagikan.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2729,8 +2719,6 @@
     <string name="label_verified">Terverifikasi</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Kredensial autentikasi</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">Ini dapat dilakukan pada kehidupan nyata melalui bertemu langsung. Jika anda memiliki channel lain yang sudah terverifikasi seperti OTR atau PGP, anda mungkin mau menggunakan itu.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">Kredensial anda</string>
     <!-- Button to reset credentials -->
@@ -2765,8 +2753,6 @@
     <string name="remove_phone_number_message">Ini akan menghapus nomor telepon anda yang terkait dari akun anda. Jika nanti anda memilih untuk menambahkan nomor telepon, anda akan diminta untuk memverifikasinya.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Lihat</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">%s kredensial</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Docs</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3736,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Di sinilah file dan folder yang dicadangkan disimpan. Item yang dicadangkan “hanya-baca” untuk melindunginya agar tidak dimodifikasi secara tidak sengaja di drive cloud anda.Anda dapat mencadangkan item dari komputer anda ke MEGA menggunakan aplikasi desktop kami.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Akun ditangguhkan karena pelanggaran hak cipta. Kami mengirimi anda e-mail dengan informasi lebih lanjut tentang ini.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Akun dihentikan karena pelanggaran Persyaratan Layanan MEGA, seperti penyalahgunaan hak orang lain, berbagi dan mengimpor data ilegal, atau penyalahgunaan sistem.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Pertemuan</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3845,8 +3831,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Lihat lebih sedikit</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Kami melindungi data anda dengan enkripsi tanpa pengetahuan. Untuk memastikan keamanan ekstra, kami meminta anda untuk memverifikasi kontak yang anda bagikan informasi sebelum mereka dapat mengakses folder bersama.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Folder tidak terdekripsi]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4566,7 +4550,7 @@
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">Tautan ke album telah dihapus atau album telah dihapus. Hubungi orang yang membagikan tautan dengan anda.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, mengerti</string>
+    <string name="album_import_error_access_confirmation">OK, mengerti</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4604,13 +4588,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Jadwalkan pembersihan tempat sampah antara 7 hari dan 10 tahun</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Beli Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Beli Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Beli Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Beli Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Persyaratan Layanan</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4872,4 +4856,16 @@
     <string name="general_app_update_message_download_success">An update has just been downloaded</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Restart</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Allow access to audio files</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Approved</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Not approved</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Perbesar</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Perkecil</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
 </resources>

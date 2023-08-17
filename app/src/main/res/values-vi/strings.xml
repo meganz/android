@@ -221,7 +221,7 @@
     <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Các Phiên Truyền Tải</string>
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
-    <string name="section_account">Trang Tài Khoản</string>
+    <string name="section_account">Tài Khoản của Tôi</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">Đăng tải camêra</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
@@ -255,7 +255,7 @@
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Đổi quyền&#160;hạn</string>
     <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">Được chia sẻ với</string>
+    <string name="file_properties_shared_folder_select_contact">Được chia&#160;sẻ với</string>
     <!-- shows the owner of an incoming shared folder -->
     <string name="file_properties_owner">Chủ sở hữu</string>
     <!-- positive button on dialog to invite a contact -->
@@ -277,7 +277,7 @@
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">Chìa khóa giải mã</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="download_preparing_files">Đang chuẩn bị cho tệp tin</string>
+    <string name="download_preparing_files">Đang chuẩn&#160;bị tệp&#160;tin</string>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="other">%1$d phiên tải lên đã được bắt đầu</item>
@@ -401,7 +401,7 @@
     <!-- error message -->
     <string name="context_no_moved">Lỗi. Chưa di chuyển được</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Mục Chia Sẻ</string>
+    <string name="context_correctly_shared">Đã chia sẻ</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Lỗi. Loại bỏ mục chia&#160;sẻ thất&#160;bại</string>
     <!-- success message when removing a node from MEGA -->
@@ -486,12 +486,6 @@
     <string name="menu_cancel_all_transfers">Hủy tất cả các truyền tải</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Chụp ảnh</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">Cho phếp hiện thông báo cho các cuộc gọi MEGA</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Xin cấp phép cho MEGA hiển thị nổi bật trên các app khác để báo cuộc gọi.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Bạn vẫn có thể đi vào phần Cài Đặt của thiết bị khi muốn bật tính năng này.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Chỉ lúc dùng Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -722,7 +716,7 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro2">Tài&#160;khoản hạng Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Tài khoản hạng Pro&#160;II</string>
+    <string name="my_account_pro3">Tài&#160;khoản Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Tài&#160;khoản Pro&#160;Lite</string>
     <!--  -->
@@ -908,7 +902,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Im lặng tất cả các âm báo chát trong</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Im lặng tất cả các âm báo chát trong</string>
+    <string name="title_dialog_mute_chatroom_notifications">Im&#160;lặng tất cả các âm&#160;báo chát trong</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Bật</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1265,7 +1259,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">Người dùng này không có trong sổ liên lạc</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Dùng mạng dữ&#160;liệu dI&#160;dộng</string>
+    <string name="camera_uploads_cellular_connection">Dùng mạng dữ&#160;liệu di&#160;dộng</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Cho&#160;phép video được tải&#160;lên</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1559,7 +1553,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Không có tệp tin nào trong [/B][A]Ổ Mây[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Không có tệp tin nào trong [/B][A]Lưu về Ngoại Tuyến[/A]</string>
+    <string name="context_empty_offline">[B]Không có tệp tin nào trong [/B][A]lưu về Ngoại Tuyến[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Không có [/B][A]tên liên&#160;lạc[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -1737,8 +1731,6 @@
     <string name="option_save_on_filesystem">Lưu vào File System</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Cuộc gọi đến</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">Quyền cho MEGA bật lên màn hình bị tắt.\nChạm vào đây để chỉnh lại.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">Có %1$s tin nhắn chưa đọc</item>
@@ -1818,8 +1810,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Xin nhập một đoạn mã dài 6 chữ số lấy từ app lập xác thực.</string>
     <!-- Text button -->
-    <string name="general_verify">Xác thực</string>
-    <!-- Text button -->
     <string name="general_next">Tiếp</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Lỗi phát sinh khi khởi tạo đoạn chủng tử hay mã QR, xin thử lại.</string>
@@ -1878,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Không có kết nối mạng. Xin kết nối lại rồi mở tệp tin.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Tệp tin đã có sẵn trong Lưu về Ngoại Tuyến</string>
+    <string name="file_already_exists">File already available Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">Tin nhắn chưa được chuyển tiếp</item>
@@ -2298,7 +2288,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA cần quyền cấp phép của bạn để truy cập vào nội dung phương tiện số và tệp tin để thực hiện chia sẻ. Một số quyền truy cập khác cũng sẽ được cần để trao đổi tin nhắn bảo mật và gọi điện an toàn.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Cho phép truy cập vào hình ảnh, phương tiện số và tệp tin.</string>
+    <string name="allow_acces_media_title">Cho phép truy cập vào hình ảnh, phương tiện số và tệp tin</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA cần phải có sự cấp phép của bạn để truy cập và chia sẻ tệp tin.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2606,7 +2596,7 @@
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Có vấn đề xảy ra</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text_2">Liên hệ với ban tổng quản lý tài khoản doanh nghiệp để giải quyết và khôi phục tài khoản của bạn.</string>
+    <string name="expired_user_business_text_2">Liên hệ với quản&#160;trị viên tài&#160;khoản Doanh&#160;Nghiệp của bạn để giải&#160;quyết và khôi&#160;phục tài&#160;khoản.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
     <string name="logout_warning_offline">Khi đăng&#160;xuất, các tệp&#160;tin trong phần Ngoại&#160;Tuyến sẽ bị xóa khỏi thiết&#160;bị.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
@@ -2729,8 +2719,6 @@
     <string name="label_verified">Đã xác thực</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Công nhận chứng thực</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">Đây là cách tốt nhất để tạo các buổi meeting người thật với nhau. Nếu bạn đã có phương thức xác minh khác như OTR hay PGP, bạn cũng có thể dùng được.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">Chứng&#160;thực của bạn</string>
     <!-- Button to reset credentials -->
@@ -2750,7 +2738,7 @@
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">Tài khoản bạn đang cố khôi phục đang bị chặn.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Tài khoản nhân viên của bạn đã bị đình chỉ bởi ban quản trị. Xin liên hệ với ban tổng quản lý tài khoản doanh nghiệp của bạn để tìm hiểu lý do.</string>
+    <string name="error_business_disabled">Tài&#160;khoản của bạn đã bị đình&#160;chỉ bởi quản&#160;trị viên. Xin liên&#160;hệ với người quản&#160;lý tài&#160;khoản Doanh&#160;Nghiệp của bạn để tìm hiểu lý&#160;do.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
     <string name="error_business_removed">Tài&#160;khoản này đã bị xóa bởi ban quản&#160;trị của bạn. Xin liên&#160;hệ trực&#160;tiếp với ban quản trị tài&#160;khoản doanh&#160;nghiệp của bạn để biết thêm chi&#160;tiết.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -2765,8 +2753,6 @@
     <string name="remove_phone_number_message">Thao tác này sẽ xóa số điện thoại hiện có trong tài khoản. Nếu sau này muốn thêm số điện thoại khác, hệ thống sẽ yêu cầu xác thực số điện thoại đó.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Xem</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">Chứng thực của %s</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Tài Liệu</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3736,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Đây là thư mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.Bạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Tài khoản bị đình chỉ do vi phạm bản quyền. Chúng tôi đã gửi cho bạn một e-mail với nhiều thông tin hơn về việc này.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Tài khoản đã bị chấm dứt hoạt động do vi phạm lỗi có nêu trong Điều Khoản Dịch Vụ của MEGA; chẳng hạn như lạm dụng hệ thống, quyền hạn sử dụng của người khác hoặc chia sẻ nội dung cấm.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Tài&#160;khoản của quý&#160;vị đã bị chấm&#160;dứt do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ của MEGA.\nQuý&#160;vị sẽ không thể lấy lại quyền truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ của mình hoặc được phép đăng&#160;ký tài&#160;khoản MEGA mới.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Họp</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3845,8 +3831,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Ẩn đi bớt</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Chúng&#160;tôi bảo&#160;vệ dữ&#160;liệu của bạn bằng thuật&#160;toán mã&#160;hóa vô&#160;kiến&#160;thức. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi yêu&#160;cầu bạn xác&#160;thực các tên liên&#160;lạc mà bạn chia&#160;sẻ thông&#160;tin trước khi họ được cấp&#160;quyền truy&#160;cập vào các thư&#160;mục chia&#160;sẻ.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[thư mục chưa giải mã]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -3880,9 +3864,9 @@
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
     <string name="video_playback_position_dialog_message">“%1$s” sẽ tiếp&#160;tục phát tại %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
-    <string name="video_playback_position_dialog_resume_button">Tiếp tục truyền</string>
+    <string name="video_playback_position_dialog_resume_button">Tiếp tục phát</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
-    <string name="video_playback_position_dialog_restart_button">Khởi động lại</string>
+    <string name="video_playback_position_dialog_restart_button">Phát từ đầu</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
     <string name="notification_subtitle_scheduled_meeting_new">[A]%s[/A][B]đã mời bạn cho một cuộc&#160;họp được lên lịch vào:[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
@@ -4491,7 +4475,7 @@
     <string name="album_share_share_link_dialog_button_link_and_key">Chia&#160;sẻ đường liên&#160;kết và chìa&#160;khóa</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
-        <item quantity="other">Chia sẻ đường liên kết</item>
+        <item quantity="other">Chia&#160;sẻ đường liên&#160;kết</item>
     </plurals>
     <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
     <plurals name="album_share_links_copied">
@@ -4568,7 +4552,7 @@
     <!-- Album import error access confirmation -->
     <string name="album_import_error_access_confirmation">OK, hiểu rồi</string>
     <!-- Call UI button label for answering with audio only -->
-    <string name="calls_answer_audio_button">Âm Thanh</string>
+    <string name="calls_answer_audio_button">Thoại</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_title_choose_right_plan">Chọn gói phù hợp với bạn</string>
     <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4604,13 +4588,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Lên lịch dọn dẹp thùng&#160;rác từ 7 ngày đến 10 năm</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Mua Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Mua Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Mua Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Mua Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Mua Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Mua Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Mua Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Mua Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Điều&#160;Khoản Dịch&#160;Vụ</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4654,7 +4638,7 @@
         <item quantity="other">Bất&#160;kỳ ai có các đường liên&#160;kết này đều có&#160;thể xem và tải&#160;xuống dữ liệu của bạn</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
-    <string name="general_save_to_cloud_drive">Lưu vào Ổ mây</string>
+    <string name="general_save_to_cloud_drive">Lưu vào Ổ&#160;Mây</string>
     <!-- Album import saving -->
     <string name="album_import_saving">Đang lưu&#8230;</string>
     <!-- Album import success message -->
@@ -4780,7 +4764,7 @@
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">Ngừng tái&#160;diễn</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_ends_section">Kết&#160;thúc</string>
+    <string name="meetings_custom_recurrence_ends_section">Kết&#160;thúc vào</string>
     <!--Action text to start a conversation from Meeting List screen empty view-->
     <string name="meeting_list_empty_action">Bắt&#160;đầu một cuộc&#160;họp</string>
     <!--Description text from Meeting List screen empty view-->
@@ -4804,7 +4788,7 @@
     <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Hủy&#160;bỏ thời&#160;điểm tái&#160;diễn %1$s?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Chỉ&#160;có mỗi thời&#160;điểm tái&#160;diễn này sẽ bị hủy. Còn tất&#160;cả các thời&#160;điểm tái&#160;diễn khác sẽ vẫn diễn&#160;ra như lịch&#160;trình.</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Chỉ có mỗi thời&#160;điểm tái&#160;diễn này sẽ bị hủy. Còn tất&#160;cả các thời&#160;điểm tái&#160;diễn khác sẽ vẫn diễn&#160;ra như lịch&#160;trình.</string>
     <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Hủy&#160;bỏ lần tái&#160;diễn và cuộc họp?</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
@@ -4850,11 +4834,11 @@
     <!-- Header content about secure sharing in approve credentials screen-->
     <string name="contact_approve_credentials_secure_share_description">Chúng&#160;tôi bảo&#160;vệ dữ&#160;liệu của bạn bằng mô&#160;hình mã&#160;hóa vô&#160;kiến&#160;thức nên tất&#160;cả thông&#160;tin bạn lưu&#160;trữ, chia&#160;sẻ và nhận được trên MEGA đều bảo&#160;vệ an&#160;toàn. Để đảm&#160;bảo tính bảo&#160;mật cao hơn, chúng&#160;tôi có yêu&#160;cầu bạn xác&#160;thực các tên liên&#160;lạc mà bạn có chia&#160;sẻ thông&#160;tin hoặc nhận dữ&#160;liệu từ họ.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">Để xác thực tên liên lạc, đảm bảo rằng chứng thực bạn thấy dưới đây trùng khớp với chứng thực tài khoản của họ. Bạn có thể hỏi người đó chia sẻ chứng thực cho bạn.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Để xác&#160;thực tên liên&#160;lạc, đảm&#160;bảo rằng chứng&#160;chỉ bạn thấy dưới đây trùng&#160;khớp với chứng&#160;chỉ tài&#160;khoản của họ. Bạn có thể hỏi người đó chia&#160;sẻ chứng&#160;chỉ cho bạn.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">Chấp nhận</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">Chấp nhận các số chứng thực</string>
+    <string name="contact_approve_credentials_toolbar_title">Chấp&#160;nhận các các chứng&#160;chỉ</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Phòng chờ</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -4871,4 +4855,16 @@
     <string name="general_app_update_message_download_success">Một bản cập&#160;nhật vừa được tải&#160;xuống</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Khởi động lại</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Cho phép truy&#160;cập vào các tệp&#160;tin âm&#160;thanh</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Đã chấp&#160;nhận</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Không chấp&#160;nhận</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Phóng ra</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Thu vào</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Không thể thêm được mục</string>
 </resources>

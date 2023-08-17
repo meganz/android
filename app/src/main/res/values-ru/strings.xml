@@ -374,7 +374,7 @@
     <!-- Menu option to delete selected items of the offline state -->
     <string name="context_delete_offline">Удалить из локальных</string>
     <!-- menu item -->
-    <string name="context_share_folder">Открыть общий доступ к папке</string>
+    <string name="context_share_folder">Поделиться папкой</string>
     <!-- menu item -->
     <string name="context_send_file">Отправить файл в чат</string>
     <!-- menu item -->
@@ -510,12 +510,6 @@
     <string name="menu_cancel_all_transfers">Отменить все передачи</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Cнимок</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">Разрешить уведомления для входящих MEGA-звонков</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA нужно разрешение на отображение поверх других приложений для звонков.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Вы по-прежнему можете предоставить разрешения вручную в настройках устройства.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Только Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1587,7 +1581,7 @@
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
     <string name="download_requires_permission">MEGA нужны разрешения на чтение и запись в вашем внешнем хранилище для скачивания файлов.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
-    <string name="old_sdcard_unavailable">Старая SD-карта недоступна, пожалуйста, укажите новое место для загрузки.</string>
+    <string name="old_sdcard_unavailable">Старая SD-карта недоступна, пожалуйста, укажите новое место для скачивания.</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">У контакта нет разрешений</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1860,8 +1854,6 @@
     <string name="option_save_on_filesystem">Сохранить в файловую систему</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Входящий звонок</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">Фоновые всплывающие окна MEGA отключены.\nНажмите, чтобы изменить настройки.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s непрочитанное сообщение</item>
@@ -1947,8 +1939,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Введите шестизначный код из приложения-аутентификатора.</string>
     <!-- Text button -->
-    <string name="general_verify">Подтвердить</string>
-    <!-- Text button -->
     <string name="general_next">Далее</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Произошла ошибка при генерации seed-ключа или QR-кода, попробуйте снова.</string>
@@ -2007,7 +1997,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Нет подключения к сети. Пожалуйста, подключитесь повторно, чтобы открыть файл.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Файл уже сохранён локально</string>
+    <string name="file_already_exists">File already available Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Сообщение не отправлено</item>
@@ -2460,7 +2450,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к медиафайлам и файлам. Другие разрешения доступа могут потребоваться для обмена зашифрованными сообщениями и для безопасных звонков.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Разрешить доступ к фотографиям, медиа и файлам.</string>
+    <string name="allow_acces_media_title">Разрешите доступ к фотографиям, медиа и файлам</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к файлам.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2881,7 +2871,7 @@
         <item quantity="other">Закрыть доступ к этим %1$d папкам?</item>
     </plurals>
     <!-- Download location label -->
-    <string name="download_location">Папка загрузки</string>
+    <string name="download_location">Папка скачивания</string>
     <!-- Text asking confirmation for download location -->
     <string name="confirmation_download_location">Всегда сохранять в эту папку?</string>
     <!-- Action to show any file in its location -->
@@ -2942,8 +2932,6 @@
     <string name="label_verified">Подтверждены</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Подлинность учётных данных</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">Лучше всего это сделать в реальной жизни, встречаясь лицом к лицу. Если у вас есть другой проверенный канал, например, проверенный OTR или PGP, вы также можете его использовать.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">Ваши учётные данные</string>
     <!-- Button to reset credentials -->
@@ -2978,8 +2966,6 @@
     <string name="remove_phone_number_message">Это удалит привязанный номер телефона из вашего аккаунта. Если позже вы решите добавить номер телефона, вам потребуется подтвердить его.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Посмотреть</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">Учётные данные %s</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Документы</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -4033,9 +4019,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Здесь хранятся резервные копии файлов и папок. Резервные копии доступны «только для чтения», чтобы защитить их от случайного изменения на Облачном диске.\nВы можете делать резервные копии элементов со своего компьютера в MEGA с помощью нашего настольного приложения.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Аккаунт заблокирован из-за нарушения авторских прав. Мы отправили вам электронное письмо с дополнительной информацией об этом.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Аккаунт заблокирован из-за нарушения условий использования MEGA, таких как злоупотребление правами других лиц, обмен и импорт незаконных данных или злоупотребление системой.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Ваш аккаунт был удалён из-за нарушения Условий использования MEGA.\nВы не сможете восстановить доступ к своим сохранённым данным или зарегистрировать новый аккаунт MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Встречи</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4154,8 +4140,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Показать меньше</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Мы защищаем ваши данные с помощью шифрования с нулевым разглашением. Чтобы обеспечить дополнительную безопасность, мы просим вас подтвердить контакты, с которыми вы делитесь информацией, прежде чем они смогут получить доступ к общим папкам.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Нерасшифрованная папка]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -5237,13 +5221,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Срок очистки корзины от 7 дней до 10 лет</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Купить Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Купить Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Купить Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Купить Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Купить Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Купить Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Купить Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Купить Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Условия использования</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -5540,11 +5524,25 @@
     <string name="contact_share_file_to_unverified_contact_warning_message">Некоторые контакты, с которыми вы делитесь информацией, не были вами подтверждены. Чтобы обеспечить дополнительную безопасность, мы рекомендуем вам подтвердить их учетные данные в «Контактах». Нажмите на три точки рядом с контактом, который хотите подтвердить, затем нажмите «Информация».</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
-        <item quantity="one">Removed %1$d participant</item>
-        <item quantity="other">Removed %1$d participants</item>
+        <item quantity="one">Удалён %1$d участник</item>
+        <item quantity="few">Удалено %1$d участника</item>
+        <item quantity="many">Удалено %1$d участников</item>
+        <item quantity="other">Удалено %1$d участника</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">Только что было скачано обновление</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Перезапуск</string>
+    <string name="general_app_update_action_restart">Перезапустить</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Разрешите доступ к аудиофайлам</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Подтверждены</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Не подтверждены</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Увеличить</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Уменьшить</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Не удалось добавить элемент</string>
 </resources>

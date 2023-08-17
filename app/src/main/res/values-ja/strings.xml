@@ -486,12 +486,6 @@
     <string name="menu_cancel_all_transfers">すべての転送をキャンセル</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">キャプチャ</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">着信MEGA通話の通知を許可する</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">通話時に他のアプリの上に表示することをMEGAに許可してください。</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">また、端末の「設定」で手動で権限を付与することも可能です。</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Wi-Fiのみ</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1737,8 +1731,6 @@
     <string name="option_save_on_filesystem">ファイルシステムに保存</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">着信</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">MEGAのバックグラウンドポップアップが無効です。\nタップして設定を変更してください。</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s件の未読メッセージ</item>
@@ -1818,8 +1810,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">オーセンティケータアプリで生成された6桁のコードをご入力ください。</string>
     <!-- Text button -->
-    <string name="general_verify">確認</string>
-    <!-- Text button -->
     <string name="general_next">次</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">シードまたはQRコードの生成中にエラーが発生しました。もう一度お試しください。</string>
@@ -1878,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">ネットワーク接続がありません。ファイルを開くには再接続してください。</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">ファイルはすでにオフライン用に保存されています</string>
+    <string name="file_already_exists">ファイルはすでにオフラインで利用可能です</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">メッセージは転送されませんでした</item>
@@ -2298,7 +2288,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGAは、共有するために、あなたのメディアやファイルにアクセスするためのあなたの許可が必要です。暗号化されたメッセージを交換したり、安全な通話を行うためには、他のアクセス権限が必要な場合があります。</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">写真、メディア、ファイルへのアクセスを許可します。</string>
+    <string name="allow_acces_media_title">写真、メディア、ファイルへのアクセスを許可します</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGAは、共有するために、あなたのファイルにアクセスするためのあなたの許可が必要です。</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2729,8 +2719,6 @@
     <string name="label_verified">照合済み</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">認証資格情報</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">これは、面と向かって会うことによって、実際の生活の中で行われるのが最善です。すでに検証済みの別のチャンネル（検証済みのOTRやPGPなど）がある場合は、それを使用することもできます。</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">あなたの資格情報</string>
     <!-- Button to reset credentials -->
@@ -2765,8 +2753,6 @@
     <string name="remove_phone_number_message">これにより、関連付けられている電話番号がアカウントから削除されます。後で電話番号を追加する場合は、電話番号を検証する必要があります。</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">確認</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">%sさんの資格情報</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">文書</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3736,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">ここにバックアップしたファイルやフォルダが保存されます。バックアップされたアイテムは、クラウドドライブ内で誤って変更されないように「読み取り専用」になります。\n当社のデスクトップアプリケーションを使用して、パソコンからMEGAにアイテムをバックアップすることができます。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">著作権侵害によりアカウントが停止されました。これに関する詳細情報を記載したメールをお送りしました。</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">度重なる著作権侵害の申し立てにより、あなたのMEGAアカウントは停止されました。これは、アカウントまたはアカウント内のデータにアクセスできないことを意味します。\n異議申し立て通知を提出する方法の詳細については、メールを確認してください。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">アカウントは、他人の権利の乱用、違法データの共有やインポート、システムの乱用など、MEGAのご利用規約に違反したために終了しました。</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">MEGAのご利用規約違反により、あなたのアカウントは停止されました。\n保存されたデータへのアクセスを回復したり、MEGAアカウントを新規登録したりすることはできません。</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">ミーティング</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3845,8 +3831,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">表示を減らす</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">当社はゼロ知識暗号化でデータを保護します。セキュリティを強化するため、連絡先が共有フォルダにアクセスする前に、情報を共有する連絡先を認証するようお願いしています。</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未復号フォルダ]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4604,13 +4588,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;ごみ箱を空にするのを7日から10年の間でスケジュールする</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro Liteを購入</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Liteを購入</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Pro Iを購入</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;Iを購入</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro IIを購入</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;IIを購入</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro IIIを購入</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;IIIを購入</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">ご利用規約</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4871,4 +4855,16 @@
     <string name="general_app_update_message_download_success">アップデートがダウンロードされました</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">再起動</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">音声ファイルへのアクセスを許可する</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">承認済み</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">未承認</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">ズームイン</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">ズームアウト</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">項目を追加できませんでした</string>
 </resources>

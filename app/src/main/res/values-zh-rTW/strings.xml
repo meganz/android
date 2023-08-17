@@ -241,7 +241,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">選擇帳戶</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">離線使用</string>
+    <string name="file_properties_available_offline">可離線使用</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">大小</string>
     <!-- When the file/folder was last modified -->
@@ -291,7 +291,7 @@
         <item quantity="other">資料夾是空的。</item>
     </plurals>
     <!-- Hint how to cancel the download -->
-    <string name="download_touch_to_show">檢視傳輸</string>
+    <string name="download_touch_to_show">查看傳輸</string>
     <!-- Warning message -->
     <string name="error_file_size_greater_than_4gb">大多數的裝置無法下載大於4&#160;GB的檔案。怹的下載可能會失敗。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -486,12 +486,6 @@
     <string name="menu_cancel_all_transfers">取消所有傳輸</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">拍照</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">允許收到MEGA來電通知</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">請授予MEGA於通話時顯示在其它應用程式上層的權限。</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">您仍然可以在裝置設定裡手動授予權限。</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">只在WiFi連線</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1217,13 +1211,13 @@
         <item quantity="other">%1$d個檔案</item>
     </plurals>
     <!-- Menu option -->
-    <string name="general_view">檢視檔案</string>
+    <string name="general_view">查看檔案</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">匯入</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">新增至雲端硬碟</string>
     <!-- Menu option -->
-    <string name="general_view_contacts">檢視聯絡人</string>
+    <string name="general_view_contacts">查看聯絡人</string>
     <!-- Menu option -->
     <string name="import_success_error">發生錯誤，無法新增至雲端硬碟</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1427,11 +1421,11 @@
     <!-- Settings preference title for help centre -->
     <string name="settings_help_centre">幫助中心</string>
     <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">發送意見</string>
+    <string name="settings_help_preference">發送意見回饋</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Android反饋建議</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">請於此提供您的意見：</string>
+    <string name="setting_feedback_body">請於此提供您的意見回饋：</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">裝置型號</string>
     <!-- mail body -->
@@ -1737,8 +1731,6 @@
     <string name="option_save_on_filesystem">儲存在檔案系統</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">來電</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">MEGA背景彈出式視窗已停用。\n點擊更改設定。</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s則未讀訊息</item>
@@ -1818,8 +1810,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">請輸入您身份驗證程式所生成的6位數字代碼。</string>
     <!-- Text button -->
-    <string name="general_verify">驗證</string>
-    <!-- Text button -->
     <string name="general_next">下一步</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">生成種子金鑰或二維條碼時出錯，請再試一次。</string>
@@ -1878,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">沒有網路連線。請重新連線來開啟檔案。</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">檔案已存在於離線使用中</string>
+    <string name="file_already_exists">File already available Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">訊息未轉發</item>
@@ -2298,7 +2288,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA需要您的授權才能存取您的多媒體與檔案以進行共享。交換加密訊息和進行安全通話可能也需要其他存取權限。</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">允許存取相片、媒體與檔案。</string>
+    <string name="allow_acces_media_title">允許存取相片、媒體與檔案</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA需要您的授權才能進行檔案共享。</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2426,7 +2416,7 @@
         <item quantity="other">%d個版本未刪除</item>
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
-    <string name="no_contacts_invite">您沒有MEGA聯絡人。請從聯絡人頁面邀請朋友。</string>
+    <string name="no_contacts_invite">您沒有MEGA聯絡人。請從聯絡人部分邀請朋友。</string>
     <!-- Invite button for chat top cell -->
     <string name="invite_more">邀請更多</string>
     <!-- Title of first tour screen -->
@@ -2729,8 +2719,6 @@
     <string name="label_verified">已驗證</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">授權認證</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">這最好由實際面對面來完成。如您有其他已驗證管道，如已驗證的OTR或PGP，也可以使採用。</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">您的憑證</string>
     <!-- Button to reset credentials -->
@@ -2765,8 +2753,6 @@
     <string name="remove_phone_number_message">這將從您的帳戶移除所關聯的手機門號。如果您之後選擇新增手機門號，則需要再進行驗證。</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">查看</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">%s的憑證</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">文件</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3736,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">這是您備份檔案和資料夾存放的地方。您備份的項目是「唯讀」的，以避免它們在您的雲端硬碟中被意外竄改。您可以使用我們桌面應用程式將您電腦中的項目備份到MEGA。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">帳戶因侵犯版權而被暫停。我們向您發送了一封電子郵件，其中包含有關此內容的更多訊息。</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">帳戶因違反MEGA服務條款而被終止，例如侵犯他人權益、共享和匯入非法資料、或濫用系統資源行為。</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">會議</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3845,8 +3831,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">顯示較少</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">我們使用零知識加密保護您的資料。為了進一步確保安全性，我們要求您驗證您與之共享資訊的聯絡人，然後他們才能存取共享資料夾。</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未解密資料夾]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4604,13 +4588,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;垃圾筒清理排程7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">購買Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">購買Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">購買Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">購買Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">服務條款</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4788,9 +4772,9 @@
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_title">是否取消「%1$s」？</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">此會議將被封存，所有與會者都會收到通知。</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">此會議將被封存，所有與會者都將收到通知。</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">此會議將被放在過去的會議中，所有與會者都會收到通知。</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">此會議將歸入過去的會議，所有與會者都將收到通知。</string>
     <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">不要取消</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
@@ -4818,9 +4802,9 @@
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B]已更新會議[/B]</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">此會議和其所有事件將被封存，所有與會者都會收到通知。</string>
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">此會議和其所有事件將被封存，所有與會者都將收到通知。</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">此會議和其所有事件將被放置在過去的會議中，所有與會者都會收到通知。</string>
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">此會議和其所有事件都將歸入過去的會議，所有與會者都將收到通知。</string>
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">您現在可以安排一次性和週期性會議。</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
@@ -4830,7 +4814,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">您現在可以點選右側的三個小圓點並選擇[A]事件[/A]來查看、取消、或編輯週期性會的任何事件。</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">使用電子郵件發送行事曆邀請給與會者，以便他們可以將會議加到他們的行事曆。</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">透過電子郵件發送行事曆邀請給與會者，以便他們可以將會議加到他們的行事曆。</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">會議已更新</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -4852,7 +4836,7 @@
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相符。您可以要求對方分享他們的憑證給您。</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">同意</string>
+    <string name="contact_approve_credentials_button_text">驗證</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">驗證憑證</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -4860,16 +4844,27 @@
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">只有主持人允許的使用者才可以加入會議。</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">在通話期間由非主持人加入的與會者不會被傳送到等候室。[A]瞭解更多[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">通話期間由非主持人加入的與會者不會被傳送到等候室。[A]瞭解更多[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">某些您與之共享資訊的聯絡人尚未經過您的驗證。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。點選您欲驗證的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
-        <item quantity="one">Removed %1$d participant</item>
-        <item quantity="other">Removed %1$d participants</item>
+        <item quantity="other">已移除%1$d個與會者</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <string name="general_app_update_message_download_success">剛剛下載了更新</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">重頭播放</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">允許存取音訊檔案</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">已驗證</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">未驗證</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">放大</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">縮小</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
 </resources>

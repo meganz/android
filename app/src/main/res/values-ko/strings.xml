@@ -486,12 +486,6 @@
     <string name="menu_cancel_all_transfers">모든 전송 취소</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">캡처</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">수신중인 MEGA 통화의 알림 허용</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">통화를 위해 MEGA에 다른 앱 위에 표시 권한을 허용해주세요.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">장치 설정에서 수동으로 권한을 허용할 수 있습니다.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">와이파이 전용</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1737,8 +1731,6 @@
     <string name="option_save_on_filesystem">파일 시스템에 저장</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">전화 수신중</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">MEGA 백그라운드 팝업이 해제되어 있습니다.\n설정을 변경하려면 탭하세요.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s개의 읽지 않은 메시지</item>
@@ -1818,8 +1810,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">인증기 앱에서 생성된 6자리 코드를 입력하세요.</string>
     <!-- Text button -->
-    <string name="general_verify">인증</string>
-    <!-- Text button -->
     <string name="general_next">다음</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">시드 또는 QR 코드를 생성하던 중 오류가 발생하였습니다, 다시 시도하세요.</string>
@@ -1878,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">네트워크 연결이 없습니다. 파일을 열려면 다시 연결하세요.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">파일이 이미 오프라인용으로 저장되어 있습니다</string>
+    <string name="file_already_exists">File already available Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">메시지가 전달되지 않음</item>
@@ -2298,7 +2288,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">공유를 하려면 MEGA에 미디어와 파일 접근 권한이 필요합니다. 암호화된 메시지를 교환하고 안전한 통화를 하려면 다른 접근 권한이 필요할 수 있습니다.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">사진, 미디어 그리고 파일에 대한 접근 허용.</string>
+    <string name="allow_acces_media_title">사진, 미디어 그리고 파일에 대한 접근 허용</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">공유를 하려면 MEGA에 파일 접근 권한이 필요합니다.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2729,8 +2719,6 @@
     <string name="label_verified">확인됨</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">진위 증명</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">현실에서 가장 확실한 방법은 직접 만나는 것입니다. 만약 증명된 OTR이나 PGP 같은 이미 증명된 다른 방법이 있다면, 그것을 사용해도 좋습니다.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">당신의 자격 증명</string>
     <!-- Button to reset credentials -->
@@ -2765,8 +2753,6 @@
     <string name="remove_phone_number_message">이것은 당신의 계정에 연결된 전화번호를 삭제합니다. 만약 나중에 전화번호를 추가하려면 전화번호를 인증해야합니다.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">보기</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">%s님의 자격 증명</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">문서</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3736,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">이곳은 백업된 파일과 폴더가 보관되는 곳입니다. 백업된 항목은 실수로 클라우드 드라이브에서 수정되는 것을 방지하지 위해 “읽기 전용”이 됩니다.\n데스크톱 앱을 이용하여 컴퓨터에서 MEGA로 항목들을 백업할 수 있습니다.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">저작권 침해로 계정이 정지되었습니다. 이것에 대한 자세한 정보를 이메일로 보내드렸습니다.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">타인의 권리 침해, 불법 데이터의 공유 및 내보내기, 시스템 오용 등의 MEGA 이용 약관 위반으로 계정이 제거되었습니다.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">회의</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3845,8 +3831,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">적게 보기</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">우리는 당신의 데이터를 영지식 암호화로 보호합니다. 추가적인 보안을 보장하기 위해, 연락처가 공유된 폴더에 접근할 수 있게 되기 전에 당신이 정보를 공유하는 연락처를 인증할 것을 요청합니다.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[복호화 되지 않은 폴더]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4604,13 +4588,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;7일과 10년 사이의 휴지통 비우기 예약</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro Lite 구입</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite 구입</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Pro I 구입</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;I 구입</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro II 구입</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II 구입</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro III 구입</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III 구입</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">이용 약관</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4871,4 +4855,16 @@
     <string name="general_app_update_message_download_success">업데이트가 다운로드 되었습니다</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">재시작</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">오디오 파일에 접근 허용</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">승인됨</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">승인되지 않음</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">확대</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">축소</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
 </resources>

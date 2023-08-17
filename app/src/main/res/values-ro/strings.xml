@@ -502,12 +502,6 @@
     <string name="menu_cancel_all_transfers">Anulează toate transferurile</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Capturează</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">Permite notificări pentru apelurile MEGA primite</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Te rugăm să-i acorzi lui MEGA permisiunea de a se afișa peste alte aplicații pentru apeluri.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Poți în continuare să acorzi manual permisiunile din setările dispozitivului.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Numai Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1443,7 +1437,7 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Bonusuri pt. invitații</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Instalează aplicația noastră mobilă</string>
+    <string name="title_install_app">Instalează o aplicație mobilă MEGA</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus de înregistrare</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1819,8 +1813,6 @@
     <string name="option_save_on_filesystem">Salvează în sistemul de fișiere</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Apel de intrare</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">Popupurile în fundal MEGA sunt dezactivate.\nAtinge pentru a schimba setările.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s mesaj necitit</item>
@@ -1904,8 +1896,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Te rugăm să introduci codul din 6 cifre generat de aplicația de autentificare.</string>
     <!-- Text button -->
-    <string name="general_verify">Verifică</string>
-    <!-- Text button -->
     <string name="general_next">Înainte</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">A apărut o eroare la generarea sămânței sau a codului QR, te rugăm să încerci din nou.</string>
@@ -1964,7 +1954,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Nicio conexiune la rețea. Te rugăm să te reconectezi pentru a deschide fișierul.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Fișierul există deja în Salvate pentru offline</string>
+    <string name="file_already_exists">Fișier deja disponibil Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Mesaj nedirecționat</item>
@@ -2406,7 +2396,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA are nevoie de permisiunea ta ca să îți acceseze conținutul media și fișiere pentru partajare. Alte permisiuni de acces pot fi necesare pentru schimbul de mesaje criptate și pentru a efectua apeluri securizate.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Permite accesul la fotografii, conținut media și fișiere.</string>
+    <string name="allow_acces_media_title">Permite accesul la fotografii, conținut media și fișiere</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA are nevoie de permisiunea ta ca să acceseze fișierele pentru partajare.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2871,8 +2861,6 @@
     <string name="label_verified">Verificat</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Acreditări de autenticitate</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">Acest lucru este realizat cel mai bine întâlnindu-vă față în față. Dacă ai un alt canal verificat deja precum OTR sau PGP verificat, l-ai putea folosi și pe acela.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">Acreditările tale</string>
     <!-- Button to reset credentials -->
@@ -2907,8 +2895,6 @@
     <string name="remove_phone_number_message">Acest lucru va elimina numărul de telefon asociat din cont. Dacă ulterior alegi să adaugi un număr de telefon, ți se va cere să îl verifici.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Vezi</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">Acreditările lui %s</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Documente</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3934,9 +3920,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Aici sunt stocate fișierele și folderele pentru care s-a făcut backup. Elementele pentru care s-a făcut backup sunt de tip „numai citire” pentru a le proteja împotriva modificării accidentale în Unitatea cloud.\nPoți face backupuri ale elementelor de pe calculator pe MEGA folosind aplicația noastră desktop.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Cont suspendat din cauza încălcării drepturilor de autor. Ți-am trimis un e-mail cu mai multe informații despre acest lucru.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Contul dvs. MEGA a fost suspendat din cauza acuzațiilor repetate de încălcare a drepturilor de autor. Aceasta înseamnă că nu vă puteți accesa contul sau datele din cadrul acestuia.\nConsultați e-mailul nostru pentru mai multe informații despre cum să depuneți o contranotificare.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Cont desființat din cauza unei încălcări a Termenilor de utilizare a serviciului MEGA, cum ar fi abuzul drepturilor celorlalți; partajarea și importarea de date ilegale; ori abuzul de sistem.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Contul dvs. a fost desființat din cauza unei încălcări a Termenilor de utilizare a serviciului MEGA.\nNu veți putea recâștiga accesul la datele stocate sau nu veți putea fi autorizat să înregistrați un nou cont MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Întâlniri</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4051,8 +4037,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Vezi mai puțini</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Vă protejăm datele cu criptare tip zero cunoștințe. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații înainte de a putea accesa folderele partajate.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[folder nedecriptat]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4100,13 +4084,13 @@
     <!-- User Alert notification for scheduled meeting title change -->
     <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s a actualizat [/A][B] numele întâlnirii din „%s” în [/B]„[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s updated[/A][B] the meeting date[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s a actualizat[/A][B] data întâlnirii periodice[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s updated[/A][B] the meeting time[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s a actualizat[/A][B] ora întâlnirii[/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s updated[/A][B] the meeting description[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s a actualizat[/A][B]descrierea întâlnirii[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the details of the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s a actualizat [/A][B]detaliile reuniunii programate pentru: [/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">Acces refuzat</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
@@ -4130,7 +4114,7 @@
     <!-- Label for scheduled daily meetings -->
     <string name="meetings_list_scheduled_meeting_daily_label">%s zilnic</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]invited you to a recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]te-a invitat la o întâlnire recurentă programată pentru: [/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s a actualizat[/A][B] descrierea întâlnirii periodice[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
@@ -4140,9 +4124,9 @@
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s a actualizat[/A][B] ora întâlnirii periodice[/B]</string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s a anulat [/A][B] Întâlnirea și toate ocurențele sale [/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s cancelled[/A][B] the occurrence scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s a anulat [/A][B] ocurență programată pentru: [/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_message">Acest link nu a fost generat cu contul în care ești autentificat(ă) în prezent. Autentifică-te în contul aferent acestui link pentru a-ți verifica adresa de e-mail.</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
@@ -4154,9 +4138,9 @@
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] de la [B]%2$s la %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Every day effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">În fiecare zi, începând cu [A]%1$s[/A] de la [B]%2$s la %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Every day effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">În fiecare zi, începând cu [A]%1$s până în %2$s[/A] de la [B]%3$s la %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="one">%1$s, în fiecare săptămână, începând cu [A]%3$s până în %4$s[/A], de la [B]%5$s la %6$s[/B]</item>
@@ -4171,13 +4155,15 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="one">%1$s și %2$s, în fiecare săptămână, începând cu [A]%4$s până în %5$s[/A], de la [B]%6$s la %7$s[/B]</item>
+        <item quantity="few">%1$s și %2$s fiecare %3$d săptămâni eficiente [A]%4$s până la %5$s[/A] din [B]%6$s a %7$s[/B]</item>
+        <item quantity="other">%1$s și %2$s fiecare %3$d săptămâni eficiente [A]%4$s până la %5$s[/A] din [B]%6$s a %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="one">%1$s și %2$s, în fiecare săptămână, începând cu [A]%4$s[/A] de la [B]%5$s la %6$s[/B]</item>
+        <item quantity="few">%1$s și %2$s, la fiecare %3$d săptămâni, începând cu [A]%4$s[/A] de la [B]%5$s la %6$s[/B]</item>
+        <item quantity="other">%1$s și %2$s, la fiecare %3$d de săptămâni, începând cu [A]%4$s[/A] de la [B]%5$s la %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
@@ -4757,19 +4743,19 @@
     </plurals>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="one">Nu ai putut să părăsești %1$d folder partajat</item>
-        <item quantity="few">Nu ai putut părăsi %1$d foldere partajate</item>
-        <item quantity="other">Nu ai putut părăsi %1$d de foldere partajate</item>
+        <item quantity="one">Nu am putut să părăsești %1$d folder partajat</item>
+        <item quantity="few">Nu am putut părăsi %1$d foldere partajate</item>
+        <item quantity="other">Nu am putut părăsi %1$d de foldere partajate</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
         <item quantity="one">Ați părăsit %1$d folder partajat,&#160;</item>
-        <item quantity="few">Ați părăsit %1$d dosare partajate,&#160;</item>
-        <item quantity="other">Ați părăsit %1$d de dosare partajate,&#160;</item>
+        <item quantity="few">Ați părăsit %1$d foldere partajate,&#160;</item>
+        <item quantity="other">Ați părăsit %1$d de foldere partajate,&#160;</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="one">nu ai putut să părăsești %1$d folder partajat</item>
+        <item quantity="one">nu ai putut lăsa %1$d1 folder partajat</item>
         <item quantity="few">nu ai putut părăsi %1$d foldere partajate</item>
         <item quantity="other">nu ai putut părăsi %1$d de foldere partajate</item>
     </plurals>
@@ -4789,84 +4775,94 @@
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
     <plurals name="general_move_node_snackbar_concat_success">
-        <item quantity="one">Moved %1$d item,&#160;</item>
-        <item quantity="other">Moved %1$d items,&#160;</item>
+        <item quantity="one">%1$d element a fost mutat,&#160;</item>
+        <item quantity="few">%1$d elemente au fost mutate,&#160;</item>
+        <item quantity="other">%1$d de elemente au fost mutate,&#160;</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
     <plurals name="general_move_node_snackbar_concat_fail">
-        <item quantity="one">couldn’t move %1$d item</item>
-        <item quantity="other">couldn’t move %1$d items</item>
+        <item quantity="one">nu a putut muta %1$d element</item>
+        <item quantity="few">nu a putut muta %1$d element</item>
+        <item quantity="other">nu a putut muta %1$d de elemente</item>
     </plurals>
     <!-- Text hint of option to add meeting name in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_name_hint">Numele întâlnirii</string>
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_label">Recurrence</string>
+    <string name="meetings_schedule_meeting_recurrence_label">Recurență</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_send_calendar_invite_label">Trimite invitația pentru calendar</string>
     <!-- Title of option to add description in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_add_description_label">Add description</string>
+    <string name="meetings_schedule_meeting_add_description_label">Adaugă o descriere</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Este necesar numele întâlnirii</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter up to 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Introdu până la 30&#160;de caractere</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter up to 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Introdu până la 3.000&#160;de caractere</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting scheduled</string>
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Întâlnirea a fost programată</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_never_label">Niciodată</string>
     <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_calendar_select_date_label">Select date</string>
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Selectează o dată</string>
     <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
-    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Discard this meeting?</string>
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Renunțați la această întâlnire?</string>
     <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
-    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">Keep editing</string>
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">Continuați să editați</string>
     <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
     <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">Înlătură</string>
     <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
-        <item quantity="one">Added %1$d participant</item>
-        <item quantity="other">Added %1$d participants</item>
+        <item quantity="one">%1$d participant a fost adăugat</item>
+        <item quantity="few">Au fost adăugați %1$d participanți</item>
+        <item quantity="other">Au fost adăugați %1$d de participanți</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
-        <item quantity="one">Couldn’t share %1$d folder</item>
-        <item quantity="other">Couldn’t share %1$d folders</item>
+        <item quantity="one">Nu am putut partaja %1$d folder</item>
+        <item quantity="few">Nu am putut partaja %1$d foldere</item>
+        <item quantity="other">Nu am putut partaja %1$d de foldere</item>
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access for %1$d contact</item>
-        <item quantity="other">Couldn’t remove access for %1$d contacts</item>
+        <item quantity="one">Nu se poate elimina accesul pentru %1$d contact</item>
+        <item quantity="few">Nu se poate elimina accesul pentru %1$d contacte</item>
+        <item quantity="other">Nu se poate elimina accesul pentru %1$d contacte</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
-        <item quantity="one">Couldn’t update permissions for %1$d contact</item>
-        <item quantity="other">Couldn’t update permissions for %1$d contacts</item>
+        <item quantity="one">Nu se poate actualiza permisiunile pentru %1$d contact</item>
+        <item quantity="few">Nu se poate actualiza permisiunile pentru %1$d contacte</item>
+        <item quantity="other">Nu se poate actualiza permisiunile pentru %1$d contacte</item>
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, am înțeles</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
-        <item quantity="one">Permanently removed %1$d item</item>
-        <item quantity="other">Permanently removed %1$d items</item>
+        <item quantity="one">%1$d element a fost eliminat definitiv</item>
+        <item quantity="few">%1$d elemente au fost eliminate definitiv</item>
+        <item quantity="other">%1$d de elemente au fost eliminate definitiv</item>
     </plurals>
     <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
     <plurals name="rubbish_bin_remove_items_snackbar_fail">
-        <item quantity="one">Couldn’t permanently remove %1$d item</item>
-        <item quantity="other">Couldn’t permanently remove %1$d items</item>
+        <item quantity="one">Nu se poate elimina definitiv %1$d element</item>
+        <item quantity="few">Nu se poate elimina definitiv %1$d elemente</item>
+        <item quantity="other">Nu se poate elimina definitiv %1$d elemente</item>
     </plurals>
     <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
     <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
-        <item quantity="one">Permanently removed %1$d item,&#160;</item>
-        <item quantity="other">Permanently removed %1$d items,&#160;</item>
+        <item quantity="one">%1$d element a fost eliminat definitiv,[w</item>
+        <item quantity="few">%1$d elemente au fost eliminate definitiv,[w</item>
+        <item quantity="other">%1$d de elemente au fost eliminate definitiv,&#160;</item>
     </plurals>
     <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
     <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
-        <item quantity="one">couldn’t permanently remove %1$d item</item>
-        <item quantity="other">couldn’t permanently remove %1$d items</item>
+        <item quantity="one">nu se poate elimina definitiv %1$d element</item>
+        <item quantity="few">nu se poate elimina definitiv %1$d elemente</item>
+        <item quantity="other">nu se poate elimina definitiv %1$d elemente</item>
     </plurals>
     <!-- The select time dialog in schedule meeting -->
-    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Introducere ora</string>
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations"></string>
     <!-- Text for the meeting invitations option on calls settings -->
@@ -4876,17 +4872,17 @@
     <!-- Text for the meeting reminders option on calls settings -->
     <string name="settings_calls_preferences_meeting_reminders_text"></string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
-    <string name="notification_sched_meeting_starts_15_minutes">Meeting starts in 15 minutes</string>
+    <string name="notification_sched_meeting_starts_15_minutes">Întâlnirea începe în 15 minute</string>
     <!-- Notification description for scheduled meetings that starts now -->
-    <string name="notification_sched_meeting_starts_now">Meeting starts now</string>
+    <string name="notification_sched_meeting_starts_now">Întâlnirea începe acum</string>
     <!-- Title for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <string name="album_share_share_link_dialog_title">Partajează și cheia de decriptare?</string>
     <!-- Explanation text for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <string name="album_share_share_link_dialog_body">Cheia de decriptare a fost exportată și va fi partajată cu linkul.</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
-    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <string name="album_share_share_link_dialog_button_link_only">Partajează numai linkul</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
-    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <string name="album_share_share_link_dialog_button_link_and_key">Partajează linkul și cheia</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
         <item quantity="one">Partajează linkul</item>
@@ -4895,8 +4891,9 @@
     </plurals>
     <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
     <plurals name="album_share_links_copied">
-        <item quantity="one">Link copied to clipboard</item>
-        <item quantity="other">Links copied to clipboard</item>
+        <item quantity="one">Link copiat în clipboard</item>
+        <item quantity="few">Link-uri copiate în clipboard</item>
+        <item quantity="other">Link-uri copiate în clipboard</item>
     </plurals>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_title">
@@ -4906,8 +4903,9 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="one">People you shared this link with will lose access to the album.</item>
-        <item quantity="other">People you shared these links with will lose access to the albums.</item>
+        <item quantity="one">Persoanele cu care ați partajat acest link vor pierde accesul la album.</item>
+        <item quantity="few">Persoanele cu care ați partajat aceste linkuri vor pierde accesul la albume.</item>
+        <item quantity="other">Persoanele cu care ați partajat aceste linkuri vor pierde accesul la albume.</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -4918,19 +4916,19 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">Introdu cheia de decriptare</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">Pentru a accesa albumul, introduceți cheia de decriptare. Dacă nu îl aveți, contactați persoana care a partajat linkul cu dvs.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
-    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <string name="photos_timeline_filter_remember_preferences">Amintiți-vă preferințele</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Device centre</string>
+    <string name="home_side_menu_device_center_title">Centrul dispozitivului</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Device centre</string>
+    <string name="device_center_list_of_devices_toolbar_title">Centrul dispozitivului</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Every day</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">În fiecare zi</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Every week</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">În fiecare săptămână</string>
     <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Every month</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">În fiecare lună</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Personalizat</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
@@ -4941,11 +4939,12 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Lunară</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Some months don’t have %1$d day. For these months, the occurrence will be scheduled for the last day of the month.</item>
-        <item quantity="other">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</item>
+        <item quantity="one">Unele luni nu au %1$d zi. Pentru aceste luni, ocurența va fi planificată pentru ultima zi a lunii.</item>
+        <item quantity="few">Unele luni nu au %1$d de zile. Pentru aceste luni, ocurența va fi planificată pentru ultima zi a lunii.</item>
+        <item quantity="other">Unele luni nu au %1$d de zile. Pentru aceste luni, ocurența va fi planificată pentru ultima zi a lunii.</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <string name="dialog_taken_down_folder_title">Nu se poate deschide folderul</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Nu se poate deschide fișierul</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
@@ -4953,9 +4952,9 @@
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
     <!-- Text of the button to show the dialog to update to pro -->
-    <string name="general_pro_only">Pro only</string>
+    <string name="general_pro_only">Numai Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_title_link_access">Link access</string>
+    <string name="cloud_drive_title_link_access">Acces la ink-uri</string>
     <!-- SubTitle of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_subtitle_link_access"></string>
     <!-- Text of setting expiry date to link-->
@@ -4963,17 +4962,17 @@
     <!-- Text of setting password to link -->
     <string name="general_set_password">Setează o parolă</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Link updated. Copy again.</string>
+    <string name="general_link_updated_copy_again">Linkul a fost actualizat. Copiați din nou.</string>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
+    <string name="general_link_created_and_copied">Linkul a fost creat și copiat în clipboard</string>
     <!-- Album import link label -->
-    <string name="album_import_link">Album link</string>
+    <string name="album_import_link">Link pentru album</string>
     <!-- Album import error access title -->
-    <string name="album_import_error_access_title">Cannot access album</string>
+    <string name="album_import_error_access_title">Nu se poate accesa albumul</string>
     <!-- Album import error access description -->
-    <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <string name="album_import_error_access_description">Link-ul către album a fost eliminat sau albumul a fost șters. Contactați persoana care a partajat linkul cu dvs.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <string name="album_import_error_access_confirmation">OK, am înțeles</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4985,109 +4984,113 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Economisește până la 16&#160;% cu facturarea anuală</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Storage:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]Spațiu de stocare: [/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transferuri: [/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/lună[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/an[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomandat</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Planul actual</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Features of Pro plans</string>
+    <string name="account_upgrade_account_description_title_features">Caracteristicile planurilor Pro</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Password-protected links</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Linkuri protejate prin parolă</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links with expiry dates</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Linkuri cu date de expirare</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Transfer quota sharing</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Partajarea transferurilor</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatic backups</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backupuri automate</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160; Derulare înapoi până la 90 de zile pe Pro &#160; Lite și până la 365 de zile pe Pro &#160; I, II și III (în curând)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Planifică golirea coșurilor de gunoi între 7 zile și 10 ani</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Cumpără Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Cumpara Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Cumpara Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Cumpara Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Termenii de utilizare a serviciului</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
-    <string name="cloud_drive_subtitle_links_access_all_user">Anyone with this link can view and download your data</string>
+    <string name="cloud_drive_subtitle_links_access_all_user">Oricine are acest link vă poate vizualiza și descărca datele</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
-    <string name="cloud_drive_subtitle_link_access_password">Only people with the password can open the link</string>
+    <string name="cloud_drive_subtitle_link_access_password">Doar persoanele cu parola pot deschide linkul</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <plurals name="general_name_collision_file_apply_for_all">
-        <item quantity="one">Apply to the duplicate</item>
-        <item quantity="other">Apply to all %1$d duplicates</item>
+        <item quantity="one">Aplică la duplicat</item>
+        <item quantity="few">Aplică la toate cele %1$d duplicate</item>
+        <item quantity="other">Aplică la toate cele %1$d de duplicate</item>
     </plurals>
     <!-- Title of the meeting info screen -->
     <string name="meetings_info_title">Informații</string>
     <!-- Option of the info screen to enable/disable notifications for a meeting -->
-    <string name="meetings_info_notifications_option">Meeting notifications</string>
+    <string name="meetings_info_notifications_option">Notificări de întâlnire</string>
     <!-- Option of the info screen to manage meeting history -->
-    <string name="meetings_info_manage_history_option">Manage meeting history</string>
+    <string name="meetings_info_manage_history_option">Gestionează istoricul întâlnirilor</string>
     <!-- Option of the info screen to leave the meeting -->
     <string name="meetings_info_leave_option">Părăsește întâlnirea</string>
     <!-- Title of the manage history screen -->
-    <string name="meetings_manage_history_view_title">Manage meeting history</string>
+    <string name="meetings_manage_history_view_title">Gestionează istoricul întâlnirilor</string>
     <!-- Option of the manage history screen to clear the meeting history -->
-    <string name="meetings_manage_history_clear">Clear meeting history</string>
+    <string name="meetings_manage_history_clear">Golește istoricul întâlnirilor</string>
     <!-- Confirmation dialog title to clear the meeting history -->
-    <string name="meetings_clear_history_confirmation_dialog_title">Clear meeting history</string>
+    <string name="meetings_clear_history_confirmation_dialog_title">Golește istoricul întâlnirilor</string>
     <!-- Confirmation dialog message to clear the meeting history -->
-    <string name="meetings_clear_history_confirmation_dialog_message">Are you sure you want to clear the full message history of this meeting?</string>
+    <string name="meetings_clear_history_confirmation_dialog_message">Sigur vrei să ștergi istoricul complet al mesajelor din acestei întâlniri?</string>
     <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
-    <string name="meetings_mute_notifications_dialog_title">Mute meeting notifications for</string>
+    <string name="meetings_mute_notifications_dialog_title">Amuțește notificările de întâlnire timp de</string>
     <!-- Confirmation dialog title to leave a meeting -->
-    <string name="meetings_leave_meeting_confirmation_dialog_title">Leave meeting?</string>
+    <string name="meetings_leave_meeting_confirmation_dialog_title">Părăsiți întâlnirea?</string>
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">Redenumește albumul</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
+    <string name="album_import_rename_album_description">Un album numit „%1$s” există deja în Albumele dvs. Introduceți un nume nou pentru albumul pe care îl salvați.</string>
     <!-- Album import enter album name -->
-    <string name="album_import_enter_album_name">Enter an album name</string>
+    <string name="album_import_enter_album_name">Introdu un nume de album</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
+    <string name="account_upgrade_account_pricing_page_link_text">Vă puteți upgrada abonamentul actual pe [A]pagina noastră de prețuri[/A].</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
-        <item quantity="one">Anyone with this link can view and download your data</item>
-        <item quantity="other">Anyone with these links can view and download your data</item>
+        <item quantity="one">Oricine are acest link vă poate vizualiza și descărca datele</item>
+        <item quantity="few">Oricine are aceste link-uri vă poate vizualiza și descărca datele</item>
+        <item quantity="other">Oricine are aceste link-uri vă poate vizualiza și descărca datele</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">Salvează în unitatea cloud</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">Saving&#8230;</string>
+    <string name="album_import_saving">Se salvează&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <string name="album_import_success_message">„%1$s” salvat în Unitatea cloud</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <string name="album_import_error_message">„%1$s” nu poate fi salvat pe Unitatea cloud. Încercați din nou mai târziu și dacă problema continuă, contactați persoana care a partajat linkul cu dvs.</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_weekdays_button">Weekdays</string>
+    <string name="meetings_custom_recurrence_weekdays_button">Zilele săptămânii</string>
     <!-- Title of occurs ever section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_every_section">Are loc la fiecare</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
-    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Every weekday</string>
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">În fiecare zi a săptămânii</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
     <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
-        <item quantity="one">Daily</item>
-        <item quantity="other">Every %1$d days</item>
+        <item quantity="one">Zilnic</item>
+        <item quantity="few">La fiecare %1$d de zile</item>
+        <item quantity="other">La fiecare %1$d de zile</item>
     </plurals>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <plurals name="general_snackbar_link_created_and_copied">
-        <item quantity="one">Link created and copied to your clipboard</item>
-        <item quantity="other">Links created and copied to your clipboard</item>
+        <item quantity="one">Link creat și copiat în clipboard</item>
+        <item quantity="few">Link-uri create și copiate în clipboard</item>
+        <item quantity="other">Link-uri create și copiate în clipboard</item>
     </plurals>
     <!-- Title of occurs on section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_occurs_on_section">Occurs on</string>
+    <string name="meetings_custom_recurrence_occurs_on_section">Are loc</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
     <string name="meetings_custom_recurrence_monday_option">L</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
@@ -5104,20 +5107,22 @@
     <string name="meetings_custom_recurrence_sunday_option">D</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
-        <item quantity="one">%1$s, every week</item>
-        <item quantity="other">%1$s, every %2$d weeks</item>
+        <item quantity="one">%1$s, în fiecare săptămână</item>
+        <item quantity="few">%1$s, la fiecare %2$d săptămâni</item>
+        <item quantity="other">%1$s, la fiecare %2$d săptămâni</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
-        <item quantity="one">%1$s and %2$s, every week</item>
-        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+        <item quantity="one">%1$s și %2$s, în fiecare săptămână</item>
+        <item quantity="few">%1$s și %2$s, la fiecare %3$d săptămâni</item>
+        <item quantity="other">%1$s și %2$s, la fiecare %3$d săptămâni</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Aveți deja un abonament recurent pentru acest plan</string>
     <!-- Album import storage exceeded title -->
-    <string name="album_import_storage_exceeded_title">Cannot save album</string>
+    <string name="album_import_storage_exceeded_title">Nu se poate salva albumul</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <string name="album_import_storage_exceeded_description">Nu aveți suficient spațiu de stocare pentru a salva acest album pe Unitatea cloud. Faceți upgrade acum pentru a obține mai mult spațiu de stocare.</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">Ziua</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -5149,148 +5154,169 @@
     <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
     <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">duminica</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
-    <string name="meetings_custom_recurrence_first_week_monthly_section">First</string>
+    <string name="meetings_custom_recurrence_first_week_monthly_section">Prima</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
-    <string name="meetings_custom_recurrence_second_week_monthly_section">Second</string>
+    <string name="meetings_custom_recurrence_second_week_monthly_section">A doua</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
-    <string name="meetings_custom_recurrence_third_week_monthly_section">Third</string>
+    <string name="meetings_custom_recurrence_third_week_monthly_section">A treia</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
-    <string name="meetings_custom_recurrence_fourth_week_monthly_section">Fourth</string>
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">A patra</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
-    <string name="meetings_custom_recurrence_fifth_week_monthly_section">Fifth</string>
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">A cincea</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
-        <item quantity="one">First %1$s of every month</item>
-        <item quantity="other">First %1$s of every %2$d months</item>
+        <item quantity="one">Prima %1$s din fiecare lună</item>
+        <item quantity="few">Prima %1$s din fiecare %2$d luni</item>
+        <item quantity="other">Prima %1$s din fiecare %2$d luni</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
-        <item quantity="one">Second %1$s of every month</item>
-        <item quantity="other">Second %1$s of every %2$d months</item>
+        <item quantity="one">A doua %1$s din fiecare lună</item>
+        <item quantity="few">A doua %1$s din fiecare %2$d luni</item>
+        <item quantity="other">A doua %1$s din fiecare %2$d luni</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
-        <item quantity="one">Third %1$s of every month</item>
-        <item quantity="other">Third %1$s of every %2$d months</item>
+        <item quantity="one">A treia %1$s din fiecare lună</item>
+        <item quantity="few">A treia %1$s din fiecare %2$d luni</item>
+        <item quantity="other">A treia %1$s din fiecare %2$d luni</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
-        <item quantity="one">Fourth %1$s of every month</item>
-        <item quantity="other">Fourth %1$s of every %2$d months</item>
+        <item quantity="one">A patra %1$s din fiecare lună</item>
+        <item quantity="few">A patra %1$s din fiecare %2$d luni</item>
+        <item quantity="other">A patra %1$s din fiecare %2$d luni</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
-        <item quantity="one">Fifth %1$s of every month</item>
-        <item quantity="other">Fifth %1$s of every %2$d months</item>
+        <item quantity="one">A cincea %1$s din fiecare lună</item>
+        <item quantity="few">A cincea %1$s din fiecare %2$d luni</item>
+        <item quantity="other">A cincea %1$s din fiecare %2$d luni</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="one">În fiecare lună, în ziua %2$d</item>
+        <item quantity="few">La fiecare %1$s luni, în ziua %2$d</item>
+        <item quantity="other">La fiecare %1$s luni, în ziua %2$d</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="one">Descărcarea a început</item>
+        <item quantity="few">%1$d descărcări au început</item>
+        <item quantity="other">%1$d de descărcări au început</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="one">Descărcarea este completă</item>
+        <item quantity="few">%1$d descărcări finalizate</item>
+        <item quantity="other">%1$d de descărcări finalizate</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_end_recurrence_label">End recurrence</string>
+    <string name="meetings_schedule_meeting_end_recurrence_label">Încheiați recurența</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_ends_section">Ends</string>
+    <string name="meetings_custom_recurrence_ends_section">Se termină</string>
     <!--Action text to start a conversation from Meeting List screen empty view-->
     <string name="meeting_list_empty_action">Începe o întâlnire</string>
     <!--Description text from Meeting List screen empty view-->
     <string name="meeting_list_empty_description">Discută securizat și privat în apeluri audio sau video cu prieteni și colegi din întreaga lume.</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_dialog_title">Cancel “%1$s”?</string>
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Anulează „%1$s”?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">This meeting will be archived and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Această întâlnire va fi arhivată și toți participanții vor fi anunțați.</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">This meeting will be placed under Past meetings and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">Această întâlnire va fi plasată în cadrul Întâlnirilor din trecut și toți participanții vor fi anunțați.</string>
     <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Nu o anula</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Cancel and archive</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Anulează și arhivează</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">Anulează întâlnirea</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">Meeting cancelled and archived</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">Întâlnirea a fost anulată și arhivată</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Meeting cancelled</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Întâlnirea a fost anulată</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Cancel the %1$s occurrence?</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Anulați ocurență din %1$s?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Only this occurrence will be cancelled. All the other occurrences will go ahead as scheduled.</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Doar această ocurență va fi anulată. Toate celelalte ocurențe vor continua așa cum a fost programat.</string>
     <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Cancel occurrence and meeting?</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Anulați ocurența și întâlnirea?</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be archived and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Aceasta este singura ocurență a întâlnirii recurente. Anularea acestei ocurențe va anula întâlnirea.\nDacă este anulată, întâlnirea va fi arhivată și toți participanții vor fi anunțați.</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be placed under Past meetings and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Aceasta este singura ocurență a întâlnirii recurente. Anularea acestei ocurențe va anula întâlnirea. \nDacă este anulată, întâlnirea va fi plasată sub Întâlniri din trecut și toți participanții vor fi anunțați.</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s occurrence cancelled</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">Ocurență din %1$s a fost anulat</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Cancel occurrence</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Anulează ocurența</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
-    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] a actualizat întâlnirea [/B]</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">This meeting and all its occurrences will be archived and all participants will be notified.</string>
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Această întâlnire și toate ocurențe sale vor fi arhivate și toți participanții vor fi anunțați.</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">This meeting and all its occurrences will be placed under Past meetings and all participants will be notified.</string>
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Această întâlnire și toate ocurențele sale vor fi plasate în Întâlniri din trecut și toți participanții vor fi anunțați.</string>
     <!-- Meeting list tooltip description for start meeting fab button -->
-    <string name="meeting_list_tooltip_fab_description">You can now schedule one-off and recurring meetings.</string>
+    <string name="meeting_list_tooltip_fab_description">Acum puteți programa întâlniri unice și recurente.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">You can start the meeting before its scheduled time by tapping [A]Start meeting[/A] in the meeting room.</string>
+    <string name="meeting_list_tooltip_sched_description">Puteți începe întâlnirea înainte de ora programată atingând [A]Începe o întâlnire[/A] în camera de întâlnire.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_title">Manage recurring meetings</string>
+    <string name="meeting_list_tooltip_recurring_title">Gestionați întâlniri recurente</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting [A]Occurrences[/A].</string>
+    <string name="meeting_list_tooltip_recurring_description">Puteți vizualiza, anula sau edita orice ocurență a unei întâlniri recurente atingând cele trei puncte din dreapta și selectând [A]Ocurențe[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Trimită prin e-mail invitația pentru calendar participanților, astfel încât aceștia să poată adăuga întâlnirea în calendarele lor.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
-    <string name="meetings_edit_scheduled_meeting_success_snackbar">Meeting updated</string>
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Întâlnire a fost actualizată</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Editare ocurența</string>
     <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
     <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Actualizează</string>
     <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Dată</string>
     <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Ora de începere</string>
     <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Selectează data de începere</string>
     <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Ora de sfârșit</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Meeting occurrence updated</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Întâlnirea a fost actualizată</string>
     <!-- Header content about secure sharing in approve credentials screen-->
     <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare tip zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații sau de la care primiți date.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Pentru a vă confirma contactul, asigurați-vă că acreditările pe care le vedeți mai sus corespund cu acreditările contului lor. Le puteți cere să vă împărtășească acreditările.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">Aprobă</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Aprobă acreditările</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_label">Waiting room</string>
+    <string name="meetings_schedule_meeting_waiting_room_label">Sală de așteptare</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only users admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Doar utilizatorii admiși de gazdă se pot alătura întâlnirii.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">Participants added by non-hosts during calls won’t be sent to the waiting room. [A]Learn more[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">Participanții adăugați de non-gazde în timpul apelurilor nu vor fi trimiși în sala de așteptare. [A]Află mai multe [/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Unele dintre contactele cu care partajați informații nu au fost confirmate de dvs. Pentru a asigura o securitate suplimentară, vă recomandăm să confirmați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl confirmați și atingeți Informații.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
-        <item quantity="one">Removed %1$d participant</item>
-        <item quantity="other">Removed %1$d participants</item>
+        <item quantity="one">%1$d participant a fost eliminat</item>
+        <item quantity="few">%1$d participanți au fost eliminați</item>
+        <item quantity="other">%1$d 150 de participanți au fost eliminați</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <string name="general_app_update_message_download_success">O actualizare tocmai a fost descărcată</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Repornește</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Permite accesul la fișierele audio</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Aprobate</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Nu sunt aprobate</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Zoom in</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Zoom out</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Elementul nu a putut fi adăugat</string>
 </resources>
