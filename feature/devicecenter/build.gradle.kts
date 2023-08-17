@@ -93,6 +93,7 @@ dependencies {
     implementation(platform(androidx.compose.bom))
     implementation(androidx.bundles.compose.bom)
     implementation(lib.compose.state.events)
+    implementation(androidx.hilt.navigation)
 
     testImplementation(testlib.junit)
     testImplementation(testlib.junit.test.ktx)

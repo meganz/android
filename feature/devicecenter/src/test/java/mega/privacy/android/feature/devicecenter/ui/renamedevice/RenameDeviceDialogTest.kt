@@ -22,7 +22,7 @@ internal class RenameDeviceDialogTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val renameDeviceViewModel: RenameDeviceViewModel = mock()
+    private val renameDeviceViewModel = mock<RenameDeviceViewModel>()
 
     @Test
     fun `test that the rename device dialog is shown`() {
@@ -37,11 +37,11 @@ internal class RenameDeviceDialogTest {
         }
         composeTestRule.setContent {
             RenameDeviceDialog(
-                renameDeviceViewModel = renameDeviceViewModel,
                 deviceId = deviceId,
                 oldDeviceName = oldDeviceName,
                 onRenameSuccessful = {},
                 onRenameCancelled = {},
+                renameDeviceViewModel = renameDeviceViewModel,
             )
         }
         composeTestRule.onNodeWithTag(RENAME_DEVICE_DIALOG_TAG).assertIsDisplayed()

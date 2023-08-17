@@ -6,8 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -22,19 +22,19 @@ internal const val RENAME_DEVICE_DIALOG_TAG = "rename_device_dialog:input_dialog
 /**
  * A Composable Dialog that allows the User to rename a Device
  *
- * @param renameDeviceViewModel The [RenameDeviceViewModel] that handles business logic
  * @param deviceId The Device ID identifying the Device to be renamed
  * @param oldDeviceName The old Device Name
  * @param onRenameSuccessful Lambda that executes code when a successful rename occurs
  * @param onRenameCancelled Lambda that executes code when the User cancels the renaming procedure
+ * @param renameDeviceViewModel The [RenameDeviceViewModel] that handles business logic
  */
 @Composable
 internal fun RenameDeviceDialog(
-    renameDeviceViewModel: RenameDeviceViewModel = viewModel(),
     deviceId: String,
     oldDeviceName: String,
     onRenameSuccessful: () -> Unit,
     onRenameCancelled: () -> Unit,
+    renameDeviceViewModel: RenameDeviceViewModel = hiltViewModel(),
 ) {
     val uiState by renameDeviceViewModel.state.collectAsStateWithLifecycle()
 
