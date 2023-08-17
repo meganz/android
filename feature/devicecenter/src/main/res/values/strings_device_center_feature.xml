@@ -3,6 +3,7 @@
     <string name="device_center_rename_device_dialog_title">Rename device</string>
     <string name="device_center_rename_device_dialog_positive_button">Rename</string>
     <string name="device_center_rename_device_dialog_negative_button">Cancel</string>
+    <string name="device_center_list_view_item_status_unknown_status">Unknown status</string>
     <string name="device_center_list_view_item_status_up_to_date">Up to date</string>
     <string name="device_center_list_view_item_status_initialising">Initialising…</string>
     <string name="device_center_list_view_item_status_scanning">Scanning…</string>

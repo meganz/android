@@ -7,6 +7,7 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import mega.privacy.android.core.ui.theme.orange_400
 import mega.privacy.android.core.ui.theme.red_500
+import mega.privacy.android.feature.devicecenter.R
 
 /**
  * Sealed UI Node Status class that enumerates all possible UI Node Statuses with their respective
@@ -24,6 +25,16 @@ sealed class DeviceCenterUINodeStatus(
 ) {
 
     /**
+     * Represents an Unknown Status. This is the default Status assigned when no matching Status
+     * is found
+     */
+    object Unknown : DeviceCenterUINodeStatus(
+        name = R.string.device_center_list_view_item_status_unknown_status,
+        icon = CoreR.drawable.ic_help_circle,
+        color = null,
+    )
+
+    /**
      * Represents an Up to Date Status
      */
     object UpToDate : DeviceCenterUINodeStatus(
@@ -33,9 +44,9 @@ sealed class DeviceCenterUINodeStatus(
     )
 
     /**
-     * Represents an Initialising Status
+     * Represents an Initializing Status
      */
-    object Initialising : DeviceCenterUINodeStatus(
+    object Initializing : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_initialising,
         icon = CoreR.drawable.ic_sync_02,
         color = in_progress_status_color,
@@ -51,20 +62,20 @@ sealed class DeviceCenterUINodeStatus(
     )
 
     /**
-     * Represents an Updating Status
+     * Represents a Syncing Status
      */
-    object Updating : DeviceCenterUINodeStatus(
+    object Syncing : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_updating,
         icon = CoreR.drawable.ic_sync_02,
         color = in_progress_status_color,
     )
 
     /**
-     * Represents an Updating Status with the Percentage
+     * Represents a Syncing Status with the Percentage
      *
      * @param progress the Update Progress indicator
      */
-    data class UpdatingWithPercentage(val progress: Int) : DeviceCenterUINodeStatus(
+    data class SyncingWithPercentage(val progress: Int) : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_updating_with_progress,
         icon = null,
         color = in_progress_status_color,
@@ -75,7 +86,7 @@ sealed class DeviceCenterUINodeStatus(
      */
     object NoCameraUploads : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_no_camera_uploads,
-        icon = CoreR.drawable.ic_alert_circle,
+        icon = CoreR.drawable.ic_info,
         color = orange_400,
     )
 
@@ -84,7 +95,7 @@ sealed class DeviceCenterUINodeStatus(
      */
     object Disabled : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_disabled,
-        icon = CoreR.drawable.ic_alert_circle,
+        icon = CoreR.drawable.ic_alert_triangle,
         color = orange_400,
     )
 
@@ -102,23 +113,23 @@ sealed class DeviceCenterUINodeStatus(
      */
     object Paused : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_paused,
-        icon = CoreR.drawable.ic_cloud_offline,
-        color = null,
-    )
-
-    /**
-     * Represents a Backup Stopped Status
-     */
-    object BackupStopped : DeviceCenterUINodeStatus(
-        name = DeviceCenterR.string.device_center_list_view_item_status_backup_stopped,
         icon = CoreR.drawable.ic_pause,
         color = null,
     )
 
     /**
-     * Represents an Out of Quota Status
+     * Represents a Stopped Status
      */
-    object OutOfQuota : DeviceCenterUINodeStatus(
+    object Stopped : DeviceCenterUINodeStatus(
+        name = DeviceCenterR.string.device_center_list_view_item_status_backup_stopped,
+        icon = CoreR.drawable.ic_x_circle,
+        color = null,
+    )
+
+    /**
+     * Represents an Overquota Status
+     */
+    object Overquota : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_out_of_quota,
         icon = CoreR.drawable.ic_alert_circle,
         color = red_500,
@@ -129,7 +140,7 @@ sealed class DeviceCenterUINodeStatus(
      */
     object Error : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_error,
-        icon = CoreR.drawable.ic_alert_circle,
+        icon = CoreR.drawable.ic_x_circle,
         color = red_500,
     )
 
@@ -138,7 +149,7 @@ sealed class DeviceCenterUINodeStatus(
      */
     object Blocked : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_blocked,
-        icon = CoreR.drawable.ic_alert_circle,
+        icon = CoreR.drawable.ic_minus_circle,
         color = red_500,
     )
 }

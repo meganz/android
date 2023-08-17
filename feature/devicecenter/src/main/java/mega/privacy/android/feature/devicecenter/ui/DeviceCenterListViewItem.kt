@@ -69,7 +69,7 @@ internal fun DeviceCenterListViewItem(
  */
 @Composable
 private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
-    if (uiNodeStatus is DeviceCenterUINodeStatus.UpdatingWithPercentage) {
+    if (uiNodeStatus is DeviceCenterUINodeStatus.SyncingWithPercentage) {
         // Apply String Formatting for this UI Status
         stringResource(uiNodeStatus.name, uiNodeStatus.progress)
     } else {
@@ -108,17 +108,18 @@ private fun EntryWithDifferentStatusPreview(
 private class DeviceCenterUINodeStatusProvider :
     PreviewParameterProvider<DeviceCenterUINodeStatus> {
     override val values = listOf(
+        DeviceCenterUINodeStatus.Unknown,
         DeviceCenterUINodeStatus.UpToDate,
-        DeviceCenterUINodeStatus.Initialising,
+        DeviceCenterUINodeStatus.Initializing,
         DeviceCenterUINodeStatus.Scanning,
-        DeviceCenterUINodeStatus.Updating,
-        DeviceCenterUINodeStatus.UpdatingWithPercentage(50),
+        DeviceCenterUINodeStatus.Syncing,
+        DeviceCenterUINodeStatus.SyncingWithPercentage(50),
         DeviceCenterUINodeStatus.NoCameraUploads,
         DeviceCenterUINodeStatus.Disabled,
         DeviceCenterUINodeStatus.Offline,
         DeviceCenterUINodeStatus.Paused,
-        DeviceCenterUINodeStatus.BackupStopped,
-        DeviceCenterUINodeStatus.OutOfQuota,
+        DeviceCenterUINodeStatus.Stopped,
+        DeviceCenterUINodeStatus.Overquota,
         DeviceCenterUINodeStatus.Error,
         DeviceCenterUINodeStatus.Blocked,
     ).asSequence()
