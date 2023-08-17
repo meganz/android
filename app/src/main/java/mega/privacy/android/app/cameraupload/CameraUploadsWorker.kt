@@ -1515,15 +1515,17 @@ class CameraUploadsWorker @AssistedInject constructor(
                             "bytes uploaded: $totalUploadedBytes " +
                             "progress: $progressPercent"
                 )
-                broadcastProgress(progressPercent, pendingToUpload)
-                showUploadProgress(
-                    totalUploaded,
-                    totalToUpload,
-                    totalUploadedBytes,
-                    totalUploadBytes,
-                    progressPercent,
-                    areUploadsPaused,
-                )
+                if (totalToUpload > 0) {
+                    broadcastProgress(progressPercent, pendingToUpload)
+                    showUploadProgress(
+                        totalUploaded,
+                        totalToUpload,
+                        totalUploadedBytes,
+                        totalUploadBytes,
+                        progressPercent,
+                        areUploadsPaused,
+                    )
+                }
             }
         }.onFailure { Timber.w(it) }
     }
