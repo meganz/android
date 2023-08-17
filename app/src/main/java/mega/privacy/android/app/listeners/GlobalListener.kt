@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCa
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
+import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -62,7 +63,6 @@ import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
-import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -91,6 +91,7 @@ class GlobalListener @Inject constructor(
     private val getNotificationCountUseCase: GetNotificationCountUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
     private val broadcastAccountBlockedUseCase: BroadcastAccountBlockedUseCase,
+    private val getIncomingContactRequestsNotificationListUseCase: GetIncomingContactRequestsNotificationListUseCase,
 ) : MegaGlobalListenerInterface {
 
     /**
@@ -197,7 +198,10 @@ class GlobalListener @Inject constructor(
                         megaApi
                     )
                 notificationBuilder.removeAllIncomingContactNotifications()
-                notificationBuilder.showIncomingContactRequestNotification()
+                applicationScope.launch {
+                    val notificationList = getIncomingContactRequestsNotificationListUseCase()
+                    notificationBuilder.showIncomingContactRequestNotification(notificationList)
+                }
                 Timber.d(
                     "IPC: %s cr.isOutgoing: %s cr.getStatus: %d",
                     cr.sourceEmail,

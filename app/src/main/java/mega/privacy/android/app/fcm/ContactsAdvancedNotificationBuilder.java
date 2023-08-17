@@ -29,17 +29,15 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -84,38 +82,16 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         this.megaApi = megaApi;
     }
 
-    public void showIncomingContactRequestNotification() {
+    public void showIncomingContactRequestNotification(List<ContactRequest> contactRequests) {
         Timber.d("showIncomingContactRequestNotification");
-
-        ArrayList<MegaContactRequest> icr = megaApi.getIncomingContactRequests();
-        if (icr == null) {
-            Timber.w("Number of requests: NULL");
-            return;
-        }
-
-        ArrayList<MegaContactRequest> finalIcr = new ArrayList<MegaContactRequest>();
-        Date currentDate = new Date(System.currentTimeMillis());
-
-        //Just show cr of the last 14 days
-        for (int i = 0; i < icr.size(); i++) {
-            MegaContactRequest cr = icr.get(i);
-
-            long ts = cr.getModificationTime() * 1000;
-            Date crDate = new Date(ts);
-            long diff = currentDate.getTime() - crDate.getTime();
-            long diffDays = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-            if (diffDays < 14) {
-                finalIcr.add(cr);
-            }
-        }
 
         String manufacturer = "xiaomi";
         if (!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
             Timber.d("POST Android N");
-            newIncomingContactRequest(finalIcr);
+            newIncomingContactRequest(contactRequests);
         } else {
             Timber.d("XIAOMI POST Android N");
-            generateIncomingNotificationPreN(finalIcr);
+            generateIncomingNotificationPreN(contactRequests);
         }
     }
 
@@ -130,12 +106,12 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
     }
 
-    public void newIncomingContactRequest(ArrayList<MegaContactRequest> contacts) {
+    public void newIncomingContactRequest(List<ContactRequest> contacts) {
         Timber.d("Number of incoming contact request: %s", contacts.size());
 
         for (int i = contacts.size() - 1; i >= 0; i--) {
             Timber.d("REQUEST: %s", i);
-            MegaContactRequest contactRequest = contacts.get(i);
+            ContactRequest contactRequest = contacts.get(i);
             Timber.d("User sent: %s", contactRequest.getSourceEmail());
             if (i == 0) {
                 sendBundledNotificationIPC(contactRequest, true);
@@ -158,7 +134,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         }
     }
 
-    public void sendBundledNotificationIPC(MegaContactRequest crToShow, boolean beep) {
+    public void sendBundledNotificationIPC(ContactRequest crToShow, boolean beep) {
         Timber.d("sendBundledNotificationIPC");
 
         Notification notification = buildIPCNotification(crToShow, beep);
@@ -171,7 +147,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationManager.notify(NOTIFICATION_SUMMARY_INCOMING_CONTACT, summary);
     }
 
-    public void generateIncomingNotificationPreN(ArrayList<MegaContactRequest> icr) {
+    public void generateIncomingNotificationPreN(List<ContactRequest> icr) {
         Timber.d("generateIncomingNotificationPreN");
 
         Intent intent = new Intent(context, ManagerActivity.class);
@@ -198,7 +174,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
         for (int i = 0; i < icr.size(); i++) {
-            MegaContactRequest contactRequest = icr.get(i);
+            ContactRequest contactRequest = icr.get(i);
             Timber.d("User sent: %s", contactRequest.getSourceEmail());
             inboxStyle.addLine(contactRequest.getSourceEmail());
         }
@@ -244,7 +220,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationManager.notify(NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT, summary);
     }
 
-    public Notification buildIPCNotification(MegaContactRequest crToShow, boolean beep) {
+    public Notification buildIPCNotification(ContactRequest crToShow, boolean beep) {
         Timber.d("buildIPCNotification");
 
         String notificationContent;
