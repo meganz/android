@@ -2877,4 +2877,12 @@ interface MegaApiGateway {
      * @param listener    MegaRequestListener to track this request
      */
     fun pauseTransferByTag(transferTag: Int, pause: Boolean, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get Verify contact verification warning enabled flag from api
+     *
+     * This method will get a flag for the user if user has set to enable to see warning
+     * if any sharing is coming un verified contact
+     */
+    suspend fun getContactVerificationWarningEnabled() : Boolean
 }

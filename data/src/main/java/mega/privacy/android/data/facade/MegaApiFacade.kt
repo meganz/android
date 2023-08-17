@@ -1334,4 +1334,7 @@ internal class MegaApiFacade @Inject constructor(
         pause: Boolean,
         listener: MegaRequestListenerInterface,
     ) = megaApi.pauseTransferByTag(transferTag, pause, listener)
+
+    override suspend fun getContactVerificationWarningEnabled(): Boolean =
+        megaApi.contactVerificationWarningEnabled()
 }
