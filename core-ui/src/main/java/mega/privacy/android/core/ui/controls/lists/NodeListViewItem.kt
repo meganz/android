@@ -116,13 +116,13 @@ fun NodeListViewItem(
     ) {
         Row(
             modifier = Modifier
+                .padding(start = 12.dp, end = 12.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val thumbNailModifier = Modifier
                 .height(48.dp)
                 .width(48.dp)
-                .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
             if (isSelected) {
                 Image(
@@ -260,7 +260,7 @@ fun NodeListViewItem(
                         modifier = Modifier.testTag(INFO_TEXT_TEST_TAG),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.subtitle2,
                         color = infoColor ?: MaterialTheme.colors.textColorSecondary,
                     )
                 }

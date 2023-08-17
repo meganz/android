@@ -61,7 +61,7 @@ import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
  * Text Color Primary for Composable
  */
 val Colors.textColorPrimary: Color
-    get() = if (isLight) dark_grey else white
+    get() = if (isLight) grey_alpha_087 else white_alpha_087
 
 /**
  * Text Color Secondary for Composable

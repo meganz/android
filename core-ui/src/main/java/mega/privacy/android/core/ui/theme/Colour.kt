@@ -368,6 +368,9 @@ val green_500 = Color(0xFF31B500)
 @ShowkaseColor("jade_300", "jade")
 val jade_300 = Color(0xFF4DB6AC)
 
+@ShowkaseColor("name = jade_400", "jade")
+val jade_400 = Color(0xFF26A69A)
+
 @ShowkaseColor("jade_600", "jade")
 val jade_600 = Color(0xFF00897B)
 
@@ -412,6 +415,9 @@ val blue_300 = Color(0xFF00C0FD)
 
 @ShowkaseColor("blue_400", "blue")
 val blue_400 = Color(0xFF00B2FC)
+
+@ShowkaseColor("blue_500", "blue")
+val blue_500 = Color(0xFF00A4FA)
 
 @ShowkaseColor("amber_300", "amber")
 val amber_300 = Color(0xFFFFD54F)

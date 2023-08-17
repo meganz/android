@@ -5,6 +5,8 @@ import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import mega.privacy.android.core.ui.theme.blue_500
+import mega.privacy.android.core.ui.theme.jade_400
 import mega.privacy.android.core.ui.theme.orange_400
 import mega.privacy.android.core.ui.theme.red_500
 import mega.privacy.android.feature.devicecenter.R
@@ -40,7 +42,7 @@ sealed class DeviceCenterUINodeStatus(
     object UpToDate : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_up_to_date,
         icon = CoreR.drawable.ic_check_circle,
-        color = completed_status_color,
+        color = jade_400,
     )
 
     /**
@@ -49,7 +51,7 @@ sealed class DeviceCenterUINodeStatus(
     object Initializing : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_initialising,
         icon = CoreR.drawable.ic_sync_02,
-        color = in_progress_status_color,
+        color = blue_500,
     )
 
     /**
@@ -58,7 +60,7 @@ sealed class DeviceCenterUINodeStatus(
     object Scanning : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_scanning,
         icon = CoreR.drawable.ic_sync_02,
-        color = in_progress_status_color,
+        color = blue_500,
     )
 
     /**
@@ -67,7 +69,7 @@ sealed class DeviceCenterUINodeStatus(
     object Syncing : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_updating,
         icon = CoreR.drawable.ic_sync_02,
-        color = in_progress_status_color,
+        color = blue_500,
     )
 
     /**
@@ -78,7 +80,7 @@ sealed class DeviceCenterUINodeStatus(
     data class SyncingWithPercentage(val progress: Int) : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_updating_with_progress,
         icon = null,
-        color = in_progress_status_color,
+        color = blue_500,
     )
 
     /**
