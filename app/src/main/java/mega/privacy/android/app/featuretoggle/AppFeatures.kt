@@ -173,7 +173,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new FileLink compose screen
      */
-    FileLinkCompose("Enable compose for FileLink", false),
+    FileLinkCompose("Enable compose for FileLink", true),
 
     /**
      * This is an MVP implementation where we include chips to the existing search functionality
