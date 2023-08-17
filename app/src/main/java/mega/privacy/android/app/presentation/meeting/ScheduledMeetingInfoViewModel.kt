@@ -184,7 +184,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 isHost = ownPrivilege == ChatRoomPermission.Moderator,
                                 isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                                 enabledAllowNonHostAddParticipantsOption = isOpenInvite,
-                                enabledWaitingRoomOption = chat.isWaitingRoom,
+                                enabledWaitingRoomOption = isWaitingRoom,
                                 isPublic = isPublic
                             )
                         }
@@ -280,32 +280,45 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
                 _state.update { state ->
                     with(state) {
-                        val isHost = if (chat.hasChanged(ChatRoomChange.OwnPrivilege)) {
+                        val hostValue = if (chat.hasChanged(ChatRoomChange.OwnPrivilege)) {
                             Timber.d("Changes in own privilege")
                             chat.ownPrivilege == ChatRoomPermission.Moderator
                         } else {
                             isHost
                         }
-                        val isOpenInvite = if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
-                            Timber.d("Changes in open invite")
 
-                            if (chat.isWaitingRoom && chat.isOpenInvite) {
-                                setWaitingRoomReminderEnabled()
-                            }
-
-                            chat.isOpenInvite
-                        } else {
-                            isOpenInvite
-                        }
-                        val title = if (chat.hasChanged(ChatRoomChange.Title)) {
+                        val titleValue = if (chat.hasChanged(ChatRoomChange.Title)) {
                             Timber.d("Changes in chat title")
                             chat.title
                         } else {
                             chatTitle
                         }
-                        val isWaitingRoom = if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
+
+                        val publicValue = if (chat.hasChanged(ChatRoomChange.ChatMode)) {
+                            Timber.d("Changes in chat mode, isPublic ${chat.isPublic}")
+                            chat.isPublic
+                        } else {
+                            isPublic
+                        }
+
+                        val retentionTimeValue =
+                            if (chat.hasChanged(ChatRoomChange.RetentionTime)) {
+                                Timber.d("Changes in retention time")
+                                getInstance().sendBroadcast(
+                                    Intent(ACTION_UPDATE_RETENTION_TIME)
+                                        .putExtra(RETENTION_TIME, chat.retentionTime)
+                                        .setPackage(getInstance().applicationContext.packageName)
+                                )
+
+                                if (chat.retentionTime != Constants.DISABLED_RETENTION_TIME) chat.retentionTime
+                                else null
+                            } else {
+                                retentionTimeSeconds
+                            }
+
+                        val waitingRoomValue = if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
                             Timber.d("Changes in waiting room")
-                            if (chat.isWaitingRoom && chat.isOpenInvite) {
+                            if (chat.isWaitingRoom && enabledAllowNonHostAddParticipantsOption) {
                                 setWaitingRoomReminderEnabled()
                             }
 
@@ -313,34 +326,25 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         } else {
                             enabledWaitingRoomOption
                         }
-                        val isPublic = if (chat.hasChanged(ChatRoomChange.ChatMode)) {
-                            Timber.d("Changes in chat mode, isPublic ${chat.isPublic}")
-                            chat.isPublic
-                        } else {
-                            isPublic
-                        }
-                        val retentionTime = if (chat.hasChanged(ChatRoomChange.RetentionTime)) {
-                            Timber.d("Changes in retention time")
-                            getInstance().sendBroadcast(
-                                Intent(ACTION_UPDATE_RETENTION_TIME)
-                                    .putExtra(RETENTION_TIME, chat.retentionTime)
-                                    .setPackage(getInstance().applicationContext.packageName)
-                            )
 
-                            if (chat.retentionTime != Constants.DISABLED_RETENTION_TIME) chat.retentionTime
-                            else null
+                        val openInviteValue = if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
+                            Timber.d("Changes in OpenInvite")
+                            if (enabledWaitingRoomOption && chat.isOpenInvite) {
+                                setWaitingRoomReminderEnabled()
+                            }
+                            chat.isOpenInvite || isHost
                         } else {
-                            retentionTimeSeconds
+                            isOpenInvite
                         }
 
                         copy(
-                            isHost = isHost,
-                            isOpenInvite = isOpenInvite || isHost,
-                            enabledAllowNonHostAddParticipantsOption = isOpenInvite,
-                            chatTitle = title,
-                            isPublic = isPublic,
-                            enabledWaitingRoomOption = isWaitingRoom,
-                            retentionTimeSeconds = retentionTime
+                            isHost = hostValue,
+                            chatTitle = titleValue,
+                            isPublic = publicValue,
+                            retentionTimeSeconds = retentionTimeValue,
+                            enabledWaitingRoomOption = waitingRoomValue,
+                            isOpenInvite = openInviteValue,
+                            enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite
                         )
                     }
                 }

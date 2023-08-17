@@ -808,16 +808,33 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private fun getChatRoomUpdates(chatId: Long) =
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
-                if (chat.hasChanged(ChatRoomChange.WaitingRoom) || chat.hasChanged(ChatRoomChange.OpenInvite)) {
-                    _state.update {
-                        it.copy(
-                            enabledWaitingRoomOption = chat.isWaitingRoom,
-                            enabledAllowAddParticipantsOption = chat.isOpenInvite
-                        )
-                    }
+                _state.update { state ->
+                    with(state) {
+                        val waitingRoomValue = if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
+                            Timber.d("Changes in waiting room")
+                            if (chat.isWaitingRoom && enabledAllowAddParticipantsOption) {
+                                setWaitingRoomReminderEnabled()
+                            }
 
-                    if (chat.isWaitingRoom && chat.isOpenInvite) {
-                        setWaitingRoomReminderEnabled()
+                            chat.isWaitingRoom
+                        } else {
+                            enabledWaitingRoomOption
+                        }
+
+                        val openInviteValue = if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
+                            Timber.d("Changes in OpenInvite")
+                            if (enabledWaitingRoomOption && chat.isOpenInvite) {
+                                setWaitingRoomReminderEnabled()
+                            }
+                            chat.isOpenInvite
+                        } else {
+                            enabledAllowAddParticipantsOption
+                        }
+
+                        copy(
+                            enabledWaitingRoomOption = waitingRoomValue,
+                            enabledAllowAddParticipantsOption = openInviteValue
+                        )
                     }
                 }
             }
