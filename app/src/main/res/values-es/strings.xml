@@ -502,12 +502,6 @@
     <string name="menu_cancel_all_transfers">Cancelar todas las transferencias</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Capturar</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">Permitir notificaciones para llamadas entrantes de MEGA</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA necesita permisos para mostrarse sobre otras aplicaciones si entra una llamada.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Puedes otorgar los permisos manualmente desde los ajustes de tu dispositivo.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Solo Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1819,8 +1813,6 @@
     <string name="option_save_on_filesystem">Guardar en el sistema de archivos</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Llamada entrante</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">Las ventanas emergentes de MEGA están desactivadas. \nToca para cambiar la configuración.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s mensaje no leído</item>
@@ -1904,8 +1896,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Introduce el código de 6 dígitos generado por tu aplicación de autenticación.</string>
     <!-- Text button -->
-    <string name="general_verify">Verificar</string>
-    <!-- Text button -->
     <string name="general_next">Siguiente</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Se ha producido un error. No se ha podido generar la clave o el código QR, inténtalo de nuevo.</string>
@@ -1964,7 +1954,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Sin conexión. Conéctate para abrir el archivo.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">El archivo ya está en la sección Sin conexión</string>
+    <string name="file_already_exists">Archivo ya disponible sin conexión</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Mensaje no reenviado</item>
@@ -2406,7 +2396,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA necesita permisos de acceso a tus archivos multimedia para que los puedas compartir. Es posible que se necesiten otros permisos de acceso para intercambiar mensajes cifrados y hacer llamadas seguras.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Permitir acceso a fotos, archivos multimedia y archivos.</string>
+    <string name="allow_acces_media_title">Permitir acceso a fotos, archivos multimedia y archivos</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA necesita permisos de acceso a tus archivos para que los puedas compartir.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2871,8 +2861,6 @@
     <string name="label_verified">Verificado</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenciales de autenticidad</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">Esto es mejor hacerlo en persona, cara a cara. Si tienes algún otro canal ya verificado, como OTR o PGP, podrías utilizarlo.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">Tus credenciales</string>
     <!-- Button to reset credentials -->
@@ -2907,8 +2895,6 @@
     <string name="remove_phone_number_message">Este numero de teléfono se desvinculará de tu cuenta. Si quisieras añadir un número de teléfono en el futuro, tendrás que verificarlo.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Ver</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">Credenciales de %s</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Documentos</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3934,9 +3920,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Aquí es donde se almacenan los backups de tus archivos y carpetas. Estos backups son de “solo lectura” para protegerlos de modificaciones accidentales en tu Nube.\nPuedes crear backups en MEGA desde tu pc usando nuestra aplicación de escritorio.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Cuenta suspendida por violar los derechos de autor. Te hemos enviado un correo electrónico con más información al respecto.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Tu cuenta de MEGA ha sido suspendida debido a repetidas notificaciones de presuntas infracciones de derechos de autor. Como consecuencia, no podrás acceder a tu cuenta ni a tus datos.\nRevisa el correo electrónico que te enviamos para obtener más información sobre cómo presentar una contranotificación.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Cuenta cerrada por incumplir los Términos de servicio de MEGA, como el abuso de los derechos de otros, el intercambio e importación de datos ilegales o el abuso del sistema.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Hemos cerrado tu cuenta debido a un incumplimiento de los Términos de servicio de MEGA.\nNo podrás recuperar el acceso a tus datos ni estás autorizado a registrar una nueva cuenta de MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Reuniones</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4051,8 +4037,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Ver menos</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Protegemos tus datos con cifrado de conocimiento cero. Para garantizar una mayor seguridad, te pedimos que verifiques los contactos con los que compartes información antes de que puedan acceder a las carpetas compartidas.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Carpeta no descifrada]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -5026,13 +5010,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Limpieza automática de la papelera entre 7 días y 10 años</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Comprar Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Comprar Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Comprar Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Comprar Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Comprar Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Comprar Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Comprar Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Comprar Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Términos de servicio</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -5068,7 +5052,7 @@
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">Renombrar álbum</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">Ya existe un álbum llamado “%1$s ” en tus álbumes. Introduce otro nombre para este álbum.</string>
+    <string name="album_import_rename_album_description">Ya existe un álbum llamado “%1$s” en tus álbumes. Introduce otro nombre para este álbum.</string>
     <!-- Album import enter album name -->
     <string name="album_import_enter_album_name">Introducir nombre del álbum</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
@@ -5272,33 +5256,33 @@
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Esta reunión y todos sus eventos se moverán a  Reuniones anteriores y todos los participantes serán notificados.</string>
     <!-- Meeting list tooltip description for start meeting fab button -->
-    <string name="meeting_list_tooltip_fab_description">Programa reuniones puntuales y periódicas.</string>
+    <string name="meeting_list_tooltip_fab_description">Programa reuniones únicas y periódicas.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">You can start the meeting before its scheduled time by tapping [A]Start meeting[/A] in the meeting room.</string>
+    <string name="meeting_list_tooltip_sched_description">Puedes empezar la reunión antes de la hora programada tocando [A]Empezar reunión[/A] en la sala de reuniones.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Gestionar reuniones periódicas</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting [A]Occurrences[/A].</string>
+    <string name="meeting_list_tooltip_recurring_description">Puedes ver, cancelar o editar cualquier evento de una reunión periódica tocando los tres puntos a la derecha y seleccionando [A]Eventos[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Envía por correo electrónico una invitación a los participantes para que puedan añadir la reunión a sus calendarios.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Reunión actualizada</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Editar evento</string>
     <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
     <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Actualizar</string>
     <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Fecha</string>
     <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Inicio</string>
     <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Seleccionar fecha de inicio</string>
     <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Fin</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Evento de la reunión actualizado</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to verify the contacts you share information with or receive data from.</string>
+    <string name="contact_approve_credentials_secure_share_description">Protegemos tus datos con cifrado de conocimiento cero para que toda la información que almacenes, compartas y recibas en MEGA esté segura. Para más seguridad, te pedimos que verifiques los contactos con los que compartes o recibes datos.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Para verificar tu contacto, asegúrate de que las credenciales que ves arriba coincidan con las credenciales de su cuenta. Puedes pedirle que comparta sus credenciales contigo.</string>
     <!-- Approve button text in approve credentials screen -->
@@ -5308,18 +5292,31 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Sala de espera</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only users admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Solo los usuarios admitidos por el anfitrión pueden unirse a la reunión.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Los participantes que han sido añadidos a las llamadas por usuarios que no son anfitriones no serán enviados a la sala de espera. [A]Más información[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Todavía no has verificado algunos de los contactos con los que compartes información. Para más seguridad, te recomendamos que verifiques sus credenciales en Contactos. Toca los tres puntos junto al contacto que deseas verificar y toca Información.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
-        <item quantity="one">Removed %1$d participant</item>
-        <item quantity="other">Removed %1$d participants</item>
+        <item quantity="one">Se ha eliminado %1$d participante</item>
+        <item quantity="many">Se han eliminado %1$d de participantes</item>
+        <item quantity="other">Se han eliminado %1$d participantes</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <string name="general_app_update_message_download_success">Se acaba de descargar una actualización</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Reiniciar</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Permitir el acceso a archivos de audio</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Aceptadas</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Sin aceptar</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Aumentar zoom</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Disminuir zoom</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">No se ha podido añadir el elemento</string>
 </resources>

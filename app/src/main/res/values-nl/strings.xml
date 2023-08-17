@@ -494,12 +494,6 @@
     <string name="menu_cancel_all_transfers">Annuleer alle overdrachten</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Vastleggen</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">Meldingen van binnenkomende MEGA-oproepen toestaan</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Verleen MEGA toestemming voor weergave over andere applicaties voor oproepen.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">U kunt nog steeds handmatig machtigingen verlenen in de apparaat Instellingen.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Alleen Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1593,7 +1587,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Geen bestanden in uw [/B][A]Cloud schijf[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Geen bestanden[/B][A]Opgeslagen voor Offline[/A]</string>
+    <string name="context_empty_offline">[B]Geen bestanden[/B][A]opgeslagen voor Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Geen [/B][A]contacten[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -1778,8 +1772,6 @@
     <string name="option_save_on_filesystem">Opslaan op Bestandssysteem</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Binnenkomende oproep</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">MEGA-pop-ups op de achtergrond zijn uitgeschakeld. \nTik om de instellingen te wijzigen.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s ongelezen bericht</item>
@@ -1861,8 +1853,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Voer de 6-cijferige code gegenereerd door uw authenticatie applicatie in.</string>
     <!-- Text button -->
-    <string name="general_verify">Verifiëren</string>
-    <!-- Text button -->
     <string name="general_next">Volgende</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Een fout heeft opgetreden bij het genereren van de seed of QR-code, probeer nogmaals.</string>
@@ -1921,7 +1911,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Geen netwerk verbinding. Verbind opnieuw om de bestand te openen.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Bestand bestaat al in Opgeslagen voor Offline</string>
+    <string name="file_already_exists">File already available Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Bericht niet doorgestuurd</item>
@@ -2352,7 +2342,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA heeft uw toestemming nodig om toegang te krijgen tot uw media en bestanden om te delen. Andere toegangsrechten kunnen nodig zijn voor het uitwisselen van versleutelde berichten en om veilig te bellen.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Toegang tot foto’s, media en bestanden toestaan.</string>
+    <string name="allow_acces_media_title">Toegang tot foto’s, media en bestanden toestaan</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA heeft uw toestemming nodig voor toegang tot uw bestanden voor deling.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2800,8 +2790,6 @@
     <string name="label_verified">Geverifieerd</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticiteit Inloggegevens</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">Dit kan het beste gebeuren door elkaar in het echte leven, face to face te ontmoeten. Als u een andere al geverifieerde kanaal heeft, zoals geverifieerd OTR of PGP, dan kunt u deze ook gebruiken.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">Uw gegevens</string>
     <!-- Button to reset credentials -->
@@ -2836,8 +2824,6 @@
     <string name="remove_phone_number_message">Hiermee wordt uw gekoppelde telefoonnummer uit uw account verwijderd. Als u er later voor kiest om een ​​telefoonnummer toe te voegen, moet u dit verifiëren.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Weergeven</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">%s’s inloggegevens</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Docs</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3835,9 +3821,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Dit is waar uw back-upbestanden en mappen worden opgeslagen. Uw back-upitems zijn “alleen-lezen” om te voorkomen dat ze per ongeluk worden gewijzigd in uw clouddrive.\nU kunt een back-up maken van items op uw computer naar MEGA met behulp van onze desktop-applicatie.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Account is geschorst vanwege copyright overtredingen. We hebben u een e-mail gestuurd met meer informatie hierover.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Uw account was beëindigd door een schending van MEGA’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Vergaderingen</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3926,7 +3912,7 @@
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Instellingen</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
-    <string name="cloud_drive_media_discovery_banner_ok">Ok, ik snap het</string>
+    <string name="cloud_drive_media_discovery_banner_ok">OK, ik snap het</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Iedereen met deze link kan aansluiten in de vergadering en het vergadergesprek weergeven.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
@@ -3948,8 +3934,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Minder weergeven</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">We beschermen uw gegevens met zero-knowledge codering. Om extra veiligheid te garanderen, vragen we u om de contacten met wie u informatie deelt te verifiëren voordat ze toegang krijgen tot de gedeelde mappen.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Ongecodeerde map]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4651,7 +4635,7 @@
         <item quantity="other">Kon toestemmingen voor %1$d contacten niet updaten</item>
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">Ok, ik snap het</string>
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, ik snap het</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
         <item quantity="one">Permanent %1$d item verwijderd</item>
@@ -4777,7 +4761,7 @@
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">De link naar het album is verwijderd of het album is verwijderd. Neem contact op met de persoon die de link met u heeft gedeeld.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, ik snap het</string>
+    <string name="album_import_error_access_confirmation">OK, ik snap het</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4815,13 +4799,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Plan het opruimen van vuilnisbakken tussen 7 dagen en 10 jaar</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Koop Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite kopen</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Koop Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;I kopen</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Koop Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II kopen</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Koop Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III kopen</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Algemene Voorwaarden</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -5097,4 +5081,16 @@
     <string name="general_app_update_message_download_success">Er is zojuist een update gedownload</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Herstarten</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Toegang tot audio bestanden toestaan</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Goedgekeurd</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Niet goedgekeurd</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Inzoomen</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Uitzoomen</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
 </resources>

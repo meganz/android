@@ -502,12 +502,6 @@
     <string name="menu_cancel_all_transfers">Annuler tous les transferts</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Prendre une photo</string>
-    <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_title">Permettre les notifications pour les appels MEGA entrants</string>
-    <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Veuillez accorder à MEGA l’autorisation de s’afficher par-dessus d’autres applis pour les appels.</string>
-    <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Vous pouvez toujours accorder les autorisations dans les Paramètres de l’appareil.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Wi-Fi seulement</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -531,7 +525,7 @@
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">Espace de stockage</string>
     <!-- Settings of the Passcode -->
-    <string name="settings_passcode_lock">Verrouillage par code d’accès</string>
+    <string name="settings_passcode_lock">Code d’accès</string>
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Options du code d’accès</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
@@ -690,7 +684,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">Version de la trousse SDK de MEGA</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">Version de la trousse SDK du dialogue en ligne MEGA Chat</string>
+    <string name="settings_about_karere_version">Version de la trousse SDK de MEGA Chat</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Visualiser le code source</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -1819,8 +1813,6 @@
     <string name="option_save_on_filesystem">Enregistrer dans le système de fichiers</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Appel entrant</string>
-    <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">Les fenêtres de MEGA sont désactivées quand l’appli est en arrière-plan.\nToucher pour changer les paramètres.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s message non lu</item>
@@ -1904,8 +1896,6 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Veuillez saisir le code à 6 chiffres généré par votre appli d’authentification.</string>
     <!-- Text button -->
-    <string name="general_verify">Confirmer</string>
-    <!-- Text button -->
     <string name="general_next">Suivant</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Une erreur est survenue lors de la génération de la graine ou du code QR, veuillez réessayer.</string>
@@ -1964,7 +1954,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Il n’y a pas de connexion réseau. Veuillez vous reconnecter pour ouvrir le fichier.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Le fichier existe déjà dans Enregistré Hors&#160;ligne</string>
+    <string name="file_already_exists">Le fichier est déjà accessible Hors&#160;ligne</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Le message n’a pas été transféré</item>
@@ -2406,7 +2396,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA a besoin de votre autorisation pour accéder à vos fichiers afin de les partager. D’autres permissions d’accès pourraient être nécessaires pour échanger des messages chiffrés et faire des appels sécurisés.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Autoriser l’accès aux photos, aux médias et aux fichiers.</string>
+    <string name="allow_acces_media_title">Autoriser l’accès aux photos, aux médias et aux fichiers</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA a besoin de votre autorisation pour accéder aux fichiers afin de les partager.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2871,8 +2861,6 @@
     <string name="label_verified">Confirmé</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Numéro d’identification</string>
-    <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">La meilleure façon de le faire est de vous rencontrer physiquement. Si vous avez un autre moyen de communication vérifiée, tel qu’OTR ou PGP, vous pouvez aussi l’utiliser.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
     <string name="label_your_credentials">Votre numéro d’identification</string>
     <!-- Button to reset credentials -->
@@ -2907,8 +2895,6 @@
     <string name="remove_phone_number_message">Le numéro de téléphone associé sera supprimé de votre compte. Si vous choisissez ultérieurement d’ajouter un numéro de téléphone, il vous sera demandé de le confirmer.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Visualiser</string>
-    <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">Numéro d’identification de %s</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Documents</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3464,7 +3450,7 @@
     <!-- Label indicating video original quality -->
     <string name="original_quality">Qualité originale</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
-    <string name="setting_fingerprint">ID par empreinte</string>
+    <string name="setting_fingerprint">ID par empreinte digitale</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
     <string name="title_enable_fingerprint">Confirmer votre empreinte pour déverrouiller</string>
     <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
@@ -3934,9 +3920,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Vos fichiers et dossiers sauvegardés y sont stockés. Vos éléments sauvegardés sont en «&#160;lecture seulement&#160;» pour empêcher qu’ils soient modifiés par accident dans votre disque nuagique.Vous pouvez sauvegarder des éléments de votre ordinateur vers MEGA grâce à notre appli pour ordinateur.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Votre compte a été désactivé en raison de violations du droit d’auteur. Nous vous avons envoyé un courriel avec plus de renseignements à ce sujet.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Votre compte MEGA a été désactivé en raison d’allégations répétées de violation des droits d’auteur. Cela signifie que vous ne pouvez ni accéder à votre compte ni à ses données.\nPour de plus amples renseignements sur la manière de déposer un contre-avis, consultez notre courriel.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Le compte a été résilié à la suite d’un non-respect des Conditions générales d’utilisation de MEGA, telle qu’une violation des droits d’autrui, un partage ou une importation de données illégales, ou un abus du système.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Votre compte a été résilié en raison du non-respect des Conditions générales d’utilisation de MEGA.\nVous ne pourrez pas accéder à vos données stockées de nouveau ni être autorisé à créer un nouveau compte MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Réunions</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4018,9 +4004,9 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s toutes les semaines</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Vue de découverte des médias</string>
+    <string name="settings_media_discovery_view_title">Mode de découverte des médias</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Ouvrir automatiquement la vue de découverte des médias pour les dossiers qui ne comprennent qu’images et vidéos. Ceci vous permet de visualiser les médias en mode galerie et de les filtrer par date.</string>
+    <string name="settings_media_discovery_view_context">Ouvrir automatiquement les dossiers qui ne comprennent qu’images et vidéos en mode de découverte des médias. Cela vous permet de visualiser les médias en mode galerie et de les filtrer par date.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
     <string name="cloud_drive_media_discovery_banner_context">Comme ce dossier ne comprend que des images et des vidéos, nous l’avons automatiquement ouvert dans la vue de découvertes des médias. Ceci vous permet de visualiser les médias en mode galerie et de les filtrer par date. Vous pouvez désactiver cette option dans Paramètres.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
@@ -4051,8 +4037,6 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Afficher moins</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Grâce au chiffrement à divulgation nulle de connaissance, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts avec qui vous partagez des renseignements avant qu’ils n’accèdent aux dossiers partagés.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[dossier non déchiffré]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -5323,4 +5307,16 @@
     <string name="general_app_update_message_download_success">Une mise à jour vient d’être téléchargée.</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Redémarrer</string>
+    <!-- Title of the screen asking permissions for Audio files -->
+    <string name="allow_access_audio_title">Autoriser l’accès aux fichiers son</string>
+    <!-- Approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_approved_text">Approuvé</string>
+    <!-- Not approved text under Approve credentials from contact info screen-->
+    <string name="contact_approve_credentials_not_approved_text">Non approuvé</string>
+    <!-- Photos action menu zoom in -->
+    <string name="photos_action_zoom_in">Zoomer avant</string>
+    <!-- Photos action menu zoom out -->
+    <string name="photos_action_zoom_out">Zoomer arrière</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Impossible d’ajouter l’article</string>
 </resources>
