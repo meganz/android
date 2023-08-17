@@ -163,14 +163,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     WaitingRoomSettings("Enable Waiting room settings", false),
 
     /**
-     * File sharing contact verification
-     */
-    ContactVerification(
-        "Enable new improved contact verification reminders",
-        false,
-    ),
-
-    /**
      * To switch into new FileLink compose screen
      */
     FileLinkCompose("Enable compose for FileLink", true),

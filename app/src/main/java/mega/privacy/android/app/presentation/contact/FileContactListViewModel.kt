@@ -8,14 +8,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.CreateShareKey
+import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -28,7 +27,7 @@ import javax.inject.Inject
 class FileContactListViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val createShareKey: CreateShareKey,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getOutShares: GetOutShares,
 ) : ViewModel() {
@@ -68,8 +67,8 @@ class FileContactListViewModel @Inject constructor(
      * function to check if contact verification feature flag is enabled
      * On every other case than success false is returned
      */
-    private suspend fun isContactVerificationFeatureFlagEnabled() =
-        getFeatureFlagValueUseCase(AppFeatures.ContactVerification)
+    private suspend fun isContactVerificationWarningOn() =
+        getContactVerificationWarningUseCase()
 
     /**
      * Function to check if any contact is not verified
@@ -78,7 +77,7 @@ class FileContactListViewModel @Inject constructor(
     private fun checkIfContactNotVerifiedBannerShouldBeShown(sharesList: List<MegaShare>?) =
         viewModelScope.launch {
             runCatching {
-                if (isContactVerificationFeatureFlagEnabled()) {
+                if (isContactVerificationWarningOn()) {
                     val showUnVerifiedContactBanner = sharesList?.any {
                         !areCredentialsVerifiedUseCase(it.user)
                     } ?: false

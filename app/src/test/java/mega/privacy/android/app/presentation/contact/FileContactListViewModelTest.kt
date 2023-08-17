@@ -9,12 +9,11 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CreateShareKey
+import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.AfterAll
@@ -35,13 +34,13 @@ class FileContactListViewModelTest {
     private val email = "email"
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val createShareKey: CreateShareKey = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock()
     private val getOutShare: GetOutShares = mock()
     private val underTest = FileContactListViewModel(
         monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
         createShareKey = createShareKey,
-        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+        getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
         areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         getOutShares = getOutShare
     )
@@ -61,7 +60,7 @@ class FileContactListViewModelTest {
         reset(
             monitorStorageStateEventUseCase,
             createShareKey,
-            getFeatureFlagValueUseCase,
+            getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase
         )
     }
@@ -69,12 +68,12 @@ class FileContactListViewModelTest {
     @ParameterizedTest(name = "when feature flag enabled is {0}, are all contacts verified is {1}, then show unverified contact banner is {2}")
     @MethodSource("provideParameters")
     fun `test that the unverified contact banner visibility is controlled`(
-        featureFlagEnabled: Boolean,
+        featureEnabled: Boolean,
         areContactsVerified: Boolean,
         showUnverifiedContactBanner: Boolean,
     ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.ContactVerification)).thenReturn(
-            featureFlagEnabled
+        whenever(getContactVerificationWarningUseCase()).thenReturn(
+            featureEnabled
         )
         val node = mock<MegaNode> {
             on { handle }.thenReturn(123456L)

@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
+import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
@@ -27,7 +28,6 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
 import nz.mega.sdk.MegaNode
@@ -53,7 +53,7 @@ class IncomingSharesViewModelTest {
     private val authorizeNode = mock<AuthorizeNode>()
     private val getIncomingSharesChildrenNode = mock<GetIncomingSharesChildrenNode>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
-    private val getFeatureFlagValue: GetFeatureFlagValueUseCase = mock()
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
 
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
@@ -102,7 +102,7 @@ class IncomingSharesViewModelTest {
             getUnverifiedIncomingShares,
             getVerifiedIncomingSharesUseCase,
             monitorRefreshSessionUseCase,
-            getFeatureFlagValue
+            getContactVerificationWarningUseCase
         )
     }
 

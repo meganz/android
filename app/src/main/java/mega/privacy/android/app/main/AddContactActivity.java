@@ -78,6 +78,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -102,9 +103,11 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
@@ -1046,7 +1049,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             addedContactsRecyclerView.setAdapter(adapterContacts);
         } else {
             if (adapterShare == null) {
-                adapterShare = new ShareContactsAdapter(addContactActivity, addedContactsShare, isContactVerificationOn);
+                adapterShare = new ShareContactsAdapter(addContactActivity, addedContactsShare);
             } else {
                 adapterShare.setContacts(addedContactsShare);
             }
@@ -1588,8 +1591,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         megaApi.addGlobalListener(this);
 
-        isContactVerificationOn = viewModel.getContactFeatureEnabledFromFlag();
-
         addContactActivity = this;
 
         checkChatChanges();
@@ -1854,6 +1855,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
             newGroup();
         }
+        observeFlow();
     }
 
     private void setEmptyStateVisibility(boolean visible) {
@@ -3529,5 +3531,17 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             }
         }
         return false;
+    }
+
+    private void observeFlow() {
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, addContactState -> {
+            if (adapterShare == null) {
+                adapterShare = new ShareContactsAdapter(addContactActivity, addedContactsShare);
+            }
+            adapterShare.updateContactVerification(addContactState.isContactVerificationWarningEnabled());
+
+            isContactVerificationOn = addContactState.isContactVerificationWarningEnabled();
+            return Unit.INSTANCE;
+        });
     }
 }

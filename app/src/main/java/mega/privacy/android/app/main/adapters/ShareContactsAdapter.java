@@ -37,11 +37,10 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     private boolean isContactVerificationOn;
 
-    public ShareContactsAdapter(Context _context, ArrayList<ShareContactInfo> _contacts, boolean isContactVerificationOn) {
+    public ShareContactsAdapter(Context _context, ArrayList<ShareContactInfo> _contacts) {
         this.contacts = _contacts;
         this.context = _context;
         this.positionClicked = -1;
-        this.isContactVerificationOn = isContactVerificationOn;
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
@@ -194,5 +193,10 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     public Object getItem(int position) {
         Timber.d("Position: %s", position);
         return contacts.get(position);
+    }
+
+    public void updateContactVerification(boolean contactVerification) {
+        isContactVerificationOn = contactVerification;
+        notifyDataSetChanged();
     }
 }
