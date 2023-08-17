@@ -322,6 +322,20 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.startChatCallNoRinging(chatId, schedId, enabledVideo, enabledAudio, listener)
 
+    override fun startMeetingInWaitingRoomChat(
+        chatId: Long,
+        schedIdWr: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.startMeetingInWaitingRoomChat(
+        chatId,
+        schedIdWr,
+        enabledVideo,
+        enabledAudio,
+        listener
+    )
+
     override fun answerChatCall(
         chatId: Long,
         enabledVideo: Boolean,

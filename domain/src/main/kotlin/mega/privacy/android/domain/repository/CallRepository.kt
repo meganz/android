@@ -64,6 +64,22 @@ interface CallRepository {
     ): ChatRequest
 
     /**
+     * Start meeting with waiting room enabled.
+     *
+     * @param chatId        The chat id.
+     * @param schedIdWr     The scheduled meeting id.
+     * @param enabledVideo  True for audio-video call, false for audio call.
+     * @param enabledAudio  True for starting a call with audio (mute disabled).
+     * @return              [ChatRequest]
+     */
+    suspend fun startMeetingInWaitingRoomChat(
+        chatId: Long,
+        schedIdWr: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+    ): ChatRequest
+
+    /**
      * Answers call.
      *
      * @param chatId            The Chat id.

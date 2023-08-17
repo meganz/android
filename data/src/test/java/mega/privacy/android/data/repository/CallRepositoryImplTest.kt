@@ -219,6 +219,41 @@ class CallRepositoryImplTest {
     }
 
     @Test
+    fun `test that startMeetingInWaitingRoomChat invokes the right methods`() = runTest {
+        whenever(
+            megaChatApiGateway.startMeetingInWaitingRoomChat(
+                any(), any(), any(), any(), any()
+            )
+        ).thenAnswer {
+            ((it.arguments[4]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaChatRequest,
+                megaChatErrorSuccess,
+            )
+        }
+
+        whenever(chatRequestMapper(megaChatRequest)).thenReturn(chatRequest)
+
+        val result = underTest.startMeetingInWaitingRoomChat(
+            chatId = chatId,
+            schedIdWr = schedId,
+            enabledVideo = video,
+            enabledAudio = audio,
+        )
+
+        verify(megaChatApiGateway).startMeetingInWaitingRoomChat(
+            chatId = eq(chatId),
+            schedIdWr = eq(schedId),
+            enabledVideo = eq(video),
+            enabledAudio = eq(audio),
+            any()
+        )
+        verify(chatRequestMapper).invoke(megaChatRequest)
+
+        assertThat(result).isEqualTo(chatRequest)
+    }
+
+    @Test
     fun `test that answerChatCall invokes the right methods`() = runTest {
         whenever(
             megaChatApiGateway.answerChatCall(

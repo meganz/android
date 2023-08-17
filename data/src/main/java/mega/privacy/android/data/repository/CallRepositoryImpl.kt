@@ -134,6 +134,29 @@ internal class CallRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun startMeetingInWaitingRoomChat(
+        chatId: Long,
+        schedIdWr: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.startMeetingInWaitingRoomChat(
+                chatId,
+                schedIdWr,
+                enabledVideo,
+                enabledAudio,
+                callback
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+        }
+    }
+
     override suspend fun answerChatCall(
         chatId: Long,
         enabledVideo: Boolean,

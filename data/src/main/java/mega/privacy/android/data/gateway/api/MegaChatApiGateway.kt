@@ -143,7 +143,7 @@ interface MegaChatApiGateway {
         speakRequest: Boolean,
         waitingRoom: Boolean,
         openInvite: Boolean,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     )
 
     /**
@@ -165,7 +165,7 @@ interface MegaChatApiGateway {
         speakRequest: Boolean,
         waitingRoom: Boolean,
         openInvite: Boolean,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     )
 
     /**
@@ -417,6 +417,23 @@ interface MegaChatApiGateway {
     fun startChatCallNoRinging(
         chatId: Long,
         schedId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Start meeting with waiting room enabled.
+     *
+     * @param chatId        The chat id.
+     * @param schedIdWr     The scheduled meeting id.
+     * @param enabledVideo  True for audio-video call, false for audio call.
+     * @param enabledAudio  True for starting a call with audio (mute disabled).
+     * @param listener      Listener.
+     */
+    fun startMeetingInWaitingRoomChat(
+        chatId: Long,
+        schedIdWr: Long,
         enabledVideo: Boolean,
         enabledAudio: Boolean,
         listener: MegaChatRequestListenerInterface,
