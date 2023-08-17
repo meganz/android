@@ -8,7 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.presentation.transfers.notification.DefaultDownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.domain.repository.TransferRepository
@@ -51,16 +50,6 @@ abstract class TransfersModule {
         @Provides
         fun provideGetNumPendingTransfers(transfersRepository: TransferRepository): GetNumPendingTransfers =
             GetNumPendingTransfers(transfersRepository::getNumPendingTransfers)
-
-        /**
-         * Provides the [AreAllTransfersPaused] implementation
-         *
-         * @param transfersRepository [TransferRepository]
-         * @return [AreAllTransfersPaused]
-         */
-        @Provides
-        fun provideAreAllTransfersPaused(transfersRepository: TransferRepository): AreAllTransfersPaused =
-            AreAllTransfersPaused(transfersRepository::areAllTransfersPaused)
 
         /**
          * Provides the [ResetTotalDownloads] implementation

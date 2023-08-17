@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -25,6 +24,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.transfer.AreAllTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfer.IsCompletedTransfersEmptyUseCase
 import mega.privacy.android.domain.usecase.transfer.uploads.GetNumPendingUploadsUseCase
@@ -37,7 +37,7 @@ import javax.inject.Inject
  * @property getNumPendingUploadsUseCase                   [GetNumPendingUploadsUseCase]
  * @property getNumPendingTransfers                 [GetNumPendingTransfers]
  * @property isCompletedTransfersEmptyUseCase       [IsCompletedTransfersEmptyUseCase]
- * @property areAllTransfersPaused                  [AreAllTransfersPaused]
+ * @property areAllTransfersPausedUseCase                  [AreAllTransfersPausedUseCase]
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -46,7 +46,7 @@ class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingUploadsUseCase: GetNumPendingUploadsUseCase,
     private val getNumPendingTransfers: GetNumPendingTransfers,
     private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
-    private val areAllTransfersPaused: AreAllTransfersPaused,
+    private val areAllTransfersPausedUseCase: AreAllTransfersPausedUseCase,
     private val transfersInfoMapper: TransfersInfoMapper,
     private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -107,7 +107,7 @@ class TransfersManagementViewModel @Inject constructor(
         viewModelScope.launch {
             val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackgroundUseCase()
             val numPendingUploads = getNumPendingUploadsUseCase()
-            val areTransfersPaused = areAllTransfersPaused()
+            val areTransfersPaused = areAllTransfersPausedUseCase()
             _state.update {
                 it.copy(
                     hideTransfersWidget = if (unHideWidget) false else it.hideTransfersWidget,
@@ -141,7 +141,7 @@ class TransfersManagementViewModel @Inject constructor(
      * Checks if transfers are paused.
      */
     fun checkTransfersState() = viewModelScope.launch {
-        areAllTransfersPaused().let { paused ->
+        areAllTransfersPausedUseCase().let { paused ->
             if (paused) {
                 _state.update { it.copy(transfersInfo = it.transfersInfo.copy(status = TransfersStatus.Paused)) }
             } else {
@@ -158,10 +158,4 @@ class TransfersManagementViewModel @Inject constructor(
             it.copy(hideTransfersWidget = true)
         }
     }
-
-    /**
-     * Are transfers paused
-     */
-    val areTransfersPaused: Boolean
-        get() = _state.value.transfersInfo.status == TransfersStatus.Paused
 }

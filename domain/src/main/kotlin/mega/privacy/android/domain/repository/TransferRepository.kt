@@ -67,14 +67,6 @@ interface TransferRepository {
     suspend fun getNumPendingNonBackgroundPausedDownloads(): Int
 
     /**
-     * Checks if the queue of transfers is paused or if all in progress transfers are individually paused.
-     *
-     * @return True if the queue of transfers is paused or if all in progress transfers are
-     * individually paused, false otherwise.
-     */
-    suspend fun areAllTransfersPaused(): Boolean
-
-    /**
      * Cancels all upload transfers
      */
     suspend fun cancelAllUploadTransfers()

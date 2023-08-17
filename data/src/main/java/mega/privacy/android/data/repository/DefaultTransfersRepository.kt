@@ -240,10 +240,6 @@ internal class DefaultTransfersRepository @Inject constructor(
             }
         }
 
-    override suspend fun areAllTransfersPaused(): Boolean = withContext(ioDispatcher) {
-        monitorPausedTransfers.value || getNumPendingPausedUploads() + getNumPendingNonBackgroundPausedDownloads() == getNumPendingTransfers()
-    }
-
     override fun monitorTransferEvents(): Flow<TransferEvent> =
         megaApiGateway.globalTransfer.map { event -> transferEventMapper(event) }
             .flowOn(ioDispatcher)
