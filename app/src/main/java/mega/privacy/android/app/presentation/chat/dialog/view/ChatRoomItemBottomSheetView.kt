@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -18,6 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,8 +52,8 @@ import kotlin.random.Random
  */
 @Composable
 internal fun ChatRoomItemBottomSheetView(
-    modifier: Modifier = Modifier,
     item: ChatRoomItem?,
+    modifier: Modifier = Modifier,
     onStartMeetingClick: () -> Unit = {},
     onOccurrencesClick: () -> Unit = {},
     onInfoClick: () -> Unit = {},
@@ -78,12 +82,14 @@ internal fun ChatRoomItemBottomSheetView(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .nestedScroll(rememberNestedScrollInteropConnection())
     ) {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .height(71.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             val (avatarImage, titleText, subtitleText, statusIcon) = createRefs()
             val subtitle = when (item) {
@@ -160,130 +166,133 @@ internal fun ChatRoomItemBottomSheetView(
 
         ChatDivider(startPadding = 16.dp)
 
-        if (item.isArchived) {
-            MenuItem(
-                modifier = Modifier.testTag("unarchive"),
-                res = R.drawable.ic_chat_archive_off,
-                text = R.string.general_unarchive,
-                description = "Unarchive",
-                onClick = onUnarchiveClick
-            )
-        } else {
-            if (item is ChatRoomItem.MeetingChatRoomItem) {
-                if (item.currentCallStatus is ChatRoomItemStatus.NotJoined) {
-                    MenuItem(
-                        modifier = Modifier.testTag("join_meeting"),
-                        res = R.drawable.join_sched_icon,
-                        text = R.string.meetings_list_join_scheduled_meeting_option,
-                        description = "Join meeting",
-                        onClick = onStartMeetingClick
-                    )
-                } else if (item.currentCallStatus is ChatRoomItemStatus.NotStarted) {
-                    MenuItem(
-                        modifier = Modifier.testTag("start_meeting"),
-                        res = R.drawable.start_sched_icon,
-                        text = R.string.meetings_list_start_scheduled_meeting_option,
-                        description = "Start meeting",
-                        onClick = onStartMeetingClick
-                    )
-                }
-                ChatDivider()
-
-                if (item.isRecurring()) {
-                    MenuItem(
-                        modifier = Modifier.testTag("occurrences"),
-                        res = R.drawable.occurrences_icon,
-                        text = R.string.meetings_list_recurring_meeting_occurrences_option,
-                        description = "Occurrences",
-                        onClick = onOccurrencesClick
-                    )
+        Column(modifier = Modifier.verticalScroll(rememberScrollState()))
+        {
+            if (item.isArchived) {
+                MenuItem(
+                    modifier = Modifier.testTag("unarchive"),
+                    res = R.drawable.ic_chat_archive_off,
+                    text = R.string.general_unarchive,
+                    description = "Unarchive",
+                    onClick = onUnarchiveClick
+                )
+            } else {
+                if (item is ChatRoomItem.MeetingChatRoomItem) {
+                    if (item.currentCallStatus is ChatRoomItemStatus.NotJoined) {
+                        MenuItem(
+                            modifier = Modifier.testTag("join_meeting"),
+                            res = R.drawable.join_sched_icon,
+                            text = R.string.meetings_list_join_scheduled_meeting_option,
+                            description = "Join meeting",
+                            onClick = onStartMeetingClick
+                        )
+                    } else if (item.currentCallStatus is ChatRoomItemStatus.NotStarted) {
+                        MenuItem(
+                            modifier = Modifier.testTag("start_meeting"),
+                            res = R.drawable.start_sched_icon,
+                            text = R.string.meetings_list_start_scheduled_meeting_option,
+                            description = "Start meeting",
+                            onClick = onStartMeetingClick
+                        )
+                    }
                     ChatDivider()
+
+                    if (item.isRecurring()) {
+                        MenuItem(
+                            modifier = Modifier.testTag("occurrences"),
+                            res = R.drawable.occurrences_icon,
+                            text = R.string.meetings_list_recurring_meeting_occurrences_option,
+                            description = "Occurrences",
+                            onClick = onOccurrencesClick
+                        )
+                        ChatDivider()
+                    }
+
+                    if (item.hasPermissions) {
+                        MenuItem(
+                            modifier = Modifier.testTag("edit"),
+                            res = R.drawable.ic_scheduled_meeting_edit,
+                            text = R.string.title_edit_profile_info,
+                            description = "Edit",
+                            onClick = onEditClick
+                        )
+                        ChatDivider()
+                    }
                 }
+
+                MenuItem(
+                    modifier = Modifier.testTag("info"),
+                    res = R.drawable.info_ic,
+                    text = R.string.general_info,
+                    description = "Info",
+                    onClick = onInfoClick
+                )
+
+                ChatDivider()
 
                 if (item.hasPermissions) {
                     MenuItem(
-                        modifier = Modifier.testTag("edit"),
-                        res = R.drawable.ic_scheduled_meeting_edit,
-                        text = R.string.title_edit_profile_info,
-                        description = "Edit",
-                        onClick = onEditClick
+                        modifier = Modifier.testTag("clear_chat_history"),
+                        res = R.drawable.ic_eraser,
+                        text = R.string.title_properties_chat_clear,
+                        description = "Clear chat history",
+                        onClick = onClearChatClick
                     )
                     ChatDivider()
                 }
-            }
 
-            MenuItem(
-                modifier = Modifier.testTag("info"),
-                res = R.drawable.info_ic,
-                text = R.string.general_info,
-                description = "Info",
-                onClick = onInfoClick
-            )
-
-            ChatDivider()
-
-            if (item.hasPermissions) {
-                MenuItem(
-                    modifier = Modifier.testTag("clear_chat_history"),
-                    res = R.drawable.ic_eraser,
-                    text = R.string.title_properties_chat_clear,
-                    description = "Clear chat history",
-                    onClick = onClearChatClick
-                )
+                if (item.isMuted) {
+                    MenuItem(
+                        modifier = Modifier.testTag("unmute"),
+                        res = R.drawable.ic_bell,
+                        text = R.string.general_unmute,
+                        description = "Unmute",
+                        onClick = onUnmuteClick
+                    )
+                } else {
+                    MenuItem(
+                        modifier = Modifier.testTag("mute"),
+                        res = R.drawable.ic_bell_off,
+                        text = R.string.general_mute,
+                        description = "Mute",
+                        onClick = onMuteClick
+                    )
+                }
                 ChatDivider()
-            }
 
-            if (item.isMuted) {
                 MenuItem(
-                    modifier = Modifier.testTag("unmute"),
-                    res = R.drawable.ic_bell,
-                    text = R.string.general_unmute,
-                    description = "Unmute",
-                    onClick = onUnmuteClick
+                    modifier = Modifier.testTag("archive"),
+                    res = R.drawable.ic_chat_archive,
+                    text = R.string.general_archive,
+                    description = "Archive",
+                    onClick = onArchiveClick
                 )
-            } else {
-                MenuItem(
-                    modifier = Modifier.testTag("mute"),
-                    res = R.drawable.ic_bell_off,
-                    text = R.string.general_mute,
-                    description = "Mute",
-                    onClick = onMuteClick
-                )
-            }
-            ChatDivider()
 
-            MenuItem(
-                modifier = Modifier.testTag("archive"),
-                res = R.drawable.ic_chat_archive,
-                text = R.string.general_archive,
-                description = "Archive",
-                onClick = onArchiveClick
-            )
+                when {
+                    canCancel(item) -> {
 
-            when {
-                canCancel(item) -> {
+                        ChatDivider()
+                        MenuItem(
+                            modifier = Modifier.testTag("cancel"),
+                            res = R.drawable.ic_trash,
+                            text = R.string.general_cancel,
+                            description = "Cancel",
+                            tintRed = true,
+                            onClick = onCancelClick
+                        )
+                    }
 
-                    ChatDivider()
-                    MenuItem(
-                        modifier = Modifier.testTag("cancel"),
-                        res = R.drawable.ic_trash,
-                        text = R.string.general_cancel,
-                        description = "Cancel",
-                        tintRed = true,
-                        onClick = onCancelClick
-                    )
-                }
-
-                item is ChatRoomItem.GroupChatRoomItem -> {
-                    ChatDivider()
-                    MenuItem(
-                        modifier = Modifier.testTag("leave"),
-                        res = R.drawable.ic_log_out,
-                        text = R.string.general_leave,
-                        description = "Leave",
-                        tintRed = true,
-                        onClick = onLeaveClick
-                    )
+                    item is ChatRoomItem.GroupChatRoomItem -> {
+                        ChatDivider()
+                        MenuItem(
+                            modifier = Modifier.testTag("leave"),
+                            res = R.drawable.ic_log_out,
+                            text = R.string.general_leave,
+                            description = "Leave",
+                            tintRed = true,
+                            onClick = onLeaveClick
+                        )
+                    }
                 }
             }
         }
