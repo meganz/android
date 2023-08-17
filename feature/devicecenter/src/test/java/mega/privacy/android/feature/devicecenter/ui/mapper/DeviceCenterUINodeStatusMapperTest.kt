@@ -47,6 +47,7 @@ internal class DeviceCenterUINodeStatusMapperTest {
         Arguments.of(DeviceCenterNodeStatus.Overquota, DeviceCenterUINodeStatus.Overquota),
         Arguments.of(DeviceCenterNodeStatus.Paused, DeviceCenterUINodeStatus.Paused),
         Arguments.of(DeviceCenterNodeStatus.Initializing, DeviceCenterUINodeStatus.Initializing),
+        Arguments.of(DeviceCenterNodeStatus.Scanning, DeviceCenterUINodeStatus.Scanning),
         Arguments.of(
             DeviceCenterNodeStatus.Syncing(50),
             DeviceCenterUINodeStatus.SyncingWithPercentage(50),

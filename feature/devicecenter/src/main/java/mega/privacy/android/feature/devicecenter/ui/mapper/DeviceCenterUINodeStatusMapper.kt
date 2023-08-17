@@ -25,6 +25,7 @@ internal class DeviceCenterUINodeStatusMapper @Inject constructor() {
         DeviceCenterNodeStatus.Overquota -> DeviceCenterUINodeStatus.Overquota
         DeviceCenterNodeStatus.Paused -> DeviceCenterUINodeStatus.Paused
         DeviceCenterNodeStatus.Initializing -> DeviceCenterUINodeStatus.Initializing
+        DeviceCenterNodeStatus.Scanning -> DeviceCenterUINodeStatus.Scanning
         is DeviceCenterNodeStatus.Syncing -> {
             if (status.progress > 0) {
                 DeviceCenterUINodeStatus.SyncingWithPercentage(status.progress)
