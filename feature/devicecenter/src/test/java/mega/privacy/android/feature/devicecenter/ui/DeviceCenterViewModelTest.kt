@@ -8,12 +8,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -88,7 +88,7 @@ internal class DeviceCenterViewModelTest {
             OwnDeviceUINode(
                 id = deviceId,
                 name = deviceName,
-                icon = R.drawable.ic_device_pc,
+                icon = DeviceIconType.PC,
                 status = DeviceCenterUINodeStatus.UpToDate,
                 folders = listOf(mock()),
             ),

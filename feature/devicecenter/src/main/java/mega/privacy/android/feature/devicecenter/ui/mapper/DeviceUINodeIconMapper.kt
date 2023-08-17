@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
-import androidx.annotation.DrawableRes
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import javax.inject.Inject
 
 /**
@@ -18,13 +18,12 @@ internal class DeviceUINodeIconMapper @Inject constructor() {
      * Invocation function
      *
      * @param deviceFolders A list of [DeviceFolderNode] objects from a Device Node
-     * @return The correct Device Icon, represented as an [Int]
+     * @return The correct Device Icon, represented as a [DeviceCenterUINodeIcon]
      */
-    @DrawableRes
     operator fun invoke(deviceFolders: List<DeviceFolderNode>) =
         if (deviceFolders.any { deviceFolderNode ->
                 deviceFolderNode.type == BackupInfoType.CAMERA_UPLOADS || deviceFolderNode.type == BackupInfoType.MEDIA_UPLOADS
             }
-        ) R.drawable.ic_device_mobile
-        else R.drawable.ic_device_pc
+        ) DeviceIconType.Mobile
+        else DeviceIconType.PC
 }

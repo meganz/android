@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
-import androidx.annotation.DrawableRes
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
+import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -27,18 +27,18 @@ internal class DeviceFolderUINodeIconMapperTest {
     @MethodSource("provideParameters")
     fun `test that the correct device folder icon is returned`(
         backupInfoType: BackupInfoType,
-        @DrawableRes deviceFolderIconRes: Int,
+        deviceFolderIcon: DeviceCenterUINodeIcon,
     ) {
-        assertThat(underTest(backupInfoType)).isEqualTo(deviceFolderIconRes)
+        assertThat(underTest(backupInfoType)).isEqualTo(deviceFolderIcon)
     }
 
     private fun provideParameters() = Stream.of(
-        Arguments.of(BackupInfoType.CAMERA_UPLOADS, R.drawable.ic_device_folder_camera_uploads),
-        Arguments.of(BackupInfoType.MEDIA_UPLOADS, R.drawable.ic_device_folder_camera_uploads),
-        Arguments.of(BackupInfoType.INVALID, R.drawable.ic_device_folder_sync),
-        Arguments.of(BackupInfoType.UP_SYNC, R.drawable.ic_device_folder_sync),
-        Arguments.of(BackupInfoType.DOWN_SYNC, R.drawable.ic_device_folder_sync),
-        Arguments.of(BackupInfoType.TWO_WAY_SYNC, R.drawable.ic_device_folder_sync),
-        Arguments.of(BackupInfoType.BACKUP_UPLOAD, R.drawable.ic_device_folder_backup),
+        Arguments.of(BackupInfoType.CAMERA_UPLOADS, FolderIconType.CameraUploads),
+        Arguments.of(BackupInfoType.MEDIA_UPLOADS, FolderIconType.CameraUploads),
+        Arguments.of(BackupInfoType.INVALID, FolderIconType.Sync),
+        Arguments.of(BackupInfoType.UP_SYNC, FolderIconType.Sync),
+        Arguments.of(BackupInfoType.DOWN_SYNC, FolderIconType.Sync),
+        Arguments.of(BackupInfoType.TWO_WAY_SYNC, FolderIconType.Sync),
+        Arguments.of(BackupInfoType.BACKUP_UPLOAD, FolderIconType.Backup),
     )
 }

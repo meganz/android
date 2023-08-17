@@ -1,11 +1,11 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -53,7 +53,7 @@ internal class DeviceFolderUINodeListMapperTest {
             )
         )
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
-        val expectedFolderUINodeIcon = R.drawable.ic_device_folder_camera_uploads
+        val expectedFolderUINodeIcon = FolderIconType.CameraUploads
 
         whenever(deviceCenterUINodeStatusMapper(folderStatus)).thenReturn(expectedUINodeStatus)
         whenever(deviceFolderUINodeIconMapper(folderType)).thenReturn(expectedFolderUINodeIcon)

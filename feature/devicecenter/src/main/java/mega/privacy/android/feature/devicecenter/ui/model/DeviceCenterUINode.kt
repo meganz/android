@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.model
 
-import androidx.annotation.DrawableRes
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 
 /**
@@ -9,16 +9,12 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  *
  * @property id The UI Node ID
  * @property name The UI Node Name
- * @property icon The UI Node Icon as a [DrawableRes]
+ * @property icon The UI Node Icon from [DeviceCenterUINodeIcon]
  * @property status The UI Node Status from [DeviceCenterUINodeStatus]
  */
 interface DeviceCenterUINode {
     val id: String
-
     val name: String
-
-    @get:DrawableRes
-    val icon: Int
-
+    val icon: DeviceCenterUINodeIcon
     val status: DeviceCenterUINodeStatus
 }

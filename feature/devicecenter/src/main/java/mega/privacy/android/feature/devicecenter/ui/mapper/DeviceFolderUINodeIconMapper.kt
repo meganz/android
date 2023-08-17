@@ -1,8 +1,7 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
-import androidx.annotation.DrawableRes
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
+import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import javax.inject.Inject
 
 /**
@@ -15,20 +14,19 @@ internal class DeviceFolderUINodeIconMapper @Inject constructor() {
      * Invocation function
      *
      * @param backupInfoType The [BackupInfoType] from a Device Folder Node
-     * @return The correct Device Folder Icon, represented as an [Int]
+     * @return The correct Device Folder Icon, represented as a [FolderIconType]
      */
-    @DrawableRes
     operator fun invoke(backupInfoType: BackupInfoType) = when (backupInfoType) {
         BackupInfoType.CAMERA_UPLOADS,
         BackupInfoType.MEDIA_UPLOADS,
-        -> R.drawable.ic_device_folder_camera_uploads
+        -> FolderIconType.CameraUploads
 
         BackupInfoType.INVALID,
         BackupInfoType.UP_SYNC,
         BackupInfoType.DOWN_SYNC,
         BackupInfoType.TWO_WAY_SYNC,
-        -> R.drawable.ic_device_folder_sync
+        -> FolderIconType.Sync
 
-        BackupInfoType.BACKUP_UPLOAD -> R.drawable.ic_device_folder_backup
+        BackupInfoType.BACKUP_UPLOAD -> FolderIconType.Backup
     }
 }

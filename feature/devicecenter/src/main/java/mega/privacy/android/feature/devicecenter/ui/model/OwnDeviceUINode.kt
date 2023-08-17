@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.model
 
-import androidx.annotation.DrawableRes
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 
 /**
@@ -8,14 +8,14 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  *
  * @property id The Current Device ID
  * @property name The Current Device Name
- * @property icon The Current Device Icon as a [DrawableRes]
+ * @property icon The Current Device Icon from [DeviceCenterUINodeIcon]
  * @property status The Current Device Status from [DeviceCenterUINodeStatus]
  * @property folders The list of Backup Folders linked to that Device as [DeviceFolderUINode] objects
  */
 data class OwnDeviceUINode(
     override val id: String,
     override val name: String,
-    @DrawableRes override val icon: Int,
+    override val icon: DeviceCenterUINodeIcon,
     override val status: DeviceCenterUINodeStatus,
     override val folders: List<DeviceFolderUINode>,
 ) : DeviceUINode

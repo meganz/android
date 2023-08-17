@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
@@ -10,6 +9,8 @@ import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
+import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -86,8 +87,8 @@ internal class DeviceUINodeListMapperTest {
         }
 
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
-        val expectedDeviceUINodeIcon = R.drawable.ic_device_mobile
-        val expectedFolderUINodeIcon = R.drawable.ic_device_folder_backup
+        val expectedDeviceUINodeIcon = DeviceIconType.Mobile
+        val expectedFolderUINodeIcon = FolderIconType.Backup
         val expectedFolderUINodeList = listOf(
             DeviceFolderUINode(
                 id = folderId,

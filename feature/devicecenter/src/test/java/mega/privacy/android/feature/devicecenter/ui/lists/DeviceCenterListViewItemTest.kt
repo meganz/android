@@ -1,10 +1,11 @@
-package mega.privacy.android.feature.devicecenter.ui
+package mega.privacy.android.feature.devicecenter.ui.lists
 
-import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import org.junit.Rule
 import org.junit.Test
@@ -23,9 +24,13 @@ internal class DeviceCenterListViewItemTest {
     fun `test that the device center list item is displayed`() {
         composeTestRule.setContent {
             DeviceCenterListViewItem(
-                icon = DeviceCenterR.drawable.ic_device_android,
-                name = "Android Device",
-                status = DeviceCenterUINodeStatus.UpToDate,
+                uiNode = OwnDeviceUINode(
+                    id = "1234-5678",
+                    name = "Android Device",
+                    icon = DeviceIconType.Android,
+                    status = DeviceCenterUINodeStatus.UpToDate,
+                    folders = emptyList(),
+                ),
                 onMenuClick = {},
             )
         }

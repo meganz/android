@@ -58,6 +58,8 @@ import java.io.File
  * @param isSelected true if the item is selected, and false if otherwise
  * @param folderInfo folder info, if null the item is a File
  * @param icon icon resource
+ * @param applySecondaryColorIconTint if true, applies the textColorSecondary color from
+ * [MaterialTheme.colors]. No tint is applied if false
  * @param fileSize file size
  * @param modifiedDate modified date
  * @param name name
@@ -79,6 +81,7 @@ fun NodeListViewItem(
     isSelected: Boolean,
     folderInfo: String?,
     @DrawableRes icon: Int,
+    applySecondaryColorIconTint: Boolean = false,
     fileSize: String?,
     modifiedDate: String?,
     name: String,
@@ -137,7 +140,12 @@ fun NodeListViewItem(
                         modifier = thumbNailModifier
                             .testTag(FOLDER_TEST_TAG),
                         painter = painterResource(id = icon),
-                        contentDescription = "Folder Thumbnail"
+                        contentDescription = "Folder Thumbnail",
+                        colorFilter = if (applySecondaryColorIconTint) {
+                            ColorFilter.tint(
+                                MaterialTheme.colors.textColorSecondary
+                            )
+                        } else null
                     )
                 } else {
                     imageState.value

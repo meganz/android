@@ -1,10 +1,10 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
-import androidx.annotation.DrawableRes
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -29,23 +29,23 @@ internal class DeviceUINodeIconMapperTest {
     @MethodSource("provideParameters")
     fun `test that the correct device icon is returned`(
         deviceFolders: List<DeviceFolderNode>,
-        @DrawableRes expectedDeviceIconRes: Int,
+        expectedDeviceIcon: DeviceCenterUINodeIcon,
     ) {
-        assertThat(underTest(deviceFolders)).isEqualTo(expectedDeviceIconRes)
+        assertThat(underTest(deviceFolders)).isEqualTo(expectedDeviceIcon)
     }
 
     private fun provideParameters() = Stream.of(
         Arguments.of(
             mockDeviceFolders(listOf(BackupInfoType.CAMERA_UPLOADS)),
-            R.drawable.ic_device_mobile
+            DeviceIconType.Mobile
         ),
         Arguments.of(
             mockDeviceFolders(listOf(BackupInfoType.MEDIA_UPLOADS)),
-            R.drawable.ic_device_mobile
+            DeviceIconType.Mobile
         ),
         Arguments.of(
             mockDeviceFolders(listOf(BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS)),
-            R.drawable.ic_device_mobile,
+            DeviceIconType.Mobile,
         ),
         Arguments.of(
             mockDeviceFolders(
@@ -55,10 +55,10 @@ internal class DeviceUINodeIconMapperTest {
                     BackupInfoType.DOWN_SYNC,
                 )
             ),
-            R.drawable.ic_device_mobile,
+            DeviceIconType.Mobile,
         ),
-        Arguments.of(mockDeviceFolders(emptyList()), R.drawable.ic_device_pc),
-        Arguments.of(mockDeviceFolders(listOf(BackupInfoType.DOWN_SYNC)), R.drawable.ic_device_pc),
+        Arguments.of(mockDeviceFolders(emptyList()), DeviceIconType.PC),
+        Arguments.of(mockDeviceFolders(listOf(BackupInfoType.DOWN_SYNC)), DeviceIconType.PC),
     )
 
     private fun mockDeviceFolders(backupFolderTypes: List<BackupInfoType>) =

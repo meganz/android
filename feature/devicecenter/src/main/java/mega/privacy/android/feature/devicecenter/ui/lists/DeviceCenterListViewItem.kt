@@ -1,6 +1,5 @@
-package mega.privacy.android.feature.devicecenter.ui
+package mega.privacy.android.feature.devicecenter.ui.lists
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -9,13 +8,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
+import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import java.io.File
 
@@ -29,29 +28,26 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_TAG =
  * A Composable Class extending [NodeListViewItem] that represents a Device / Device Folder entry
  * in the Device Center
  *
- * @param icon The entry Icon
- * @param name The entry Name
- * @param status The [DeviceCenterUINodeStatus]
+ * @param uiNode The [DeviceCenterUINode] to be displayed
  * @param onMenuClick Lambda that performs a specific action when the Menu icon is clicked
  */
 @Composable
 internal fun DeviceCenterListViewItem(
-    @DrawableRes icon: Int,
-    name: String,
-    status: DeviceCenterUINodeStatus,
+    uiNode: DeviceCenterUINode,
     onMenuClick: () -> Unit,
 ) {
     NodeListViewItem(
         modifier = Modifier.testTag(DEVICE_CENTER_LIST_VIEW_ITEM_TAG),
         isSelected = false,
-        folderInfo = getStatusText(status),
-        icon = icon,
+        folderInfo = getStatusText(uiNode.status),
+        icon = uiNode.icon.iconRes,
+        applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
         fileSize = null,
         modifiedDate = null,
-        name = name,
-        infoColor = getStatusColor(status),
-        infoIcon = status.icon,
-        infoIconTint = getStatusColor(status),
+        name = uiNode.name,
+        infoColor = getStatusColor(uiNode.status),
+        infoIcon = uiNode.status.icon,
+        infoIconTint = getStatusColor(uiNode.status),
         showMenuButton = true,
         isTakenDown = false,
         isFavourite = false,
@@ -86,41 +82,22 @@ private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
 private fun getStatusColor(uiNodeStatus: DeviceCenterUINodeStatus) =
     uiNodeStatus.color ?: MaterialTheme.colors.textColorSecondary
 
+/**
+ * A Preview Composable that displays [DeviceCenterListViewItem]
+ */
 @CombinedThemePreviews
 @Composable
-private fun EntryWithDifferentStatusPreview(
-    @PreviewParameter(DeviceCenterUINodeStatusProvider::class) status: DeviceCenterUINodeStatus,
-) {
+private fun DeviceCenterListViewItemPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
-            icon = R.drawable.ic_device_android,
-            name = "Android Device",
-            status = status,
+            uiNode = OwnDeviceUINode(
+                id = "1234-5678",
+                name = "Backup Name",
+                icon = DeviceIconType.Android,
+                status = DeviceCenterUINodeStatus.UpToDate,
+                folders = emptyList(),
+            ),
             onMenuClick = {},
         )
     }
-}
-
-/**
- * Provider class that enumerates the list of [DeviceCenterUINodeStatus] objects to be shown in
- * the Preview
- */
-private class DeviceCenterUINodeStatusProvider :
-    PreviewParameterProvider<DeviceCenterUINodeStatus> {
-    override val values = listOf(
-        DeviceCenterUINodeStatus.Unknown,
-        DeviceCenterUINodeStatus.UpToDate,
-        DeviceCenterUINodeStatus.Initializing,
-        DeviceCenterUINodeStatus.Scanning,
-        DeviceCenterUINodeStatus.Syncing,
-        DeviceCenterUINodeStatus.SyncingWithPercentage(50),
-        DeviceCenterUINodeStatus.NoCameraUploads,
-        DeviceCenterUINodeStatus.Disabled,
-        DeviceCenterUINodeStatus.Offline,
-        DeviceCenterUINodeStatus.Paused,
-        DeviceCenterUINodeStatus.Stopped,
-        DeviceCenterUINodeStatus.Overquota,
-        DeviceCenterUINodeStatus.Error,
-        DeviceCenterUINodeStatus.Blocked,
-    ).asSequence()
 }
