@@ -165,6 +165,13 @@ interface CameraUploadRepository {
     suspend fun saveSyncRecord(record: SyncRecord)
 
     /**
+     * Save sync records
+     *
+     * @return
+     */
+    suspend fun saveSyncRecords(records: List<SyncRecord>)
+
+    /**
      * Delete sync record by local path
      *
      * @return

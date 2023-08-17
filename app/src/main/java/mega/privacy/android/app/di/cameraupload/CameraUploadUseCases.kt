@@ -73,7 +73,6 @@ import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
-import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -176,13 +175,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetSyncRecordByFingerprint(cameraUploadRepository: CameraUploadRepository): GetSyncRecordByFingerprint =
             GetSyncRecordByFingerprint(cameraUploadRepository::getSyncRecordByFingerprint)
-
-        /**
-         * Provide the [SaveSyncRecord] implementation
-         */
-        @Provides
-        fun provideSaveSyncRecord(cameraUploadRepository: CameraUploadRepository): SaveSyncRecord =
-            SaveSyncRecord(cameraUploadRepository::saveSyncRecord)
 
         /**
          * Provide the [SetSyncRecordPendingByPath] implementation

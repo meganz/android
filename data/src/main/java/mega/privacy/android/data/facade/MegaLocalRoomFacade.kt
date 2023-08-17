@@ -175,6 +175,13 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun saveSyncRecord(record: SyncRecord) =
         syncRecordDao.insertOrUpdateSyncRecord(syncRecordEntityMapper(record))
 
+    override suspend fun saveSyncRecords(records: List<SyncRecord>) {
+        syncRecordDao.insertOrUpdateSyncRecords(
+            records.map { record ->
+                syncRecordEntityMapper(record)
+            })
+    }
+
     override suspend fun setUploadVideoSyncStatus(syncStatus: Int) =
         syncRecordDao.updateVideoState(syncStatus)
 

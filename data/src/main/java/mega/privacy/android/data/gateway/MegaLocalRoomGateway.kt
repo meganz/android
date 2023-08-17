@@ -201,6 +201,11 @@ interface MegaLocalRoomGateway {
     suspend fun saveSyncRecord(record: SyncRecord)
 
     /**
+     * Save sync records
+     */
+    suspend fun saveSyncRecords(records: List<SyncRecord>)
+
+    /**
      * Sets the new Video Sync Status for Camera Uploads
      *
      * @param syncStatus The new Video Sync Status, represented as an [Int]

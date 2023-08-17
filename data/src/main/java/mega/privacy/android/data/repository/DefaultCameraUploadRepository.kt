@@ -214,6 +214,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         megaLocalRoomGateway.saveSyncRecord(record)
     }
 
+    override suspend fun saveSyncRecords(records: List<SyncRecord>) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.saveSyncRecords(records)
+    }
+
     override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long? {
         return withContext(ioDispatcher) {
             when (type) {

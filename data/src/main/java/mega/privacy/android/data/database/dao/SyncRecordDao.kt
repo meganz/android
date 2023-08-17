@@ -13,6 +13,9 @@ internal interface SyncRecordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateSyncRecord(entity: SyncRecordEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateSyncRecords(entity: List<SyncRecordEntity>)
+
     @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_SYNC_RECORDS}")
     suspend fun getAllSyncRecords(): List<SyncRecordEntity>
 
