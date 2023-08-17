@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SyncRecord
@@ -34,6 +35,12 @@ class GetPendingUploadListUseCase @Inject constructor(
 ) {
 
     /**
+     * Limit the number of concurrent coroutines to process the media list to 16
+     * to avoid consuming too much memory
+     */
+    private val semaphore = Semaphore(16)
+
+    /**
      *  Format the [CameraUploadMedia] queue to a [SyncRecord] list
      *
      * @param mediaList a queue of [CameraUploadMedia] retrieved from the MediaStore
@@ -52,11 +59,12 @@ class GetPendingUploadListUseCase @Inject constructor(
 
         mediaList.map { media ->
             async {
+                semaphore.acquire()
                 yield()
-                runCatching {
+                val syncRecord = runCatching {
                     // Check if the file is already inserted in the database
                     if (mediaLocalPathExists(media.filePath, isSecondary))
-                        return@async null
+                        return@runCatching null
 
                     val localFingerPrint =
                         getFingerprintUseCase(media.filePath) ?: return@runCatching null
@@ -67,14 +75,14 @@ class GetPendingUploadListUseCase @Inject constructor(
 
                     val sourceFile = File(media.filePath)
 
-                    return@runCatching nodeExists?.let { node ->
+                    nodeExists?.let { node ->
                         val isNodeInRubbish = isNodeInRubbish(node.id.longValue)
                         val isNodeNotInCameraUploadsFolder =
                             getParentNodeUseCase(node.id)?.id?.longValue != parentNodeHandle
 
                         // Check if node exists somewhere else than the camera upload folder
                         // If already in camera upload folder, skip, else copy is needed
-                        if (!isNodeInRubbish && isNodeNotInCameraUploadsFolder) {
+                        return@runCatching if (!isNodeInRubbish && isNodeNotInCameraUploadsFolder) {
                             val (latitude, longitude) = getNodeGPSCoordinatesUseCase(nodeExists.id)
                             SyncRecord(
                                 localPath = media.filePath,
@@ -98,7 +106,7 @@ class GetPendingUploadListUseCase @Inject constructor(
                         // The node does not exist, upload is needed
                         val gpsData = getGPSCoordinatesUseCase(sourceFile.absolutePath, isVideo)
 
-                        SyncRecord(
+                        return@runCatching SyncRecord(
                             localPath = sourceFile.absolutePath,
                             newPath = null,
                             originFingerprint = localFingerPrint,
@@ -119,6 +127,8 @@ class GetPendingUploadListUseCase @Inject constructor(
                         )
                     }
                 }.getOrNull()
+                semaphore.release()
+                syncRecord
             }
         }.awaitAll().filterNotNull()
     }
