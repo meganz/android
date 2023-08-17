@@ -1,9 +1,5 @@
 package mega.privacy.android.domain.entity.chat
 
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-
 /**
  * Chat scheduled meeting
  *
@@ -39,21 +35,4 @@ data class ChatScheduledMeeting constructor(
     val rules: ChatScheduledRules? = null,
     val changes: List<ScheduledMeetingChanges>? = null,
     val isCanceled: Boolean = false,
-) {
-
-    /**
-     * Check if Meeting is pending to be started or finished
-     *
-     * @return  true if it's pending, false otherwise
-     */
-    fun isPending(): Boolean {
-        val now = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
-        return startDateTime?.toZonedDateTime()?.isAfter(now) == true
-                || endDateTime?.toZonedDateTime()?.isAfter(now) == true
-                || (rules != null && (rules.until == 0L || rules.until.toZonedDateTime()
-            .isAfter(now)))
-    }
-
-    private fun Long.toZonedDateTime(): ZonedDateTime =
-        ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
-}
+)

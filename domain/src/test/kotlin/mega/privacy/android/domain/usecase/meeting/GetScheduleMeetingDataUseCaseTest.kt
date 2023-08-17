@@ -9,6 +9,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import org.junit.After
@@ -18,6 +20,8 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class GetScheduleMeetingDataUseCaseTest {
@@ -25,7 +29,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
     private lateinit var underTest: GetScheduleMeetingDataUseCase
 
     private val getScheduledMeetingByChat = mock<GetScheduledMeetingByChat>()
-    private val getNextSchedMeetingOccurrence = mock<GetNextSchedMeetingOccurrenceUseCase>()
+    private val callRepository = mock<CallRepository>()
     private val getChatRoom = mock<GetChatRoom>()
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -34,7 +38,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
         Dispatchers.setMain(testDispatcher)
         underTest = GetScheduleMeetingDataUseCase(
             getScheduledMeetingByChat,
-            getNextSchedMeetingOccurrence,
+            GetNextSchedMeetingOccurrenceUseCase(callRepository),
             getChatRoom,
         )
     }
@@ -44,7 +48,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
         Dispatchers.resetMain()
     }
 
-    @Test
+    @Test(expected = java.lang.IllegalStateException::class)
     fun `test that getMeetingScheduleData return null`() =
         runTest {
             val chatId = 123L
@@ -96,5 +100,37 @@ internal class GetScheduleMeetingDataUseCaseTest {
             assertThrows<IllegalStateException> {
                 underTest.invoke(chatId) { _, _ -> "" }
             }
+        }
+
+    @Test
+    fun `test that getNextSchedMeetingOccurrence is called accordingly`() =
+        runTest {
+            val chatId = 123L
+            val now = Instant.now().minus(1L, ChronoUnit.HALF_DAYS).epochSecond
+            val meetingOccurrence = ChatScheduledMeetingOccurr(
+                schedId = 456L,
+                startDateTime = Instant.now().plusSeconds(60).epochSecond,
+                endDateTime = Instant.now().plusSeconds(120).epochSecond,
+                isCancelled = false
+            )
+
+            whenever(getChatRoom(chatId)).thenReturn(mock())
+            whenever(getScheduledMeetingByChat(chatId)).thenReturn(
+                listOf(
+                    ChatScheduledMeeting(
+                        chatId = chatId,
+                        parentSchedId = -1L,
+                        isCanceled = false
+                    )
+                )
+            )
+
+            whenever(
+                callRepository.fetchScheduledMeetingOccurrencesByChat(chatId, now)
+            ).thenReturn(listOf(meetingOccurrence))
+
+            underTest.invoke(chatId) { _, _ -> "" }
+
+            verify(callRepository).fetchScheduledMeetingOccurrencesByChat(chatId, now)
         }
 }

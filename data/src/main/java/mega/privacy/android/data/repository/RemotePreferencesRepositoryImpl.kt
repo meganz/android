@@ -15,7 +15,6 @@ import mega.privacy.android.domain.repository.RemotePreferencesRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -64,7 +63,6 @@ internal class RemotePreferencesRepositoryImpl @Inject constructor(
 
                             else -> {
                                 val method = "getUserAttribute(MegaApiJava.USER_ATTR_APPS_PREFS)"
-                                Timber.e("Calling $method failed with error code ${error.errorCode}")
                                 continuation.failWithError(error, method)
                             }
                         }

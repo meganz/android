@@ -11,9 +11,9 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
@@ -24,8 +24,8 @@ import mega.privacy.android.data.mapper.meeting.ChatSessionTermCodeMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingFlagsMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingRulesMapper
-import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
+import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -49,9 +49,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
 
@@ -371,29 +368,6 @@ class CallRepositoryImplTest {
 
             assertThat(result).isEqualTo(expectedResult)
         }
-
-    @Test
-    fun `test that getNextScheduledMeetingOccurrence invokes the right methods`() = runTest {
-        val since =
-            Instant.now().atZone(ZoneOffset.UTC).minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
-        whenever(
-            megaChatApiGateway.fetchScheduledMeetingOccurrencesByChat(
-                chatId = any(), since = any(), any()
-            )
-        ).thenAnswer {
-            ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
-                mock(),
-                megaChatRequestOccursSuccess,
-                megaChatErrorSuccess,
-            )
-        }
-
-        underTest.getNextScheduledMeetingOccurrence(chatId = chatId)
-
-        verify(megaChatApiGateway).fetchScheduledMeetingOccurrencesByChat(
-            eq(chatId), eq(since), any()
-        )
-    }
 
     @Test
     fun `test that chat call update is returned when OnChatCallUpdate is called with non null chat call value`() =

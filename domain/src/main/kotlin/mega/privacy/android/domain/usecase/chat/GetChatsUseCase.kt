@@ -441,9 +441,6 @@ class GetChatsUseCase @Inject constructor(
     private suspend fun isChatMuted(chatId: Long): Boolean =
         runCatching { !chatRepository.isChatNotifiable(chatId) }.getOrNull() ?: false
 
-    private suspend fun isLastMessageGeolocation(chatId: Long): Boolean =
-        runCatching { chatRepository.isChatLastMessageGeolocation(chatId) }.getOrNull() ?: false
-
     private suspend fun getCurrentCall(chatId: Long): ChatRoomItemStatus =
         runCatching { getChatCall(chatId)?.let(chatRoomItemStatusMapper::invoke) }.getOrNull()
             ?: ChatRoomItemStatus.NotStarted

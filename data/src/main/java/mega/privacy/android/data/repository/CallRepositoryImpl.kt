@@ -37,10 +37,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -283,21 +279,6 @@ internal class CallRepositoryImpl @Inject constructor(
             occurrences.toList()
         }
 
-    override suspend fun getNextScheduledMeetingOccurrence(chatId: Long): ChatScheduledMeetingOccurr? =
-        withContext(dispatcher) {
-            val now = ZonedDateTime.now()
-            fetchScheduledMeetingOccurrencesByChat(
-                chatId,
-                now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
-            )
-                .sortedBy(ChatScheduledMeetingOccurr::startDateTime)
-                .firstOrNull { occurr ->
-                    !occurr.isCancelled
-                            && (occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
-                            || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
-                }
-        }
-
     override suspend fun createChatroomAndSchedMeeting(
         peerList: List<Long>,
         isMeeting: Boolean,
@@ -437,9 +418,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 continuation.failWithError(error, "onRequestCompleted")
             }
         }
-
-    private fun Long.toZonedDateTime(): ZonedDateTime =
-        ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 
     override suspend fun getCallHandleList(state: ChatCallStatus) = withContext(dispatcher) {
         megaChatApiGateway.getChatCalls(megaChatCallStatusMapper(state))

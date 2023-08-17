@@ -148,14 +148,6 @@ interface CallRepository {
     ): List<ChatScheduledMeetingOccurr>
 
     /**
-     * Get next available scheduled meeting occurrence given the current time
-     *
-     * @param chatId    MegaChatHandle that identifies a chat room
-     * @return          ChatScheduledMeetingOccurr
-     */
-    suspend fun getNextScheduledMeetingOccurrence(chatId: Long): ChatScheduledMeetingOccurr?
-
-    /**
      * Creates a chatroom and a scheduled meeting for that chatroom
      *
      * @param peerList List of peers
