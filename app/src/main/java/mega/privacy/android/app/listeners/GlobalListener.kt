@@ -53,7 +53,6 @@ import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCa
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
-import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -88,7 +87,6 @@ class GlobalListener @Inject constructor(
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
     private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
-    private val broadcastAccountUpdateUseCase: BroadcastAccountUpdateUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
     private val getNotificationCountUseCase: GetNotificationCountUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
@@ -172,7 +170,6 @@ class GlobalListener @Inject constructor(
         Timber.d("onAccountUpdate")
 
         applicationScope.launch {
-            runCatching { broadcastAccountUpdateUseCase() }.onFailure { Timber.e(it) }
             runCatching { getPaymentMethodUseCase(true) }.onFailure { Timber.e(it) }
             runCatching { getPricing(true) }.onFailure { Timber.e(it) }
             runCatching { dbH.resetExtendedAccountDetailsTimestamp() }.onFailure { Timber.e(it) }

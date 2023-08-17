@@ -132,19 +132,6 @@ interface LoginRepository {
     suspend fun broadcastFetchNodesFinish()
 
     /**
-     * Monitors account update.
-     *
-     * @return Flow of Boolean.
-     */
-    fun monitorAccountUpdate(): Flow<Boolean>
-
-    /**
-     * Broadcast account update.
-     *
-     */
-    suspend fun broadcastAccountUpdate()
-
-    /**
      * Should show password reminder dialog
      *
      */

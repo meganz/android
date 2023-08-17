@@ -131,16 +131,6 @@ internal interface AppEventGateway {
     suspend fun broadcastFetchNodesFinish()
 
     /**
-     * Monitors account update.
-     */
-    fun monitorAccountUpdate(): Flow<Boolean>
-
-    /**
-     * Broadcast account update.
-     */
-    suspend fun broadcastAccountUpdate()
-
-    /**
      * Monitor camera upload folder icon update
      *
      * @return Flow of [CameraUploadFolderIconUpdate]

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailState
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
-import mega.privacy.android.domain.usecase.login.MonitorAccountUpdateUseCase
+import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
 import javax.inject.Inject
 
 /**
@@ -20,7 +20,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ConfirmEmailViewModel @Inject constructor(
-    private val monitorAccountUpdateUseCase: MonitorAccountUpdateUseCase,
+    private val monitorAccountConfirmationUseCase: MonitorAccountConfirmationUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ConfirmEmailState())
@@ -28,7 +28,7 @@ class ConfirmEmailViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            monitorAccountUpdateUseCase().collectLatest {
+            monitorAccountConfirmationUseCase().collectLatest {
                 _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Login) }
             }
         }

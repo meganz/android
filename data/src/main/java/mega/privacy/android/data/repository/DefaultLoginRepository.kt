@@ -361,10 +361,6 @@ internal class DefaultLoginRepository @Inject constructor(
 
     override suspend fun broadcastFetchNodesFinish() = appEventGateway.broadcastFetchNodesFinish()
 
-    override fun monitorAccountUpdate() = appEventGateway.monitorAccountUpdate()
-
-    override suspend fun broadcastAccountUpdate() = appEventGateway.broadcastAccountUpdate()
-
     override suspend fun shouldShowPasswordReminderDialog(atLogin: Boolean) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->

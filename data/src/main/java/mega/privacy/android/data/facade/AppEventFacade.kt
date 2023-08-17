@@ -32,7 +32,6 @@ internal class AppEventFacade @Inject constructor(
     private val _fileAvailableOffline = MutableSharedFlow<Long>()
     private val logout = MutableSharedFlow<Boolean>()
     private val fetchNodesFinish = MutableSharedFlow<Boolean>()
-    private val accountUpdate = MutableSharedFlow<Boolean>()
     private val _transferFailed = MutableSharedFlow<Boolean>()
     private val transfersFinished = MutableSharedFlow<TransfersFinishedState>()
     private val pushNotificationSettingsUpdate = MutableSharedFlow<Boolean>()
@@ -115,10 +114,6 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorFetchNodesFinish() = fetchNodesFinish.asSharedFlow()
 
     override suspend fun broadcastFetchNodesFinish() = fetchNodesFinish.emit(true)
-
-    override fun monitorAccountUpdate() = accountUpdate.asSharedFlow()
-
-    override suspend fun broadcastAccountUpdate() = accountUpdate.emit(true)
 
     override suspend fun broadcastPushNotificationSettings() =
         pushNotificationSettingsUpdate.emit(true)
