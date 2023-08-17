@@ -13,8 +13,6 @@ import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -29,16 +27,6 @@ class AppEventFacadeTest {
         underTest = AppEventFacade(
             appScope = coroutineScope
         )
-    }
-
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that broadcast upload pause state fires an event`(isPaused: Boolean) = runTest {
-        underTest.monitorPausedTransfers().test {
-            underTest.broadcastPausedTransfers(isPaused)
-            assertThat(expectMostRecentItem()).isEqualTo(isPaused)
-        }
     }
 
     @Test

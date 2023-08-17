@@ -12,5 +12,5 @@ class AreTransfersPausedUseCase @Inject constructor(
     /**
      * Are transfers paused (downloads and uploads)
      */
-    suspend operator fun invoke() = transferRepository.areTransfersPaused()
+    suspend operator fun invoke() = transferRepository.monitorPausedTransfers().value
 }

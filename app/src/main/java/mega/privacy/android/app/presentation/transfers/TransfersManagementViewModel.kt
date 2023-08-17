@@ -25,7 +25,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.transfer.BroadcastPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfer.IsCompletedTransfersEmptyUseCase
 import mega.privacy.android.domain.usecase.transfer.uploads.GetNumPendingUploadsUseCase
@@ -39,7 +38,6 @@ import javax.inject.Inject
  * @property getNumPendingTransfers                 [GetNumPendingTransfers]
  * @property isCompletedTransfersEmptyUseCase       [IsCompletedTransfersEmptyUseCase]
  * @property areAllTransfersPaused                  [AreAllTransfersPaused]
- * @property broadcastPausedTransfersUseCase               [BroadcastPausedTransfersUseCase]
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -49,7 +47,6 @@ class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingTransfers: GetNumPendingTransfers,
     private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
     private val areAllTransfersPaused: AreAllTransfersPaused,
-    private val broadcastPausedTransfersUseCase: BroadcastPausedTransfersUseCase,
     private val transfersInfoMapper: TransfersInfoMapper,
     private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -150,7 +147,6 @@ class TransfersManagementViewModel @Inject constructor(
             } else {
                 checkTransfersInfo(TransferType.NONE, false)
             }
-            broadcastPausedTransfersUseCase(paused)
         }
     }
 

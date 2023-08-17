@@ -1,14 +1,18 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
@@ -36,6 +40,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import nz.mega.sdk.MegaError
@@ -45,6 +50,7 @@ import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Default [TransferRepository] implementation.
@@ -56,9 +62,11 @@ import javax.inject.Inject
  * @param appEventGateway [AppEventGateway]
  * @param localStorageGateway [MegaLocalStorageGateway]
  */
+@Singleton
 internal class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationScope private val scope: CoroutineScope,
     private val transferEventMapper: TransferEventMapper,
     private val transferMapper: TransferMapper,
     private val transferAppDataStringMapper: TransferAppDataStringMapper,
@@ -69,6 +77,15 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val transferDataMapper: TransferDataMapper,
     private val cancelTokenProvider: CancelTokenProvider,
 ) : TransferRepository {
+
+    private val monitorPausedTransfers = MutableStateFlow(false)
+
+    init {
+        //update monitorPausedTransfer with current sdk value
+        scope.launch {
+            monitorPausedTransfers.emit(megaApiGateway.areUploadTransfersPaused() || megaApiGateway.areDownloadTransfersPaused())
+        }
+    }
 
     override fun startUpload(
         localPath: String,
@@ -210,10 +227,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.getCompletedTransfersCount() == 0
     }
 
-    override suspend fun areTransfersPaused(): Boolean = withContext(ioDispatcher) {
-        megaApiGateway.areUploadTransfersPaused() || megaApiGateway.areDownloadTransfersPaused()
-    }
-
     override suspend fun getNumPendingPausedUploads(): Int = withContext(ioDispatcher) {
         getUploadTransfers().count { transfer ->
             !transfer.isFinished && transfer.state == MegaTransfer.STATE_PAUSED
@@ -228,7 +241,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
 
     override suspend fun areAllTransfersPaused(): Boolean = withContext(ioDispatcher) {
-        areTransfersPaused() || getNumPendingPausedUploads() + getNumPendingNonBackgroundPausedDownloads() == getNumPendingTransfers()
+        monitorPausedTransfers.value || getNumPendingPausedUploads() + getNumPendingNonBackgroundPausedDownloads() == getNumPendingTransfers()
     }
 
     override fun monitorTransferEvents(): Flow<TransferEvent> =
@@ -325,11 +338,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.getTransfersByTag(transferTag)?.let { transferMapper(it) }
     }
 
-    override fun monitorPausedTransfers() = appEventGateway.monitorPausedTransfers()
-
-    override suspend fun broadcastPausedTransfers(isPaused: Boolean) = withContext(ioDispatcher) {
-        appEventGateway.broadcastPausedTransfers(isPaused)
-    }
+    override fun monitorPausedTransfers() = monitorPausedTransfers.asStateFlow()
 
     override suspend fun getInProgressTransfers(): List<Transfer> = withContext(ioDispatcher) {
         val transfers = mutableListOf<Transfer>()
@@ -440,6 +449,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
 
+        monitorPausedTransfers.emit(isPauseResponse)
         localStorageGateway.setTransferQueueStatus(isPauseResponse)
         return@withContext isPauseResponse
     }

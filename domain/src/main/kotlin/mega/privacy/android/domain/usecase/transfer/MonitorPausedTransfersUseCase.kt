@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfer
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
@@ -14,5 +15,5 @@ class MonitorPausedTransfersUseCase @Inject constructor(private val transferRepo
      *
      * @return Flow of Boolean. True if all transfers are paused, false if not.
      */
-    operator fun invoke() = transferRepository.monitorPausedTransfers()
+    operator fun invoke(): Flow<Boolean> = transferRepository.monitorPausedTransfers()
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -50,13 +51,6 @@ interface TransferRepository {
      * @return True if the completed transfers is empty, false otherwise.
      */
     suspend fun isCompletedTransfersEmpty(): Boolean
-
-    /**
-     * Are transfers paused (downloads and uploads)
-     *
-     * @return true if downloads and uploads are paused
-     */
-    suspend fun areTransfersPaused(): Boolean
 
     /**
      * Gets the number of pending and paused uploads.
@@ -189,14 +183,7 @@ interface TransferRepository {
     /**
      * Monitors paused transfers.
      */
-    fun monitorPausedTransfers(): Flow<Boolean>
-
-    /**
-     * Broadcasts paused transfers.
-     *
-     * @param isPaused true if all transfers are paused
-     */
-    suspend fun broadcastPausedTransfers(isPaused: Boolean)
+    fun monitorPausedTransfers(): StateFlow<Boolean>
 
     /**
      * Get in progress transfers

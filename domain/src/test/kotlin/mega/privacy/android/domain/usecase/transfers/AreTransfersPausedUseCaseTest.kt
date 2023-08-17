@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
@@ -41,7 +42,8 @@ class AreTransfersPausedUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that correct value is returned when invoked`(expected: Boolean) =
         runTest {
-            whenever(transferRepository.areTransfersPaused()).thenReturn(expected)
+            val flow = MutableStateFlow(expected)
+            whenever(transferRepository.monitorPausedTransfers()).thenReturn(flow)
             val actual = underTest()
             Truth.assertThat(actual).isEqualTo(expected)
         }

@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -69,22 +70,30 @@ class DefaultTransfersRepositoryTest {
     private val transferDataMapper = mock<TransferDataMapper>()
     private val cancelTokenProvider = mock<CancelTokenProvider>()
 
+    private val testScope = CoroutineScope(UnconfinedTestDispatcher())
+
     @BeforeAll
-    fun setUp() {
-        underTest = DefaultTransfersRepository(
-            megaApiGateway = megaApiGateway,
-            ioDispatcher = UnconfinedTestDispatcher(),
-            transferEventMapper = transferEventMapper,
-            appEventGateway = appEventGateway,
-            transferMapper = transferMapper,
-            transferAppDataStringMapper = transferAppDataStringMapper,
-            localStorageGateway = localStorageGateway,
-            workerManagerGateway = workerManagerGateway,
-            megaLocalRoomGateway = megaLocalRoomGateway,
-            transferDataMapper = transferDataMapper,
-            cancelTokenProvider = cancelTokenProvider,
-        )
+    fun setUp() = runTest {
+        //need to stub this methods as are called on init
+        whenever(megaApiGateway.areUploadTransfersPaused()).thenReturn(false)
+        whenever(megaApiGateway.areDownloadTransfersPaused()).thenReturn(false)
+        underTest = createDefaultTransfersRepository()
     }
+
+    private fun createDefaultTransfersRepository() = DefaultTransfersRepository(
+        megaApiGateway = megaApiGateway,
+        ioDispatcher = UnconfinedTestDispatcher(),
+        transferEventMapper = transferEventMapper,
+        appEventGateway = appEventGateway,
+        transferMapper = transferMapper,
+        transferAppDataStringMapper = transferAppDataStringMapper,
+        localStorageGateway = localStorageGateway,
+        workerManagerGateway = workerManagerGateway,
+        megaLocalRoomGateway = megaLocalRoomGateway,
+        transferDataMapper = transferDataMapper,
+        cancelTokenProvider = cancelTokenProvider,
+        scope = testScope,
+    )
 
     @BeforeEach
     fun resetMocks() {
@@ -601,21 +610,7 @@ class DefaultTransfersRepositoryTest {
     @ValueSource(booleans = [true, false])
     fun `test that pauseTransfers returns success when MegaApi returns API_OK`(isPause: Boolean) =
         runTest {
-            val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-            }
-
-            val megaRequest = mock<MegaRequest> {
-                on { flag }.thenReturn(isPause)
-            }
-
-            whenever(megaApiGateway.pauseTransfers(any(), any())).thenAnswer {
-                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError,
-                )
-            }
+            stubPauseTransfers(isPause)
 
             assertThat(underTest.pauseTransfers(isPause)).isEqualTo(isPause)
         }
@@ -726,6 +721,35 @@ class DefaultTransfersRepositoryTest {
             verify(megaLocalRoomGateway).deleteCompletedTransfer(any())
         }
 
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that monitor paused transfers initial value is set by megaApiGateway current value`(
+        expected: Boolean,
+    ) = runTest {
+        whenever(megaApiGateway.areUploadTransfersPaused()).thenReturn(expected)
+        whenever(megaApiGateway.areDownloadTransfersPaused()).thenReturn(expected)
+        //creating a new instance of DefaultTransfersRepository because monitorPausedTransfers is cached
+        val flow = createDefaultTransfersRepository().monitorPausedTransfers()
+        assertThat(flow.value).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that monitor paused transfers is updated when pauseTransfers is updated`(
+        expected: Boolean,
+    ) = runTest {
+        whenever(megaApiGateway.areUploadTransfersPaused()).thenReturn(!expected)
+        whenever(megaApiGateway.areDownloadTransfersPaused()).thenReturn(!expected)
+        stubPauseTransfers(expected)
+        //creating a new instance of DefaultTransfersRepository because monitorPausedTransfers is cached
+        val underTest = createDefaultTransfersRepository()
+        val flow = underTest.monitorPausedTransfers()
+        assertThat(flow.value).isEqualTo(!expected) //just to be sure the value will be updated after emitting a new value
+        underTest.pauseTransfers(expected)
+        assertThat(flow.value).isEqualTo(expected)
+    }
+
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class ActiveTransfersTest {
@@ -819,6 +843,24 @@ class DefaultTransfersRepositoryTest {
         fun `test that workerManagerGateway enqueueDownloadsWorkerRequest is called when startDownloadWorker is called`() {
             underTest.startDownloadWorker()
             verify(workerManagerGateway).enqueueDownloadsWorkerRequest()
+        }
+    }
+
+    private fun stubPauseTransfers(isPause: Boolean) {
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        val megaRequest = mock<MegaRequest> {
+            on { flag }.thenReturn(isPause)
+        }
+
+        whenever(megaApiGateway.pauseTransfers(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError,
+            )
         }
     }
 }
