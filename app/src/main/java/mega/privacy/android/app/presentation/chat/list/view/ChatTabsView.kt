@@ -53,6 +53,8 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  * Chat tabs view
  *
  * @param state             [ChatsTabState]
+ * @param managementState   [ScheduledMeetingManagementState]
+ * @param showMeetingTab    True to show Meeting tab as initial tab or false (default) otherwise
  * @param onTabSelected
  * @param onItemClick
  * @param onItemMoreClick
@@ -63,6 +65,7 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 fun ChatTabsView(
     state: ChatsTabState,
     managementState: ScheduledMeetingManagementState,
+    showMeetingTab: Boolean = false,
     onTabSelected: (ChatTab) -> Unit = {},
     onItemClick: (Long) -> Unit = {},
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
@@ -74,10 +77,11 @@ fun ChatTabsView(
     onStartChatClick: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
+    val initialPage = if (showMeetingTab) ChatTab.MEETINGS.ordinal else ChatTab.CHATS.ordinal
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(initialPage)
     var scrollToTop by remember { mutableStateOf(false) }
     var showFabButton by remember { mutableStateOf(true) }
     var filteredChats by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }

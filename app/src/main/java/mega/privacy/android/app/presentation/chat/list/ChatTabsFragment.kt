@@ -73,9 +73,21 @@ import javax.inject.Inject
 class ChatTabsFragment : Fragment() {
 
     companion object {
+        private const val EXTRA_SHOW_MEETING_TAB = "EXTRA_SHOW_MEETING_TAB"
+
+        /**
+         * Create a new instance of [ChatTabsFragment]
+         *
+         * @param showMeetingTab    Flag to show Meeting tab as initial tab
+         * @return                  New instance of [ChatTabsFragment]
+         */
         @JvmStatic
-        fun newInstance(): ChatTabsFragment =
-            ChatTabsFragment()
+        fun newInstance(showMeetingTab: Boolean): ChatTabsFragment =
+            ChatTabsFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(EXTRA_SHOW_MEETING_TAB, showMeetingTab)
+                }
+            }
     }
 
     @Inject
@@ -83,6 +95,10 @@ class ChatTabsFragment : Fragment() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
+
+    private val showMeetingTab by lazy {
+        arguments?.getBoolean(EXTRA_SHOW_MEETING_TAB, false) ?: false
+    }
 
     private var actionMode: ActionMode? = null
     private var currentTab: ChatTab = ChatTab.CHATS
@@ -129,6 +145,7 @@ class ChatTabsFragment : Fragment() {
                     ChatTabsView(
                         state = chatsTabState,
                         managementState = managementState,
+                        showMeetingTab = showMeetingTab,
                         onTabSelected = ::onTabSelected,
                         onItemClick = ::onItemClick,
                         onItemMoreClick = ::onItemMoreClick,

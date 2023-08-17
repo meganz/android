@@ -85,7 +85,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -3432,11 +3431,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         closeDrawer()
     }
 
-    private fun selectDrawerItemChat() {
+    /**
+     * Select the chat drawer item
+     *
+     * @param chatId    If the chat drawer item is selected when opening a chat room, it is possible
+     *                  to pass here the chat ID to determine whether it is a chat or a meeting and
+     *                  select the corresponding tab as the initial tab.
+     */
+    private fun selectDrawerItemChat(chatId: Long? = null) {
         setToolbarTitle()
         chatTabsFragment = chatsFragment
         if (chatTabsFragment == null) {
-            chatTabsFragment = ChatTabsFragment.newInstance()
+            var showMeetingTab = false
+            chatId?.let {
+                megaChatApi.getChatRoom(it)?.let { chatRoom ->
+                    showMeetingTab = chatRoom.isMeeting
+                }
+            }
+            chatTabsFragment = ChatTabsFragment.newInstance(showMeetingTab = showMeetingTab)
         } else {
             refreshFragment(FragmentTag.RECENT_CHAT.tag)
         }
@@ -3617,9 +3629,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
+    /**
+     * Select a drawer item
+     *
+     * @param item      [DrawerItem] to select
+     * @param chatId    If the drawer item is the chat drawer item and it is selected when opening a
+     *                  chat room, it is possible to pass here the chat ID to determine whether it
+     *                  is a chat or a meeting and select the corresponding tab as the initial tab.
+     */
     @SuppressLint("NewApi")
     @JvmOverloads
-    fun selectDrawerItem(item: DrawerItem?) {
+    fun selectDrawerItem(item: DrawerItem?, chatId: Long? = null) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
             Timber.d("ManagerActivity doesn't call setContentView")
@@ -3824,7 +3844,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.CHAT -> {
                 Timber.d("Chat selected")
-                selectDrawerItemChat()
+                selectDrawerItemChat(chatId)
                 supportInvalidateOptionsMenu()
                 showHideBottomNavigationView(false)
                 if (!comesFromNotifications) {
@@ -4105,7 +4125,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             this.startActivity(chatIntent)
         }
         drawerItem = DrawerItem.CHAT
-        selectDrawerItem(drawerItem)
+        selectDrawerItem(drawerItem, chatId)
     }
 
     /**
