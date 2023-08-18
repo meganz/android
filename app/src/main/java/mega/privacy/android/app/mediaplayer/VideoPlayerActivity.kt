@@ -226,6 +226,8 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
+        videoViewModel.updateScreenOrientationState(configuration.orientation)
+
         createPlayer()
         setupToolbar()
         setupNavDestListener()
@@ -275,6 +277,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                     handle: String?,
                     isUpdateName: Boolean,
                 ) {
+                    videoViewModel.setCurrentPlayingVideoSize(null)
                     handle?.let {
                         setCurrentPlayingHandle(it.toLong())
                         lifecycleScope.launch {
@@ -370,6 +373,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
+                    videoViewModel.setCurrentPlayingVideoSize(videoWidth to videoHeight)
                     requestOrientationUpdate.value = Pair(videoWidth, videoHeight)
                 }
             }

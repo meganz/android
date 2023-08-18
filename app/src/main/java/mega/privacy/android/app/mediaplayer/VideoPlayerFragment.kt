@@ -45,6 +45,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
+import mega.privacy.android.app.utils.getScreenHeight
+import mega.privacy.android.app.utils.getScreenWidth
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import org.jetbrains.anko.configuration
@@ -341,7 +343,6 @@ class VideoPlayerFragment : Fragment() {
                         "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
                     viewHolder.binding.playerView.videoSurfaceView?.let { view ->
                         viewModel.screenshotWhenVideoPlaying(
-                            captureAreaView = requireActivity().window.decorView,
                             rootFolderPath = screenshotsFolderPath,
                             captureView = view
                         ) { bitmap ->
@@ -375,19 +376,46 @@ class VideoPlayerFragment : Fragment() {
         if (!layout.isVisible()) {
             layout.isVisible = true
         }
-        view.setImageBitmap(bitmap)
-        val scaleY =
-            if (requireActivity().configuration.orientation == ORIENTATION_LANDSCAPE) {
-                SCREENSHOT_SCALE_LANDSCAPE
+        val screenWidth = requireActivity().getScreenWidth()
+        val screenHeight = requireActivity().getScreenHeight()
+        val currentOrientation = activity?.configuration?.orientation
+
+        // Re-compute the size based on screen size
+        val (width, height) = if (currentOrientation == ORIENTATION_LANDSCAPE
+            && bitmap.height > bitmap.width
+        ) {
+            (screenHeight * bitmap.width / bitmap.height) to screenHeight
+        } else {
+            screenWidth to (screenWidth * bitmap.height / bitmap.width)
+        }
+        // Resize the bitmap based on the screen size to avoid the bitmap size being greater than the screen size
+        val resizeBitmap = Bitmap.createScaledBitmap(bitmap, width, height, false)
+        view.setImageBitmap(resizeBitmap)
+
+        val scaleY = if (currentOrientation == ORIENTATION_LANDSCAPE) {
+            SCREENSHOT_SCALE_LANDSCAPE
+        } else {
+            SCREENSHOT_SCALE_PORTRAIT
+        }
+        // If the width of the screenshot is too small when the orientation is landscape,
+        // use 0.7 for  the value of "relateX" to avoid the screenshot animation cannot be displayed as completed
+        val relateX =
+            if (currentOrientation == ORIENTATION_LANDSCAPE && width * scaleY / screenWidth < 0.15) {
+                SCREENSHOT_RELATE_X_70
             } else {
-                SCREENSHOT_SCALE_PORTRAIT
+                SCREENSHOT_RELATE_X_90
             }
+
         val anim: Animation = ScaleAnimation(
-            SCREENSHOT_SCALE_ORIGINAL, scaleY,  // Start and end values for the X axis scaling
-            SCREENSHOT_SCALE_ORIGINAL, scaleY,  // Start and end values for the Y axis scaling
-            Animation.RELATIVE_TO_SELF, SCREENSHOT_RELATE_X,  // Pivot point of X scaling
-            Animation.RELATIVE_TO_PARENT, SCREENSHOT_RELATE_Y
-        ) // Pivot point of Y scaling
+            SCREENSHOT_SCALE_ORIGINAL,
+            scaleY,  // Start and end values for the X axis scaling
+            SCREENSHOT_SCALE_ORIGINAL,
+            scaleY,  // Start and end values for the Y axis scaling
+            Animation.RELATIVE_TO_PARENT,
+            relateX,  // Pivot point of X scaling
+            Animation.RELATIVE_TO_PARENT,
+            SCREENSHOT_RELATE_Y // Pivot point of Y scaling
+        )
 
         anim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(p0: Animation?) {
@@ -399,6 +427,7 @@ class VideoPlayerFragment : Fragment() {
                     layout.isVisible = false
                     layout.clearAnimation()
                     bitmap.recycle()
+                    resizeBitmap.recycle()
                 }, SCREENSHOT_DURATION)
             }
 
@@ -706,8 +735,9 @@ class VideoPlayerFragment : Fragment() {
         private const val SCREENSHOT_SCALE_ORIGINAL: Float = 1F
         private const val SCREENSHOT_SCALE_PORTRAIT: Float = 0.4F
         private const val SCREENSHOT_SCALE_LANDSCAPE: Float = 0.3F
-        private const val SCREENSHOT_RELATE_X: Float = 0.9F
-        private const val SCREENSHOT_RELATE_Y: Float = 0.6F
+        private const val SCREENSHOT_RELATE_X_70: Float = 0.7F
+        private const val SCREENSHOT_RELATE_X_90: Float = 0.9F
+        private const val SCREENSHOT_RELATE_Y: Float = 0.75F
         private const val ANIMATION_DURATION: Long = 500
         private const val SCREENSHOT_DURATION: Long = 500
 

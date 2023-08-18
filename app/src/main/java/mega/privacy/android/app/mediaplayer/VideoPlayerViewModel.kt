@@ -303,6 +303,8 @@ class VideoPlayerViewModel @Inject constructor(
     internal val videoPlayerPausedForPlaylistKey = "VIDEO_PLAYER_PAUSED_FOR_PLAYLIST"
     internal val currentSubtitleFileInfoKey = "CURRENT_SUBTITLE_FILE_INFO"
 
+    private var currentPlayingVideoSize: Pair<Int, Int>? = null
+
     private val _isSubtitleDialogShown = savedStateHandle.getStateFlow(
         viewModelScope,
         subtitleDialogShowKey,
@@ -343,6 +345,11 @@ class VideoPlayerViewModel @Inject constructor(
             }
         }
         setupTransferListener()
+    }
+
+    internal fun setCurrentPlayingVideoSize(videoSize: Pair<Int, Int>?) {
+        Timber.d("screenshotWhenVideoPlaying videoSize ${videoSize?.first} : ${videoSize?.second}")
+        currentPlayingVideoSize = videoSize
     }
 
     /**
@@ -536,7 +543,6 @@ class VideoPlayerViewModel @Inject constructor(
     /**
      * Capture the screenshot when video playing
      *
-     * @param captureAreaView the view that capture area
      * @param rootFolderPath the root folder path of screenshots
      * @param captureView the view that will be captured
      * @param successCallback the callback after the screenshot is saved successfully
@@ -544,7 +550,6 @@ class VideoPlayerViewModel @Inject constructor(
      */
     @SuppressLint("SimpleDateFormat")
     internal fun screenshotWhenVideoPlaying(
-        captureAreaView: View,
         rootFolderPath: String,
         captureView: View,
         successCallback: (bitmap: Bitmap) -> Unit,
@@ -558,16 +563,20 @@ class VideoPlayerViewModel @Inject constructor(
             SimpleDateFormat(DATE_FORMAT_PATTERN).format(Date(System.currentTimeMillis()))
         val filePath =
             "$rootFolderPath${SCREENSHOT_NAME_PREFIX}$screenshotFileName${SCREENSHOT_NAME_SUFFIX}"
+        // Using video size for the capture size to ensure the screenshot is complete.
+        val (captureWidth, captureHeight) = currentPlayingVideoSize?.let { (width, height) ->
+            width to height
+        } ?: (captureView.width to captureView.height)
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val screenshotBitmap = Bitmap.createBitmap(
-                    captureView.width,
-                    captureView.height,
+                    captureWidth,
+                    captureHeight,
                     Bitmap.Config.ARGB_8888
                 )
                 PixelCopy.request(
                     captureView as SurfaceView,
-                    Rect(0, 0, captureAreaView.width, captureAreaView.height),
+                    Rect(0, 0, captureWidth, captureHeight),
                     screenshotBitmap,
                     { copyResult ->
                         if (copyResult == PixelCopy.SUCCESS) {
