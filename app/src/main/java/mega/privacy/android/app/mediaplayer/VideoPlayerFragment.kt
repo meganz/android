@@ -149,7 +149,7 @@ class VideoPlayerFragment : Fragment() {
             mediaPlayerGateway.setPlayWhenReady(true)
         }
 
-        videoPlayerActivity?.setDraggable(true)
+        videoPlayerActivity?.setDraggable(!viewModel.screenLockState.value)
     }
 
     override fun onPause() {

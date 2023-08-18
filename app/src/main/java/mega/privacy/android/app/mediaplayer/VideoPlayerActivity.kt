@@ -674,6 +674,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         with(videoViewModel) {
             collectFlow(screenLockState) { isLock ->
                 updateToolbar(isLock)
+                setDraggable(!isLock)
             }
 
             collectFlow(
