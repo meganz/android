@@ -15,6 +15,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables prefetch timeline photos as soon initialization screen completed
+     */
+    PrefetchTimeline(
+        "Enables prefetch timeline photos as soon initialization screen completed",
+        false,
+    ),
+
+    /**
      * Enables the new compose passcode backend implementation
      */
     PasscodeBackend(

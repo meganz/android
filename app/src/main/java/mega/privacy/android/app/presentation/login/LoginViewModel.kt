@@ -71,6 +71,7 @@ import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
@@ -113,6 +114,7 @@ class LoginViewModel @Inject constructor(
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
+    private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -721,6 +723,8 @@ class LoginViewModel @Inject constructor(
         runCatching {
             fetchNodesUseCase().collectLatest { update ->
                 if (update.progress?.floatValue == 1F) {
+                    prefetchTimeline()
+
                     MegaApplication.isLoggingIn = false
                     _state.update {
                         it.copy(
@@ -749,6 +753,11 @@ class LoginViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private suspend fun prefetchTimeline() {
+        if (!getFeatureFlagValueUseCase(AppFeatures.PrefetchTimeline)) return
+        getTimelinePhotosUseCase()
     }
 
     /**

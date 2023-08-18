@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
@@ -99,6 +100,7 @@ internal class LoginViewModelTest {
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase = mock()
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
+    private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -131,7 +133,8 @@ internal class LoginViewModelTest {
             monitorEphemeralCredentialsUseCase = monitorEphemeralCredentialsUseCase,
             saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
-            monitorAccountBlockedUseCase = monitorAccountBlockedUseCase
+            monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
+            getTimelinePhotosUseCase = getTimelinePhotosUseCase,
         )
     }
 
