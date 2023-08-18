@@ -6924,6 +6924,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         notificationsSectionText.alpha = 0.38f
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
         rubbishBinSection.isEnabled = false
+        syncSection.isEnabled = false
+        syncSection.findViewById<TextView>(R.id.sync_section_text).alpha = 0.38f
         rubbishBinSection.findViewById<TextView>(R.id.rubbish_bin_section_text).alpha =
             0.38f
         upgradeAccount.isEnabled = false
@@ -6972,6 +6974,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         rubbishBinSection.isEnabled = true
         rubbishBinSection.findViewById<TextView>(R.id.rubbish_bin_section_text).alpha =
             1f
+        syncSection.isEnabled = true
+        syncSection.findViewById<TextView>(R.id.sync_section_text).alpha = 1f
         upgradeAccount.isEnabled = true
     }
 
