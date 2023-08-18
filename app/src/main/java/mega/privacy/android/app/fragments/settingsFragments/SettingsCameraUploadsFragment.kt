@@ -124,6 +124,12 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var megaPathSecMediaFolder = ""
     private var isExternalSDCardMU = false
 
+    /**
+     * Flag that control the start of the Camera Uploads when the user leaves the screen [onPause]
+     * to avoid unwanted trigger when the user goes to the folder picker for choosing primary and secondary local folder
+     */
+    private var canStartCameraUploads = true
+
     private val viewModel by viewModels<SettingsCameraUploadsViewModel>()
 
     /**
@@ -185,12 +191,21 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
+     * Re-enable the flag that allows the start of the Camera Uploads when leaving the screen
+     */
+    override fun onResume() {
+        super.onResume()
+        canStartCameraUploads = true
+    }
+
+    /**
      * In onPause(), the Worker to start Camera Uploads will be fired if the user enables
      * the feature
      */
     override fun onPause() {
         Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()")
-        viewModel.startCameraUpload()
+        if (canStartCameraUploads)
+            viewModel.startCameraUpload()
 
         super.onPause()
     }
@@ -337,6 +352,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             }
 
             KEY_CAMERA_UPLOAD_CAMERA_FOLDER -> {
+                canStartCameraUploads = false
                 intent = Intent(context, FileStorageActivity::class.java).apply {
                     action = FileStorageActivity.Mode.PICK_FOLDER.action
                     putExtra(
@@ -349,6 +365,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
             KEY_CAMERA_UPLOAD_MEGA_FOLDER -> {
                 if (viewModel.isConnected.not()) return false
+                canStartCameraUploads = false
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
                     action = FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC
                 }
@@ -951,7 +968,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun handleBusinessAccountSuspendedPrompt(showPrompt: Boolean) {
         if (showPrompt) {
-            requireContext().sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(requireContext().applicationContext.packageName))
+            requireContext().sendBroadcast(
+                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
+                    requireContext().applicationContext.packageName
+                )
+            )
             // After sending the broadcast, reset the Business Account suspended prompt state
             viewModel.resetBusinessAccountSuspendedPromptState()
         }
@@ -1177,7 +1198,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Refresh the Camera Uploads service settings depending on the service status
      */
-    fun refreshCameraUploadsSettings() {
+    private fun refreshCameraUploadsSettings() {
         var cuEnabled = false
         prefs = dbH.preferences
         if (prefs != null) {
@@ -1224,7 +1245,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * This method is to do the setting process and UI related process.
      * It also cancels all Camera Uploads and Heartbeat workers.
      */
-    fun disableCameraUploads() {
+    private fun disableCameraUploads() {
         viewModel.stopCameraUploads()
         disableCameraUploadUIProcess()
     }
@@ -1308,7 +1329,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Show Reset Compression Queue Size Dialog
      */
     @Suppress("DEPRECATION")
-    fun showResetCompressionQueueSizeDialog() {
+    private fun showResetCompressionQueueSizeDialog() {
         val display = requireActivity().windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
         display?.getMetrics(outMetrics)
