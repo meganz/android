@@ -501,4 +501,12 @@ interface NodeRepository {
      * @param longitude Longitude in signed decimal degrees notation
      */
     suspend fun setNodeCoordinates(nodeId: NodeId, latitude: Double, longitude: Double)
+
+    /**
+     * Get parent user email from any folder from incoming shares
+     *
+     * @param nodeId node handle from which we need to get the user email who shared the folder
+     * @return null if the node is not found
+     */
+    suspend fun getIncomingShareParentUserEmail(nodeId: NodeId): String?
 }

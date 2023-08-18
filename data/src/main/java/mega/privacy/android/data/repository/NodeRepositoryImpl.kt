@@ -700,4 +700,11 @@ internal class NodeRepositoryImpl @Inject constructor(
             requireNotNull(node) { "Node to disable export with handle ${nodeId.longValue} not found" }
             megaApiGateway.setNodeCoordinates(node, latitude, longitude)
         }
+
+    override suspend fun getIncomingShareParentUserEmail(nodeId: NodeId) =
+        withContext(ioDispatcher) {
+            return@withContext megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+                megaApiGateway.getUserFromInShare(it, true)?.email
+            }
+        }
 }
