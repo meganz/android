@@ -1,17 +1,14 @@
 package mega.privacy.android.data.repository.thumbnailpreview
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.extensions.encodeBase64
-import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getThumbnailFileName
-import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -20,7 +17,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -30,20 +26,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
 ) : ThumbnailPreviewRepository {
-
-    private var thumbnailFolderPath: String? = null
-
-    private var previewFolderPath: String? = null
-
-    init {
-        runBlocking(ioDispatcher) {
-            thumbnailFolderPath =
-                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
-            previewFolderPath =
-                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
-        }
-    }
-
 
     override suspend fun getThumbnailFromLocal(handle: Long): File? =
         withContext(ioDispatcher) {
@@ -74,17 +56,11 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             megaApi.getMegaNodeByHandle(handle)?.let { node ->
                 getThumbnailFile(node)?.let { thumbnail ->
                     suspendCancellableCoroutine { continuation ->
-                        megaApi.getThumbnail(node, thumbnail.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _, error ->
-                                    if (error.errorCode == MegaError.API_OK) {
-                                        continuation.resumeWith(Result.success(thumbnail))
-                                    } else {
-                                        continuation.failWithError(error, "getThumbnailFromServer")
-                                    }
-                                }
-                            )
-                        )
+                        val listener = continuation.getRequestListener("getThumbnailFromServer") {
+                            thumbnail
+                        }
+                        megaApi.getThumbnail(node, thumbnail.absolutePath, listener)
+                        continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
                     }
                 }
             }
@@ -95,21 +71,14 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             megaApiFolder.getMegaNodeByHandle(handle)?.let { node ->
                 getThumbnailFile(node)?.let { thumbnail ->
                     suspendCancellableCoroutine { continuation ->
-                        megaApiFolder.getThumbnail(node, thumbnail.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _, error ->
-                                    if (error.errorCode == MegaError.API_OK) {
-                                        continuation.resumeWith(Result.success(thumbnail))
-                                    } else {
-                                        Timber.e(error.toException("getPublicNodeThumbnailFromServer"))
-                                        continuation.failWithError(
-                                            error,
-                                            "getPublicNodeThumbnailFromServer"
-                                        )
-                                    }
-                                }
-                            )
-                        )
+                        val listener =
+                            continuation.getRequestListener("getPublicNodeThumbnailFromServer") {
+                                thumbnail
+                            }
+                        megaApiFolder.getThumbnail(node, thumbnail.absolutePath, listener)
+                        continuation.invokeOnCancellation {
+                            megaApiFolder.removeRequestListener(listener)
+                        }
                     }
                 }
             }
@@ -136,17 +105,11 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             megaApi.getMegaNodeByHandle(handle)?.let { node ->
                 getPreviewFile(node)?.let { preview ->
                     suspendCancellableCoroutine { continuation ->
-                        megaApi.getPreview(node, preview.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _, error ->
-                                    if (error.errorCode == MegaError.API_OK) {
-                                        continuation.resumeWith(Result.success(preview))
-                                    } else {
-                                        continuation.failWithError(error, "getPreviewFromServer")
-                                    }
-                                }
-                            )
-                        )
+                        val listener = continuation.getRequestListener("getPreviewFromServer") {
+                            preview
+                        }
+                        megaApi.getPreview(node, preview.absolutePath, listener)
+                        continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
                     }
                 }
             }
@@ -157,12 +120,15 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         callback: (success: Boolean) -> Unit,
     ) = withContext(ioDispatcher) {
         val node = megaApi.getMegaNodeByHandle(handle)
+        val thumbnailFolderPath =
+            cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
+
         if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
             callback(false)
         } else {
             megaApi.getThumbnail(
                 node,
-                getThumbnailPath(thumbnailFolderPath ?: return@withContext, node),
+                getThumbnailPath(thumbnailFolderPath, node),
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _, error ->
                         callback(error.errorCode == MegaError.API_OK)
@@ -177,12 +143,15 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         callback: (success: Boolean) -> Unit,
     ) = withContext(ioDispatcher) {
         val node = megaApi.getMegaNodeByHandle(handle)
+        val previewFolderPath =
+            cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
+
         if (node == null || previewFolderPath == null || !node.hasPreview()) {
             callback(false)
         } else {
             megaApi.getPreview(
                 node,
-                getPreviewPath(previewFolderPath ?: return@withContext, node),
+                getPreviewPath(previewFolderPath, node),
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _, error ->
                         callback(error.errorCode == MegaError.API_OK)
@@ -196,7 +165,9 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         handle: Long,
     ): Boolean = withContext(ioDispatcher) {
         val node = megaApiFolder.getMegaNodeByHandle(handle)
-        val thumbnailFolderPath = thumbnailFolderPath
+        val thumbnailFolderPath =
+            cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
+
         if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
             return@withContext false
         } else {
@@ -219,7 +190,9 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         handle: Long,
     ): Boolean = withContext(ioDispatcher) {
         val node = megaApiFolder.getMegaNodeByHandle(handle)
-        val previewFolderPath = previewFolderPath
+        val previewFolderPath =
+            cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
+
         if (node == null || previewFolderPath == null || !node.hasPreview()) {
             return@withContext false
         } else {
@@ -313,7 +286,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             megaApi.getMegaNodeByHandle(nodeHandle)?.let {
                 suspendCancellableCoroutine { continuation ->
-                    val listener = continuation.getRequestListener("setThumbnail") {}
+                    val listener = continuation.getRequestListener("setPreview") {}
                     megaApi.setThumbnail(it, srcFilePath, listener)
                     continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
                 }

@@ -24,7 +24,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -39,9 +38,11 @@ class ThumbnailPreviewRepositoryImplTest {
     private val cacheGateway = mock<CacheGateway>()
 
     private val cacheDir = File("cache")
-
-    val nodeHandle = 123L
-    val path = "/test/path"
+    private val thumbnailName = "thumbnailName"
+    private val thumbnailPath =
+        "${cacheDir.path}/${CacheFolderConstant.THUMBNAIL_FOLDER}/$thumbnailName"
+    private val thumbnailFile = File(thumbnailPath)
+    private val nodeHandle = 123L
     private val megaNode = mock<MegaNode>()
 
     @BeforeAll
@@ -62,14 +63,9 @@ class ThumbnailPreviewRepositoryImplTest {
     @Test
     fun `test that get thumbnail from server returns successfully if no error is thrown`() {
         runTest {
-            val thumbnailName = "test"
-            val expectedPath =
-                "${cacheDir.path}/${CacheFolderConstant.THUMBNAIL_FOLDER}/$thumbnailName"
-            val thumbnail = File(expectedPath)
-
             whenever(megaNode.base64Handle).thenReturn(thumbnailName)
-            whenever(megaApi.getMegaNodeByHandle(any())).thenReturn(megaNode)
-            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
+            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnailFile)
 
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest>()
@@ -85,22 +81,17 @@ class ThumbnailPreviewRepositoryImplTest {
                 )
             }
 
-            val actual = underTest.getThumbnailFromServer(1L)
-            assertThat(actual?.path).isEqualTo(expectedPath)
+            val actual = underTest.getThumbnailFromServer(nodeHandle)
+            assertThat(actual?.path).isEqualTo(thumbnailPath)
         }
     }
 
     @Test
-    fun `test that get thumbnail from server returns doesn't successfully`() {
+    fun `test that get thumbnail from server doesn't returns successfully`() {
         runTest {
-            val thumbnailName = "test"
-            val expectedPath =
-                "${cacheDir.path}/${CacheFolderConstant.THUMBNAIL_FOLDER}/$thumbnailName"
-            val thumbnail = File(expectedPath)
-
             whenever(megaNode.base64Handle).thenReturn(thumbnailName)
-            whenever(megaApi.getMegaNodeByHandle(any())).thenReturn(megaNode)
-            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
+            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnailFile)
 
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest>()
@@ -116,7 +107,7 @@ class ThumbnailPreviewRepositoryImplTest {
                 )
             }
             assertThrows<MegaException> {
-                underTest.getThumbnailFromServer(1L)
+                underTest.getThumbnailFromServer(nodeHandle)
             }
         }
     }
@@ -124,14 +115,9 @@ class ThumbnailPreviewRepositoryImplTest {
     @Test
     fun `test that get public node thumbnail from server returns successfully if no error is thrown`() {
         runTest {
-            val thumbnailName = "test"
-            val expectedPath =
-                "${cacheDir.path}/${CacheFolderConstant.THUMBNAIL_FOLDER}/$thumbnailName"
-            val thumbnail = File(expectedPath)
-
             whenever(megaNode.base64Handle).thenReturn(thumbnailName)
-            whenever(megaApiFolder.getMegaNodeByHandle(any())).thenReturn(megaNode)
-            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
+            whenever(megaApiFolder.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
+            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnailFile)
 
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest>()
@@ -147,22 +133,17 @@ class ThumbnailPreviewRepositoryImplTest {
                 )
             }
 
-            val actual = underTest.getPublicNodeThumbnailFromServer(1L)
-            assertThat(actual?.path).isEqualTo(expectedPath)
+            val actual = underTest.getPublicNodeThumbnailFromServer(nodeHandle)
+            assertThat(actual?.path).isEqualTo(thumbnailPath)
         }
     }
 
     @Test
     fun `test that get public node thumbnail from server returns doesn't successfully`() {
         runTest {
-            val thumbnailName = "test"
-            val expectedPath =
-                "${cacheDir.path}/${CacheFolderConstant.THUMBNAIL_FOLDER}/$thumbnailName"
-            val thumbnail = File(expectedPath)
-
             whenever(megaNode.base64Handle).thenReturn(thumbnailName)
-            whenever(megaApiFolder.getMegaNodeByHandle(any())).thenReturn(megaNode)
-            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
+            whenever(megaApiFolder.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
+            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnailFile)
 
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest>()
@@ -178,7 +159,7 @@ class ThumbnailPreviewRepositoryImplTest {
                 )
             }
             assertThrows<MegaException> {
-                underTest.getPublicNodeThumbnailFromServer(1L)
+                underTest.getPublicNodeThumbnailFromServer(nodeHandle)
             }
         }
     }
@@ -189,7 +170,7 @@ class ThumbnailPreviewRepositoryImplTest {
             whenever(megaApiFolder.getMegaNodeByHandle(any())).thenReturn(megaNode)
             whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(null)
 
-            val actual = underTest.getPublicNodeThumbnailFromLocal(1L)
+            val actual = underTest.getPublicNodeThumbnailFromLocal(nodeHandle)
             assertThat(actual?.path).isEqualTo(null)
         }
     }
@@ -197,7 +178,6 @@ class ThumbnailPreviewRepositoryImplTest {
     @Test
     fun `test that get public node thumbnail from local returns successfully if no error is thrown`() {
         runTest {
-            val thumbnailName = "test"
             val expectedPath =
                 "${cacheDir.path}/${CacheFolderConstant.THUMBNAIL_FOLDER}/$thumbnailName"
             val thumbnail: File = mock()
@@ -208,7 +188,7 @@ class ThumbnailPreviewRepositoryImplTest {
             whenever(megaApiFolder.getMegaNodeByHandle(any())).thenReturn(megaNode)
             whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
 
-            val actual = underTest.getPublicNodeThumbnailFromLocal(1L)
+            val actual = underTest.getPublicNodeThumbnailFromLocal(nodeHandle)
             assertThat(actual?.path).isEqualTo(expectedPath)
         }
     }
