@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.imageviewer
 
 import android.content.Context
+import android.content.res.Resources
 import com.google.common.truth.Truth
 import com.jraska.livedata.test
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.DisableExportUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterAll
@@ -56,7 +58,7 @@ internal class ImageViewerViewModelTest {
     private lateinit var isUserLoggedIn: IsUserLoggedIn
     private lateinit var getGlobalChangesUseCase: GetGlobalChangesUseCase
     private lateinit var context: Context
-    private lateinit var getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase
+    private lateinit var disableExportUseCase: DisableExportUseCase
 
     @BeforeAll
     fun initialise() {
@@ -74,6 +76,7 @@ internal class ImageViewerViewModelTest {
         checkNameCollisionUseCase = mock()
         legacyCopyNodeUseCase = mock()
         getNodeByHandle = mock()
+        disableExportUseCase = mock()
         whenever(getGlobalChangesUseCase.get()).thenAnswer {
             Flowable.just(
                 GetGlobalChangesUseCase.Result.OnNodesUpdate(
@@ -93,7 +96,8 @@ internal class ImageViewerViewModelTest {
             getImageHandlesUseCase = mock(),
             getGlobalChangesUseCase = getGlobalChangesUseCase,
             getNodeUseCase = mock(),
-            legacyExportNodeUseCase = mock(),
+            exportNodeUseCase = mock(),
+            disableExportUseCase = disableExportUseCase,
             cancelTransferByTagUseCase = mock(),
             isUserLoggedInUseCase = isUserLoggedIn,
             deleteChatMessageUseCase = mock(),
@@ -292,5 +296,28 @@ internal class ImageViewerViewModelTest {
             )
             advanceUntilIdle()
             underTest.onCopyMoveException().test().assertValue(runtimeException)
+        }
+
+    @Test
+    internal fun `test that link removed snack bar is shown when removeLink is called and operation is success`() =
+        runTest {
+            val nodeHandle = 1L
+            val expectedMessage = "Link removed"
+            whenever(isUserLoggedIn.invoke()).thenReturn(true)
+            whenever(context.resources).thenReturn(mock())
+            whenever(
+                context.resources.getQuantityString(
+                    R.plurals.context_link_removal_success,
+                    1
+                )
+            ).thenReturn(expectedMessage)
+            whenever(disableExportUseCase(NodeId(nodeHandle))).thenReturn(Unit)
+            underTest.removeLink(
+                nodeHandle
+            )
+            advanceUntilIdle()
+            underTest.onSnackBarMessage().observeOnce {
+                Truth.assertThat(it).isEqualTo(expectedMessage)
+            }
         }
 }

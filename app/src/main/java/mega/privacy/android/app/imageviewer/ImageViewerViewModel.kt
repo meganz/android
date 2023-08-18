@@ -29,7 +29,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.getLink.useCase.LegacyExportNodeUseCase
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -69,6 +68,8 @@ import mega.privacy.android.domain.usecase.imageviewer.GetImageByOfflineNodeHand
 import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.DisableExportUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
@@ -97,7 +98,6 @@ import javax.inject.Inject
  * @property copyNodeUseCase            Needed to copy image node on demand
  * @property moveNodeUseCase            Needed to move image node on demand
  * @property removeNodeUseCase          Needed to remove image node on demand
- * @property legacyExportNodeUseCase    Needed to export image node on demand
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property isUserLoggedInUseCase      UseCase required to check when the user is already logged in
  * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
@@ -120,7 +120,8 @@ class ImageViewerViewModel @Inject constructor(
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val legacyExportNodeUseCase: LegacyExportNodeUseCase,
+    private val exportNodeUseCase: ExportNodeUseCase,
+    private val disableExportUseCase: DisableExportUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val isUserLoggedInUseCase: IsUserLoggedIn,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
@@ -661,11 +662,16 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun removeLink(nodeHandle: Long) {
-        legacyExportNodeUseCase.disableExport(nodeHandle)
-            .subscribeAndComplete {
+        viewModelScope.launch {
+            runCatching {
+                disableExportUseCase(NodeId(nodeHandle))
+            }.onSuccess {
                 snackBarMessage.value =
                     context.resources.getQuantityString(R.plurals.context_link_removal_success, 1)
+            }.onFailure {
+                Timber.e(it)
             }
+        }
     }
 
     fun removeChatMessage(nodeHandle: Long) {
@@ -681,21 +687,16 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
+    val result = MutableLiveData<String?>()
     fun exportNode(node: MegaNode): LiveData<String?> {
-        val result = MutableLiveData<String?>()
-        legacyExportNodeUseCase.export(node)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { link ->
-                    result.value = link
-                },
-                onError = { error ->
-                    Timber.e(error)
-                    result.value = null
-                }
-            )
-            .addTo(composite)
+        viewModelScope.launch {
+            runCatching { exportNodeUseCase(NodeId(node.handle)) }.onSuccess { link ->
+                result.value = link
+            }.onFailure { error ->
+                Timber.e(error)
+                result.value = null
+            }
+        }
         return result
     }
 

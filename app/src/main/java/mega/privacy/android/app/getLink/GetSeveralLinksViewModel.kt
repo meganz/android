@@ -3,22 +3,24 @@ package mega.privacy.android.app.getLink
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.data.LinkItem
-import mega.privacy.android.app.getLink.useCase.LegacyExportNodeUseCase
 import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -30,13 +32,13 @@ import javax.inject.Inject
  * Its shared with its activity [GetLinkActivity].
  *
  * @property megaApi                    MegaApiAndroid instance to use.
- * @property legacyExportNodeUseCase    Use case to export nodes.
+ * @property exportNodesUseCase         Use case to export nodes.
  * @property getThumbnailUseCase        Use case to request thumbnails.
  */
 @HiltViewModel
 class GetSeveralLinksViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val legacyExportNodeUseCase: LegacyExportNodeUseCase,
+    private val exportNodesUseCase: ExportNodesUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
 ) : BaseRxViewModel() {
 
@@ -111,14 +113,16 @@ class GetSeveralLinksViewModel @Inject constructor(
     private fun exportNodes(pendingExports: List<MegaNode>) {
         if (pendingExports.isNotEmpty()) {
             exportingNodes.value = true
-            legacyExportNodeUseCase.export(pendingExports)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { exportedNodes -> notifyExportedNodes(exportedNodes) },
-                    onError = { error -> Timber.e(error) }
-                )
-                .addTo(composite)
+            val pendingExportNodeHandles = pendingExports.map { it.handle }
+            viewModelScope.launch {
+                runCatching {
+                    exportNodesUseCase(pendingExportNodeHandles)
+                }.onSuccess { exportedNodes ->
+                    notifyExportedNodes(exportedNodes)
+                }.onFailure { error ->
+                    Timber.e(error)
+                }
+            }
         } else {
             exportingNodes.value = false
         }
@@ -127,9 +131,9 @@ class GetSeveralLinksViewModel @Inject constructor(
     /**
      * Updates the list of [LinkItem]s when the export actions have been finished.
      *
-     * @param exportedNodes HashMap<Long, String> Key is the node handle, value the node link.
+     * @param exportedNodes Map<Long, String> Key is the node handle, value the node link.
      */
-    private fun notifyExportedNodes(exportedNodes: HashMap<Long, String>) {
+    private fun notifyExportedNodes(exportedNodes: Map<Long, String>) {
         val links = (linkItemsList.value ?: return).toMutableList()
 
         for (item in links.indices) {

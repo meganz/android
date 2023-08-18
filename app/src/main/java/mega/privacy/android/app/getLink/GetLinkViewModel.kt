@@ -7,10 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,13 +14,14 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.getLink.useCase.LegacyExportNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -41,14 +38,14 @@ import javax.inject.Inject
  * @property megaApi                        MegaApiAndroid instance to use.
  * @property dbH                            DataBaseHandle instance to use.
  * @property encryptLinkWithPasswordUseCase Use case to encrypt a link with a password.
- * @property legacyExportNodeUseCase        Use case to export a node.
+ * @property exportNodeUseCase              Use case to export a node.
  */
 @HiltViewModel
 class GetLinkViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler,
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
-    private val legacyExportNodeUseCase: LegacyExportNodeUseCase,
+    private val exportNodeUseCase: ExportNodeUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
@@ -124,20 +121,20 @@ class GetLinkViewModel @Inject constructor(
      * Exports the node.
      */
     fun export(isFirstTime: Boolean = false) {
-        legacyExportNodeUseCase.export(node)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
+        viewModelScope.launch {
+            node?.let {
+                runCatching {
+                    exportNodeUseCase(NodeId(it.handle))
+                }.onSuccess {
                     updateLink(node?.handle)
                     if (isFirstTime) {
                         copyLink(true)
                     }
-                },
-                onError = Timber::w
-            )
-            .addTo(composite)
-
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
+        }
     }
 
     /**
@@ -146,14 +143,17 @@ class GetLinkViewModel @Inject constructor(
      * @param expiryDate Expiry date to export.
      */
     fun exportWithTimestamp(expiryDate: Long) {
-        legacyExportNodeUseCase.export(node, expiryDate)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { updateLink(node?.handle) },
-                onError = Timber::w
-            )
-            .addTo(composite)
+        viewModelScope.launch {
+            node?.let {
+                runCatching {
+                    exportNodeUseCase(NodeId(it.handle), expiryDate)
+                }.onSuccess {
+                    updateLink(node?.handle)
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
+        }
     }
 
     /**
