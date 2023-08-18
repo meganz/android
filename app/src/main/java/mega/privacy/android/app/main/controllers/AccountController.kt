@@ -14,7 +14,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName
 import mega.privacy.android.app.utils.FileUtil.saveTextOnFile
 import mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace
 import mega.privacy.android.app.utils.Util.isOffline
@@ -23,7 +22,6 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 @ActivityScoped
@@ -95,16 +93,6 @@ class AccountController @Inject constructor(
                 context.onRecoveryKeyExported()
             }
         }
-    }
-
-    /**
-     * Rename the old MK or RK file to the new RK file name.
-     * @param oldFile Old MK or RK file to be renamed
-     */
-    fun renameRK(oldFile: File) {
-        Timber.d("renameRK")
-        val newRKFile = File(oldFile.parentFile, getRecoveryKeyFileName(context))
-        oldFile.renameTo(newRKFile)
     }
 
     private fun createRkBitmap(): Bitmap? {

@@ -498,4 +498,13 @@ interface AccountRepository {
      * @return True if enabled, false otherwise.
      */
     suspend fun isAchievementsEnabled(): Boolean
+
+    /**
+     * Rename Recovery Key file
+     *
+     * @param relativePath    Relative path of the file
+     * @param newName         New name for the file
+     * @return                True if success or false otherwise
+     */
+    suspend fun renameRecoveryKeyFile(relativePath: String, newName: String): Boolean
 }

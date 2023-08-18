@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUse
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
@@ -166,6 +167,7 @@ class ManagerViewModel @Inject constructor(
     private val deleteNodesUseCase: DeleteNodesUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
+    private val renameRecoveryKeyFileUseCase: RenameRecoveryKeyFileUseCase,
 ) : ViewModel() {
 
     /**
@@ -818,6 +820,26 @@ class ManagerViewModel @Inject constructor(
      */
     fun markHandleMoveRequestResult() {
         _state.update { it.copy(moveRequestResult = null) }
+    }
+
+    /**
+     * Rename Recovery Key file if needed
+     *
+     * @param relativePath    Relative path of the file
+     * @param newName         New name for the file
+     */
+    fun renameRecoveryKeyFileIfNeeded(relativePath: String, newName: String) {
+        viewModelScope.launch {
+            runCatching {
+                renameRecoveryKeyFileUseCase(relativePath, newName)
+            }.onSuccess {
+                if (it) {
+                    Timber.d("Old $relativePath file has been renamed to $newName")
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     internal companion object {

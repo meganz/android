@@ -24,6 +24,7 @@ import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -138,6 +139,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val ephemeralCredentialsGateway: EphemeralCredentialsGateway,
     private val accountBlockedDetailMapper: AccountBlockedDetailMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val fileGateway: FileGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -935,6 +937,12 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun isAchievementsEnabled() = withContext(ioDispatcher) {
         megaApiGateway.isAchievementsEnabled
     }
+
+    override suspend fun renameRecoveryKeyFile(relativePath: String, newName: String) =
+        withContext(ioDispatcher) {
+            val oldFile = fileGateway.buildExternalStorageFile(relativePath)
+            fileGateway.renameFile(oldFile, newName)
+        }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

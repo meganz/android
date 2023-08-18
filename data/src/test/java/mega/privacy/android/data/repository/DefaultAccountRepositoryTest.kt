@@ -10,6 +10,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -66,6 +67,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertEquals
 
@@ -98,6 +100,7 @@ class DefaultAccountRepositoryTest {
     private val ephemeralCredentialsGateway = mock<EphemeralCredentialsGateway>()
     private val accountBlockedDetailMapper = AccountBlockedDetailMapper()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
+    private val fileGateway = mock<FileGateway>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -156,7 +159,8 @@ class DefaultAccountRepositoryTest {
             appEventGateway = appEventGateway,
             ephemeralCredentialsGateway = ephemeralCredentialsGateway,
             accountBlockedDetailMapper = accountBlockedDetailMapper,
-            megaLocalRoomGateway = megaLocalRoomGateway
+            megaLocalRoomGateway = megaLocalRoomGateway,
+            fileGateway = fileGateway
         )
 
     }
@@ -1027,5 +1031,17 @@ class DefaultAccountRepositoryTest {
         runTest {
             underTest.broadcastRefreshSession()
             verify(appEventGateway).broadcastRefreshSession()
+        }
+
+    @Test
+    fun `test that invoke correctly when call renameMkFileIfNeeded`() =
+        runTest {
+            val relativePath = "/Mega.txt"
+            val newName = "newName"
+            val file = mock<File>()
+            whenever(fileGateway.buildExternalStorageFile(relativePath)).thenReturn(file)
+            underTest.renameRecoveryKeyFile(relativePath, newName)
+            verify(fileGateway).buildExternalStorageFile(relativePath)
+            verify(fileGateway).renameFile(file, newName)
         }
 }

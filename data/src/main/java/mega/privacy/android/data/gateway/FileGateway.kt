@@ -184,4 +184,21 @@ interface FileGateway {
      * lists files in the directory and remove only files from the directory not folders
      */
     suspend fun deleteFilesInDirectory(directory: File)
+
+    /**
+     * Build external storage file
+     *
+     * @param filePath    Path of the file
+     * @return            The external storage [File]
+     */
+    suspend fun buildExternalStorageFile(filePath: String): File
+
+    /**
+     * Rename file
+     *
+     * @param oldFile    [File] to be renamed
+     * @param newName    New name for the file
+     * @return           True if success or false otherwise
+     */
+    suspend fun renameFile(oldFile: File, newName: String): Boolean
 }

@@ -203,8 +203,6 @@ public class Constants {
     public static final String TYPE_REACTION = "TYPE_REACTION";
     public static final String INVALID_REACTION = "INVALID_REACTION";
 
-    public static final String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
-
     public static final String ACTION_STORAGE_STATE_CHANGED = "ACTION_STORAGE_STATE_CHANGED";
 
     public static final String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";

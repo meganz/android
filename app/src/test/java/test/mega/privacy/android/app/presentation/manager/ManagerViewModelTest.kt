@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
@@ -243,6 +244,7 @@ class ManagerViewModelTest {
     private val deleteNodesUseCase = mock<DeleteNodesUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
     private val copyNodesUseCase = mock<CopyNodesUseCase>()
+    private val renameRecoveryKeyFileUseCase = mock<RenameRecoveryKeyFileUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -300,7 +302,8 @@ class ManagerViewModelTest {
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
             deleteNodesUseCase = deleteNodesUseCase,
             moveNodesUseCase = moveNodesUseCase,
-            copyNodesUseCase = copyNodesUseCase
+            copyNodesUseCase = copyNodesUseCase,
+            renameRecoveryKeyFileUseCase = renameRecoveryKeyFileUseCase,
         )
     }
 

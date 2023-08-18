@@ -144,7 +144,6 @@ import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
@@ -465,7 +464,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     var rootNode: MegaNode? = null
     val nodeController: NodeController by lazy { NodeController(this) }
     private val contactController: ContactController by lazy { ContactController(this) }
-    private val accountController: AccountController by lazy { AccountController(this) }
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
     private val nodeSaver: NodeSaver by lazy {
         NodeSaver(
@@ -1004,15 +1002,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             return
         }
-        val fMKOld = FileUtil.buildExternalStorageFile(FileUtil.OLD_MK_FILE)
-        val fRKOld = FileUtil.buildExternalStorageFile(FileUtil.OLD_RK_FILE)
-        if (FileUtil.isFileAvailable(fMKOld)) {
-            Timber.d("Old MK file need to be renamed!")
-            accountController.renameRK(fMKOld)
-        } else if (FileUtil.isFileAvailable(fRKOld)) {
-            Timber.d("Old RK file need to be renamed!")
-            accountController.renameRK(fRKOld)
-        }
+        viewModel.renameRecoveryKeyFileIfNeeded(FileUtil.OLD_MK_FILE, FileUtil.getRecoveryKeyFileName(this))
+        viewModel.renameRecoveryKeyFileIfNeeded(FileUtil.OLD_RK_FILE, FileUtil.getRecoveryKeyFileName(this))
         if (handleRootNodeAndHeartbeatState(savedInstanceState)) return
         userInfoViewModel.checkPasswordReminderStatus()
         updateAccountDetailsVisibleInfo()
@@ -2650,14 +2641,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.d("ACTION_OPEN_CONTACTS_SECTION")
                     markNotificationsSeen(true)
                     openContactLink(intent.getLongExtra(Constants.CONTACT_HANDLE, -1))
-                }
-
-                Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT -> {
-                    val parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                    if (parentPath != null) {
-                        val ac = AccountController(this)
-                        ac.exportMK(parentPath)
-                    }
                 }
 
                 Constants.ACTION_OPEN_FOLDER -> {
@@ -6730,16 +6713,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 megaContacts = intent.getBooleanExtra(AddContactActivity.EXTRA_MEGA_CONTACTS, true)
                 if (contactsData != null) {
                     contactController.inviteMultipleContacts(contactsData)
-                }
-            }
-
-            requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK -> {
-                val parentPath = intent?.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                if (parentPath != null) {
-                    val path = parentPath + File.separator + FileUtil.getRecoveryKeyFileName(this)
-                    Timber.d("REQUEST_DOWNLOAD_FOLDER:path to download: %s", path)
-                    val ac = AccountController(this)
-                    ac.exportMK(path)
                 }
             }
 

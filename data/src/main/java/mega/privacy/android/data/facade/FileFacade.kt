@@ -269,6 +269,17 @@ class FileFacade @Inject constructor(
         }
     }
 
+    override suspend fun buildExternalStorageFile(filePath: String): File =
+        File(Environment.getExternalStorageDirectory().absolutePath + filePath)
+
+    override suspend fun renameFile(oldFile: File, newName: String): Boolean {
+        if (oldFile.exists()) {
+            val newRKFile = File(oldFile.parentFile, newName)
+            return oldFile.renameTo(newRKFile)
+        }
+        return false
+    }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val OFFLINE_DIR = "MEGA Offline"
