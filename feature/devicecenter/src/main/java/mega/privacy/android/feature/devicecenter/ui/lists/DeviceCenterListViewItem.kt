@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.devicecenter.ui.lists
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -8,10 +10,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import mega.privacy.android.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
@@ -24,9 +30,12 @@ import java.io.File
 internal const val DEVICE_CENTER_LIST_VIEW_ITEM_TAG =
     "device_center_list_view_item:node_list_view_item"
 
+internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
+    "device_center_list_view_item:custom_divider"
+
 /**
  * A Composable Class extending [NodeListViewItem] that represents a Device / Device Folder entry
- * in the Device Center
+ * in the Device Center. Each entry also shows a [CustomDivider]
  *
  * @param uiNode The [DeviceCenterUINode] to be displayed
  * @param onMenuClick Lambda that performs a specific action when the Menu icon is clicked
@@ -36,25 +45,52 @@ internal fun DeviceCenterListViewItem(
     uiNode: DeviceCenterUINode,
     onMenuClick: () -> Unit,
 ) {
-    NodeListViewItem(
-        modifier = Modifier.testTag(DEVICE_CENTER_LIST_VIEW_ITEM_TAG),
-        isSelected = false,
-        folderInfo = getStatusText(uiNode.status),
-        icon = uiNode.icon.iconRes,
-        applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
-        fileSize = null,
-        modifiedDate = null,
-        name = uiNode.name,
-        infoColor = getStatusColor(uiNode.status),
-        infoIcon = uiNode.status.icon,
-        infoIconTint = getStatusColor(uiNode.status),
-        showMenuButton = true,
-        isTakenDown = false,
-        isFavourite = false,
-        isSharedWithPublicLink = false,
-        imageState = remember { mutableStateOf(null as File?) },
-        onClick = onMenuClick,
-    )
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(72.dp)
+    ) {
+        val (nodeListViewItem, divider) = createRefs()
+
+        NodeListViewItem(
+            modifier = Modifier
+                .testTag(DEVICE_CENTER_LIST_VIEW_ITEM_TAG)
+                .constrainAs(nodeListViewItem) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+            isSelected = false,
+            folderInfo = getStatusText(uiNode.status),
+            icon = uiNode.icon.iconRes,
+            applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
+            fileSize = null,
+            modifiedDate = null,
+            name = uiNode.name.ifBlank {
+                stringResource(R.string.device_center_list_view_item_title_unknown_device)
+            },
+            infoColor = getStatusColor(uiNode.status),
+            infoIcon = uiNode.status.icon,
+            infoIconTint = getStatusColor(uiNode.status),
+            showMenuButton = true,
+            isTakenDown = false,
+            isFavourite = false,
+            isSharedWithPublicLink = false,
+            imageState = remember { mutableStateOf(null as File?) },
+            onClick = onMenuClick,
+        )
+        CustomDivider(
+            modifier = Modifier
+                .testTag(DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG)
+                .constrainAs(divider) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(parent.bottom)
+                },
+            withStartPadding = true,
+        )
+    }
 }
 
 /**
@@ -93,6 +129,27 @@ private fun DeviceCenterListViewItemPreview() {
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",
                 name = "Backup Name",
+                icon = DeviceIconType.Android,
+                status = DeviceCenterUINodeStatus.UpToDate,
+                folders = emptyList(),
+            ),
+            onMenuClick = {},
+        )
+    }
+}
+
+/**
+ * A Preview Composable that displays [DeviceCenterListViewItem] with a default Title if the Device
+ * has no name
+ */
+@CombinedThemePreviews
+@Composable
+private fun DeviceCenterListViewItemWithEmptyTitle() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        DeviceCenterListViewItem(
+            uiNode = OwnDeviceUINode(
+                id = "1234-5678",
+                name = "",
                 icon = DeviceIconType.Android,
                 status = DeviceCenterUINodeStatus.UpToDate,
                 folders = emptyList(),

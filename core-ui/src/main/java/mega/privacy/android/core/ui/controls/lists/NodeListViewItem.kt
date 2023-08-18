@@ -160,7 +160,7 @@ fun NodeListViewItem(
             }
             ConstraintLayout(
                 modifier = Modifier
-                    .padding(start = 16.dp)
+                    .padding(start = 12.dp)
                     .fillMaxWidth()
             ) {
                 val (nodeInfo, threeDots, titleText, infoRow, availableOffline) = createRefs()

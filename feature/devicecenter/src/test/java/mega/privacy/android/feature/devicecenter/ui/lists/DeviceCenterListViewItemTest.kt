@@ -35,5 +35,6 @@ internal class DeviceCenterListViewItemTest {
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_LIST_VIEW_ITEM_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG).assertIsDisplayed()
     }
 }
