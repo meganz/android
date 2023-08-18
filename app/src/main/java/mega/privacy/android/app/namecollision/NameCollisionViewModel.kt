@@ -116,15 +116,17 @@ class NameCollisionViewModel @Inject constructor(
             action.invoke()
         } ?: MegaNode.unserialize(collision.serializedNode)?.let { node ->
             if (!node.isForeign) {
-                viewModelScope.launch {
-                    getNodeByFingerprintAndParentNodeUseCase(
-                        node.fingerprint,
-                        NodeId(collision.parentHandle)
-                    )?.let {
-                        isCopyToOrigin = it.parentId.longValue == collision.parentHandle
-                        action.invoke()
+                node.fingerprint?.let {
+                    viewModelScope.launch {
+                        getNodeByFingerprintAndParentNodeUseCase(
+                            it,
+                            NodeId(collision.parentHandle)
+                        )?.let {
+                            isCopyToOrigin = it.parentId.longValue == collision.parentHandle
+                            action.invoke()
+                        }
                     }
-                }
+                } ?: Timber.w("Fingerprint is null")
             }
         }
     }
