@@ -1,14 +1,18 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.data.wrapper.StringWrapper
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 
 /**
  * Test class for [BackupDeviceNamesMapper]
@@ -18,16 +22,34 @@ internal class BackupDeviceNamesMapperTest {
 
     private lateinit var underTest: BackupDeviceNamesMapper
 
+    private val stringWrapper = mock<StringWrapper>()
+
     @BeforeAll
     fun setUp() {
-        underTest = BackupDeviceNamesMapper()
+        underTest = BackupDeviceNamesMapper(stringWrapper)
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(stringWrapper)
     }
 
     @Test
     fun `test that the mapping is correct`() {
         val keySize = 2
-        val firstPair = Pair("12345", "Device One")
-        val secondPair = Pair("67890", "Device Two")
+
+        val deviceOneBase64Name = "abcdef-ghijkl"
+        val deviceTwoBase64Name = "mnopq-rstuvw"
+        val expectedDeviceOneName = "Device One"
+        val expectedDeviceTwoName = "Device Two"
+
+        val firstPair = Pair("12345", deviceOneBase64Name)
+        val secondPair = Pair("67890", deviceTwoBase64Name)
+
+        stringWrapper.stub {
+            on { decodeBase64(deviceOneBase64Name) }.thenReturn(expectedDeviceOneName)
+            on { decodeBase64(deviceTwoBase64Name) }.thenReturn(expectedDeviceTwoName)
+        }
 
         val megaStringKeyList = mock<MegaStringList> {
             on { size() }.thenReturn(keySize)
@@ -42,8 +64,8 @@ internal class BackupDeviceNamesMapperTest {
 
         assertThat(underTest(megaStringMap)).isEqualTo(
             mapOf(
-                firstPair.first to firstPair.second,
-                secondPair.first to secondPair.second,
+                firstPair.first to expectedDeviceOneName,
+                secondPair.first to expectedDeviceTwoName,
             )
         )
     }

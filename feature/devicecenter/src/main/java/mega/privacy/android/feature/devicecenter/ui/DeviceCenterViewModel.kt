@@ -2,6 +2,7 @@ package mega.privacy.android.feature.devicecenter.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +20,7 @@ import javax.inject.Inject
  * @property getDevicesUseCase [GetDevicesUseCase]
  * @property deviceUINodeListMapper [DeviceUINodeListMapper]
  */
+@HiltViewModel
 internal class DeviceCenterViewModel @Inject constructor(
     private val getDevicesUseCase: GetDevicesUseCase,
     private val deviceUINodeListMapper: DeviceUINodeListMapper,

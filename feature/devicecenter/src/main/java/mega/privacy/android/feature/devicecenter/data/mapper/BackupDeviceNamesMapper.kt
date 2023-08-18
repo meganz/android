@@ -1,13 +1,18 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
+import mega.privacy.android.data.wrapper.StringWrapper
 import nz.mega.sdk.MegaStringMap
 import javax.inject.Inject
 
 /**
  * Mapper that converts a [MegaStringMap] whose Key-Value Pair is the Device ID and
  * Device Name into a [Map]
+ *
+ * @property stringWrapper [StringWrapper]
  */
-internal class BackupDeviceNamesMapper @Inject constructor() {
+internal class BackupDeviceNamesMapper @Inject constructor(
+    private val stringWrapper: StringWrapper,
+) {
     /**
      * Invocation function
      *
@@ -25,7 +30,7 @@ internal class BackupDeviceNamesMapper @Inject constructor() {
                 for (i in 0 until keySize) {
                     val deviceId = keys[i]
                     val deviceName = megaStringMap.get(deviceId).orEmpty()
-                    this[deviceId] = deviceName
+                    this[deviceId] = stringWrapper.decodeBase64(deviceName)
                 }
             }
         } ?: emptyMap()
