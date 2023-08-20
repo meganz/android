@@ -384,6 +384,7 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
+import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
@@ -2010,6 +2011,16 @@ public class ChatActivity extends PasscodeActivity
      */
     private void collectFlows() {
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, chatState -> {
+
+            if (chatState.getOpenWaitingRoomScreen()) {
+                viewModel.setOpenWaitingRoomConsumed();
+                Intent intentWaitingRoom = new Intent(chatActivity, WaitingRoomActivity.class);
+                intentWaitingRoom.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intentWaitingRoom.putExtra(MEETING_CHAT_ID, chatState.getChatId());
+                startActivity(intentWaitingRoom);
+            }
+
+
             if (chatState.getError() != null) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
             } else if (chatState.isCallAnswered()) {
@@ -2026,9 +2037,10 @@ public class ChatActivity extends PasscodeActivity
                 viewModel.onConsumePushNotificationSettingsUpdateEvent();
             }
 
-            Long schedId = chatState.getSchedId();
-            if (schedId != null && schedId != MEGACHAT_INVALID_HANDLE) {
+            ChatScheduledMeeting schedMeet = chatState.getScheduledMeeting();
+            if (schedMeet != null) {
                 adapter.notifyItemChanged(0);
+                updateCallBanner();
             }
 
             ScheduledMeetingStatus schedMeetStatus = chatState.getScheduledMeetingStatus();
@@ -2045,13 +2057,8 @@ public class ChatActivity extends PasscodeActivity
                 startOrJoinMeetingBanner.setVisibility(View.GONE);
             }
 
-            ChatScheduledMeeting schedMeet = chatState.getScheduledMeeting();
             if (schedMeet != null) {
                 setTitle(null);
-            }
-
-            if (chatState.getSchedId() != null) {
-                updateCallBanner();
             }
 
             long callChatId = chatState.getCurrentCallChatId();
@@ -5957,6 +5964,9 @@ public class ChatActivity extends PasscodeActivity
             Timber.d("CHANGE_TYPE_OWN_PRIV for the chat: %s", chat.getChatId());
             setChatSubtitle();
             supportInvalidateOptionsMenu();
+            viewModel.chatRoomUpdated(chat.isWaitingRoom(), chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);
+        } else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_WAITING_ROOM)) {
+            viewModel.chatRoomUpdated(chat.isWaitingRoom(), chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);
         } else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_TITLE)) {
             updateTitle();
         } else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_USER_STOP_TYPING)) {
@@ -9069,7 +9079,7 @@ public class ChatActivity extends PasscodeActivity
 
         if (!chatRoom.isArchived() && chatRoom.isActive() && callInProgressLayout != null &&
                 callInProgressLayout.getVisibility() != View.VISIBLE &&
-                viewModel.getState().getValue().getSchedId() != null &&
+                viewModel.getState().getValue().getScheduledMeeting() != null &&
                 startOrJoinMeetingBanner.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setAlpha(1);
             callInProgressLayout.setVisibility(View.VISIBLE);

@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * Chat UI state
  *
  * @property chatId                                     Chat Id.
- * @property schedId                                    Scheduled meeting Id.
  * @property error                                      String resource id for showing an error.
  * @property isCallAnswered                             Handle when a call is answered.
  * @property isChatInitialised                          True, if the chat is initialised. False, if not.
@@ -25,12 +24,14 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property isJoiningOrLeaving                         True if user is joining or leaving the chat, false otherwise.
  * @property joiningOrLeavingAction                     String ID which indicates if the UI to set is the joining or leaving state.
  * @property snackbarMessage                            String ID to display as a snackbar message.
- * @property contactInvitation                          Contact invtation result to check if it's in contacts
+ * @property contactInvitation                          Contact invitation result to check if it's in contacts
+ * @property isWaitingRoom                              True, if it's waiting room. False, if not.
+ * @property isHost                                     True, if has host permissions. False, if not.
+ * @property openWaitingRoomScreen                      Should open waiting Room screen.
  * @property enabledFeatureFlags                        Set of enabled feature flags
  */
 data class ChatState(
     val chatId: Long = -1L,
-    val schedId: Long? = null,
     val error: Int? = null,
     val isCallAnswered: Boolean = false,
     val isChatInitialised: Boolean = false,
@@ -46,5 +47,8 @@ data class ChatState(
     @StringRes val joiningOrLeavingAction: Int? = null,
     @StringRes val snackbarMessage: Int? = null,
     val contactInvitation: ContactInvitation? = null,
+    val isWaitingRoom: Boolean = false,
+    val isHost: Boolean = false,
+    val openWaitingRoomScreen: Boolean = false,
     val enabledFeatureFlags: Set<Feature> = emptySet(),
 )

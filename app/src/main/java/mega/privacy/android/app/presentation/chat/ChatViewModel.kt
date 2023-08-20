@@ -35,7 +35,6 @@ import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.gateway.DeviceGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -50,8 +49,10 @@ import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.LeaveChat
+import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
@@ -71,23 +72,22 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.domain.entity.ChatRoomPermission
 
 /**
- * View Model for [mega.privacy.android.app.main.megachat.ChatActivity]
+ * View Model for [ChatActivity]
  *
  * @property monitorStorageStateEventUseCase                [MonitorStorageStateEventUseCase]
  * @property startChatCall                                  [StartChatCall]
- * @property chatApiGateway                                 [MegaChatApiGateway]
  * @property answerChatCallUseCase                          [AnswerChatCallUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property cameraGateway                                  [CameraGateway]
  * @property chatManagement                                 [ChatManagement]
  * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
  * @property startChatCallNoRingingUseCase                  [StartChatCallNoRingingUseCase]
- * @property megaChatApiGateway                             [MegaChatApiGateway]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
  * @property getChatCall                                    [GetChatCall]
  * @property monitorChatCallUpdates                         [MonitorChatCallUpdates]
@@ -96,18 +96,19 @@ import javax.inject.Inject
  * @property isConnected                                    True if the app has some network connection, false otherwise.
  * @property monitorUpdatePushNotificationSettingsUseCase   monitors push notification settings update
  * @property deviceGateway                                  [DeviceGateway]
+ * @property getChatRoom                                    [GetChatRoom]
  * @property monitorChatArchivedUseCase                     [MonitorChatArchivedUseCase]
  * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
  * @property monitorJoinedSuccessfullyUseCase               [MonitorJoinedSuccessfullyUseCase]
  * @property monitorLeaveChatUseCase                        [MonitorLeaveChatUseCase]
  * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
+ * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
  * @property leaveChat                                      [LeaveChat]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val startChatCall: StartChatCall,
-    private val chatApiGateway: MegaChatApiGateway,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val passcodeManagement: PasscodeManagement,
@@ -116,9 +117,9 @@ class ChatViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val openOrStartCall: OpenOrStartCall,
-    private val megaChatApiGateway: MegaChatApiGateway,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
+    private val getChatRoom: GetChatRoom,
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
@@ -134,6 +135,7 @@ class ChatViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val loadPendingMessagesUseCase: LoadPendingMessagesUseCase,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
+    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -189,7 +191,7 @@ class ChatViewModel @Inject constructor(
 
         viewModelScope.launch {
             monitorLeaveChatUseCase().conflate().collect { chatId ->
-                if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                if (chatId != INVALID_HANDLE) {
                     if (state.value.chatId == chatId) {
                         _state.update { state ->
                             state.copy(
@@ -246,29 +248,66 @@ class ChatViewModel @Inject constructor(
      * Call button clicked
      *
      * @param video True, video on. False, video off.
-     * @param isStartCall True, if it should start as a call. False if not.
+     * @param shouldCallRing True, calls should ring. False, otherwise.
      */
-    fun onCallTap(video: Boolean, isStartCall: Boolean) {
+    fun onCallTap(video: Boolean, shouldCallRing: Boolean) {
         MegaApplication.isWaitingForCall = false
         cameraGateway.setFrontCamera()
+
+        val isWaitingRoom = _state.value.isWaitingRoom
+        val isHost = _state.value.isHost
+        val hasSchedMeeting = _state.value.scheduledMeeting != null
+
         when {
-            _state.value.schedId == null || _state.value.schedId == megaChatApiGateway.getChatInvalidHandle() ->
-                startCall(
-                    video = video
-                )
+            isWaitingRoom -> {
+                when {
+                    isHost && state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined -> {
+                        answerCall(
+                            _state.value.chatId,
+                            video = false,
+                            audio = true
+                        )
+
+                    }
+
+                    isHost && state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> {
+                    }
+
+                    !isHost -> {
+                        _state.update {
+                            it.copy(
+                                openWaitingRoomScreen = true
+                            )
+                        }
+                    }
+                }
+
+            }
+
+            !hasSchedMeeting -> startCall(
+                video = video
+            )
 
             _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted ->
-                if (isStartCall) startCall(
-                    video = video
-                ) else startSchedMeeting()
+                if (shouldCallRing)
+                    startCall(video = video)
+                else
+                    startSchedMeeting()
 
-            _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined
-            -> answerCall(
-                _state.value.chatId,
-                video = false,
-                audio = true
-            )
+            _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined ->
+                answerCall(
+                    _state.value.chatId,
+                    video = false,
+                    audio = true
+                )
         }
+    }
+
+    /**
+     * Sets open waiting room as consumed.
+     */
+    fun setOpenWaitingRoomConsumed() {
+        _state.update { state -> state.copy(openWaitingRoomScreen = false) }
     }
 
     /**
@@ -309,17 +348,56 @@ class ChatViewModel @Inject constructor(
      * @param newChatId   Chat id.
      */
     fun setChatId(newChatId: Long) {
-        if (newChatId != chatApiGateway.getChatInvalidHandle() && newChatId != state.value.chatId) {
+        if (newChatId != INVALID_HANDLE && newChatId != state.value.chatId) {
             _state.update {
                 it.copy(
                     chatId = newChatId
                 )
             }
-
+            getChat()
             getScheduledMeeting()
             getScheduledMeetingUpdates()
         }
     }
+
+    /**
+     * Get chat room
+     */
+    private fun getChat() =
+        viewModelScope.launch {
+            runCatching {
+                getChatRoom(state.value.chatId)
+            }.onFailure { exception ->
+                Timber.e("Chat room does not exist, finish $exception")
+            }.onSuccess { chatRoom ->
+                Timber.d("Chat room exists")
+                chatRoom?.apply {
+                    if (isActive) {
+                        Timber.d("Chat room is active")
+                        chatRoomUpdated(
+                            isWaitingRoom = isWaitingRoom,
+                            isHost = ownPrivilege == ChatRoomPermission.Moderator
+                        )
+                    }
+                }
+            }
+        }
+
+    /**
+     * Update waiting room and host values
+     */
+    fun chatRoomUpdated(
+        isWaitingRoom: Boolean = state.value.isWaitingRoom,
+        isHost: Boolean = state.value.isHost,
+    ) {
+        _state.update { state ->
+            state.copy(
+                isWaitingRoom = isWaitingRoom,
+                isHost = isHost
+            )
+        }
+    }
+
 
     /**
      * Get scheduled meeting
@@ -332,14 +410,14 @@ class ChatViewModel @Inject constructor(
                 Timber.d("Scheduled meeting does not exist")
                 _state.update {
                     it.copy(
-                        schedId = megaChatApiGateway.getChatInvalidHandle(),
-                        scheduledMeetingStatus = null
+                        scheduledMeetingStatus = null,
+                        scheduledMeeting = null
                     )
                 }
             }.onSuccess { scheduledMeetingList ->
                 scheduledMeetingList?.let { list ->
                     list.forEach { scheduledMeetReceived ->
-                        if (scheduledMeetReceived.parentSchedId == chatApiGateway.getChatInvalidHandle()) {
+                        if (scheduledMeetReceived.parentSchedId == INVALID_HANDLE) {
                             var scheduledMeetingStatus: ScheduledMeetingStatus =
                                 ScheduledMeetingStatus.NotStarted
                             if (!scheduledMeetReceived.isPast()) {
@@ -361,7 +439,6 @@ class ChatViewModel @Inject constructor(
 
                             _state.update {
                                 it.copy(
-                                    schedId = scheduledMeetReceived.schedId,
                                     schedIsPending = !scheduledMeetReceived.isPast(),
                                     scheduledMeetingStatus = scheduledMeetingStatus,
                                     scheduledMeeting = scheduledMeetReceived
@@ -373,15 +450,6 @@ class ChatViewModel @Inject constructor(
                 }
 
                 getChatCallUpdates()
-
-                if (_state.value.schedId == null) {
-                    _state.update {
-                        it.copy(
-                            schedId = megaChatApiGateway.getChatInvalidHandle(),
-                            scheduledMeetingStatus = null
-                        )
-                    }
-                }
             }
         }
 
@@ -395,7 +463,7 @@ class ChatViewModel @Inject constructor(
                     return@collectLatest
                 }
 
-                if (scheduledMeetReceived.parentSchedId == megaChatApiGateway.getChatInvalidHandle()) {
+                if (scheduledMeetReceived.parentSchedId == INVALID_HANDLE) {
                     return@collectLatest
                 }
 
@@ -408,7 +476,6 @@ class ChatViewModel @Inject constructor(
                             ->
                                 _state.update { state ->
                                     state.copy(
-                                        schedId = scheduledMeetReceived.schedId,
                                         schedIsPending = !scheduledMeetReceived.isPast(),
                                         scheduledMeeting = scheduledMeetReceived
                                     )
@@ -477,7 +544,7 @@ class ChatViewModel @Inject constructor(
             openOrStartCall(chatId = _state.value.chatId, video = video, audio = true)
         }.onSuccess { call ->
             call?.apply {
-                chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }?.let {
+                chatId.takeIf { it != INVALID_HANDLE }?.let {
                     Timber.d("Call started")
                     openCurrentCall(call = this)
                 }
@@ -490,27 +557,25 @@ class ChatViewModel @Inject constructor(
      */
     private fun startSchedMeeting() =
         viewModelScope.launch {
-            _state.value.schedId?.let { schedId ->
-                if (schedId != megaChatApiGateway.getChatInvalidHandle()) {
-                    Timber.d("Start scheduled meeting")
-                    runCatching {
-                        startChatCallNoRingingUseCase(
-                            chatId = _state.value.chatId,
-                            schedId = schedId,
-                            enabledVideo = false,
-                            enabledAudio = true
-                        )
-                    }.onSuccess { call ->
-                        call?.let {
-                            call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                                ?.let {
-                                    Timber.d("Meeting started")
-                                    openCurrentCall(call = call)
-                                }
-                        }
-                    }.onFailure {
-                        Timber.e(it)
+            _state.value.scheduledMeeting?.let { sched ->
+                Timber.d("Start scheduled meeting")
+                runCatching {
+                    startChatCallNoRingingUseCase(
+                        chatId = _state.value.chatId,
+                        schedId = sched.schedId,
+                        enabledVideo = false,
+                        enabledAudio = true
+                    )
+                }.onSuccess { call ->
+                    call?.let {
+                        call.chatId.takeIf { it != INVALID_HANDLE }
+                            ?.let {
+                                Timber.d("Meeting started")
+                                openCurrentCall(call = call)
+                            }
                     }
+                }.onFailure {
+                    Timber.e(it)
                 }
             }
         }
@@ -540,7 +605,7 @@ class ChatViewModel @Inject constructor(
     fun removeCurrentCall() {
         _state.update {
             it.copy(
-                currentCallChatId = megaChatApiGateway.getChatInvalidHandle(),
+                currentCallChatId = INVALID_HANDLE,
                 currentCallVideoStatus = false,
                 currentCallAudioStatus = false
             )
@@ -616,15 +681,23 @@ class ChatViewModel @Inject constructor(
      */
     fun checkEndCall() {
         MegaApplication.getChatManagement().stopCounterToFinishCall()
-
-        chatApiGateway.getChatCall(_state.value.chatId)?.let { call ->
-            endCallUseCase.hangCall(call.callId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(onError = { error ->
-                    Timber.e(error.stackTraceToString())
-                })
-                .addTo(rxSubscriptions)
+        viewModelScope.launch {
+            runCatching {
+                getChatCall(state.value.chatId)
+            }.onFailure { exception ->
+                Timber.e("Call does not exist $exception")
+            }.onSuccess { call ->
+                Timber.d("Call exists")
+                call?.apply {
+                    endCallUseCase.hangCall(call.callId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(onError = { error ->
+                            Timber.e(error.stackTraceToString())
+                        })
+                        .addTo(rxSubscriptions)
+                }
+            }
         }
 
         viewModelScope.launch {
@@ -762,4 +835,9 @@ class ChatViewModel @Inject constructor(
      * @return
      */
     fun onPendingMessageLoaded(): LiveData<PendingMessage> = newPendingMessage
+
+    companion object {
+        private const val INVALID_HANDLE = -1L
+    }
+
 }

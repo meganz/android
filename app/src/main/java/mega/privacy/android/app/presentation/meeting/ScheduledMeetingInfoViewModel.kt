@@ -19,7 +19,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
-import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
@@ -48,7 +47,6 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
@@ -65,7 +63,6 @@ import javax.inject.Inject
  * @property getChatRoom                                    [GetChatRoom]
  * @property getChatParticipants                            [GetChatParticipants]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
- * @property getChatCall                                    [GetChatCall]
  * @property getVisibleContactsUseCase                      [GetVisibleContactsUseCase]
  * @property inviteToChat                                   [InviteToChat]
  * @property leaveChat                                      [LeaveChat]
@@ -74,7 +71,6 @@ import javax.inject.Inject
  * @property setOpenInvite                                  [SetOpenInvite]
  * @property updateChatPermissions                          [UpdateChatPermissions]
  * @property getPublicChatToPrivate                         [SetPublicChatToPrivate]
- * @property getChatRoomUseCase                             [GetChatRoomUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property chatManagement                                 [ChatManagement]
  * @property startConversationUseCase                       [StartConversationUseCase]
@@ -95,7 +91,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getChatRoom: GetChatRoom,
     private val getChatParticipants: GetChatParticipants,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
-    private val getChatCall: GetChatCall,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val inviteToChat: InviteToChat,
     private val leaveChat: LeaveChat,
@@ -104,7 +99,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val setOpenInvite: SetOpenInvite,
     private val updateChatPermissions: UpdateChatPermissions,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
-    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
     private val startConversationUseCase: StartConversationUseCase,

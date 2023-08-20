@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.data.gateway.DeviceGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
@@ -34,7 +33,6 @@ import javax.inject.Inject
  * @property fetchScheduledMeetingOccurrencesByChat                 [FetchScheduledMeetingOccurrencesByChat]
  * @property fetchNumberOfScheduledMeetingOccurrencesByChat         [FetchNumberOfScheduledMeetingOccurrencesByChat]
  * @property getChatParticipants                                    [GetChatParticipants]
- * @property megaChatApiGateway                                     [MegaChatApiGateway]
  * @property monitorScheduledMeetingUpdates                         [MonitorScheduledMeetingUpdates]
  * @property monitorScheduledMeetingOccurrencesUpdates              [MonitorScheduledMeetingOccurrencesUpdates]
  * @property state                                                  Current view state as [RecurringMeetingInfoState]
@@ -46,7 +44,6 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private val fetchScheduledMeetingOccurrencesByChat: FetchScheduledMeetingOccurrencesByChat,
     private val fetchNumberOfScheduledMeetingOccurrencesByChat: FetchNumberOfScheduledMeetingOccurrencesByChat,
     private val getChatParticipants: GetChatParticipants,
-    private val megaChatApiGateway: MegaChatApiGateway,
     private val deviceGateway: DeviceGateway,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorScheduledMeetingOccurrencesUpdates: MonitorScheduledMeetingOccurrencesUpdates,
@@ -229,7 +226,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
      * @ return True, if it's the main scheduled meeting. False if not.
      */
     private fun isMainScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
-        scheduledMeet.parentSchedId == megaChatApiGateway.getChatInvalidHandle()
+        scheduledMeet.parentSchedId == -1L
 
     /**
      * Get scheduled meeting updates

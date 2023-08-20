@@ -17,10 +17,11 @@ import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.presentation.chat.ContactInvitation
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.data.gateway.DeviceGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.LeaveChat
+import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
@@ -56,7 +57,6 @@ class ChatViewModelTest {
     //Mocks
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val startChatCall: StartChatCall = mock()
-    private val chatApiGateway: MegaChatApiGateway = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
@@ -65,9 +65,9 @@ class ChatViewModelTest {
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase = mock()
     private val openOrStartCall: OpenOrStartCall = mock()
-    private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
     private val getChatCall: GetChatCall = mock()
+    private val getChatRoom: GetChatRoom = mock()
     private val monitorChatCallUpdates: MonitorChatCallUpdates = mock()
     private val endCallUseCase: EndCallUseCase = mock()
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase = mock()
@@ -91,6 +91,9 @@ class ChatViewModelTest {
     private val monitorScheduledMeetingUpdates = mock<MonitorScheduledMeetingUpdates> {
         onBlocking { invoke() }.thenReturn(flowOf())
     }
+    private val monitorChatRoomUpdates = mock<MonitorChatRoomUpdates> {
+        onBlocking { invoke(any()) }.thenReturn(flowOf())
+    }
     private val leaveChat = mock<LeaveChat>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val loadPendingMessagesUseCase = mock<LoadPendingMessagesUseCase> {
@@ -103,7 +106,6 @@ class ChatViewModelTest {
         underTest = ChatViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             startChatCall = startChatCall,
-            chatApiGateway = chatApiGateway,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
             passcodeManagement = passcodeManagement,
@@ -113,9 +115,9 @@ class ChatViewModelTest {
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
             openOrStartCall = openOrStartCall,
-            megaChatApiGateway = megaChatApiGateway,
             getScheduledMeetingByChat = getScheduledMeetingByChat,
             getChatCall = getChatCall,
+            getChatRoom = getChatRoom,
             monitorChatCallUpdates = monitorChatCallUpdates,
             endCallUseCase = endCallUseCase,
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
@@ -129,7 +131,8 @@ class ChatViewModelTest {
             isContactRequestSentUseCase = isContactRequestSentUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             loadPendingMessagesUseCase = loadPendingMessagesUseCase,
-            monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates
+            monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates,
+            monitorChatRoomUpdates = monitorChatRoomUpdates,
         )
     }
 
@@ -251,4 +254,28 @@ class ChatViewModelTest {
                     .isEqualTo(ContactInvitation(email = myEmail, name = myName, isSent = false))
             }
         }
+
+    @Test
+    fun `test that chatRoomUpdated updates state correctly`() = runTest {
+        val isWaitingRoom = true
+        val isHost = true
+
+        underTest.chatRoomUpdated(isWaitingRoom, isHost)
+
+        underTest.state.test {
+            val state = awaitItem()
+            Truth.assertThat(state.isWaitingRoom).isEqualTo(isWaitingRoom)
+            Truth.assertThat(state.isHost).isEqualTo(isHost)
+        }
+    }
+
+    @Test
+    fun `test that setOpenWaitingRoomConsumed updates state correctly`() = runTest {
+        underTest.setOpenWaitingRoomConsumed()
+
+        underTest.state.test {
+            val state = awaitItem()
+            Truth.assertThat(state.openWaitingRoomScreen).isFalse()
+        }
+    }
 }

@@ -5091,6 +5091,11 @@
     <string name="photos_action_zoom_in">Zoom in</string>
     <!-- Photos action menu zoom out -->
     <string name="photos_action_zoom_out">Zoom out</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Wait for host to start the meeting</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wait for host to let you in</string>
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
+
 </resources>
