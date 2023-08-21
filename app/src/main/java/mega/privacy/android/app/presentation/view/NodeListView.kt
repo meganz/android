@@ -94,10 +94,10 @@ fun <T : TypedNode> NodeListView(
             NodeListViewItem(
                 isSelected = nodeUIItemList[it].isSelected,
                 folderInfo = nodeEntity
-                    .let { node -> node as? FolderNode }
+                    .let { node -> node as? TypedFolderNode }
                     ?.folderInfo(),
                 icon = nodeEntity
-                    .let { node -> node as? FolderNode }
+                    .let { node -> node as? TypedFolderNode }
                     ?.getIcon()
                     ?: MimeTypeList.typeForName(nodeUIItemList[it].node.name).iconResourceId,
                 fileSize = nodeEntity
