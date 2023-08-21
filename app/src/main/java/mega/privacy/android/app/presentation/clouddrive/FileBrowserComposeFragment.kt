@@ -449,6 +449,7 @@ class FileBrowserComposeFragment : Fragment() {
                                     requireActivity().supportFragmentManager,
                                     ConfirmMoveToRubbishBinDialogFragment.TAG
                                 )
+                            disableSelectMode()
                         }
                 }
 
@@ -456,6 +457,7 @@ class FileBrowserComposeFragment : Fragment() {
                     (requireActivity() as ManagerActivity).showConfirmationRemoveAllSharingContacts(
                         it.selectedMegaNode
                     )
+                    disableSelectMode()
                 }
 
                 OptionItems.SELECT_ALL_CLICKED -> {
@@ -484,6 +486,7 @@ class FileBrowserComposeFragment : Fragment() {
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             .setData(Uri.parse(Constants.DISPUTE_URL))
                     )
+                    disableSelectMode()
                 }
             }
         }
