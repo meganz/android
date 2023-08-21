@@ -5,7 +5,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.constant.FileConstant
-import mega.privacy.android.data.extensions.encodeBase64
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getThumbnailFileName
@@ -239,8 +238,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
 
 
     override suspend fun createThumbnail(handle: Long, file: File) = withContext(ioDispatcher) {
-        val thumbnailFileName =
-            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
+        val thumbnailFileName = getThumbnailOrPreviewFileName(handle)
         val thumbnailFile = getThumbnailFile(thumbnailFileName)
         requireNotNull(thumbnailFile)
         megaApi.createThumbnail(file.absolutePath, thumbnailFile.absolutePath)
@@ -248,28 +246,25 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
 
 
     override suspend fun createPreview(handle: Long, file: File) = withContext(ioDispatcher) {
-        val previewFileName =
-            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
+        val previewFileName = getThumbnailOrPreviewFileName(handle)
         val previewFile = getPreviewFile(previewFileName)
         requireNotNull(previewFile)
         megaApi.createPreview(file.absolutePath, previewFile.absolutePath)
     }
 
     override suspend fun deleteThumbnail(handle: Long) = withContext(ioDispatcher) {
-        val thumbnailFileName =
-            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
-        getThumbnailFile(thumbnailFileName)?.delete()
+        val thumbnailFileName = getThumbnailOrPreviewFileName(handle)
+        getThumbnailFile(thumbnailFileName)?.takeIf { it.exists() }?.delete()
     }
 
     override suspend fun deletePreview(handle: Long) = withContext(ioDispatcher) {
-        val previewFileName =
-            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
-        getPreviewFile(previewFileName)?.delete()
+        val previewFileName = getThumbnailOrPreviewFileName(handle)
+        getPreviewFile(previewFileName)?.takeIf { it.exists() }?.delete()
     }
 
     override suspend fun getThumbnailOrPreviewFileName(nodeHandle: Long) =
         withContext(ioDispatcher) {
-            megaApi.handleToBase64(nodeHandle) + ".jpg"
+            "${megaApi.handleToBase64(nodeHandle)}.jpg"
         }
 
     override suspend fun setThumbnail(nodeHandle: Long, srcFilePath: String) =
