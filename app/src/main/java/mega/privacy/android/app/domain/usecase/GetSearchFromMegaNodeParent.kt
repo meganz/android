@@ -13,11 +13,13 @@ interface GetSearchFromMegaNodeParent {
      * @param parentHandleSearch
      * @param megaCancelToken
      * @param parent [MegaNode]
+     * @param searchType
      */
     suspend operator fun invoke(
         query: String,
         parentHandleSearch: Long,
         megaCancelToken: MegaCancelToken,
-        parent: MegaNode?
+        parent: MegaNode?,
+        searchType: Int = -1
     ): List<MegaNode>?
 }

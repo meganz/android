@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.domain.usecase.SearchNodes
+import mega.privacy.android.app.domain.usecase.SearchNodesUseCase
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -36,7 +36,7 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param rootNodeExistsUseCase Check if the root node exists
- * @param searchNodes Perform a search request
+ * @param searchNodesUseCase Perform a search request
  * @param getCloudSortOrder Get the Cloud Sort Order
  * @param getSearchParentNodeHandle Get parent node for current node
  */
@@ -46,7 +46,7 @@ class SearchViewModel @Inject constructor(
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getRootFolder: GetRootFolder,
-    private val searchNodes: SearchNodes,
+    private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getSearchParentNodeHandle: GetParentNodeHandle,
 ) : ViewModel() {
@@ -209,7 +209,7 @@ class SearchViewModel @Inject constructor(
         cancelSearch()
         searchCancelToken = initNewSearch()
         searchCancelToken?.let { token ->
-            val nodes = searchNodes(
+            val nodes = searchNodesUseCase(
                 query = query,
                 parentHandleSearch = parentHandleSearch,
                 parentHandle = parentHandle,

@@ -310,11 +310,23 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         query: String,
         order: SortOrder,
         megaCancelToken: MegaCancelToken,
+        searchType: Int,
     ): List<MegaNode> {
         return withContext(ioDispatcher) {
-            return@withContext megaApiGateway.search(
-                parentNode, query, megaCancelToken, sortOrderIntMapper(order)
-            )
+            return@withContext if (searchType == -1) {
+                megaApiGateway.search(
+                    parentNode, query, megaCancelToken, sortOrderIntMapper(order)
+                )
+            } else {
+                megaApiGateway.searchByType(
+                    parentNode = parentNode,
+                    searchString = query,
+                    cancelToken = megaCancelToken,
+                    recursive = true,
+                    order = sortOrderIntMapper(order),
+                    type = searchType
+                )
+            }
         }
     }
 

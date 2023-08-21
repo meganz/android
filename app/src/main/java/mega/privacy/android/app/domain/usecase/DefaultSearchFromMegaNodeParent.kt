@@ -22,12 +22,19 @@ class DefaultSearchFromMegaNodeParent @Inject constructor(
         parentHandleSearch: Long,
         megaCancelToken: MegaCancelToken,
         parent: MegaNode?,
+        searchType: Int,
     ): List<MegaNode>? {
         return parent?.let {
             if (query.isEmpty() || parentHandleSearch != MegaApiJava.INVALID_HANDLE) {
                 megaNodeRepository.getChildrenNode(it, getCloudSortOrder())
             } else {
-                megaNodeRepository.search(it, query, getCloudSortOrder(), megaCancelToken)
+                megaNodeRepository.search(
+                    parentNode = it,
+                    query = query,
+                    order = getCloudSortOrder(),
+                    megaCancelToken = megaCancelToken,
+                    searchType = searchType
+                )
             }
         } ?: run {
             emptyList()

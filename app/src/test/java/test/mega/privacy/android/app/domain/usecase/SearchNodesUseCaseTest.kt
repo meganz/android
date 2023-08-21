@@ -3,12 +3,11 @@ package test.mega.privacy.android.app.domain.usecase
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultSearchNodes
 import mega.privacy.android.app.domain.usecase.GetSearchInSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchLinkSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchOutSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchFromMegaNodeParent
-import mega.privacy.android.app.domain.usecase.SearchNodes
+import mega.privacy.android.app.domain.usecase.SearchNodesUseCase
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.data.repository.MegaNodeRepository
 import nz.mega.sdk.MegaCancelToken
@@ -21,8 +20,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultSearchNodesTest {
-    private lateinit var underTest: SearchNodes
+class SearchNodesUseCaseTest {
+    private lateinit var underTest: SearchNodesUseCase
     private val getSearchLinkSharesNodes: GetSearchLinkSharesNodes = mock()
     private val getSearchOutSharesNodes: GetSearchOutSharesNodes = mock()
     private val getSearchInSharesNodes: GetSearchInSharesNodes = mock()
@@ -37,7 +36,7 @@ class DefaultSearchNodesTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultSearchNodes(
+        underTest = SearchNodesUseCase(
             getSearchInSharesNodes = getSearchInSharesNodes,
             getSearchFromMegaNodeParent = getSearchFromMegaNodeParent,
             getSearchLinkSharesNodes = getSearchLinkSharesNodes,

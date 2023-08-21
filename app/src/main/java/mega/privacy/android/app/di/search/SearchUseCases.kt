@@ -11,13 +11,11 @@ import mega.privacy.android.app.domain.usecase.DefaultGetSearchLinkSharesNodes
 import mega.privacy.android.app.domain.usecase.DefaultGetSearchOutSharesNodes
 import mega.privacy.android.app.domain.usecase.DefaultIncomingExplorerSearchNode
 import mega.privacy.android.app.domain.usecase.DefaultSearchFromMegaNodeParent
-import mega.privacy.android.app.domain.usecase.DefaultSearchNodes
 import mega.privacy.android.app.domain.usecase.GetIncomingExplorerSearchNode
 import mega.privacy.android.app.domain.usecase.GetSearchInSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchLinkSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchOutSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchFromMegaNodeParent
-import mega.privacy.android.app.domain.usecase.SearchNodes
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -30,9 +28,6 @@ abstract class SearchUseCases {
 
     @Binds
     abstract fun bindGetSearchLinkShare(defaultGetSearchLinkSharesNodes: DefaultGetSearchLinkSharesNodes): GetSearchLinkSharesNodes
-
-    @Binds
-    abstract fun bindSearchNode(defaultSearchNodeUseCase: DefaultSearchNodes): SearchNodes
 
     @Binds
     abstract fun bindSearchFromMegaNodeParent(defaultSearchFromMegaNodeParent: DefaultSearchFromMegaNodeParent): GetSearchFromMegaNodeParent

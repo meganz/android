@@ -238,12 +238,14 @@ interface MegaNodeRepository {
      * @param query Query string
      * @param order [SortOrder]
      * @param megaCancelToken [MegaNode]
+     * @param searchType filter type
      */
     suspend fun search(
         parentNode: MegaNode,
         query: String,
         order: SortOrder,
         megaCancelToken: MegaCancelToken,
+        searchType: Int = -1,
     ): List<MegaNode>
 
     /**

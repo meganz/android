@@ -17,14 +17,25 @@ import javax.inject.Inject
  * @property getSearchOutSharesNodes [GetSearchOutSharesNodes]
  * @property getSearchFromMegaNodeParent [GetSearchFromMegaNodeParent]
  */
-class DefaultSearchNodes @Inject constructor(
+class SearchNodesUseCase @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
     private val getSearchLinkSharesNodes: GetSearchLinkSharesNodes,
     private val getSearchOutSharesNodes: GetSearchOutSharesNodes,
     private val getSearchInSharesNodes: GetSearchInSharesNodes,
     private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParent,
-) : SearchNodes {
-    override suspend fun invoke(
+) {
+
+    /**
+     * Use Case which search Nodes
+     * @param query query string
+     * @param parentHandleSearch ParentHandleSearch
+     * @param parentHandle ParentHandle
+     * @param drawerItem [DrawerItem]
+     * @param sharesTab sharesTab
+     * @param megaCancelToken [MegaCancelToken]
+     * @param isFirstLevel firstLevel
+     */
+    suspend operator fun invoke(
         query: String?,
         parentHandleSearch: Long,
         parentHandle: Long,
@@ -32,6 +43,7 @@ class DefaultSearchNodes @Inject constructor(
         sharesTab: Int,
         megaCancelToken: MegaCancelToken,
         isFirstLevel: Boolean,
+        searchType: Int = -1
     ): List<MegaNode>? {
         return query?.let {
             val parent = if (parentHandleSearch == MegaApiJava.INVALID_HANDLE) {
@@ -39,6 +51,7 @@ class DefaultSearchNodes @Inject constructor(
                     DrawerItem.HOMEPAGE -> megaNodeRepository.getRootNode()
                     DrawerItem.CLOUD_DRIVE ->
                         megaNodeRepository.getNodeByHandle(parentHandle)
+
                     DrawerItem.SHARED_ITEMS -> {
                         when (SharesTab.fromPosition(sharesTab)) {
                             SharesTab.INCOMING_TAB -> {
@@ -47,12 +60,14 @@ class DefaultSearchNodes @Inject constructor(
                                 }
                                 megaNodeRepository.getNodeByHandle(parentHandle)
                             }
+
                             SharesTab.OUTGOING_TAB -> {
                                 if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                     return@let getSearchOutSharesNodes(query, megaCancelToken)
                                 }
                                 megaNodeRepository.getNodeByHandle(parentHandle)
                             }
+
                             SharesTab.LINKS_TAB -> {
                                 if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                     return@let getSearchLinkSharesNodes(
@@ -63,11 +78,13 @@ class DefaultSearchNodes @Inject constructor(
                                 }
                                 megaNodeRepository.getNodeByHandle(parentHandle)
                             }
+
                             else -> {
                                 null
                             }
                         }
                     }
+
                     DrawerItem.RUBBISH_BIN -> {
                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                             megaNodeRepository.getRubbishBinNode()
@@ -75,6 +92,7 @@ class DefaultSearchNodes @Inject constructor(
                             megaNodeRepository.getNodeByHandle(parentHandle)
                         }
                     }
+
                     DrawerItem.INBOX -> {
                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                             megaNodeRepository.getInboxNode()
@@ -82,6 +100,7 @@ class DefaultSearchNodes @Inject constructor(
                             megaNodeRepository.getNodeByHandle(parentHandle)
                         }
                     }
+
                     else -> megaNodeRepository.getRootNode()
                 }
             } else {
@@ -92,7 +111,8 @@ class DefaultSearchNodes @Inject constructor(
                 query = query,
                 parentHandleSearch = parentHandleSearch,
                 megaCancelToken = megaCancelToken,
-                parent = parent
+                parent = parent,
+                searchType = searchType
             )
         } ?: run {
             emptyList()
