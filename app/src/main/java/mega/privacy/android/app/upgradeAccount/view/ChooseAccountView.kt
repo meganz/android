@@ -3,11 +3,15 @@ package mega.privacy.android.app.upgradeAccount.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +21,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,11 +35,17 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
@@ -80,10 +94,11 @@ fun ChooseAccountView(
         }
     ) { paddingValues ->
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
             modifier = Modifier
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState(), enabled = true)
+                .fillMaxWidth(),
         ) {
             if (state.localisedSubscriptionsList.isNotEmpty()) {
 
@@ -124,7 +139,7 @@ fun ChooseAccountView(
                     color = MaterialTheme.colors.grey_500_grey_400,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                        .align(Alignment.CenterHorizontally)
+                        .align(Alignment.Start)
                 )
             }
         }
@@ -138,7 +153,7 @@ fun ChooseAccountView(
 fun FreePlanRow(
     onPlanClicked: (AccountType) -> Unit,
 ) {
-    Row(
+    ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp)
@@ -146,76 +161,84 @@ fun FreePlanRow(
             .alpha(alpha = ContentAlpha.high)
             .testTag(AccountType.FREE.toString())
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .weight(.3f)
-                .padding(top = 10.dp)
-        ) {
-            Image(
-                painter = painterResource(id = UIAccountType.FREE.iconValue),
-                contentDescription = null
-            )
-            Text(
-                text = stringResource(id = UIAccountType.FREE.textValue),
-                color = MaterialTheme.colors.green_500_green_300
-            )
-        }
-        Column(
-            modifier = Modifier
-                .weight(.7f)
-                .padding(start = 10.dp)
-        ) {
-            MegaSpannedText(
-                value = stringResource(
-                    id = R.string.account_upgrade_storage_label,
-                    "20 GB+"
-                ) + "[B]1[/B]",
-                baseStyle = subtitle2,
-                styles = hashMapOf(
-                    SpanIndicator('A') to SpanStyle(
-                        color = MaterialTheme.colors.black_white,
-                    ),
-                    SpanIndicator('B') to SpanStyle(
-                        baselineShift = BaselineShift.Superscript,
-                        color = MaterialTheme.colors.red_500_red_300,
-                        fontSize = 12.sp
-                    )
+        val (image, title, storage, transfer, footnote) = createRefs()
+
+        Image(
+            painter = painterResource(id = UIAccountType.FREE.iconValue),
+            contentDescription = null,
+            modifier = Modifier.constrainAs(image) {
+                top.linkTo(parent.top, margin = 16.dp)
+                start.linkTo(parent.start, margin = 16.dp)
+            }
+        )
+        Text(
+            text = stringResource(id = UIAccountType.FREE.textValue),
+            color = MaterialTheme.colors.green_500_green_300,
+            modifier = Modifier.constrainAs(title) {
+                top.linkTo(image.bottom)
+                start.linkTo(image.start)
+                end.linkTo(image.end)
+            }
+        )
+        MegaSpannedText(
+            value = stringResource(
+                id = R.string.account_upgrade_storage_label,
+                "20 GB+"
+            ) + "[B]1[/B]",
+            baseStyle = subtitle2,
+            styles = hashMapOf(
+                SpanIndicator('A') to SpanStyle(
+                    color = MaterialTheme.colors.black_white,
                 ),
-                modifier = Modifier.padding(bottom = 8.dp),
-                color = MaterialTheme.colors.grey_600_grey_300,
-            )
-            MegaSpannedText(
-                value = stringResource(id = R.string.account_choose_free_limited_transfer_quota),
-                baseStyle = subtitle2,
-                styles = hashMapOf(
-                    SpanIndicator('A') to SpanStyle(
-                        color = MaterialTheme.colors.black_white,
-                    )
-                ),
-                color = MaterialTheme.colors.grey_600_grey_300,
-            )
-            MegaSpannedText(
-                value = "[A]1 [/A]" + stringResource(id = R.string.footnote_achievements),
-                baseStyle = MaterialTheme.typography.body4,
-                styles = hashMapOf(
-                    SpanIndicator('A') to SpanStyle(
-                        baselineShift = BaselineShift.Superscript,
-                        color = MaterialTheme.colors.red_500_red_300,
-                        fontSize = 10.sp
-                    )
-                ),
-                modifier = Modifier.padding(top = 5.dp, end = 20.dp),
-                color = MaterialTheme.colors.grey_600_grey_300,
-            )
-        }
+                SpanIndicator('B') to SpanStyle(
+                    baselineShift = BaselineShift.Superscript,
+                    color = MaterialTheme.colors.red_500_red_300,
+                    fontSize = 12.sp
+                )
+            ),
+            modifier = Modifier.constrainAs(storage) {
+                top.linkTo(parent.top, margin = 10.dp)
+                start.linkTo(image.end, margin = 50.dp)
+            },
+            color = MaterialTheme.colors.grey_600_grey_300,
+        )
+        MegaSpannedText(
+            value = stringResource(id = R.string.account_choose_free_limited_transfer_quota),
+            baseStyle = subtitle2,
+            styles = hashMapOf(
+                SpanIndicator('A') to SpanStyle(
+                    color = MaterialTheme.colors.black_white,
+                )
+            ),
+            modifier = Modifier.constrainAs(transfer) {
+                top.linkTo(storage.bottom, margin = 2.dp)
+                start.linkTo(storage.start)
+            },
+            color = MaterialTheme.colors.grey_600_grey_300,
+        )
+        MegaSpannedText(
+            value = "[A]1 [/A]" + stringResource(id = R.string.footnote_achievements),
+            baseStyle = MaterialTheme.typography.body4,
+            styles = hashMapOf(
+                SpanIndicator('A') to SpanStyle(
+                    baselineShift = BaselineShift.Superscript,
+                    color = MaterialTheme.colors.red_500_red_300,
+                    fontSize = 10.sp
+                )
+            ),
+            modifier = Modifier.constrainAs(footnote) {
+                linkTo(transfer.start, parent.end, bias = 0f)
+                top.linkTo(transfer.bottom, margin = 5.dp)
+                width = Dimension.preferredWrapContent
+            },
+            color = MaterialTheme.colors.grey_600_grey_300,
+        )
     }
 }
 
 /**
  * Row to display Pro plan, can be reused for each Pro plan
  */
-
 @Composable
 fun ChooseSubscriptionPlansInfoRow(
     proPlan: AccountType,
@@ -254,7 +277,7 @@ fun ChooseSubscriptionPlansInfoRow(
     val priceSubString = priceString.replaceFirst("[A]", "")
     val priceSubSubString = priceSubString.replaceFirst("[/A]", "")
 
-    Row(
+    ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp)
@@ -262,77 +285,74 @@ fun ChooseSubscriptionPlansInfoRow(
             .alpha(alpha = ContentAlpha.high)
             .testTag(proPlan.toString())
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        val (image, title, priceLabel, storageText, transferText) = createRefs()
+
+        Image(
+            painter = painterResource(id = uiAccountType.iconValue),
+            contentDescription = null,
+            modifier = Modifier.constrainAs(image) {
+                top.linkTo(anchor = parent.top, margin = 16.dp)
+                start.linkTo(anchor = parent.start, margin = 16.dp)
+            }
+        )
+        Text(
+            text = stringResource(id = uiAccountType.textValue),
+            color = if (isLight) uiAccountType.colorValue else uiAccountType.colorValueDark,
+            modifier = Modifier.constrainAs(title) {
+                top.linkTo(image.bottom)
+                start.linkTo(anchor = image.start)
+                end.linkTo(anchor = image.end)
+            }
+        )
+        Text(
+            text = createPriceText(
+                isLight = isLight,
+                uiAccountType = uiAccountType,
+                priceString = priceString,
+                priceSubString = priceSubString,
+                priceSubSubString = priceSubSubString
+            ),
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
-                .weight(.3f)
-                .padding(top = 10.dp)
-        ) {
-            Image(
-                painter = painterResource(id = uiAccountType.iconValue),
-                contentDescription = null
-            )
-            Text(
-                text = stringResource(id = uiAccountType.textValue),
-                color = if (isLight) uiAccountType.colorValue else uiAccountType.colorValueDark
-            )
-        }
-        Column(
-            modifier = Modifier
-                .weight(.7f)
-                .padding(start = 10.dp)
-        ) {
-            Text(
-                text = createPriceText(
-                    isLight = isLight,
-                    uiAccountType = uiAccountType,
-                    priceString = priceString,
-                    priceSubString = priceSubString,
-                    priceSubSubString = priceSubSubString,
+                .border(
+                    width = 1.dp,
+                    color = if (isLight) uiAccountType.colorValue else uiAccountType.colorValueDark,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .constrainAs(priceLabel) {
+                    top.linkTo(parent.top, margin = 10.dp)
+                    start.linkTo(image.end, 40.dp)
+                }
+        )
+        MegaSpannedText(
+            value = storageString,
+            baseStyle = body2,
+            styles = hashMapOf(
+                SpanIndicator('A') to SpanStyle(
+                    color = MaterialTheme.colors.black_white,
                 ),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .border(
-                        width = 1.dp,
-                        color = if (isLight) uiAccountType.colorValue else uiAccountType.colorValueDark,
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding(
-                        horizontal = 8.dp,
-                        vertical = 4.dp
-                    )
-            )
-            MegaSpannedText(
-                value = storageString,
-                baseStyle = body2,
-                styles = hashMapOf(
-                    SpanIndicator('A') to SpanStyle(
-                        color = MaterialTheme.colors.black_white,
-                    ),
+            ),
+            modifier = Modifier.constrainAs(storageText) {
+                top.linkTo(priceLabel.bottom, 8.dp)
+                start.linkTo(priceLabel.start, margin = 8.dp)
+            },
+            color = MaterialTheme.colors.grey_600_grey_300,
+        )
+        MegaSpannedText(
+            value = transferString,
+            baseStyle = body2,
+            styles = hashMapOf(
+                SpanIndicator('A') to SpanStyle(
+                    color = MaterialTheme.colors.black_white,
                 ),
-                modifier = Modifier
-                    .padding(
-                        start = 9.dp,
-                        top = 8.dp,
-                    ),
-                color = MaterialTheme.colors.grey_600_grey_300,
-            )
-            MegaSpannedText(
-                value = transferString,
-                baseStyle = body2,
-                styles = hashMapOf(
-                    SpanIndicator('A') to SpanStyle(
-                        color = MaterialTheme.colors.black_white,
-                    ),
-                ),
-                modifier = Modifier
-                    .padding(
-                        start = 9.dp,
-                        top = 2.dp,
-                    ),
-                color = MaterialTheme.colors.grey_600_grey_300,
-            )
-        }
+            ),
+            modifier = Modifier.constrainAs(transferText) {
+                top.linkTo(storageText.bottom, 2.dp)
+                start.linkTo(storageText.start)
+            },
+            color = MaterialTheme.colors.grey_600_grey_300,
+        )
     }
 }
 
