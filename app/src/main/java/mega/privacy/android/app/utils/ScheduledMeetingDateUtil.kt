@@ -65,27 +65,19 @@ object ScheduledMeetingDateUtil {
             OccurrenceFrequencyType.Daily -> {
                 val interval = scheduledMeeting.getIntervalValue()
                 result = when {
-                    interval > 1 ->
-                        context.getString(
-                            when {
-                                scheduledMeeting.isToday() -> R.string.meetings_one_off_occurrence_info_today
-                                scheduledMeeting.isTomorrow() -> R.string.meetings_one_off_occurrence_info_tomorrow
-                                else -> R.string.notification_subtitle_scheduled_meeting_one_off
-                            },
-                            scheduledMeeting.getCompleteStartDate(),
-                            startTime,
-                            endTime
-                        )
-
-                    scheduledMeeting.isForever() -> context.getString(
-                        R.string.notification_subtitle_scheduled_meeting_recurring_daily_forever,
+                    scheduledMeeting.isForever() -> context.resources.getQuantityString(
+                        R.plurals.notification_subtitle_scheduled_meeting_recurring_daily_forever,
+                        interval,
+                        interval,
                         startDate,
                         startTime,
                         endTime
                     )
 
-                    else -> context.getString(
-                        R.string.notification_subtitle_scheduled_meeting_recurring_daily_until,
+                    else -> context.resources.getQuantityString(
+                        R.plurals.notification_subtitle_scheduled_meeting_recurring_daily_until,
+                        interval,
+                        interval,
                         startDate,
                         endDate,
                         startTime,
