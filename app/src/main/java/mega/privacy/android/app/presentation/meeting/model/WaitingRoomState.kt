@@ -9,13 +9,19 @@ import java.time.ZonedDateTime
  * @property finish                     True, if the activity is to be terminated.
  * @property chatId                     Chat id.
  * @property schedId                    Scheduled meeting id.
- * @property schedMeetTitle             Scheduled meeting title.
- * @property schedMeetDate              Scheduled meeting [ZonedDateTime].
+ * @property title                      Scheduled meeting title.
+ * @property formattedTimestamp         Scheduled meeting timestamp formatted.
+ * @property micEnabled                 Flag to check if mic is enabled
+ * @property cameraEnabled              Flag to check if camera is enabled
+ * @property speakerEnabled             Flag to check if speaker is enabled
  **/
 data class WaitingRoomState(
     val finish: Boolean = false,
     val chatId: Long = -1L,
     val schedId: Long = -1L,
-    val schedMeetTitle: String = "Book Club",
-    val schedMeetDate: ZonedDateTime = ZonedDateTime.now(),
+    val title: String = "Book Club",
+    val formattedTimestamp: String = "Monday, 30 May · 10:25-11:25",
+    val micEnabled: Boolean = false,
+    val cameraEnabled: Boolean = false,
+    val speakerEnabled: Boolean = false,
 )

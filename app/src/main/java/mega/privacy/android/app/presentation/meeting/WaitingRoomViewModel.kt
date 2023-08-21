@@ -47,4 +47,28 @@ class WaitingRoomViewModel @Inject constructor(
             }
         }
     }
+
+    fun onMicEnabled(enable: Boolean) {
+        _state.update {
+            it.copy(
+                micEnabled = enable
+            )
+        }
+    }
+
+    fun onCameraEnabled(enable: Boolean) {
+        _state.update {
+            it.copy(
+                cameraEnabled = enable
+            )
+        }
+    }
+
+    fun onSpeakerEnabled(enable: Boolean) {
+        _state.update {
+            it.copy(
+                speakerEnabled = enable
+            )
+        }
+    }
 }
