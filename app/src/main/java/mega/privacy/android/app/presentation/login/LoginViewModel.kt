@@ -149,7 +149,8 @@ class LoginViewModel @Inject constructor(
                     { state: LoginState ->
                         state.copy(
                             intentState = LoginIntentState.ReadyForInitialSetup,
-                            accountSession = AccountSession(session = session),
+                            accountSession = state.accountSession?.copy(session = session)
+                                ?: AccountSession(session = session),
                             is2FAEnabled = false,
                             isAccountConfirmed = false,
                             pressedBackWhileLogin = false,
