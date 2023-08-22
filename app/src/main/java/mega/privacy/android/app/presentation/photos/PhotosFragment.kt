@@ -18,6 +18,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,6 +58,7 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFr
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActionModeCallback
+import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
@@ -657,11 +659,13 @@ class PhotosFragment : Fragment() {
         resetAlbumContentState(album = album, resetMessage = resetMessage)
         viewLifecycleOwner.lifecycleScope.launch {
             Handler(Looper.getMainLooper()).post {
-                managerActivity.skipToAlbumContentFragment(
-                    AlbumDynamicContentFragment.getInstance(
-                        doesAccountHavePhotos()
-                    )
-                )
+                val fragment = if (!albumsViewModel.isReworkAlbum) {
+                    AlbumDynamicContentFragment.getInstance(doesAccountHavePhotos())
+                } else {
+                    Toast.makeText(requireContext(), "Rework album", Toast.LENGTH_SHORT).show()
+                    AlbumContentFragment.getInstance(album.id)
+                }
+                managerActivity.skipToAlbumContentFragment(fragment)
             }
         }
     }

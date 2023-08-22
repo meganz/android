@@ -23,6 +23,15 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * Enables new architecture of album.
+     * Remove once regression testing completed
+     */
+    ReworkAlbum(
+        "Enables new architecture of album",
+        false,
+    ),
+
+    /**
      * Enables prefetch timeline photos as soon initialization screen completed
      */
     PrefetchTimeline(

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums
 
+@Deprecated(message = "In favor of mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentState")
 data class AlbumContentState(
     val isLoadingPhotos: Boolean = true,
     val isAddingPhotos: Boolean = false,

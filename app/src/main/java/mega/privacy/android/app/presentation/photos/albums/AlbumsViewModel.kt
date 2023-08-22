@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.LegacyUIAlbumMapper
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -58,6 +59,7 @@ class AlbumsViewModel @Inject constructor(
     private val getAlbumPhotos: GetAlbumPhotos,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
     private val uiAlbumMapper: UIAlbumMapper,
+    private val legacyUIAlbumMapper: LegacyUIAlbumMapper,
     private var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
     private val getNodeListByIds: GetNodeListByIds,
@@ -79,11 +81,21 @@ class AlbumsViewModel @Inject constructor(
 
     private var createAlbumJob: Job? = null
 
+    @Volatile
+    var isReworkAlbum: Boolean = false
+
     init {
-        loadAlbums()
+        viewModelScope.launch {
+            isReworkAlbum = getFeatureFlagValueUseCase(AppFeatures.ReworkAlbum)
+            if (!isReworkAlbum) {
+                loadAlbumsInLegacyArchitecture()
+            } else {
+                loadAlbums()
+            }
+        }
     }
 
-    private fun loadAlbums() {
+    private fun loadAlbumsInLegacyArchitecture() {
         currentNodeJob = viewModelScope.launch {
             val includedSystemAlbums = getDefaultAlbumsMapUseCase()
             runCatching {
@@ -96,7 +108,7 @@ class AlbumsViewModel @Inject constructor(
                         }.takeIf {
                             shouldAddAlbum(it, key)
                         }?.let {
-                            uiAlbumMapper(it, key, isLoadingDone = true)
+                            legacyUIAlbumMapper(it, key, isLoadingDone = true)
                         }
                     }
                 }.collectLatest { systemAlbums ->
@@ -112,6 +124,43 @@ class AlbumsViewModel @Inject constructor(
                             albums = albums,
                             currentAlbum = currentAlbum,
                         )
+                    }
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    private fun loadAlbums() {
+        currentNodeJob = viewModelScope.launch {
+            val includedSystemAlbums = getDefaultAlbumsMapUseCase()
+            runCatching {
+                getDefaultAlbumPhotos(
+                    includedSystemAlbums.values.toList()
+                ).mapLatest { photos ->
+                    includedSystemAlbums.mapNotNull { (key, value) ->
+                        photos.filter {
+                            value(it)
+                        }.takeIf {
+                            shouldAddAlbum(it, key)
+                        }?.let {
+                            val cover = withContext(defaultDispatcher) {
+                                it.maxByOrNull { photo -> photo.modificationTime }
+                            }
+                            uiAlbumMapper(it.size, cover, cover, key)
+                        }
+                    }
+                }.collectLatest { systemAlbums ->
+                    albumJob ?: loadUserAlbums()
+
+                    val albums = withContext(defaultDispatcher) {
+                        val userAlbums = _state.value.albums.filter { it.id is Album.UserAlbum }
+                        systemAlbums + userAlbums
+                    }
+
+                    _state.update {
+                        it.copy(albums = albums)
                     }
                 }
             }.onFailure { exception ->
@@ -181,7 +230,13 @@ class AlbumsViewModel @Inject constructor(
             val uiAlbum = userUIAlbums.firstOrNull { uiAlbum ->
                 (uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id
             }
-            uiAlbumMapper(uiAlbum?.photos.orEmpty(), userAlbum, isLoadingDone = true)
+            if (!isReworkAlbum) {
+                legacyUIAlbumMapper(uiAlbum?.photos.orEmpty(), userAlbum, isLoadingDone = true)
+            } else {
+                val cover = userAlbum.cover
+                val defaultCover = uiAlbum?.photos?.maxByOrNull { it.modificationTime }
+                uiAlbumMapper(uiAlbum?.count ?: 0, cover, defaultCover, userAlbum)
+            }
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.creationTime }
 
         systemUIAlbums + updatedUserUIAlbums
@@ -216,7 +271,13 @@ class AlbumsViewModel @Inject constructor(
 
         val updatedUserUIAlbums = userUIAlbums.map { uiAlbum ->
             if ((uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id) {
-                uiAlbumMapper(photos, uiAlbum.id, isLoadingDone = true)
+                if (!isReworkAlbum) {
+                    legacyUIAlbumMapper(photos, uiAlbum.id, isLoadingDone = true)
+                } else {
+                    val cover = uiAlbum.id.cover
+                    val defaultCover = photos.maxByOrNull { it.modificationTime }
+                    uiAlbumMapper(photos.size, cover, defaultCover, uiAlbum.id)
+                }
             } else {
                 uiAlbum
             }
@@ -410,7 +471,7 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    private fun getAllUserAlbumsNames() = _state.value.albums.filter {
+    internal fun getAllUserAlbumsNames() = _state.value.albums.filter {
         it.id is Album.UserAlbum
     }.map { it.title }
         .filterIsInstance<AlbumTitle.StringTitle>().map { it.title }

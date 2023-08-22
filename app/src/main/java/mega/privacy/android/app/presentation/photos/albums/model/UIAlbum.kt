@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property title          The album title
  * @property count          The count of photos items inside the album
  * @property coverPhoto     The selected photos used as the cover
+ * @property defaultCover   The fallback cover if main cover is null
  * @property photos         The list of all photos in the albums
  * @property isLoadingDone  To indicate if the loading of the UIAlbum is done
  */
@@ -18,6 +19,7 @@ data class UIAlbum(
     val title: AlbumTitle,
     val count: Int,
     val coverPhoto: Photo?,
+    val defaultCover: Photo? = null,
     val photos: List<Photo>,
     val isLoadingDone: Boolean = false,
 )

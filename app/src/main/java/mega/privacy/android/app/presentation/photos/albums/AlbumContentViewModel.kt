@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressComp
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import javax.inject.Inject
 
+@Deprecated(message = "In favor of mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentViewModel")
 @HiltViewModel
 class AlbumContentViewModel @Inject constructor(
     private val observeAlbumPhotosAddingProgress: ObserveAlbumPhotosAddingProgress,

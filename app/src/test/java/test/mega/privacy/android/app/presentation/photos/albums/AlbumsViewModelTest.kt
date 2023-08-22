@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -16,9 +17,11 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.LegacyUIAlbumMapper
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -59,7 +62,8 @@ class AlbumsViewModelTest {
     private lateinit var underTest: AlbumsViewModel
 
     private val getDefaultAlbumPhotos = mock<GetDefaultAlbumPhotos>()
-    private val uiAlbumMapper = mock<UIAlbumMapper>()
+    private val uiAlbumMapper = mock<LegacyUIAlbumMapper>()
+    private val newUiAlbumMapper = mock<UIAlbumMapper>()
     private val getUserAlbums = mock<GetUserAlbums>()
     private val getAlbumPhotos = mock<GetAlbumPhotos>()
     private val getFeatureFlagUseCase =
@@ -80,6 +84,7 @@ class AlbumsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf()))
+        runBlocking { whenever(getFeatureFlagUseCase(AppFeatures.ReworkAlbum)).thenReturn(false) }
 
         underTest = AlbumsViewModel(
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
@@ -87,7 +92,8 @@ class AlbumsViewModelTest {
             getUserAlbums = getUserAlbums,
             getAlbumPhotos = getAlbumPhotos,
             getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
-            uiAlbumMapper = uiAlbumMapper,
+            uiAlbumMapper = newUiAlbumMapper,
+            legacyUIAlbumMapper = uiAlbumMapper,
             getFeatureFlagValueUseCase = getFeatureFlagUseCase,
             removeFavouritesUseCase = removeFavouritesUseCase,
             getNodeListByIds = getNodeListByIds,

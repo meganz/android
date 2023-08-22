@@ -232,7 +232,7 @@ fun AlbumsView(
             ) {
                 items(
                     items = albumsViewState.albums,
-                    key = { it.id.toString() + it.coverPhoto?.id.toString() }
+                    key = { it.id.toString() + "${it.coverPhoto?.id}" + "${it.defaultCover?.id}" }
                 ) { album ->
                     Box(
                         modifier = Modifier
@@ -260,7 +260,7 @@ fun AlbumsView(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             val imageState = produceState<String?>(initialValue = null) {
-                                album.coverPhoto?.let {
+                                (album.coverPhoto ?: album.defaultCover)?.let {
                                     downloadPhoto(
                                         false,
                                         it

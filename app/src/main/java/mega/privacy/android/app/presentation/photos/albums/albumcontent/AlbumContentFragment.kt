@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.albums
+package mega.privacy.android.app.presentation.photos.albums.albumcontent
 
 import android.content.Intent
 import android.os.Bundle
@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -32,15 +33,18 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
-import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
-import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
+import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
+import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.AlbumContentScreen
 import mega.privacy.android.app.presentation.photos.compose.albumcontent.isFilterable
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
+import mega.privacy.android.domain.entity.photos.Album.GifAlbum
+import mega.privacy.android.domain.entity.photos.Album.RawAlbum
+import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -51,33 +55,26 @@ import javax.inject.Inject
 /**
  * New Album Content View
  */
-@Deprecated(message = "In favor of mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment")
 @AndroidEntryPoint
-class AlbumDynamicContentFragment : Fragment() {
-    internal val timelineViewModel: TimelineViewModel by activityViewModels()
-    internal val albumsViewModel: AlbumsViewModel by activityViewModels()
+class AlbumContentFragment : Fragment() {
+    private val timelineViewModel: TimelineViewModel by activityViewModels()
+    private val albumsViewModel: AlbumsViewModel by activityViewModels()
 
     private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
-    private val albumContentViewModel: AlbumContentViewModel by viewModels()
+    internal val albumContentViewModel: AlbumContentViewModel by viewModels()
 
-    @Inject
-    lateinit var getThemeMode: GetThemeMode
     internal lateinit var managerActivity: ManagerActivity
-    private var menu: Menu? = null
 
     // Action mode
+    private var menu: Menu? = null
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: AlbumContentActionModeCallback
 
     @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+    lateinit var getThemeMode: GetThemeMode
 
-    companion object {
-        @JvmStatic
-        fun getInstance(isAccountHasPhotos: Boolean): AlbumDynamicContentFragment {
-            return AlbumDynamicContentFragment()
-        }
-    }
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val albumPhotosSelectionLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -129,6 +126,9 @@ class AlbumDynamicContentFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        albumContentViewModel.revalidateAlbumNameInput(
+            albumNames = albumsViewModel.getAllUserAlbumsNames(),
+        )
         Analytics.tracker.trackEvent(AlbumContentScreenEvent)
     }
 
@@ -144,7 +144,7 @@ class AlbumDynamicContentFragment : Fragment() {
     private fun setupFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                albumsViewModel.state.collect { state ->
+                albumContentViewModel.state.collect { state ->
                     if (state.selectedPhotos.isEmpty()) {
                         if (actionMode != null) {
                             exitActionMode()
@@ -155,14 +155,12 @@ class AlbumDynamicContentFragment : Fragment() {
                         }
                         actionMode?.title = state.selectedPhotos.size.toString()
                     }
+
                     menu?.let { menu ->
-                        state.currentAlbum?.let { album ->
-                            val photos = state.albums.getAlbumPhotos(album)
-                            menu.findItem(R.id.action_menu_sort_by)?.isVisible =
-                                photos.isNotEmpty()
-                        }
+                        menu.findItem(R.id.action_menu_sort_by)?.isVisible = state.photos.isNotEmpty()
                     }
-                    if (!state.showRenameDialog){
+
+                    if (!state.showRenameDialog) {
                         managerActivity.setToolbarTitle(getCurrentAlbumTitle())
                     }
                 }
@@ -180,7 +178,7 @@ class AlbumDynamicContentFragment : Fragment() {
         managerActivity.overridePendingTransition(0, 0)
     }
 
-    private fun openAlbumPhotosSelection(album: Album.UserAlbum) {
+    private fun openAlbumPhotosSelection(album: UserAlbum) {
         val intent = AlbumScreenWrapperActivity.createAlbumPhotosSelectionScreen(
             context = requireContext(),
             albumId = album.id,
@@ -192,8 +190,8 @@ class AlbumDynamicContentFragment : Fragment() {
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {}
 
     private fun openAlbumCoverSelectionScreen() {
-        val album = albumsViewModel.state.value.currentAlbum
-        if (album !is Album.UserAlbum) return
+        val album = albumContentViewModel.state.value.uiAlbum?.id
+        if (album !is UserAlbum) return
 
         val intent = AlbumScreenWrapperActivity.createAlbumCoverSelectionScreen(
             context = requireContext(),
@@ -204,7 +202,7 @@ class AlbumDynamicContentFragment : Fragment() {
 
     private fun handleAlbumCoverSelectionResult(result: ActivityResult) {
         val message = result.data?.getStringExtra(AlbumScreenWrapperActivity.MESSAGE)
-        albumsViewModel.setSnackBarMessage(message.orEmpty())
+        albumContentViewModel.setSnackBarMessage(message.orEmpty())
     }
 
     private fun enterActionMode() {
@@ -226,24 +224,25 @@ class AlbumDynamicContentFragment : Fragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        albumsViewModel.state.value.currentAlbum?.let { album ->
-            val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
+        albumContentViewModel.state.value.uiAlbum?.id?.let { album ->
+            val photos = albumContentViewModel.state.value.photos
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
             photos.setFilterMenuItemVisibility()
-            if (album is Album.UserAlbum) {
+
+            if (album is UserAlbum) {
                 val isAlbumSharingEnabled = runBlocking {
                     getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)
                 }
                 menu.findItem(R.id.action_menu_get_link)?.let { menu ->
                     menu.title =
                         context?.resources?.getQuantityString(R.plurals.album_share_get_links, 1)
-                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == false
+                    menu.isVisible = isAlbumSharingEnabled && album.isExported == false
                 }
                 menu.findItem(R.id.action_menu_manage_link)?.let { menu ->
-                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == true
+                    menu.isVisible = isAlbumSharingEnabled && album.isExported == true
                 }
                 menu.findItem(R.id.action_menu_remove_link)?.let { menu ->
-                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == true
+                    menu.isVisible = isAlbumSharingEnabled && album.isExported == true
                 }
 
                 menu.findItem(R.id.action_menu_rename)?.isVisible = true
@@ -271,11 +270,11 @@ class AlbumDynamicContentFragment : Fragment() {
             }
 
             R.id.action_menu_sort_by -> {
-                albumsViewModel.showSortByDialog(showSortByDialog = true)
+                albumContentViewModel.showSortByDialog(showSortByDialog = true)
             }
 
             R.id.action_menu_filter -> {
-                albumsViewModel.showFilterDialog(showFilterDialog = true)
+                albumContentViewModel.showFilterDialog(showFilterDialog = true)
             }
 
             R.id.action_menu_delete -> {
@@ -283,7 +282,7 @@ class AlbumDynamicContentFragment : Fragment() {
             }
 
             R.id.action_menu_rename -> {
-                albumsViewModel.showRenameDialog(showRenameDialog = true)
+                albumContentViewModel.showRenameDialog(showRenameDialog = true)
             }
 
             R.id.action_menu_select_album_cover -> {
@@ -302,11 +301,11 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun handleAlbumDeletion() {
-        val photos = albumsViewModel.state.value.currentUIAlbum?.photos.orEmpty()
+        val photos = albumContentViewModel.state.value.photos
         if (photos.isEmpty()) {
             albumContentViewModel.deleteAlbum()
         } else {
-            albumsViewModel.showDeleteAlbumsConfirmation()
+            albumContentViewModel.showDeleteAlbumsConfirmation()
         }
     }
 
@@ -314,7 +313,7 @@ class AlbumDynamicContentFragment : Fragment() {
      * Get current page title
      */
     fun getCurrentAlbumTitle(): String {
-        val currentUIAlbum = albumsViewModel.state.value.currentUIAlbum
+        val currentUIAlbum = albumContentViewModel.state.value.uiAlbum
         return if (context != null && currentUIAlbum != null) {
             currentUIAlbum.title.getTitleString(requireContext())
         } else {
@@ -322,19 +321,15 @@ class AlbumDynamicContentFragment : Fragment() {
         }
     }
 
-    val currentAlbum: Album? get() = albumsViewModel.state.value.currentAlbum
-
-    val currentUserAlbum: Album.UserAlbum? get() = albumsViewModel.state.value.currentUserAlbum
-
     override fun onPause() {
         ackPhotosAddingProgressCompleted()
         ackPhotosRemovingProgressCompleted()
-        albumsViewModel.setSnackBarMessage("")
+        albumContentViewModel.setSnackBarMessage("")
         super.onPause()
     }
 
     private fun ackPhotosAddingProgressCompleted() {
-        val album = albumsViewModel.state.value.currentUserAlbum ?: return
+        val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
         val isProgressCompleted = albumContentViewModel.state.value.isAddingPhotosProgressCompleted
 
         if (!isProgressCompleted) return
@@ -342,7 +337,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun ackPhotosRemovingProgressCompleted() {
-        val album = albumsViewModel.state.value.currentUserAlbum ?: return
+        val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
         val isProgressCompleted = albumContentViewModel.state.value.isRemovingPhotosProgressCompleted
 
         if (!isProgressCompleted) return
@@ -350,7 +345,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun openAlbumGetLinkScreen(isNewLink: Boolean) {
-        val album = albumsViewModel.state.value.currentUserAlbum ?: return
+        val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
         val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
             context = requireContext(),
             albumId = album.id,
@@ -358,5 +353,22 @@ class AlbumDynamicContentFragment : Fragment() {
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
+    }
+
+    companion object {
+        @JvmStatic
+        fun getInstance(album: Album): AlbumContentFragment {
+            return AlbumContentFragment().apply {
+                arguments = bundleOf(
+                    "type" to when (album) {
+                        FavouriteAlbum -> "favourite"
+                        GifAlbum -> "gif"
+                        RawAlbum -> "raw"
+                        else -> "custom"
+                    },
+                    "id" to if (album is UserAlbum) album.id.id else null,
+                )
+            }
+        }
     }
 }

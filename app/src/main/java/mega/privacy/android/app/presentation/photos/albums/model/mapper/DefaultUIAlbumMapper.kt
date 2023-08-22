@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Mapper to convert list of Photos to UIAlbum
  */
 class DefaultUIAlbumMapper @Inject constructor() :
-    UIAlbumMapper {
+    LegacyUIAlbumMapper {
 
     override fun invoke(photos: List<Photo>, album: Album, isLoadingDone: Boolean): UIAlbum {
         val title = when (album) {
