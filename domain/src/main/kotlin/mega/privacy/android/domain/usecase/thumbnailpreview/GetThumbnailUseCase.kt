@@ -18,13 +18,16 @@ class GetThumbnailUseCase @Inject constructor(
      * @param nodeId
      * @return
      */
-    suspend operator fun invoke(nodeId: Long): File? {
+    suspend operator fun invoke(nodeId: Long, allowThrow: Boolean = false): File? {
         runCatching {
             thumbnailPreviewRepository.getThumbnailFromLocal(nodeId)
                 ?: thumbnailPreviewRepository.getThumbnailFromServer(nodeId)
         }.fold(
             onSuccess = { return it },
-            onFailure = { return null }
+            onFailure = { e ->
+                if (allowThrow) throw e
+                return null
+            }
         )
     }
 }

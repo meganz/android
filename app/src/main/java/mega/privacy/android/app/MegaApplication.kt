@@ -26,6 +26,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fcm.CreateNotificationChannelsUseCase
+import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
+import mega.privacy.android.app.fetcher.MegaThumbnailKeyer
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -54,6 +56,7 @@ import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -173,6 +176,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var greeter: Provider<Greeter>
 
+    @Inject
+    lateinit var getThumbnailUseCase: dagger.Lazy<GetThumbnailUseCase>
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -260,6 +266,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                     add(GifDecoder.Factory())
                 }
                 add(SvgDecoder.Factory())
+                add(MegaThumbnailFetcher.Factory(getThumbnailUseCase = getThumbnailUseCase))
+                add(MegaThumbnailKeyer)
             }
             .build()
     }

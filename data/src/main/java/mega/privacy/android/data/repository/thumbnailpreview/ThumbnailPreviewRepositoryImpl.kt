@@ -54,6 +54,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     override suspend fun getThumbnailFromServer(handle: Long): File? =
         withContext(ioDispatcher) {
             megaApi.getMegaNodeByHandle(handle)?.let { node ->
+                if (!node.hasThumbnail()) return@withContext null
                 getThumbnailFile(node)?.let { thumbnail ->
                     suspendCancellableCoroutine { continuation ->
                         val listener = continuation.getRequestListener("getThumbnailFromServer") {

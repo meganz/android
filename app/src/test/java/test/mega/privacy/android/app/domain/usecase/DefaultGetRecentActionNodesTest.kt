@@ -21,7 +21,7 @@ class DefaultGetRecentActionNodesTest {
     private lateinit var underTest: GetRecentActionNodes
 
     private val getThumbnailUseCase = mock<GetThumbnailUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(null)
+        onBlocking { invoke(any(), any()) }.thenReturn(null)
     }
     private val nodes = (0L..5L).map { value ->
         mock<TypedFileNode> {

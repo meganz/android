@@ -64,6 +64,7 @@ class ThumbnailPreviewRepositoryImplTest {
     fun `test that get thumbnail from server returns successfully if no error is thrown`() {
         runTest {
             whenever(megaNode.base64Handle).thenReturn(thumbnailName)
+            whenever(megaNode.hasThumbnail()).thenReturn(true)
             whenever(megaApi.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
             whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnailFile)
 
@@ -90,6 +91,7 @@ class ThumbnailPreviewRepositoryImplTest {
     fun `test that get thumbnail from server doesn't returns successfully`() {
         runTest {
             whenever(megaNode.base64Handle).thenReturn(thumbnailName)
+            whenever(megaNode.hasThumbnail()).thenReturn(true)
             whenever(megaApi.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
             whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnailFile)
 
