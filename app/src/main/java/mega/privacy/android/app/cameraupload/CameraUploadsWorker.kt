@@ -29,10 +29,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.monitoring.PerformanceReporter
-import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.data.R
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_UPLOADS_PAUSED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
@@ -52,6 +50,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
@@ -216,7 +215,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase,
     private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase,
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
-    private val completedTransferMapper: LegacyCompletedTransferMapper,
+    private val completedTransferMapper: CompletedTransferMapper,
     private val setCoordinatesUseCase: SetCoordinatesUseCase,
     private val isChargingUseCase: IsChargingUseCase,
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
@@ -1190,8 +1189,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         try {
             val path = transfer.localPath
             if (transfer.state == TransferState.STATE_COMPLETED) {
-                val androidCompletedTransfer = AndroidCompletedTransfer(transfer, error, context)
-                addCompletedTransferUseCase(completedTransferMapper(androidCompletedTransfer))
+                addCompletedTransferUseCase(completedTransferMapper(transfer, error))
             }
             error?.let {
                 Timber.d("Image Sync Finished, Error Code: ${it.errorCode}")

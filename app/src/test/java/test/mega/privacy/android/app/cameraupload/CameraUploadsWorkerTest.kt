@@ -23,7 +23,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.app.monitoring.PerformanceReporter
-import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
+import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
@@ -184,7 +184,7 @@ class CameraUploadsWorkerTest {
     private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase =
         mock()
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase = mock()
-    private val completedTransferMapper: LegacyCompletedTransferMapper = mock()
+    private val completedTransferMapper: CompletedTransferMapper = mock()
     private val setCoordinatesUseCase: SetCoordinatesUseCase = mock()
     private val isChargingUseCase: IsChargingUseCase = mock()
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase = mock()

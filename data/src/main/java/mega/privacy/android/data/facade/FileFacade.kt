@@ -280,6 +280,9 @@ class FileFacade @Inject constructor(
         return false
     }
 
+    override suspend fun getAbsolutePath(path: String) =
+        File(path).takeIf { it.exists() }?.absolutePath
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val OFFLINE_DIR = "MEGA Offline"

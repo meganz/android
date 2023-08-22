@@ -201,4 +201,11 @@ interface FileGateway {
      * @return           True if success or false otherwise
      */
     suspend fun renameFile(oldFile: File, newName: String): Boolean
+
+    /**
+     * get absolute path of a file if exists
+     *
+     * @param path
+     */
+    suspend fun getAbsolutePath(path: String): String?
 }

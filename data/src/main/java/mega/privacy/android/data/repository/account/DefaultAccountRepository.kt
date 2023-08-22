@@ -518,7 +518,7 @@ internal class DefaultAccountRepository @Inject constructor(
             request.megaAccountDetails,
             request.numDetails,
             megaApiGateway.getRootNode(),
-            megaApiGateway.getRubbishNode(),
+            megaApiGateway.getRubbishBinNode(),
             megaApiGateway.getIncomingSharesNode(null),
         )
         // keep previous info if new info null

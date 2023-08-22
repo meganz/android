@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * [TransferType] to SDK Int mapper
  */
-internal class TransferTypeIntMapper @Inject constructor() {
+class TransferTypeIntMapper @Inject constructor() {
 
     /**
      * Invoke

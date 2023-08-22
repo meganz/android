@@ -13,9 +13,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
+import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -40,6 +42,7 @@ import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.feature.sync.data.service.ApplicationLoggingInSetter
 
 /**
@@ -139,6 +142,26 @@ abstract class UtilWrapperModule {
                     } catch (ignore: IllegalArgumentException) {
                         Base64.decode(base64.trim(), Base64.URL_SAFE).toString(Charsets.UTF_8)
                     }
+
+                override fun getSizeString(size: Long) = Util.getSizeString(size, context)
+
+                override fun getErrorStringResource(megaException: MegaException) =
+                    context.getString(megaException.getErrorStringId())
+
+                override fun getCloudDriveSection() =
+                    context.getString(R.string.section_cloud_drive)
+
+                override fun getRubbishBinSection() =
+                    context.getString(R.string.section_rubbish_bin)
+
+                override fun getTitleIncomingSharesExplorer() =
+                    context.getString(R.string.title_incoming_shares_explorer)
+
+                override fun getErrorStorageQuota() =
+                    context.getString(R.string.error_share_owner_storage_quota)
+
+                override fun getSavedForOfflineNew() =
+                    context.getString(R.string.section_saved_for_offline_new)
             }
 
         /**

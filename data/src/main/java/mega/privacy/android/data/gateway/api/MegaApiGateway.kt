@@ -1301,13 +1301,6 @@ interface MegaApiGateway {
     suspend fun getVerifiedIncomingShares(order: Int?): List<MegaShare>
 
     /**
-     * Returns the rubbish node of the account.
-     *
-     * @return Rubbish node of the account.
-     */
-    suspend fun getRubbishNode(): MegaNode?
-
-    /**
      * Create a new MegaSet item
      *
      * @param name the name of the set

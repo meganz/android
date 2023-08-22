@@ -24,6 +24,7 @@ internal fun MegaException.getErrorStringId(): Int =
                 "Too many concurrent connections or transfers" -> R.string.api_etoomay
                 else -> R.string.payment_egeneric_api_error_unknown
             }
+
         MegaError.API_ERANGE -> R.string.api_erange
         MegaError.API_EEXPIRED -> R.string.api_eexpired
         MegaError.API_ENOENT -> R.string.api_enoent
@@ -33,6 +34,7 @@ internal fun MegaException.getErrorStringId(): Int =
                 "Circular linkage detected" -> R.string.api_ecircular
                 else -> R.string.payment_egeneric_api_error_unknown
             }
+
         MegaError.API_EACCESS -> R.string.api_eaccess
         MegaError.API_EEXIST -> R.string.api_eexist
         MegaError.API_EINCOMPLETE -> R.string.api_eincomplete
@@ -44,6 +46,7 @@ internal fun MegaException.getErrorStringId(): Int =
             } else {
                 R.string.payment_egeneric_api_error_unknown
             }
+
         MegaError.API_EOVERQUOTA -> R.string.api_eoverquota
         MegaError.API_ETEMPUNAVAIL -> R.string.api_etempunavail
         MegaError.API_ETOOMANYCONNECTIONS -> R.string.api_etoomanyconnections

@@ -113,4 +113,17 @@ data class Transfer(
             .filterIsInstance(TransferAppData.ChatUpload::class.java)
             .firstOrNull()
             ?.pendingMessageId
+
+    /**
+     * Get the sdcard transfer path, if the transfer is a sdcard transfer
+     *
+     * @return a String representation of the transfer path, null if cannot be retrieved
+     */
+    fun getSDCardTransferPath(): String? =
+        if (isSDCardDownload()) {
+            transferAppData
+                .filterIsInstance<TransferAppData.SdCardDownload>()
+                .singleOrNull()
+                ?.targetPath
+        } else null
 }
