@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,9 +19,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
 import mega.privacy.android.app.utils.Util
@@ -45,6 +50,7 @@ internal fun FileInfoContent(
     onContactMoreOptionsClick: (ContactPermission) -> Unit,
     onShowMoreContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
+    onVerifyContactClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isShareContactExpanded by remember { mutableStateOf(false) }
@@ -68,8 +74,18 @@ internal fun FileInfoContent(
             inShareOwnerContactItem?.let { contactItem ->
                 OwnerInfoView(
                     contactItem,
-                    modifier = paddingEnd
+                    modifier = paddingEnd,
                 )
+                if (viewState.isRemindersForContactVerificationEnabled && !contactItem.areCredentialsVerified) {
+                    Text(
+                        text = stringResource(id = R.string.contact_approve_credentials_toolbar_title),
+                        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.secondary),
+                        modifier = Modifier
+                            .padding(bottom = 16.dp, start = 72.dp, end = 16.dp)
+                            .clickable(onClick = { onVerifyContactClick(contactItem.email) })
+                            .testTag(TEST_TAG_LOCATION)
+                    )
+                }
                 FileInfoContentDivider(16.dp)
             }
 
@@ -228,6 +244,7 @@ private fun FileInfoContentPreview(
             onShowMoreContactsClick = {},
             onPublicLinkCopyClick = {},
             onLocationClick = {},
+            onVerifyContactClick = {},
             modifier = Modifier.verticalScroll(scrollState)
         )
     }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
@@ -131,6 +132,7 @@ class FileInfoViewModel @Inject constructor(
     private val clipboardGateway: ClipboardGateway,
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -160,6 +162,14 @@ class FileInfoViewModel @Inject constructor(
      * the [NodeId] of the current node for this screen
      */
     val nodeId get() = typedNode.id
+
+    init {
+        viewModelScope.launch {
+            val isRemindersForContactVerificationEnabled =
+                getContactVerificationWarningUseCase()
+            _uiState.update { it.copy(isRemindersForContactVerificationEnabled = isRemindersForContactVerificationEnabled) }
+        }
+    }
 
     /**
      * Sets the node and updates its state

@@ -20,6 +20,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
@@ -150,6 +151,7 @@ internal class FileInfoViewModelTest {
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -210,6 +212,7 @@ internal class FileInfoViewModelTest {
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase
         )
     }
 

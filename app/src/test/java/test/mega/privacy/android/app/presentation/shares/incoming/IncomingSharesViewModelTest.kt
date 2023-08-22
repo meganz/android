@@ -28,6 +28,8 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
 import nz.mega.sdk.MegaNode
@@ -54,6 +56,10 @@ class IncomingSharesViewModelTest {
     private val getIncomingSharesChildrenNode = mock<GetIncomingSharesChildrenNode>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
+    private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase = mock()
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock {
+        onBlocking { invoke(any()) }.thenReturn(true)
+    }
 
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
@@ -91,18 +97,20 @@ class IncomingSharesViewModelTest {
 
     private fun initViewModel() {
         underTest = IncomingSharesViewModel(
-            getNodeByHandle,
-            authorizeNode,
-            getParentNodeHandle,
-            getIncomingSharesChildrenNode,
-            getCloudSortOrder,
-            getOtherSortOrder,
-            monitorNodeUpdates,
-            { monitorContactUpdates },
-            getUnverifiedIncomingShares,
-            getVerifiedIncomingSharesUseCase,
-            monitorRefreshSessionUseCase,
-            getContactVerificationWarningUseCase
+            getNodeByHandle = getNodeByHandle,
+            authorizeNode = authorizeNode,
+            getParentNodeHandle = getParentNodeHandle,
+            getIncomingSharesChildrenNode = getIncomingSharesChildrenNode,
+            getCloudSortOrder = getCloudSortOrder,
+            getOthersSortOrder = getOtherSortOrder,
+            monitorNodeUpdates = monitorNodeUpdates,
+            monitorContactUpdates = { monitorContactUpdates },
+            getUnverifiedIncomingShares = getUnverifiedIncomingShares,
+            getVerifiedIncomingSharesUseCase = getVerifiedIncomingSharesUseCase,
+            monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
+            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+            areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
+            getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
         )
     }
 
@@ -382,9 +390,9 @@ class IncomingSharesViewModelTest {
         runTest {
             val handle = 123456789L
             // initialization
-            verify(getVerifiedIncomingSharesUseCase).invoke(underTest.state.value.sortOrder)
+            verify(getUnverifiedIncomingShares).invoke(underTest.state.value.sortOrder)
             underTest.setIncomingTreeDepth(1, handle)
-            verifyNoMoreInteractions(getVerifiedIncomingSharesUseCase)
+            verifyNoMoreInteractions(getUnverifiedIncomingShares)
         }
 
     @Test

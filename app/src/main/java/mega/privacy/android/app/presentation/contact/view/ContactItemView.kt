@@ -224,13 +224,17 @@ internal fun ContactAvatarVerified(
         modifier = modifier,
     ) {
         val avatarModifier = Modifier
-            .padding(16.dp)
+            .padding(
+                horizontal = 16.dp,
+                vertical = if (contactItem.areCredentialsVerified) 16.dp else 8.dp
+            )
             .size(40.dp)
         AnimatedContent(
             targetState = selected,
             transitionSpec = {
                 scaleIn(animationSpec = tween(220)) with scaleOut(animationSpec = tween(90))
-            }
+            },
+            label = ""
         ) {
             if (selected) {
                 Image(
@@ -308,7 +312,7 @@ internal fun contactItemForPreviews(id: Int) = ContactItem(
     defaultAvatarColor = "blue",
     visibility = UserVisibility.Visible,
     timestamp = 2345262L,
-    areCredentialsVerified = true,
+    areCredentialsVerified = false,
     status = UserStatus.Online,
     lastSeen = null
 )

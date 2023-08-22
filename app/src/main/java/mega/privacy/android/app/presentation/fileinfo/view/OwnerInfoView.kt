@@ -5,7 +5,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.ContactAvatarVerified
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
@@ -41,8 +39,7 @@ internal fun OwnerInfoView(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .height(72.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ContactAvatarVerified(contactItem)

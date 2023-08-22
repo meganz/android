@@ -84,7 +84,7 @@ internal fun FileInfoHeader(
                         .testTag(TEST_TAG_ACCESS)
                         .constrainAs(permission) {
                             start.linkTo(parent.start, paddingStartDefault.dp)
-                            bottom.linkTo(parent.bottom, 5.dp)
+                            top.linkTo(titleVisible.bottom, 5.dp)
                         }
 
                 )

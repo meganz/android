@@ -35,6 +35,7 @@ import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDial
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
@@ -121,7 +122,7 @@ class FileInfoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        viewModel.setNode(readExtrasAndGetHandel() ?: run {
+        viewModel.setNode(readExtrasAndGetHandle() ?: run {
             finish()
             return
         })
@@ -166,6 +167,7 @@ class FileInfoActivity : BaseActivity() {
                     onShowMoreSharedWithContactsClick = this::navigateToSharedContacts,
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
                     onMenuActionClick = { handleAction(it, uiState) },
+                    onVerifyContactClick = this::navigateToVerifyContacts,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
                     }
@@ -186,6 +188,20 @@ class FileInfoActivity : BaseActivity() {
                 updateContactShareBottomSheet(uiState)
             }
         }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        viewModel.setNode(
+            handleNode = readExtrasAndGetHandle() ?: run { finish(); return },
+            forceUpdate = true,
+        )
+    }
+
+    private fun navigateToVerifyContacts(email: String) {
+        val intent = Intent(this, AuthenticityCredentialsActivity::class.java)
+        intent.putExtra(Constants.EMAIL, email)
+        startActivity(intent)
     }
 
     /**
@@ -232,7 +248,7 @@ class FileInfoActivity : BaseActivity() {
         nodeSaver.saveState(outState)
     }
 
-    private fun readExtrasAndGetHandel() = intent.extras?.let { extras ->
+    private fun readExtrasAndGetHandle() = intent.extras?.let { extras ->
         val handleNode = extras.getLong(Constants.HANDLE, -1)
         Timber.d("Handle of the selected node: %s", handleNode)
         adapterType = intent.getIntExtra(

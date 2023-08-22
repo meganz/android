@@ -263,6 +263,10 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     megaNodeAdapter?.setContactVerificationOn(it.contactVerificationOn)
                     updateNodes(it.nodes)
                     setEmptyView(it.isInvalidHandle)
+                    showContactNotVerifiedWarning(
+                        it.showContactNotVerifiedBanner,
+                        it.incomingNodeName
+                    )
                 }
             }
         }
@@ -276,6 +280,20 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
             updateViewType(state.viewType)
+        }
+    }
+
+    private fun showContactNotVerifiedWarning(showBanner: Boolean, incomingNodeName: String?) {
+        warningTextView?.apply {
+            if (showBanner && !incomingNodeName.isNullOrEmpty()) {
+                visibility = View.VISIBLE
+                text = getString(
+                    R.string.contact_incoming_shared_folder_contact_not_approved_alert_text,
+                    incomingNodeName
+                )
+            } else {
+                visibility = View.GONE
+            }
         }
     }
 

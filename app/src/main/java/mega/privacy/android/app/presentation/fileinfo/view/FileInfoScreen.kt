@@ -73,6 +73,7 @@ internal fun FileInfoScreen(
     onShowMoreSharedWithContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
+    onVerifyContactClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     statusBarHeight: Float = Util.getStatusBarHeight().toFloat() / LocalDensity.current.density,
 ) {
@@ -187,6 +188,7 @@ internal fun FileInfoScreen(
                         onContactsClosed = { onMenuActionClick(FileInfoMenuAction.SelectionModeAction.ClearSelection) },
                         onShowMoreContactsClick = onShowMoreSharedWithContactsClick,
                         onPublicLinkCopyClick = onPublicLinkCopyClick,
+                        onVerifyContactClick = onVerifyContactClick,
                         modifier = Modifier.heightIn(
                             min = boxWithConstraintsScope.maxHeight
                         )
@@ -245,6 +247,7 @@ private fun FileInfoScreenPreview(
             onShowMoreSharedWithContactsClick = {},
             onPublicLinkCopyClick = {},
             onLocationClick = {},
+            onVerifyContactClick = {},
             onMenuActionClick = { action ->
                 when (action) {
                     FileInfoMenuAction.SelectionModeAction.ClearSelection -> {
@@ -314,6 +317,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             creationTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
             modificationTime = Instant.now().epochSecond,
             hasPreview = true,
+            isRemindersForContactVerificationEnabled = true,
             actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
 
@@ -349,6 +353,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             creationTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
             modificationTime = null,
             hasPreview = false,
+            isRemindersForContactVerificationEnabled = true,
             actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
 
@@ -381,6 +386,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             creationTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
             modificationTime = Instant.now().epochSecond,
             hasPreview = false,
+            isRemindersForContactVerificationEnabled = true,
             actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
 
@@ -416,6 +422,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             creationTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
             modificationTime = Instant.now().epochSecond,
             hasPreview = false,
+            isRemindersForContactVerificationEnabled = true,
             actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
     }

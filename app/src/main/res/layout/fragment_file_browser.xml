@@ -16,6 +16,20 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible"/>
 
+    <TextView
+        android:id="@+id/text_warning_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow_100_yellow_700_alpha_015"
+        android:padding="16dp"
+        android:text="@string/contact_share_file_to_unverified_contact_warning_message"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.13sp.Grey87Yellow700"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/file_browser_over_quota_banner"
+        tools:visibility="visible" />
+
     <mega.privacy.android.app.components.NewGridRecyclerView
         android:id="@+id/file_browser_recycler_view"
         android:layout_width="0dp"
@@ -27,7 +41,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/file_browser_over_quota_banner"
+        app:layout_constraintTop_toBottomOf="@+id/text_warning_message"
         tools:visibility="visible"/>
 
     <ImageView

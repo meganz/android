@@ -112,6 +112,11 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     protected var emptyListImageView: ImageView? = null
 
     /**
+     * The [TextView] which displays warning message to the user
+     */
+    protected var warningTextView: TextView? = null
+
+    /**
      * The [TextView] that is displayed when there are no items in [megaNodeAdapter]
      */
     private var emptyListTextView: TextView? = null
@@ -247,6 +252,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
         fastScroller = binding.fileBrowserFastScroller
         emptyListImageView = binding.fileBrowserEmptyListImage
         emptyListTextView = binding.fileBrowserEmptyListText
+        warningTextView = binding.textWarningMessage
 
         setupFastScroller()
         setupRecyclerView()

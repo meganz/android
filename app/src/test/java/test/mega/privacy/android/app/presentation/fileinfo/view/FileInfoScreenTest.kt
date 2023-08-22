@@ -39,6 +39,7 @@ class FileInfoScreenTest {
                 onShowMoreSharedWithContactsClick = {},
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
+                onVerifyContactClick = {},
                 statusBarHeight = 0f,
             )
         }
@@ -69,6 +70,7 @@ class FileInfoScreenTest {
                 onShowMoreSharedWithContactsClick = {},
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
+                onVerifyContactClick = {},
                 statusBarHeight = 0f,
             )
         }

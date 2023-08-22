@@ -15,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -22,6 +23,8 @@ import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -48,7 +51,9 @@ class IncomingSharesViewModel @Inject constructor(
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getVerifiedIncomingSharesUseCase: GetVerifiedIncomingSharesUseCase,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
-    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
+    private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
 ) : ViewModel() {
 
     /** private UI state */
@@ -140,7 +145,6 @@ class IncomingSharesViewModel @Inject constructor(
      */
     fun increaseIncomingTreeDepth(handle: Long) = viewModelScope.launch {
         setIncomingTreeDepth(_state.value.incomingTreeDepth + 1, handle)
-
     }
 
     /**
@@ -163,9 +167,9 @@ class IncomingSharesViewModel @Inject constructor(
                 isLoading = true,
                 incomingTreeDepth = depth,
                 incomingHandle = handle,
+                incomingNodeName = getNodeByHandle(handle)?.name,
                 incomingParentHandle = getParentNodeHandle(handle),
-                sortOrder = if (depth == 0) getOthersSortOrder() else
-                    getCloudSortOrder()
+                sortOrder = if (depth == 0) getOthersSortOrder() else getCloudSortOrder()
             )
         }
 
@@ -247,13 +251,28 @@ class IncomingSharesViewModel @Inject constructor(
             getIncomingSharesChildrenNode(handle)
                 ?.map { Pair<MegaNode, ShareData?>(it, null) }
         }
-
+        checkIfSelectedFolderIsSharedByVerifiedContact()
         return when {
             unverifiedNodes?.isNotEmpty() == true && verifiedNodes?.isNotEmpty() == true -> unverifiedNodes + verifiedNodes
             unverifiedNodes?.isNotEmpty() == true -> unverifiedNodes
             else -> verifiedNodes
         }
     }
+
+    private fun checkIfSelectedFolderIsSharedByVerifiedContact() =
+        viewModelScope.launch {
+            if (_state.value.contactVerificationOn) {
+                val showBanner = if (_state.value.incomingHandle == -1L) {
+                    false
+                } else {
+                    val email =
+                        getIncomingShareParentUserEmailUseCase(NodeId(_state.value.incomingHandle))
+                    val verified = email?.let { areCredentialsVerifiedUseCase(it) } ?: run { false }
+                    !verified
+                }
+                _state.update { it.copy(showContactNotVerifiedBanner = showBanner) }
+            }
+        }
 
     /**
      * Check if the handle is valid or not

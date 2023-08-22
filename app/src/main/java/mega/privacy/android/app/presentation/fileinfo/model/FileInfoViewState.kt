@@ -49,6 +49,7 @@ import nz.mega.sdk.MegaShare
  * @param hasPreview this node has a preview (Images, pdf, videos, etc.)
  * @param actions a list of [FileInfoMenuAction] representing available actions for this node
  * @param requiredExtraAction an initiated action that needs to be confirmed by the user or more data needs to be specified (typically by an alert dialog)
+ * @param isRemindersForContactVerificationEnabled checks if reminders for contact verification is enabled
  */
 internal data class FileInfoViewState(
     val title: String = "",
@@ -86,6 +87,7 @@ internal data class FileInfoViewState(
     val hasPreview: Boolean = false,
     val actions: List<FileInfoMenuAction> = emptyList(),
     val requiredExtraAction: FileInfoExtraAction? = null,
+    val isRemindersForContactVerificationEnabled: Boolean = false,
 ) {
 
     /**
