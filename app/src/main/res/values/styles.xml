@@ -756,8 +756,8 @@
     </style>
 
     <style name="videoPlayerToolbarThemeDark" parent="ThemeOverlay.MaterialComponents.Dark">
-        <item name="android:popupBackground">@color/grey_800</item>
-        <item name="actionModeBackground">@color/grey_800</item>
+        <item name="android:popupBackground">@color/black</item>
+        <item name="actionModeBackground">@color/black</item>
     </style>
 
     <style name="ThemeOverlay.Mega.DatePicker" parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar">

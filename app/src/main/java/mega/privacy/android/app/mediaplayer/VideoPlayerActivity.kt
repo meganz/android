@@ -1307,14 +1307,14 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             if (showElevation) {
                 R.color.action_mode_background
             } else {
-                R.color.dark_grey
+                R.color.black
             }
 
         WindowCompat.setDecorFitsSystemWindows(window, !isMainPlayer || !isPlaylist)
 
         updatePaddingForSystemUI(isMainPlayer, isPlaylist)
 
-        binding.rootLayout.setBackgroundColor(getColor(R.color.dark_grey))
+        binding.rootLayout.setBackgroundColor(getColor(R.color.black))
 
         when {
             (isMainPlayer || isPlaylist) && !isDarkMode -> {
@@ -1322,7 +1322,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 toolbarElevation = TOOLBAR_ELEVATION_ZERO
                 if (isMainPlayer) {
                     toolbarBackgroundColor = R.color.grey_alpha_070
-                    statusBarColor = ContextCompat.getColor(this, R.color.dark_grey)
+                    statusBarColor = ContextCompat.getColor(this, R.color.black)
                 } else {
                     toolbarBackgroundColor = elevationToolbarBackgroundColor
                     statusBarColor = elevationStatusBarColor
@@ -1367,7 +1367,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             isAppearanceLightNavigationBars = false
             isAppearanceLightStatusBars = false
         }
-        window.navigationBarColor = getColor(R.color.dark_grey)
+        window.navigationBarColor = getColor(R.color.black)
     }
 
     private fun updatePaddingForSystemUI(
