@@ -142,7 +142,6 @@ import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListene
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.LoadPreviewListener
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
@@ -319,7 +318,6 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
@@ -1001,8 +999,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             return
         }
-        viewModel.renameRecoveryKeyFileIfNeeded(FileUtil.OLD_MK_FILE, FileUtil.getRecoveryKeyFileName(this))
-        viewModel.renameRecoveryKeyFileIfNeeded(FileUtil.OLD_RK_FILE, FileUtil.getRecoveryKeyFileName(this))
+        viewModel.renameRecoveryKeyFileIfNeeded(
+            FileUtil.OLD_MK_FILE,
+            FileUtil.getRecoveryKeyFileName(this)
+        )
+        viewModel.renameRecoveryKeyFileIfNeeded(
+            FileUtil.OLD_RK_FILE,
+            FileUtil.getRecoveryKeyFileName(this)
+        )
         if (handleRootNodeAndHeartbeatState(savedInstanceState)) return
         userInfoViewModel.checkPasswordReminderStatus()
         updateAccountDetailsVisibleInfo()
@@ -4816,6 +4820,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             if (isInMDMode) {
                 isInMDMode = false
+                fileBrowserViewModel.handleBackFromMD()
                 backToDrawerItem(bottomNavigationCurrentItem)
             }
             if (isFileBrowserComposeEnabled()) {

@@ -82,7 +82,7 @@ class FileBrowserViewModel @Inject constructor(
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase,
     private val transfersManagement: TransfersManagement,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
-    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -193,6 +193,22 @@ class FileBrowserViewModel @Inject constructor(
             it.copy(
                 fileBrowserHandle = handle,
                 mediaHandle = handle
+            )
+        }
+        refreshNodes()
+    }
+
+    /**
+     * handle logic if back from Media Discovery
+     */
+    fun handleBackFromMD() = viewModelScope.launch {
+        handleStack.pop()
+        val currentParent =
+            _state.value.parentHandle ?: getRootFolder()?.handle ?: MegaApiJava.INVALID_HANDLE
+        _state.update {
+            it.copy(
+                fileBrowserHandle = currentParent,
+                mediaHandle = currentParent
             )
         }
         refreshNodes()
