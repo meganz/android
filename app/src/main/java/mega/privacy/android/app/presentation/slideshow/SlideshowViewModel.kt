@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.domain.usecase.GetPhotosByIds
+import mega.privacy.android.domain.usecase.GetPhotosByIdsUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
@@ -37,7 +37,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SlideshowViewModel @Inject constructor(
-    private val getPhotosByIds: GetPhotosByIds,
+    private val getPhotosByIdsUseCase: GetPhotosByIdsUseCase,
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase,
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase,
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase,
@@ -104,7 +104,7 @@ class SlideshowViewModel @Inject constructor(
                     val ids = imageItems.map {
                         it.getNodeHandle() ?: it.id
                     }
-                    getPhotosByIds(ids = ids.map { id -> NodeId(id) }).filterIsInstance<Photo.Image>()
+                    getPhotosByIdsUseCase(ids = ids.map { id -> NodeId(id) }).filterIsInstance<Photo.Image>()
                         .map { SlideshowItem.DefaultItem(it) }
                 }
             }

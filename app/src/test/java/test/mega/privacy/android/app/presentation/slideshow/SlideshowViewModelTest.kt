@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.slideshow.SlideshowViewModel
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.domain.usecase.GetPhotosByIds
+import mega.privacy.android.domain.usecase.GetPhotosByIdsUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
@@ -32,7 +32,7 @@ import kotlin.test.assertEquals
 class SlideshowViewModelTest {
     private lateinit var underTest: SlideshowViewModel
 
-    private val getPhotosByIds: GetPhotosByIds = mock()
+    private val getPhotosByIdsUseCase: GetPhotosByIdsUseCase = mock()
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase = mock()
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase = mock()
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase = mock()
@@ -59,7 +59,7 @@ class SlideshowViewModelTest {
     }
 
     private fun createSUT() = SlideshowViewModel(
-        getPhotosByIds = getPhotosByIds,
+        getPhotosByIdsUseCase = getPhotosByIdsUseCase,
         monitorSlideshowOrderSettingUseCase = monitorSlideshowOrderSettingUseCase,
         monitorSlideshowSpeedSettingUseCase = monitorSlideshowSpeedSettingUseCase,
         monitorSlideshowRepeatSettingUseCase = monitorSlideshowRepeatSettingUseCase,

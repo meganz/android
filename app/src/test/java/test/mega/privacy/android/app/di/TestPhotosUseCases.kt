@@ -7,12 +7,10 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
-import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
-import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.photos.AddPhotosToAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
@@ -54,9 +52,6 @@ object TestPhotosUseCases {
     @Provides
     fun provideUpdateAlbumPhotosRemovingProgressCompletedUseCase(): UpdateAlbumPhotosRemovingProgressCompleted =
         mock()
-
-    @Provides
-    fun provideGetPhotosByIdsUseCase(): GetPhotosByIds = mock()
 
     @Provides
     fun provideExportAlbumsUseCase(): ExportAlbumsUseCase = mock()

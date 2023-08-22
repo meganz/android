@@ -308,8 +308,9 @@ internal class DefaultPhotosRepository @Inject constructor(
                     cache
                 } else {
                     var photo: Photo? = null
-                    megaApiFacade.getMegaNodeByHandle(id.longValue)
-                        ?: megaApiFolder.getMegaNodeByHandle(id.longValue)?.also { node ->
+
+                    (megaApiFacade.getMegaNodeByHandle(id.longValue) ?: megaApiFolder.getMegaNodeByHandle(id.longValue))
+                        ?.also { node ->
                             photo = mapMegaNodeToPhoto(node, filterSvg = false)
                             photo?.let {
                                 photosCache[id] = it

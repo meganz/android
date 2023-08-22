@@ -2,12 +2,10 @@ package mega.privacy.android.app.di.photos
 
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
-import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.usecase.DefaultFilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.DefaultFilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumPhotos
@@ -19,7 +17,6 @@ import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosRemovingProgr
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
-import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
@@ -56,11 +53,4 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindUpdateAlbumPhotosRemovingProgressCompleted(useCase: DefaultUpdateAlbumPhotosRemovingProgressCompleted): UpdateAlbumPhotosRemovingProgressCompleted
-
-    companion object {
-
-        @Provides
-        fun provideGetPhotosByIds(repository: PhotosRepository): GetPhotosByIds =
-            GetPhotosByIds(repository::getPhotosByIds)
-    }
 }
