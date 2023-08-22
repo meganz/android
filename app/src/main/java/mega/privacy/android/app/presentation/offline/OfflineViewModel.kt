@@ -23,6 +23,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
@@ -48,6 +49,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OfflineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val crashReporter: CrashReporter,
     private val repo: MegaNodeRepo,
     monitorNodeUpdates: MonitorNodeUpdates,
     private val getThumbnailUseCase: GetThumbnailUseCase,
@@ -223,6 +225,8 @@ class OfflineViewModel @Inject constructor(
                     nodeFile.isDirectory -> navigateIn(node.node, firstVisiblePosition)
                     nodeFile.isFile -> openNodeAction.onNext(Pair(position, node))
                 }
+            } else {
+                Timber.e("File isn't available: ${nodeFile.name}")
             }
         }
     }
@@ -288,6 +292,7 @@ class OfflineViewModel @Inject constructor(
             historySearchQuery != null -> {
                 navigationDepthInSearch++
             }
+
             else -> {
                 firstVisiblePositionStack
                     .push(if (firstVisiblePosition >= 0) firstVisiblePosition else 0)
@@ -357,9 +362,11 @@ class OfflineViewModel @Inject constructor(
             query != null -> {
                 context.getString(R.string.action_search) + ": " + query
             }
+
             path == OFFLINE_ROOT || path == "" -> {
                 context.getString(R.string.section_saved_for_offline_new)
             }
+
             else -> {
                 val pathWithoutLastSlash = path.substring(0, path.length - 1)
                 pathWithoutLastSlash.substring(
@@ -461,7 +468,11 @@ class OfflineViewModel @Inject constructor(
                     getThumbnailUseCase(node.handle.toLong())
                 }.fold(
                     onSuccess = { it },
-                    onFailure = { null }
+                    onFailure = {
+                        Timber.e(it, "Exception loading offline node")
+                        crashReporter.log("Exception loading offline node: ${it.message}")
+                        null
+                    }
                 )
                 nodes.add(
                     OfflineNode(

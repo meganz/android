@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
+import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removeSecondaryBackup
@@ -66,6 +67,7 @@ import javax.inject.Inject
 class SqliteDatabaseHandler @Inject constructor(
     @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    val crashReporter: CrashReporter,
     private val legacyLoggingSettings: LegacyLoggingSettings,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
@@ -2317,6 +2319,7 @@ class SqliteDatabaseHandler @Inject constructor(
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
+            crashReporter.log("Exception loading offline node: ${e.message}")
         }
         return listOffline
     }
