@@ -3734,6 +3734,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 supportInvalidateOptionsMenu()
                 syncFragment?.let { replaceFragment(it, FragmentTag.SYNC.tag) }
                 showFabButton()
+                updateTransfersWidgetPosition(false)
             }
 
             DrawerItem.HOMEPAGE -> {
@@ -8593,7 +8594,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 ?: return
         val params = transfersWidgetLayout.layoutParams as LinearLayout.LayoutParams
         params.gravity = Gravity.END
-        if (!bNVHidden && isInMainHomePage) {
+        if (!bNVHidden && isInMainHomePage || drawerItem == DrawerItem.SYNC) {
             params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM.toFloat(), outMetrics)
         } else {
             params.bottomMargin = 0
