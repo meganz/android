@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.net.Uri
@@ -273,9 +272,6 @@ class VideoPlayerViewModel @Inject constructor(
     private val _mediaPlaybackState = MutableStateFlow(false)
     internal val mediaPlaybackState: StateFlow<Boolean> = _mediaPlaybackState
 
-    private val _screenOrientationState = MutableStateFlow(ORIENTATION_PORTRAIT)
-    internal val screenOrientationState: StateFlow<Int> = _screenOrientationState
-
     private val _showPlaybackPositionDialogState = MutableStateFlow(PlaybackPositionState())
     internal val showPlaybackPositionDialogState: StateFlow<PlaybackPositionState> =
         _showPlaybackPositionDialogState
@@ -295,6 +291,9 @@ class VideoPlayerViewModel @Inject constructor(
     private var playSourceChanged: MutableList<MediaItem> = mutableListOf()
     private var playlistItemsChanged: MutableList<PlaylistItem> = mutableListOf()
     private var playingPosition = 0
+
+    // The value for confirming the video whether revert to be played when VideoPlayerFragment is created.
+    private var isPlayingReverted = false
 
     private var cancelToken: MegaCancelToken? = null
 
@@ -347,6 +346,12 @@ class VideoPlayerViewModel @Inject constructor(
         setupTransferListener()
     }
 
+    internal fun setPlayingReverted(value: Boolean) {
+        isPlayingReverted = value
+    }
+
+    internal fun isPlayingReverted() = isPlayingReverted
+
     internal fun setCurrentPlayingVideoSize(videoSize: Pair<Int, Int>?) {
         Timber.d("screenshotWhenVideoPlaying videoSize ${videoSize?.first} : ${videoSize?.second}")
         currentPlayingVideoSize = videoSize
@@ -358,9 +363,6 @@ class VideoPlayerViewModel @Inject constructor(
      * @return repeat mode
      */
     internal fun getVideoRepeatMode() = _videoRepeatToggleMode.value
-
-    internal fun updateScreenOrientationState(orientation: Int) =
-        _screenOrientationState.update { orientation }
 
     internal fun updateShowPlaybackPositionDialogState(newState: PlaybackPositionState) =
         _showPlaybackPositionDialogState.update { newState }
@@ -396,7 +398,7 @@ class VideoPlayerViewModel @Inject constructor(
         isSubtitleShown = subtitleShown,
         isSubtitleDialogShown = subtitleDialogShown,
         isAddSubtitle = isAddSubtitle,
-        subtitleFileInfo = subtitleFileInfo,
+        subtitleFileInfo = subtitleFileInfo
     )
 
     /**

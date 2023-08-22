@@ -51,11 +51,11 @@ import timber.log.Timber
 fun AddSubtitleDialog(
     selectOptionState: Int,
     matchedSubtitleFileUpdate: suspend () -> SubtitleFileInfo?,
-    subtitleFileName: String? = null,
     onOffClicked: () -> Unit,
     onAddedSubtitleClicked: () -> Unit,
     onAutoMatch: (SubtitleFileInfo) -> Unit,
     onToSelectSubtitle: () -> Unit,
+    subtitleFileName: String? = null,
     onDismissRequest: () -> Unit,
 ) {
     var subtitleFileInfo by remember {
@@ -149,8 +149,8 @@ fun AddSubtitleDialog(
  */
 @Composable
 private fun OptionText(
-    modifier: Modifier = Modifier,
     text: String,
+    modifier: Modifier = Modifier,
     selectedColor: Color = colorResource(id = R.color.teal_200),
     unselectedColor: Color = Color.White,
     isSelected: Boolean = false,

@@ -1,9 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Intent
-import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -82,11 +80,9 @@ class VideoPlayerFragment : Fragment() {
 
     private var videoPlayerView: StyledPlayerView? = null
 
-    private var toolbarVisible = true
+    private var toolbarVisible = false
 
     private var retryFailedDialog: AlertDialog? = null
-
-    private var playbackPositionDialog: Dialog? = null
 
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
@@ -146,9 +142,10 @@ class VideoPlayerFragment : Fragment() {
             showToolbar()
             delayHideToolbar()
         }
-
-        if (viewModel.mediaPlaybackState.value) {
+        // According to the value of isPlayingReverted to confirm whether revert the video to play
+        if (viewModel.isPlayingReverted()) {
             mediaPlayerGateway.setPlayWhenReady(true)
+            viewModel.setPlayingReverted(false)
         }
 
         videoPlayerActivity?.setDraggable(!viewModel.screenLockState.value)
@@ -157,9 +154,6 @@ class VideoPlayerFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         viewModel.updateAddSubtitleState()
-        if (mediaPlayerGateway.mediaPlayerIsPlaying()) {
-            mediaPlayerGateway.setPlayWhenReady(false)
-        }
     }
 
     override fun onDestroyView() {
@@ -169,23 +163,11 @@ class VideoPlayerFragment : Fragment() {
         mediaPlayerGateway.removeListener(playerListener)
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        viewModel.updateScreenOrientationState(newConfig.orientation)
-    }
-
     private fun observeFlow() {
         if (view != null) {
             with(viewModel) {
                 viewLifecycleOwner.collectFlow(metadataState) { metadata ->
                     playerViewHolder?.displayMetadata(metadata)
-                }
-
-                viewLifecycleOwner.collectFlow(screenOrientationState) { orientation ->
-                    playerViewHolder?.setTrackNameVisible(orientation != ORIENTATION_LANDSCAPE)
-                    if (toolbarVisible) {
-                        delayHideToolbar()
-                    }
                 }
 
                 if (!playlistObserved) {
@@ -232,54 +214,8 @@ class VideoPlayerFragment : Fragment() {
                     }
                 }
 
-                viewLifecycleOwner.collectFlow(showPlaybackPositionDialogState) { state ->
-                    if (state.showPlaybackDialog) {
-                        playbackPositionDialog =
-                            MaterialAlertDialogBuilder(requireContext())
-                                .setTitle(R.string.video_playback_position_dialog_title)
-                                .setMessage(
-                                    String.format(
-                                        getString(
-                                            R.string.video_playback_position_dialog_message
-                                        ),
-                                        state.mediaItemName,
-                                        formatMillisecondsToString(
-                                            state.playbackPosition ?: 0
-                                        )
-                                    )
-                                )
-                                .setNegativeButton(
-                                    R.string.video_playback_position_dialog_resume_button
-                                ) { _, _ ->
-                                    if (state.isDialogShownBeforeBuildSources)
-                                        setResumePlaybackPositionBeforeBuildSources()
-                                    else
-                                        setResumePlaybackPosition(state.playbackPosition)
-
-                                }
-                                .setPositiveButton(
-                                    R.string.video_playback_position_dialog_restart_button
-                                ) { _, _ ->
-                                    if (state.isDialogShownBeforeBuildSources)
-                                        setRestartPlayVideoBeforeBuildSources()
-                                    else
-                                        setRestartPlayVideo()
-                                }
-                                .setOnCancelListener {
-                                    if (state.isDialogShownBeforeBuildSources) {
-                                        cancelPlaybackPositionDialogBeforeBuildSources()
-                                    } else {
-                                        cancelPlaybackPositionDialog()
-                                    }
-                                }.create().apply {
-                                    show()
-                                }
-                    }
-                }
-
                 viewLifecycleOwner.collectFlow(subtitleDisplayState) { state ->
                     playerViewHolder?.updateSubtitleButtonUI(state.isSubtitleShown)
-                    mediaPlayerGateway.setPlayWhenReady(!state.isSubtitleDialogShown)
                     if (!state.isSubtitleDialogShown) {
                         delayHideToolbar()
                     }
@@ -629,51 +565,6 @@ class VideoPlayerFragment : Fragment() {
         }
     }
 
-    private fun setRestartPlayVideo() {
-        updateDialogShownStateAndVideoPlayType(VideoPlayerViewModel.VIDEO_TYPE_RESTART_PLAYBACK_POSITION)
-        // Set playWhenReady to be true, making the video is playing after the restart button is clicked
-        if (!mediaPlayerGateway.getPlayWhenReady()) {
-            mediaPlayerGateway.setPlayWhenReady(true)
-        }
-        // If the restart button is clicked, remove playback information of current item
-        viewModel.deletePlaybackInformation(viewModel.getCurrentPlayingHandle())
-    }
-
-    private fun setRestartPlayVideoBeforeBuildSources() {
-        updateDialogShownStateAndVideoPlayType(VideoPlayerViewModel.VIDEO_TYPE_RESTART_PLAYBACK_POSITION)
-        // Initial video sources after the restart button is clicked
-        viewModel.initVideoSources(activity?.intent)
-    }
-
-    private fun setResumePlaybackPosition(playbackPosition: Long?) {
-        updateDialogShownStateAndVideoPlayType(VideoPlayerViewModel.VIDEO_TYPE_RESUME_PLAYBACK_POSITION)
-        // Seek to playback position history after the resume button is clicked
-        playbackPosition?.let {
-            mediaPlayerGateway.playerSeekToPositionInMs(it)
-        }
-        // Set playWhenReady to be true, making the video is playing after the resume button is clicked
-        if (!mediaPlayerGateway.getPlayWhenReady()) {
-            mediaPlayerGateway.setPlayWhenReady(true)
-        }
-    }
-
-    private fun setResumePlaybackPositionBeforeBuildSources() {
-        updateDialogShownStateAndVideoPlayType(VideoPlayerViewModel.VIDEO_TYPE_RESUME_PLAYBACK_POSITION)
-        // Initial video sources after the resume button is clicked
-        viewModel.initVideoSources(activity?.intent)
-    }
-
-    private fun cancelPlaybackPositionDialog() {
-        updateDialogShownStateAndVideoPlayType(VideoPlayerViewModel.VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG)
-    }
-
-    private fun cancelPlaybackPositionDialogBeforeBuildSources() {
-        updateDialogShownStateAndVideoPlayType(VideoPlayerViewModel.VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG)
-        viewModel.initVideoSources(activity?.intent)
-        // If the dialog is cancelled, set PlayWhenReady to be false to paused video after build sources.
-        mediaPlayerGateway.setPlayWhenReady(false)
-    }
-
     private fun addSubtitle(subtitleFileUrl: String) {
         if (!mediaPlayerGateway.addSubtitle(subtitleFileUrl)) {
             showAddingSubtitleFailedMessage()
@@ -695,23 +586,6 @@ class VideoPlayerFragment : Fragment() {
                     )
                 )
             }
-        }
-    }
-
-    /**
-     * Update dialog shon state and video play type
-     *
-     * @param type video play type
-     */
-    private fun updateDialogShownStateAndVideoPlayType(type: Int) {
-        // Set showDialog to be false, avoid the dialog is shown repeatedly when screen is rotated
-        with(viewModel) {
-            updateShowPlaybackPositionDialogState(
-                showPlaybackPositionDialogState.value.copy(
-                    showPlaybackDialog = false
-                )
-            )
-            setVideoPlayType(type)
         }
     }
 

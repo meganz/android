@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -7,7 +8,9 @@ import android.content.IntentFilter
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.database.ContentObserver
 import android.graphics.Color
 import android.os.Bundle
@@ -34,10 +37,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,23 +64,21 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
-import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_INBOX
 import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
 import mega.privacy.android.app.utils.Constants.HANDLE
@@ -86,16 +86,21 @@ import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS
 import mega.privacy.android.app.utils.Constants.NAME
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
+import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
@@ -110,7 +115,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -119,8 +124,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Extending MediaPlayerActivity is to declare portrait in manifest,
- * to avoid crash when set requestedOrientation.
+ * Video player activity
  */
 @AndroidEntryPoint
 class VideoPlayerActivity : MediaPlayerActivity() {
@@ -133,19 +137,17 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     private lateinit var binding: ActivityVideoPlayerBinding
 
-    private var viewingTrackInfo: TrackInfoFragmentArgs? = null
-
     private val videoViewModel: VideoPlayerViewModel by viewModels()
 
     private var takenDownDialog: AlertDialog? = null
 
     private var currentOrientation: Int = SCREEN_ORIENTATION_SENSOR_PORTRAIT
 
-    private val requestOrientationUpdate = MutableLiveData<Pair<Int, Int>>()
-
     private var mediaPlayerIntent: Intent? = null
     private var isPlayingAfterReady = false
     private var currentPlayingHandle: Long? = null
+
+    private var playbackPositionDialog: Dialog? = null
 
     private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -225,8 +227,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-
-        videoViewModel.updateScreenOrientationState(configuration.orientation)
 
         createPlayer()
         setupToolbar()
@@ -374,7 +374,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
                     videoViewModel.setCurrentPlayingVideoSize(videoWidth to videoHeight)
-                    requestOrientationUpdate.value = Pair(videoWidth, videoHeight)
+                    updateOrientationBasedOnVideoSize(videoWidth, videoHeight)
                 }
             }
 
@@ -412,7 +412,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         actionNodeCallback = object : ActionNodeCallback {
                             override fun finishRenameActionWithSuccess(newName: String) {
                                 videoViewModel.updateItemName(it.handle, newName)
-                                updateTrackInfoNodeNameIfNeeded(it.handle, newName)
                                 //Avoid the dialog is shown repeatedly when screen is rotated.
                                 viewModel.renameUpdate(null)
                             }
@@ -499,6 +498,10 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
                 R.id.properties -> {
                     videoViewModel.sendInfoButtonClickedEvent()
+                    // Pause the video when the file info page is opened, and allow the video to
+                    // revert to playing after back to the video player page.
+                    mediaPlayerGateway.setPlayWhenReady(false)
+                    videoViewModel.setPlayingReverted(true)
                     val intent: Intent
                     if (adapterType == OFFLINE_ADAPTER) {
                         intent = Intent(this, OfflineFileInfoActivity::class.java).apply {
@@ -636,10 +639,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                     selectFolderToMoveLauncher.launch(
                         Intent(this, FileExplorerActivity::class.java).apply {
                             action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-                            putExtra(
-                                Constants.INTENT_EXTRA_KEY_MOVE_FROM,
-                                longArrayOf(playingHandle)
-                            )
+                            putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
                         }
                     )
                 }
@@ -660,9 +660,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 R.id.move_to_trash -> {
                     if (adapterType == FROM_CHAT) {
                         getChatMessage().let { (chatId, message) ->
-                            message?.let {
-                                ChatUtil.removeAttachmentMessage(this, chatId, it)
-                            }
+                            message?.let { removeAttachmentMessage(this, chatId, it) }
                         }
                     } else {
                         MegaNodeDialogUtil.moveToRubbishOrRemove(
@@ -711,68 +709,126 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
             }
 
-            collectFlow(screenOrientationState) { orientation ->
-                binding.toolbar.title = if (orientation == ORIENTATION_LANDSCAPE) {
-                    videoViewModel.metadataState.value.title
-                        ?: videoViewModel.metadataState.value.nodeName
-                } else {
-                    ""
+            collectFlow(metadataState) { metadata ->
+                if (navController.currentDestination?.id == R.id.video_main_player) {
+                    setToolbarTitle(
+                        if (configuration.orientation == ORIENTATION_LANDSCAPE) {
+                            metadata.title ?: metadata.nodeName
+                        } else {
+                            ""
+                        }
+                    )
+                }
+
+                dragToExit.nodeChanged(
+                    getCurrentPlayingHandle()
+                )
+            }
+
+            // Put in the Activity to avoid Fragment recreate to cause the state changes when the screen rotated
+            collectFlow(subtitleDisplayState) { state ->
+                // According to the state of the subtitle dialog displayed and the
+                // state of the playback position dialog displayed to pause or play the video.
+                mediaPlayerGateway.setPlayWhenReady(
+                    !state.isSubtitleDialogShown
+                            && !videoViewModel.showPlaybackPositionDialogState.value.showPlaybackDialog
+                )
+            }
+
+            // Put in the Activity to avoid Fragment recreate to cause the state changes when the screen rotated
+            collectFlow(showPlaybackPositionDialogState) { state ->
+                if (state.showPlaybackDialog) {
+                    mediaPlayerGateway.setPlayWhenReady(false)
+                    playbackPositionDialog =
+                        MaterialAlertDialogBuilder(this@VideoPlayerActivity)
+                            .setTitle(R.string.video_playback_position_dialog_title)
+                            .setMessage(
+                                String.format(
+                                    getString(
+                                        R.string.video_playback_position_dialog_message
+                                    ),
+                                    state.mediaItemName,
+                                    formatMillisecondsToString(
+                                        state.playbackPosition ?: 0
+                                    )
+                                )
+                            )
+                            .setNegativeButton(
+                                R.string.video_playback_position_dialog_resume_button
+                            ) { _, _ ->
+                                if (state.isDialogShownBeforeBuildSources)
+                                    setResumePlaybackPositionBeforeBuildSources()
+                                else
+                                    setResumePlaybackPosition(state.playbackPosition)
+
+                            }
+                            .setPositiveButton(
+                                R.string.video_playback_position_dialog_restart_button
+                            ) { _, _ ->
+                                if (state.isDialogShownBeforeBuildSources)
+                                    setRestartPlayVideoBeforeBuildSources()
+                                else
+                                    setRestartPlayVideo()
+                            }
+                            .setOnCancelListener {
+                                if (state.isDialogShownBeforeBuildSources) {
+                                    cancelPlaybackPositionDialogBeforeBuildSources()
+                                } else {
+                                    cancelPlaybackPositionDialog()
+                                }
+                            }.setOnDismissListener {
+                                mediaPlayerGateway.setPlayWhenReady(true)
+                            }.create().apply {
+                                show()
+                            }
                 }
             }
         }
+    }
 
-        collectFlow(videoViewModel.metadataState) { metadata ->
-            setToolbarTitle(
-                if (configuration.orientation == ORIENTATION_LANDSCAPE) {
-                    metadata.title ?: metadata.nodeName
-                } else {
-                    ""
-                }
-            )
+    /**
+     * Update orientation according to the video size.
+     *
+     * @param videoWidth the width of the video
+     * @param videoHeight the height of the video
+     */
+    private fun updateOrientationBasedOnVideoSize(videoWidth: Int, videoHeight: Int) {
+        val rotationMode = Settings.System.getInt(
+            contentResolver,
+            ACCELEROMETER_ROTATION,
+            SCREEN_BRIGHTNESS_MODE_MANUAL
+        )
 
-            dragToExit.nodeChanged(
-                videoViewModel.getCurrentPlayingHandle()
-            )
-        }
+        currentOrientation =
+            if (videoWidth > videoHeight) {
+                SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            } else {
+                SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            }
 
-        collectFlow(requestOrientationUpdate.asFlow()) { (width, height) ->
-            val rotationMode = Settings.System.getInt(
-                contentResolver,
-                ACCELEROMETER_ROTATION,
-                SCREEN_BRIGHTNESS_MODE_MANUAL
-            )
-
-            currentOrientation =
-                if (width > height) {
-                    SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                } else {
-                    SCREEN_ORIENTATION_SENSOR_PORTRAIT
-                }
-
-            requestedOrientation =
-                if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                    SCREEN_ORIENTATION_SENSOR
-                } else {
-                    currentOrientation
-                }
-        }
+        requestedOrientation =
+            if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                SCREEN_ORIENTATION_SENSOR
+            } else {
+                currentOrientation
+            }
     }
 
     private fun initMediaData() {
-        currentPlayingHandle = intent?.getLongExtra(
-            Constants.INTENT_EXTRA_KEY_HANDLE,
-            MegaApiJava.INVALID_HANDLE
-        )
+        currentPlayingHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
 
         videoViewModel.monitorPlaybackTimes(currentPlayingHandle) { positionInMs ->
             // If the first video contains playback history, show dialog before build sources
             if (positionInMs != null && positionInMs > 0) {
                 mediaPlayerIntent = intent
+                // Set the playing handle when the playback position dialog is displayed,
+                // to avoid the toolbar cannot be shown caused by the playing handle is null.
+                videoViewModel.setCurrentPlayingHandle(currentPlayingHandle ?: INVALID_HANDLE)
                 with(videoViewModel) {
                     updateShowPlaybackPositionDialogState(
                         showPlaybackPositionDialogState.value.copy(
                             showPlaybackDialog = true,
-                            mediaItemName = intent?.getStringExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME),
+                            mediaItemName = intent?.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME),
                             playbackPosition = positionInMs
                         )
                     )
@@ -823,6 +879,24 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         videoViewModel.savePlaybackTimes()
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Because the Activity is not recreated when the screen rotated, reload the Fragment
+        // to load the different orientation layouts according to the rotation orientation.
+        if (navController.currentDestination?.id == R.id.video_main_player) {
+            navController.popBackStack()
+            navController.navigate(R.id.video_main_player)
+            setToolbarTitle(
+                if (newConfig.orientation == ORIENTATION_LANDSCAPE) {
+                    videoViewModel.metadataState.value.title
+                        ?: videoViewModel.metadataState.value.nodeName
+                } else {
+                    ""
+                }
+            )
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
@@ -831,23 +905,21 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     }
 
     private fun setupNavDestListener() {
-        navController.addOnDestinationChangedListener { _, dest, args ->
+        navController.addOnDestinationChangedListener { _, dest, _ ->
             setupToolbarColors()
             when (dest.id) {
-                R.id.video_main_player,
-                R.id.playlist,
-                -> {
-                    if (dest.id == R.id.video_main_player) {
+                R.id.video_main_player -> {
+                    if (currentOrientation == ORIENTATION_PORTRAIT) {
                         supportActionBar?.title = ""
                     }
-                    viewingTrackInfo = null
                 }
 
-                R.id.track_info -> {
-                    supportActionBar?.title = getString(R.string.audio_track_info)
-                    if (args != null) {
-                        viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
-                    }
+                R.id.video_playlist,
+                -> {
+                    // Pause the video when the playlist page is opened, and allow the video to
+                    // revert to playing after back to the video player page.
+                    mediaPlayerGateway.setPlayWhenReady(false)
+                    videoViewModel.setPlayingReverted(true)
                 }
             }
             refreshMenuOptionsVisibility()
@@ -960,14 +1032,14 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
         intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE).let { adapterType ->
             when (currentFragmentId) {
-                R.id.playlist -> {
+                R.id.video_playlist -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     searchMenuItem?.isVisible = true
                     // Display the select option
                     menu.findItem(R.id.select).isVisible = true
                 }
 
-                R.id.video_main_player, R.id.track_info -> {
+                R.id.video_main_player -> {
                     when {
                         adapterType == OFFLINE_ADAPTER -> {
                             menu.toggleAllMenuItemsVisibility(false)
@@ -979,7 +1051,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                                 currentFragmentId == R.id.video_main_player
                         }
 
-                        adapterType == Constants.RUBBISH_BIN_ADAPTER || megaApi.isInRubbish(
+                        adapterType == RUBBISH_BIN_ADAPTER || megaApi.isInRubbish(
                             megaApi.getNodeByHandle(
                                 videoViewModel.getCurrentPlayingHandle()
                             )
@@ -1025,9 +1097,9 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         }
 
                         adapterType == FOLDER_LINK_ADAPTER
-                                || adapterType == Constants.FROM_IMAGE_VIEWER
+                                || adapterType == FROM_IMAGE_VIEWER
                                 || adapterType == FROM_ALBUM_SHARING
-                                || adapterType == Constants.VERSIONS_ADAPTER -> {
+                                || adapterType == VERSIONS_ADAPTER -> {
                             menu.toggleAllMenuItemsVisibility(false)
                             menu.findItem(R.id.save_to_device).isVisible = true
                         }
@@ -1125,22 +1197,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         }
     }
 
-    /**
-     * Update node name if current displayed fragment is TrackInfoFragment.
-     *
-     * @param handle node handle
-     * @param newName new node name
-     */
-    private fun updateTrackInfoNodeNameIfNeeded(handle: Long, newName: String) {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) ?: return
-        navHostFragment.childFragmentManager.fragments.firstOrNull()?.let { firstChild ->
-            if (firstChild is TrackInfoFragment) {
-                firstChild.updateNodeNameIfNeeded(handle, newName)
-            }
-        }
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -1232,7 +1288,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     override fun setupToolbarColors(showElevation: Boolean) {
         val isDarkMode = isDarkMode(this)
         val isMainPlayer = navController.currentDestination?.id == R.id.video_main_player
-        val isPlaylist = navController.currentDestination?.id == R.id.playlist
+        val isPlaylist = navController.currentDestination?.id == R.id.video_playlist
         @ColorRes val toolbarBackgroundColor: Int
         @ColorInt val statusBarColor: Int
         val toolbarElevation: Float
@@ -1425,6 +1481,68 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     private fun stopPlayer() {
         mediaPlayerGateway.playerStop()
         finish()
+    }
+
+    private fun setRestartPlayVideo() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESTART_PLAYBACK_POSITION)
+        // Set playWhenReady to be true, making the video is playing after the restart button is clicked
+        if (!mediaPlayerGateway.getPlayWhenReady()) {
+            mediaPlayerGateway.setPlayWhenReady(true)
+        }
+        // If the restart button is clicked, remove playback information of current item
+        videoViewModel.deletePlaybackInformation(videoViewModel.getCurrentPlayingHandle())
+    }
+
+    private fun setRestartPlayVideoBeforeBuildSources() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESTART_PLAYBACK_POSITION)
+        // Initial video sources after the restart button is clicked
+        videoViewModel.initVideoSources(intent)
+    }
+
+    private fun setResumePlaybackPosition(playbackPosition: Long?) {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESUME_PLAYBACK_POSITION)
+        // Seek to playback position history after the resume button is clicked
+        playbackPosition?.let {
+            mediaPlayerGateway.playerSeekToPositionInMs(it)
+        }
+        // Set playWhenReady to be true, making the video is playing after the resume button is clicked
+        if (!mediaPlayerGateway.getPlayWhenReady()) {
+            mediaPlayerGateway.setPlayWhenReady(true)
+        }
+    }
+
+    private fun setResumePlaybackPositionBeforeBuildSources() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESUME_PLAYBACK_POSITION)
+        // Initial video sources after the resume button is clicked
+        videoViewModel.initVideoSources(intent)
+    }
+
+    private fun cancelPlaybackPositionDialog() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG)
+    }
+
+    private fun cancelPlaybackPositionDialogBeforeBuildSources() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG)
+        videoViewModel.initVideoSources(intent)
+        // If the dialog is cancelled, set PlayWhenReady to be false to paused video after build sources.
+        mediaPlayerGateway.setPlayWhenReady(false)
+    }
+
+    /**
+     * Update dialog shon state and video play type
+     *
+     * @param type video play type
+     */
+    private fun updateDialogShownStateAndVideoPlayType(type: Int) {
+        // Set showDialog to be false, avoid the dialog is shown repeatedly when screen is rotated
+        with(videoViewModel) {
+            updateShowPlaybackPositionDialogState(
+                showPlaybackPositionDialogState.value.copy(
+                    showPlaybackDialog = false
+                )
+            )
+            setVideoPlayType(type)
+        }
     }
 
     companion object {

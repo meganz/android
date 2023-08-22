@@ -11,21 +11,21 @@
         tools:layout="@layout/fragment_audio_player">
         <action
             android:id="@+id/action_audio_player_to_playlist"
-            app:destination="@id/playlist" />
+            app:destination="@+id/audio_playlist" />
 
         <action
             android:id="@+id/action_audio_player_to_track_info"
-            app:destination="@id/track_info" />
+            app:destination="@+id/track_info" />
     </fragment>
 
     <fragment
-        android:id="@+id/playlist"
+        android:id="@+id/audio_playlist"
         android:name="mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment"
         android:label=""
         tools:layout="@layout/fragment_media_playlist">
         <action
             android:id="@+id/action_audio_playlist_to_track_info"
-            app:destination="@id/track_info" />
+            app:destination="@+id/track_info" />
     </fragment>
 
     <fragment

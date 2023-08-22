@@ -11,38 +11,12 @@
         tools:layout="@layout/fragment_video_player">
         <action
             android:id="@+id/action_video_player_to_playlist"
-            app:destination="@id/playlist" />
-
-        <action
-            android:id="@+id/action_video_player_to_track_info"
-            app:destination="@id/track_info" />
+            app:destination="@+id/video_playlist" />
     </fragment>
 
-    <fragment
-        android:id="@+id/playlist"
+    <fragment android:id="@+id/video_playlist"
         android:name="mega.privacy.android.app.mediaplayer.playlist.VideoPlaylistFragment"
         android:label=""
         tools:layout="@layout/fragment_media_playlist">
-        <action
-            android:id="@+id/action_video_playlist_to_track_info"
-            app:destination="@id/track_info" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/track_info"
-        android:name="mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment"
-        android:label="">
-        <argument
-            android:name="adapterType"
-            app:argType="integer" />
-        <argument
-            android:name="fromIncomingShare"
-            app:argType="boolean" />
-        <argument
-            android:name="handle"
-            app:argType="long" />
-        <argument
-            android:name="uri"
-            app:argType="string" />
     </fragment>
 </navigation>

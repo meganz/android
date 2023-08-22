@@ -506,7 +506,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             setupToolbarColors()
             when (dest.id) {
                 R.id.audio_main_player,
-                R.id.playlist,
+                R.id.audio_playlist,
                 -> {
                     if (dest.id == R.id.audio_main_player) {
                         supportActionBar?.title = ""
@@ -817,7 +817,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             it.getCurrentIntent()?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
                 ?.let { adapterType ->
                     when (currentFragmentId) {
-                        R.id.playlist -> {
+                        R.id.audio_playlist -> {
                             menu.toggleAllMenuItemsVisibility(false)
                             searchMenuItem?.isVisible = true
                             // Display the select option
