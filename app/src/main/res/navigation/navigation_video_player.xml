@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/media_player"
-    app:startDestination="@id/video_main_player">
+    app:startDestination="@+id/video_main_player">
     <fragment
         android:id="@+id/video_main_player"
         android:name="mega.privacy.android.app.mediaplayer.VideoPlayerFragment"
