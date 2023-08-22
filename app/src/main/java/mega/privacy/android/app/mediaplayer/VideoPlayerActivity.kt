@@ -711,13 +711,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
             collectFlow(metadataState) { metadata ->
                 if (navController.currentDestination?.id == R.id.video_main_player) {
-                    setToolbarTitle(
-                        if (configuration.orientation == ORIENTATION_LANDSCAPE) {
-                            metadata.title ?: metadata.nodeName
-                        } else {
-                            ""
-                        }
-                    )
+                    updateToolbarTitleBasedOnOrientation(metadata)
                 }
 
                 dragToExit.nodeChanged(
@@ -886,14 +880,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         if (navController.currentDestination?.id == R.id.video_main_player) {
             navController.popBackStack()
             navController.navigate(R.id.video_main_player)
-            setToolbarTitle(
-                if (newConfig.orientation == ORIENTATION_LANDSCAPE) {
-                    videoViewModel.metadataState.value.title
-                        ?: videoViewModel.metadataState.value.nodeName
-                } else {
-                    ""
-                }
-            )
+            updateToolbarTitleBasedOnOrientation(videoViewModel.metadataState.value)
         }
     }
 
@@ -1222,6 +1209,21 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     override fun setToolbarTitle(title: String) {
         binding.toolbar.title = title
+    }
+
+    /**
+     * Update toolbar title based on orientation
+     *
+     * @param metadata Metadata
+     */
+    internal fun updateToolbarTitleBasedOnOrientation(metadata: Metadata) {
+        setToolbarTitle(
+            if (configuration.orientation == ORIENTATION_LANDSCAPE) {
+                metadata.title ?: metadata.nodeName
+            } else {
+                ""
+            }
+        )
     }
 
     override fun hideToolbar(animate: Boolean) {

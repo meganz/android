@@ -131,6 +131,7 @@ class VideoPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        videoPlayerActivity?.updateToolbarTitleBasedOnOrientation(viewModel.metadataState.value)
         observeFlow()
     }
 
