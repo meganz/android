@@ -2076,7 +2076,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">暗号化キーローテーションは、100人を超える参加者との会話では無効になっています。</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">参加者の制限を超えたため、このチャットを非公開に変えられません。</string>
+    <string name="warning_make_chat_private">参加者数がプライベートチャットの制限を超えているため、チャットをプライベートに変換できませんでした。</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B]さんがチャットリンクを作成しました。[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">本人確認証明</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">検証されていません</string>
+    <string name="label_not_verified">未承認</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">照合済み</string>
+    <string name="label_verified">承認済み</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">認証資格情報</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3250,7 +3250,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">開始画面を選択</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">MEGAアプリを次回起動したときに開く画面を選ぶための設定を変更します。</string>
+    <string name="choose_start_screen_text">設定を変更すると、MEGAアプリを起動したときに開く画面を選択できます。</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">設定を変更</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3376,7 +3376,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s サブスクリプション</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">%1$sとのアクティブなMEGAサブスクリプションをお持ちです。MEGAではそれをキャンセルできないため、%2$sで別にキャンセルする必要があります。詳細については、当社のヘルプセンターをご覧ください。</string>
+    <string name="message_android_platform_subscription">%1$sとのアクティブなMEGAサブスクリプションをお持ちです。MEGAではそれをキャンセルできないため、%2$sを介して別にキャンセルする必要があります。詳細については、当社のヘルプセンターをご覧ください。</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">アクティブなMEGAサブスクリプションをお持ちです。これは、アカウント削除後、自動的に解除されます。 詳しくは、当社のヘルプセンターをご覧ください。</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3384,7 +3384,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">%1sにアクセス</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">これがアカウント削除の最後のステップです。アカウントとサブスクリプションの両方が削除され、クラウドに保存されているすべてのデータを恒久的に失うことになります。以下にパスワードを入力してください。</string>
+    <string name="delete_account_text_other_platform_last_step">これはアカウントを削除する最後のステップです。アカウントとサブスクリプションの両方が削除され、保存されているデータはすべて恒久的に失われます。以下にパスワードを入力してください。</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">タイムライン</string>
     <!-- Title of album tab in photos section. -->
@@ -3836,7 +3836,7 @@
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">共有フォルダにアクセスするには、あなたと共有した人もあなたを承認する必要があります。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを承認</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを承認する</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">プレビュー用にファイルを準備しています</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -3927,10 +3927,14 @@
     <string name="photos_album_cover_updated">アルバムカバーを更新しました</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A]、[B]%2$sから%3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">[A]%1$s[/A]から毎日、[B]%2$sから%3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">[A]%1$sから毎日%2$sまで[/A]、[B]%3$s から%4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
+        <item quantity="other">[A]%2$s[/A]から%1$d日ごとに、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで%1$d日ごとに、[B]%4$sから%5$s[/B]</item>
+    </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="other">[A]%3$sから%4$s[/A]まで、%2$d週間ごとに%1$sに、[B]%5$sから %6$s[/B]</item>
@@ -4280,9 +4284,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">一度に最大150個のアイテムのみをアルバムに追加できます。</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">連絡先を認証できません</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">連絡先を承認できません</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">連絡先リストにないため、%sを認証できません。相手側が最初にあなたの招待を受け入れるのを待ちます。</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">連絡先リストにないため、%sを承認できません。相手側が最初にあなたの招待を受け入れるのを待ちます。</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4832,9 +4836,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">ミーティングの開催状況が更新されました</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">当社はゼロ知識暗号化でデータを保護するため、MEGAで保存、共有、受信する情報はすべて安全です。さらなるセキュリティを確保するために、情報を共有する連絡先、またはデータを受信する連絡先を認証するようお願いいたします。</string>
+    <string name="contact_approve_credentials_secure_share_description">当社はゼロ知識暗号化でデータを保護するため、MEGAで保存、共有、受信する情報はすべて安全です。さらなるセキュリティを確保するために、情報を共有する連絡先、またはデータを受信する連絡先を承認するようお願いいたします。</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">連絡先を認証するには、上記の認証情報がアカウントの認証情報と一致していることを確認してください。連絡先に認証情報を共有するように依頼できます。</string>
+    <string name="contact_approve_credentials_contact_verify_description">連絡先を承認するには、上記の認証情報がアカウントの認証情報と一致していることを確認してください。連絡先に認証情報を共有するように依頼できます。</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">承認</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4846,7 +4850,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">通話中に主催者以外によって追加された参加者は待合室に送られません。[A]詳細[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">情報を共有している連絡先の一部は、あなたによって認証されていません。さらなるセキュリティを確保するために、連絡先で認証情報を確認することをお勧めします。認証したい連絡先の横にある3つの点をタップし、「情報」をタップします。</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">情報を共有している連絡先の一部は、あなたによって承認されていません。さらなるセキュリティを確保するために、連絡先で認証情報を承認することをお勧めします。承認したい連絡先の横にある3つの点をタップし、「情報」をタップします。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">%1$d人の参加者を削除しました</item>
@@ -4867,4 +4871,8 @@
     <string name="photos_action_zoom_out">ズームアウト</string>
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">項目を追加できませんでした</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">主催者がミーティングを開始するまでお待ちください</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">主催者が参加を許可するまでお待ちください</string>
 </resources>

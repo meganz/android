@@ -1997,7 +1997,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Нет подключения к сети. Пожалуйста, подключитесь повторно, чтобы открыть файл.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">File already available Offline</string>
+    <string name="file_already_exists">Файл уже доступен локально</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Сообщение не отправлено</item>
@@ -2214,7 +2214,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">Чередование ключей шифрования отключено для разговоров с более чем 100 участниками.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">Невозможно преобразовать этот чат в частный из-за превышения лимита участников.</string>
+    <string name="warning_make_chat_private">Невозможно преобразовать этот чат в приватный, так как количество участников в нём превышает лимит для приватных чатов.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B] создал ссылку на чат.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2927,7 +2927,7 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Подтвердить учётные данные</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Не подтверждено</string>
+    <string name="label_not_verified">Не подтверждены</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Подтверждены</string>
     <!-- ”Verify user” dialog title -->
@@ -3529,7 +3529,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">Выберите стартовый раздел</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">Выберите, какой раздел будет открываться при следующем запуске приложения MEGA.</string>
+    <string name="choose_start_screen_text">Выберите, какой раздел будет открываться при запуске приложения MEGA.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">Изменить раздел</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3663,7 +3663,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Открыть %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">Остался один шаг перед удалением аккаунта. Ваш аккаунт и подписка будут удалены, и вы навсегда потеряете все данные, хранящиеся в облаке. Пожалуйста, введите пароль.</string>
+    <string name="delete_account_text_other_platform_last_step">Остался один шаг перед удалением аккаунта. Ваш аккаунт и подписка будут удалены, и вы навсегда потеряете все сохранённые данные. Пожалуйста, введите пароль.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">Временная шкала</string>
     <!-- Title of album tab in photos section. -->
@@ -4019,7 +4019,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Здесь хранятся резервные копии файлов и папок. Резервные копии доступны «только для чтения», чтобы защитить их от случайного изменения на Облачном диске.\nВы можете делать резервные копии элементов со своего компьютера в MEGA с помощью нашего настольного приложения.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Ваш аккаунт MEGA был заблокирован из-за неоднократных обвинений в нарушении авторских прав. Это означает, что вы не можете получить доступ к аккаунту или данным в нём.\nДля получения дополнительной информации о том, как подать встречное заявление, проверьте электронную почту.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Ваш аккаунт был удалён из-за нарушения Условий использования MEGA.\nВы не сможете восстановить доступ к своим сохранённым данным или зарегистрировать новый аккаунт MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -4143,9 +4143,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Нерасшифрованная папка]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">Чтобы общая папка стала доступной, человек, который поделился ею с вами, также должен подтвердить вас.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Чтобы общая папка стала доступной, человек, который поделился ей с вами, также должен одобрить вас.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Подтвердить %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Подготовка файла к превью</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4242,10 +4242,16 @@
     <string name="photos_album_cover_updated">Обложка альбома обновлена</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] с [B]%2$s до %3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Каждый день с [A]%1$s[/A] с [B]%2$s до %3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Каждый день с [A]%1$s по %2$s[/A] с [B]%3$s до %4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
+        <item quantity="one">Every day effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
+        <item quantity="one">Every day effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+    </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="one">%1$s каждую неделю с [A]%3$s по %4$s[/A] с [B]%5$s до %6$s[/B]</item>
@@ -4826,9 +4832,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">За один раз вы можете добавить в альбом до 150 элементов.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Не удаётся подтвердить контакт</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Не удаётся одобрить контакт</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">Вы не можете подтвердить %s, так как его нет в вашем списке контактов. Подождите, пока он сначала примет приглашение.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Вы не можете одобрить %s, так как его нет в вашем списке контактов. Подождите, пока он сначала примет приглашение.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Начать</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5507,9 +5513,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Повторение встречи обновлено</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">Мы защищаем ваши данные с помощью шифрования с нулевым разглашением, поэтому вся информация, которую вы храните, делитесь и получаете в MEGA, находится в безопасности. Чтобы обеспечить дополнительную безопасность, мы просим вас подтвердить контакты, с которыми вы делитесь информацией или от которых получаете данные.</string>
+    <string name="contact_approve_credentials_secure_share_description">Мы защищаем ваши данные с помощью шифрования с нулевым разглашением, поэтому вся информация, которую вы храните, делитесь и получаете в MEGA, находится в безопасности. Чтобы обеспечить дополнительную безопасность, мы просим вас одобрить контакты, с которыми вы делитесь информацией или от которых получаете данные.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">Чтобы подтвердить контакт, убедитесь, что учётные данные, которые вы видите выше, соответствуют его учётным данным. Вы можете попросить его поделиться с вами своими учётными данными.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Чтобы одобрить контакт, убедитесь, что учётные данные, которые вы видите выше, соответствуют его учётным данным. Вы можете попросить его поделиться с вами своими учётными данными.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">Подтвердить</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -5521,7 +5527,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Участники, добавленные во время звонков не организаторами, не будут отправлены в комнату ожидания. [A]Подробнее[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Некоторые контакты, с которыми вы делитесь информацией, не были вами подтверждены. Чтобы обеспечить дополнительную безопасность, мы рекомендуем вам подтвердить их учетные данные в «Контактах». Нажмите на три точки рядом с контактом, который хотите подтвердить, затем нажмите «Информация».</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Некоторые контакты, с которыми вы делитесь информацией, не были вами одобрены. Чтобы обеспечить дополнительную безопасность, мы рекомендуем вам одобрить их учетные данные в «Контактах». Нажмите на три точки рядом с контактом, который хотите одобрить, затем нажмите «Информация».</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">Удалён %1$d участник</item>
@@ -5545,4 +5551,8 @@
     <string name="photos_action_zoom_out">Уменьшить</string>
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">Не удалось добавить элемент</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Подождите, пока организатор начнёт встречу</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Подождите, пока организатор впустит вас</string>
 </resources>

@@ -2076,7 +2076,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">การสลับกุญแจเข้ารหัสถูกปิดใช้งานไว้สำหรับการสนทนาที่มีผู้เข้าร่วมมากกว่า 100 คน</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">ไม่สามารถแปลงแชทเป็นส่วนตัวได้เนื่องจากมีผู้เข้าร่วมถึงจำนวนสูงสุดแล้ว</string>
+    <string name="warning_make_chat_private">The chat could not be converted to private because the number of participants exceeds the limit for private chats.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B] ได้สร้างลิงก์แชท[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">ตรวจสอบข้อมูลประจำตัว</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">ไม่ผ่านการตรวจสอบ</string>
+    <string name="label_not_verified">Not approved</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">ตรวจสอบแล้ว</string>
+    <string name="label_verified">Approved</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">ความถูกต้องของข้อมูลประจำตัว</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3250,7 +3250,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">เลือกหน้าจอเริ่มต้นของคุณ</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">เปลี่ยนการตั้งค่าเพื่อเลือกหน้าจอที่จะแสดงเป็นหน้าแรกเมื่อคุณเปิดแอป MEGA ครั้งถัดไป</string>
+    <string name="choose_start_screen_text">Change settings to choose which screen opens when you launch the MEGA app.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">เปลี่ยนการตั้งค่า</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3376,7 +3376,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">มีการสมัครใช้งานของ %1s อยู่</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ %1$s คุณต้องยกเลิกที่ %2$s ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
+    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately via %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">คุณมีการสมัครใช้งาน MEGA อยู่ แต่เมื่อบัญชีคุณถูกลบออก ระบบจะยกเลิกการสมัครใช้งานของคุณโดยอัตโนมัติ สำหรับข้อมูลเพิ่มเติม กรุณาเยี่ยมชมได้ที่ศูนย์ช่วยเหลือของเรา</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3384,7 +3384,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">เยี่ยมชม %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">นี่เป็นขั้นตอนสุดท้ายในการลบบัญชีของคุณ ทั้งบัญชีและการสมัครใช้งานของคุณจะถูกลบด้วย พร้อมทั้งคุณจะสูญเสียข้อมูลทั้งหมดที่จัดเก็บไว้ในระบบคลาวด์อย่างถาวร กรุณากรอกรหัสผ่านของคุณด้านล่าง</string>
+    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all your stored data. Please enter your password below.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">ไทม์ไลน์</string>
     <!-- Title of album tab in photos section. -->
@@ -3834,9 +3834,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[โฟลเดอร์ที่ไม่ได้ถอดรหัส]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">หากต้องการเข้าถึงโฟลเดอร์ที่แชร์ บุคคลที่แชร์โฟลเดอร์กับคุณควรมีการตรวจสอบด้วย</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should approve you, too.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">ตรวจสอบ %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">กำลังเตรียมไฟล์เพื่อแสดงตัวอย่าง</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -3927,10 +3927,16 @@
     <string name="photos_album_cover_updated">อัปเดตปกอัลบั้มแล้ว</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] ตั้งแต่ [B]%2$s จนถึง %3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">ทุกวัน มีผล [A]%1$s[/A] ตั้งแต่ [B]%2$s จนถึง %3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">ทุกวัน มีผลตั้งแต่ [A]%1$s จนถึง %2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
+        <item quantity="one">Every day effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
+        <item quantity="one">Every day effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+    </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="other">%1$s ทุก %2$d สัปดาห์ มีผลตั้งแต่ [A]%3$s จนถึง %4$s[/A] ตั้งแต่ [B]%5$s จนถึง %6$s[/B]</item>
@@ -4280,9 +4286,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">คุณสามารถเพิ่มรายการลงในอัลบั้มได้ครั้งละไม่เกิน 150 รายการ</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">ไม่สามารถตรวจสอบผู้ติดต่อได้</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot approve contact</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">คุณไม่สามารถตรวจสอบ %s ได้เนื่องจากไม่ได้อยู่ในรายชื่อผู้ติดต่อของคุณ รอให้พวกเขาตอบรับคำเชิญของคุณก่อน</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t approve %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">เริ่ม</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4832,9 +4838,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">อัปเดตเหตุการณ์การประชุมแล้ว</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to verify the contacts you share information with or receive data from.</string>
+    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to approve the contacts you share information with or receive data from.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">ในการตรวจสอบผู้ติดต่อของคุณ ตรวจสอบให้แน่ใจว่าข้อมูลประจำตัวที่แสดงด้านบนตรงกับข้อมูลประจำตัวของคุณ คุณสามารถขอให้ผู้ติดต่อของคุณให้ข้อมูลประจำตัวแก่คุณได้</string>
+    <string name="contact_approve_credentials_contact_verify_description">To approve your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">อนุมัติ</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4846,7 +4852,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Participants added by non-hosts during calls won’t be sent to the waiting room. [A]Learn more[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">Removed %1$d participant</item>
@@ -4868,4 +4874,8 @@
     <string name="photos_action_zoom_out">ย่อ</string>
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Wait for host to start the meeting</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wait for host to let you in</string>
 </resources>

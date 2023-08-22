@@ -1868,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">네트워크 연결이 없습니다. 파일을 열려면 다시 연결하세요.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">File already available Offline</string>
+    <string name="file_already_exists">파일이 이미 오프라인용으로 저장되어 있습니다</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">메시지가 전달되지 않음</item>
@@ -2076,7 +2076,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">암호화 키 순환은 100명 이상의 참여자가 있는 대화에서는 비활성화됩니다.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">참여자 수가 제한을 초과하였기 때문이 이 대화를 비밀 대화로 전환할 수 없습니다.</string>
+    <string name="warning_make_chat_private">일부 참여자가 비공개 대화 한도를 초과하였기 때문에 대화를 비공개로 전환할 수 없습니다.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A]님이[B] 대화 링크를 만들었습니다.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">자격 증명 인증 중</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">인증되지 않음</string>
+    <string name="label_not_verified">승인되지 않음</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">확인됨</string>
+    <string name="label_verified">승인됨</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">진위 증명</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3250,7 +3250,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">시작 화면을 선택하세요</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">다음 번에 MEGA 앱을 실행할 때 열 화면을 선택하는 설정을 바꿉니다.</string>
+    <string name="choose_start_screen_text">MEGA 앱을 실행할 때 열 화면을 선택하는 설정을 바꿉니다.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">설정 변경</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3384,7 +3384,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">%1s 방문</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">계정을 삭제하는 마지막 단계입니다. 당신의 계정과 구독 모두 삭제되며 클라우드에 저장된 모든 데이터를 영구적으로 잃게 됩니다. 아래에 암호를 입력하세요.</string>
+    <string name="delete_account_text_other_platform_last_step">계정을 삭제하는 마지막 단계입니다. 당신의 계정과 구독 모두 삭제되며 저장된 모든 데이터를 영구적으로 잃게 됩니다. 아래에 암호를 입력하세요.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">연표</string>
     <!-- Title of album tab in photos section. -->
@@ -3722,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">이곳은 백업된 파일과 폴더가 보관되는 곳입니다. 백업된 항목은 실수로 클라우드 드라이브에서 수정되는 것을 방지하지 위해 “읽기 전용”이 됩니다.\n데스크톱 앱을 이용하여 컴퓨터에서 MEGA로 항목들을 백업할 수 있습니다.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">당신의 MEGA 계정이 반복된 저작권 침해 혐의로 인해 정지 되었습니다. 이것은 당신의 계정이나 그 안의 데이터에 접근할 수 없다는 뜻입니다.\n이의 제기를 접수하는 방법에 대한 자세한 정보는 이메일을 확인하세요.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">당신의 계정이 MEGA의 이용 약관 위반으로 삭제되었습니다.\n저장된 데이터에 대한 접근 또는 새 MEGA 계정을 등록하는 것이 금지됩니다.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">회의</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3834,9 +3834,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[복호화 되지 않은 폴더]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">공유된 폴더에 접근하려면, 당신에게 공유해준 사람도 당신을 인증해야 합니다.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">공유된 폴더에 접근하려면, 당신에게 공유해준 사람도 당신을 확인해야 합니다.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">%s님 인증</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">%s 님 확인</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">파일 미리보기 준비 중</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -3927,10 +3927,14 @@
     <string name="photos_album_cover_updated">사진첩 표지 업데이트됨</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] [B]%2$s부터 %3$s까지[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">[A]%1$s[/A]부터 매일 [B]%2$s부터 %3$s까지[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">[A]%1$s부터 %2$s까지[/A] 매일 [B]%3$s부터 %4$s까지[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
+        <item quantity="other">[A]%2$s[/A]부터 %1$d일마다 [B]%3$s부터 %4$s까지[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
+        <item quantity="other">[A]%2$s부터 %3$s까지[/A] %1$d일마다 [B]%4$s부터 %5$s까지[/B]</item>
+    </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="other">[A]%3$s부터 %4$s까지[/A] 매 %2$d주마다 %1$s [B]%5$s부터 %6$s까지[/B]</item>
@@ -4280,9 +4284,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">사진첩에 한번에 최대 150개의 항목만 추가할 수 있습니다.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">연락처를 인증할 수 없습니다</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">연락처를 확인할 수 없습니다</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">당신의 연락처 목록에 %s님이 없기 때문에 인증할 수 없습니다. 그들이 초대를 수락할 때까지 기다리세요.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">당신의 연락처 목록에 %s 님이 없기 때문에 확인할 수 없습니다. 그들이 초대를 수락할 때까지 기다리세요.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">시작</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4832,13 +4836,13 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">회의 되풀이 항목 수정됨</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">우리는 당신이 MEGA에 저장, 공유, 수신하는 모든 정보가 안전하도록 영지식 암호화로 당신의 데이터를 보호합니다. 추가적인 보안을 적용하려면, 우리는 당신이 정보를 공유하거나 데이터를 받는 연락처를 인증할 것을 요청합니다.</string>
+    <string name="contact_approve_credentials_secure_share_description">우리는 당신이 MEGA에 저장, 공유, 수신하는 모든 정보가 안전하도록 영지식 암호화로 당신의 데이터를 보호합니다. 추가적인 보안을 적용하려면, 우리는 당신이 정보를 공유하거나 데이터를 받는 연락처를 확인할 것을 요청합니다.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">연락처를 인증하려면, 위에 보이는 자격 증명이 연락처의 계정 자격 증명과 일치하는지 확인하세요. 연락처에게 자격 증명을 공유해달라고 요청하세요.</string>
+    <string name="contact_approve_credentials_contact_verify_description">연락처를 확인하려면, 위에 보이는 자격 증명이 연락처의 계정 자격 증명과 일치하는지 확인하세요. 연락처에게 자격 증명을 공유해달라고 요청하세요.</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">승인</string>
+    <string name="contact_approve_credentials_button_text">확인</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">자격 증명 승인</string>
+    <string name="contact_approve_credentials_toolbar_title">자격 증명 확인</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">대기실</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -4846,7 +4850,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">통화 중에 호스트가 아닌 사람으로부터 추가된 참여자들은 대기실에 보내질 수 없습니다. [A]더 알아보기[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">정보를 공유하는 연락처 중 일부가 당신에 의해 인증되지 않았습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 인증할 것을 권장합니다. 인증하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">정보를 공유하는 연락처 중 일부가 당신에 의해 확인되지 않았습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 확인할 것을 권장합니다. 확인하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">%1$d명의 참여자를 제거하였습니다</item>
@@ -4866,5 +4870,9 @@
     <!-- Photos action menu zoom out -->
     <string name="photos_action_zoom_out">축소</string>
     <!-- Message of adding subtitle failed for video player-->
-    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
+    <string name="media_player_video_message_adding_subtitle_failed">항목을 추가할 수 없습니다</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">주최자가 회의를 시작하기를 기다립니다</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">주최자가 당신을 들어오게 하기를 기다립니다</string>
 </resources>

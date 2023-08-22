@@ -774,9 +774,9 @@
     <!-- Title of the dialog to park an account -->
     <string name="park_account_dialog_title">停用帳戶</string>
     <!-- Button to park an account -->
-    <string name="park_account_button">封存</string>
+    <string name="park_account_button">停用</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">這是封存您帳戶的最後一步，請輸入您的新密碼。您的資料將保留至少60天。如果您之後想起您已封存帳戶的密碼，請聯繫 support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">這是停用您帳戶的最後一步，請輸入您的新密碼。您的資料將保留至少60天。如果您之後想起您已停用帳戶的密碼，請聯繫 support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">請輸入新密碼</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1545,7 +1545,7 @@
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">檢視</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
-    <string name="external_play">用&#8230;開啟</string>
+    <string name="external_play">打開檔案的應用程式</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">用&#8230;共享</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
@@ -1842,7 +1842,7 @@
     <!-- Label shown when it disables the Two-Factor Authentication -->
     <string name="label_2fa_disabled">已停用雙重驗證</string>
     <!-- Text of the button which action is to show the authentication apps -->
-    <string name="open_app_button">從&#8230;開啟</string>
+    <string name="open_app_button">開啟</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
     <string name="intent_not_available_2fa">在您的裝置上，沒有任何可用的應用程式可以用來啟用雙重驗證</string>
     <!-- Text button -->
@@ -2076,7 +2076,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">與超過100位與會者的對話無法使用加密金鑰輪替功能。</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">由於超過與會者人數上限，因此無法將此對話轉換為私人的。</string>
+    <string name="warning_make_chat_private">The chat could not be converted to private because the number of participants exceeds the limit for private chats.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B]建立對話連結。[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">驗證憑證</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">未驗證</string>
+    <string name="label_not_verified">未批准</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">已驗證</string>
+    <string name="label_verified">已批准</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">授權認證</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3250,7 +3250,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">選擇您的開始畫面</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">更改設定來選擇下次啟動MEGA應用程式時的開始畫面。</string>
+    <string name="choose_start_screen_text">Change settings to choose which screen opens when you launch the MEGA app.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">變更設定</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3376,7 +3376,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s訂閱</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">您目前在%1$s有一個現行的MEGA訂閱。您必須在%2$s中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
+    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately via %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">您有一個現行的MEGA訂閱。它會在帳戶刪除後自動取消，造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3384,7 +3384,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">造訪%1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">這是刪除帳戶最後一個步驟。您的帳戶和訂閱都將被刪除，而且您將永久遺失所有儲存在雲端空間的資料。請在下方輸入您的密碼。</string>
+    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all your stored data. Please enter your password below.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">時間軸</string>
     <!-- Title of album tab in photos section. -->
@@ -3834,9 +3834,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未解密資料夾]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">若要存取共享資料夾，與您共享資料夾的人也會對您進行驗證。</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">要存取共享資料夾，與您共享資料夾的人也應該批准您。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">驗證：%s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -3927,10 +3927,16 @@
     <string name="photos_album_cover_updated">相簿封面已更新</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] 從[B]%2$s到%3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">從[A]%1$s[/A]起，每天的[B]%2$s到%3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">從[A]%1$s到%2$s[/A]，每天的[B]%3$s到%4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
+        <item quantity="one">Every day effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
+        <item quantity="one">Every day effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+    </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="other">從[A]%3$s到%4$s[/A]，每%2$d週的%1$s的[B]%5$s到%6$s[/B]</item>
@@ -4280,9 +4286,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">您一次最多只能在一個相簿中新增150個項目。</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">無法驗證聯絡人</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">無法批准聯絡人</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法驗證%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀啨。</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t approve %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4832,9 +4838,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">會議事件已更新</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密技術來保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您驗證您與之共享資訊，或從之接收資料的聯絡人。</string>
+    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密技術來保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您批准您與之共享資訊，或從之接收資料的聯絡人。</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相符。您可以要求對方分享他們的憑證給您。</string>
+    <string name="contact_approve_credentials_contact_verify_description">若要批准您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相匹配。您可以要求對方分享他們的憑證給您。</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">驗證</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4846,7 +4852,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">通話期間由非主持人加入的與會者不會被傳送到等候室。[A]瞭解更多[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">某些您與之共享資訊的聯絡人尚未經過您的驗證。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。點選您欲驗證的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">已移除%1$d個與會者</item>
@@ -4858,13 +4864,17 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">允許存取音訊檔案</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">已驗證</string>
+    <string name="contact_approve_credentials_approved_text">已批准</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">未驗證</string>
+    <string name="contact_approve_credentials_not_approved_text">未批准</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">放大</string>
     <!-- Photos action menu zoom out -->
     <string name="photos_action_zoom_out">縮小</string>
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Wait for host to start the meeting</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">等待主持人讓你進入</string>
 </resources>
