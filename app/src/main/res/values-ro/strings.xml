@@ -2168,7 +2168,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">Rotația cheii criptate este dezactivată pentru conversațiile cu mai mult de 100 de participanți.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">Nu se poate converti acest chat în privat deoarece s-a depășit limita de participanți.</string>
+    <string name="warning_make_chat_private">The chat could not be converted to private because the number of participants exceeds the limit for private chats.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B] a creat un link al chatului.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2856,9 +2856,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Verifică acreditările</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Neverificate</string>
+    <string name="label_not_verified">Nu sunt aprobate</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Verificat</string>
+    <string name="label_verified">Aprobate</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Acreditări de autenticitate</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3436,7 +3436,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">Alege ecranul de start</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">Modifică setările pentru a alege ecranul care se deschide la următoarea lansare a aplicației MEGA.</string>
+    <string name="choose_start_screen_text">Change settings to choose which screen opens when you launch the MEGA app.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">Modifică setarea</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3562,7 +3562,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Abonament %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">Ai un abonament MEGA activ cu %1$s. Trebuie să îl anulezi separat la %2$s, deoarece MEGA nu îl poate anula pentru tine. Vizitează-ne Centrul de ajutor pentru mai multe informații.</string>
+    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately via %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Ai un abonament MEGA activ. Acesta va fi anulat automat după ștergerea contului. Vizitează centrul nostru de asistență pentru mai multe informații.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3570,7 +3570,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Vizitează %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">Acesta este ultimul pas pentru a-ți șterge contul. Atât contul, cât și abonamentul vor fi șterse și vei pierde definitiv toate datele stocate în unitatea cloud. Te rugăm să introduci parola mai jos.</string>
+    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all your stored data. Please enter your password below.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">Cronologie</string>
     <!-- Title of album tab in photos section. -->
@@ -4040,9 +4040,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[folder nedecriptat]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">Pentru a accesa folderul partajat, persoana care l-a partajat cu tine ar trebui să te verifice și pe tine.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Pentru a accesa folderul partajat, persoana care l-a partajat cu tine ar trebui să te aprobe și pe tine.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Verifică pe %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Se pregătește fișierul pentru previzualizare</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4137,10 +4137,16 @@
     <string name="photos_album_cover_updated">Copertă de album actualizată</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] de la [B]%2$s la %3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">În fiecare zi, începând cu [A]%1$s[/A] de la [B]%2$s la %3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">În fiecare zi, începând cu [A]%1$s până în %2$s[/A] de la [B]%3$s la %4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
+        <item quantity="one">Every day effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
+        <item quantity="one">Every day effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+    </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="one">%1$s, în fiecare săptămână, începând cu [A]%3$s până în %4$s[/A], de la [B]%5$s la %6$s[/B]</item>
@@ -4644,9 +4650,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">Poți adăuga doar până la 150 de elemente o dată într-un album</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Nu se poate verifica contactul</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Nu se poate aproba contactul</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">Nu poți confirma pe %s deoarece nu se află în lista de contacte. Așteaptă ca această persoană să îți accepte mai întâi invitația.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t approve %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Pornește</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5282,9 +5288,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Întâlnirea a fost actualizată</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare tip zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații sau de la care primiți date.</string>
+    <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare tip zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să aprobați contactele cu care partajați informații sau de la care primiți date.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">Pentru a vă confirma contactul, asigurați-vă că acreditările pe care le vedeți mai sus corespund cu acreditările contului lor. Le puteți cere să vă împărtășească acreditările.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Pentru a vă aproba contactul, asigurați-vă că acreditările pe care le vedeți mai sus corespund cu acreditările contului lor. Le puteți cere să vă împărtășească acreditările.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">Aprobă</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -5296,7 +5302,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Participanții adăugați de non-gazde în timpul apelurilor nu vor fi trimiși în sala de așteptare. [A]Află mai multe [/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Unele dintre contactele cu care partajați informații nu au fost confirmate de dvs. Pentru a asigura o securitate suplimentară, vă recomandăm să confirmați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl confirmați și atingeți Informații.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">%1$d participant a fost eliminat</item>
@@ -5319,4 +5325,8 @@
     <string name="photos_action_zoom_out">Zoom out</string>
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">Elementul nu a putut fi adăugat</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Așteptați ca gazda să înceapă întâlnirea</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Așteptați ca gazda să vă lase să intrați</string>
 </resources>

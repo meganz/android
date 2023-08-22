@@ -2785,9 +2785,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Verify credentials</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Not verified</string>
+    <string name="label_not_verified">Not approved</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Verified</string>
+    <string name="label_verified">Approved</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticity Credentials</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3939,7 +3939,7 @@
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should approve you, too.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4503,12 +4503,18 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5091,11 +5097,10 @@
     <string name="photos_action_zoom_in">Zoom in</string>
     <!-- Photos action menu zoom out -->
     <string name="photos_action_zoom_out">Zoom out</string>
+    <!-- Message of adding subtitle failed for video player-->
+    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
     <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Wait for host to start the meeting</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wait for host to let you in</string>
-    <!-- Message of adding subtitle failed for video player-->
-    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
-
 </resources>

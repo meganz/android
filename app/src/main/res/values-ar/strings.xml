@@ -2083,7 +2083,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">لا يوجد اتصال شبكة. لا إعادة الاتصال لفتح الملف.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">File already available Offline</string>
+    <string name="file_already_exists">الملف متاح بالفعل دون اتصال بالانترنت</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="zero">لم تتم إعادة توجيه الرسالة</item>
@@ -2306,7 +2306,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">تدوير مفتاح التشفير معطل للمحادثات مع أكثر من 100 مشارك.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">يتعذر تحويل هذه المحادثة إلى خاصة لأنه تم تجاوز حد المشاركين.</string>
+    <string name="warning_make_chat_private">لا يمكن تحويل المحادثة إلى خاصة لأن عدد المشاركين يتجاوز الحد الأقصى للمحادثات الخاصة.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B] أنشأ رابط محادثة.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -3069,9 +3069,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">وثق بيانات الاعتماد</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">لم يتم التحقق</string>
+    <string name="label_not_verified">لم تتم الموافقة</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">تم التحقق</string>
+    <string name="label_verified">تمت الموافقة</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">بيانات الاعتماد صالحة</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3715,7 +3715,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">اختر شاشة البداية الخاصة بك</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">قم بتغيير الإعدادات لاختيار الشاشة التي تفتح عند تشغيل تطبيق ميغا MEGA في المرة التالية.</string>
+    <string name="choose_start_screen_text">قم بتغيير الإعدادات لاختيار الشاشة التي تفتح عند تشغيل تطبيق ميغا MEGA.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">تغيير الإعدادات</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3841,7 +3841,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">اشتراك %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">لديك اشتراك ميغا MEGA مفعل مع %1$s. يجب عليك إلغاؤه بشكل منفصل في %2$s، لأن ميغا MEGA غير قادرة على إلغائه لك. تفضل بزيارة مركز المساعدة لدينا لمزيد من المعلومات.</string>
+    <string name="message_android_platform_subscription">لديك اشتراك ميغا MEGA مفعل مع %1$s. يجب عليك إلغاؤه بشكل منفصل عبر %2$s، لأن ميغا MEGA غير قادرة على إلغائه لك. تفضل بزيارة مركز المساعدة لدينا لمزيد من المعلومات.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">لديك اشتراك ميغا MEGA مفعل. سيتم إلغاؤه تلقائيًا بعد حذف الحساب. قم بزيارة مركز المساعدة للحصول على مزيد من المعلومات.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3849,7 +3849,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">قم بزيارة %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">هذه هي الخطوة الأخيرة لحذف حسابك. سيتم حذف كل من حسابك واشتراكك وستفقد جميع البيانات المخزنة في السحابة بشكل دائم. الرجاء إدخال كلمة المرور الخاصة بك أدناه.</string>
+    <string name="delete_account_text_other_platform_last_step">هذه هي الخطوة الأخيرة لحذف حسابك. سيتم حذف كل من حسابك واشتراكك وستفقد جميع بياناتك المخزنة بشكل دائم. الرجاء إدخال كلمة المرور الخاصة بك أدناه.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">الجدول الزمني</string>
     <!-- Title of album tab in photos section. -->
@@ -4217,9 +4217,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">هذا هو المكان الذي يتم فيه تخزين الملفات والمجلدات التي تم نسخها احتياطيًا. العناصر التي تم نسخها احتياطيًا هي ”للقراءة فقط“ لحمايتها من التعديل العرضي في السواقة السحابية الخاص بك.\nيمكنك نسخ العناصر احتياطيًا من جهاز الكمبيوتر الخاص بك إلى ميغا MEGA باستخدام تطبيق الحاسوب المكتبي الخاص بنا.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">تم تعليق حساب ميغا MEGA الخاص بك بسبب الادعاءات المتكررة بانتهاكات حقوق النشر. هذا يعني أنه لا يمكنك الوصول إلى حسابك أو البيانات الموجودة فيه.\n تحقق من بريدنا الإلكتروني للحصول على مزيد من المعلومات حول كيفية تقديم إشعار مضاد.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">تم إنهاء حسابك بسبب خرق لشروط خدمة ميغا MEGA.\n لن تتمكن من استعادة الوصول إلى بياناتك المخزنة أو لن يُسمح لك بتسجيل حساب ميغا MEGA جديد.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">الاجتماعات</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4349,9 +4349,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[مجلد غير مشفر]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">للوصول إلى المجلد المشارك يجب على الشخص الذي شاركه معك التحقق منك أيضًا.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">للوصول إلى المجلد المشارك يجب أن يوافق عليك أيضًا الشخص الذي شاركه معك.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">تحقق من %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">تحضير الملف للعرض</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4452,10 +4452,16 @@
     <string name="photos_album_cover_updated">تم تحديث غلاف الألبوم</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] من [B]%2$s إلى %3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">كل يوم اعتباراً من تاريخ [A]%1$s[/A] من [B]%2$s إلى %3$s[/B]</string>
-    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">كل يوم اعتباراً من تاريخ [A]%1$s حتى %2$s[/A] من [B] %3$s إلى %4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
+        <item quantity="one">Every day effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
+        <item quantity="one">Every day effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Every %1$d days effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+    </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="zero">%1$s كل %2$d أسبوع اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
@@ -5190,9 +5196,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">يمكنك إضافة ما يصل إلى 150 عنصرًا فقط في المرة الواحدة إلى الألبوم.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">لا يمكن التحقق من جهة الاتصال</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">لا يمكن الموافقة على جهة الاتصال</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">لا يمكنك التحقق من %s لأنه ليس في قائمة جهات الاتصال الخاصة بك. انتظر حتى يقبل دعوتك أولاً.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">لا يمكنك الموافقة %s لأنهم ليسوا في قائمة جهات الاتصال الخاصة بك. انتظر حتى يقبلوا دعوتك أولاً.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">بدء</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5643,13 +5649,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;جدولة سلة المحذوفات بين 7 أيام و 10 سنوات</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">اشتري برو لايت Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">اشتر برو  Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">اشتر برو Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">اشتر برو Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">شروط الخدمة</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -5957,9 +5963,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">تم تحديث تكرار الاجتماع</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">نحن نحمي بياناتك بتشفير المعرفة الصفرية بحيث تكون جميع المعلومات التي تقوم بتخزينها ومشاركتها وتلقيها على ميغا MEGA آمنة. لضمان أمان إضافي نطلب منك التحقق من جهات الاتصال التي تشارك المعلومات معها أو تتلقى البيانات منها.</string>
+    <string name="contact_approve_credentials_secure_share_description">نحن نحمي بياناتك بتشفير المعرفة الصفرية بحيث تكون جميع المعلومات التي تقوم بتخزينها ومشاركتها وتلقيها على ميغا MEGA آمنة. لضمان أمان إضافي نطلب منك الموافقة على جهات الاتصال التي تشارك المعلومات معها أو تتلقى البيانات منها.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">للتحقق من جهة الاتصال الخاصة بك، تأكد من أن بيانات الاعتماد التي تراها أعلاه تطابق بيانات اعتماد حسابهم. يمكنك أن تطلب منهم مشاركة بيانات اعتمادهم معك.</string>
+    <string name="contact_approve_credentials_contact_verify_description">للموافقة على جهة الاتصال الخاصة بك، تأكد من أن بيانات الاعتماد التي تراها أعلاه تطابق بيانات اعتماد حسابهم. يمكنك أن تطلب منهم مشاركة بيانات اعتمادهم معك.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">موافق</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -5971,7 +5977,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">لن يتم إرسال المشاركين الذين تمت إضافتهم بواسطة غير مضيفين أثناء المكالمات إلى غرفة الانتظار. [A]اعرف أكثر[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">لم تتحقق من بعض جهات الاتصال التي تشارك المعلومات معها. لضمان أمان إضافي نوصيك بالتحقق من بيانات الاعتماد الخاصة بهم في جهات الاتصال. اضغط على النقاط الثلاث بجوار جهة الاتصال التي تريد التحقق منها وانقر فوق معلومات.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">لم توافق على بعض جهات الاتصال التي تشارك المعلومات معها. لضمان أمان إضافي نوصيك بالتحقق من بيانات الاعتماد الخاصة بهم في جهات الاتصال. اضغط على النقاط الثلاث بجوار جهة الاتصال التي تريد الموافقة عليها وانقر فوق معلومات.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="zero">تمت إزالة %1$d مشارك</item>
@@ -5996,5 +6002,9 @@
     <!-- Photos action menu zoom out -->
     <string name="photos_action_zoom_out">تصغير</string>
     <!-- Message of adding subtitle failed for video player-->
-    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
+    <string name="media_player_video_message_adding_subtitle_failed">لا يمكن إضافة العنصر</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">انتظر المضيف لبدء الاجتماع</string>
+    <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">انتظر حتى يسمح لك المضيف بالدخول</string>
 </resources>
