@@ -8,15 +8,16 @@ import mega.privacy.android.domain.exception.MegaException
  *
  * @property transfer
  */
-sealed class TransferEvent(open val transfer: Transfer) {
+sealed interface TransferEvent {
+    val transfer: Transfer
+
 
     /**
      * Transfer start event
      *
      * @property transfer
      */
-    data class TransferStartEvent(override val transfer: Transfer) :
-        TransferEvent(transfer)
+    data class TransferStartEvent(override val transfer: Transfer) : TransferEvent
 
     /**
      * Transfer finish event
@@ -27,7 +28,7 @@ sealed class TransferEvent(open val transfer: Transfer) {
     data class TransferFinishEvent(
         override val transfer: Transfer,
         val error: MegaException?,
-    ) : TransferEvent(transfer)
+    ) : TransferEvent
 
     /**
      * Transfer update event
@@ -35,7 +36,7 @@ sealed class TransferEvent(open val transfer: Transfer) {
      * @property transfer
      */
     data class TransferUpdateEvent(override val transfer: Transfer) :
-        TransferEvent(transfer)
+        TransferEvent
 
     /**
      * Transfer temporary error
@@ -46,7 +47,7 @@ sealed class TransferEvent(open val transfer: Transfer) {
     data class TransferTemporaryErrorEvent(
         override val transfer: Transfer,
         val error: MegaException?,
-    ) : TransferEvent(transfer)
+    ) : TransferEvent
 
     /**
      * Transfer data
@@ -55,5 +56,11 @@ sealed class TransferEvent(open val transfer: Transfer) {
      * @property buffer
      */
     data class TransferDataEvent(override val transfer: Transfer, val buffer: ByteArray?) :
-        TransferEvent(transfer)
+        TransferEvent
+
+    /**
+     * Transfer has been paused or resumed
+     * @param paused
+     */
+    data class TransferPaused(override val transfer: Transfer, val paused: Boolean) : TransferEvent
 }

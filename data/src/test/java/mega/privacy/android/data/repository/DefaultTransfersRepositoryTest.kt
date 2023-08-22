@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,10 +17,13 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
+import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -45,6 +49,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -64,6 +69,7 @@ class DefaultTransfersRepositoryTest {
     private val appEventGateway: AppEventGateway = mock()
     private val transferMapper: TransferMapper = mock()
     private val transferAppDataStringMapper: TransferAppDataStringMapper = mock()
+    private val pausedTransferEventMapper = mock<PausedTransferEventMapper>()
     private val localStorageGateway: MegaLocalStorageGateway = mock()
     private val workerManagerGateway = mock<WorkManagerGateway>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
@@ -80,20 +86,23 @@ class DefaultTransfersRepositoryTest {
         underTest = createDefaultTransfersRepository()
     }
 
-    private fun createDefaultTransfersRepository() = DefaultTransfersRepository(
-        megaApiGateway = megaApiGateway,
-        ioDispatcher = UnconfinedTestDispatcher(),
-        transferEventMapper = transferEventMapper,
-        appEventGateway = appEventGateway,
-        transferMapper = transferMapper,
-        transferAppDataStringMapper = transferAppDataStringMapper,
-        localStorageGateway = localStorageGateway,
-        workerManagerGateway = workerManagerGateway,
-        megaLocalRoomGateway = megaLocalRoomGateway,
-        transferDataMapper = transferDataMapper,
-        cancelTokenProvider = cancelTokenProvider,
-        scope = testScope,
-    )
+    private fun createDefaultTransfersRepository(): DefaultTransfersRepository {
+        return DefaultTransfersRepository(
+            megaApiGateway = megaApiGateway,
+            ioDispatcher = UnconfinedTestDispatcher(),
+            transferEventMapper = transferEventMapper,
+            appEventGateway = appEventGateway,
+            transferMapper = transferMapper,
+            transferAppDataStringMapper = transferAppDataStringMapper,
+            pausedTransferEventMapper = pausedTransferEventMapper,
+            localStorageGateway = localStorageGateway,
+            workerManagerGateway = workerManagerGateway,
+            megaLocalRoomGateway = megaLocalRoomGateway,
+            transferDataMapper = transferDataMapper,
+            cancelTokenProvider = cancelTokenProvider,
+            scope = testScope,
+        )
+    }
 
     @BeforeEach
     fun resetMocks() {
@@ -102,6 +111,7 @@ class DefaultTransfersRepositoryTest {
             transferEventMapper,
             appEventGateway,
             transferMapper,
+            pausedTransferEventMapper,
             localStorageGateway,
             workerManagerGateway,
             megaLocalRoomGateway,
@@ -748,6 +758,42 @@ class DefaultTransfersRepositoryTest {
         assertThat(flow.value).isEqualTo(!expected) //just to be sure the value will be updated after emitting a new value
         underTest.pauseTransfers(expected)
         assertThat(flow.value).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that monitorTransferEvents emits transfer events`() = runTest {
+        val start = GlobalTransfer.OnTransferStart(mock())
+        val finish = GlobalTransfer.OnTransferFinish(mock(), mock())
+        val startEvent = TransferEvent.TransferStartEvent(mock())
+        val finishEvent = TransferEvent.TransferFinishEvent(mock(), mock())
+        val globalTransferEventsFlow = flowOf(start, finish)
+        whenever(transferEventMapper(start)).thenReturn(startEvent)
+        whenever(transferEventMapper(finish)).thenReturn(finishEvent)
+        whenever(megaApiGateway.globalRequestEvents).thenReturn(emptyFlow())
+        whenever(megaApiGateway.globalTransfer).thenReturn(globalTransferEventsFlow)
+        underTest.monitorTransferEvents().test {
+            assertThat(awaitItem()).isEqualTo(startEvent)
+            assertThat(awaitItem()).isEqualTo(finishEvent)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorTransferEvents emits transfer paused events`() = runTest {
+        val pause = RequestEvent.OnRequestFinish(mock(), mock())
+        val resume = RequestEvent.OnRequestFinish(mock(), mock())
+        val pauseEvent = TransferEvent.TransferPaused(mock(), true)
+        val resumeEvent = TransferEvent.TransferPaused(mock(), false)
+        val globalRequestEventsFlow = flowOf(pause, resume)
+        whenever(pausedTransferEventMapper(eq(pause), any())).thenReturn(pauseEvent)
+        whenever(pausedTransferEventMapper(eq(resume), any())).thenReturn(resumeEvent)
+        whenever(megaApiGateway.globalRequestEvents).thenReturn(globalRequestEventsFlow)
+        whenever(megaApiGateway.globalTransfer).thenReturn(emptyFlow())
+        underTest.monitorTransferEvents().test {
+            assertThat(awaitItem()).isEqualTo(pauseEvent)
+            assertThat(awaitItem()).isEqualTo(resumeEvent)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Nested

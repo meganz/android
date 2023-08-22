@@ -862,6 +862,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             // No further action necessary for these Scenarios
             is TransferEvent.TransferStartEvent,
             is TransferEvent.TransferDataEvent,
+            is TransferEvent.TransferPaused,
             -> Unit
         }
     }

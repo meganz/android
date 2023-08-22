@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -25,6 +27,7 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
@@ -68,6 +71,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope,
     private val transferEventMapper: TransferEventMapper,
+    private val pausedTransferEventMapper: PausedTransferEventMapper,
     private val transferMapper: TransferMapper,
     private val transferAppDataStringMapper: TransferAppDataStringMapper,
     private val appEventGateway: AppEventGateway,
@@ -241,8 +245,14 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
 
     override fun monitorTransferEvents(): Flow<TransferEvent> =
-        megaApiGateway.globalTransfer.map { event -> transferEventMapper(event) }
-            .flowOn(ioDispatcher)
+        merge(
+            megaApiGateway.globalTransfer.map { event -> transferEventMapper(event) },
+            megaApiGateway.globalRequestEvents.mapNotNull { event ->
+                pausedTransferEventMapper(event) {
+                    getTransferByTag(event.request.transferTag)
+                }
+            },
+        ).flowOn(ioDispatcher)
 
     override suspend fun cancelTransferByTag(transferTag: Int) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->

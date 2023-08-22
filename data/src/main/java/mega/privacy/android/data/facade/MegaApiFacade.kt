@@ -13,6 +13,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -28,6 +29,7 @@ import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
@@ -154,6 +156,36 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
 
     override suspend fun getSdkVersion(): String? = megaApi.version
+
+    override val globalRequestEvents = callbackFlow {
+        val listener = object : MegaRequestListenerInterface {
+            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+                trySend(RequestEvent.OnRequestFinish(request, e))
+            }
+
+            override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
+                trySend(RequestEvent.OnRequestStart(request))
+            }
+
+            override fun onRequestTemporaryError(
+                api: MegaApiJava,
+                request: MegaRequest,
+                e: MegaError,
+            ) {
+                trySend(RequestEvent.OnRequestTemporaryError(request, e))
+            }
+
+            override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
+                trySend(RequestEvent.OnRequestUpdate(request))
+            }
+
+        }
+        megaApi.addRequestListener(listener)
+        awaitClose { megaApi.removeRequestListener(listener) }
+    }.shareIn(
+        sharingScope,
+        SharingStarted.WhileSubscribed()
+    )
 
     override val globalUpdates: Flow<GlobalUpdate> = callbackFlow {
         val listener = object : MegaGlobalListenerInterface {

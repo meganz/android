@@ -125,6 +125,7 @@ class TransfersViewModel @Inject constructor(
                         is TransferEvent.TransferUpdateEvent -> updateTransfer(it.transfer)
                         is TransferEvent.TransferTemporaryErrorEvent,
                         is TransferEvent.TransferDataEvent,
+                        is TransferEvent.TransferPaused,
                         -> Unit
                     }
                 }

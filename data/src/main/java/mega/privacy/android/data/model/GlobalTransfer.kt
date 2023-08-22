@@ -8,13 +8,15 @@ import nz.mega.sdk.MegaTransfer
  *
  * @property transfer
  */
-sealed class GlobalTransfer(open val transfer: MegaTransfer) {
+sealed interface GlobalTransfer {
+    val transfer: MegaTransfer
+
     /**
      * On transfer start
      *
      * @property transfer
      */
-    data class OnTransferStart(override val transfer: MegaTransfer) : GlobalTransfer(transfer)
+    data class OnTransferStart(override val transfer: MegaTransfer) : GlobalTransfer
 
     /**
      * On transfer finish
@@ -23,14 +25,14 @@ sealed class GlobalTransfer(open val transfer: MegaTransfer) {
      * @property error
      */
     data class OnTransferFinish(override val transfer: MegaTransfer, val error: MegaError) :
-        GlobalTransfer(transfer)
+        GlobalTransfer
 
     /**
      * On transfer update
      *
      * @property transfer
      */
-    data class OnTransferUpdate(override val transfer: MegaTransfer) : GlobalTransfer(transfer)
+    data class OnTransferUpdate(override val transfer: MegaTransfer) : GlobalTransfer
 
     /**
      * On transfer temporary error
@@ -41,7 +43,7 @@ sealed class GlobalTransfer(open val transfer: MegaTransfer) {
     data class OnTransferTemporaryError(
         override val transfer: MegaTransfer,
         val error: MegaError,
-    ) : GlobalTransfer(transfer)
+    ) : GlobalTransfer
 
     /**
      * On transfer data
@@ -50,5 +52,5 @@ sealed class GlobalTransfer(open val transfer: MegaTransfer) {
      * @property buffer
      */
     data class OnTransferData(override val transfer: MegaTransfer, val buffer: ByteArray?) :
-        GlobalTransfer(transfer)
+        GlobalTransfer
 }

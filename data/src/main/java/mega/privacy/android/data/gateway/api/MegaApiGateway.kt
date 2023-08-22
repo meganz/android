@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway.api
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaCancelToken
@@ -260,6 +261,11 @@ interface MegaApiGateway {
      * Global transfer
      */
     val globalTransfer: Flow<GlobalTransfer>
+
+    /**
+     * Global [RequestEvent] for all requests processed within this gateway.
+     */
+    val globalRequestEvents: Flow<RequestEvent>
 
     /**
      * Get favourites
@@ -2884,5 +2890,5 @@ interface MegaApiGateway {
      * This method will get a flag for the user if user has set to enable to see warning
      * if any sharing is coming un verified contact
      */
-    suspend fun getContactVerificationWarningEnabled() : Boolean
+    suspend fun getContactVerificationWarningEnabled(): Boolean
 }
