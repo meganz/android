@@ -1,9 +1,8 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.app.domain.usecase.search
 
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -13,13 +12,17 @@ import javax.inject.Inject
  * @property megaNodeRepository [MegaNodeRepository]
  * @property getCloudSortOrder Sort order of cloud
  */
-class DefaultGetSearchOutSharesNodes @Inject constructor(
+class GetSearchOutSharesNodesUseCase @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
-) : GetSearchOutSharesNodes {
-    override suspend fun invoke(query: String, megaCancelToken: MegaCancelToken): List<MegaNode> {
+) {
+    /**
+     * Invoke
+     * @param query query to be searched
+     */
+    suspend operator fun invoke(query: String): List<MegaNode> {
         val searchList =
-            megaNodeRepository.searchOutShares(query, megaCancelToken, getCloudSortOrder())
+            megaNodeRepository.searchOutShares(query, getCloudSortOrder())
         return if (query.isEmpty()) {
             if (getCloudSortOrder() == SortOrder.ORDER_DEFAULT_DESC) {
                 searchList.sortedWith(

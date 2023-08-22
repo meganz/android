@@ -1,14 +1,12 @@
-package test.mega.privacy.android.app.domain.usecase
+package test.mega.privacy.android.app.domain.usecase.search
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultSearchFromMegaNodeParent
-import mega.privacy.android.app.domain.usecase.GetSearchFromMegaNodeParent
+import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -18,19 +16,19 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultSearchFromMegaNodeParentTest {
-    private lateinit var underTest: GetSearchFromMegaNodeParent
+class GetSearchFromMegaNodeParentUseCaseTest {
+    private lateinit var underTest: GetSearchFromMegaNodeParentUseCase
     private val megaNodeRepository: MegaNodeRepository = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val megaCancelToken: MegaCancelToken = mock()
     private val query = "Some query"
     private val parent: MegaNode = mock()
     private val parentHandleSearch = 0L
     private val invalidParentHandleSearch = -1L
+    private val searchType = -1
 
     @Before
     fun setUp() {
-        underTest = DefaultSearchFromMegaNodeParent(
+        underTest = GetSearchFromMegaNodeParentUseCase(
             megaNodeRepository = megaNodeRepository,
             getCloudSortOrder = getCloudSortOrder
         )
@@ -42,7 +40,7 @@ class DefaultSearchFromMegaNodeParentTest {
             parent = null,
             parentHandleSearch = parentHandleSearch,
             query = query,
-            megaCancelToken = megaCancelToken
+            searchType = searchType
         )
         Truth.assertThat(list).isEmpty()
     }
@@ -60,7 +58,7 @@ class DefaultSearchFromMegaNodeParentTest {
             parent = parent,
             parentHandleSearch = parentHandleSearch,
             query = "",
-            megaCancelToken = megaCancelToken
+            searchType = searchType
         )
         verify(megaNodeRepository, times(1)).getChildrenNode(
             parentNode = parent,
@@ -79,7 +77,7 @@ class DefaultSearchFromMegaNodeParentTest {
             parent = parent,
             parentHandleSearch = parentHandleSearch,
             query = query,
-            megaCancelToken = megaCancelToken
+            searchType = searchType
         )
         verify(megaNodeRepository, times(1)).getChildrenNode(
             parentNode = parent,
@@ -95,7 +93,6 @@ class DefaultSearchFromMegaNodeParentTest {
             megaNodeRepository.search(
                 parentNode = parent,
                 query = query,
-                megaCancelToken = megaCancelToken,
                 order = getCloudSortOrder()
             )
         ).thenReturn(listOf(mock()))
@@ -103,13 +100,12 @@ class DefaultSearchFromMegaNodeParentTest {
             parent = parent,
             query = query,
             parentHandleSearch = invalidParentHandleSearch,
-            megaCancelToken = megaCancelToken
+            searchType = searchType
         )
 
         verify(megaNodeRepository, times(1)).search(
             parentNode = parent,
             query = query,
-            megaCancelToken = megaCancelToken,
             order = getCloudSortOrder()
         )
 

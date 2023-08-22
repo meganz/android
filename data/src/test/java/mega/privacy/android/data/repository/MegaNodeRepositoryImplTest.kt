@@ -45,6 +45,7 @@ class MegaNodeRepositoryImplTest {
             chatFilesFolderUserAttributeMapper = mock(),
             streamingGateway = mock(),
             getLinksSortOrder = mock(),
+            cancelTokenProvider = mock()
         )
     }
 

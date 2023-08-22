@@ -1,29 +1,26 @@
-package test.mega.privacy.android.app.domain.usecase
+package test.mega.privacy.android.app.domain.usecase.search
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultGetSearchLinkSharesNodes
-import mega.privacy.android.app.domain.usecase.GetSearchLinkSharesNodes
+import mega.privacy.android.app.domain.usecase.search.GetSearchLinkSharesNodesUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import nz.mega.sdk.MegaCancelToken
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetSearchLinkSharesNodesTest {
-    private lateinit var underTest: GetSearchLinkSharesNodes
+class GetSearchLinkSharesNodesUseCaseTest {
+    private lateinit var underTest: GetSearchLinkSharesNodesUseCase
     private val megaNodeRepository: MegaNodeRepository = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val megaCancelToken: MegaCancelToken = mock()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetSearchLinkSharesNodes(
+        underTest = GetSearchLinkSharesNodesUseCase(
             megaNodeRepository = megaNodeRepository,
             getCloudSortOrder = getCloudSortOrder
         )
@@ -36,12 +33,11 @@ class DefaultGetSearchLinkSharesNodesTest {
         whenever(
             megaNodeRepository.searchLinkShares(
                 query = query,
-                megaCancelToken = megaCancelToken,
                 order = getCloudSortOrder(),
                 isFirstLevelNavigation = false
             )
         ).thenReturn(emptyList())
-        val list = underTest(query, megaCancelToken, false)
+        val list = underTest(query, false)
         Truth.assertThat(list).isEmpty()
     }
 
@@ -52,12 +48,11 @@ class DefaultGetSearchLinkSharesNodesTest {
         whenever(
             megaNodeRepository.searchLinkShares(
                 query = query,
-                megaCancelToken = megaCancelToken,
                 order = getCloudSortOrder(),
                 isFirstLevelNavigation = false
             )
         ).thenReturn(listOf(mock(), mock()))
-        val list = underTest(query, megaCancelToken, false)
+        val list = underTest(query, false)
         Truth.assertThat(list).hasSize(2)
     }
 }

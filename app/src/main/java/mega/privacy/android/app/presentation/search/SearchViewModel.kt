@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.domain.usecase.SearchNodesUseCase
+import mega.privacy.android.app.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -23,9 +23,9 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.Stack
@@ -49,6 +49,7 @@ class SearchViewModel @Inject constructor(
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getSearchParentNodeHandle: GetParentNodeHandle,
+    private val cancelCancelTokenUseCase: CancelCancelTokenUseCase
 ) : ViewModel() {
 
     /**
@@ -93,10 +94,6 @@ class SearchViewModel @Inject constructor(
             .map { Event(it) }
             .asLiveData()
 
-    /**
-     * Current search cancel token after a search request has been performed
-     */
-    private var searchCancelToken: MegaCancelToken? = null
 
     /**
      * Set the current search parent handle
@@ -207,19 +204,17 @@ class SearchViewModel @Inject constructor(
         val sharesTab = _state.value.searchSharesTab.position
 
         cancelSearch()
-        searchCancelToken = initNewSearch()
-        searchCancelToken?.let { token ->
-            val nodes = searchNodesUseCase(
-                query = query,
-                parentHandleSearch = parentHandleSearch,
-                parentHandle = parentHandle,
-                drawerItem = drawerItem,
-                sharesTab = sharesTab,
-                isFirstLevel = isFirstNavigationLevel,
-                megaCancelToken = token
-            )
-            finishSearch(nodes ?: emptyList())
-        }
+        setIsInSearchProgress(true)
+        val nodes = searchNodesUseCase(
+            query = query,
+            parentHandleSearch = parentHandleSearch,
+            parentHandle = parentHandle,
+            drawerItem = drawerItem,
+            sharesTab = sharesTab,
+            isFirstLevel = isFirstNavigationLevel,
+        )
+        finishSearch(nodes ?: emptyList())
+
     }
 
     /**
@@ -263,17 +258,9 @@ class SearchViewModel @Inject constructor(
      */
     fun cancelSearch() {
         setNodes(null)
-        searchCancelToken?.cancel()
-    }
-
-    /**
-     * Initialize a new search request
-     *
-     * @return a mega cancel token
-     */
-    private fun initNewSearch(): MegaCancelToken {
-        setIsInSearchProgress(true)
-        return MegaCancelToken.createInstance()
+        viewModelScope.launch {
+            cancelCancelTokenUseCase()
+        }
     }
 
     /**

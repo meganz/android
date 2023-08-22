@@ -27,7 +27,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -55,6 +54,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
  * @property getLinksSortOrder
+ * @property cancelTokenProvider
  */
 internal class MegaNodeRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -73,6 +73,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
     private val getLinksSortOrder: GetLinksSortOrder,
+    private val cancelTokenProvider: CancelTokenProvider,
 ) : MegaNodeRepository {
 
     override suspend fun moveNode(
@@ -231,7 +232,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun searchInShares(
         query: String,
-        megaCancelToken: MegaCancelToken,
         order: SortOrder,
     ): List<MegaNode> {
         return withContext(ioDispatcher) {
@@ -240,7 +240,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             } else {
                 megaApiGateway.searchOnInShares(
                     query,
-                    megaCancelToken,
+                    cancelTokenProvider.getOrCreateCancelToken(),
                     sortOrderIntMapper(order)
                 )
             }
@@ -249,7 +249,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun searchOutShares(
         query: String,
-        megaCancelToken: MegaCancelToken,
         order: SortOrder,
     ): List<MegaNode> {
         return withContext(ioDispatcher) {
@@ -268,7 +267,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             } else {
                 megaApiGateway.searchOnOutShares(
                     query = query,
-                    megaCancelToken = megaCancelToken,
+                    megaCancelToken = cancelTokenProvider.getOrCreateCancelToken(),
                     order = sortOrderIntMapper(order)
                 )
             }
@@ -284,7 +283,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun searchLinkShares(
         query: String,
-        megaCancelToken: MegaCancelToken,
         order: SortOrder,
         isFirstLevelNavigation: Boolean,
     ): List<MegaNode> {
@@ -298,7 +296,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             } else {
                 megaApiGateway.searchOnLinkShares(
                     query,
-                    megaCancelToken,
+                    cancelTokenProvider.getOrCreateCancelToken(),
                     sortOrderIntMapper(order)
                 )
             }
@@ -309,9 +307,9 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         parentNode: MegaNode,
         query: String,
         order: SortOrder,
-        megaCancelToken: MegaCancelToken,
         searchType: Int,
     ): List<MegaNode> {
+        val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
         return withContext(ioDispatcher) {
             return@withContext if (searchType == -1) {
                 megaApiGateway.search(

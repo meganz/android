@@ -1,26 +1,32 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.app.domain.usecase.search
 
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
- * Default SearchFromMegaNodeParent search Nodes from searched Query for a [MegaNode]
+ * Use case for SearchFromMegaNodeParent search Nodes from searched Query for a [MegaNode]
  *
  * @property megaNodeRepository [MegaNodeRepository]
  * @property getCloudSortOrder [GetCloudSortOrder]
  */
-class DefaultSearchFromMegaNodeParent @Inject constructor(
+class GetSearchFromMegaNodeParentUseCase @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
-) : GetSearchFromMegaNodeParent {
-    override suspend fun invoke(
+) {
+
+    /**
+     * Use case for search query by MegaNode
+     * @param query
+     * @param parentHandleSearch
+     * @param parent [MegaNode]
+     * @param searchType
+     */
+    suspend operator fun invoke(
         query: String,
         parentHandleSearch: Long,
-        megaCancelToken: MegaCancelToken,
         parent: MegaNode?,
         searchType: Int,
     ): List<MegaNode>? {
@@ -32,7 +38,6 @@ class DefaultSearchFromMegaNodeParent @Inject constructor(
                     parentNode = it,
                     query = query,
                     order = getCloudSortOrder(),
-                    megaCancelToken = megaCancelToken,
                     searchType = searchType
                 )
             }

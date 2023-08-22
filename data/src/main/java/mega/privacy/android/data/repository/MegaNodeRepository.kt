@@ -193,22 +193,18 @@ interface MegaNodeRepository {
     /**
      * Provides searched nodes InShares from query
      * @param query String to be searched
-     * @param megaCancelToken [MegaCancelToken]
      */
     suspend fun searchInShares(
         query: String,
-        megaCancelToken: MegaCancelToken,
         order: SortOrder,
     ): List<MegaNode>
 
     /**
      * Provides searched nodes from OutShares from query
      * @param query String to be searched
-     * @param megaCancelToken [MegaCancelToken]
      */
     suspend fun searchOutShares(
         query: String,
-        megaCancelToken: MegaCancelToken,
         order: SortOrder,
     ): List<MegaNode>
 
@@ -223,11 +219,9 @@ interface MegaNodeRepository {
     /**
      * Provides searched nodes from Link from query
      * @param query String to be searched
-     * @param megaCancelToken [MegaCancelToken]
      */
     suspend fun searchLinkShares(
         query: String,
-        megaCancelToken: MegaCancelToken,
         order: SortOrder,
         isFirstLevelNavigation: Boolean,
     ): List<MegaNode>
@@ -237,14 +231,12 @@ interface MegaNodeRepository {
      * @param parentNode [MegaNode]
      * @param query Query string
      * @param order [SortOrder]
-     * @param megaCancelToken [MegaNode]
      * @param searchType filter type
      */
     suspend fun search(
         parentNode: MegaNode,
         query: String,
         order: SortOrder,
-        megaCancelToken: MegaCancelToken,
         searchType: Int = -1,
     ): List<MegaNode>
 
@@ -257,5 +249,5 @@ interface MegaNodeRepository {
     /**
      * Get contact verification warning enabled flag
      */
-    suspend fun getContactVerificationEnabledWarning() : Boolean
+    suspend fun getContactVerificationEnabledWarning(): Boolean
 }

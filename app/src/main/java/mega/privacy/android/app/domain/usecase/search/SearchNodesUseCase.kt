@@ -1,10 +1,9 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.app.domain.usecase.search
 
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.data.repository.MegaNodeRepository
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -12,17 +11,17 @@ import javax.inject.Inject
  * Default SearchNodeUseCase search Nodes from searched Query
  *
  * @property megaNodeRepository [MegaNodeRepository]
- * @property getSearchLinkSharesNodes [GetSearchLinkSharesNodes]
- * @property getSearchInSharesNodes [GetSearchInSharesNodes]
- * @property getSearchOutSharesNodes [GetSearchOutSharesNodes]
- * @property getSearchFromMegaNodeParent [GetSearchFromMegaNodeParent]
+ * @property getSearchLinkSharesNodesUseCase [GetSearchLinkSharesNodesUseCase]
+ * @property getSearchInSharesNodesUseCase [GetSearchInSharesNodesUseCase]
+ * @property getSearchOutSharesNodesUseCase [GetSearchOutSharesNodesUseCase]
+ * @property getSearchFromMegaNodeParentUseCase [GetSearchFromMegaNodeParentUseCase]
  */
 class SearchNodesUseCase @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
-    private val getSearchLinkSharesNodes: GetSearchLinkSharesNodes,
-    private val getSearchOutSharesNodes: GetSearchOutSharesNodes,
-    private val getSearchInSharesNodes: GetSearchInSharesNodes,
-    private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParent,
+    private val getSearchLinkSharesNodesUseCase: GetSearchLinkSharesNodesUseCase,
+    private val getSearchOutSharesNodesUseCase: GetSearchOutSharesNodesUseCase,
+    private val getSearchInSharesNodesUseCase: GetSearchInSharesNodesUseCase,
+    private val getSearchFromMegaNodeParentUseCase: GetSearchFromMegaNodeParentUseCase,
 ) {
 
     /**
@@ -32,7 +31,6 @@ class SearchNodesUseCase @Inject constructor(
      * @param parentHandle ParentHandle
      * @param drawerItem [DrawerItem]
      * @param sharesTab sharesTab
-     * @param megaCancelToken [MegaCancelToken]
      * @param isFirstLevel firstLevel
      */
     suspend operator fun invoke(
@@ -41,7 +39,6 @@ class SearchNodesUseCase @Inject constructor(
         parentHandle: Long,
         drawerItem: DrawerItem?,
         sharesTab: Int,
-        megaCancelToken: MegaCancelToken,
         isFirstLevel: Boolean,
         searchType: Int = -1
     ): List<MegaNode>? {
@@ -56,23 +53,22 @@ class SearchNodesUseCase @Inject constructor(
                         when (SharesTab.fromPosition(sharesTab)) {
                             SharesTab.INCOMING_TAB -> {
                                 if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                                    return@let getSearchInSharesNodes(query, megaCancelToken)
+                                    return@let getSearchInSharesNodesUseCase(query)
                                 }
                                 megaNodeRepository.getNodeByHandle(parentHandle)
                             }
 
                             SharesTab.OUTGOING_TAB -> {
                                 if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                                    return@let getSearchOutSharesNodes(query, megaCancelToken)
+                                    return@let getSearchOutSharesNodesUseCase(query)
                                 }
                                 megaNodeRepository.getNodeByHandle(parentHandle)
                             }
 
                             SharesTab.LINKS_TAB -> {
                                 if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                                    return@let getSearchLinkSharesNodes(
+                                    return@let getSearchLinkSharesNodesUseCase(
                                         query,
-                                        megaCancelToken,
                                         isFirstLevel
                                     )
                                 }
@@ -107,10 +103,9 @@ class SearchNodesUseCase @Inject constructor(
                 megaNodeRepository.getNodeByHandle(parentHandleSearch)
             }
 
-            return getSearchFromMegaNodeParent(
+            return getSearchFromMegaNodeParentUseCase(
                 query = query,
                 parentHandleSearch = parentHandleSearch,
-                megaCancelToken = megaCancelToken,
                 parent = parent,
                 searchType = searchType
             )

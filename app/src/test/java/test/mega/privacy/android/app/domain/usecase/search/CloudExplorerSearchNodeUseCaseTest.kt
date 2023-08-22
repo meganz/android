@@ -1,13 +1,11 @@
-package test.mega.privacy.android.app.domain.usecase
+package test.mega.privacy.android.app.domain.usecase.search
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultCloudExplorerSearchNode
-import mega.privacy.android.app.domain.usecase.GetCloudExplorerSearchNode
-import mega.privacy.android.app.domain.usecase.GetSearchFromMegaNodeParent
+import mega.privacy.android.app.domain.usecase.search.CloudExplorerSearchNodeUseCase
+import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -17,17 +15,17 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultCloudExplorerSearchNodeTest {
-    private lateinit var underTest: GetCloudExplorerSearchNode
+class CloudExplorerSearchNodeUseCaseTest {
+    private lateinit var underTest: CloudExplorerSearchNodeUseCase
     private val megaNodeRepository: MegaNodeRepository = mock()
-    private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParent = mock()
-    private val megaCancelToken: MegaCancelToken = mock()
+    private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParentUseCase = mock()
+    private val searchType = -1
 
     @Before
     fun setUp() {
-        underTest = DefaultCloudExplorerSearchNode(
+        underTest = CloudExplorerSearchNodeUseCase(
             megaNodeRepository = megaNodeRepository,
-            getSearchFromMegaNodeParent = getSearchFromMegaNodeParent
+            getSearchFromMegaNodeParentUseCase = getSearchFromMegaNodeParent
         )
     }
 
@@ -35,7 +33,6 @@ class DefaultCloudExplorerSearchNodeTest {
     fun `test that when query is null in cloud explorer then it returns empty list`() = runTest {
         val list = underTest(
             query = null,
-            megaCancelToken = megaCancelToken,
             parentHandle = -1L,
             parentHandleSearch = -1L
         )
@@ -53,13 +50,12 @@ class DefaultCloudExplorerSearchNodeTest {
                 getSearchFromMegaNodeParent(
                     query = query,
                     parentHandleSearch = parentHandle,
-                    megaCancelToken = megaCancelToken,
-                    parent = parent
+                    parent = parent,
+                    searchType = searchType
                 )
             ).thenReturn(listOf(mock()))
             val list = underTest(
                 query = query,
-                megaCancelToken = megaCancelToken,
                 parentHandle = parentHandle,
                 parentHandleSearch = parentHandle
             )
@@ -67,8 +63,8 @@ class DefaultCloudExplorerSearchNodeTest {
             verify(getSearchFromMegaNodeParent, times(1)).invoke(
                 query = query,
                 parentHandleSearch = parentHandle,
-                megaCancelToken = megaCancelToken,
-                parent = parent
+                parent = parent,
+                searchType = searchType
             )
             Truth.assertThat(list).hasSize(1)
         }

@@ -1,14 +1,12 @@
-package test.mega.privacy.android.app.domain.usecase
+package test.mega.privacy.android.app.domain.usecase.search
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultIncomingExplorerSearchNode
-import mega.privacy.android.app.domain.usecase.GetIncomingExplorerSearchNode
-import mega.privacy.android.app.domain.usecase.GetSearchFromMegaNodeParent
-import mega.privacy.android.app.domain.usecase.GetSearchInSharesNodes
+import mega.privacy.android.app.domain.usecase.search.IncomingExplorerSearchNodeUseCase
+import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
+import mega.privacy.android.app.domain.usecase.search.GetSearchInSharesNodesUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -18,19 +16,19 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultIncomingExplorerSearchNodeTest {
-    private lateinit var underTest: GetIncomingExplorerSearchNode
+class IncomingExplorerSearchNodeUseCaseTest {
+    private lateinit var underTest: IncomingExplorerSearchNodeUseCase
     private val megaNodeRepository: MegaNodeRepository = mock()
-    private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParent = mock()
-    private val getSearchInSharesNodes: GetSearchInSharesNodes = mock()
-    private val megaCancelToken: MegaCancelToken = mock()
+    private val getSearchFromMegaNodeParentUseCase: GetSearchFromMegaNodeParentUseCase = mock()
+    private val getSearchInSharesNodesUseCase: GetSearchInSharesNodesUseCase = mock()
+    private val searchType = -1
 
     @Before
     fun setUp() {
-        underTest = DefaultIncomingExplorerSearchNode(
+        underTest = IncomingExplorerSearchNodeUseCase(
             megaNodeRepository = megaNodeRepository,
-            getSearchFromMegaNodeParent = getSearchFromMegaNodeParent,
-            getSearchInSharesNodes = getSearchInSharesNodes
+            getSearchFromMegaNodeParentUseCase = getSearchFromMegaNodeParentUseCase,
+            getSearchInSharesNodesUseCase = getSearchInSharesNodesUseCase
         )
     }
 
@@ -40,7 +38,7 @@ class DefaultIncomingExplorerSearchNodeTest {
             query = null,
             parentHandle = 0L,
             parentHandleSearch = 0L,
-            megaCancelToken = megaCancelToken
+            searchType = searchType
         )
         Truth.assertThat(list).isEmpty()
     }
@@ -52,28 +50,28 @@ class DefaultIncomingExplorerSearchNodeTest {
         val query = "Some Query"
         whenever(megaNodeRepository.getNodeByHandle(parentHandle)).thenReturn(parent)
         whenever(
-            getSearchFromMegaNodeParent(
+            getSearchFromMegaNodeParentUseCase(
                 parentHandleSearch = parentHandle,
                 parent = parent,
                 query = query,
-                megaCancelToken = megaCancelToken
+                searchType = searchType
             )
         ).thenReturn(listOf(mock()))
         val list = underTest(
             query = query,
             parentHandleSearch = parentHandle,
             parentHandle = parentHandle,
-            megaCancelToken = megaCancelToken
+            searchType = searchType
         )
         verify(megaNodeRepository, times(1)).getNodeByHandle(parentHandle)
-        verify(getSearchInSharesNodes, times(1)).invoke(
-            query = query, megaCancelToken = megaCancelToken
+        verify(getSearchInSharesNodesUseCase, times(1)).invoke(
+            query = query
         )
-        verify(getSearchFromMegaNodeParent, times(1)).invoke(
+        verify(getSearchFromMegaNodeParentUseCase, times(1)).invoke(
             parentHandleSearch = parentHandle,
             parent = parent,
             query = query,
-            megaCancelToken = megaCancelToken
+            searchType = searchType
         )
         Truth.assertThat(list).hasSize(1)
     }

@@ -1,28 +1,30 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.app.domain.usecase.search
 
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
- * Default get In share  nodes from searched Query
+ * Use case to get In share  nodes from searched Query
  *
  * @property megaNodeRepository [MegaNodeRepository]
  * @property getCloudSortOrder Sort order of cloud
  */
-class DefaultGetSearchInSharesNodes @Inject constructor(
+class GetSearchInSharesNodesUseCase @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
     private val getCloudSortOrder: GetCloudSortOrder
-) : GetSearchInSharesNodes {
-    override suspend fun invoke(
+) {
+
+    /**
+     * Get the Inshares mega nodes of searched Query
+     * @param query: Query needs to searched
+     */
+    suspend operator fun invoke(
         query: String,
-        megaCancelToken: MegaCancelToken,
     ): List<MegaNode> {
         return megaNodeRepository.searchInShares(
             query = query,
-            megaCancelToken = megaCancelToken,
             order = getCloudSortOrder()
         )
     }
