@@ -37,7 +37,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_IN
 import mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
-import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
@@ -46,6 +45,7 @@ import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.notifications.TransferOverQuotaNotification
+import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -85,9 +85,9 @@ import mega.privacy.android.domain.usecase.transfer.CancelAllDownloadTransfersUs
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
-import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfer.monitorpaused.MonitorDownloadTransfersPausedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -145,7 +145,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
     lateinit var broadcastTransferOverQuota: BroadcastTransferOverQuota
 
     @Inject
-    lateinit var monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase
+    lateinit var monitorDownloadPausedTransfersUseCase: MonitorDownloadTransfersPausedUseCase
 
     @Inject
     lateinit var monitorStopTransfersWorkUseCase: MonitorStopTransfersWorkUseCase
@@ -262,7 +262,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
     private fun setReceivers() {
 
         lifecycleScope.launch {
-            monitorPausedTransfersUseCase().collectLatest {
+            monitorDownloadPausedTransfersUseCase().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
                 delay(TransfersManagement.WAIT_TIME_BEFORE_UPDATE)
                 updateProgressNotification(it)

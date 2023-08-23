@@ -27,6 +27,7 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
@@ -223,6 +224,24 @@ internal class DefaultTransfersRepository @Inject constructor(
         getUploadTransfers().count { transfer -> !transfer.isFinished }
     }
 
+    override suspend fun getNumPendingGeneralUploads() = withContext(ioDispatcher) {
+        getUploadTransfers().count { transfer ->
+            !transfer.isFinished && !transfer.isCUUpload() && !transfer.isChatUpload()
+        }
+    }
+
+    override suspend fun getNumPendingCameraUploads() = withContext(ioDispatcher) {
+        getUploadTransfers().count { transfer ->
+            !transfer.isFinished && transfer.isCUUpload()
+        }
+    }
+
+    override suspend fun getNumPendingChatUploads() = withContext(ioDispatcher) {
+        getUploadTransfers().count { transfer ->
+            !transfer.isFinished && transfer.isChatUpload()
+        }
+    }
+
     override suspend fun getNumPendingTransfers(): Int = withContext(ioDispatcher) {
         getNumPendingDownloadsNonBackground() + getNumPendingUploads()
     }
@@ -236,6 +255,31 @@ internal class DefaultTransfersRepository @Inject constructor(
             !transfer.isFinished && transfer.state == MegaTransfer.STATE_PAUSED
         }
     }
+
+
+    override suspend fun getNumPendingPausedGeneralUploads() = withContext(ioDispatcher) {
+        getUploadTransfers().count { transfer ->
+            !transfer.isFinished && transfer.state == MegaTransfer.STATE_PAUSED
+                    && !transfer.isCUUpload() && !transfer.isChatUpload()
+        }
+    }
+
+    override suspend fun getNumPendingPausedCameraUploads() = withContext(ioDispatcher) {
+        getUploadTransfers().count { transfer ->
+            !transfer.isFinished
+                    && transfer.state == MegaTransfer.STATE_PAUSED
+                    && transfer.isCUUpload()
+        }
+    }
+
+    override suspend fun getNumPendingPausedChatUploads() = withContext(ioDispatcher) {
+        getUploadTransfers().count { transfer ->
+            !transfer.isFinished
+                    && transfer.state == MegaTransfer.STATE_PAUSED
+                    && transfer.isChatUpload()
+        }
+    }
+
 
     override suspend fun getNumPendingNonBackgroundPausedDownloads(): Int =
         withContext(ioDispatcher) {
@@ -509,3 +553,9 @@ internal class DefaultTransfersRepository @Inject constructor(
             }
         }
 }
+
+private fun MegaTransfer.isCUUpload() =
+    this.appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
+
+private fun MegaTransfer.isChatUpload() =
+    this.appData?.contains(AppDataTypeConstants.ChatUpload.sdkTypeValue) == true

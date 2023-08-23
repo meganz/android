@@ -5,7 +5,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
 /**
- * Use case for monitoring paused transfers.
+ * Use case for monitoring transfers paused Globally (individual transfers can be paused or not).
  *
  */
 class MonitorPausedTransfersUseCase @Inject constructor(private val transferRepository: TransferRepository) {
@@ -13,7 +13,7 @@ class MonitorPausedTransfersUseCase @Inject constructor(private val transferRepo
     /**
      * Invoke
      *
-     * @return Flow of Boolean. True if all transfers are paused, false if not.
+     * @return Flow of Boolean. True if transfers are paused globally, false if not (individual transfers can be paused or not).
      */
     operator fun invoke(): Flow<Boolean> = transferRepository.monitorPausedTransfers()
 }

@@ -17,6 +17,7 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
@@ -793,6 +794,69 @@ class DefaultTransfersRepositoryTest {
             assertThat(awaitItem()).isEqualTo(pauseEvent)
             assertThat(awaitItem()).isEqualTo(resumeEvent)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class PendingCounters {
+        @Test
+        fun `test that getNumPendingGeneralUploads returns correctly`() = runTest {
+            stubUploadTransfers()
+            assertThat(underTest.getNumPendingGeneralUploads()).isEqualTo(2)
+        }
+
+        @Test
+        fun `test that getNumPendingCameraUploads returns correctly`() = runTest {
+            stubUploadTransfers()
+            assertThat(underTest.getNumPendingCameraUploads()).isEqualTo(2)
+        }
+
+        @Test
+        fun `test that getNumPendingChatUploads returns correctly`() = runTest {
+            stubUploadTransfers()
+            assertThat(underTest.getNumPendingChatUploads()).isEqualTo(2)
+        }
+
+        @Test
+        fun `test that getNumPendingPausedGeneralUploads returns correctly`() = runTest {
+            stubUploadTransfers()
+            assertThat(underTest.getNumPendingPausedGeneralUploads()).isEqualTo(1)
+        }
+
+        @Test
+        fun `test that getNumPendingPausedCameraUploads returns correctly`() = runTest {
+            stubUploadTransfers()
+            assertThat(underTest.getNumPendingPausedCameraUploads()).isEqualTo(1)
+        }
+
+        @Test
+        fun `test that getNumPendingPausedChatUploads returns correctly`() = runTest {
+            stubUploadTransfers()
+            assertThat(underTest.getNumPendingPausedChatUploads()).isEqualTo(1)
+        }
+
+        private fun stubUploadTransfers() = runTest {
+            val megaTransfers =
+                (1..3).flatMap { type ->
+                    listOf(true, false).flatMap { paused ->
+                        listOf(true, false).map { finished ->
+                            val megaTransfer = mock<MegaTransfer>()
+                            whenever(megaTransfer.isFinished).thenReturn(finished)
+                            whenever(megaTransfer.state).thenReturn(if (paused) MegaTransfer.STATE_PAUSED else MegaTransfer.STATE_ACTIVE)
+                            whenever(megaTransfer.appData).thenReturn(
+                                when (type) {
+                                    2 -> AppDataTypeConstants.CameraUpload.sdkTypeValue
+                                    3 -> AppDataTypeConstants.ChatUpload.sdkTypeValue
+                                    else -> null
+                                }
+                            )
+                            megaTransfer
+                        }
+                    }
+                }
+            whenever(megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD))
+                .thenReturn(megaTransfers)
         }
     }
 

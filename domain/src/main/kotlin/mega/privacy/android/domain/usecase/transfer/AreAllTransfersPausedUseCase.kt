@@ -13,7 +13,7 @@ class AreAllTransfersPausedUseCase @Inject constructor(
     /**
      * Invoke.
      *
-     * @return True if the queue of transfers is paused or if there are in progress transfers and all all of them are
+     * @return True if the queue of transfers is paused or if there are in progress transfers and all of them are
      *         individually paused, false otherwise.
      */
     suspend operator fun invoke() = with(transferRepository) {
