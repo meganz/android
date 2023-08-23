@@ -1,6 +1,8 @@
 package mega.privacy.android.core.ui.controls.buttons
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -23,11 +25,12 @@ class ToggleMegaButtonTest {
         composeTestRule.setContent {
             ToggleMegaButton(
                 modifier = Modifier,
+                checked = true,
+                enabled = true,
                 title = "Mic",
-                enable = true,
-                enabledIcon = R.drawable.ic_waiting_room_mic_on,
-                disabledIcon = R.drawable.ic_waiting_room_mic_off,
-                onCheckedChange = { }
+                enabledIcon = R.drawable.ic_universal_mic_on,
+                disabledIcon = R.drawable.ic_universal_mic_off,
+                onCheckedChange = {},
             )
         }
         composeTestRule.onNodeWithTag("toggle_mega_button:toggle", useUnmergedTree = true).assertExists()
@@ -40,11 +43,12 @@ class ToggleMegaButtonTest {
         composeTestRule.setContent {
             ToggleMegaButton(
                 modifier = Modifier,
+                checked = true,
+                enabled = true,
                 title = "Mic",
-                enable = false,
-                enabledIcon = R.drawable.ic_waiting_room_mic_on,
-                disabledIcon = R.drawable.ic_waiting_room_mic_off,
-                onCheckedChange = { }
+                enabledIcon = R.drawable.ic_universal_mic_on,
+                disabledIcon = R.drawable.ic_universal_mic_off,
+                onCheckedChange = {},
             )
         }
         composeTestRule.onNodeWithTag("toggle_mega_button:toggle", useUnmergedTree = true).assertExists()
@@ -58,15 +62,48 @@ class ToggleMegaButtonTest {
         composeTestRule.setContent {
             ToggleMegaButton(
                 modifier = Modifier,
+                checked = false,
+                enabled = true,
                 title = "Mic",
-                enable = false,
-                enabledIcon = R.drawable.ic_waiting_room_mic_on,
-                disabledIcon = R.drawable.ic_waiting_room_mic_off,
+                enabledIcon = R.drawable.ic_universal_mic_on,
+                disabledIcon = R.drawable.ic_universal_mic_off,
                 onCheckedChange = mock
             )
         }
 
         composeTestRule.onNodeWithTag("toggle_mega_button:toggle").performClick()
         verify(mock).invoke(true)
+    }
+
+    @Test
+    fun `test that ToggleMegaButton is disabled when enabled is set to false`() {
+        composeTestRule.setContent {
+            ToggleMegaButton(
+                modifier = Modifier,
+                checked = true,
+                enabled = false,
+                title = "Mic",
+                enabledIcon = R.drawable.ic_universal_mic_on,
+                disabledIcon = R.drawable.ic_universal_mic_off,
+                onCheckedChange = {},
+            )
+        }
+        composeTestRule.onNodeWithTag("toggle_mega_button:toggle").assertIsNotEnabled()
+    }
+
+    @Test
+    fun `test that ToggleMegaButton is enabled when enabled is set to true`() {
+        composeTestRule.setContent {
+            ToggleMegaButton(
+                modifier = Modifier,
+                checked = true,
+                enabled = true,
+                title = "Mic",
+                enabledIcon = R.drawable.ic_universal_mic_on,
+                disabledIcon = R.drawable.ic_universal_mic_off,
+                onCheckedChange = {},
+            )
+        }
+        composeTestRule.onNodeWithTag("toggle_mega_button:toggle").assertIsEnabled()
     }
 }

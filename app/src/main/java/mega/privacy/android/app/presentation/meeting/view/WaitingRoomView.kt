@@ -1,12 +1,15 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,13 +27,17 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,13 +48,19 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.fade
+import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
 import mega.privacy.android.core.ui.controls.buttons.ToggleMegaButton
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.grey_900
-import mega.privacy.android.core.ui.theme.grey_alpha_087
-import mega.privacy.android.core.ui.theme.white_alpha_087
+import kotlin.random.Random
 
 
 /**
@@ -63,7 +76,9 @@ internal fun WaitingRoomView(
     onCameraToggleChange: (Boolean) -> Unit,
     onSpeakerToggleChange: (Boolean) -> Unit,
 ) {
+    val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
+    var showLeaveDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -71,7 +86,7 @@ internal fun WaitingRoomView(
             SnackbarHost(hostState = it) { data ->
                 Snackbar(
                     snackbarData = data,
-                    backgroundColor = grey_alpha_087
+                    backgroundColor = MaterialTheme.colors.onSurface
                 )
             }
         }
@@ -85,77 +100,97 @@ internal fun WaitingRoomView(
             val (closeButton, infoButton, titleText, timestampText, alertText, videoPreview, micButton, cameraButton, speakerButton) = createRefs()
 
             IconButton(
-                onClick = onCloseClicked,
+                onClick = { showLeaveDialog = true },
                 modifier = Modifier.constrainAs(closeButton) {
-                    start.linkTo(parent.start)
                     top.linkTo(parent.top)
+                    start.linkTo(parent.start)
                 }
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_close),
-                    contentDescription = "Close waiting room button",
-                    tint = white_alpha_087
+                    modifier = Modifier.size(24.dp),
+                    imageVector = ImageVector.vectorResource(mega.privacy.android.core.R.drawable.ic_universal_close),
+                    contentDescription = "Waiting Room Close button",
+                    tint = MaterialTheme.colors.onSurface
                 )
             }
 
             IconButton(
                 onClick = onInfoClicked,
                 modifier = Modifier.constrainAs(infoButton) {
-                    end.linkTo(parent.end)
                     top.linkTo(parent.top)
+                    end.linkTo(parent.end)
                 }
             ) {
                 Icon(
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(24.dp),
                     imageVector = ImageVector.vectorResource(mega.privacy.android.core.R.drawable.ic_info),
-                    contentDescription = "Waiting room info button",
-                    tint = white_alpha_087,
+                    contentDescription = "Waiting Room Info button",
+                    tint = MaterialTheme.colors.onSurface,
                 )
             }
 
             Text(
-                text = state.title,
+                text = state.title ?: stringResource(R.string.general_loading),
                 style = MaterialTheme.typography.h6,
-                color = white_alpha_087,
+                color = MaterialTheme.colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.constrainAs(titleText) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(parent.top, 60.dp)
-                }
+                modifier = Modifier
+                    .testTag("waiting_room:title")
+                    .constrainAs(titleText) {
+                        top.linkTo(parent.top, 60.dp)
+                        linkTo(parent.start, parent.end)
+                    }
+                    .placeholder(
+                        color = MaterialTheme.colors.grey_020_grey_900,
+                        shape = RoundedCornerShape(4.dp),
+                        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
+                        visible = state.title.isNullOrBlank(),
+                    ),
             )
 
             Text(
-                text = state.formattedTimestamp,
+                text = state.formattedTimestamp ?: stringResource(R.string.unknown_name_label),
                 style = MaterialTheme.typography.subtitle2,
-                color = white_alpha_087,
+                color = MaterialTheme.colors.onSurface,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.constrainAs(timestampText) {
-                    top.linkTo(titleText.bottom, 2.dp)
-                    end.linkTo(parent.end)
-                    start.linkTo(parent.start)
-                }
+                modifier = Modifier
+                    .testTag("waiting_room:timestamp")
+                    .constrainAs(timestampText) {
+                        top.linkTo(titleText.bottom, 2.dp)
+                        linkTo(parent.start, parent.end)
+                    }
+                    .placeholder(
+                        color = MaterialTheme.colors.grey_020_grey_900,
+                        shape = RoundedCornerShape(4.dp),
+                        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
+                        visible = state.formattedTimestamp.isNullOrBlank(),
+                    ),
             )
 
             Chip(
                 onClick = {},
                 colors = ChipDefaults.chipColors(
-                    backgroundColor = white_alpha_087,
-                    contentColor = grey_alpha_087,
+                    backgroundColor = MaterialTheme.colors.onSurface,
+                    contentColor = MaterialTheme.colors.surface,
                 ),
                 modifier = Modifier.constrainAs(alertText) {
                     top.linkTo(timestampText.bottom, 24.dp)
-                    end.linkTo(parent.end)
-                    start.linkTo(parent.start)
+                    linkTo(parent.start, parent.end)
                 }
             ) {
                 Text(
-                    text = stringResource(R.string.meetings_waiting_room_wait_for_host_to_let_you_in_label),
+                    text = stringResource(
+                        if (state.hasStarted)
+                            R.string.meetings_waiting_room_wait_for_host_to_let_you_in_label
+                        else
+                            R.string.meetings_waiting_room_wait_for_host_to_start_meeting_label
+                    ),
                     style = MaterialTheme.typography.subtitle2medium,
+                    modifier = Modifier.padding(vertical = 9.dp, horizontal = 4.dp)
                 )
             }
 
@@ -163,21 +198,25 @@ internal fun WaitingRoomView(
                 .clip(RoundedCornerShape(8.dp))
                 .background(color = grey_900)
                 .constrainAs(videoPreview) {
-                    linkTo(parent.start, parent.end, startMargin = 70.dp, endMargin = 70.dp)
                     top.linkTo(alertText.bottom, 24.dp)
+                    linkTo(parent.start, parent.end, startMargin = 70.dp, endMargin = 70.dp)
                     width = Dimension.fillToConstraints
                     height = Dimension.ratio("55:83")
                 }
             ) {
                 if (state.cameraEnabled) {
-                    CameraPreview(modifier = Modifier.fillMaxSize())
+                    CameraPreview(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag("waiting_room:camera_preview")
+                    )
                 } else {
-                    Image(
+                    ChatAvatarView(
                         modifier = Modifier
                             .size(88.dp)
-                            .align(Alignment.Center),
-                        bitmap = ImageBitmap.imageResource(R.drawable.ic_guest_avatar),
-                        contentDescription = "Camera video feed",
+                            .align(Alignment.Center)
+                            .testTag("waiting_room:avatar_image"),
+                        avatars = state.avatar?.let(::listOf)
                     )
                 }
             }
@@ -187,10 +226,11 @@ internal fun WaitingRoomView(
                     top.linkTo(videoPreview.bottom, margin = 70.dp)
                     linkTo(videoPreview.start, cameraButton.start)
                 },
+                checked = state.micEnabled,
+                enabled = context.hasMicrophonePermissions(),
                 title = stringResource(R.string.general_mic),
-                enable = state.micEnabled,
-                enabledIcon = mega.privacy.android.core.R.drawable.ic_waiting_room_mic_on,
-                disabledIcon = mega.privacy.android.core.R.drawable.ic_waiting_room_mic_off,
+                enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_mic_on,
+                disabledIcon = mega.privacy.android.core.R.drawable.ic_universal_mic_off,
                 onCheckedChange = onMicToggleChange,
             )
 
@@ -199,10 +239,11 @@ internal fun WaitingRoomView(
                     top.linkTo(videoPreview.bottom, margin = 70.dp)
                     linkTo(micButton.end, speakerButton.start)
                 },
+                checked = state.cameraEnabled,
+                enabled = context.hasCameraPermissions(),
                 title = stringResource(R.string.general_camera),
-                enable = state.cameraEnabled,
-                enabledIcon = mega.privacy.android.core.R.drawable.ic_waiting_room_video_on,
-                disabledIcon = mega.privacy.android.core.R.drawable.ic_waiting_room_video_off,
+                enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_video_on,
+                disabledIcon = mega.privacy.android.core.R.drawable.ic_universal_video_off,
                 onCheckedChange = onCameraToggleChange,
             )
 
@@ -211,10 +252,10 @@ internal fun WaitingRoomView(
                     top.linkTo(videoPreview.bottom, margin = 70.dp)
                     linkTo(cameraButton.end, videoPreview.end)
                 },
+                checked = state.speakerEnabled,
                 title = stringResource(R.string.general_speaker),
-                enable = state.speakerEnabled,
-                enabledIcon = mega.privacy.android.core.R.drawable.ic_waiting_room_max,
-                disabledIcon = mega.privacy.android.core.R.drawable.ic_waiting_room_off,
+                enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_max,
+                disabledIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_off,
                 onCheckedChange = onSpeakerToggleChange,
             )
 
@@ -223,6 +264,16 @@ internal fun WaitingRoomView(
                 cameraButton,
                 speakerButton,
                 chainStyle = ChainStyle.Spread,
+            )
+        }
+
+        if (showLeaveDialog) {
+            MegaAlertDialog(
+                text = stringResource(R.string.meetings_leave_meeting_confirmation_dialog_title),
+                confirmButtonText = stringResource(R.string.general_leave),
+                cancelButtonText = stringResource(R.string.general_cancel),
+                onConfirm = onCloseClicked,
+                onDismiss = { showLeaveDialog = false },
             )
         }
     }
@@ -253,22 +304,29 @@ private fun CameraPreview(
     )
 }
 
-/**
- * Waiting Room View Preview
- */
+private fun Context.hasCameraPermissions(): Boolean =
+    checkSelfPermission(Manifest.permission.CAMERA) == PERMISSION_GRANTED
+
+private fun Context.hasMicrophonePermissions(): Boolean =
+    checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED
+
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PreviewWaitingRoomView() {
-    WaitingRoomView(
-        state = WaitingRoomState(
-            chatId = -1,
-            schedId = -1,
-            title = "Test title"
-        ),
-        onInfoClicked = {},
-        onCloseClicked = {},
-        onMicToggleChange = {},
-        onCameraToggleChange = {},
-        onSpeakerToggleChange = {},
-    )
+internal fun PreviewWaitingRoomView() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        WaitingRoomView(
+            state = WaitingRoomState(
+                chatId = -1,
+                schedId = -1,
+                hasStarted = Random.nextBoolean(),
+                title = "Book Club",
+                formattedTimestamp = "Monday, 30 May · 10:25 -11:25",
+            ),
+            onInfoClicked = {},
+            onCloseClicked = {},
+            onMicToggleChange = {},
+            onCameraToggleChange = {},
+            onSpeakerToggleChange = {},
+        )
+    }
 }

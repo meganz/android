@@ -718,6 +718,7 @@
         <activity
             android:name="mega.privacy.android.app.presentation.meeting.WaitingRoomActivity"
             android:launchMode="singleTop"
+            android:screenOrientation="sensorPortrait"
             android:windowSoftInputMode="adjustNothing"/>
 
         <activity android:name=".presentation.contactinfo.ComposeContactInfoActivity" />

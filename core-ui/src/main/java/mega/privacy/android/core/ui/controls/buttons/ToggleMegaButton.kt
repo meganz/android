@@ -1,9 +1,11 @@
 package mega.privacy.android.core.ui.controls.buttons
 
+import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,34 +25,39 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.preview.BooleanProvider
+import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Mega custom implementation of [IconToggleButton]
  *
- * @param modifier
- * @param title
- * @param enable
- * @param enabledIcon
- * @param disabledIcon
- * @param onCheckedChange
+ * @param modifier          [Modifier]
+ * @param checked           Whether or not the Button is currently checked
+ * @param title             String title to show under the Button
+ * @param enabledIcon       Icon to show when the button is not checked
+ * @param disabledIcon      Icon to show when the button is checked
+ * @param enabled           Whether or not the Button will handle input events and appear enabled
+ * @param onCheckedChange   Callback to be invoked when this button is selected
  */
 @Composable
 fun ToggleMegaButton(
     modifier: Modifier,
+    checked: Boolean,
     title: String,
-    enable: Boolean,
     @DrawableRes enabledIcon: Int,
     @DrawableRes disabledIcon: Int,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
     val iconRes: Int
     val tintColor: Color
     val backgroundColor: Color
-    if (enable) {
+    if (checked) {
         iconRes = disabledIcon
         tintColor = MaterialTheme.colors.surface
         backgroundColor = MaterialTheme.colors.onSurface
@@ -67,7 +74,8 @@ fun ToggleMegaButton(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         IconToggleButton(
-            checked = enable,
+            checked = checked,
+            enabled = enabled,
             onCheckedChange = { enabled ->
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 onCheckedChange(enabled)
@@ -101,26 +109,21 @@ fun ToggleMegaButton(
     }
 }
 
-@Preview
+/**
+ * Preview [ToggleMegaButton]
+ */
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-internal fun PreviewEnabledToggleMegaButton() {
-    ToggleMegaButton(
-        modifier = Modifier,
-        title = "Mic",
-        enable = true,
-        enabledIcon = R.drawable.ic_waiting_room_mic_on,
-        disabledIcon = R.drawable.ic_waiting_room_mic_off,
-    ) {}
-}
-
-@Preview
-@Composable
-internal fun PreviewDisabledToggleMegaButton() {
-    ToggleMegaButton(
-        modifier = Modifier,
-        title = "Mic",
-        enable = false,
-        enabledIcon = R.drawable.ic_waiting_room_mic_on,
-        disabledIcon = R.drawable.ic_waiting_room_mic_off,
-    ) {}
+fun PreviewEnabledToggleMegaButton(
+    @PreviewParameter(BooleanProvider::class) isEnabled: Boolean,
+) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ToggleMegaButton(
+            modifier = Modifier,
+            checked = isEnabled,
+            title = "Camera",
+            enabledIcon = R.drawable.ic_universal_video_on,
+            disabledIcon = R.drawable.ic_universal_video_off,
+        ) {}
+    }
 }
