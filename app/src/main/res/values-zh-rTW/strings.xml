@@ -241,7 +241,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">選擇帳戶</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">可離線使用</string>
+    <string name="file_properties_available_offline">離線使用</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">大小</string>
     <!-- When the file/folder was last modified -->
@@ -1868,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">沒有網路連線。請重新連線來開啟檔案。</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">File already available Offline</string>
+    <string name="file_already_exists">檔案已經離線可用</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">訊息未轉發</item>
@@ -2076,7 +2076,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">與超過100位與會者的對話無法使用加密金鑰輪替功能。</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">The chat could not be converted to private because the number of participants exceeds the limit for private chats.</string>
+    <string name="warning_make_chat_private">對話無法轉換為私密聊天，因為與會者人數超過了私密對話的限制。</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B]建立對話連結。[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -3250,7 +3250,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">選擇您的開始畫面</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">Change settings to choose which screen opens when you launch the MEGA app.</string>
+    <string name="choose_start_screen_text">更改設定以選擇啟動MEGA應用程式時的啟始螢幕。</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">變更設定</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3376,15 +3376,15 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s訂閱</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately via %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_android_platform_subscription">您目前使用%1$s訂閱MEGA。您必須透過%2$s單獨取消它，因為MEGA無法為您取消。造訪我們的幫助中心瞭解更多資訊。</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">您有一個現行的MEGA訂閱。它會在帳戶刪除後自動取消，造訪我們的幫助中心瞭解更多訊息。</string>
+    <string name="message_other_platform_subscription">您目前有一個MEGA訂閱。它會在帳戶刪除後自動取消，造訪我們的幫助中心瞭解更多資訊。</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">您在Apple有一個現行的MEGA訂閱。您必須從您的iTunes帳戶中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
+    <string name="message_itunes_platform_subscription">您目前使用Apple訂閱MEGA。您必須從您的iTunes帳戶中單獨取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心瞭解更多資訊。</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">造訪%1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all your stored data. Please enter your password below.</string>
+    <string name="delete_account_text_other_platform_last_step">這是刪除帳戶的最後一步驟。您的帳戶和訂閱都將被刪除，並且您將永久失去所有儲存的資料。請在下面輸入您的密碼。</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">時間軸</string>
     <!-- Title of album tab in photos section. -->
@@ -3722,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">這是您備份檔案和資料夾存放的地方。您備份的項目是「唯讀」的，以避免它們在您的雲端硬碟中被意外竄改。您可以使用我們桌面應用程式將您電腦中的項目備份到MEGA。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">由於多次指控侵犯版權，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或其中的資料。\n請查看我們的電子郵件，瞭解有關如何提交反對通知的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">您的帳戶由於違反MEGA的服務條款而被終止。\n您將無法重新存取您儲存的資料，也無法被授權註冊新的MEGA帳戶。</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">會議</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3836,7 +3836,7 @@
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">要存取共享資料夾，與您共享資料夾的人也應該批准您。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">批准%s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -3929,13 +3929,11 @@
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] 從[B]%2$s到%3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
-        <item quantity="one">Every day effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Every %1$d days effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d天的[B]%3$s到%4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
-        <item quantity="one">Every day effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Every %1$d days effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d天的[B]%4$s到%5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
@@ -4288,7 +4286,7 @@
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">無法批准聯絡人</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t approve %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法批准%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀請。</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4594,13 +4592,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;垃圾筒清理排程7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">購買Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">購買Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">購買Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">購買Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">服務條款</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4852,7 +4850,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">通話期間由非主持人加入的與會者不會被傳送到等候室。[A]瞭解更多[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">您與之共享資訊的某些聯絡人尚未獲得您的批准。為了確保額外的安全性，我們建議您在聯絡人中批准他們的憑證。點選您要批准的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">已移除%1$d個與會者</item>
@@ -4872,9 +4870,13 @@
     <!-- Photos action menu zoom out -->
     <string name="photos_action_zoom_out">縮小</string>
     <!-- Message of adding subtitle failed for video player-->
-    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
+    <string name="media_player_video_message_adding_subtitle_failed">無法新增項目</string>
     <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Wait for host to start the meeting</string>
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">等待主持人開始會議</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">等待主持人讓你進入</string>
+    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未批准的聯絡人共享。為了確保額外的安全性，我們建議您在聯絡人中批准他們的憑證。點選您要批准的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
+    <!-- Cancel button in leave meeting dialog in a waiting room -->
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">不要離開</string>
 </resources>

@@ -83,7 +83,7 @@
     <!-- Search button -->
     <string name="action_pause">Tạm dừng</string>
     <!-- Menu item -->
-    <string name="action_refresh">Tải lại thông tin</string>
+    <string name="action_refresh">Tải lại mới</string>
     <!-- Menu item -->
     <string name="action_sort_by">Xếp theo</string>
     <!-- Menu item -->
@@ -435,7 +435,7 @@
     <!--  -->
     <string name="subscription_type_yearly">Hàng năm</string>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Đã xóa chia sẻ</string>
+    <string name="context_share_correctly_removed">Đã loại&#160;bỏ chia&#160;sẻ</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">Thư mục mới</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -3376,7 +3376,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Gói đăng ký dịch vụ với %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately via %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_android_platform_subscription">Bạn hiện đang có một gói đăng&#160;ký MEGA được mua với %1$s. Bạn cần phải tự tiến&#160;hành hủy&#160;bỏ trong %2$s, vì MEGA không thể thực&#160;hiện cho bạn được. Trung&#160;Tâm Hướng&#160;Dẫn để có thêm thông&#160;tin.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Bạn hiện đang có một gói đăng ký dịch vụ với MEGA. Gói dịch vụ đó sẽ tự động huỷ sau khi tài khoản bị xóa. Truy cập Thư Viện Hướng Dẫn để có thêm thông tin.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3384,7 +3384,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Truy cập %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all your stored data. Please enter your password below.</string>
+    <string name="delete_account_text_other_platform_last_step">Đây là bước cuối&#160;cùng để tiến&#160;hành việc xóa bỏ tài&#160;khoản. Tài&#160;khoản và gói đăng&#160;ký của bạn sẽ bị xóa và bạn sẽ mất vĩnh&#160;viễn tất&#160;cả dữ&#160;liệu đã được lưu&#160;trữ. Vui&#160;lòng nhập mật&#160;khẩu của bạn dưới đây.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">Dòng thời gian</string>
     <!-- Title of album tab in photos section. -->
@@ -3722,7 +3722,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Đây là thư mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.Bạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong. \nKiểm&#160;tra thư email chúng&#160;tôi đã gửi tới quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;đối.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Tài&#160;khoản của quý&#160;vị đã bị chấm&#160;dứt do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ của MEGA.\nQuý&#160;vị sẽ không thể lấy lại quyền truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ của mình hoặc được phép đăng&#160;ký tài&#160;khoản MEGA mới.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3834,7 +3834,7 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[thư mục chưa giải mã]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should approve you, too.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Để có thể truy&#160;cập thư&#160;mục này, người chia&#160;sẻ thư&#160;mục này cho bạn cũng cần phải chấp&#160;nhận bạn.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Chấp nhận %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
@@ -4284,9 +4284,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">Bạn chỉ có&#160;thể chọn mỗi&#160;lần lên tới 150&#160;mục để thêm vào một album.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot approve contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Không thể chấp&#160;nhận tên liên&#160;lạc</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t approve %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Bạn không&#160;thể chấp&#160;nhận %s vì họ không&#160;có trong sổ liên&#160;lạc của bạn. Hãy chờ đến khi họ chấp&#160;nhận lời&#160;mời của bạn trước.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Bắt&#160;đầu</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4836,9 +4836,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Thời&#160;điểm tái&#160;diễn cuộc họp đã được cập&#160;nhật</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to approve the contacts you share information with or receive data from.</string>
+    <string name="contact_approve_credentials_secure_share_description">Chúng&#160;tôi bảo&#160;vệ dữ&#160;liệu của bạn bằng mô&#160;hình mã&#160;hóa vô&#160;kiến&#160;thức nên tất&#160;cả thông&#160;tin bạn lưu&#160;trữ, chia&#160;sẻ và nhận được trên MEGA đều bảo&#160;vệ an&#160;toàn. Để đảm&#160;bảo tính bảo&#160;mật cao hơn, chúng&#160;tôi có yêu&#160;cầu bạn chấp&#160;nhận các tên liên&#160;lạc mà bạn có chia&#160;sẻ thông&#160;tin hoặc nhận dữ&#160;liệu từ họ.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">To approve your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Để chấp&#160;nhận tên liên&#160;lạc, đảm&#160;bảo rằng chứng&#160;chỉ bạn thấy dưới đây trùng&#160;khớp với chứng&#160;chỉ tài&#160;khoản của họ. Bạn có thể hỏi người đó chia&#160;sẻ chứng&#160;chỉ cho bạn.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">Chấp nhận</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4850,7 +4850,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Những người tham&#160;gia cuộc gọi được thêm bởi người không phải là người chủ&#160;trì sẽ không được chuyển đến phòng chờ. [A]Tìm&#160;hiểu thêm[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Một số tên liên&#160;lạc mà bạn đang chia&#160;sẻ thông&#160;tin chưa được bạn chấp&#160;nhận. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi khuyên bạn nên chấp&#160;nhận chứng&#160;chỉ đăng&#160;nhập của họ trong Sổ Liên&#160;Lạc. Nhấn vào ba dấu chấm bên cạnh tên liên&#160;lạc bạn muốn chấp&#160;nhận và nhấn vào Thông&#160;tin.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">Đã loại bỏ %1$d thành&#160;viên</item>
@@ -4875,4 +4875,8 @@
     <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Đợi cho người chủ&#160;trì bắt&#160;đầu cuộc họp</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Đợi cho người chủ&#160;trì cho bạn vào</string>
+    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s là mục được chia&#160;sẻ từ một tên liên&#160;lạc chưa được bạn chấp&#160;nhận. Một số tên liên&#160;lạc mà bạn đang chia&#160;sẻ thông&#160;tin chưa được bạn chấp&#160;nhận. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi khuyên bạn nên chấp&#160;nhận chứng&#160;chỉ đăng&#160;nhập của họ trong Sổ Liên&#160;Lạc. Nhấn vào ba dấu chấm bên cạnh tên liên&#160;lạc bạn muốn chấp&#160;nhận và nhấn vào Thông&#160;tin.</string>
+    <!-- Cancel button in leave meeting dialog in a waiting room -->
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Không rời khỏi</string>
 </resources>

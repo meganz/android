@@ -2664,7 +2664,7 @@
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]Niciun fișier în [/B][A]Recente[/A]</string>
     <!-- Title of a recents bucket -->
-    <string name="title_bucket">%1$s și încă %2$d</string>
+    <string name="title_bucket">%1$s și alți %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
     <plurals name="title_media_bucket_only_images">
         <item quantity="one">%d imagine</item>
@@ -5329,4 +5329,8 @@
     <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Așteptați ca gazda să înceapă întâlnirea</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Așteptați ca gazda să vă lase să intrați</string>
+    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t approved. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <!-- Cancel button in leave meeting dialog in a waiting room -->
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Nu părăsiți</string>
 </resources>

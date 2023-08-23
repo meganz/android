@@ -4875,4 +4875,8 @@
     <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">主催者がミーティングを開始するまでお待ちください</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">主催者が参加を許可するまでお待ちください</string>
+    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%sは、あなたが承認していない連絡先によって共有されています。セキュリティをさらに強化するために、連絡先で認証情報を承認することをお勧めします。承認したい連絡先の横にある三点をタップして、「情報」をタップします。</string>
+    <!-- Cancel button in leave meeting dialog in a waiting room -->
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">退室しない</string>
 </resources>

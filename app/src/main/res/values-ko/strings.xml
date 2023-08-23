@@ -4875,4 +4875,8 @@
     <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">주최자가 회의를 시작하기를 기다립니다</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">주최자가 당신을 들어오게 하기를 기다립니다</string>
+    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s은/는 당신이 확인하지 않은 연락처에 의해 공유되었습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 확인할 것을 권장합니다. 확인하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
+    <!-- Cancel button in leave meeting dialog in a waiting room -->
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">떠나지 않기</string>
 </resources>
