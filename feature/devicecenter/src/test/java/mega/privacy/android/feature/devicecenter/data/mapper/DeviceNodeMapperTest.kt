@@ -38,7 +38,52 @@ internal class DeviceNodeMapperTest {
     }
 
     @Test
-    fun `test that all backup information is mapped to devices`() {
+    fun `test that the current device is mapped`() {
+        val currentDeviceId = "1234-5678"
+        val deviceIdAndNameMap = mapOf(
+            currentDeviceId to "Current Device Name",
+        )
+        val backupInfoList = listOf<BackupInfo>(
+            mock { on { deviceId }.thenReturn(currentDeviceId) }
+        )
+        val currentDeviceBackupInfo = backupInfoList.filterBackupInfoByDeviceId(currentDeviceId)
+        val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
+            mock { on { name }.thenReturn("Current Device Folder One") }
+        )
+        val currentDeviceStatus = DeviceCenterNodeStatus.NoCameraUploads
+
+        whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
+            currentDeviceFolderNodes
+        )
+        whenever(
+            deviceNodeStatusMapper(
+                folders = currentDeviceFolderNodes,
+                isCameraUploadsEnabled = false,
+                isCurrentDevice = true
+            )
+        ).thenReturn(currentDeviceStatus)
+
+        assertThat(
+            underTest(
+                backupInfoList = backupInfoList,
+                currentDeviceId = currentDeviceId,
+                deviceIdAndNameMap = deviceIdAndNameMap,
+                isCameraUploadsEnabled = false,
+            )
+        ).isEqualTo(
+            listOf(
+                OwnDeviceNode(
+                    id = currentDeviceId,
+                    name = deviceIdAndNameMap[currentDeviceId].orEmpty(),
+                    status = currentDeviceStatus,
+                    folders = currentDeviceFolderNodes,
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `test that a non current device is mapped if it has backup folders`() {
         val currentDeviceId = "1234-5678"
         val otherDeviceId = "7391-9042"
         val deviceIdAndNameMap = mapOf(
@@ -95,6 +140,65 @@ internal class DeviceNodeMapperTest {
                 name = deviceIdAndNameMap[otherDeviceId].orEmpty(),
                 status = otherDeviceStatus,
                 folders = otherDeviceFolderNodes,
+            ),
+        )
+        assertThat(
+            underTest(
+                backupInfoList = backupInfoList,
+                currentDeviceId = currentDeviceId,
+                deviceIdAndNameMap = deviceIdAndNameMap,
+                isCameraUploadsEnabled = isCameraUploadsEnabled,
+            )
+        ).isEqualTo(deviceNodes)
+    }
+
+    @Test
+    fun `test that a non current device is not mapped if it has no backup folders`() {
+        val currentDeviceId = "1234-5678"
+        val otherDeviceId = "7391-9042"
+        val deviceIdAndNameMap = mapOf(
+            currentDeviceId to "Current Device Name",
+            otherDeviceId to "Other Device name",
+        )
+        val backupInfoList = listOf<BackupInfo>(
+            mock { on { deviceId }.thenReturn(currentDeviceId) },
+        )
+        val isCameraUploadsEnabled = false
+
+        // Current Device
+        val currentDeviceBackupInfo = backupInfoList.filterBackupInfoByDeviceId(currentDeviceId)
+        val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
+            mock { on { name }.thenReturn("Current Device Folder One") }
+        )
+        val currentDeviceStatus = DeviceCenterNodeStatus.NoCameraUploads
+        whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
+            currentDeviceFolderNodes
+        )
+        whenever(
+            deviceNodeStatusMapper(
+                folders = currentDeviceFolderNodes,
+                isCameraUploadsEnabled = isCameraUploadsEnabled,
+                isCurrentDevice = true
+            )
+        ).thenReturn(currentDeviceStatus)
+
+        // Other Device/s
+        val otherDeviceStatus = DeviceCenterNodeStatus.Unknown
+        whenever(deviceFolderNodeMapper(emptyList())).thenReturn(emptyList())
+        whenever(
+            deviceNodeStatusMapper(
+                folders = emptyList(),
+                isCameraUploadsEnabled = isCameraUploadsEnabled,
+                isCurrentDevice = false,
+            )
+        ).thenReturn(otherDeviceStatus)
+
+        val deviceNodes = listOf(
+            OwnDeviceNode(
+                id = currentDeviceId,
+                name = deviceIdAndNameMap[currentDeviceId].orEmpty(),
+                status = currentDeviceStatus,
+                folders = currentDeviceFolderNodes,
             ),
         )
         assertThat(
