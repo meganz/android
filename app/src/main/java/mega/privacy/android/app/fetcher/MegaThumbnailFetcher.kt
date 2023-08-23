@@ -8,7 +8,6 @@ import coil.fetch.FetchResult
 import coil.fetch.Fetcher
 import coil.fetch.SourceResult
 import coil.request.Options
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import okio.Path.Companion.toOkioPath
 
@@ -16,11 +15,11 @@ import okio.Path.Companion.toOkioPath
  * Mega thumbnail fetcher to load thumbnails from normal MegaNode
  */
 internal class MegaThumbnailFetcher(
-    private val nodeId: NodeId,
+    private val request: ThumbnailRequest,
     private val getThumbnailUseCase: dagger.Lazy<GetThumbnailUseCase>,
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {
-        val file = getThumbnailUseCase.get()(nodeId.longValue, true)
+        val file = getThumbnailUseCase.get()(request.id.longValue, true)
             ?: throw NullPointerException("Thumbnail file is null")
         return SourceResult(
             source = ImageSource(file = file.toOkioPath()),
@@ -34,15 +33,19 @@ internal class MegaThumbnailFetcher(
      */
     class Factory(
         private val getThumbnailUseCase: dagger.Lazy<GetThumbnailUseCase>,
-    ) : Fetcher.Factory<NodeId> {
+    ) : Fetcher.Factory<ThumbnailRequest> {
 
-        override fun create(data: NodeId, options: Options, imageLoader: ImageLoader): Fetcher? {
+        override fun create(
+            data: ThumbnailRequest,
+            options: Options,
+            imageLoader: ImageLoader,
+        ): Fetcher? {
             if (!isApplicable(data)) return null
             return MegaThumbnailFetcher(data, getThumbnailUseCase)
         }
 
-        private fun isApplicable(data: NodeId): Boolean {
-            return data.longValue > 0
+        private fun isApplicable(data: ThumbnailRequest): Boolean {
+            return data.id.longValue > 0
         }
     }
 }

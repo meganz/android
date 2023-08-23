@@ -11,23 +11,15 @@ import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.main.adapters.MegaCompletedTransfersAdapter
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
-import javax.inject.Inject
 
 /**
  * The Fragment is used for displaying the finished items of transfer.
  */
 @AndroidEntryPoint
 class CompletedTransfersFragment : TransfersBaseFragment() {
-    /**
-     * MegaApiAndroid injection
-     */
-    @Inject
-    @MegaApi
-    lateinit var megaApi: MegaApiAndroid
-
-    private lateinit var adapter: MegaCompletedTransfersAdapter
+    private val adapter: MegaCompletedTransfersAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        MegaCompletedTransfersAdapter(requireActivity())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,16 +35,14 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
         binding.transfersEmptyImage.setImageResource(
             if (Util.isScreenInPortrait(requireContext())) {
                 R.drawable.empty_transfer_portrait
-            } else R.drawable.empty_transfer_landscape)
-
-        binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(requireContext(),
-            getString(R.string.completed_transfers_empty_new))
-
-        adapter = MegaCompletedTransfersAdapter(
-            context = requireActivity(),
-            transfers = viewModel.getCompletedTransfers(),
-            megaApi = megaApi
+            } else R.drawable.empty_transfer_landscape
         )
+
+        binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(
+            requireContext(),
+            getString(R.string.completed_transfers_empty_new)
+        )
+
         setupFlow()
         binding.transfersListView.adapter = adapter
     }
@@ -64,7 +54,10 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
             }
         }
         viewLifecycleOwner.collectFlow(viewModel.completedTransfers) { completedTransfers ->
-            adapter.setCompletedTransfers(completedTransfers)
+            adapter.submitList(completedTransfers) {
+                // List Adapter doesn't auto move to top when new item inserted, we need to use this callback to scroll to top
+                binding.transfersListView.scrollToPosition(0)
+            }
             setEmptyView(completedTransfers.size)
         }
     }

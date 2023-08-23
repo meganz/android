@@ -11,20 +11,23 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fetcher.ThumbnailRequest
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import kotlin.math.roundToLong
@@ -37,8 +40,6 @@ class MegaTransfersAdapter(
     private val listView: RecyclerView,
     private val selectModeInterface: SelectModeInterface,
     private val transfersViewModel: TransfersViewModel,
-    private val megaApi: MegaApiAndroid,
-    private val megaApiFolder: MegaApiAndroid,
     private val dbH: LegacyDatabaseHandler,
     private val onPauseTransfer: (Transfer) -> Unit,
 ) : ListAdapter<Transfer, TransferViewHolder>(TRANSFER_DIFF_CALLBACK), RotatableAdapter {
@@ -114,50 +115,19 @@ class MegaTransfersAdapter(
                 holder.document = transfer.nodeHandle
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers)
-                    val nodeFromMegaApi = megaApi.getNodeByHandle(transfer.nodeHandle)
-                    val nodeFromMegaApiFolder = megaApiFolder.getNodeByHandle(transfer.nodeHandle)
-                    // If node that gets from MegaApi is null, getting the node from megaApiFolder
-                    val node = nodeFromMegaApi ?: nodeFromMegaApiFolder
-                    if (node != null) {
-                        if (node.hasThumbnail()) {
-                            ThumbnailUtils.getThumbnailFromCache(node) ?: let {
-                                ThumbnailUtils.getThumbnailFromFolder(node, context) ?: let {
-                                    try {
-                                        ThumbnailUtils.getThumbnailFromMegaTransfer(
-                                            node,
-                                            context,
-                                            holder,
-                                            megaApi,
-                                            this
-                                        )
-                                    } catch (e: Exception) {
-                                        Timber.e(e, "Exception getting thumbnail")
-                                        null
-                                    }
-                                }
-                            }
-                        } else {
-                            null
-                        }?.let { thumbnail ->
-                            holder.thumbnailIcon.setImageBitmap(
-                                ThumbnailUtils.getRoundedBitmap(
-                                    context,
-                                    thumbnail,
-                                    Util.dp2px(THUMB_CORNER_RADIUS_DP)
-                                )
+                    holder.thumbnailIcon.load(ThumbnailRequest(NodeId(transfer.nodeHandle))) {
+                        crossfade(false)
+                        transformations(
+                            RoundedCornersTransformation(
+                                dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
                             )
-                            holder.thumbnailIcon.isVisible = true
-                            holder.defaultIcon.isVisible = false
-                        } ?: showDefaultIcon(
-                            holder = holder,
-                            drawableId = MimeTypeList.typeForName(transfer.fileName).iconResourceId
                         )
-                    } else {
-                        // If the node cannot be got from both MegaApi and MegaApiFolder, show default icon
-                        showDefaultIcon(
-                            holder = holder,
-                            drawableId = MimeTypeList.typeForName(transfer.fileName).iconResourceId
-                        )
+                        listener(onError = { _, _ ->
+                            showDefaultIcon(
+                                holder = holder,
+                                drawableId = MimeTypeList.typeForName(transfer.fileName).iconResourceId
+                            )
+                        })
                     }
                 }
             }

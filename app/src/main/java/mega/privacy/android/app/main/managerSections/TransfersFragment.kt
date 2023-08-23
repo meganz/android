@@ -34,10 +34,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.transfer.Transfer
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,21 +45,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     TransfersActionBarCallBack.TransfersActionCallback {
-
-    /**
-     * MegaApiAndroid injection
-     */
-    @Inject
-    @MegaApi
-    lateinit var megaApi: MegaApiAndroid
-
-    /**
-     * MegaApiFolder injection
-     */
-    @Inject
-    @MegaApiFolder
-    lateinit var megaApiFolder: MegaApiAndroid
-
     /**
      * [LegacyDatabaseHandler]
      */
@@ -109,8 +91,6 @@ internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                 listView = recyclerView,
                 selectModeInterface = this,
                 transfersViewModel = viewModel,
-                megaApi = megaApi,
-                megaApiFolder = megaApiFolder,
                 dbH = dbH,
                 onPauseTransfer = ::handlePauseTransfers
             )

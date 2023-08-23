@@ -7,18 +7,19 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fetcher.ThumbnailRequest
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
-import mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap
-import mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache
-import mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder
 import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaTransfer.STATE_CANCELLED
 import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
 import nz.mega.sdk.MegaTransfer.STATE_FAILED
@@ -30,25 +31,7 @@ import timber.log.Timber
  */
 class MegaCompletedTransfersAdapter(
     private val context: Context,
-    transfers: List<CompletedTransfer?>,
-    private val megaApi: MegaApiAndroid,
-) : RecyclerView.Adapter<TransferViewHolder>() {
-
-    private var completedTransfers: List<CompletedTransfer?>
-
-    init {
-        completedTransfers = transfers
-    }
-
-    /**
-     * Set completed transfers
-     *
-     * @param transfers List<[CompletedTransfer]>
-     */
-    fun setCompletedTransfers(transfers: List<CompletedTransfer?>) {
-        this.completedTransfers = transfers
-        notifyDataSetChanged()
-    }
+) : ListAdapter<CompletedTransfer, TransferViewHolder>(COMPLETED_TRANSFER_DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransferViewHolder {
         val view =
@@ -70,7 +53,8 @@ class MegaCompletedTransfersAdapter(
             itemLayout.setOnClickListener {
                 Timber.d("onClick")
                 (context as? ManagerActivity)?.showManageTransferOptionsPanel(
-                    getItem(holder.absoluteAdapterPosition))
+                    getItem(holder.absoluteAdapterPosition)
+                )
             }
         }
         view.tag = view
@@ -91,19 +75,19 @@ class MegaCompletedTransfersAdapter(
                 defaultIcon.setImageResource(MimeTypeList.typeForName(fileName).iconResourceId)
                 MimeTypeList.typeForName(fileName).let { mimeTypeList ->
                     if (mimeTypeList.isImage || mimeTypeList.isVideo) {
-                        completedTransfer.handle?.let { handle ->
-                            val thumbnail =
-                                getThumbnailFromCache(handle) ?: megaApi.getNodeByHandle(handle)
-                                    ?.let { node ->
-                                        getThumbnailFromFolder(node, context)
-                                    }
-                            if (thumbnail != null)
-                                thumbnailIcon.setImageBitmap(
-                                    getRoundedBitmap(context,
-                                        thumbnail,
-                                        dp2px(THUMB_CORNER_RADIUS_DP)))
-                            defaultIcon.isVisible = thumbnail == null
-                            thumbnailIcon.isVisible = thumbnail != null
+                        holder.thumbnailIcon.load(ThumbnailRequest(NodeId(completedTransfer.handle))) {
+                            transformations(
+                                RoundedCornersTransformation(
+                                    dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
+                                )
+                            )
+                            listener(onError = { _, _ ->
+                                defaultIcon.isVisible = true
+                                thumbnailIcon.isVisible = false
+                            }, onSuccess = { _, _ ->
+                                defaultIcon.isVisible = false
+                                thumbnailIcon.isVisible = true
+                            })
                         }
                     }
                 }
@@ -113,32 +97,50 @@ class MegaCompletedTransfersAdapter(
                     else
                         R.drawable.ic_upload_transfers
                 )
-                textViewCompleted.setTextColor(getThemeColor(context,
-                    android.R.attr.textColorSecondary))
+                textViewCompleted.setTextColor(
+                    getThemeColor(
+                        context,
+                        android.R.attr.textColorSecondary
+                    )
+                )
 
                 val stateParams = imageViewCompleted.layoutParams as RelativeLayout.LayoutParams
                 stateParams.marginEnd = dp2px(5f, context.resources.displayMetrics)
                 when (completedTransfer.state) {
                     STATE_COMPLETED -> {
                         textViewCompleted.text = completedTransfer.path
-                        imageViewCompleted.setColorFilter(ContextCompat.getColor(context,
-                            R.color.green_500_300),
-                            PorterDuff.Mode.SRC_IN)
+                        imageViewCompleted.setColorFilter(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.green_500_300
+                            ),
+                            PorterDuff.Mode.SRC_IN
+                        )
                         imageViewCompleted.setImageResource(R.drawable.ic_transfers_completed)
                     }
+
                     STATE_FAILED -> {
-                        textViewCompleted.setTextColor(getThemeColor(context, com.google.android.material.R.attr.colorError))
-                        textViewCompleted.text = String.format("%s: %s",
+                        textViewCompleted.setTextColor(
+                            getThemeColor(
+                                context,
+                                com.google.android.material.R.attr.colorError
+                            )
+                        )
+                        textViewCompleted.text = String.format(
+                            "%s: %s",
                             context.getString(R.string.failed_label),
-                            completedTransfer.error)
+                            completedTransfer.error
+                        )
                         stateParams.marginEnd = 0
                         imageViewCompleted.setImageBitmap(null)
                     }
+
                     STATE_CANCELLED -> {
                         textViewCompleted.text = context.getString(R.string.transfer_cancelled)
                         stateParams.marginEnd = 0
                         imageViewCompleted.setImageBitmap(null)
                     }
+
                     else -> {
                         textViewCompleted.text = context.getString(R.string.transfer_unknown)
                         imageViewCompleted.clearColorFilter()
@@ -150,26 +152,18 @@ class MegaCompletedTransfersAdapter(
         }
     }
 
-    override fun getItemCount(): Int = completedTransfers.size
+    companion object {
+        private val COMPLETED_TRANSFER_DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<CompletedTransfer>() {
+                override fun areItemsTheSame(
+                    oldItem: CompletedTransfer,
+                    newItem: CompletedTransfer,
+                ): Boolean = oldItem.id == newItem.id
 
-    /**
-     * Get transfer item
-     *
-     * @param position the item position
-     * @return transfer item
-     */
-    fun getItem(position: Int) = completedTransfers.getOrNull(position)
-
-    override fun getItemId(position: Int) = position.toLong()
-
-    /**
-     * Remove item
-     *
-     * @param position the removed position
-     * @param transfers the transfer list after removed
-     */
-    fun removeItemData(position: Int, transfers: List<CompletedTransfer?>) {
-        completedTransfers = transfers
-        notifyItemRemoved(position)
+                override fun areContentsTheSame(
+                    oldItem: CompletedTransfer,
+                    newItem: CompletedTransfer,
+                ): Boolean = oldItem == newItem
+            }
     }
 }
