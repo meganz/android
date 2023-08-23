@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,7 +68,6 @@ fun WaitingRoomWarningDialog(
                     value = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_warning),
                     baseStyle = MaterialTheme.typography.subtitle1.copy(
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colors.onPrimary
                     ),
                     styles = mapOf(SpanIndicator('A') to SpanStyle(textDecoration = TextDecoration.Underline)),

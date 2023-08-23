@@ -5105,4 +5105,6 @@
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wait for host to let you in</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t approved. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <!-- Cancel button in leave meeting dialog in a waiting room -->
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Don’t leave</string>
 </resources>

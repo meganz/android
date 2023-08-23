@@ -127,6 +127,10 @@ internal fun CreateScheduledMeetingView(
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
+    val shouldShowWarningDialog =
+        state.enabledWaitingRoomOption && state.enabledAllowAddParticipantsOption &&
+                managementState.waitingRoomReminder == WaitingRoomReminders.Enabled && managementState.isWaitingRoomFeatureFlagEnabled
+
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost = {
@@ -143,7 +147,7 @@ internal fun CreateScheduledMeetingView(
                 onAcceptClicked = onAcceptClicked,
                 onDiscardClicked = onDiscardClicked,
                 onValueChange = onTitleValueChange,
-                elevation = !firstItemVisible
+                elevation = shouldShowWarningDialog || !firstItemVisible
             )
         }
     ) { paddingValues ->
@@ -161,7 +165,7 @@ internal fun CreateScheduledMeetingView(
         )
 
         Column {
-            if (state.enabledWaitingRoomOption && state.enabledAllowAddParticipantsOption && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled && managementState.isWaitingRoomFeatureFlagEnabled) {
+            if (shouldShowWarningDialog) {
                 WaitingRoomWarningDialog(
                     onLearnMoreClicked = onLearnMoreWarningClicked,
                     onCloseClicked = onCloseWarningClicked

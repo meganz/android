@@ -2016,7 +2016,7 @@ public class ChatActivity extends PasscodeActivity
                 viewModel.setOpenWaitingRoomConsumed();
                 Intent intentWaitingRoom = new Intent(chatActivity, WaitingRoomActivity.class);
                 intentWaitingRoom.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intentWaitingRoom.putExtra(MEETING_CHAT_ID, chatState.getChatId());
+                intentWaitingRoom.putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, chatState.getChatId());
                 startActivity(intentWaitingRoom);
             }
 

@@ -30,6 +30,7 @@ class ChatRoomTimestampMapper @Inject constructor(
     private val hourFormat by lazy { if (is24HourFormat) "HH:mm" else "hh:mma" }
     private val dateFormat by lazy { "dd MMMM yyyy $hourFormat" }
     private val headerDateFormat by lazy { "EEEE, d MMM" }
+    private val waitingRoomFormat by lazy { "EEEE, d MMM yyyy" }
 
     /**
      * Convert chat room item last timestamp to readable form
@@ -114,6 +115,26 @@ class ChatRoomTimestampMapper @Inject constructor(
 
             else -> null
         }
+
+    /**
+     * Get Date Time formatted for Waiting Rooms
+     *
+     * @param startTimestamp    Meeting start time
+     * @param endTimestamp      Meeting end time
+     * @return                  Time formatted
+     */
+    fun getWaitingRoomTimeFormatted(
+        startTimestamp: Long,
+        endTimestamp: Long,
+    ): String {
+        val time = getMeetingTimeFormatted(startTimestamp, endTimestamp)
+        val date = DateTimeFormatter
+            .ofPattern(waitingRoomFormat)
+            .withZone(ZoneId.systemDefault())
+            .format(Instant.ofEpochSecond(startTimestamp))
+
+        return "$date · $time"
+    }
 
     private fun ChatRoomItem.scheduledStartTimestamp(): Long? =
         if (this is ChatRoomItem.MeetingChatRoomItem) this.scheduledStartTimestamp else null

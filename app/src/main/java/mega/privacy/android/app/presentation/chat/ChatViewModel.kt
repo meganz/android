@@ -76,6 +76,7 @@ import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 
 /**
  * View Model for [ChatActivity]
@@ -88,6 +89,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property chatManagement                                 [ChatManagement]
  * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
  * @property startChatCallNoRingingUseCase                  [StartChatCallNoRingingUseCase]
+ * @property startMeetingInWaitingRoomChatUseCase                  [StartMeetingInWaitingRoomChatUseCase]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
  * @property getChatCall                                    [GetChatCall]
  * @property monitorChatCallUpdates                         [MonitorChatCallUpdates]
@@ -116,6 +118,7 @@ class ChatViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
+    private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val openOrStartCall: OpenOrStartCall,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
@@ -271,6 +274,10 @@ class ChatViewModel @Inject constructor(
                     }
 
                     isHost && state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> {
+                        val schedIdWr: Long =
+                            if (!hasSchedMeeting || shouldCallRing) -1L else state.value.scheduledMeeting?.schedId
+                                ?: -1L
+                        startSchedMeetingWithWaitingRoom(schedIdWr)
                     }
 
                     !isHost -> {
@@ -551,6 +558,34 @@ class ChatViewModel @Inject constructor(
             }
         }.onFailure { Timber.w("Exception opening or starting call: $it") }
     }
+
+    /**
+     * Start scheduled meeting with waiting room
+     *
+     * @param schedIdWr   Scheduled meeting id
+     */
+    private fun startSchedMeetingWithWaitingRoom(schedIdWr: Long) =
+        viewModelScope.launch {
+            Timber.d("Start scheduled meeting with waiting room schedIdWr")
+            runCatching {
+                startMeetingInWaitingRoomChatUseCase(
+                    chatId = _state.value.chatId,
+                    schedIdWr = schedIdWr,
+                    enabledVideo = false,
+                    enabledAudio = true
+                )
+            }.onSuccess { call ->
+                call?.let {
+                    call.chatId.takeIf { it != INVALID_HANDLE }
+                        ?.let {
+                            Timber.d("Meeting started")
+                            openCurrentCall(call = call)
+                        }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
 
     /**
      * Start scheduled meeting

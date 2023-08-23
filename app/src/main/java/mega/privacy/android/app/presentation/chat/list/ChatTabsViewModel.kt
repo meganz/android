@@ -197,33 +197,46 @@ class ChatTabsViewModel @Inject constructor(
                     ?.let { item ->
                         val meeting = item as MeetingChatRoomItem
                         when (meeting.currentCallStatus) {
-                            is ChatRoomItemStatus.NotJoined ->
-                                answerChatCallUseCase(chatId = chatId, video = false, audio = true)
-                                    ?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                    ?.let { call ->
-                                        chatManagement.removeJoiningCallChatId(chatId)
-                                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                                        CallUtil.clearIncomingCallNotification(call.callId)
-                                        openCurrentCall(call)
-                                    }
-
-                            is ChatRoomItemStatus.NotStarted ->
-                                if (meeting.schedId != null) {
-                                    startChatCallNoRingingUseCase(
-                                        chatId = chatId,
-                                        schedId = meeting.schedId!!,
-                                        enabledVideo = false,
-                                        enabledAudio = true
-                                    )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                        ?.let(::openCurrentCall)
+                            is ChatRoomItemStatus.NotJoined -> {
+                                if (meeting.isWaitingRoom) {
+                                    state.update { it.copy(currentWaitingRoom = chatId) }
                                 } else {
-                                    openOrStartCall(
+                                    answerChatCallUseCase(
                                         chatId = chatId,
                                         video = false,
                                         audio = true
                                     )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                        ?.let(::openCurrentCall)
+                                        ?.let { call ->
+                                            chatManagement.removeJoiningCallChatId(chatId)
+                                            rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                                            CallUtil.clearIncomingCallNotification(call.callId)
+                                            openCurrentCall(call)
+                                        }
                                 }
+                            }
+
+                            is ChatRoomItemStatus.NotStarted -> {
+                                if (meeting.isWaitingRoom) {
+                                    state.update { it.copy(currentWaitingRoom = chatId) }
+                                } else {
+                                    if (meeting.schedId != null) {
+                                        startChatCallNoRingingUseCase(
+                                            chatId = chatId,
+                                            schedId = meeting.schedId!!,
+                                            enabledVideo = false,
+                                            enabledAudio = true
+                                        )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
+                                            ?.let(::openCurrentCall)
+                                    } else {
+                                        openOrStartCall(
+                                            chatId = chatId,
+                                            video = false,
+                                            audio = true
+                                        )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
+                                            ?.let(::openCurrentCall)
+                                    }
+                                }
+                            }
 
                             else -> {
                                 // Nothing to do
@@ -250,10 +263,15 @@ class ChatTabsViewModel @Inject constructor(
     }
 
     /**
-     * Remove current chat call
+     * Remove current chat call and Waiting Room
      */
-    fun removeCurrentCall() {
-        state.update { it.copy(currentCallChatId = null) }
+    fun removeCurrentCallAndWaitingRoom() {
+        state.update {
+            it.copy(
+                currentCallChatId = null,
+                currentWaitingRoom = null,
+            )
+        }
     }
 
     /**

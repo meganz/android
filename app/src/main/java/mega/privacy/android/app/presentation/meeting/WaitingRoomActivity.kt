@@ -10,8 +10,8 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.meeting.view.WaitingRoomView
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
@@ -29,6 +29,8 @@ class WaitingRoomActivity : PasscodeActivity() {
 
     companion object {
         private const val INFO_SCREEN_URL = "https://mega.io/chatandmeetings"
+
+        internal const val EXTRA_CHAT_ID = "EXTRA_CHAT_ID"
     }
 
     @Inject
@@ -36,16 +38,22 @@ class WaitingRoomActivity : PasscodeActivity() {
 
     private val viewModel by viewModels<WaitingRoomViewModel>()
 
+    private val chatId by lazy {
+        intent.getLongExtra(EXTRA_CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+    }
+
     /**
      * Perform Activity initialization
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val chatId = intent.getLongExtra(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
-        viewModel.setChatId(newChatId = chatId)
-
         setContent { MainComposeView() }
+
+        collectFlow(viewModel.state) { uiState ->
+            if (uiState.finish) finish()
+        }
+
+        viewModel.loadMeetingDetails(chatId)
     }
 
     /**

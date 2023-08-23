@@ -46,6 +46,7 @@ import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
+import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_NEW_CHAT_ID
 import mega.privacy.android.app.utils.CallUtil
@@ -193,7 +194,12 @@ class ChatTabsFragment : Fragment() {
 
             state.currentCallChatId?.let { chatId ->
                 launchChatCallScreen(chatId)
-                viewModel.removeCurrentCall()
+                viewModel.removeCurrentCallAndWaitingRoom()
+            }
+
+            state.currentWaitingRoom?.let { chatId ->
+                launchWaitingRoomScreen(chatId)
+                viewModel.removeCurrentCallAndWaitingRoom()
             }
 
             state.snackBar?.let { snackBar ->
@@ -343,6 +349,20 @@ class ChatTabsFragment : Fragment() {
                 putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
                 putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, true)
                 putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, false)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        )
+    }
+
+    /**
+     * Launch waiting room screen
+     *
+     * @param chatId    Chat Room Id
+     */
+    private fun launchWaitingRoomScreen(chatId: Long) {
+        startActivity(
+            Intent(context, WaitingRoomActivity::class.java).apply {
+                putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, chatId)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
         )

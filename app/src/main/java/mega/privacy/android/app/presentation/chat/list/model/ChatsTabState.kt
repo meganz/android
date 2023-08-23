@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  * @property selectedIds
  * @property currentChatStatus
  * @property currentCallChatId
+ * @property currentWaitingRoom
  * @property searchQuery
  * @property snackBar
  * @property isParticipatingInChatCallResult
@@ -28,6 +29,7 @@ data class ChatsTabState constructor(
     val selectedIds: List<Long> = emptyList(),
     val currentChatStatus: ChatStatus? = null,
     val currentCallChatId: Long? = null,
+    val currentWaitingRoom: Long? = null,
     val searchQuery: String? = null,
     val snackBar: SnackBarItem? = null,
     val isParticipatingInChatCallResult: Boolean? = null,

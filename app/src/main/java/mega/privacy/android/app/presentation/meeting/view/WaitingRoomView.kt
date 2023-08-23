@@ -271,7 +271,7 @@ internal fun WaitingRoomView(
             MegaAlertDialog(
                 text = stringResource(R.string.meetings_leave_meeting_confirmation_dialog_title),
                 confirmButtonText = stringResource(R.string.general_leave),
-                cancelButtonText = stringResource(R.string.general_cancel),
+                cancelButtonText = stringResource(R.string.meetings__waiting_room_leave_meeting_dialog_cancel_button),
                 onConfirm = onCloseClicked,
                 onDismiss = { showLeaveDialog = false },
             )

@@ -141,6 +141,7 @@ sealed class ChatRoomItem(
      * @property scheduledStartTimestamp
      * @property scheduledEndTimestamp
      * @property scheduledTimestampFormatted
+     * @property isWaitingRoom
      * @property isPublic
      * @property avatars
      * @property chatId
@@ -168,6 +169,7 @@ sealed class ChatRoomItem(
         val scheduledStartTimestamp: Long? = null,
         val scheduledEndTimestamp: Long? = null,
         val scheduledTimestampFormatted: String? = null,
+        val isWaitingRoom: Boolean = false,
         val isPublic: Boolean = false,
         val avatars: List<ChatAvatarItem>? = null,
         override val chatId: Long,
@@ -273,6 +275,7 @@ sealed class ChatRoomItem(
         scheduledStartTimestamp: Long? = null,
         scheduledEndTimestamp: Long? = null,
         scheduledTimestampFormatted: String? = null,
+        isWaitingRoom: Boolean? = null,
     ): ChatRoomItem = when (this) {
         is IndividualChatRoomItem -> copy(
             chatId = chatId,
@@ -329,6 +332,7 @@ sealed class ChatRoomItem(
             lastTimestampFormatted = lastTimestampFormatted,
             highlight = highlight,
             header = header,
+            isWaitingRoom = isWaitingRoom ?: this.isWaitingRoom,
             isPublic = isPublic ?: this.isPublic,
             avatars = avatarItems ?: this.avatars,
             schedId = schedId ?: this.schedId,

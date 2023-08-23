@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.After
@@ -94,6 +95,7 @@ class ChatViewModelTest {
     private val monitorChatRoomUpdates = mock<MonitorChatRoomUpdates> {
         onBlocking { invoke(any()) }.thenReturn(flowOf())
     }
+    private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
     private val leaveChat = mock<LeaveChat>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val loadPendingMessagesUseCase = mock<LoadPendingMessagesUseCase> {
@@ -133,6 +135,7 @@ class ChatViewModelTest {
             loadPendingMessagesUseCase = loadPendingMessagesUseCase,
             monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates,
             monitorChatRoomUpdates = monitorChatRoomUpdates,
+            startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
         )
     }
 
