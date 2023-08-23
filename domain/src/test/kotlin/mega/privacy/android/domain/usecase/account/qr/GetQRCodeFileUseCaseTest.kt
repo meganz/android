@@ -47,7 +47,9 @@ class GetQRCodeFileUseCaseTest {
     @Test
     fun `test that QR code file is returned`() = runTest {
         val email = "a@b.c"
-        val expectedFile: File = mock()
+        val expectedFile = mock<File> {
+            on { exists() }.thenReturn(true)
+        }
         whenever(accountRepository.getAccountEmail()).thenReturn(email)
         whenever(qrCodeRepository.getQRFile(any())).thenReturn(expectedFile)
         assertThat(underTest()).isEqualTo(expectedFile)
