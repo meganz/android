@@ -400,6 +400,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             }
 
             KEY_LOCAL_SECONDARY_MEDIA_FOLDER -> {
+                canStartCameraUploads = false
                 intent = Intent(context, FileStorageActivity::class.java).apply {
                     action = FileStorageActivity.Mode.PICK_FOLDER.action
                     putExtra(
@@ -412,6 +413,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
             KEY_MEGA_SECONDARY_MEDIA_FOLDER -> {
                 if (viewModel.isConnected.not()) return false
+                canStartCameraUploads = false
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
                     action = FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC
                 }
