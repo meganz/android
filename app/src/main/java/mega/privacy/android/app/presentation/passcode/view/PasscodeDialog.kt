@@ -31,6 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -40,6 +42,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.findFragmentActivity
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
@@ -52,6 +55,11 @@ import mega.privacy.android.core.ui.controls.textfields.PasscodeField
 import mega.privacy.android.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
+import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
+import mega.privacy.mobile.analytics.event.PasscodeLogoutButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PasscodeUnlockDialogEvent
 
 /**
  * Passcode dialog
@@ -67,7 +75,7 @@ internal fun PasscodeDialog(
         onError: () -> Unit,
         onFail: () -> Unit,
         context: Context,
-    ) -> Unit = ::LaunchBiometricPrompt,
+    ) -> Unit = ::launchBiometricPrompt,
 ) {
     val uiState by passcodeUnlockViewModel.state.collectAsStateWithLifecycle()
 
@@ -78,6 +86,7 @@ internal fun PasscodeDialog(
     if (showBiometricPrompt) {
         val context = LocalContext.current
         LaunchedEffect(key1 = Unit) {
+            Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
             showBiometricAuth(
                 passcodeUnlockViewModel::unlockWithBiometrics,
                 { showBiometricPrompt = false },
@@ -95,12 +104,18 @@ internal fun PasscodeDialog(
                 usePlatformDefaultWidth = false,
             )
         ) {
+            LaunchedEffect(key1 = showBiometricPrompt) {
+                Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
+            }
             when (val currentState = uiState) {
                 PasscodeUnlockState.Loading -> TODO()
                 is PasscodeUnlockState.Data -> {
                     DialogContent(
                         onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
-                        onPasscodeEntered = passcodeUnlockViewModel::unlockWithPasscode,
+                        onPasscodeEntered = { passcode ->
+                            Analytics.tracker.trackEvent(PasscodeEnteredEvent)
+                            passcodeUnlockViewModel.unlockWithPasscode(passcode)
+                        },
                         failedAttemptCount = currentState.failedAttempts,
                         showLogoutWarning = currentState.logoutWarning,
                         passcodeType = currentState.passcodeType,
@@ -112,7 +127,7 @@ internal fun PasscodeDialog(
     }
 }
 
-private fun LaunchBiometricPrompt(
+private fun launchBiometricPrompt(
     onSuccess: () -> Unit,
     onError: () -> Unit,
     onFail: () -> Unit,
@@ -182,7 +197,17 @@ private fun DialogContent(
                 } else if (passcodeType is PasscodeUIType.Pin) {
                     PasscodeField(
                         onComplete = onPasscodeEntered,
-                        modifier = Modifier.testTag(PASSCODE_FIELD_TAG),
+                        modifier = Modifier
+                            .testTag(PASSCODE_FIELD_TAG)
+                            .semantics(
+                                mergeDescendants = true,
+                                properties = {
+                                    setText {
+                                        onPasscodeEntered(it.text)
+                                        true
+                                    }
+                                }
+                            ),
                         numberOfCharacters = passcodeType.digits
                     )
                 }
@@ -207,13 +232,19 @@ private fun DialogContent(
             if (failedAttemptCount > 0 && !usePassword) {
                 Spacer(modifier = Modifier.height(20.dp))
                 OutlinedMegaButton(
-                    onClick = { logoutDialog = true },
+                    onClick = {
+                        Analytics.tracker.trackEvent(PasscodeLogoutButtonPressedEvent)
+                        logoutDialog = true
+                    },
                     textId = R.string.action_logout,
                     modifier = Modifier.testTag(LOGOUT_BUTTON_TAG),
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 TextMegaButton(
-                    onClick = { usePassword = true },
+                    onClick = {
+                        Analytics.tracker.trackEvent(ForgotPasscodeButtonPressedEvent)
+                        usePassword = true
+                    },
                     textId = R.string.settings_passcode_forgot_passcode_button,
                     modifier = Modifier.testTag(FORGOT_PASSCODE_BUTTON_TAG),
                 )
@@ -235,6 +266,7 @@ private fun ShowPasswordField(onPasswordEntered: (String) -> Unit, hintText: Str
             .fillMaxWidth(0.5f)
             .testTag(PASSWORD_FIELD_TAG),
         onTextChange = { password = it },
+        text = password,
         imeAction = ImeAction.Done,
         keyboardActions = KeyboardActions(
             onDone = {

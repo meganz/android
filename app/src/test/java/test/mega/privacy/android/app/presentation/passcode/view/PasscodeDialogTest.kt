@@ -13,6 +13,7 @@ import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.input.ImeAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
@@ -23,9 +24,16 @@ import mega.privacy.android.app.presentation.passcode.view.LOGOUT_BUTTON_TAG
 import mega.privacy.android.app.presentation.passcode.view.PASSCODE_FIELD_TAG
 import mega.privacy.android.app.presentation.passcode.view.PASSWORD_FIELD_TAG
 import mega.privacy.android.app.presentation.passcode.view.PasscodeDialog
+import mega.privacy.android.core.ui.test.AnalyticsTestRule
+import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
+import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
+import mega.privacy.mobile.analytics.event.PasscodeLogoutButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PasscodeUnlockDialogEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -37,8 +45,12 @@ import org.mockito.kotlin.verify
 @RunWith(AndroidJUnit4::class)
 internal class PasscodeDialogTest {
 
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val passcodeUnlockViewModel: PasscodeUnlockViewModel = mock()
     private val biometricAuthIsAvailable = mock<() -> Boolean>()
@@ -275,6 +287,121 @@ internal class PasscodeDialogTest {
 
         composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
+    }
+
+
+    //Analytics
+    @Test
+    fun `test that passcode dialog event is emitted when displayed`() {
+        val uiState = PasscodeUnlockState.Data(
+            passcodeType = PasscodeUIType.Pin(false, 4),
+            failedAttempts = 0,
+            logoutWarning = false
+        )
+
+        displayDialogWithState(uiState)
+
+        composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+
+        assertThat(analyticsRule.events).contains(PasscodeUnlockDialogEvent)
+    }
+
+    @Test
+    fun `test that biometric dialog event is emitted when biometric dialog is displayed`() {
+        biometricAuthIsAvailable.stub {
+            on { invoke() }.thenReturn(true)
+        }
+
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Alphanumeric(true),
+                failedAttempts = 0,
+                logoutWarning = false
+            )
+        )
+
+        verify(showBiometricAuth).invoke(any(), any(), any(), any())
+
+        assertThat(analyticsRule.events).contains(PasscodeBiometricUnlockDialogEvent)
+    }
+
+    @Test
+    fun `test that passcode entered event is emitted when the pin type passcode is entered`() {
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
+                failedAttempts = 1,
+                logoutWarning = false
+            )
+        )
+
+        val expected = "1234"
+
+        val passwordField =
+            composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = false)
+
+        passwordField.performTextInput(expected)
+
+        verify(passcodeUnlockViewModel).unlockWithPasscode(expected)
+        assertThat(analyticsRule.events).contains(PasscodeEnteredEvent)
+    }
+
+    @Test
+    fun `test that passcode entered event is emitted when the password type passcode is entered`() {
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Alphanumeric(false),
+                failedAttempts = 1,
+                logoutWarning = false
+            )
+        )
+
+        val expected = "Expected"
+
+        val passwordField =
+            composeTestRule.onNode(
+                hasAnyAncestor(hasTestTag(PASSWORD_FIELD_TAG)) and hasImeAction(
+                    ImeAction.Done
+                ), useUnmergedTree = false
+            )
+
+        passwordField.performTextInput(expected)
+        passwordField.performImeAction()
+
+        verify(passcodeUnlockViewModel).unlockWithPasscode(expected)
+        assertThat(analyticsRule.events).contains(PasscodeEnteredEvent)
+    }
+
+    @Test
+    fun `test that forgot passcode event is fired when forgot passcode is clicked`() {
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
+                failedAttempts = 1,
+                logoutWarning = false
+            )
+        )
+
+        composeTestRule.onNodeWithTag(FORGOT_PASSCODE_BUTTON_TAG)
+            .performClick()
+
+        assertThat(analyticsRule.events).contains(ForgotPasscodeButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that logout button pressed event is fired`() {
+        displayDialogWithState(
+            PasscodeUnlockState.Data(
+                passcodeType = PasscodeUIType.Pin(false, 4),
+                failedAttempts = 1,
+                logoutWarning = false
+            )
+        )
+
+        composeTestRule.onNodeWithTag(LOGOUT_BUTTON_TAG).performClick()
+
+        assertThat(analyticsRule.events).contains(PasscodeLogoutButtonPressedEvent)
     }
 
     private fun displayDialogWithState(uiState: PasscodeUnlockState) {

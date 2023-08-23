@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
@@ -44,6 +45,11 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
+import mega.privacy.mobile.analytics.event.PasscodeLogoutButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PasscodeScreenEvent
+import mega.privacy.mobile.analytics.event.PasscodeSettingScreenEvent
 import timber.log.Timber
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -152,6 +158,12 @@ class PasscodeLockActivity : BaseActivity() {
             ACTION_SET_PASSCODE_LOCK -> SET_MODE
             ACTION_RESET_PASSCODE_LOCK -> RESET_MODE
             else -> UNLOCK_MODE
+        }
+
+        if (mode == UNLOCK_MODE) {
+            Analytics.tracker.trackEvent(PasscodeScreenEvent)
+        } else {
+            Analytics.tracker.trackEvent(PasscodeSettingScreenEvent)
         }
 
         setOrUnlockMode = mode == SET_MODE || mode == UNLOCK_MODE
@@ -518,10 +530,12 @@ class PasscodeLockActivity : BaseActivity() {
         }
 
         binding.logoutButton.setOnClickListener {
+            Analytics.tracker.trackEvent(PasscodeLogoutButtonPressedEvent)
             askConfirmLogout()
         }
 
         binding.forgetPasscodeButton.setOnClickListener {
+            Analytics.tracker.trackEvent(ForgotPasscodeButtonPressedEvent)
             forgetPasscode = true
             lifecycleScope.launch {
                 initPasscodeScreen()
@@ -877,6 +891,7 @@ class PasscodeLockActivity : BaseActivity() {
                 .build()
         }
 
+        Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
         biometricPrompt.authenticate(promptInfo, CryptoObject(getCipher()))
     }
 
