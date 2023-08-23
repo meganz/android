@@ -366,7 +366,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                     tracePerformance(PerfCompressVideosTrace) { compressVideos() }
                     tracePerformance(PerfUploadCompressedVideosTrace) { uploadCompressedVideos() }
 
-                    onQueueComplete()
                     endService()
                     Result.success()
                 } else {
@@ -964,12 +963,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private fun getLastModifiedTime(file: SyncRecord): Long =
         File(file.localPath).lastModified()
 
-    private suspend fun onQueueComplete() {
-        Timber.d("onQueueComplete")
-        resetTotalUploadsUseCase()
-        resetUploadsCounts()
-    }
-
     /**
      * Executes certain behavior when the Primary Folder is disabled
      */
@@ -1115,6 +1108,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     ) = withContext(NonCancellable) {
         Timber.d("Finish Camera upload process: $cancelMessage")
 
+        resetTotalUploadsUseCase()
+        resetUploadsCounts()
         deleteCameraUploadsTemporaryRootDirectoryUseCase()
         sendStatusToBackupCenter(aborted = aborted)
         cancelAllPendingTransfers()
