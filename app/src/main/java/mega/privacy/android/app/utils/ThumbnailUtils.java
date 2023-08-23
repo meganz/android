@@ -20,7 +20,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.ParcelFileDescriptor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
@@ -34,9 +33,6 @@ import android.widget.RelativeLayout;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.shockwave.pdfium.PdfDocument;
-import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,13 +48,13 @@ import mega.privacy.android.app.main.adapters.MegaExplorerAdapter;
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter.ViewHolderExplorer;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter;
-import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketAdapter;
 import mega.privacy.android.app.main.adapters.TransferViewHolder;
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.main.providers.MegaProviderAdapter;
 import mega.privacy.android.app.main.providers.MegaProviderAdapter.ViewHolderProvider;
 import mega.privacy.android.app.presentation.recentactions.RecentActionsAdapter;
+import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketAdapter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -1089,52 +1085,6 @@ public class ThumbnailUtils {
         // There is no cache before, we have to start an async task to have the thumbnail bitmap
         new AttachThumbnailToFileStorageExplorerTask(context, megaApi, adapter, position).execute(document);
 
-    }
-
-    public static void createThumbnailPdf(Context context, String localPath, MegaApiAndroid megaApi, long handle) {
-        Timber.d("createThumbnailPdf: %s : %d", localPath, handle);
-
-        MegaNode pdfNode = megaApi.getNodeByHandle(handle);
-
-        if (pdfNode == null) {
-            Timber.w("Pdf is NULL");
-            return;
-        }
-
-        int pageNumber = 0;
-        PdfiumCore pdfiumCore = new PdfiumCore(context);
-        FileOutputStream out = null;
-
-        File thumbDir = getThumbFolder(context);
-        File thumb = new File(thumbDir, pdfNode.getBase64Handle() + ".jpg");
-        File file = new File(localPath);
-        try {
-            PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
-            pdfiumCore.openPage(pdfDocument, pageNumber);
-            int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
-            int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
-            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmp, 200, 200, false);
-            out = new FileOutputStream(thumb);
-            boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-            if (result) {
-                Timber.d("Compress OK!");
-                megaApi.setThumbnail(pdfNode, thumb.getAbsolutePath());
-            } else {
-                Timber.d("Not Compress");
-            }
-            pdfiumCore.closeDocument(pdfDocument);
-        } catch (Exception e) {
-
-        } finally {
-            try {
-                if (out != null)
-                    out.close();
-            } catch (Exception e) {
-
-            }
-        }
     }
 
     public static void createThumbnailVideo(Context context, String localPath, MegaApiAndroid megaApi, long handle) {

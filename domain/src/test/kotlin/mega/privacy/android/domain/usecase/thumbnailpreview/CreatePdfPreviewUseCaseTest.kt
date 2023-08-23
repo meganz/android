@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.thumbnailpreview
 
-import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.files.PdfRepository
@@ -11,7 +10,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -21,17 +22,20 @@ class CreatePdfPreviewUseCaseTest {
 
     private lateinit var underTest: CreatePdfPreviewUseCase
 
-    private lateinit var pdfRepository: PdfRepository
+    private val pdfRepository = mock<PdfRepository>()
+    private val setPreviewUseCase = mock<SetPreviewUseCase>()
 
     @BeforeAll
     fun setup() {
-        pdfRepository = mock()
-        underTest = CreatePdfPreviewUseCase(pdfRepository)
+        underTest = CreatePdfPreviewUseCase(
+            pdfRepository = pdfRepository,
+            setPreviewUseCase = setPreviewUseCase
+        )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(pdfRepository)
+        reset(pdfRepository, setPreviewUseCase)
     }
 
     @ParameterizedTest(name = " {0}")
@@ -40,9 +44,20 @@ class CreatePdfPreviewUseCaseTest {
     fun `test that create pdf preview returns correctly when repository returns `(
         expectedPreviewPath: String?,
     ) = runTest {
-        val file = File("test/filePath")
-        val localPath = "test/localPath"
-        whenever(pdfRepository.createPreview(file, localPath)).thenReturn(expectedPreviewPath)
-        Truth.assertThat(underTest.invoke(file, localPath)).isEqualTo(expectedPreviewPath)
+        val nodeHandle = 1L
+        val path = "test/filePath"
+        val localFile = File(path)
+        whenever(pdfRepository.createPreview(nodeHandle, localFile)).thenReturn(expectedPreviewPath)
+        expectedPreviewPath?.let {
+            whenever(setPreviewUseCase(nodeHandle, expectedPreviewPath)).thenReturn(Unit)
+        }
+        underTest.invoke(nodeHandle, localFile)
+        verify(pdfRepository).createPreview(nodeHandle, localFile)
+
+        if (expectedPreviewPath == null) {
+            verify(setPreviewUseCase, never()).invoke(nodeHandle, path)
+        } else {
+            verify(setPreviewUseCase).invoke(nodeHandle, expectedPreviewPath)
+        }
     }
 }

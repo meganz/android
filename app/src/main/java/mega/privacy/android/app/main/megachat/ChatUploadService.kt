@@ -6,18 +6,15 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
 import android.os.Build
 import android.os.IBinder
-import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -44,10 +41,7 @@ import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.qualifier.MegaApi
@@ -70,6 +64,7 @@ import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.chatuploads.IsThereAnyChatUploadUseCase
+import mega.privacy.android.domain.usecase.transfer.uploads.SetNodeAttributesAfterUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -84,7 +79,6 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
 import javax.inject.Inject
 
 /**
@@ -136,6 +130,9 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var isThereAnyChatUploadUseCase: IsThereAnyChatUploadUseCase
+
+    @Inject
+    lateinit var setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -1075,130 +1072,12 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
             if (error == null) {
                 Timber.d("Upload OK: $nodeHandle")
 
-                if (FileUtil.isVideoFile(localPath)) {
-                    Timber.d("Is video!!!")
-                    val previewDir = PreviewUtils.getPreviewFolder(this@ChatUploadService)
-                    val preview = File(
-                        previewDir,
-                        MegaApiAndroid.handleToBase64(nodeHandle) + JPG_EXTENSION
-                    )
-                    val thumbDir = ThumbnailUtils.getThumbFolder(this@ChatUploadService)
-                    val thumb = File(
-                        thumbDir,
-                        MegaApiAndroid.handleToBase64(nodeHandle) + JPG_EXTENSION
-                    )
-                    megaApi.createThumbnail(localPath, thumb.absolutePath)
-                    megaApi.createPreview(localPath, preview.absolutePath)
-                    attachNodes(transfer)
-                } else if (MimeTypeList.typeForName(localPath).isImage) {
-                    Timber.d("Is image!!!")
-                    val previewDir = PreviewUtils.getPreviewFolder(this@ChatUploadService)
-                    val preview = File(
-                        previewDir,
-                        MegaApiAndroid.handleToBase64(nodeHandle) + JPG_EXTENSION
-                    )
-                    megaApi.createPreview(localPath, preview.absolutePath)
-                    val thumbDir = ThumbnailUtils.getThumbFolder(this@ChatUploadService)
-                    val thumb = File(
-                        thumbDir,
-                        MegaApiAndroid.handleToBase64(nodeHandle) + JPG_EXTENSION
-                    )
-                    megaApi.createThumbnail(localPath, thumb.absolutePath)
-                    attachNodes(transfer)
-                } else if (MimeTypeList.typeForName(localPath).isPdf) {
-                    Timber.d("Is pdf!!!")
-                    try {
-                        ThumbnailUtils.createThumbnailPdf(
-                            this@ChatUploadService,
-                            localPath,
-                            megaApi,
-                            nodeHandle
-                        )
-                    } catch (e: Exception) {
-                        Timber.e("Pdf thumbnail could not be created", e)
-                    }
+                lifecycleScope.launch {
+                    runCatching { setNodeAttributesAfterUploadUseCase(nodeHandle, File(localPath)) }
+                        .onFailure { error -> Timber.e("Set Node Attributes error: $error") }
+                }
 
-                    val pageNumber = 0
-                    var out: FileOutputStream? = null
-                    try {
-                        val pdfiumCore =
-                            PdfiumCore(this@ChatUploadService)
-                        val pdfNode = megaApi.getNodeByHandle(nodeHandle)
-
-                        if (pdfNode == null) {
-                            Timber.e("pdf is NULL")
-                            return
-                        }
-
-                        val previewDir = PreviewUtils.getPreviewFolder(this@ChatUploadService)
-                        val preview = File(
-                            previewDir,
-                            MegaApiAndroid.handleToBase64(nodeHandle) + JPG_EXTENSION
-                        )
-                        val file = File(localPath)
-                        val pdfDocument = pdfiumCore.newDocument(
-                            ParcelFileDescriptor.open(
-                                file,
-                                ParcelFileDescriptor.MODE_READ_ONLY
-                            )
-                        )
-                        pdfiumCore.openPage(pdfDocument, pageNumber)
-                        val width =
-                            pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber)
-                        val height =
-                            pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber)
-                        val bmp =
-                            Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-
-                        pdfiumCore.renderPageBitmap(
-                            pdfDocument,
-                            bmp,
-                            pageNumber,
-                            0,
-                            0,
-                            width,
-                            height
-                        )
-                        val resizedBitmap =
-                            PreviewUtils.resizeBitmapUpload(bmp, width, height)
-                        out = FileOutputStream(preview)
-                        val result = resizedBitmap.compress(
-                            Bitmap.CompressFormat.JPEG,
-                            100,
-                            out
-                        ) // bmp is your Bitmap instance
-
-                        if (result) {
-                            Timber.d("Compress OK!")
-                            val oldPreview =
-                                File(previewDir, fileName + JPG_EXTENSION)
-                            if (oldPreview.exists()) {
-                                oldPreview.delete()
-                            }
-                        } else {
-                            Timber.d("Not Compress")
-                        }
-
-                        //Attach node one the request finish
-                        requestSent++
-                        megaApi.setPreview(
-                            pdfNode,
-                            preview.absolutePath,
-                            this@ChatUploadService
-                        )
-                        pdfiumCore.closeDocument(pdfDocument)
-                        updatePdfAttachStatus(transfer)
-                    } catch (e: Exception) {
-                        Timber.e("Pdf preview could not be created", e)
-                        attachNodes(transfer)
-                    } finally {
-                        try {
-                            out?.close()
-                        } catch (e: Exception) {
-                            Timber.e(e)
-                        }
-                    }
-                } else if (isVoiceClip()) {
+                if (isVoiceClip()) {
                     Timber.d("Is voice clip")
                     attachVoiceClips(transfer)
                 } else {

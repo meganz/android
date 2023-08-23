@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.thumbnailpreview
 
-import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.files.PdfRepository
@@ -11,7 +10,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -21,17 +22,20 @@ class CreatePdfThumbnailUseCaseTest {
 
     private lateinit var underTest: CreatePdfThumbnailUseCase
 
-    private lateinit var pdfRepository: PdfRepository
+    private val pdfRepository = mock<PdfRepository>()
+    private val setThumbnailUseCase = mock<SetThumbnailUseCase>()
 
     @BeforeAll
     fun setup() {
-        pdfRepository = mock()
-        underTest = CreatePdfThumbnailUseCase(pdfRepository)
+        underTest = CreatePdfThumbnailUseCase(
+            pdfRepository = pdfRepository,
+            setThumbnailUseCase = setThumbnailUseCase
+        )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(pdfRepository)
+        reset(pdfRepository, setThumbnailUseCase)
     }
 
     @ParameterizedTest(name = " {0}")
@@ -40,9 +44,21 @@ class CreatePdfThumbnailUseCaseTest {
     fun `test that create pdf thumbnail returns correctly when repository returns `(
         expectedThumbnailPath: String?,
     ) = runTest {
-        val file = File("test/filePath")
-        val localPath = "test/localPath"
-        whenever(pdfRepository.createThumbnail(file, localPath)).thenReturn(expectedThumbnailPath)
-        Truth.assertThat(underTest.invoke(file, localPath)).isEqualTo(expectedThumbnailPath)
+        val nodeHandle = 1L
+        val path = "test/filePath"
+        val localFile = File(path)
+        whenever(pdfRepository.createThumbnail(nodeHandle, localFile))
+            .thenReturn(expectedThumbnailPath)
+        expectedThumbnailPath?.let {
+            whenever(setThumbnailUseCase(nodeHandle, expectedThumbnailPath)).thenReturn(Unit)
+        }
+        underTest.invoke(nodeHandle, localFile)
+        verify(pdfRepository).createThumbnail(nodeHandle, localFile)
+
+        if (expectedThumbnailPath == null) {
+            verify(setThumbnailUseCase, never()).invoke(nodeHandle, path)
+        } else {
+            verify(setThumbnailUseCase).invoke(nodeHandle, expectedThumbnailPath)
+        }
     }
 }

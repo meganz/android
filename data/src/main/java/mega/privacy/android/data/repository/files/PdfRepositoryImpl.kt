@@ -7,6 +7,10 @@ import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.constant.FileConstant
+import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.files.PdfRepository
 import timber.log.Timber
@@ -22,26 +26,34 @@ import javax.inject.Inject
  */
 class PdfRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val megaApi: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val cacheGateway: CacheGateway,
 ) : PdfRepository {
 
-    override suspend fun createThumbnail(thumbnail: File, localPath: String) =
-        createThumbnailOrPreview(file = thumbnail, localPath = localPath, isPreview = false)
+    override suspend fun createThumbnail(nodeHandle: Long, localFile: File) =
+        createThumbnailOrPreview(nodeHandle = nodeHandle, localFile = localFile, isPreview = false)
 
-    override suspend fun createPreview(preview: File, localPath: String) =
-        createThumbnailOrPreview(file = preview, localPath = localPath, isPreview = true)
+    override suspend fun createPreview(nodeHandle: Long, localFile: File) =
+        createThumbnailOrPreview(nodeHandle = nodeHandle, localFile = localFile, isPreview = true)
 
     private suspend fun createThumbnailOrPreview(
-        file: File,
-        localPath: String,
+        nodeHandle: Long,
+        localFile: File,
         isPreview: Boolean,
     ) = withContext(ioDispatcher) {
         val pdfiumCore = PdfiumCore(context)
-        val temporaryFile = File(localPath)
         val pageNumber = 0
+        val fileName = megaApi.handleToBase64(nodeHandle) + FileConstant.JPG_EXTENSION
+        val file = if (isPreview) {
+            cacheGateway.getCacheFile(CacheFolderConstant.PREVIEW_FOLDER, fileName)
+        } else {
+            cacheGateway.getCacheFile(CacheFolderConstant.THUMBNAIL_FOLDER, fileName)
+        } ?: return@withContext null
+
         val out = FileOutputStream(file)
         val pdfDocument = pdfiumCore.newDocument(
-            ParcelFileDescriptor.open(temporaryFile, ParcelFileDescriptor.MODE_READ_ONLY)
+            ParcelFileDescriptor.open(localFile, ParcelFileDescriptor.MODE_READ_ONLY)
         )
 
         try {

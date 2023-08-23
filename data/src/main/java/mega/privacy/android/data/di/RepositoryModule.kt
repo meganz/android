@@ -52,6 +52,7 @@ import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
+import mega.privacy.android.data.repository.files.PdfRepositoryImpl
 import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRepositoryImpl
 import mega.privacy.android.data.repository.security.PasscodeRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
@@ -96,6 +97,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
+import mega.privacy.android.domain.repository.files.PdfRepository
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
@@ -266,4 +268,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindInAppUpdateRepository(implementation: InAppUpdateRepositoryImpl): InAppUpdateRepository
+
+
+    @Binds
+    abstract fun bindPdfRepository(implementation: PdfRepositoryImpl): PdfRepository
 }

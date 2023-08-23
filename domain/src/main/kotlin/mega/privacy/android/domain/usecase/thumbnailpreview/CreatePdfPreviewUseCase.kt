@@ -8,17 +8,23 @@ import javax.inject.Inject
  * Create pdf preview use case.
  *
  * @property pdfRepository [PdfRepository]
+ * @property setPreviewUseCase [SetPreviewUseCase]
  */
 class CreatePdfPreviewUseCase @Inject constructor(
     private val pdfRepository: PdfRepository,
+    private val setPreviewUseCase: SetPreviewUseCase,
 ) {
     /**
      * Invoke.
      *
-     * @param preview File in which the preview will be created.
-     * @param localPath Local path required for creating a PdfDocument.
+     * @param nodeHandle Node handle of the file already in the Cloud.
+     * @param localFile Local file.
      * @return Path of the thumbnail file if created successfully, null otherwise.
      */
-    suspend operator fun invoke(preview: File, localPath: String) =
-        pdfRepository.createPreview(preview, localPath)
+    suspend operator fun invoke(nodeHandle: Long, localFile: File) =
+        runCatching {
+            pdfRepository.createPreview(nodeHandle, localFile)
+        }.getOrNull()?.let { previewPath ->
+            setPreviewUseCase(nodeHandle = nodeHandle, srcFilePath = previewPath)
+        }
 }

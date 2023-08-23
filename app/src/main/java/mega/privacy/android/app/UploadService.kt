@@ -6,19 +6,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
-import android.graphics.Bitmap
-import android.media.MediaMetadataRetriever
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.IBinder
-import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +27,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
 import mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -49,10 +43,7 @@ import mega.privacy.android.app.utils.CacheFolderManager.deleteCacheFolderIfEmpt
 import mega.privacy.android.app.utils.CacheFolderManager.getCacheFileAsync
 import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolderAsync
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
@@ -81,13 +72,13 @@ import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseC
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfer.uploads.ResetTotalUploadsUseCase
+import mega.privacy.android.domain.usecase.transfer.uploads.SetNodeAttributesAfterUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
 import javax.inject.Inject
 
 /**
@@ -170,6 +161,9 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var getCurrentUploadSpeedUseCase: GetCurrentUploadSpeedUseCase
+
+    @Inject
+    lateinit var setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase
 
     private val intentFlow = MutableSharedFlow<Intent>()
 
@@ -802,7 +796,11 @@ internal class UploadService : LifecycleService() {
         Timber.d("Path: $localPath, Size: $transferredBytes")
 
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(applicationContext.packageName))
+            sendBroadcast(
+                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
+                    applicationContext.packageName
+                )
+            )
         }
 
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
@@ -857,168 +855,9 @@ internal class UploadService : LifecycleService() {
                         completedSuccessfully++
                     }
                 }
-                if (FileUtil.isVideoFile(localPath)) {
-                    Timber.d("Is video!!!")
-                    val previewDir = PreviewUtils.getPreviewFolder(this@UploadService)
-                    val preview = File(
-                        previewDir,
-                        MegaApiAndroid.handleToBase64(nodeHandle) + ".jpg"
-                    )
-                    val thumbDir = ThumbnailUtils.getThumbFolder(this@UploadService)
-                    val thumb = File(
-                        thumbDir,
-                        MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
-                    )
-                    megaApi.createThumbnail(localPath, thumb.absolutePath)
-                    megaApi.createPreview(localPath, preview.absolutePath)
-                    val node = megaApi.getNodeByHandle(nodeHandle)
-                    node?.let {
-                        val retriever = MediaMetadataRetriever()
-                        var location: String? = null
-                        try {
-                            retriever.setDataSource(localPath)
-                            location =
-                                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
-                        } catch (ex: Exception) {
-                            Timber.e(ex, "Exception is thrown")
-                        }
-                        location?.let {
-                            Timber.d("Location: $location")
-                            var secondTry = false
-                            try {
-                                val mid = location.length / 2 //get the middle of the String
-                                val parts = arrayOf(
-                                    location.substring(0, mid),
-                                    location.substring(mid)
-                                )
-                                val lat = parts[0].toDouble()
-                                val lon = parts[1].toDouble()
-                                Timber.d("Lat: $lat") //first part
-                                Timber.d("Long: $lon") //second part
-                                megaApi.setNodeCoordinates(node, lat, lon, null)
-                            } catch (e: Exception) {
-                                secondTry = true
-                                Timber.e(e, "Exception, second try to set GPS coordinates")
-                            }
-                            if (secondTry) {
-                                try {
-                                    val lat = location.substring(0, 7).toDouble()
-                                    val lon = location.substring(8, 17).toDouble()
-                                    Timber.d("Lat: $lat") //first part
-                                    Timber.d("Long: $lon") //second part
-                                    megaApi.setNodeCoordinates(node, lat, lon, null)
-                                } catch (e: Exception) {
-                                    Timber.e(
-                                        e,
-                                        "Exception again, no chance to set coordinates of video"
-                                    )
-                                }
-                            }
-                        } ?: run {
-                            Timber.d("No location info")
-                        }
-                    }
-                } else if (typeForName(localPath).isImage) {
-                    Timber.d("Is image!!!")
-                    val previewDir = PreviewUtils.getPreviewFolder(this@UploadService)
-                    val preview = File(
-                        previewDir,
-                        MegaApiAndroid.handleToBase64(nodeHandle) + ".jpg"
-                    )
-                    val thumbDir = ThumbnailUtils.getThumbFolder(this@UploadService)
-                    val thumb = File(
-                        thumbDir,
-                        MegaApiAndroid.handleToBase64(nodeHandle) + ".jpg"
-                    )
-                    megaApi.createThumbnail(localPath, thumb.absolutePath)
-                    megaApi.createPreview(localPath, preview.absolutePath)
-                    megaApi.getNodeByHandle(nodeHandle)?.let { node ->
-                        try {
-                            ExifInterface(localPath).latLong?.let { latLong ->
-                                megaApi.setNodeCoordinates(
-                                    node,
-                                    latLong[0],
-                                    latLong[1],
-                                    null
-                                )
-                            }
-                        } catch (e: Exception) {
-                            Timber.w(e, "Couldn't read exif info: transfer.path")
-                        }
-                    }
-                } else if (typeForName(localPath).isPdf) {
-                    Timber.d("Is pdf!!!")
-                    try {
-                        ThumbnailUtils.createThumbnailPdf(
-                            this@UploadService,
-                            localPath,
-                            megaApi,
-                            transfer.nodeHandle
-                        )
-                    } catch (e: Exception) {
-                        Timber.w(e, "Pdf thumbnail could not be created")
-                    }
-                    val pageNumber = 0
-                    var out: FileOutputStream? = null
-                    try {
-                        val pdfiumCore =
-                            PdfiumCore(this@UploadService)
-                        val pdfNode = megaApi.getNodeByHandle(transfer.nodeHandle)
-                            ?: run {
-                                Timber.e("pdf is NULL")
-                                return
-                            }
-                        val previewDir = PreviewUtils.getPreviewFolder(this@UploadService)
-                        val preview = File(
-                            previewDir,
-                            MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
-                        )
-                        val file = File(localPath)
-                        val pdfDocument = pdfiumCore.newDocument(
-                            ParcelFileDescriptor.open(
-                                file,
-                                ParcelFileDescriptor.MODE_READ_ONLY
-                            )
-                        )
-                        pdfiumCore.openPage(pdfDocument, pageNumber)
-                        val width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber)
-                        val height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber)
-                        val bmp =
-                            Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                        pdfiumCore.renderPageBitmap(
-                            pdfDocument,
-                            bmp,
-                            pageNumber,
-                            0,
-                            0,
-                            width,
-                            height
-                        )
-                        val resizedBitmap =
-                            PreviewUtils.resizeBitmapUpload(bmp, width, height)
-                        out = FileOutputStream(preview)
-                        val result = resizedBitmap.compress(
-                            Bitmap.CompressFormat.JPEG,
-                            100,
-                            out
-                        ) // bmp is your Bitmap instance
-                        if (result) {
-                            Timber.d("Compress OK!")
-                            megaApi.setPreview(pdfNode, preview.absolutePath)
-                        } else {
-                            Timber.w("Not Compress")
-                        }
-                        pdfiumCore.closeDocument(pdfDocument)
-                    } catch (e: Exception) {
-                        Timber.w(e, "Pdf preview could not be created")
-                    } finally {
-                        try {
-                            out?.close()
-                        } catch (_: Exception) {
-                        }
-                    }
-                } else {
-                    Timber.d("NOT video, image or pdf!")
+                lifecycleScope.launch {
+                    runCatching { setNodeAttributesAfterUploadUseCase(nodeHandle, File(localPath)) }
+                        .onFailure { error -> Timber.e("Set Node Attributes error: $error") }
                 }
             } else {
                 Timber.e(

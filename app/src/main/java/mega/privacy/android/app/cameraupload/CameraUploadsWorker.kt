@@ -131,8 +131,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GeneratePreviewUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GenerateThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
@@ -220,8 +220,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val isChargingUseCase: IsChargingUseCase,
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
-    private val generateThumbnailUseCase: GenerateThumbnailUseCase,
-    private val generatePreviewUseCase: GeneratePreviewUseCase,
+    private val createImageOrVideoThumbnailUseCase: CreateImageOrVideoThumbnailUseCase,
+    private val createImageOrVideoPreviewUseCase: CreateImageOrVideoPreviewUseCase,
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase,
     private val deletePreviewUseCase: DeletePreviewUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -1223,10 +1223,10 @@ class CameraUploadsWorker @AssistedInject constructor(
                     }
                     File(record.localPath).takeIf { it.exists() }?.let {
                         if (deleteThumbnailUseCase(nonNullNode.id.longValue)) {
-                            generateThumbnailUseCase(nonNullNode.id.longValue, it)
+                            createImageOrVideoThumbnailUseCase(nonNullNode.id.longValue, it)
                         }
                         if (deletePreviewUseCase(nonNullNode.id.longValue)) {
-                            generatePreviewUseCase(nonNullNode.id.longValue, it)
+                            createImageOrVideoPreviewUseCase(nonNullNode.id.longValue, it)
                         }
                     }
                 }

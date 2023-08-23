@@ -85,8 +85,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GeneratePreviewUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GenerateThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
@@ -189,8 +189,8 @@ class CameraUploadsWorkerTest {
     private val isChargingUseCase: IsChargingUseCase = mock()
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase = mock()
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase = mock()
-    private val generatePreviewUseCase: GeneratePreviewUseCase = mock()
-    private val generateThumbnailUseCase: GenerateThumbnailUseCase = mock()
+    private val createImageOrVideoPreviewUseCase: CreateImageOrVideoPreviewUseCase = mock()
+    private val createImageOrVideoThumbnailUseCase: CreateImageOrVideoThumbnailUseCase = mock()
     private val deletePreviewUseCase: DeletePreviewUseCase = mock()
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
@@ -299,8 +299,8 @@ class CameraUploadsWorkerTest {
             isChargingUseCase = isChargingUseCase,
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
             broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
-            generatePreviewUseCase = generatePreviewUseCase,
-            generateThumbnailUseCase = generateThumbnailUseCase,
+            createImageOrVideoPreviewUseCase = createImageOrVideoPreviewUseCase,
+            createImageOrVideoThumbnailUseCase = createImageOrVideoThumbnailUseCase,
             deletePreviewUseCase = deletePreviewUseCase,
             deleteThumbnailUseCase = deleteThumbnailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,

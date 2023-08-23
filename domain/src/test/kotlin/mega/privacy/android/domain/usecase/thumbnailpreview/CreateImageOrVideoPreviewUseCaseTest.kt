@@ -11,19 +11,19 @@ import org.mockito.kotlin.verify
 import java.io.File
 
 /**
- * Test class for [GeneratePreviewUseCase]
+ * Test class for [CreateImageOrVideoPreviewUseCase]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GeneratePreviewUseCaseTest {
+class CreateImageOrVideoPreviewUseCaseTest {
 
-    private lateinit var underTest: GeneratePreviewUseCase
+    private lateinit var underTest: CreateImageOrVideoPreviewUseCase
 
     private val thumbnailPreviewRepository = mock<ThumbnailPreviewRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = GeneratePreviewUseCase(
+        underTest = CreateImageOrVideoPreviewUseCase(
             thumbnailPreviewRepository = thumbnailPreviewRepository,
         )
     }
