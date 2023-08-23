@@ -271,7 +271,7 @@ class SlideshowFragment : Fragment() {
         isPlaying: Boolean,
         onPlayIconClick: () -> Unit,
         onImageTap: ((Offset) -> Unit),
-        HandleEffectComposable: @Composable () -> Unit,
+        handleEffectComposable: @Composable () -> Unit,
     ) {
         Scaffold(
             scaffoldState = scaffoldState,
@@ -293,10 +293,10 @@ class SlideshowFragment : Fragment() {
                                 slideshowViewModel.downloadFullSizeImage(
                                     slideshowItem = slideshowItem
                                 ).collectLatest { imageResult ->
-                                    value = imageResult.getHighestResolutionAvailableUri()
+                                    value = imageResult.previewUri ?: imageResult.thumbnailUri
                                 }
                             }.onFailure { exception ->
-                                Timber.d(exception)
+                                Timber.d("Failed to load image: $exception")
                             }
                         }
 
@@ -316,7 +316,7 @@ class SlideshowFragment : Fragment() {
                         )
                     }
 
-                    HandleEffectComposable()
+                    handleEffectComposable()
                 }
 
                 if (!isPlaying) {

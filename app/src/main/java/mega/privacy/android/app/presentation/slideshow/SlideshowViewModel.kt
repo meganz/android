@@ -68,7 +68,11 @@ class SlideshowViewModel @Inject constructor(
     fun setData(
         items: List<ImageItem>,
     ) {
-        playSlideshow(imageItems = items)
+        playSlideshow(imageItems = items.filter {
+            it.nodeItem?.node?.let { node ->
+                node.hasPreview() && node.hasThumbnail()
+            } ?: false
+        })
     }
 
     private fun playSlideshow(imageItems: List<ImageItem>) {
