@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.slideshow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.presentation.slideshow.model.SlideshowItem
 import mega.privacy.android.app.presentation.slideshow.model.SlideshowViewState
@@ -17,6 +19,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetPhotosByIdsUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
@@ -30,6 +34,8 @@ import mega.privacy.android.domain.usecase.slideshow.GetPhotoByAlbumImportNodeUs
 import mega.privacy.android.domain.usecase.slideshow.GetPhotoByPublicLinkUseCase
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.io.path.Path
+import kotlin.io.path.exists
 
 /**
  * ViewModel for slideshow
@@ -48,6 +54,7 @@ class SlideshowViewModel @Inject constructor(
     private val getPhotoByPublicLinkUseCase: GetPhotoByPublicLinkUseCase,
     private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase,
     private val getPhotoByAlbumImportNodeUseCase: GetPhotoByAlbumImportNodeUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     /**
@@ -68,17 +75,13 @@ class SlideshowViewModel @Inject constructor(
     fun setData(
         items: List<ImageItem>,
     ) {
-        playSlideshow(imageItems = items.filter {
-            it.nodeItem?.node?.let { node ->
-                node.hasPreview() && node.hasThumbnail()
-            } ?: false
-        })
+        playSlideshow(imageItems = items)
     }
 
     private fun playSlideshow(imageItems: List<ImageItem>) {
         if (_state.value.slideshowItems.isNotEmpty())
             return
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             val slideshowItems = when (imageItems.first()) {
                 is ImageItem.ChatNode -> {
                     imageItems.mapNotNull {
@@ -113,12 +116,19 @@ class SlideshowViewModel @Inject constructor(
                 }
             }
             val order = _state.value.order ?: SlideshowOrder.Shuffle
-            val sortedItems = sortItems(slideshowItems, order)
+            val filteredSlideshowItems = slideshowItems.filter {
+                with(it.photo) {
+                    Path(previewFilePath ?: "").exists() || Path(thumbnailFilePath ?: "").exists()
+                }
+            }
+
+            val sortedItems = sortItems(filteredSlideshowItems, order)
             _state.update {
                 it.copy(
                     slideshowItems = sortedItems,
                     isPlaying = true
                 )
+
             }
         }
     }
