@@ -53,7 +53,7 @@ internal class PasscodeDialogTest {
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val passcodeUnlockViewModel: PasscodeUnlockViewModel = mock()
-    private val biometricAuthIsAvailable = mock<() -> Boolean>()
+    private val biometricAuthIsAvailable = mock<(Context) -> Boolean>()
 
     private val showBiometricAuth =
         mock<(onSuccess: () -> Unit, onError: () -> Unit, onFail: () -> Unit, context: Context) -> Unit>()
@@ -247,7 +247,7 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that biometric auth is launched if available and enabled`() {
         biometricAuthIsAvailable.stub {
-            on { invoke() }.thenReturn(true)
+            on { invoke(any()) }.thenReturn(true)
         }
 
         displayDialogWithState(
@@ -265,7 +265,7 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that biometric error falls back to passcode`() {
         biometricAuthIsAvailable.stub {
-            on { invoke() }.thenReturn(true)
+            on { invoke(any()) }.thenReturn(true)
         }
 
         displayDialogWithState(
@@ -310,7 +310,7 @@ internal class PasscodeDialogTest {
     @Test
     fun `test that biometric dialog event is emitted when biometric dialog is displayed`() {
         biometricAuthIsAvailable.stub {
-            on { invoke() }.thenReturn(true)
+            on { invoke(any()) }.thenReturn(true)
         }
 
         displayDialogWithState(
@@ -417,7 +417,7 @@ internal class PasscodeDialogTest {
             PasscodeDialog(
                 passcodeUnlockViewModel = passcodeUnlockViewModel,
                 biometricAuthIsAvailable = biometricAuthIsAvailable,
-                showBiometricAuth = showBiometricAuth
+                showBiometricAuth = showBiometricAuth,
             )
         }
     }

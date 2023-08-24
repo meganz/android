@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.passcode.view
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.AuthenticationCallback
 import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
@@ -69,7 +70,7 @@ import mega.privacy.mobile.analytics.event.PasscodeUnlockDialogEvent
 @Composable
 internal fun PasscodeDialog(
     passcodeUnlockViewModel: PasscodeUnlockViewModel = viewModel(),
-    biometricAuthIsAvailable: () -> Boolean,
+    biometricAuthIsAvailable: (Context) -> Boolean = ::areBiometricsEnabled,
     showBiometricAuth: (
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -79,12 +80,12 @@ internal fun PasscodeDialog(
 ) {
     val uiState by passcodeUnlockViewModel.state.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     var showBiometricPrompt: Boolean by rememberSaveable {
-        mutableStateOf(biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable())
+        mutableStateOf(biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable(context))
     }
 
     if (showBiometricPrompt) {
-        val context = LocalContext.current
         LaunchedEffect(key1 = Unit) {
             Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
             showBiometricAuth(
@@ -297,6 +298,10 @@ private fun FailedAttemptsView(
             .padding(horizontal = 16.dp, vertical = 8.dp)
     )
 }
+
+private fun areBiometricsEnabled(context: Context) = BiometricManager.from(context).canAuthenticate(
+    BiometricManager.Authenticators.BIOMETRIC_STRONG
+) == BiometricManager.BIOMETRIC_SUCCESS
 
 internal const val PASSCODE_FIELD_TAG = "passcode_dialog:passcode_field"
 internal const val PASSWORD_FIELD_TAG = "passcode_dialog:password_text_field"
