@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.AlbumSelected
 import mega.privacy.mobile.analytics.event.AlbumSelectedEvent
@@ -137,7 +138,11 @@ fun PhotosScreen(
                 albumsViewState = albumsViewState,
                 openAlbum = {
                     Analytics.tracker.trackEvent(
-                        AlbumSelectedEvent(selectionType = AlbumSelected.SelectionType.Single)
+                        AlbumSelectedEvent(
+                            selectionType = AlbumSelected.SelectionType.Single,
+                            imageCount = getSelectedAlbumImageCount(it),
+                            videoCount = getSelectedAlbumVideoCount(it),
+                        )
                     )
                     onNavigateAlbumContent(it)
                 },
@@ -153,12 +158,20 @@ fun PhotosScreen(
                 onAlbumSelection = { album ->
                     if (album.id in albumsViewState.selectedAlbumIds) {
                         Analytics.tracker.trackEvent(
-                            AlbumSelectedEvent(selectionType = AlbumSelected.SelectionType.MultiRemove)
+                            AlbumSelectedEvent(
+                                selectionType = AlbumSelected.SelectionType.MultiRemove,
+                                imageCount = null,
+                                videoCount = null,
+                            )
                         )
                         albumsViewModel.unselectAlbum(album)
                     } else {
                         Analytics.tracker.trackEvent(
-                            AlbumSelectedEvent(selectionType = AlbumSelected.SelectionType.MultiAdd)
+                            AlbumSelectedEvent(
+                                selectionType = AlbumSelected.SelectionType.MultiAdd,
+                                imageCount = null,
+                                videoCount = null,
+                            )
                         )
                         albumsViewModel.selectAlbum(album)
                     }
@@ -201,4 +214,15 @@ fun PhotosScreen(
         },
         onDeny = { timelineViewModel.setBusinessAccountPromptState(shouldShow = false) },
     )
+}
+
+private fun getSelectedAlbumImageCount(album: UIAlbum): Int? = if (album.id !is Album.UserAlbum) {
+    null
+} else {
+    album.photos.filterIsInstance<Photo.Image>().size
+}
+private fun getSelectedAlbumVideoCount(album: UIAlbum): Int? = if (album.id !is Album.UserAlbum) {
+    null
+} else {
+    album.photos.filterIsInstance<Photo.Video>().size
 }
