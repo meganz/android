@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
@@ -23,6 +24,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
@@ -35,6 +37,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -48,6 +51,9 @@ class MediaDiscoveryFragment : Fragment() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
     internal lateinit var managerActivity: ManagerActivity
     private var menu: Menu? = null
 
@@ -94,6 +100,9 @@ class MediaDiscoveryFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
+                val isNewMediaDiscoveryFabEnabled by produceState(initialValue = false) {
+                    value = getFeatureFlagUseCase(AppFeatures.NewMediaDiscoveryFab)
+                }
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     MediaDiscoveryView(
                         mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
@@ -107,15 +116,28 @@ class MediaDiscoveryFragment : Fragment() {
                         onPhotoLongPressed = this@MediaDiscoveryFragment::onLongPress,
                         onCardClick = mediaDiscoveryViewModel::onCardClick,
                         onTimeBarTabSelected = mediaDiscoveryViewModel::onTimeBarTabSelected,
-                        onSwitchListView = {
-                            lifecycleScope.launch {
-                                mediaDiscoveryViewModel.setListViewTypeClicked()
-                                (activity as ManagerActivity).switchToCDFromMD()
-                            }
-                        }
+                        onSwitchListView = this@MediaDiscoveryFragment::onSwitchListView,
+                        onCapture = this@MediaDiscoveryFragment::onCapture,
+                        onUploadFiles = this@MediaDiscoveryFragment::onUploadFiles,
+                        isNewMediaDiscoveryFabEnabled = isNewMediaDiscoveryFabEnabled
                     )
                 }
             }
+        }
+    }
+
+    private fun onUploadFiles() {
+        //TODO
+    }
+
+    private fun onCapture() {
+        //TODO
+    }
+
+    private fun onSwitchListView() {
+        lifecycleScope.launch {
+            mediaDiscoveryViewModel.setListViewTypeClicked()
+            (activity as ManagerActivity).switchToCDFromMD()
         }
     }
 

@@ -1,29 +1,50 @@
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
+
 package mega.privacy.android.app.presentation.photos.mediadiscovery.view
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +59,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
@@ -53,6 +76,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
+import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.photos.Photo
 
@@ -70,9 +94,22 @@ fun MediaDiscoveryView(
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     onSwitchListView: () -> Unit,
+    onUploadFiles: () -> Unit,
+    onCapture: () -> Unit,
+    isNewMediaDiscoveryFabEnabled: Boolean,
 ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
     val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
+        skipHalfExpanded = true,
+    )
+
+    BackHandler(enabled = modalSheetState.isVisible) {
+        coroutineScope.launch { modalSheetState.hide() }
+    }
 
     if (mediaDiscoveryViewState.shouldBack)
         Back()
@@ -127,13 +164,87 @@ fun MediaDiscoveryView(
                 onCardClick = onCardClick,
                 onTimeBarTabSelected = onTimeBarTabSelected,
                 onSwitchListView = onSwitchListView,
+                addFabButton = {
+                    if (isNewMediaDiscoveryFabEnabled) {
+                        AddFabButton(
+                            onFabClick = {
+                                coroutineScope.launch {
+                                    modalSheetState.show()
+                                }
+                            }
+                        )
+                    }
+                }
             )
         } else {
-            EmptyView(mediaDiscoveryViewState.currentMediaType)
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (isNewMediaDiscoveryFabEnabled) {
+                    AddFabButton(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        onFabClick = {
+                            coroutineScope.launch {
+                                modalSheetState.show()
+                            }
+                        }
+                    )
+                }
+                EmptyView(mediaDiscoveryViewState.currentMediaType)
+            }
         }
     } else {
         PhotosSkeletonView()
     }
+
+    MDBottomSheet(
+        coroutineScope = coroutineScope,
+        modalSheetState = modalSheetState,
+        onUploadFiles = onUploadFiles,
+        onCapture = onCapture,
+    )
+}
+
+@Composable
+fun MDBottomSheet(
+    modalSheetState: ModalBottomSheetState,
+    coroutineScope: CoroutineScope,
+    onUploadFiles: () -> Unit,
+    onCapture: () -> Unit,
+) {
+    ModalBottomSheetLayout(
+        sheetState = modalSheetState,
+        scrimColor = black.copy(alpha = 0.32f),
+        sheetContent = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp, start = 18.dp, end = 18.dp)
+                    .wrapContentHeight()
+            ) {
+                MenuItem(
+                    modifier = Modifier,
+                    res = R.drawable.ic_upload_file,
+                    text = R.string.upload_files,
+                    description = "UploadFiles",
+                    onClick = {
+                        onUploadFiles()
+                        coroutineScope.launch { modalSheetState.hide() }
+                    }
+                )
+                MenuItem(
+                    modifier = Modifier,
+                    res = R.drawable.ic_camera_uploads,
+                    text = R.string.menu_take_picture,
+                    description = "Capture",
+                    onClick = {
+                        onCapture()
+                        coroutineScope.launch { modalSheetState.hide() }
+                    }
+                )
+            }
+        }
+    ) {}
 }
 
 @Composable
@@ -262,18 +373,21 @@ private fun MDView(
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
     onSwitchListView: () -> Unit,
+    addFabButton: @Composable () -> Unit,
 ) {
-    val lazyGridState: LazyGridState =
-        rememberSaveable(
+    val lazyGridState = rememberSaveable(
+        mediaDiscoveryViewState.scrollStartIndex,
+        mediaDiscoveryViewState.scrollStartOffset,
+        saver = LazyGridState.Saver,
+    ) {
+        LazyGridState(
             mediaDiscoveryViewState.scrollStartIndex,
             mediaDiscoveryViewState.scrollStartOffset,
-            saver = LazyGridState.Saver,
-        ) {
-            LazyGridState(
-                mediaDiscoveryViewState.scrollStartIndex,
-                mediaDiscoveryViewState.scrollStartOffset,
-            )
-        }
+        )
+    }
+    val scrollNotInProgress by remember {
+        derivedStateOf { !lazyGridState.isScrollInProgress }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -338,11 +452,49 @@ private fun MDView(
             }
         }
         if (mediaDiscoveryViewState.selectedPhotoIds.isEmpty()) {
-            TimeSwitchBar(
-                selectedTimeBarTab = mediaDiscoveryViewState.selectedTimeBarTab,
-                onTimeBarTabSelected = onTimeBarTabSelected
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End
+            ) {
+                AnimatedVisibility(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    visible = scrollNotInProgress,
+                    exit = scaleOut(),
+                    enter = scaleIn()
+                ) {
+                    addFabButton()
+                }
+                TimeSwitchBar(
+                    selectedTimeBarTab = mediaDiscoveryViewState.selectedTimeBarTab,
+                    onTimeBarTabSelected = onTimeBarTabSelected
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun AddFabButton(
+    modifier: Modifier = Modifier,
+    onFabClick: () -> Unit,
+) {
+    FloatingActionButton(
+        onClick = onFabClick,
+        modifier = modifier
+            .size(56.dp)
+    ) {
+        Icon(
+            painter = painterResource(
+                id = R.drawable.ic_fab_add
+            ),
+            contentDescription = "Add",
+            tint = if (!MaterialTheme.colors.isLight) {
+                Color.Black
+            } else {
+                Color.White
+            }
+        )
     }
 }
 
@@ -450,6 +602,38 @@ fun OKButton(
         Text(
             text = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
             fontSize = 16.sp
+        )
+    }
+}
+
+@Composable
+private fun MenuItem(
+    modifier: Modifier,
+    @DrawableRes res: Int,
+    @StringRes text: Int,
+    description: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .clickable(onClick = onClick)
+    ) {
+        Icon(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .align(Alignment.CenterVertically),
+            painter = painterResource(id = res),
+            contentDescription = description,
+            tint = MaterialTheme.colors.textColorSecondary
+        )
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 36.dp, vertical = 2.dp)
+                .align(Alignment.CenterVertically),
+            text = stringResource(id = text),
+            style = MaterialTheme.typography.subtitle1
         )
     }
 }

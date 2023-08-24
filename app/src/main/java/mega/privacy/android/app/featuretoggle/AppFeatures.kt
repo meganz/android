@@ -15,6 +15,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables new media discovery fab
+     */
+    NewMediaDiscoveryFab(
+        "Enables new media discovery fab",
+        false,
+    ),
+
+    /**
      * Enables prefetch timeline photos as soon initialization screen completed
      */
     PrefetchTimeline(
