@@ -1092,24 +1092,23 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
                 //Show the owner of the shared folder
-                boolean isContactVerifiedByMega = false;
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for (int j = 0; j < sharesIncoming.size(); j++) {
                     MegaShare mS = sharesIncoming.get(j);
                     if (mS.getNodeHandle() == node.getHandle()) {
                         MegaUser user = megaApi.getContact(mS.getUser());
-                        isContactVerifiedByMega = megaApi.areCredentialsVerified(user);
+                        boolean isContactVerifiedByMega = megaApi.areCredentialsVerified(user);
                         if (user != null) {
                             holder.textViewFileSize.setText(getMegaUserNameDB(user));
                         } else {
                             holder.textViewFileSize.setText(mS.getUser());
                         }
+                        if (isContactVerificationOn && isContactVerifiedByMega) {
+                            holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_verified, 0);
+                        } else {
+                            holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                        }
                     }
-                }
-                if (isContactVerificationOn && isContactVerifiedByMega) {
-                    holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_verified, 0);
-                } else {
-                    holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 }
                 if (((ManagerActivity) context).getDeepBrowserTreeIncoming() == 0) {
                     int accessLevel = megaApi.getAccess(node);
