@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.passcode
 
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import javax.inject.Inject
 
@@ -19,4 +20,5 @@ class MonitorPasscodeLockStateUseCase @Inject constructor(
      * @return flow of locked state
      */
     operator fun invoke() = passcodeRepository.monitorLockState()
+        .map { it ?: false }
 }
