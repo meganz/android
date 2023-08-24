@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.slideshow.SlideshowViewModel
@@ -70,6 +71,7 @@ class SlideshowViewModelTest {
         getPhotoByPublicLinkUseCase = getPhotoByPublicLinkUseCase,
         getImageByAlbumImportNodeUseCase = getImageByAlbumImportNodeUseCase,
         getPhotoByAlbumImportNodeUseCase = getPhotoByAlbumImportNodeUseCase,
+        ioDispatcher = UnconfinedTestDispatcher(),
     )
 
     @Test
