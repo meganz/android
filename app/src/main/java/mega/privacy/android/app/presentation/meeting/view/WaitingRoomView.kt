@@ -101,10 +101,12 @@ internal fun WaitingRoomView(
 
             IconButton(
                 onClick = { showLeaveDialog = true },
-                modifier = Modifier.constrainAs(closeButton) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                }
+                modifier = Modifier
+                    .testTag("waiting_room:button_close")
+                    .constrainAs(closeButton) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }
             ) {
                 Icon(
                     modifier = Modifier.size(24.dp),
@@ -116,10 +118,12 @@ internal fun WaitingRoomView(
 
             IconButton(
                 onClick = onInfoClicked,
-                modifier = Modifier.constrainAs(infoButton) {
-                    top.linkTo(parent.top)
-                    end.linkTo(parent.end)
-                }
+                modifier = Modifier
+                    .testTag("waiting_room:button_info")
+                    .constrainAs(infoButton) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
             ) {
                 Icon(
                     modifier = Modifier.size(24.dp),
@@ -137,7 +141,7 @@ internal fun WaitingRoomView(
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .testTag("waiting_room:title")
+                    .testTag("waiting_room:text_title")
                     .constrainAs(titleText) {
                         top.linkTo(parent.top, 60.dp)
                         linkTo(parent.start, parent.end)
@@ -158,7 +162,7 @@ internal fun WaitingRoomView(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .testTag("waiting_room:timestamp")
+                    .testTag("waiting_room:text_timestamp")
                     .constrainAs(timestampText) {
                         top.linkTo(titleText.bottom, 2.dp)
                         linkTo(parent.start, parent.end)
@@ -177,10 +181,12 @@ internal fun WaitingRoomView(
                     backgroundColor = MaterialTheme.colors.onSurface,
                     contentColor = MaterialTheme.colors.surface,
                 ),
-                modifier = Modifier.constrainAs(alertText) {
-                    top.linkTo(timestampText.bottom, 24.dp)
-                    linkTo(parent.start, parent.end)
-                }
+                modifier = Modifier
+                    .testTag("waiting_room:text_alert")
+                    .constrainAs(alertText) {
+                        top.linkTo(timestampText.bottom, 24.dp)
+                        linkTo(parent.start, parent.end)
+                    }
             ) {
                 Text(
                     text = stringResource(
@@ -208,24 +214,26 @@ internal fun WaitingRoomView(
                     CameraPreview(
                         modifier = Modifier
                             .fillMaxSize()
-                            .testTag("waiting_room:camera_preview")
+                            .testTag("waiting_room:preview_camera")
                     )
                 } else {
                     ChatAvatarView(
                         modifier = Modifier
                             .size(88.dp)
                             .align(Alignment.Center)
-                            .testTag("waiting_room:avatar_image"),
+                            .testTag("waiting_room:image_avatar"),
                         avatars = state.avatar?.let(::listOf)
                     )
                 }
             }
 
             ToggleMegaButton(
-                modifier = Modifier.constrainAs(micButton) {
-                    top.linkTo(videoPreview.bottom, margin = 70.dp)
-                    linkTo(videoPreview.start, cameraButton.start)
-                },
+                modifier = Modifier
+                    .testTag("waiting_room:button_mic")
+                    .constrainAs(micButton) {
+                        top.linkTo(videoPreview.bottom, margin = 70.dp)
+                        linkTo(videoPreview.start, cameraButton.start)
+                    },
                 checked = state.micEnabled,
                 enabled = context.hasMicrophonePermissions(),
                 title = stringResource(R.string.general_mic),
@@ -235,10 +243,12 @@ internal fun WaitingRoomView(
             )
 
             ToggleMegaButton(
-                modifier = Modifier.constrainAs(cameraButton) {
-                    top.linkTo(videoPreview.bottom, margin = 70.dp)
-                    linkTo(micButton.end, speakerButton.start)
-                },
+                modifier = Modifier
+                    .testTag("waiting_room:button_camera")
+                    .constrainAs(cameraButton) {
+                        top.linkTo(videoPreview.bottom, margin = 70.dp)
+                        linkTo(micButton.end, speakerButton.start)
+                    },
                 checked = state.cameraEnabled,
                 enabled = context.hasCameraPermissions(),
                 title = stringResource(R.string.general_camera),
@@ -248,10 +258,12 @@ internal fun WaitingRoomView(
             )
 
             ToggleMegaButton(
-                modifier = Modifier.constrainAs(speakerButton) {
-                    top.linkTo(videoPreview.bottom, margin = 70.dp)
-                    linkTo(cameraButton.end, videoPreview.end)
-                },
+                modifier = Modifier
+                    .testTag("waiting_room:button_speaker")
+                    .constrainAs(speakerButton) {
+                        top.linkTo(videoPreview.bottom, margin = 70.dp)
+                        linkTo(cameraButton.end, videoPreview.end)
+                    },
                 checked = state.speakerEnabled,
                 title = stringResource(R.string.general_speaker),
                 enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_max,
@@ -269,6 +281,7 @@ internal fun WaitingRoomView(
 
         if (showLeaveDialog) {
             MegaAlertDialog(
+                modifier = Modifier.testTag("waiting_room:dialog_leave"),
                 text = stringResource(R.string.meetings_leave_meeting_confirmation_dialog_title),
                 confirmButtonText = stringResource(R.string.general_leave),
                 cancelButtonText = stringResource(R.string.meetings__waiting_room_leave_meeting_dialog_cancel_button),

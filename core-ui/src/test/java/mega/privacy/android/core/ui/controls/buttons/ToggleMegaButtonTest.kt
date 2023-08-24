@@ -1,8 +1,10 @@
 package mega.privacy.android.core.ui.controls.buttons
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -105,5 +107,24 @@ class ToggleMegaButtonTest {
             )
         }
         composeTestRule.onNodeWithTag("toggle_mega_button:toggle").assertIsEnabled()
+    }
+
+    @Test
+    fun `test that ToggleMegaButton title matches the text field`() {
+        val title = "Mic"
+
+        composeTestRule.setContent {
+            ToggleMegaButton(
+                modifier = Modifier,
+                checked = true,
+                enabled = true,
+                title = title,
+                enabledIcon = R.drawable.ic_universal_mic_on,
+                disabledIcon = R.drawable.ic_universal_mic_off,
+                onCheckedChange = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag("toggle_mega_button:text").assert(hasText(title))
     }
 }

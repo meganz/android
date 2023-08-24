@@ -5,11 +5,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
@@ -59,12 +57,6 @@ class WaitingRoomViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(WaitingRoomState())
     val state: StateFlow<WaitingRoomState> = _state
-
-    /**
-     * Monitor connectivity event
-     */
-    val monitorConnectivityEvent =
-        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     init {
         monitorCallUpdates()
