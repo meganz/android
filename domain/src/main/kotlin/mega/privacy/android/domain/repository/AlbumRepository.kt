@@ -36,10 +36,11 @@ interface AlbumRepository {
      * Get album element ids
      *
      * @param albumId the id of the album which elements we want to get
+     * @param refresh if the elements should be reused from cache
      *
      * @return a list of node id's
      */
-    suspend fun getAlbumElementIDs(albumId: AlbumId): List<AlbumPhotoId>
+    suspend fun getAlbumElementIDs(albumId: AlbumId, refresh: Boolean = false): List<AlbumPhotoId>
 
     /**
      * Create an album
@@ -251,6 +252,13 @@ interface AlbumRepository {
      * @return Link's validity
      */
     suspend fun isAlbumLinkValid(albumLink: AlbumLink): Boolean
+
+    /**
+     * Clear album cache
+     *
+     * @param albumId Album id to be cleared
+     */
+    fun clearAlbumCache(albumId: AlbumId)
 
     /**
      * Clear all albums cache

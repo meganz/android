@@ -49,5 +49,8 @@ class DefaultGetUserAlbum @Inject constructor(
     private fun monitorUserAlbumUpdate(albumId: AlbumId): Flow<Album.UserAlbum?> =
         albumRepository.monitorUserSetsUpdate()
             .mapNotNull { sets -> sets.find { it.id == albumId.id } }
-            .mapLatest { getUserAlbum(albumId) }
+            .mapLatest {
+                albumRepository.clearAlbumCache(albumId)
+                getUserAlbum(albumId)
+            }
 }

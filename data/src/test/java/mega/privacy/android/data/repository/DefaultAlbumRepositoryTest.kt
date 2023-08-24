@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -116,6 +117,7 @@ class DefaultAlbumRepositoryTest {
 
             underTest = createUnderTest(this)
             underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhotos)
+            advanceUntilIdle()
 
             underTest.observeAlbumPhotosAddingProgress(testAlbumId).test {
                 val progress = awaitItem()

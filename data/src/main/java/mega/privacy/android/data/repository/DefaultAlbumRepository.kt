@@ -189,8 +189,13 @@ internal class DefaultAlbumRepository @Inject constructor(
             },
     )
 
-    override suspend fun getAlbumElementIDs(albumId: AlbumId): List<AlbumPhotoId> =
-        albumElements[albumId] ?: withContext(ioDispatcher) {
+    override suspend fun getAlbumElementIDs(
+        albumId: AlbumId,
+        refresh: Boolean,
+    ): List<AlbumPhotoId> {
+        if (refresh) albumElements.remove(albumId)
+
+        return albumElements[albumId] ?: withContext(ioDispatcher) {
             val elementList = megaApiGateway.getSetElements(sid = albumId.id)
             (0 until elementList.size()).mapNotNull { index ->
                 val element = elementList[index]
@@ -201,6 +206,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                 else element.toAlbumPhotoId()
             }.also { albumElements[albumId] = it }
         }
+    }
 
     override fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<AlbumPhotoId>> = merge(
         megaApiGateway.globalUpdates
@@ -226,32 +232,35 @@ internal class DefaultAlbumRepository @Inject constructor(
         userSetsFlow.tryEmit(userSets)
     }
 
-    override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
-        withContext(ioDispatcher) {
-            val progressFlow = getAlbumPhotosAddingProgressFlow(albumID)
-            progressFlow.tryEmit(
-                AlbumPhotosAddingProgress(
-                    isProgressing = true,
-                    totalAddedPhotos = 0,
-                )
+    override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>) {
+        val progressFlow = getAlbumPhotosAddingProgressFlow(albumID)
+        progressFlow.tryEmit(
+            AlbumPhotosAddingProgress(
+                isProgressing = true,
+                totalAddedPhotos = 0,
             )
+        )
+        createAlbumItems(albumID, photoIDs)
+    }
 
-            val listener = CreateSetElementListenerInterface(
-                target = photoIDs.size,
-                onCompletion = { success, _ ->
-                    progressFlow.tryEmit(
-                        AlbumPhotosAddingProgress(
-                            isProgressing = false,
-                            totalAddedPhotos = success,
-                        )
+    private fun createAlbumItems(albumID: AlbumId, photoIDs: List<NodeId>) = appScope.launch {
+        val listener = CreateSetElementListenerInterface(
+            target = photoIDs.size,
+            onCompletion = { success, _ ->
+                val progressFlow = getAlbumPhotosAddingProgressFlow(albumID)
+                progressFlow.tryEmit(
+                    AlbumPhotosAddingProgress(
+                        isProgressing = false,
+                        totalAddedPhotos = success,
                     )
-                }
-            )
-
-            for (photoID in photoIDs) {
-                megaApiGateway.createSetElement(albumID.id, photoID.longValue, listener)
+                )
             }
+        )
+
+        for (photoID in photoIDs) {
+            megaApiGateway.createSetElement(albumID.id, photoID.longValue, listener)
         }
+    }
 
     override suspend fun removePhotosFromAlbum(albumID: AlbumId, photoIDs: List<AlbumPhotoId>) =
         withContext(ioDispatcher) {
@@ -691,6 +700,10 @@ internal class DefaultAlbumRepository @Inject constructor(
                 }
             }
         }
+
+    override fun clearAlbumCache(albumId: AlbumId) {
+        userSets.remove(albumId.id)
+    }
 
     override fun clearCache() {
         monitorNodeUpdatesJob?.cancel()

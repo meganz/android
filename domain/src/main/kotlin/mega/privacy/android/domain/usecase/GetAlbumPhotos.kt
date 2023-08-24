@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 /**
  * Get album photos use case.
  */
+@Deprecated(message = "In favor of mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase")
 fun interface GetAlbumPhotos {
     /**
      * Get album photos from album id.
