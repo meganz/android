@@ -56,6 +56,7 @@ import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -179,6 +180,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var getThumbnailUseCase: dagger.Lazy<GetThumbnailUseCase>
 
+    @Inject
+    lateinit var getPublicNodeThumbnailUseCase: dagger.Lazy<GetPublicNodeThumbnailUseCase>
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -266,7 +270,12 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                     add(GifDecoder.Factory())
                 }
                 add(SvgDecoder.Factory())
-                add(MegaThumbnailFetcher.Factory(getThumbnailUseCase = getThumbnailUseCase))
+                add(
+                    MegaThumbnailFetcher.Factory(
+                        getThumbnailUseCase = getThumbnailUseCase,
+                        getPublicNodeThumbnailUseCase = getPublicNodeThumbnailUseCase
+                    )
+                )
                 add(MegaThumbnailKeyer)
             }
             .build()
