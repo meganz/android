@@ -161,11 +161,14 @@ internal class TransferPageFragment : Fragment() {
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             val pauseOrResultResult = uiState.pauseOrResultResult
             if (pauseOrResultResult?.isSuccess == true) {
-                transfersManagementViewModel.checkTransfersState()
                 val isPause = pauseOrResultResult.getOrThrow()
-                playTransfersMenuIcon?.isVisible = isPause
-                pauseTransfersMenuIcon?.isVisible = !isPause
+                playTransfersMenuIcon?.isVisible =
+                    isPause && uiState.transfersTab == TransfersTab.PENDING_TAB
+                pauseTransfersMenuIcon?.isVisible =
+                    !isPause && uiState.transfersTab == TransfersTab.PENDING_TAB
                 transfersFragment?.refresh()
+                transfersManagementViewModel.checkTransfersState()
+                viewModel.markPauseOrResultResultConsumed()
             }
 
             if (uiState.cancelTransfersResult != null) {
