@@ -12,6 +12,12 @@ internal class CallTermCodeMapper @Inject constructor() {
         MegaChatCall.TERM_CODE_INVALID -> TermCodeType.Invalid
         MegaChatCall.TERM_CODE_HANGUP -> TermCodeType.Hangup
         MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS -> TermCodeType.TooManyParticipants
+        MegaChatCall.TERM_CODE_REJECT -> TermCodeType.Reject
+        MegaChatCall.TERM_CODE_ERROR -> TermCodeType.Error
+        MegaChatCall.TERM_CODE_NO_PARTICIPATE -> TermCodeType.NoParticipate
+        MegaChatCall.TERM_CODE_TOO_MANY_CLIENTS -> TermCodeType.TooManyClients
+        MegaChatCall.TERM_CODE_PROTOCOL_VERSION -> TermCodeType.ProtocolVersion
+        MegaChatCall.TERM_CODE_KICKED -> TermCodeType.Kicked
         else -> TermCodeType.Unknown
     }
 }

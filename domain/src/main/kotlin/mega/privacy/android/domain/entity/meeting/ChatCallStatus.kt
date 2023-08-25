@@ -20,6 +20,11 @@ enum class ChatCallStatus {
     Connecting,
 
     /**
+     * Call status Waiting room
+     */
+    WaitingRoom,
+
+    /**
      * Call status Joining
      */
     Joining,

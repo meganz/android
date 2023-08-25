@@ -50,6 +50,46 @@ enum class ChatCallChanges {
     OutgoingRingingStop,
 
     /**
+     * Change type Waiting room allow
+     */
+    WRAllow,
+
+    /**
+     * Change type Waiting room deny
+     */
+    WRDeny,
+
+    /**
+     * Change type Waiting room composition
+     */
+    WRComposition,
+
+    /**
+     * Change type Waiting room users entered
+     */
+    WRUsersEntered,
+
+    /**
+     * Change type Waiting room users leave
+     */
+    WRUsersLeave,
+
+    /**
+     * Change type Waiting room users allow
+     */
+    WRUsersAllow,
+
+    /**
+     * Change type Waiting room users deny
+     */
+    WRUsersDeny,
+
+    /**
+     * Change type Waiting room pushed from call
+     */
+    WRPushedFromCall,
+
+    /**
      * Unknown
      */
     Unknown

@@ -20,6 +20,36 @@ enum class TermCodeType {
     TooManyParticipants,
 
     /**
+     *  Term code reject
+     */
+    Reject,
+
+    /**
+     *  Term code Error
+     */
+    Error,
+
+    /**
+     *  Term code no participate
+     */
+    NoParticipate,
+
+    /**
+     *  Term code too many clients
+     */
+    TooManyClients,
+
+    /**
+     *  Term code protocol version
+     */
+    ProtocolVersion,
+
+    /**
+     *  Term code kicked
+     */
+    Kicked,
+
+    /**
      *  Term code Unknown
      */
     Unknown,

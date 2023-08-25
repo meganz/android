@@ -32,6 +32,7 @@ class ChatCallStatusMapperTest {
         Arguments.of(MegaChatCall.CALL_STATUS_INITIAL, ChatCallStatus.Initial),
         Arguments.of(MegaChatCall.CALL_STATUS_USER_NO_PRESENT, ChatCallStatus.UserNoPresent),
         Arguments.of(MegaChatCall.CALL_STATUS_CONNECTING, ChatCallStatus.Connecting),
+        Arguments.of(MegaChatCall.CALL_STATUS_WAITING_ROOM, ChatCallStatus.WaitingRoom),
         Arguments.of(MegaChatCall.CALL_STATUS_JOINING, ChatCallStatus.Joining),
         Arguments.of(MegaChatCall.CALL_STATUS_IN_PROGRESS, ChatCallStatus.InProgress),
         Arguments.of(

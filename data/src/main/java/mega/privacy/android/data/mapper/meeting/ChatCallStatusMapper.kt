@@ -21,6 +21,7 @@ internal class ChatCallStatusMapper @Inject constructor() {
         MegaChatCall.CALL_STATUS_INITIAL -> ChatCallStatus.Initial
         MegaChatCall.CALL_STATUS_USER_NO_PRESENT -> ChatCallStatus.UserNoPresent
         MegaChatCall.CALL_STATUS_CONNECTING -> ChatCallStatus.Connecting
+        MegaChatCall.CALL_STATUS_WAITING_ROOM -> ChatCallStatus.WaitingRoom
         MegaChatCall.CALL_STATUS_JOINING -> ChatCallStatus.Joining
         MegaChatCall.CALL_STATUS_IN_PROGRESS -> ChatCallStatus.InProgress
         MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION -> ChatCallStatus.TerminatingUserParticipation
