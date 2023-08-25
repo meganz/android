@@ -127,11 +127,11 @@ class MediaDiscoveryFragment : Fragment() {
     }
 
     private fun onUploadFiles() {
-        //TODO
+        (activity as ManagerActivity).uploadFiles()
     }
 
     private fun onCapture() {
-        //TODO
+        (activity as ManagerActivity).takePictureAndUpload()
     }
 
     private fun onSwitchListView() {
