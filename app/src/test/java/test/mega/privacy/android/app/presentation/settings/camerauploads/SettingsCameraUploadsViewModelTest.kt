@@ -527,7 +527,7 @@ class SettingsCameraUploadsViewModelTest {
 
         underTest.changePrimaryFolderPath(
             newPath = testPath,
-            isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+            isFolderInSDCard = isPrimaryFolderInSDCard,
         )
 
         verify(setPrimaryFolderPathUseCase).invoke(
@@ -550,7 +550,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.changePrimaryFolderPath(
                 testPath,
-                isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+                isFolderInSDCard = isPrimaryFolderInSDCard,
             )
             underTest.state.test {
                 assertThat(awaitItem().invalidFolderSelectedTextId).isEqualTo(R.string.error_invalid_folder_selected)

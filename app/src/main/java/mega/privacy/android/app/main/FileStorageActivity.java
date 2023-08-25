@@ -96,10 +96,10 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     public static final String EXTRA_DOCUMENT_HASHES = "document_hash";
     public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
     public static final String EXTRA_PATH = "filepath";
-    public static final String EXTRA_IS_PRIMARY_FOLDER_IN_SD_CARD = "is_primary_folder_in_sd_card";
+    public static final String EXTRA_IS_FOLDER_IN_SD_CARD = "is_folder_in_sd_card";
     public static final String EXTRA_PROMPT = "prompt";
 
-    private Boolean isPrimaryFolderInSDCard = false;
+    private Boolean isFolderInSDCard = false;
 
     // Pick modes
     public enum Mode {
@@ -483,7 +483,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     private void finishPickFolder() {
         Intent intent = new Intent();
         intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
-        intent.putExtra(EXTRA_IS_PRIMARY_FOLDER_IN_SD_CARD, isPrimaryFolderInSDCard);
+        intent.putExtra(EXTRA_IS_FOLDER_IN_SD_CARD, isFolderInSDCard);
         intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
         intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
         intent.putExtra(EXTRA_URL, url);
@@ -578,17 +578,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
                 Timber.d("Folder picked from system picker");
                 getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 isFolderInPrimaryStorage = setPathAndCheckIfIsPrimary(uri);
-                if (!isFolderInPrimaryStorage) {
-                    switch (pickFolderType) {
-                        case CU_FOLDER:
-                            isPrimaryFolderInSDCard = true;
-                            break;
-                        case MU_FOLDER:
-                            dbH.setMediaFolderExternalSdCard(true);
-                            dbH.setUriMediaExternalSdCard(uri.toString());
-                            break;
-                    }
-                }
+                isFolderInSDCard = !isFolderInPrimaryStorage;
                 finishPickFolder();
                 break;
 

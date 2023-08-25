@@ -7,7 +7,6 @@ import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
@@ -73,7 +72,6 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updat
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.displayNotificationPermissionRationale
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
@@ -483,16 +481,13 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         when (requestCode) {
             REQUEST_CAMERA_FOLDER -> {
                 val newPrimaryFolderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                val isPrimaryFolderInSDCard =
-                    intent.getBooleanExtra(
-                        FileStorageActivity.EXTRA_IS_PRIMARY_FOLDER_IN_SD_CARD,
-                        false,
-                    )
+                val isFolderInSDCard =
+                    intent.getBooleanExtra(FileStorageActivity.EXTRA_IS_FOLDER_IN_SD_CARD, false)
 
                 with(viewModel) {
                     changePrimaryFolderPath(
                         newPath = newPrimaryFolderPath,
-                        isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+                        isFolderInSDCard = isFolderInSDCard,
                     )
                     resetTimestampsAndCacheDirectory()
                     rescheduleCameraUpload()
@@ -530,6 +525,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER -> {
                 // Secondary Folder to Sync
                 val secondaryPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
+                val isFolderInSDCard =
+                    intent.getBooleanExtra(FileStorageActivity.EXTRA_IS_FOLDER_IN_SD_CARD, false)
                 if (!isNewSettingValid(
                         primaryPath = prefs.camSyncLocalPath,
                         secondaryPath = secondaryPath,
@@ -544,18 +541,18 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     ).show()
                     return
                 }
-                isExternalSDCardMU = SDCardUtils.isLocalFolderOnSDCard(
-                    context,
-                    secondaryPath
-                ) && !FileUtil.isBasedOnFileStorage()
-                dbH.mediaFolderExternalSdCard = isExternalSDCardMU
-                localSecondaryFolderPath =
-                    if (isExternalSDCardMU) SDCardUtils.getSDCardDirName(Uri.parse(dbH.uriMediaExternalSdCard)) else secondaryPath
-                dbH.setSecondaryFolderPath(localSecondaryFolderPath.orEmpty())
-                prefs.localPathSecondaryFolder = localSecondaryFolderPath.orEmpty()
-                localSecondaryFolder?.summary = localSecondaryFolderPath.orEmpty()
-                dbH.setSecSyncTimeStamp(0)
-                dbH.setSecVideoSyncTimeStamp(0)
+                with(isFolderInSDCard) {
+                    isExternalSDCardMU = this
+                    dbH.mediaFolderExternalSdCard = this
+                }
+                with(secondaryPath) {
+                    localSecondaryFolderPath = this
+                    dbH.setSecondaryFolderPath(this.orEmpty())
+                    dbH.uriMediaExternalSdCard = this.orEmpty()
+                    prefs.localPathSecondaryFolder = this.orEmpty()
+                    localSecondaryFolder?.summary = this.orEmpty()
+                }
+                viewModel.restoreSecondaryTimestampsAndSyncRecordProcess()
                 viewModel.rescheduleCameraUpload()
 
                 // Update Sync when the Secondary Local Folder has changed
@@ -1272,11 +1269,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 dbH.setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
             }
         } else if (isExternalSDCardMU) {
-            val uri = Uri.parse(dbH.uriMediaExternalSdCard)
-            val pickedDirName = SDCardUtils.getSDCardDirName(uri)
-            if (pickedDirName != null) {
-                localSecondaryFolderPath = pickedDirName
-            } else {
+            dbH.uriMediaExternalSdCard?.let {
+                localSecondaryFolderPath = it
+            } ?: run {
                 localSecondaryFolderPath = getString(R.string.settings_empty_folder)
                 dbH.setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
             }

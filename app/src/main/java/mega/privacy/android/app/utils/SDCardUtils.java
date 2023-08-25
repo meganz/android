@@ -6,9 +6,6 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 import android.content.Context;
-import android.net.Uri;
-
-import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -75,21 +72,6 @@ public class SDCardUtils {
             return localPath.startsWith(sdRoot);
         }
         return false;
-    }
-
-    /**
-     * Gets the name of a SD card folder from an Uri.
-     *
-     * @param treeUri the Uri to get the name of the folder
-     * @return The name of the SD card folder.
-     * @deprecated This function is no longer acceptable to retrieve the SD Card Directory Name. Use
-     * {@link mega.privacy.android.data.gateway.SDCardGateway#getDirectoryName(Uri, Continuation)}
-     * instead
-     */
-    @Deprecated
-    public static String getSDCardDirName(Uri treeUri) {
-        DocumentFile pickedDir = DocumentFile.fromTreeUri(MegaApplication.getInstance(), treeUri);
-        return pickedDir != null && pickedDir.canWrite() ? pickedDir.getName() : null;
     }
 
     /**

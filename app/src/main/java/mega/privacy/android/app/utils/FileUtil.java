@@ -808,16 +808,6 @@ public class FileUtil {
     }
 
     /**
-     * According device's Android version to see if get file path and write permission by FileStorageActivity.
-     *
-     * @return true if using FileStorageActivity to get file path and write permission on the path.
-     * false by SAF
-     */
-    public static boolean isBasedOnFileStorage() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
-    }
-
-    /**
      * The full path of a SD card URI has two parts:
      * 1. SD card root path, can get it from SDCardOperator. For example: /storage/2BA3-12F1.
      * 2. User selected specific folder path on the SD card, can get it from getDocumentPathFromTreeUri.
