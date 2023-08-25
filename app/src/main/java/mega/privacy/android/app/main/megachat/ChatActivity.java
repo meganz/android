@@ -9079,7 +9079,6 @@ public class ChatActivity extends PasscodeActivity
 
         if (!chatRoom.isArchived() && chatRoom.isActive() && callInProgressLayout != null &&
                 callInProgressLayout.getVisibility() != View.VISIBLE &&
-                viewModel.getState().getValue().getScheduledMeeting() != null &&
                 startOrJoinMeetingBanner.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setAlpha(1);
             callInProgressLayout.setVisibility(View.VISIBLE);
