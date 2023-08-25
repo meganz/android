@@ -1,9 +1,11 @@
 package mega.privacy.android.data.facade
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -277,7 +279,7 @@ internal class MegaApiFacade @Inject constructor(
         awaitClose {
             megaApi.removeTransferListener(listener)
         }
-    }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+    }.buffer(Channel.Factory.UNLIMITED).shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     override fun getFavourites(
         node: MegaNode?,

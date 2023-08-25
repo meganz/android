@@ -114,6 +114,12 @@ internal class TransferPageViewModel @Inject constructor(
     }
 
     /**
+     * Mark pause or result result consumed
+     */
+    fun markPauseOrResultResultConsumed() =
+        _state.update { state -> state.copy(pauseOrResultResult = null) }
+
+    /**
      * Mark delete failed or cancelled transfer result consumed
      */
     fun markDeleteFailedOrCancelledTransferResultConsumed() =
