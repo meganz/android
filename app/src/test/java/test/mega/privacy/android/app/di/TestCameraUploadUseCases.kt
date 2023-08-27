@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
@@ -206,4 +207,7 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideCookieEnabledCheckWrapper() = mock<CookieEnabledCheckWrapper>()
+
+    @Provides
+    fun provideCameraEnumeratorWrapper() = mock<CameraEnumeratorWrapper>()
 }

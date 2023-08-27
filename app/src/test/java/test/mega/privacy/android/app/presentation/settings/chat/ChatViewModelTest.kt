@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.meeting.gateway.CameraGateway
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.ChatViewModel
@@ -61,7 +61,7 @@ class ChatViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
-    private val cameraGateway: CameraGateway = mock()
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
     private val chatManagement: ChatManagement = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase = mock()
@@ -111,7 +111,7 @@ class ChatViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
             passcodeManagement = passcodeManagement,
-            cameraGateway = cameraGateway,
+            setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             deviceGateway = deviceGateway,
             chatManagement = chatManagement,
             rtcAudioManagerGateway = rtcAudioManagerGateway,

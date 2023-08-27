@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
-import mega.privacy.android.app.meeting.gateway.CameraGateway
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
@@ -81,7 +81,7 @@ class ContactInfoViewModelTest {
     private var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private var monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private var passcodeManagement: PasscodeManagement = mock()
-    private var cameraGateway: CameraGateway = mock()
+    private var setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
     private var chatManagement: ChatManagement = mock()
     private var monitorContactUpdates: MonitorContactUpdates = mock()
     private var getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
@@ -161,7 +161,7 @@ class ContactInfoViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             passcodeManagement = passcodeManagement,
-            cameraGateway = cameraGateway,
+            setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             chatManagement = chatManagement,
             monitorContactUpdates = monitorContactUpdates,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,

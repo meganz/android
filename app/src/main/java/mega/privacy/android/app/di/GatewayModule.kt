@@ -14,9 +14,7 @@ import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerServiceViewModel
-import mega.privacy.android.app.meeting.facade.CameraFacade
 import mega.privacy.android.app.meeting.facade.RTCAudioManagerFacade
-import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.AlbumStringResourceGateway
@@ -74,13 +72,6 @@ abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindRTCAudioManagerGateway(implementation: RTCAudioManagerFacade): RTCAudioManagerGateway
-
-    /**
-     * Provides [CameraGateway] implementation
-     */
-    @Binds
-    @Singleton
-    abstract fun bindCameraGateway(implementation: CameraFacade): CameraGateway
 
     @Binds
     @Singleton

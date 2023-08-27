@@ -19,9 +19,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
-import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -79,7 +79,7 @@ import javax.inject.Inject
  * @property monitorConnectivityUseCase                     [MonitorConnectivityUseCase]
  * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
  * @property monitorUpdatePushNotificationSettingsUseCase   [MonitorUpdatePushNotificationSettingsUseCase]
- * @property cameraGateway                                  [CameraGateway]
+ * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
  * @property deviceGateway                                  [DeviceGateway]
  * @property setWaitingRoomUseCase                          [SetWaitingRoomUseCase]
  * @property setWaitingRoomRemindersUseCase                 [SetWaitingRoomRemindersUseCase]
@@ -107,7 +107,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
-    private val cameraGateway: CameraGateway,
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val deviceGateway: DeviceGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
@@ -643,8 +643,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param chatCallId chat id
      */
     private fun openOrStartChatCall(chatCallId: Long) {
-        cameraGateway.setFrontCamera()
         viewModelScope.launch {
+            setChatVideoInDeviceUseCase()
             openOrStartCall(chatCallId, video = false, audio = true)?.let { call ->
                 Timber.d("Call started")
                 MegaApplication.isWaitingForCall = false

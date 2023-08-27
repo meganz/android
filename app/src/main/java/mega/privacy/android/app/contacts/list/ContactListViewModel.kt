@@ -25,8 +25,8 @@ import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
 import mega.privacy.android.app.domain.usecase.CreateShareKey
-import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.notifyObserver
@@ -49,7 +49,7 @@ import javax.inject.Inject
  * @property passcodeManagement         [PasscodeManagement]
  * @property startChatCall              [StartChatCall]
  * @property chatApiGateway             [MegaChatApiGateway]
- * @property cameraGateway              [CameraGateway]
+ * @property setChatVideoInDeviceUseCase [SetChatVideoInDeviceUseCase]
  * @property chatManagement             [ChatManagement]
  */
 @HiltViewModel
@@ -61,7 +61,7 @@ class ContactListViewModel @Inject constructor(
     private val startChatCall: StartChatCall,
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
-    private val cameraGateway: CameraGateway,
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
     private val createShareKey: CreateShareKey,
     @ApplicationContext private val context: Context,
@@ -235,10 +235,9 @@ class ContactListViewModel @Inject constructor(
 
         MegaApplication.isWaitingForCall = false
 
-        cameraGateway.setFrontCamera()
-
         viewModelScope.launch {
             runCatching {
+                setChatVideoInDeviceUseCase()
                 startChatCall(chatId, video, audio)
             }.onFailure { exception ->
                 Timber.e(exception)

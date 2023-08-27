@@ -456,4 +456,18 @@ internal class CallRepositoryImpl @Inject constructor(
 
     override suspend fun broadcastScheduledMeetingCanceled(messageResId: Int) =
         appEventGateway.broadcastScheduledMeetingCanceled(messageResId)
+
+    override suspend fun setChatVideoInDevice(device: String) = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.setChatVideoInDevice(device, callback)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(callback)
+            }
+        }
+    }
 }

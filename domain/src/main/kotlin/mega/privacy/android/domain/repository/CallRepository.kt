@@ -306,4 +306,11 @@ interface CallRepository {
      * @param messageResId [Int]
      */
     suspend fun broadcastScheduledMeetingCanceled(messageResId: Int)
+
+    /**
+     * Select the video device to be used in calls.
+     *
+     * @param device Identifier of device to be selected.
+     */
+    suspend fun setChatVideoInDevice(device: String): ChatRequest
 }

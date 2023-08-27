@@ -24,7 +24,7 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.meeting.gateway.CameraGateway
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.model.ChatState
@@ -32,9 +32,11 @@ import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.usecase.call.EndCallUseCase
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -70,13 +72,11 @@ import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.app.main.megachat.ChatActivity
-import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 
 /**
  * View Model for [ChatActivity]
@@ -85,7 +85,7 @@ import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChat
  * @property startChatCall                                  [StartChatCall]
  * @property answerChatCallUseCase                          [AnswerChatCallUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
- * @property cameraGateway                                  [CameraGateway]
+ * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
  * @property chatManagement                                 [ChatManagement]
  * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
  * @property startChatCallNoRingingUseCase                  [StartChatCallNoRingingUseCase]
@@ -114,7 +114,7 @@ class ChatViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val passcodeManagement: PasscodeManagement,
-    private val cameraGateway: CameraGateway,
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
@@ -255,7 +255,7 @@ class ChatViewModel @Inject constructor(
      */
     fun onCallTap(video: Boolean, shouldCallRing: Boolean) {
         MegaApplication.isWaitingForCall = false
-        cameraGateway.setFrontCamera()
+        viewModelScope.launch { setChatVideoInDeviceUseCase() }
 
         val isWaitingRoom = _state.value.isWaitingRoom
         val isHost = _state.value.isHost
@@ -655,12 +655,12 @@ class ChatViewModel @Inject constructor(
      * @param audio     True, audio on. False, audio off
      */
     private fun answerCall(chatId: Long, video: Boolean, audio: Boolean) {
-        cameraGateway.setFrontCamera()
         chatManagement.addJoiningCallChatId(chatId)
 
         viewModelScope.launch {
             Timber.d("Answer call")
             runCatching {
+                setChatVideoInDeviceUseCase()
                 answerChatCallUseCase(chatId = chatId, video = video, audio = audio)
             }.onSuccess { call ->
                 call?.apply {

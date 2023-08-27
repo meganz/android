@@ -20,21 +20,21 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
-import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
 import mega.privacy.android.app.usecase.call.EndCallUseCase
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
@@ -48,7 +48,7 @@ import javax.inject.Inject
  * @property getChatRoomUseCase                             [GetChatRoomUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property chatApiGateway                                 [MegaChatApiGateway]
- * @property cameraGateway                                  [CameraGateway]
+ * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
  * @property chatManagement                                 [ChatManagement]
  * @property endCallUseCase                                 [EndCallUseCase]
  * @property sendStatisticsMeetingsUseCase                  [SendStatisticsMeetingsUseCase]
@@ -65,7 +65,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
-    private val cameraGateway: CameraGateway,
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
@@ -189,10 +189,9 @@ class GroupChatInfoViewModel @Inject constructor(
 
         MegaApplication.isWaitingForCall = false
 
-        cameraGateway.setFrontCamera()
-
         viewModelScope.launch {
             runCatching {
+                setChatVideoInDeviceUseCase()
                 startChatCall(chatId, video, audio)
             }.onFailure { exception ->
                 Timber.e(exception)

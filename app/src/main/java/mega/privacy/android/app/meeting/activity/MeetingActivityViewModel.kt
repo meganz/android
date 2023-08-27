@@ -38,7 +38,6 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
-import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
@@ -47,6 +46,7 @@ import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetLocalAudioChangesUseCase
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
@@ -84,7 +84,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val getCallUseCase: GetCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
-    private val cameraGateway: CameraGateway,
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val checkChatLink: CheckChatLink,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val logoutUseCase: LogoutUseCase,
@@ -766,10 +766,10 @@ class MeetingActivityViewModel @Inject constructor(
             }
 
             chatManagement.addJoiningCallChatId(chatId)
-            cameraGateway.setFrontCamera()
 
             viewModelScope.launch {
                 runCatching {
+                    setChatVideoInDeviceUseCase()
                     answerChatCallUseCase(chatId = chatId, video = enableVideo, audio = enableAudio)
                 }.onSuccess { call ->
                     chatManagement.removeJoiningCallChatId(chatId)

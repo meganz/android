@@ -22,7 +22,6 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -33,6 +32,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -82,7 +82,7 @@ import javax.inject.Inject
  * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
  * @property monitorConnectivityUseCase         [MonitorConnectivityUseCase]
  * @property passcodeManagement                 [PasscodeManagement]
- * @property cameraGateway                      [CameraGateway]
+ * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
  * @property chatManagement                     [ChatManagement]
  * @property monitorContactUpdates              [MonitorContactUpdates]
  * @property requestLastGreen                   [RequestLastGreen]
@@ -101,7 +101,7 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val passcodeManagement: PasscodeManagement,
-    private val cameraGateway: CameraGateway,
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
@@ -333,8 +333,8 @@ class ContactInfoViewModel @Inject constructor(
         Timber.d("Start call")
         _state.update { it.copy(enableCallLayout = false, shouldInitiateCall = false) }
         MegaApplication.isWaitingForCall = false
-        cameraGateway.setFrontCamera()
         runCatching {
+            setChatVideoInDeviceUseCase()
             openOrStartCall(chatId = chatId, video = hasVideo, audio = hasAudio)
         }.onSuccess { call ->
             call?.let { chatCall ->

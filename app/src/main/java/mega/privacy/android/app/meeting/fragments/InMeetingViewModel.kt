@@ -39,7 +39,6 @@ import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
-import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
@@ -51,6 +50,7 @@ import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
@@ -96,7 +96,7 @@ import javax.inject.Inject
  * @property getParticipantsChangesUseCase  [GetParticipantsChangesUseCase]
  * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
  * @property setOpenInvite                  [SetOpenInvite]
- * @property cameraGateway                  [CameraGateway]
+ * @property setChatVideoInDeviceUseCase    [SetChatVideoInDeviceUseCase]
  * @property megaChatApiGateway             [MegaChatApiGateway]
  * @property passcodeManagement             [PasscodeManagement]
  * @property chatManagement                 [ChatManagement]
@@ -114,7 +114,7 @@ class InMeetingViewModel @Inject constructor(
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val setOpenInvite: SetOpenInvite,
-    private val cameraGateway: CameraGateway,
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
@@ -1150,10 +1150,10 @@ class InMeetingViewModel @Inject constructor(
 
                 Timber.d("Chat status is connected")
                 MegaApplication.isWaitingForCall = false
-                cameraGateway.setFrontCamera()
 
                 viewModelScope.launch {
                     runCatching {
+                        setChatVideoInDeviceUseCase()
                         startChatCall(currentChatId, enableVideo, enableAudio)
                     }.onFailure { exception ->
                         Timber.e(exception)

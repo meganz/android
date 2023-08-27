@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
+import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
@@ -44,6 +45,8 @@ import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.feature.sync.data.service.ApplicationLoggingInSetter
+import org.webrtc.Camera1Enumerator
+import org.webrtc.CameraEnumerator
 
 /**
  * Util wrapper module
@@ -239,6 +242,14 @@ abstract class UtilWrapperModule {
                 }
             }
 
-
+        /**
+         * Provides [CameraEnumeratorWrapper]
+         */
+        @Provides
+        fun provideCameraEnumeratorWrapper(): CameraEnumeratorWrapper =
+            object : CameraEnumeratorWrapper {
+                override fun invoke(): CameraEnumerator =
+                    Camera1Enumerator(true)
+            }
     }
 }
