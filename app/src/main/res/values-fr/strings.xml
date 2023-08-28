@@ -97,7 +97,7 @@
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">Mode imagettes</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="action_export_master_key">Sauvegarder la Clé de récupération</string>
+    <string name="action_export_master_key">Sauvegarder la clé de récupération</string>
     <!-- Menu item to let the user cancel subscriptions -->
     <string name="action_cancel_subscriptions">Annuler l’abonnement</string>
     <!-- success message when the subscription has been canceled correctly -->
@@ -738,17 +738,17 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Compte&#160;Pro&#160;Lite</string>
     <!--  -->
-    <string name="backup_title">Sauvegarder votre Clé de récupération</string>
+    <string name="backup_title">Sauvegarder votre clé de récupération</string>
     <!-- Subtitle of the screen to backup the master key -->
-    <string name="backup_subtitle">Votre mot de passe déverrouille votre Clé de récupération</string>
+    <string name="backup_subtitle">Votre mot de passe déverrouille votre clé de récupération</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">Vos données ne sont lisibles qu’à la suite d’une chaîne d’opérations de déchiffrement qui commence par votre clé principale de chiffrement (Clé de récupération), que nous stockons chiffrée avec votre mot de passe. Cela signifie que si vous perdez votre mot de passe, votre Clé de récupération ne pourra plus être déchiffrée et que vous ne pourrez plus déchiffrer vos données.</string>
+    <string name="backup_first_paragraph">Vos données ne sont lisibles qu’à la suite d’une chaîne d’opérations de déchiffrement qui commence par votre clé principale de chiffrement (clé de récupération), que nous stockons chiffrée avec votre mot de passe. Cela signifie que si vous perdez votre mot de passe, votre clé de récupération ne pourra plus être déchiffrée et que vous ne pourrez plus déchiffrer vos données.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="backup_second_paragraph">En exportant et en conservant la Clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
+    <string name="backup_second_paragraph">En exportant et en conservant la clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Un assaillant externe ne peut pas accéder à votre compte avec seulement votre clé. Une réinitialisation du mot de passe exige à la fois la clé et l’accès à votre compte de courriel.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copiez la Clé de récupération dans le presse-papiers ou enregistrez-la comme fichier texte.</string>
+    <string name="backup_action">Copiez la clé de récupération dans le presse-papiers ou enregistrez-la comme fichier texte.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Enregistrer</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -762,7 +762,7 @@
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Mot de passe oublié ?</string>
     <!-- Hint of the text when the user can write his master key -->
-    <string name="edit_text_insert_mk">Saisissez votre Clé de récupération ici</string>
+    <string name="edit_text_insert_mk">Saisissez votre clé de récupération ici</string>
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">Saisissez votre mot de passe ici</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
@@ -786,7 +786,7 @@
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Réinitialisation du mot de passe</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="text_dialog_insert_MK">Veuillez saisir votre Clé de récupération ci-dessous</string>
+    <string name="text_dialog_insert_MK">Veuillez saisir votre clé de récupération ci-dessous</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Votre mot de passe a été changé.</string>
     <!-- Title of the dialog to park an account -->
@@ -800,7 +800,7 @@
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Le lien de récupération est expiré. Veuillez réessayer.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">Votre Clé de récupération sera utilisée pour réinitialiser votre mot de passe. Veuillez saisir votre nouveau mot de passe.</string>
+    <string name="text_reset_pass_logged_in">Votre clé de récupération sera utilisée pour réinitialiser votre mot de passe. Veuillez saisir votre nouveau mot de passe.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">Surclasser le compte</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
@@ -826,7 +826,7 @@
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK">La clé que vous avez fournie ne correspond pas à ce compte. Veuillez vous assurez d’utiliser la bonne clé et réessayer.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">La Clé de récupération est invalide</string>
+    <string name="incorrect_MK_title">La clé de récupération est invalide</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Récupération des renseignements&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -1802,7 +1802,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Le mot de passe a été accepté</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Le mot de passe est erroné.\nSauvegardez votre Clé de récupération dès que possible.</string>
+    <string name="test_pwd_wrong">Le mot de passe est erroné.\nSauvegardez votre clé de récupération dès que possible.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copier vers le presse-papiers</string>
     <!-- Option that permits user logout -->
@@ -1824,9 +1824,9 @@
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Sécurité</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_title">Sauvegarder la Clé de récupération</string>
+    <string name="settings_recovery_key_title">Sauvegarder la clé de récupération</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_summary">En exportant et en conservant la Clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
+    <string name="settings_recovery_key_summary">En exportant et en conservant la clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
     <string name="login_connectivity_issues">Impossible d’atteindre MEGA. Veuillez vérifier votre connectivité ou réessayer ultérieurement.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
@@ -1934,7 +1934,7 @@
     <!-- Text button -->
     <string name="general_close">Fermer</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Exportez votre Clé de récupération pour terminer</string>
+    <string name="backup_rk_2fa_end">Exportez votre clé de récupération pour terminer</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Appli d’authentification à deux facteurs</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->

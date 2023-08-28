@@ -3092,7 +3092,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Tu privacidad</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Utilizamos cookies y tecnologías similares (“Cookies”) para ofrecerte nuestros servicios y mejorar tu experiencia al usarlos. Acepta el uso de Cookies o personalizalo en los ajustes. Encuentra más información al respecto en nuestra [A]Política de cookies[/A].</string>
+    <string name="dialog_cookie_alert_message">Utilizamos cookies y tecnologías similares (“Cookies”) para ofrecerte nuestros servicios y mejorar tu experiencia al usarlos. Acepta el uso de Cookies o personalízalo en los ajustes. Encuentra más información al respecto en nuestra [A]Política de cookies[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Ajustes de Cookies no guardados.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4654,7 +4654,7 @@
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">No se puede aprobar el contacto</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">No se puede aprobar %s porque no está en tu lista de contactos. Espera a que acepte tu invitación primero.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">No puedes aprobar %s porque no está en tu lista de contactos. Espera a que acepte tu invitación primero.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Empezar</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5292,7 +5292,7 @@
     <!-- Header content about secure sharing in approve credentials screen-->
     <string name="contact_approve_credentials_secure_share_description">Protegemos tus datos con cifrado de conocimiento cero para que toda la información que almacenes, compartas y recibas en MEGA esté segura. Para más seguridad, te pedimos que apruebes los contactos con los que compartes o recibes datos.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">To approve your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Para aprobar tu contacto, asegúrate de que las credenciales que ves arriba coincidan con las credenciales de su cuenta. Puedes pedirle que comparta sus credenciales contigo.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">Aceptar</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -5304,7 +5304,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Los participantes que han sido añadidos a las llamadas por usuarios que no son anfitriones no serán enviados a la sala de espera. [A]Más información[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Todavía no has aprobado algunos de los contactos con los que compartes información. Para más seguridad, te recomendamos que apruebes sus credenciales en Contactos. Toca los tres puntos junto al contacto que deseas aprobar y toca Información.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">Se ha eliminado %1$d participante</item>
@@ -5328,11 +5328,11 @@
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">No se ha podido añadir el elemento</string>
     <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Wait for host to start the meeting</string>
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Espera a que el anfitrión empiece la reunión</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wait for host to let you in</string>
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Espera a que el anfitrión te deje entrar</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t approved. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s está siendo compartida por un contacto que no has aprobado. Para más seguridad, te recomendamos que apruebes sus credenciales en Contactos. Toca los tres puntos junto al contacto que deseas aprobar y toca Información.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
-    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Don’t leave</string>
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">No abandonar</string>
 </resources>

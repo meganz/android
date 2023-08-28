@@ -681,7 +681,7 @@
     <!-- title of the screen that shows the ZIP files -->
     <string name="zip_browser_activity">ZIP-Browser</string>
     <!--  -->
-    <string name="free_account">Kostenlos</string>
+    <string name="free_account">Free</string>
     <!-- category in sort by action -->
     <string name="sortby_name">Name</string>
     <!-- sort files alphabetically ascending -->
@@ -956,7 +956,7 @@
     <!-- Title of the screen to select the sound of the notifications -->
     <string name="notification_sound_title">Benachrichtigungston</string>
     <!-- Button to clear the chat history -->
-    <string name="general_clear">Leeren</string>
+    <string name="general_clear">Löschen</string>
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Der Chatverlauf wurde gelöscht</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
@@ -2164,7 +2164,7 @@
     <!-- General label for files -->
     <string name="general_files">Dateien</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Auf Mobilgerät speichern</string>
+    <string name="general_save_to_device">Auf Gerät speichern</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Auf MEGA hochladen</string>
     <!-- Label choose destination -->
@@ -2873,7 +2873,7 @@
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
     <string name="subtitle_properties_chat_clear">Alle Nachrichten und Dateifreigaben in dieser Unterhaltung löschen. Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <!-- Title of the history retention option -->
-    <string name="title_properties_history_retention">Automatische Löschung des Chatverlaufs</string>
+    <string name="title_properties_history_retention">Nachrichtenlebensdauer</string>
     <!-- Subtitle of the history retention option when history retention is disabled -->
     <string name="subtitle_properties_history_retention">Automatische Löschung älterer Nachrichten.</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled -->
