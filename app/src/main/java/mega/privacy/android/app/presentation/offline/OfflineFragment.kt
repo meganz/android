@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.offline
 
+import mega.privacy.android.core.R as CoreUiR
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorInflater
@@ -39,7 +40,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -199,7 +199,6 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
     @SuppressLint("WrongConstant")
     override fun onResume() {
         super.onResume()
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.registerReceiver(
                 requireContext(), receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST),
@@ -211,7 +210,6 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
                 IntentFilter(REFRESH_OFFLINE_FILE_LIST)
             )
         }
-
         viewModel.loadOfflineNodes()
     }
 
