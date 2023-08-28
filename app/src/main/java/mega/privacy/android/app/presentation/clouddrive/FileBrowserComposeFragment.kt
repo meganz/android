@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -48,7 +47,6 @@ import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
@@ -99,7 +97,6 @@ class FileBrowserComposeFragment : Fragment() {
 
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
-    private val thumbnailViewModel: ThumbnailViewModel by viewModels()
 
     /**
      * onAttach
@@ -158,7 +155,6 @@ class FileBrowserComposeFragment : Fragment() {
                         ),
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
-                        thumbnailViewModel = thumbnailViewModel,
                         onLinkClicked = ::navigateToLink,
                         onDisputeTakeDownClicked = ::navigateToLink,
                         onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,

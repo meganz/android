@@ -11,7 +11,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -33,20 +33,44 @@ fun ThumbnailView(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
 ) {
-    imageFile?.let {
-        Image(
-            modifier = modifier
-                .aspectRatio(1f),
-            painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(it)
-                    .crossfade(true)
-                    .build(),
-                placeholder = painterResource(id = R.drawable.ic_image_thumbnail),
-                error = painterResource(id = R.drawable.ic_image_thumbnail),
-            ),
+    ThumbnailView(
+        contentDescription = contentDescription,
+        data = imageFile,
+        defaultImage = defaultImage,
+        modifier = modifier,
+        contentScale = contentScale,
+    )
+}
+
+/**
+ * Thumbnail view
+ *
+ * @param contentDescription content description
+ * @param data any data [File], [Uri], [Bitmap], [ThumbnailRequest]
+ * @param defaultImage default image
+ * @param modifier
+ * @param contentScale content scale
+ */
+@Composable
+fun ThumbnailView(
+    contentDescription: String?,
+    data: Any?,
+    @DrawableRes defaultImage: Int,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit,
+) {
+    data?.let {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(data)
+                .crossfade(true)
+                .build(),
             contentDescription = contentDescription,
+            placeholder = painterResource(id = R.drawable.ic_image_thumbnail),
+            error = painterResource(id = R.drawable.ic_image_thumbnail),
             contentScale = contentScale,
+            modifier = modifier
+                .aspectRatio(1f)
         )
     } ?: run {
         Image(

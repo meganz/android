@@ -9,10 +9,92 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.fetcher.ThumbnailRequest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import java.io.File
+
+/**
+This method will show [NodeUIItem] in Grid manner based on span and getting thumbnail using [ThumbnailRequest]
+ *
+ * @param nodeUIItems List of [NodeUIItem]
+ * @param onMenuClick three dots click
+ * @param onItemClicked on item click
+ * @param onLongClick on long item click
+ * @param onEnterMediaDiscoveryClick on enter media discovery click
+ * @param sortOrder the sort order of the list
+ * @param onSortOrderClick on sort order click
+ * @param onChangeViewTypeClick on change view type click
+ * @param showSortOrder whether to show change sort order button
+ * @param gridState the state of the grid
+ * @param showMediaDiscoveryButton whether to show media discovery button
+ * @param modifier
+ * @param spanCount the span count of the grid
+ * @param showChangeViewType whether to show change view type button
+ */
+@Composable
+fun <T : TypedNode> NodeGridView(
+    nodeUIItems: List<NodeUIItem<T>>,
+    onMenuClick: (NodeUIItem<T>) -> Unit,
+    onItemClicked: (NodeUIItem<T>) -> Unit,
+    onLongClick: (NodeUIItem<T>) -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit,
+    sortOrder: String,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClick: () -> Unit,
+    showSortOrder: Boolean,
+    gridState: LazyGridState,
+    showMediaDiscoveryButton: Boolean,
+    modifier: Modifier = Modifier,
+    spanCount: Int = 2,
+    showChangeViewType: Boolean = true,
+) {
+    LazyVerticalGrid(
+        state = gridState,
+        columns = GridCells.Fixed(spanCount),
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        if (showSortOrder || showChangeViewType) {
+            item(
+                key = "header",
+                span = {
+                    GridItemSpan(currentLineSpan = spanCount)
+                }
+            ) {
+                HeaderViewItem(
+                    modifier = modifier,
+                    onSortOrderClick = onSortOrderClick,
+                    onChangeViewTypeClick = onChangeViewTypeClick,
+                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                    sortOrder = sortOrder,
+                    isListView = false,
+                    showSortOrder = showSortOrder,
+                    showChangeViewType = showChangeViewType,
+                    showMediaDiscoveryButton = showMediaDiscoveryButton,
+                )
+            }
+        }
+        items(count = nodeUIItems.size,
+            key = {
+                if (nodeUIItems[it].isInvisible) {
+                    it
+                } else {
+                    nodeUIItems[it].node.id.longValue
+                }
+            }) {
+            NodeGridViewItem(
+                modifier = modifier,
+                nodeUIItem = nodeUIItems[it],
+                onMenuClick = onMenuClick,
+                onItemClicked = onItemClicked,
+                onLongClick = onLongClick,
+                thumbnailData = ThumbnailRequest(nodeUIItems[it].node.id),
+            )
+        }
+    }
+}
 
 /**
  * This method will show [NodeUIItem] in Grid manner based on span
@@ -24,6 +106,7 @@ import java.io.File
  * @param spanCount
  * @param getThumbnail
  */
+@Deprecated("Use NodeGridView with ThumbnailRequest instead")
 @Composable
 fun <T : TypedNode> NodeGridView(
     nodeUIItems: List<NodeUIItem<T>>,

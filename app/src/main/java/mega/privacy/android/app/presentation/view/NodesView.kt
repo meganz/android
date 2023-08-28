@@ -16,6 +16,109 @@ import java.io.File
 
 
 /**
+ * NEW Nodes view to load thumbnails using [ThumbnailRequest]
+ *
+ * @param nodeUIItems List of [NodeUIItem]
+ * @param onMenuClick three dots click
+ * @param onItemClicked callback for item click
+ * @param onLongClick callback for long item click
+ * @param sortOrder the sort order of the list
+ * @param isListView whether the current view is list view
+ * @param onSortOrderClick callback for sort order click
+ * @param onChangeViewTypeClick callback for change view type click
+ * @param onLinkClicked callback for link click
+ * @param onDisputeTakeDownClicked callback for dispute take down click
+ * @param modifier
+ * @param listState the state of the list
+ * @param gridState the state of the grid
+ * @param spanCount the span count of the grid
+ * @param showSortOrder whether to show change sort order button
+ * @param showMediaDiscoveryButton whether to show media discovery button
+ * @param onEnterMediaDiscoveryClick callback for enter media discovery click
+ */
+@Composable
+fun <T : TypedNode> NodesView(
+    nodeUIItems: List<NodeUIItem<T>>,
+    onMenuClick: (NodeUIItem<T>) -> Unit,
+    onItemClicked: (NodeUIItem<T>) -> Unit,
+    onLongClick: (NodeUIItem<T>) -> Unit,
+    sortOrder: String,
+    isListView: Boolean,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClick: () -> Unit,
+    onLinkClicked: (String) -> Unit,
+    onDisputeTakeDownClicked: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    listState: LazyListState = LazyListState(),
+    gridState: LazyGridState = LazyGridState(),
+    spanCount: Int = 2,
+    showSortOrder: Boolean = true,
+    showMediaDiscoveryButton: Boolean = false,
+    onEnterMediaDiscoveryClick: () -> Unit = {},
+) {
+    val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
+    val orientation = LocalConfiguration.current.orientation
+    val span = if (orientation == Configuration.ORIENTATION_PORTRAIT) spanCount else 4
+    if (isListView) {
+        NodeListView(
+            modifier = modifier,
+            nodeUIItemList = nodeUIItems,
+            onMenuClick = onMenuClick,
+            onItemClicked = {
+                if (it.isTakenDown) {
+                    takenDownDialog.value = Pair(true, it.node is FolderNode)
+                } else {
+                    onItemClicked(it)
+                }
+            },
+            onLongClick = onLongClick,
+            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+            sortOrder = sortOrder,
+            onSortOrderClick = onSortOrderClick,
+            onChangeViewTypeClick = onChangeViewTypeClick,
+            showSortOrder = showSortOrder,
+            listState = listState,
+            showMediaDiscoveryButton = showMediaDiscoveryButton,
+        )
+    } else {
+        val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
+        NodeGridView(
+            modifier = modifier,
+            nodeUIItems = newList,
+            onMenuClick = onMenuClick,
+            onItemClicked = {
+                if (it.isTakenDown) {
+                    takenDownDialog.value = Pair(true, it.node is FolderNode)
+                } else {
+                    onItemClicked(it)
+                }
+            },
+            onLongClick = onLongClick,
+            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+            spanCount = span,
+            sortOrder = sortOrder,
+            onSortOrderClick = onSortOrderClick,
+            onChangeViewTypeClick = onChangeViewTypeClick,
+            showSortOrder = showSortOrder,
+            gridState = gridState,
+            showMediaDiscoveryButton = showMediaDiscoveryButton,
+        )
+    }
+    if (takenDownDialog.value.first) {
+        TakeDownDialog(
+            isFolder = takenDownDialog.value.second, onConfirm = {
+                takenDownDialog.value = Pair(false, false)
+            }, onDeny = {
+                takenDownDialog.value = Pair(false, false)
+                onDisputeTakeDownClicked.invoke(Constants.DISPUTE_URL)
+            }, onLinkClick = {
+                onLinkClicked(it)
+            }
+        )
+    }
+}
+
+/**
  * /**
  * List/Grid view for file/folder list
  * @param modifier [Modifier]
@@ -31,6 +134,7 @@ import java.io.File
  * @param onDisputeTakeDownClicked
 */
  */
+@Deprecated("Use NodesView with ThumbnailRequest instead")
 @Composable
 fun <T : TypedNode> NodesView(
     nodeUIItems: List<NodeUIItem<T>>,

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.fetcher.ThumbnailRequest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.app.presentation.view.extension.getIcon
@@ -46,6 +47,7 @@ import java.io.File
  * @param onChangeViewTypeClick
  * @param getThumbnail
  */
+@Deprecated("Use NodeListView with ThumbnailRequest instead")
 @Composable
 fun <T : TypedNode> NodeListView(
     nodeUIItemList: List<NodeUIItem<T>>,
@@ -119,6 +121,111 @@ fun <T : TypedNode> NodeListView(
                 isFavourite = nodeEntity.isFavourite,
                 isSharedWithPublicLink = nodeEntity.exportedData != null,
                 imageState = imageState,
+                onClick = { onItemClicked(nodeUIItemList[it]) },
+                onLongClick = { onLongClick(nodeUIItemList[it]) },
+                onMenuClick = { onMenuClick(nodeUIItemList[it]) },
+                labelColor = if (nodeEntity.label != MegaNode.NODE_LBL_UNKNOWN)
+                    colorResource(
+                        id = MegaNodeUtil.getNodeLabelColor(
+                            nodeEntity.label
+                        )
+                    ) else null,
+                nodeAvailableOffline = nodeUIItemList[it].isAvailableOffline
+            )
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                thickness = 1.dp
+            )
+        }
+    }
+}
+
+/**
+ * This method will show [NodeUIItem] in vertical list using [ThumbnailRequest] to load thumbnails
+ *
+ * @param nodeUIItemList list of [NodeUIItem] to show
+ * @param onMenuClick callback to handle menu click
+ * @param onItemClicked callback to handle item click
+ * @param onLongClick callback to handle long click
+ * @param onEnterMediaDiscoveryClick callback to handle media discovery click
+ * @param sortOrder the sort order of the list
+ * @param onSortOrderClick callback to handle sort order click
+ * @param onChangeViewTypeClick callback to handle change view type click
+ * @param showSortOrder whether to show change sort order button
+ * @param listState the state of the list
+ * @param showMediaDiscoveryButton whether to show media discovery button
+ * @param modifier
+ * @param showChangeViewType whether to show change view type button
+ */
+@Composable
+fun <T : TypedNode> NodeListView(
+    nodeUIItemList: List<NodeUIItem<T>>,
+    onMenuClick: (NodeUIItem<T>) -> Unit,
+    onItemClicked: (NodeUIItem<T>) -> Unit,
+    onLongClick: (NodeUIItem<T>) -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit,
+    sortOrder: String,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClick: () -> Unit,
+    showSortOrder: Boolean,
+    listState: LazyListState,
+    showMediaDiscoveryButton: Boolean,
+    modifier: Modifier = Modifier,
+    showChangeViewType: Boolean = true,
+) {
+    LazyColumn(state = listState, modifier = modifier) {
+        if (showSortOrder || showChangeViewType) {
+            item(
+                key = "header"
+            ) {
+                HeaderViewItem(
+                    modifier = modifier,
+                    onSortOrderClick = onSortOrderClick,
+                    onChangeViewTypeClick = onChangeViewTypeClick,
+                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                    sortOrder = sortOrder,
+                    isListView = true,
+                    showSortOrder = showSortOrder,
+                    showChangeViewType = showChangeViewType,
+                    showMediaDiscoveryButton = showMediaDiscoveryButton,
+                )
+            }
+        }
+        items(count = nodeUIItemList.size,
+            key = {
+                nodeUIItemList[it].node.id.longValue
+            }) {
+            val nodeEntity = nodeUIItemList[it].node
+            NodeListViewItem(
+                isSelected = nodeUIItemList[it].isSelected,
+                folderInfo = nodeEntity
+                    .let { node -> node as? FolderNode }
+                    ?.folderInfo(),
+                icon = nodeEntity
+                    .let { node -> node as? TypedFolderNode }
+                    ?.getIcon()
+                    ?: MimeTypeList.typeForName(nodeUIItemList[it].node.name).iconResourceId,
+                fileSize = nodeEntity
+                    .let { node -> node as? FileNode }
+                    ?.let { file -> formatFileSize(file.size, LocalContext.current) },
+                modifiedDate = nodeEntity
+                    .let { node -> node as? FileNode }
+                    ?.let { fileNode ->
+                        formatModifiedDate(
+                            java.util.Locale(
+                                Locale.current.language, Locale.current.region
+                            ),
+                            fileNode.modificationTime
+                        )
+                    },
+                name = nodeEntity.name,
+                showMenuButton = true,
+                isTakenDown = nodeEntity.isTakenDown,
+                isFavourite = nodeEntity.isFavourite,
+                isSharedWithPublicLink = nodeEntity.exportedData != null,
+                thumbnailData = ThumbnailRequest(nodeEntity.id),
                 onClick = { onItemClicked(nodeUIItemList[it]) },
                 onLongClick = { onLongClick(nodeUIItemList[it]) },
                 onMenuClick = { onMenuClick(nodeUIItemList[it]) },

@@ -52,7 +52,6 @@ import java.io.File
  * @param onMenuClick three dots click
  * @param imageState Thumbnail state to get Thumbnail
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun <T : TypedNode> NodeGridViewItem(
     modifier: Modifier,
@@ -61,6 +60,35 @@ internal fun <T : TypedNode> NodeGridViewItem(
     onItemClicked: (NodeUIItem<T>) -> Unit,
     onLongClick: (NodeUIItem<T>) -> Unit,
     imageState: State<File?>,
+) {
+    NodeGridViewItem(
+        modifier = modifier,
+        nodeUIItem = nodeUIItem,
+        onMenuClick = onMenuClick,
+        onItemClicked = onItemClicked,
+        onLongClick = onLongClick,
+        thumbnailData = imageState.value
+    )
+}
+
+/**
+ * Grid view item for file/folder info
+ * @param modifier [Modifier]
+ * @param nodeUIItem [NodeUIItem]
+ * @param onLongClick onLongItemClick
+ * @param onItemClicked itemClick
+ * @param onMenuClick three dots click
+ * @param thumbnailData Thumbnail data to get Thumbnail (File, Uri, ThumbnailRequest)
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+internal fun <T : TypedNode> NodeGridViewItem(
+    modifier: Modifier,
+    nodeUIItem: NodeUIItem<T>,
+    onMenuClick: (NodeUIItem<T>) -> Unit,
+    onItemClicked: (NodeUIItem<T>) -> Unit,
+    onLongClick: (NodeUIItem<T>) -> Unit,
+    thumbnailData: Any?,
 ) {
     if (nodeUIItem.node is FolderNode) {
         ConstraintLayout(
@@ -155,7 +183,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                         .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
                         .padding(1.dp),
                     contentDescription = "File",
-                    imageFile = imageState.value,
+                    data = thumbnailData,
                     defaultImage = MimeTypeList.typeForName(nodeUIItem.name).iconResourceId,
                     contentScale = ContentScale.Fit,
                 )

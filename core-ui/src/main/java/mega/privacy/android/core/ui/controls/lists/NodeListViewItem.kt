@@ -74,27 +74,101 @@ import java.io.File
  * @param onMenuClick three dots click
  * @param imageState Thumbnail state
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NodeListViewItem(
-    modifier: Modifier = Modifier,
     isSelected: Boolean,
     folderInfo: String?,
     @DrawableRes icon: Int,
-    applySecondaryColorIconTint: Boolean = false,
     fileSize: String?,
     modifiedDate: String?,
     name: String,
+    isTakenDown: Boolean,
+    showMenuButton: Boolean,
+    isFavourite: Boolean,
+    imageState: State<File?>,
+    onClick: () -> Unit,
+    isSharedWithPublicLink: Boolean,
+    modifier: Modifier = Modifier,
+    applySecondaryColorIconTint: Boolean = false,
     infoColor: Color? = null,
     @DrawableRes infoIcon: Int? = null,
     infoIconTint: Color? = null,
     labelColor: Color? = null,
+    onLongClick: (() -> Unit)? = null,
+    isEnabled: Boolean = true,
+    onMenuClick: () -> Unit = {},
+    nodeAvailableOffline: Boolean = false,
+) {
+    NodeListViewItem(
+        modifier = modifier,
+        isSelected = isSelected,
+        folderInfo = folderInfo,
+        icon = icon,
+        applySecondaryColorIconTint = applySecondaryColorIconTint,
+        fileSize = fileSize,
+        modifiedDate = modifiedDate,
+        name = name,
+        infoColor = infoColor,
+        infoIcon = infoIcon,
+        infoIconTint = infoIconTint,
+        labelColor = labelColor,
+        showMenuButton = showMenuButton,
+        isTakenDown = isTakenDown,
+        isFavourite = isFavourite,
+        isSharedWithPublicLink = isSharedWithPublicLink,
+        thumbnailData = imageState.value,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        isEnabled = isEnabled,
+        onMenuClick = onMenuClick,
+        nodeAvailableOffline = nodeAvailableOffline
+    )
+}
+
+/**
+ * A Composable UI that serves as a base Node List View UI in which all other Node UIs are
+ * derived from
+ *
+ * @param modifier [Modifier]
+ * @param isSelected true if the item is selected, and false if otherwise
+ * @param folderInfo folder info, if null the item is a File
+ * @param icon icon resource
+ * @param applySecondaryColorIconTint if true, applies the textColorSecondary color from
+ * [MaterialTheme.colors]. No tint is applied if false
+ * @param fileSize file size
+ * @param modifiedDate modified date
+ * @param name name
+ * @param infoColor The Info Text Color
+ * @param infoIcon The Info Icon
+ * @param infoIconTint The Info Icon Tint
+ * @param labelColor labelColor
+ * @param isTakenDown is taken down
+ * @param isFavourite is favourite
+ * @param isSharedWithPublicLink is shared with public link
+ * @param onLongClick onLongItemClick
+ * @param onMenuClick three dots click
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun NodeListViewItem(
+    isSelected: Boolean,
+    folderInfo: String?,
+    @DrawableRes icon: Int,
+    fileSize: String?,
+    modifiedDate: String?,
+    name: String,
     showMenuButton: Boolean,
     isTakenDown: Boolean,
     isFavourite: Boolean,
     isSharedWithPublicLink: Boolean,
-    imageState: State<File?>,
+    thumbnailData: Any?,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    applySecondaryColorIconTint: Boolean = false,
+    infoColor: Color? = null,
+    @DrawableRes infoIcon: Int? = null,
+    infoIconTint: Color? = null,
+    labelColor: Color? = null,
     onLongClick: (() -> Unit)? = null,
     isEnabled: Boolean = true,
     onMenuClick: () -> Unit = {},
@@ -148,11 +222,10 @@ fun NodeListViewItem(
                         } else null
                     )
                 } else {
-                    imageState.value
                     ThumbnailView(
                         modifier = thumbNailModifier
                             .testTag(FILE_TEST_TAG),
-                        imageFile = imageState.value,
+                        data = thumbnailData,
                         defaultImage = icon,
                         contentDescription = "Thumbnail"
                     )
