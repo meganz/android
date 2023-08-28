@@ -23,7 +23,6 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.entity.SortOrder
@@ -70,7 +69,6 @@ class FileBrowserViewModelTest {
     private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val getOptionsForToolbarMapper: GetOptionsForToolbarMapper = mock()
     private val handleOptionClickMapper: HandleOptionClickMapper = mock()
     private val monitorViewType: MonitorViewType = mock()
     private val setViewType: SetViewType = mock()
@@ -103,7 +101,6 @@ class FileBrowserViewModelTest {
             getCloudSortOrder = getCloudSortOrder,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
-            getOptionsForToolbarMapper = getOptionsForToolbarMapper,
             handleOptionClickMapper = handleOptionClickMapper,
             monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
             getBandWidthOverQuotaDelayUseCase = getBandWidthOverQuotaDelayUseCase,
@@ -422,13 +419,6 @@ class FileBrowserViewModelTest {
         underTest.clearAllNodes()
         Truth.assertThat(underTest.state.value.selectedNodeHandles).isEmpty()
     }
-
-    @Test
-    fun `test that when prepare options menu clicked it invokes getOptionsForToolbarMapper`() =
-        runTest {
-            underTest.prepareForGetOptionsForToolbar()
-            verify(getOptionsForToolbarMapper).invoke(emptyList(), 0)
-        }
 
     @Test
     fun `test that when onOptionItemClicked then it invokes handleOptionClickMapper`() = runTest {

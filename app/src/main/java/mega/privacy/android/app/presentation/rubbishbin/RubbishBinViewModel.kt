@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
+import mega.privacy.android.app.domain.usecase.GetRubbishBinFolderUseCase
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -47,7 +47,7 @@ import javax.inject.Inject
  * @param setViewType [SetViewType] to set view type
  * @param monitorViewType [MonitorViewType] check view type
  * @param getIntentToOpenFileMapper [GetIntentToOpenFileMapper]
- * @param getRubbishBinFolder [GetRubbishBinFolder]
+ * @param getRubbishBinFolderUseCase [GetRubbishBinFolderUseCase]
  */
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
@@ -59,7 +59,7 @@ class RubbishBinViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
-    private val getRubbishBinFolder: GetRubbishBinFolder,
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
     private val getNodeByHandle: GetNodeByHandle,
 ) : ViewModel() {
 
@@ -128,7 +128,7 @@ class RubbishBinViewModel @Inject constructor(
                     nodeList = nodeList,
                     sortOrder = getCloudSortOrder(),
                     isRubbishBinEmpty = INVALID_HANDLE == _state.value.rubbishBinHandle ||
-                            getRubbishBinFolder()?.handle == _state.value.rubbishBinHandle
+                            getRubbishBinFolderUseCase()?.handle == _state.value.rubbishBinHandle
                 )
             }
         }

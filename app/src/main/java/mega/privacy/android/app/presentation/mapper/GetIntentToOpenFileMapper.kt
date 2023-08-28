@@ -7,12 +7,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import androidx.core.content.FileProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
@@ -29,12 +31,14 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -62,6 +66,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
     private val httpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val getCloudSortOrder: GetCloudSortOrder,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
     /**
@@ -125,22 +130,33 @@ class GetIntentToOpenFileMapper @Inject constructor(
 
         } else if (MimeTypeList.typeForName(fileNode.name).isURL) {
             val intent = Intent(Intent.ACTION_VIEW)
-            val br = getLocalFileForNode(fileNode)?.let {
-                val urlFile = File(it.path)
-                BufferedReader(FileReader(urlFile))
-            } ?: run {
-                startHttpServer(intent, activity)
-                val path =
-                    getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
-                        ?: throw UrlDownloadException()
-                val connection = URL(path).openConnection() as HttpURLConnection
-                BufferedReader(InputStreamReader(connection.inputStream))
-            }
-            var line = br.readLine()
-            if (line != null) {
-                line = br.readLine()
-                val url = line.replace(Constants.URL_INDICATOR, "")
-                intent.data = Uri.parse(url)
+            try {
+                val br = getLocalFileForNode(fileNode)?.let {
+                    val urlFile = File(it.path)
+                    FileReader(urlFile).buffered()
+                } ?: run {
+                    startHttpServer(intent, activity)
+                    val path =
+                        getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
+                    withContext(ioDispatcher) {
+                        val nodeURL = URL(path)
+                        val connection = nodeURL.openConnection() as HttpURLConnection
+                        connection.inputStream.bufferedReader()
+                    }
+                }
+                var line = withContext(ioDispatcher) {
+                    br.readLine()
+                }
+                if (line != null) {
+                    line = withContext(ioDispatcher) {
+                        br.readLine()
+                    }
+                    val url = line.replace(Constants.URL_INDICATOR, "")
+                    intent.data = Uri.parse(url)
+                }
+            } catch (ex: Exception) {
+                Timber.e(ex)
+                throw UrlDownloadException()
             }
             intent
 

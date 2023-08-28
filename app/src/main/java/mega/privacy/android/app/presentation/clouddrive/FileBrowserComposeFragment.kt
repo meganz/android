@@ -50,6 +50,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -96,6 +97,12 @@ class FileBrowserComposeFragment : Fragment() {
      */
     @Inject
     lateinit var getIntentToOpenFileMapper: GetIntentToOpenFileMapper
+
+    /**
+     * Mapper to get options for Action Bar
+     */
+    @Inject
+    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
 
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
@@ -146,7 +153,7 @@ class FileBrowserComposeFragment : Fragment() {
                             fileBrowserViewModel.onLongItemClicked(it)
                             if (actionMode == null) {
                                 actionMode =
-                                    (requireActivity() as AppCompatActivity).startSupportActionMode(
+                                    (activity as? AppCompatActivity)?.startSupportActionMode(
                                         ActionBarCallBack()
                                     )
                             }
@@ -164,7 +171,7 @@ class FileBrowserComposeFragment : Fragment() {
                         onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
                         onUpgradeClicked = {
                             fileBrowserViewModel::onBannerDismissClicked
-                            (requireActivity() as? ManagerActivity)?.navigateToUpgradeAccount()
+                            (activity as? ManagerActivity)?.navigateToUpgradeAccount()
                         },
                         onEnterMediaDiscoveryClick = {
                             disableSelectMode()
@@ -215,7 +222,7 @@ class FileBrowserComposeFragment : Fragment() {
             openFile(fileNode = it)
             fileBrowserViewModel.onItemPerformedClicked()
         } ?: run {
-            (requireActivity() as ManagerActivity).setToolbarTitle()
+            (activity as? ManagerActivity)?.setToolbarTitle()
         }
     }
 
@@ -359,8 +366,13 @@ class FileBrowserComposeFragment : Fragment() {
                     ?: return false
             menu.findItem(R.id.cab_menu_share_link).title =
                 resources.getQuantityString(R.plurals.get_links, selected.size)
-            val control = fileBrowserViewModel.prepareForGetOptionsForToolbar()
-            CloudStorageOptionControlUtil.applyControl(menu, control)
+            lifecycleScope.launch {
+                val control = getOptionsForToolbarMapper(
+                    selectedNodeHandleList = fileBrowserViewModel.state.value.selectedNodeHandles,
+                    totalNodes = fileBrowserViewModel.state.value.nodesList.size
+                )
+                CloudStorageOptionControlUtil.applyControl(menu, control)
+            }
             return true
         }
 
@@ -372,7 +384,7 @@ class FileBrowserComposeFragment : Fragment() {
 
         override fun onDestroyActionMode(mode: ActionMode) {
             fileBrowserViewModel.clearAllNodes()
-            (requireActivity() as ManagerActivity).let {
+            (activity as? ManagerActivity)?.let {
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
                 actionMode = null
@@ -530,7 +542,7 @@ class FileBrowserComposeFragment : Fragment() {
                 }
             }.onFailure {
                 Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                (requireActivity() as? BaseActivity)?.showSnackbar(
+                (activity as? BaseActivity)?.showSnackbar(
                     type = Constants.SNACKBAR_TYPE,
                     content = getString(R.string.general_text_error),
                     chatId = -1,
