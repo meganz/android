@@ -4846,11 +4846,11 @@
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">อนุมัติข้อมูลประจำตัว</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_label">Waiting room</string>
+    <string name="meetings_schedule_meeting_waiting_room_label">ห้องนั่งรอ</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">Only users admitted by the host can join the meeting.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">Participants added by non-hosts during calls won’t be sent to the waiting room. [A]Learn more[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">ในระหว่างการโทร ผู้เข้าร่วมที่เพิ่มจากผู้ที่ไม่ใช่ผู้จัดการประชุมจะไม่ถูกจัดให้อยู่ในห้องนั่งรอ [A]เรียนรู้เพิ่มเติม[/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->

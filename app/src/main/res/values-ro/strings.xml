@@ -2168,7 +2168,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">Rotația cheii criptate este dezactivată pentru conversațiile cu mai mult de 100 de participanți.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">The chat could not be converted to private because the number of participants exceeds the limit for private chats.</string>
+    <string name="warning_make_chat_private">Chatul nu a putut fi convertit în privat, deoarece numărul de participanți depășește limita pentru chat-urile private.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B] a creat un link al chatului.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2822,7 +2822,7 @@
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Obține o cotă de transfer mai mare</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Fișierul nu poate fi găsit în unitatea ta cloud.</string>
+    <string name="warning_node_not_exists_in_cloud">Fișierul nu poate fi găsit în Unitatea ta cloud.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Spațiu de stocare plin</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -5070,7 +5070,7 @@
         <item quantity="other">Oricine are aceste link-uri vă poate vizualiza și descărca datele</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
-    <string name="general_save_to_cloud_drive">Salvează în unitatea cloud</string>
+    <string name="general_save_to_cloud_drive">Salvează în Unitatea cloud</string>
     <!-- Album import saving -->
     <string name="album_import_saving">Se salvează&#8230;</string>
     <!-- Album import success message -->

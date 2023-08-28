@@ -5434,10 +5434,10 @@
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Скачивание началось</item>
-        <item quantity="few">Начато %1$d скачивания</item>
-        <item quantity="many">Начато %1$d скачиваний</item>
-        <item quantity="other">Начато %1$d скачивания</item>
+        <item quantity="one">Скачивание запущено</item>
+        <item quantity="few">Запущено %1$d скачивания</item>
+        <item quantity="many">Запущено %1$d скачиваний</item>
+        <item quantity="other">Запущено %1$d скачивания</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
