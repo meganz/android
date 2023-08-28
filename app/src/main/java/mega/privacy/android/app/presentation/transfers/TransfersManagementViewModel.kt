@@ -105,12 +105,14 @@ class TransfersManagementViewModel @Inject constructor(
         unHideWidget: Boolean = false,
     ) {
         viewModelScope.launch {
+            _state.update {
+                it.copy(hideTransfersWidget = if (unHideWidget) false else it.hideTransfersWidget)
+            }
             val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackgroundUseCase()
             val numPendingUploads = getNumPendingUploadsUseCase()
             val areTransfersPaused = areAllTransfersPausedUseCase()
             _state.update {
                 it.copy(
-                    hideTransfersWidget = if (unHideWidget) false else it.hideTransfersWidget,
                     transfersInfo = transfersInfoMapper(
                         transferType = transfersSizeInfo.transferType,
                         numPendingDownloadsNonBackground = numPendingDownloadsNonBackground,
