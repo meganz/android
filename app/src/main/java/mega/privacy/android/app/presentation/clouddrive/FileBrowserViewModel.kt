@@ -57,7 +57,6 @@ import javax.inject.Inject
  * @param monitorViewType [MonitorViewType] check view type
  * @param setViewType [SetViewType] to set view type
  * @param handleOptionClickMapper [HandleOptionClickMapper] handle option click click mapper
- * @param getOptionsForToolbarMapper [GetIntentToOpenFileMapper] to get toolbar options mapper
  * @param monitorRefreshSessionUseCase [MonitorRefreshSessionUseCase]
  * @param getBandWidthOverQuotaDelayUseCase [GetBandWidthOverQuotaDelayUseCase]
  * @param transfersManagement [TransfersManagement]
@@ -76,7 +75,6 @@ class FileBrowserViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorViewType: MonitorViewType,
     private val setViewType: SetViewType,
-    private val getOptionsForToolbarMapper: GetOptionsForToolbarMapper,
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase,
@@ -547,17 +545,6 @@ class FileBrowserViewModel @Inject constructor(
                 ViewType.GRID -> setViewType(ViewType.LIST)
             }
         }
-    }
-
-    /**
-     * Prepares toolbar to show options for selected nodes
-     * @return [CloudStorageOptionControlUtil.Control]
-     */
-    fun prepareForGetOptionsForToolbar() = runBlocking {
-        getOptionsForToolbarMapper(
-            selectedNodeHandleList = state.value.selectedNodeHandles,
-            totalNodes = state.value.nodesList.size
-        )
     }
 
     /**

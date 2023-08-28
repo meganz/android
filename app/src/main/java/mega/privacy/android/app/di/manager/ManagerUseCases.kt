@@ -24,7 +24,6 @@ import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -76,10 +75,6 @@ abstract class ManagerUseCases {
         @Provides
         fun provideGetRootFolder(megaNodeRepository: MegaNodeRepository): GetRootFolder =
             GetRootFolder(megaNodeRepository::getRootNode)
-
-        @Provides
-        fun provideGetRubbishBinFolder(megaNodeRepository: MegaNodeRepository): GetRubbishBinFolder =
-            GetRubbishBinFolder(megaNodeRepository::getRubbishBinNode)
 
         @Provides
         fun provideHasInboxChildren(megaNodeRepository: MegaNodeRepository): HasInboxChildren =

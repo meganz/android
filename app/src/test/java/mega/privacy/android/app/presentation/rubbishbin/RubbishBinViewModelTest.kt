@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
+import mega.privacy.android.app.domain.usecase.GetRubbishBinFolderUseCase
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
@@ -22,7 +22,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -53,7 +52,7 @@ class RubbishBinViewModelTest {
     private val monitorViewType = mock<MonitorViewType>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val getIntentToOpenFileMapper = mock<GetIntentToOpenFileMapper>()
-    private val getRubbishBinFolder = mock<GetRubbishBinFolder>()
+    private val getRubbishBinFolderUseCase = mock<GetRubbishBinFolderUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
 
@@ -76,7 +75,7 @@ class RubbishBinViewModelTest {
             monitorViewType = monitorViewType,
             getCloudSortOrder = getCloudSortOrder,
             getIntentToOpenFileMapper = getIntentToOpenFileMapper,
-            getRubbishBinFolder = getRubbishBinFolder,
+            getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
             getNodeByHandle = getNodeByHandle
         )
     }

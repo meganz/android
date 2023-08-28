@@ -12,12 +12,12 @@ import javax.inject.Inject
  *
  *  @property nodeRepository [NodeRepository]
  *  @property getCloudSortOrder [GetCloudSortOrder]
- *  @property getRubbishBinFolder [GetRubbishBinFolder]
+ *  @property getRubbishBinFolderUseCase [GetRubbishBinFolderUseCase]
  */
 class DefaultGetRubbishBinChildren @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getRubbishBinFolder: GetRubbishBinFolder,
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
     private val addNodeType: AddNodeType,
 ) : GetRubbishBinChildren {
     /**
@@ -28,7 +28,7 @@ class DefaultGetRubbishBinChildren @Inject constructor(
      */
     override suspend operator fun invoke(parentHandle: Long): List<TypedNode> {
         val nodeID = if (parentHandle == nodeRepository.getInvalidHandle()) {
-            getRubbishBinFolder()?.let {
+            getRubbishBinFolderUseCase()?.let {
                 NodeId(longValue = it.handle)
             } ?: run {
                 return emptyList()

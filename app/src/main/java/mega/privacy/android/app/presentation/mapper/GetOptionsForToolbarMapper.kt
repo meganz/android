@@ -4,7 +4,7 @@ import android.view.MenuItem
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
+import mega.privacy.android.app.domain.usecase.GetRubbishBinFolderUseCase
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -24,7 +24,7 @@ class GetOptionsForToolbarMapper @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val checkAccessErrorExtended: CheckAccessErrorExtended,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
-    private val rubbishBinFolder: GetRubbishBinFolder,
+    private val rubbishBinFolder: GetRubbishBinFolderUseCase,
 ) {
 
     /**

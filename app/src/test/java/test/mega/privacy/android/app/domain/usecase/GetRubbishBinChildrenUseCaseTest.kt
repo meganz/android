@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
+import mega.privacy.android.app.domain.usecase.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -23,7 +23,7 @@ class GetRubbishBinChildrenUseCaseTest {
     private lateinit var underTest: DefaultGetRubbishBinChildren
     private val nodeRepository: NodeRepository = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val getRubbishBinFolder: GetRubbishBinFolder = mock()
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase = mock()
     private val addNodeType: AddNodeType = mock()
 
     @Before
@@ -31,7 +31,7 @@ class GetRubbishBinChildrenUseCaseTest {
         underTest = DefaultGetRubbishBinChildren(
             nodeRepository = nodeRepository,
             getCloudSortOrder = getCloudSortOrder,
-            getRubbishBinFolder = getRubbishBinFolder,
+            getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
             addNodeType = addNodeType
         )
     }
@@ -40,7 +40,7 @@ class GetRubbishBinChildrenUseCaseTest {
     fun `test that invoke with -1L invoke getRubbishBinNode`() = runTest {
         whenever(nodeRepository.getInvalidHandle()).thenReturn(-1L)
         underTest(-1L)
-        verify(getRubbishBinFolder).invoke()
+        verify(getRubbishBinFolderUseCase).invoke()
     }
 
     @Test
@@ -48,7 +48,7 @@ class GetRubbishBinChildrenUseCaseTest {
         val parentHandle = -1L
         whenever(nodeRepository.getInvalidHandle()).thenReturn(parentHandle)
         underTest(parentHandle)
-        whenever(getRubbishBinFolder()).thenReturn(null)
+        whenever(getRubbishBinFolderUseCase()).thenReturn(null)
         val list = underTest(-1L)
         Truth.assertThat(list).isEmpty()
     }
