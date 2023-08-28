@@ -68,6 +68,10 @@ android {
     }
 }
 
+tasks.withType<Test> {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+}
+
 dependencies {
     testImplementation(project(":core-ui-test"))
     lintChecks(project(":lint"))

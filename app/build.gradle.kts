@@ -282,6 +282,10 @@ project.extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
     }
 }
 
+tasks.withType<Test> {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+}
+
 dependencies {
     // Modules
     implementation(project(":core:formatter"))
