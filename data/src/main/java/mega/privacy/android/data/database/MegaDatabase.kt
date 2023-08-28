@@ -8,10 +8,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
+import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
 
 @Database(
@@ -19,12 +21,14 @@ import mega.privacy.android.data.database.entity.SyncRecordEntity
         ContactEntity::class,
         CompletedTransferEntity::class,
         ActiveTransferEntity::class,
-        SyncRecordEntity::class
+        SyncRecordEntity::class,
+        SdTransferEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
     autoMigrations = [
-        AutoMigration(69, 70)
+        AutoMigration(69, 70),
+        AutoMigration(72, 73),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -35,6 +39,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun activeTransfersDao(): ActiveTransferDao
 
     abstract fun syncRecordDao(): SyncRecordDao
+    abstract fun sdTransferDao(): SdTransferDao
 
     companion object {
         private val MIGRATION_67_68 = object : Migration(67, 68) {
