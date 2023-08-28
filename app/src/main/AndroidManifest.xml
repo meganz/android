@@ -666,11 +666,6 @@
         <activity
             android:name="mega.privacy.android.app.mediaplayer.SelectSubtitleFileActivity"
             android:launchMode="singleTop" />
-
-        <activity
-            android:name=".presentation.chat.dialog.AskForDisplayOverActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.Mega.FullScreen" />
         <activity
             android:name=".activities.settingsActivities.StartScreenPreferencesActivity"
             android:label="@string/start_screen_setting"

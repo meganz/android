@@ -9,7 +9,6 @@ import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -60,8 +59,7 @@ object MyAccountViewUtil {
                     usedStoragePercentage.toString()
                 )
 
-                setTextStyle(
-                    textAppearance =
+                setTextAppearance(
                     if (isStorageOverQuota) {
                         R.style.TextAppearance_Mega_Body2_Medium_Red600Red300
                     } else {
@@ -306,8 +304,8 @@ object MyAccountViewUtil {
                 else R.string.payment_required_label
             )
 
-            setTextStyle(
-                textAppearance = when {
+            setTextAppearance(
+                when {
                     expandedView && expired -> R.style.TextAppearance_Mega_Body2_Red400Red300
                     expandedView -> R.style.TextAppearance_Mega_Body2_Amber800Amber700
                     expired -> R.style.TextAppearance_Mega_Body2_Red400

@@ -22,7 +22,6 @@ import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.setRenewalDateF
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
-import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
@@ -81,8 +80,8 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
             R.drawable.background_usage_storage_transfer
         )
 
-        paymentAlertBinding.renewExpiryText.setTextStyle(
-            textAppearance = R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
+        paymentAlertBinding.renewExpiryText.setTextAppearance(
+            R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
         )
 
         binding.rubbishSeparator.isVisible = false
