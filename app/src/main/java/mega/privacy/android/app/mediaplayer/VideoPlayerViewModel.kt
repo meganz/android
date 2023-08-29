@@ -44,6 +44,7 @@ import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
+import mega.privacy.android.app.mediaplayer.model.VideoControllerPadding
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_NEXT
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PLAYING
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
@@ -276,6 +277,10 @@ class VideoPlayerViewModel @Inject constructor(
     internal val showPlaybackPositionDialogState: StateFlow<PlaybackPositionState> =
         _showPlaybackPositionDialogState
 
+    private val _playerControllerPaddingState = MutableStateFlow(VideoControllerPadding())
+    internal val playerControllerPaddingState: StateFlow<VideoControllerPadding> =
+        _playerControllerPaddingState
+
     internal var videoPlayType = VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
         private set
 
@@ -356,6 +361,11 @@ class VideoPlayerViewModel @Inject constructor(
         Timber.d("screenshotWhenVideoPlaying videoSize ${videoSize?.first} : ${videoSize?.second}")
         currentPlayingVideoSize = videoSize
     }
+
+    internal fun updatePlayerControllerPaddingState(left: Int, right: Int, bottom: Int) =
+        _playerControllerPaddingState.update {
+            it.copy(paddingLeft = left, paddingRight = right, paddingBottom = bottom)
+        }
 
     /**
      * Get video repeat mode

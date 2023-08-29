@@ -225,8 +225,8 @@ class VideoPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
                     this@VideoPlaylistFragment.isActionMode = isActionMode
                 }
 
-                viewLifecycleOwner.collectFlow(mediaPlaybackState) { paused ->
-                    adapter?.refreshPausedState(paused)
+                viewLifecycleOwner.collectFlow(mediaPlaybackState) { isPaused ->
+                    adapter?.refreshPausedState(isPaused)
                 }
             }
         }

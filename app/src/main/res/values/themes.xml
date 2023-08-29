@@ -148,7 +148,8 @@
     </style>
 
     <style name="Theme.Mega.FullScreen.VideoPlayer" parent="Theme.Mega.FullScreen">
-        <item name="android:windowIsTranslucent">false</item>
-        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 </resources>

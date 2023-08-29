@@ -768,7 +768,7 @@ public class Constants {
 
     public static final long AUDIO_PLAYER_TRACK_NAME_FADE_DURATION_MS = 200;
     public static final long AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS = 3000;
-    public static final long MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 400;
+    public static final long MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 300;
 
     public static final int MAX_BADGE_NUM = 9;
 

@@ -20,7 +20,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -139,9 +141,12 @@ class VideoPlayerFragment : Fragment() {
         super.onResume()
         setupPlayer()
 
-        if (!toolbarVisible) {
+        if (!toolbarVisible && !viewModel.isPlayingReverted()) {
             showToolbar()
             delayHideToolbar()
+        } else {
+            hideToolbar()
+            playerViewHolder?.hideController()
         }
         // According to the value of isPlayingReverted to confirm whether revert the video to play
         if (viewModel.isPlayingReverted()) {
@@ -169,6 +174,10 @@ class VideoPlayerFragment : Fragment() {
             with(viewModel) {
                 viewLifecycleOwner.collectFlow(metadataState) { metadata ->
                     playerViewHolder?.displayMetadata(metadata)
+                }
+
+                viewLifecycleOwner.collectFlow(playerControllerPaddingState) { (left, right, bottom) ->
+                    updatePlayerControllerPadding(left = left, right = right, bottom = bottom)
                 }
 
                 if (!playlistObserved) {
@@ -290,7 +299,7 @@ class VideoPlayerFragment : Fragment() {
                                     layout = binding.screenshotScaleAnimationLayout,
                                     bitmap = bitmap
                                 )
-                                videoPlayerActivity?.showSnackbarForVideoPlayer(
+                                videoPlayerActivity?.showSnackBarForVideoPlayer(
                                     getString(R.string.media_player_video_snackbar_screenshot_saved)
                                 )
                             }
@@ -591,7 +600,7 @@ class VideoPlayerFragment : Fragment() {
     }
 
     private fun showAddingSubtitleFailedMessage() {
-        (activity as? VideoPlayerActivity)?.showSnackbarForVideoPlayer(
+        (activity as? VideoPlayerActivity)?.showSnackBarForVideoPlayer(
             getString(R.string.media_player_video_message_adding_subtitle_failed)
         )
     }
@@ -604,6 +613,18 @@ class VideoPlayerFragment : Fragment() {
             Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
             Constants.INVALID_VALUE
         ) != Constants.OFFLINE_ADAPTER
+
+    /**
+     * Update the player controls view padding to adapt the system UI displayed.
+     *
+     * @param left padding left
+     * @param right padding right
+     * @param bottom padding bottom
+     */
+    private fun updatePlayerControllerPadding(left: Int, right: Int, bottom: Int) {
+        binding.root.findViewById<ConstraintLayout>(R.id.controls_view)
+            .updatePadding(left = left, top = 0, right = right, bottom = bottom)
+    }
 
     companion object {
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots"

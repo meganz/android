@@ -12,6 +12,7 @@
         android:background="@color/black"
         app:controller_layout_id="@layout/video_player_control"
         app:shutter_background_color="@color/black"
+        android:animateLayoutChanges="true"
         app:surface_type="surface_view" />
 
     <LinearLayout

@@ -34,7 +34,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -394,7 +393,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
 
             onSnackbarMessage().observe(this@VideoPlayerActivity) { message ->
-                showSnackbarForVideoPlayer(getString(message))
+                showSnackBarForVideoPlayer(getString(message))
             }
 
             onExceptionThrown().observe(this@VideoPlayerActivity, ::manageException)
@@ -860,7 +859,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     }
 
     private fun showNotAllowPlayAlert() {
-        showSnackbarForVideoPlayer(getString(R.string.not_allow_play_alert))
+        showSnackBarForVideoPlayer(getString(R.string.not_allow_play_alert))
     }
 
     override fun onResume() {
@@ -1227,39 +1226,33 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     }
 
     override fun hideToolbar(animate: Boolean) {
-        with(binding.toolbar) {
-            if (animate) {
-                animate()
-                    .translationY(-measuredHeight.toFloat())
-                    .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
-                    .start()
-            } else {
-                animate().cancel()
-                translationY = -measuredHeight.toFloat()
-            }
-        }
+        toolbarDisplayedAnimation(animate, -binding.toolbar.measuredHeight.toFloat())
         hideSystemUI()
     }
 
     override fun showToolbar(animate: Boolean) {
-        with(binding.toolbar) {
-            if (animate) {
-                animate()
-                    .translationY(TRANSLATION_Y_ZERO)
-                    .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
-                    .start()
-            } else {
-                animate().cancel()
-                translationY = TRANSLATION_Y_ZERO
-            }
-        }
+        toolbarDisplayedAnimation(animate, TRANSLATION_Y_ZERO)
         showSystemUI()
     }
 
+    private fun toolbarDisplayedAnimation(animate: Boolean, translationY: Float) {
+        binding.toolbar.let { toolbar ->
+            if (animate) {
+                toolbar.animate()
+                    .translationY(translationY)
+                    .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
+                    .start()
+            } else {
+                toolbar.animate().cancel()
+                toolbar.translationY = translationY
+            }
+        }
+    }
+
     private fun hideSystemUI() {
-        WindowInsetsControllerCompat(window, binding.root).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        with(WindowInsetsControllerCompat(window, binding.root)) {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 
@@ -1367,7 +1360,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             isAppearanceLightNavigationBars = false
             isAppearanceLightStatusBars = false
         }
-        window.navigationBarColor = getColor(R.color.black)
+        window.navigationBarColor = getColor(android.R.color.transparent)
     }
 
     private fun updatePaddingForSystemUI(
@@ -1390,17 +1383,29 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                             } else {
                                 Pair(0, 0)
                             }
-                        binding.toolbar.updatePadding(
-                            left = 0,
-                            top = insets.top,
-                            right = 0,
-                            bottom = 0
-                        )
+                        // Only when not all inset values of the system UI are 0, update the padding.
+                        // Avoid the view looks flicker
+                        if (!(insets.top == 0 && insets.bottom == 0 && insets.left == 0 && insets.right == 0)) {
+                            binding.toolbar.updatePadding(
+                                left = horizontalInsets.first,
+                                top = insets.top,
+                                right = horizontalInsets.second,
+                                bottom = 0
+                            )
+                            if (isVideoPlayerMainView) {
+                                videoViewModel.updatePlayerControllerPaddingState(
+                                    left = horizontalInsets.first,
+                                    right = horizontalInsets.second,
+                                    bottom = insets.bottom
+                                )
+                            }
+                        }
+
                         binding.rootLayout.updatePadding(
-                            left = horizontalInsets.first,
+                            left = if (isVideoPlaylist) horizontalInsets.first else 0,
                             top = 0,
-                            right = horizontalInsets.second,
-                            bottom = insets.bottom
+                            right = if (isVideoPlaylist) horizontalInsets.second else 0,
+                            bottom = if (isVideoPlaylist) insets.bottom else 0
                         )
                     }
                 }
@@ -1421,14 +1426,14 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     }
 
     /**
-     * Show snackbar
+     * Show snack bar
      * @param type
      * @param content
      * @param chatId
      */
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         content?.let {
-            showSnackbarForVideoPlayer(it)
+            showSnackBarForVideoPlayer(it)
         }
     }
 
@@ -1451,24 +1456,24 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     private fun manageException(throwable: Throwable) {
         if (!manageCopyMoveException(throwable) && throwable is MegaException) {
             throwable.message?.let { errorMessage ->
-                showSnackbarForVideoPlayer(errorMessage)
+                showSnackBarForVideoPlayer(errorMessage)
             }
         }
     }
 
     /**
-     * Show the customized snackbar for video player because video player always shows dark mode.
+     * Show the customized snack bar for video player because video player always shows dark mode.
      *
      * @param message the message that will be shown
      */
-    internal fun showSnackbarForVideoPlayer(message: String) {
-        Snackbar.make(binding.rootLayout, message, Snackbar.LENGTH_LONG).let { snackbar ->
-            with(snackbar.view as Snackbar.SnackbarLayout) {
+    internal fun showSnackBarForVideoPlayer(message: String) {
+        Snackbar.make(binding.rootLayout, message, Snackbar.LENGTH_LONG).let { snackBar ->
+            with(snackBar.view as Snackbar.SnackbarLayout) {
                 setBackgroundColor(getColor(R.color.white))
                 findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     .setTextColor(getColor(R.color.dark_grey))
             }
-            snackbar.show()
+            snackBar.show()
         }
     }
 
