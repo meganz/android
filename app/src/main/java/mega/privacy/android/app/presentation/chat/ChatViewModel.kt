@@ -265,7 +265,7 @@ class ChatViewModel @Inject constructor(
         when {
             isWaitingRoom -> {
                 when {
-                    state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined -> {
+                    isHost && state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined -> {
                         answerCall(
                             _state.value.chatId,
                             video = false,
@@ -280,7 +280,7 @@ class ChatViewModel @Inject constructor(
                         startSchedMeetingWithWaitingRoom(schedIdWr)
                     }
 
-                    !isHost && state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> {
+                    !isHost -> {
                         _state.update {
                             it.copy(
                                 openWaitingRoomScreen = true

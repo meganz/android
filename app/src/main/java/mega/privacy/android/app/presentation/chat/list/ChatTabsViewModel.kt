@@ -200,17 +200,21 @@ class ChatTabsViewModel @Inject constructor(
                         val meeting = item as MeetingChatRoomItem
                         when (meeting.currentCallStatus) {
                             is ChatRoomItemStatus.NotJoined -> {
-                                answerChatCallUseCase(
-                                    chatId = chatId,
-                                    video = false,
-                                    audio = true
-                                )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                    ?.let { call ->
-                                        chatManagement.removeJoiningCallChatId(chatId)
-                                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                                        CallUtil.clearIncomingCallNotification(call.callId)
-                                        openCurrentCall(call)
-                                    }
+                                if (meeting.isWaitingRoom) {
+                                    state.update { it.copy(currentWaitingRoom = chatId) }
+                                } else {
+                                    answerChatCallUseCase(
+                                        chatId = chatId,
+                                        video = false,
+                                        audio = true
+                                    )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
+                                        ?.let { call ->
+                                            chatManagement.removeJoiningCallChatId(chatId)
+                                            rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                                            CallUtil.clearIncomingCallNotification(call.callId)
+                                            openCurrentCall(call)
+                                        }
+                                }
                             }
 
                             is ChatRoomItemStatus.NotStarted -> {

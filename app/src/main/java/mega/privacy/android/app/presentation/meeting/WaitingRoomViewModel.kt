@@ -81,6 +81,8 @@ class WaitingRoomViewModel @Inject constructor(
      * @param chatId        Chat Room Id
      */
     fun loadMeetingDetails(chatId: Long) {
+        _state.update { it.copy(chatId = chatId) }
+
         retrieveMeetingDetails(chatId)
         retrieveCallDetails(chatId)
     }
@@ -98,7 +100,6 @@ class WaitingRoomViewModel @Inject constructor(
             }.onSuccess { meeting ->
                 _state.update {
                     it.copy(
-                        chatId = chatId,
                         schedId = meeting.schedId,
                         title = meeting.title,
                         formattedTimestamp = meeting.getFormattedTimestamp(),
@@ -123,8 +124,7 @@ class WaitingRoomViewModel @Inject constructor(
                     call.chatId == _state.value.chatId
                             && (call.changes == ChatCallChanges.Status
                             || call.changes == ChatCallChanges.WRAllow
-                            || call.changes == ChatCallChanges.WRDeny
-                            || call.changes == ChatCallChanges.WRPushedFromCall)
+                            || call.changes == ChatCallChanges.WRDeny)
                 }
                 .collectLatest { it.updateUiState() }
         }
@@ -213,23 +213,31 @@ class WaitingRoomViewModel @Inject constructor(
      * Update UI state based on current [ChatCall]
      */
     private fun ChatCall.updateUiState() {
-        val shouldJoinCall = changes == ChatCallChanges.WRAllow
-        val shouldLeaveWaitingRoom = changes == ChatCallChanges.WRDeny
-        val callStarted = if (hasStarted()) {
+        if (this.shouldAnswer()) {
             answerChatCall()
-            true
-        } else {
-            false
         }
 
         _state.update {
             it.copy(
-                callStarted = callStarted,
-                joinCall = shouldJoinCall,
-                finish = shouldLeaveWaitingRoom // TODO Show Dialog
+                callStarted = this.hasStarted(),
+                joinCall = this.shouldJoin(),
+                finish = changes == ChatCallChanges.WRDeny // TODO Show Dialog
             )
         }
     }
+
+    /**
+     * Check if [ChatCall] should be joined
+     */
+    private fun ChatCall.shouldJoin(): Boolean =
+        changes == ChatCallChanges.WRAllow || status == ChatCallStatus.Joining
+                || status == ChatCallStatus.InProgress
+
+    /**
+     * Check if [ChatCall] should be answered
+     */
+    private fun ChatCall.shouldAnswer(): Boolean =
+        status == ChatCallStatus.WaitingRoom || status == ChatCallStatus.UserNoPresent
 
     /**
      * Check if [ChatCall] has started
