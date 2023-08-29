@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoSubState
 import nz.mega.sdk.MegaSync.Error
 import javax.inject.Inject
 

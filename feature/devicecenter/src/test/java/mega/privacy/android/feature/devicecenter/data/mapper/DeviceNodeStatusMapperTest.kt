@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoSubState
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import org.junit.jupiter.api.BeforeAll

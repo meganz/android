@@ -1,7 +1,5 @@
 package mega.privacy.android.feature.devicecenter.domain.entity
 
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState
-
 /**
  * Sealed class representing the Status of each Device Center Node
  *

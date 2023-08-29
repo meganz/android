@@ -1,11 +1,11 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfo
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoHeartbeatStatus
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoState
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoHeartbeatStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoState
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoSubState
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoType
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBackupInfo
 import nz.mega.sdk.MegaSync

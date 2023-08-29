@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfo
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupDeviceNamesMapper
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupInfoListMapper
 import mega.privacy.android.feature.devicecenter.data.mapper.DeviceNodeMapper

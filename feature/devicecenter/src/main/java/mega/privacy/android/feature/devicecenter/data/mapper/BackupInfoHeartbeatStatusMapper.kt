@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoHeartbeatStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoHeartbeatStatus
 import nz.mega.sdk.MegaBackupInfo
 import javax.inject.Inject
 

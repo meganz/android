@@ -1,10 +1,10 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfo
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoHeartbeatStatus
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoState
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoHeartbeatStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoState
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoSubState
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoType
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import nz.mega.sdk.MegaApiJava

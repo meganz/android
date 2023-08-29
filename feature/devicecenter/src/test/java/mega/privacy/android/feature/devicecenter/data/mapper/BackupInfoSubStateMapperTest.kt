@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoSubState
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoSubState
 import nz.mega.sdk.MegaSync.Error
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test

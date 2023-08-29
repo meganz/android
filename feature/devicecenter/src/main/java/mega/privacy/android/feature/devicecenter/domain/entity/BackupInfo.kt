@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.data.entity
+package mega.privacy.android.feature.devicecenter.domain.entity
 
 /**
  * Data class representing the User's Backup information from the "sf" API Call. This class is

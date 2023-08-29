@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.devicecenter.domain.repository
 
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfo
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceNode
 
 /**

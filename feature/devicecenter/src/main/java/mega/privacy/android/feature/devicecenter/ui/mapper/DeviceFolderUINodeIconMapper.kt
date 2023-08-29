@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
-import mega.privacy.android.feature.devicecenter.data.entity.BackupInfoType
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import javax.inject.Inject
 
