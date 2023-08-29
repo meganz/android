@@ -310,6 +310,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()
                     .detectAll()
+                    .penaltyDeathOnNetwork()
                     .penaltyLog()
                     .build()
             )
