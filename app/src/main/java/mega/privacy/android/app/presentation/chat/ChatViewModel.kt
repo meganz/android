@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -264,13 +265,12 @@ class ChatViewModel @Inject constructor(
         when {
             isWaitingRoom -> {
                 when {
-                    isHost && state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined -> {
+                    state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined -> {
                         answerCall(
                             _state.value.chatId,
                             video = false,
                             audio = true
                         )
-
                     }
 
                     isHost && state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> {
@@ -280,7 +280,7 @@ class ChatViewModel @Inject constructor(
                         startSchedMeetingWithWaitingRoom(schedIdWr)
                     }
 
-                    !isHost -> {
+                    !isHost && state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> {
                         _state.update {
                             it.copy(
                                 openWaitingRoomScreen = true
@@ -670,7 +670,18 @@ class ChatViewModel @Inject constructor(
                     openCurrentCall(this)
                     _state.update { it.copy(isCallAnswered = true) }
                 }
-            }.onFailure { Timber.w("Exception answering call: $it") }
+            }.onFailure { error ->
+                if (error is MegaException && error.errorCode == MegaChatError.ERROR_ACCESS) {
+                    _state.update {
+                        it.copy(
+                            isWaitingRoom = true,
+                            openWaitingRoomScreen = true
+                        )
+                    }
+                } else {
+                    Timber.w("Exception answering call: $error")
+                }
+            }
         }
     }
 

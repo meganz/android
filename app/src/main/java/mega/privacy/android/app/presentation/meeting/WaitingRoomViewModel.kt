@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -17,17 +18,21 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.waitingroom.IsValidWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 
 /**
@@ -53,7 +58,12 @@ class WaitingRoomViewModel @Inject constructor(
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val getChatCall: GetChatCall,
+    private val answerChatCallUseCase: AnswerChatCallUseCase,
 ) : ViewModel() {
+
+    companion object {
+        private const val WAITING_ROOM_TIMEOUT = 10
+    }
 
     private val _state = MutableStateFlow(WaitingRoomState())
     val state: StateFlow<WaitingRoomState> = _state
@@ -62,6 +72,7 @@ class WaitingRoomViewModel @Inject constructor(
         monitorCallUpdates()
         monitorMeetingUpdates()
         retrieveMyAvatar()
+        startCountdownTimer()
     }
 
     /**
@@ -103,40 +114,19 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     /**
-     * Retrieve current Chat room call details
-     *
-     * @param chatId    Chat Room Id
-     */
-    private fun retrieveCallDetails(chatId: Long) {
-        viewModelScope.launch {
-            runCatching {
-                getChatCall(chatId)
-            }.onSuccess { call ->
-                _state.update {
-                    it.copy(
-                        hasStarted = call?.hasStarted() ?: false
-                    )
-                }
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
-        }
-    }
-
-    /**
      * Monitor current call updates
      */
     private fun monitorCallUpdates() =
         viewModelScope.launch {
             monitorChatCallUpdates()
-                .filter { it.changes == ChatCallChanges.Status && it.chatId == _state.value.chatId }
-                .collectLatest { call ->
-                    _state.update {
-                        it.copy(
-                            hasStarted = call.hasStarted()
-                        )
-                    }
+                .filter { call ->
+                    call.chatId == _state.value.chatId
+                            && (call.changes == ChatCallChanges.Status
+                            || call.changes == ChatCallChanges.WRAllow
+                            || call.changes == ChatCallChanges.WRDeny
+                            || call.changes == ChatCallChanges.WRPushedFromCall)
                 }
+                .collectLatest { it.updateUiState() }
         }
 
     /**
@@ -182,6 +172,28 @@ class WaitingRoomViewModel @Inject constructor(
         }
     }
 
+    private fun retrieveCallDetails(chatId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                getChatCall(chatId)
+            }.onSuccess { call ->
+                call?.updateUiState()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    /**
+     * Start countdown timer to leave the screen after [WAITING_ROOM_TIMEOUT] minutes.
+     */
+    private fun startCountdownTimer() {
+        viewModelScope.launch {
+            delay(WAITING_ROOM_TIMEOUT.minutes)
+            _state.update { it.copy(finish = true) }
+        }
+    }
+
     /**
      * Checks that current Chat Room is a valid Waiting Room
      *
@@ -198,11 +210,56 @@ class WaitingRoomViewModel @Inject constructor(
         timestampMapper.getWaitingRoomTimeFormatted(startDateTime!!, endDateTime!!)
 
     /**
+     * Update UI state based on current [ChatCall]
+     */
+    private fun ChatCall.updateUiState() {
+        val shouldJoinCall = changes == ChatCallChanges.WRAllow
+        val shouldLeaveWaitingRoom = changes == ChatCallChanges.WRDeny
+        val callStarted = if (hasStarted()) {
+            answerChatCall()
+            true
+        } else {
+            false
+        }
+
+        _state.update {
+            it.copy(
+                callStarted = callStarted,
+                joinCall = shouldJoinCall,
+                finish = shouldLeaveWaitingRoom // TODO Show Dialog
+            )
+        }
+    }
+
+    /**
      * Check if [ChatCall] has started
      */
     private fun ChatCall.hasStarted(): Boolean =
-        status == ChatCallStatus.UserNoPresent || status == ChatCallStatus.Connecting
-                || status == ChatCallStatus.Joining || status == ChatCallStatus.InProgress
+        when (status) {
+            ChatCallStatus.WaitingRoom,
+            ChatCallStatus.UserNoPresent,
+            ChatCallStatus.Connecting,
+            ChatCallStatus.Joining,
+            ChatCallStatus.InProgress,
+            -> true
+
+            else -> false
+        }
+
+    private fun answerChatCall() {
+        viewModelScope.launch {
+            runCatching {
+                val state = state.value
+                answerChatCallUseCase(state.chatId, state.cameraEnabled, state.micEnabled)
+            }.onFailure { error ->
+                if (error is MegaException && error.errorCode == MegaChatError.ERROR_EXIST) {
+                    // Already requested, do nothing.
+                } else {
+                    Timber.e(error)
+                }
+            }
+        }
+    }
 
     /**
      * On mic enabled

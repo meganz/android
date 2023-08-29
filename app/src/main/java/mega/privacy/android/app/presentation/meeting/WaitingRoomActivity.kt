@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.view.WaitingRoomView
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -50,7 +51,13 @@ class WaitingRoomActivity : PasscodeActivity() {
         setContent { MainComposeView() }
 
         collectFlow(viewModel.state) { uiState ->
-            if (uiState.finish) finish()
+            when {
+                uiState.joinCall ->
+                    launchCallScreen(uiState.chatId, uiState.micEnabled, uiState.cameraEnabled)
+
+                uiState.finish ->
+                    finish()
+            }
         }
 
         viewModel.loadMeetingDetails(chatId)
@@ -81,5 +88,17 @@ class WaitingRoomActivity : PasscodeActivity() {
         } else {
             Timber.w("Internet Browser not available")
         }
+    }
+
+    private fun launchCallScreen(chatId: Long, micEnabled: Boolean, cameraEnabled: Boolean) {
+        val intent = Intent(this, MeetingActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            action = MeetingActivity.MEETING_ACTION_IN
+            putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
+            putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, micEnabled)
+            putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, cameraEnabled)
+        }
+        startActivity(intent)
+        finish()
     }
 }

@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseC
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
+import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -198,21 +200,17 @@ class ChatTabsViewModel @Inject constructor(
                         val meeting = item as MeetingChatRoomItem
                         when (meeting.currentCallStatus) {
                             is ChatRoomItemStatus.NotJoined -> {
-                                if (meeting.isWaitingRoom) {
-                                    state.update { it.copy(currentWaitingRoom = chatId) }
-                                } else {
-                                    answerChatCallUseCase(
-                                        chatId = chatId,
-                                        video = false,
-                                        audio = true
-                                    )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                        ?.let { call ->
-                                            chatManagement.removeJoiningCallChatId(chatId)
-                                            rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                                            CallUtil.clearIncomingCallNotification(call.callId)
-                                            openCurrentCall(call)
-                                        }
-                                }
+                                answerChatCallUseCase(
+                                    chatId = chatId,
+                                    video = false,
+                                    audio = true
+                                )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
+                                    ?.let { call ->
+                                        chatManagement.removeJoiningCallChatId(chatId)
+                                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                                        CallUtil.clearIncomingCallNotification(call.callId)
+                                        openCurrentCall(call)
+                                    }
                             }
 
                             is ChatRoomItemStatus.NotStarted -> {
@@ -243,8 +241,12 @@ class ChatTabsViewModel @Inject constructor(
                             }
                         }
                     }
-            }.onFailure { exception ->
-                Timber.e(exception)
+            }.onFailure { error ->
+                if (error is MegaException && error.errorCode == MegaChatError.ERROR_ACCESS) {
+                    state.update { it.copy(currentWaitingRoom = chatId) }
+                } else {
+                    Timber.e(error)
+                }
             }
         }
     }

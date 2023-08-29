@@ -190,7 +190,7 @@ internal fun WaitingRoomView(
             ) {
                 Text(
                     text = stringResource(
-                        if (state.hasStarted)
+                        if (state.callStarted)
                             R.string.meetings_waiting_room_wait_for_host_to_let_you_in_label
                         else
                             R.string.meetings_waiting_room_wait_for_host_to_start_meeting_label
@@ -205,7 +205,7 @@ internal fun WaitingRoomView(
                 .background(color = grey_900)
                 .constrainAs(videoPreview) {
                     top.linkTo(alertText.bottom, 24.dp)
-                    linkTo(parent.start, parent.end, startMargin = 70.dp, endMargin = 70.dp)
+                    linkTo(parent.start, parent.end, startMargin = 54.dp, endMargin = 54.dp)
                     width = Dimension.fillToConstraints
                     height = Dimension.ratio("55:83")
                 }
@@ -331,7 +331,7 @@ internal fun PreviewWaitingRoomView() {
             state = WaitingRoomState(
                 chatId = -1,
                 schedId = -1,
-                hasStarted = Random.nextBoolean(),
+                callStarted = Random.nextBoolean(),
                 title = "Book Club",
                 formattedTimestamp = "Monday, 30 May · 10:25 -11:25",
             ),

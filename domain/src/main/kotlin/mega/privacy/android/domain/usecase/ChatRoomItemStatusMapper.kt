@@ -23,8 +23,9 @@ class ChatRoomItemStatusMapper @Inject constructor() {
             ChatCallStatus.InProgress,
             -> ChatRoomItemStatus.Joined(chatCall.getStartTimestamp())
 
-            ChatCallStatus.UserNoPresent ->
-                ChatRoomItemStatus.NotJoined(chatCall.getStartTimestamp())
+            ChatCallStatus.UserNoPresent,
+            ChatCallStatus.WaitingRoom,
+            -> ChatRoomItemStatus.NotJoined(chatCall.getStartTimestamp())
 
             else -> ChatRoomItemStatus.NotStarted
         }

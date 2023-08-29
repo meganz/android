@@ -5,6 +5,7 @@ import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.data.model.meeting.ChatCallUpdate
+import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -15,6 +16,7 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatScheduledFlags
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledRules
+import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaHandleList
 
 /**
@@ -930,4 +932,84 @@ interface MegaChatApiGateway {
      * @param listener MegaChatRequestListener to track this request
      */
     fun setOnlineStatus(status: Int, listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Register a listener to receive video from local device for an specific chat room
+     *
+     * You can use MegaChatApi::removeChatLocalVideoListener to stop receiving events.
+     *
+     * @note if we want to receive video before start a call (openVideoDevice), we have to
+     * register a MegaChatVideoListener with chatid = MEGACHAT_INVALID_HANDLE
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param listener MegaChatVideoListener that will receive local video
+     */
+    fun addChatLocalVideoListener(chatId: Long, listener: MegaChatVideoListenerInterface)
+
+    /**
+     * Register a listener to receive video from remote device for an specific chat room and peer
+     *
+     * You can use MegaChatApi::removeChatRemoteVideoListener to stop receiving events.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param clientId MegaChatHandle that identifies the client
+     * @param hiRes boolean that identify if video is high resolution or low resolution
+     * @param listener MegaChatVideoListener that will receive remote video
+     */
+    fun addChatRemoteVideoListener(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MegaChatVideoListenerInterface
+    )
+
+    /**
+     * Unregister a MegaChatVideoListener
+     *
+     * This listener won't receive more events.
+     * @note if we want to remove the listener added to receive video frames before start a call
+     * we have to use chatid = MEGACHAT_INVALID_HANDLE
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param clientId MegaChatHandle that identifies the client
+     * @param hiRes boolean that identify if video is high resolution or low resolution
+     * @param listener Object that is unregistered
+     */
+    fun removeChatVideoListener(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MegaChatVideoListenerInterface?
+    )
+
+    /**
+     * Register a listener to receive video from local device for an specific chat room.
+     * This listener will be deregistered automatically.
+     *
+     * @param chatId    Chat Room Id
+     * @return          Flow of [ChatVideoUpdate]
+     */
+    fun getChatLocalVideoUpdates(chatId: Long): Flow<ChatVideoUpdate>
+
+    /**
+     * Open video device
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_OPEN_VIDEO_DEVICE
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getFlag - Returns true open device
+     *
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun openVideoDevice(listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Release video device
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_OPEN_VIDEO_DEVICE
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getFlag - Returns false close device
+     *
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun releaseVideoDevice(listener: MegaChatRequestListenerInterface)
 }

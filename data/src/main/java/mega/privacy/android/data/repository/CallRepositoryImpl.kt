@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
@@ -30,16 +31,17 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
+import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
+import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * Default implementation of [CallRepository]
@@ -96,8 +98,9 @@ internal class CallRepositoryImpl @Inject constructor(
         enabledAudio: Boolean,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val callback = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val callback = continuation.getChatRequestListener(
+                methodName = "startCallRinging",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.startChatCall(
@@ -118,8 +121,9 @@ internal class CallRepositoryImpl @Inject constructor(
         enabledAudio: Boolean,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val callback = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val callback = continuation.getChatRequestListener(
+                methodName = "startCallNoRinging",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.startChatCallNoRinging(
@@ -141,8 +145,9 @@ internal class CallRepositoryImpl @Inject constructor(
         enabledAudio: Boolean,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val callback = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val callback = continuation.getChatRequestListener(
+                methodName = "startMeetingInWaitingRoomChat",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.startMeetingInWaitingRoomChat(
@@ -163,8 +168,9 @@ internal class CallRepositoryImpl @Inject constructor(
         enabledAudio: Boolean,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val callback = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val callback = continuation.getChatRequestListener(
+                methodName = "answerChatCall",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.answerChatCall(
@@ -182,8 +188,9 @@ internal class CallRepositoryImpl @Inject constructor(
         callId: Long,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val callback = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val callback = continuation.getChatRequestListener(
+                methodName = "hangChatCall",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.hangChatCall(
@@ -199,8 +206,9 @@ internal class CallRepositoryImpl @Inject constructor(
         setOnHold: Boolean,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val callback = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val callback = continuation.getChatRequestListener(
+                methodName = "holdChatCall",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.holdChatCall(
@@ -240,29 +248,21 @@ internal class CallRepositoryImpl @Inject constructor(
     ): List<ChatScheduledMeetingOccurr> =
         withContext(dispatcher) {
             suspendCancellableCoroutine { continuation ->
-                val callback = OptionalMegaChatRequestListenerInterface(
-                    onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
-                        if (error.errorCode == MegaChatError.ERROR_OK) {
-                            val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-                            request.megaChatScheduledMeetingOccurrList?.let { occursList ->
-                                if (occursList.size() > 0) {
-                                    for (i in 0 until occursList.size()) {
-                                        occurrences.add(
-                                            chatScheduledMeetingOccurrMapper(occursList.at(i))
-                                        )
-                                    }
-                                }
+                val callback = continuation.getChatRequestListener(
+                    methodName = "fetchScheduledMeetingOccurrencesByChat"
+                ) { request ->
+                    val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
+                    request.megaChatScheduledMeetingOccurrList?.let { occursList ->
+                        if (occursList.size() > 0) {
+                            for (i in 0 until occursList.size()) {
+                                occurrences.add(
+                                    chatScheduledMeetingOccurrMapper(occursList.at(i))
+                                )
                             }
-
-                            continuation.resume(occurrences)
-                        } else {
-                            continuation.failWithError(
-                                error,
-                                "fetchScheduledMeetingOccurrencesByChat"
-                            )
                         }
                     }
-                )
+                    occurrences
+                }
 
                 megaChatApiGateway.fetchScheduledMeetingOccurrencesByChat(
                     chatId,
@@ -319,8 +319,9 @@ internal class CallRepositoryImpl @Inject constructor(
         attributes: String?,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val callback = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val callback = continuation.getChatRequestListener(
+                methodName = "createChatroomAndSchedMeeting",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.createChatroomAndSchedMeeting(
@@ -358,8 +359,9 @@ internal class CallRepositoryImpl @Inject constructor(
         rules: ChatScheduledRules?,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val listener = continuation.getChatRequestListener(
+                methodName = "updateScheduledMeeting",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.updateScheduledMeeting(
@@ -389,8 +391,9 @@ internal class CallRepositoryImpl @Inject constructor(
         cancelled: Boolean,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val listener = continuation.getChatRequestListener(
+                methodName = "updateScheduledMeetingOccurrence",
+                chatRequestMapper::invoke
             )
 
             megaChatApiGateway.updateScheduledMeetingOccurrence(
@@ -433,15 +436,6 @@ internal class CallRepositoryImpl @Inject constructor(
             .mapNotNull { ResultOccurrenceUpdate(it.chatId, it.append) }
             .flowOn(dispatcher)
 
-    private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =
-        { request: MegaChatRequest, error: MegaChatError ->
-            if (error.errorCode == MegaChatError.ERROR_OK) {
-                continuation.resumeWith(Result.success(chatRequestMapper(request)))
-            } else {
-                continuation.failWithError(error, "onRequestCompleted")
-            }
-        }
-
     override suspend fun getCallHandleList(state: ChatCallStatus) = withContext(dispatcher) {
         megaChatApiGateway.getChatCalls(megaChatCallStatusMapper(state))
             ?.let { handleListMapper(it) } ?: emptyList()
@@ -459,15 +453,62 @@ internal class CallRepositoryImpl @Inject constructor(
 
     override suspend fun setChatVideoInDevice(device: String) = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val callback = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = onRequestCompleted(continuation)
+            val listener = continuation.getChatRequestListener("setChatVideoInDevice") {}
+
+            megaChatApiGateway.setChatVideoInDevice(device, listener)
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override fun getChatLocalVideoUpdates(chatId: Long): Flow<ChatVideoUpdate> =
+        megaChatApiGateway.getChatLocalVideoUpdates(chatId).flowOn(dispatcher)
+
+    override suspend fun openVideoDevice() = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val methodName = "openVideoDevice"
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaChatError.ERROR_OK) {
+                        if (request.flag) {
+                            continuation.resume(Unit)
+                        } else {
+                            continuation.resumeWithException(IllegalStateException("Video device error"))
+                        }
+                    } else {
+                        Timber.e("Calling $methodName failed with error code ${error.errorCode}")
+                        continuation.failWithError(error, methodName)
+                    }
+                }
             )
 
-            megaChatApiGateway.setChatVideoInDevice(device, callback)
+            megaChatApiGateway.openVideoDevice(listener)
 
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(callback)
-            }
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun releaseVideoDevice() = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val methodName = "releaseVideoDevice"
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaChatError.ERROR_OK) {
+                        if (!request.flag) {
+                            continuation.resume(Unit)
+                        } else {
+                            continuation.resumeWithException(IllegalStateException("Video device error"))
+                        }
+                    } else {
+                        Timber.e("Calling $methodName failed with error code ${error.errorCode}")
+                        continuation.failWithError(error, methodName)
+                    }
+                }
+            )
+
+            megaChatApiGateway.releaseVideoDevice(listener)
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 }

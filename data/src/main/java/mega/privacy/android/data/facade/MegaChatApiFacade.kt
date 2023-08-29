@@ -11,6 +11,7 @@ import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.data.model.meeting.ChatCallUpdate
+import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
@@ -31,6 +32,7 @@ import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledMeetingListenerInterface
 import nz.mega.sdk.MegaChatScheduledRules
 import nz.mega.sdk.MegaChatSession
+import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaHandleList
 import javax.inject.Inject
 
@@ -576,4 +578,47 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun setOnlineStatus(status: Int, listener: MegaChatRequestListenerInterface) =
         chatApi.setOnlineStatus(status, listener)
+
+    override fun addChatLocalVideoListener(chatId: Long, listener: MegaChatVideoListenerInterface) {
+        chatApi.addChatLocalVideoListener(chatId, listener)
+    }
+
+    override fun addChatRemoteVideoListener(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MegaChatVideoListenerInterface,
+    ) {
+        chatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    override fun removeChatVideoListener(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MegaChatVideoListenerInterface?,
+    ) {
+        chatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    override fun getChatLocalVideoUpdates(chatId: Long): Flow<ChatVideoUpdate> =
+        callbackFlow {
+            val listener = MegaChatVideoListenerInterface { _, _, width, height, byteBuffer ->
+                trySend(ChatVideoUpdate(width, height, byteBuffer))
+            }
+
+            chatApi.addChatLocalVideoListener(chatId, listener)
+
+            awaitClose {
+                chatApi.removeChatVideoListener(chatId, getChatInvalidHandle(), false, listener)
+            }
+        }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
+    override fun openVideoDevice(listener: MegaChatRequestListenerInterface) {
+        chatApi.openVideoDevice(listener)
+    }
+
+    override fun releaseVideoDevice(listener: MegaChatRequestListenerInterface) {
+        chatApi.releaseVideoDevice(listener)
+    }
 }

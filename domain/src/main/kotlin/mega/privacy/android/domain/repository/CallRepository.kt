@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
+import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
@@ -312,5 +313,27 @@ interface CallRepository {
      *
      * @param device Identifier of device to be selected.
      */
-    suspend fun setChatVideoInDevice(device: String): ChatRequest
+    suspend fun setChatVideoInDevice(device: String)
+
+    /**
+     * Get video updates from local device for an specific chat room.
+     *
+     * @param chatId    Chat Room Id
+     * @return          Flow of [ChatVideoUpdate]
+     */
+    fun getChatLocalVideoUpdates(chatId: Long): Flow<ChatVideoUpdate>
+
+    /**
+     * Open video device
+     *
+     * @return      True if the device is opened, false otherwise.
+     */
+    suspend fun openVideoDevice()
+
+    /**
+     * Release video device
+     *
+     * @return      True if the device is closed, false otherwise.
+     */
+    suspend fun releaseVideoDevice()
 }
