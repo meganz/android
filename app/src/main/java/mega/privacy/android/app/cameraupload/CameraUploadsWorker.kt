@@ -29,7 +29,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.data.R
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_UPLOADS_PAUSED
@@ -50,6 +49,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
@@ -129,10 +129,10 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
@@ -355,7 +355,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
             withContext(ioDispatcher) {
                 performanceEnabled =
-                    getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPerformance)
+                    getFeatureFlagValueUseCase(DataFeatures.CameraUploadsPerformance)
                 initService()
                 if (hasMediaPermissionUseCase() && isLoginSuccessful() && canRunCameraUploads()) {
                     Timber.d("Calling startWorker() successful. Starting Camera Uploads")

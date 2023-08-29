@@ -3,6 +3,7 @@ package mega.privacy.android.app.featuretoggle
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
+
 /**
  * App features
  *
@@ -45,14 +46,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     PasscodeBackend(
         "Enables the new compose passcode backend implementation",
         false,
-    ),
-
-    /**
-     * Enable Camera Uploads Performance benchmark
-     */
-    CameraUploadsPerformance(
-        "Enable Camera Uploads Performance benchmark",
-        false
     ),
 
     /**
