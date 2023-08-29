@@ -19,11 +19,8 @@ import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
-import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
-import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -199,7 +196,7 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * handle logic if back from Media Discovery
      */
-    fun handleBackFromMD() = viewModelScope.launch {
+    suspend fun handleBackFromMD() {
         handleStack.pop()
         val currentParent =
             _state.value.parentHandle ?: getRootFolder()?.handle ?: MegaApiJava.INVALID_HANDLE
@@ -209,7 +206,7 @@ class FileBrowserViewModel @Inject constructor(
                 mediaHandle = currentParent
             )
         }
-        refreshNodes()
+        refreshNodesState()
     }
 
     /**
@@ -256,22 +253,26 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun refreshNodes() {
         viewModelScope.launch {
-            val typedNodeList = getFileBrowserChildrenUseCase(_state.value.fileBrowserHandle)
-            val nodeList = getNodeUiItems(typedNodeList)
-            val nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList()
-            val hasMediaFile: Boolean = containsMediaItemUseCase(typedNodeList)
-            val isRootNode = getRootFolder()?.handle == _state.value.fileBrowserHandle
-            _state.update {
-                it.copy(
-                    showMediaDiscoveryIcon = !isRootNode && hasMediaFile,
-                    nodes = nodes,
-                    parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle),
-                    nodesList = nodeList,
-                    sortOrder = getCloudSortOrder(),
-                    isFileBrowserEmpty = MegaApiJava.INVALID_HANDLE == _state.value.fileBrowserHandle ||
-                            getRootFolder()?.handle == _state.value.fileBrowserHandle
-                )
-            }
+            refreshNodesState()
+        }
+    }
+
+    private suspend fun refreshNodesState() {
+        val typedNodeList = getFileBrowserChildrenUseCase(_state.value.fileBrowserHandle)
+        val nodeList = getNodeUiItems(typedNodeList)
+        val nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList()
+        val hasMediaFile: Boolean = containsMediaItemUseCase(typedNodeList)
+        val isRootNode = getRootFolder()?.handle == _state.value.fileBrowserHandle
+        _state.update {
+            it.copy(
+                showMediaDiscoveryIcon = !isRootNode && hasMediaFile,
+                nodes = nodes,
+                parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle),
+                nodesList = nodeList,
+                sortOrder = getCloudSortOrder(),
+                isFileBrowserEmpty = MegaApiJava.INVALID_HANDLE == _state.value.fileBrowserHandle ||
+                        getRootFolder()?.handle == _state.value.fileBrowserHandle
+            )
         }
     }
 

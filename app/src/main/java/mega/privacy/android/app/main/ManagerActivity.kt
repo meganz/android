@@ -4820,17 +4820,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             if (isInMDMode) {
-                isInMDMode = false
-                fileBrowserViewModel.handleBackFromMD()
-                backToDrawerItem(bottomNavigationCurrentItem)
-            }
-            if (isFileBrowserComposeEnabled()) {
-                if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
-                    performOnBack()
+                lifecycleScope.launch {
+                    isInMDMode = false
+                    fileBrowserViewModel.handleBackFromMD()
+                    backToDrawerItem(bottomNavigationCurrentItem)
                 }
             } else {
-                if (!isCloudAdded || fileBrowserFragment?.onBackPressed() == 0) {
-                    performOnBack()
+                if (isFileBrowserComposeEnabled()) {
+                    if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
+                        performOnBack()
+                    }
+                } else {
+                    if (!isCloudAdded || fileBrowserFragment?.onBackPressed() == 0) {
+                        performOnBack()
+                    }
                 }
             }
         } else if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER) {
