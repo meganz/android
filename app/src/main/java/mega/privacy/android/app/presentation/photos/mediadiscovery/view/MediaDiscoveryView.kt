@@ -74,9 +74,6 @@ fun MediaDiscoveryView(
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
     val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
 
-    if (mediaDiscoveryViewState.shouldBack)
-        Back()
-
     HandleSortByDialog(
         mediaDiscoveryViewState = mediaDiscoveryViewState,
         mediaDiscoveryViewModel = mediaDiscoveryViewModel,
