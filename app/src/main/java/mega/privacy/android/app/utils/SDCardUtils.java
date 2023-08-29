@@ -16,7 +16,7 @@ import kotlin.coroutines.Continuation;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.objects.SDTransfer;
+import mega.privacy.android.domain.entity.SdTransfer;
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper;
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer;
 import nz.mega.sdk.MegaApiJava;
@@ -135,13 +135,13 @@ public class SDCardUtils {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiJava megaApi = app.getMegaApi();
         LegacyDatabaseHandler dbH = app.getDbH();
-        ArrayList<SDTransfer> sdTransfers = dbH.getSdTransfers();
+        ArrayList<SdTransfer> sdTransfers = dbH.getSdTransfers();
         if (sdTransfers == null || sdTransfers.isEmpty()) {
             return Collections.emptyList();
         }
 
         ArrayList<CompletedTransfer> completedTransfers = new ArrayList<>();
-        for (SDTransfer sdtransfer : sdTransfers) {
+        for (SdTransfer sdtransfer : sdTransfers) {
             if (megaApi == null) {
                 return Collections.emptyList();
             }

@@ -42,7 +42,6 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.monitoring.CrashReporter
-import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.presentation.offline.OfflineFragment
@@ -61,6 +60,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -1341,7 +1341,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         val appData = transfer.appData
         if (appData.contains(Constants.APP_DATA_SD_CARD)) {
             dbH.addSDTransfer(
-                SDTransfer(
+                SdTransfer(
                     transfer.tag,
                     transfer.fileName,
                     Util.getSizeString(transfer.totalBytes, this@DownloadService),

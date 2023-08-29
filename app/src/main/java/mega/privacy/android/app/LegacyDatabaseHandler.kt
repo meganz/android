@@ -2,8 +2,8 @@ package mega.privacy.android.app
 
 import android.database.sqlite.SQLiteDatabase
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
-import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.chat.PendingMessage
 
@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessage
 interface LegacyDatabaseHandler : DatabaseHandler {
     val offlineFiles: ArrayList<MegaOffline>
 
-    val sdTransfers: ArrayList<SDTransfer>
+    val sdTransfers: ArrayList<SdTransfer>
 
     fun setChatItemPreferences(chatPrefs: ChatItemPreferences)
     fun findChatPreferencesByHandle(handle: String?): ChatItemPreferences?
@@ -63,6 +63,6 @@ interface LegacyDatabaseHandler : DatabaseHandler {
     ): Long
 
     fun findPendingMessageById(messageId: Long): PendingMessage?
-    fun addSDTransfer(transfer: SDTransfer): Long
+    fun addSDTransfer(transfer: SdTransfer): Long
     fun saveBackup(backup: Backup): Boolean
 }

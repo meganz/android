@@ -2,7 +2,6 @@ package mega.privacy.android.app
 
 import android.content.Context
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeFolderPath
 import mega.privacy.android.app.utils.OfflineUtils
@@ -11,6 +10,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.extensions.mapTransferType
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.exception.MegaException
@@ -86,7 +86,7 @@ class AndroidCompletedTransfer {
         parentHandle = transfer.parentHandle
     }
 
-    constructor(transfer: SDTransfer, context: Context) {
+    constructor(transfer: SdTransfer, context: Context) {
         fileName = transfer.name
         type = MegaTransfer.TYPE_DOWNLOAD
         state = MegaTransfer.STATE_COMPLETED

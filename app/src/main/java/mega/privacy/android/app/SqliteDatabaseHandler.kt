@@ -17,7 +17,6 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.monitoring.CrashReporter
-import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removeSecondaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.setPrimaryBackup
@@ -33,6 +32,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.database.MegaDatabaseConstant.DATABASE_NAME
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_CONTACTS
+import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_SD_TRANSFERS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -43,6 +43,7 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
@@ -3926,9 +3927,9 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override val sdTransfers: ArrayList<SDTransfer>
+    override val sdTransfers: ArrayList<SdTransfer>
         get() {
-            val sdTransfers = ArrayList<SDTransfer>()
+            val sdTransfers = ArrayList<SdTransfer>()
             val selectQuery = "SELECT * FROM $TABLE_SD_TRANSFERS"
             try {
                 db.rawQuery(selectQuery, null)?.use { cursor ->
@@ -3941,7 +3942,7 @@ class SqliteDatabaseHandler @Inject constructor(
                             val path = decrypt(cursor.getString(5))
                             val appData = decrypt(cursor.getString(6))
                             sdTransfers.add(
-                                SDTransfer(
+                                SdTransfer(
                                     tag,
                                     name!!,
                                     size!!,
@@ -3959,7 +3960,7 @@ class SqliteDatabaseHandler @Inject constructor(
             return sdTransfers
         }
 
-    override fun addSDTransfer(transfer: SDTransfer): Long {
+    override fun addSDTransfer(transfer: SdTransfer): Long {
         val values = ContentValues()
         values.put(KEY_SD_TRANSFERS_TAG, transfer.tag)
         values.put(KEY_SD_TRANSFERS_NAME, encrypt(transfer.name))
@@ -4395,7 +4396,6 @@ class SqliteDatabaseHandler @Inject constructor(
         private const val TABLE_EPHEMERAL = "ephemeral"
         private const val TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle"
         private const val TABLE_SYNC_RECORDS = "syncrecords"
-        private const val TABLE_SD_TRANSFERS = "sdtransfers"
         const val TABLE_BACKUPS = "backups"
         private const val KEY_ID = "id"
         private const val KEY_EMAIL = "email"
