@@ -43,7 +43,6 @@ import mega.privacy.android.app.meeting.CallSoundsController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.monitoring.CrashReporter
-import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
@@ -56,6 +55,7 @@ import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.monitoring.EnablePerformanceReporterUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -79,7 +79,7 @@ import javax.inject.Provider
  * @property myAccountInfo
  * @property passcodeManagement
  * @property crashReporter
- * @property performanceReporter
+ * @property enablePerformanceReporterUseCase
  * @property getCallSoundsUseCase
  * @property themeModeState
  * @property transfersManagement
@@ -126,7 +126,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var crashReporter: CrashReporter
 
     @Inject
-    lateinit var performanceReporter: PerformanceReporter
+    lateinit var enablePerformanceReporterUseCase: EnablePerformanceReporterUseCase
 
     @Inject
     lateinit var getCallSoundsUseCase: GetCallSoundsUseCase
@@ -388,7 +388,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 { cookies: Set<CookieType> ->
                     val analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS)
                     crashReporter.setEnabled(analyticsCookiesEnabled)
-                    performanceReporter.setEnabled(analyticsCookiesEnabled)
+                    enablePerformanceReporterUseCase(analyticsCookiesEnabled)
                 },
                 { throwable: Throwable -> Timber.e(throwable) }
             )

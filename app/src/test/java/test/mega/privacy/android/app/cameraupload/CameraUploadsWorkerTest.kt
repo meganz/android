@@ -22,7 +22,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
-import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
@@ -79,14 +78,16 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.monitoring.StopTracePerformanceUseCase
+import mega.privacy.android.domain.usecase.monitoring.StartTracePerformanceUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
@@ -194,7 +195,6 @@ class CameraUploadsWorkerTest {
     private val deletePreviewUseCase: DeletePreviewUseCase = mock()
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
-    private val performanceReporter: PerformanceReporter = mock()
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper =
         mock()
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
@@ -202,6 +202,8 @@ class CameraUploadsWorkerTest {
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper = mock()
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase =
         mock()
+    private val startTracePerformanceUseCase: StartTracePerformanceUseCase = mock()
+    private val stopTracePerformanceUseCase: StopTracePerformanceUseCase = mock()
 
 
     @Before
@@ -304,12 +306,13 @@ class CameraUploadsWorkerTest {
             deletePreviewUseCase = deletePreviewUseCase,
             deleteThumbnailUseCase = deleteThumbnailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            performanceReporter = performanceReporter,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper,
             applicationWrapper = applicationWrapper,
             cookieEnabledCheckWrapper = cookieEnabledCheckWrapper,
-            broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase
+            broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase,
+            startTracePerformanceUseCase = startTracePerformanceUseCase,
+            stopTracePerformanceUseCase = stopTracePerformanceUseCase,
         )
     }
 

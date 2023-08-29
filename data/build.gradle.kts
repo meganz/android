@@ -100,6 +100,9 @@ dependencies {
 
     "gmsImplementation"(lib.billing.client.ktx)
 
+    implementation(platform(google.firebase.bom))
+    implementation(google.firebase.perf.ktx)
+
     coreLibraryDesugaring(lib.desugar)
 
     // Logging
@@ -122,4 +125,3 @@ dependencies {
     androidTestImplementation(testlib.junit.test.ktx)
     androidTestImplementation(testlib.runner)
 }
-

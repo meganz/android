@@ -19,7 +19,6 @@ import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
-import mega.privacy.android.data.repository.ImageRepositoryImpl
 import mega.privacy.android.data.repository.DefaultLoginRepository
 import mega.privacy.android.data.repository.DefaultMediaPlayerRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
@@ -40,6 +39,7 @@ import mega.privacy.android.data.repository.FileLinkRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
 import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.ImageRepositoryImpl
 import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
@@ -53,8 +53,9 @@ import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
 import mega.privacy.android.data.repository.files.PdfRepositoryImpl
-import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRepositoryImpl
+import mega.privacy.android.data.repository.monitoring.PerformanceReporterRepositoryImpl
 import mega.privacy.android.data.repository.security.PasscodeRepositoryImpl
+import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
@@ -98,9 +99,10 @@ import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
 import mega.privacy.android.domain.repository.files.PdfRepository
-import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
+import mega.privacy.android.domain.repository.monitoring.PerformanceReporterRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -272,4 +274,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPdfRepository(implementation: PdfRepositoryImpl): PdfRepository
+
+    @Singleton
+    @Binds
+    abstract fun providePerformanceReporterRepository(implementation: PerformanceReporterRepositoryImpl): PerformanceReporterRepository
 }

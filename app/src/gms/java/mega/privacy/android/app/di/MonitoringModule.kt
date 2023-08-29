@@ -11,8 +11,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.monitoring.FirebaseCrashReporter
-import mega.privacy.android.app.monitoring.FirebasePerformanceReporter
-import mega.privacy.android.app.monitoring.PerformanceReporter
 import timber.log.Timber
 import javax.inject.Singleton
 
@@ -34,11 +32,6 @@ class MonitoringModule {
     @Provides
     fun provideCrashReporter(firebaseCrashlytics: FirebaseCrashlytics): CrashReporter =
         FirebaseCrashReporter(firebaseCrashlytics)
-
-    @Singleton
-    @Provides
-    fun providePerformanceReporter(firebasePerformance: FirebasePerformance): PerformanceReporter =
-        FirebasePerformanceReporter(firebasePerformance)
 
     /**
      * If the default app was not initialized, FirebaseApp.getInstance() throws an [IllegalStateException].

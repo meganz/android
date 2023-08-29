@@ -29,7 +29,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.data.R
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_UPLOADS_PAUSED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
@@ -125,6 +124,8 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.monitoring.StopTracePerformanceUseCase
+import mega.privacy.android.domain.usecase.monitoring.StartTracePerformanceUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
@@ -225,12 +226,13 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase,
     private val deletePreviewUseCase: DeletePreviewUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val performanceReporter: PerformanceReporter,
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     private val applicationWrapper: ApplicationWrapper,
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
+    private val startTracePerformanceUseCase: StartTracePerformanceUseCase,
+    private val stopTracePerformanceUseCase: StopTracePerformanceUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -377,7 +379,14 @@ class CameraUploadsWorker @AssistedInject constructor(
         } catch (throwable: Throwable) {
             Timber.e(throwable, "Worker cancelled")
             endService(aborted = true)
-            performanceReporter.clearTraces()
+            stopTracePerformanceUseCase(
+                listOf(
+                    PerfScanFilesTrace,
+                    PerfUploadFilesTrace,
+                    PerfCompressVideosTrace,
+                    PerfUploadCompressedVideosTrace
+                )
+            )
             Result.failure()
         }
     }
@@ -1649,11 +1658,8 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun <T> tracePerformance(traceName: String, block: suspend () -> T) {
         if (performanceEnabled) {
-            with(performanceReporter) {
-                setEnabled(true)
-                trace(traceName) {
-                    block()
-                }
+            startTracePerformanceUseCase(traceName) {
+                block()
             }
         } else block()
     }

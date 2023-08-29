@@ -1,16 +1,16 @@
-package mega.privacy.android.app.monitoring
+package mega.privacy.android.domain.repository.monitoring
 
 /**
  * Performance reporter class to collect performance data such as Traces.
  */
-interface PerformanceReporter {
+interface PerformanceReporterRepository {
 
     /**
      * Measures the time it takes to run the [block]
      *
      * @param traceName     Trace name to be uniquely identified
      */
-    suspend fun <T> trace(traceName: String, block: suspend () -> T)
+    suspend fun <T> trace(traceName: String, block: suspend () -> T): T
 
     /**
      * This will start a trace with the given name.
@@ -51,9 +51,10 @@ interface PerformanceReporter {
     fun stopTrace(traceName: String)
 
     /**
+     * @param traceNames
      * Stops and clear all the existing traces
      */
-    fun clearTraces()
+    fun stopTraces(traceNames: List<String>)
 
     /**
      * Set if allow to collect and upload performance info.

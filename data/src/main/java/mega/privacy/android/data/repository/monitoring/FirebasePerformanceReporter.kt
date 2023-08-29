@@ -1,22 +1,29 @@
-package mega.privacy.android.app.monitoring
+package mega.privacy.android.data.repository.monitoring
 
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.ktx.trace
 import com.google.firebase.perf.metrics.Trace
-import mega.privacy.android.app.monitoring.PerformanceReporter
+import mega.privacy.android.domain.repository.monitoring.PerformanceReporterRepository
+import java.util.Hashtable
+import javax.inject.Inject
 
 /**
  * Report performance to FirebasePerformance
  */
-class FirebasePerformanceReporter(
-    private val firebasePerformance: FirebasePerformance
-) : PerformanceReporter {
+internal class PerformanceReporterRepositoryImpl @Inject constructor(
+    private val firebasePerformance: FirebasePerformance,
+) : PerformanceReporterRepository {
 
-    private val traces = mutableMapOf<String, Trace>()
+    /*
+     * thread safe trace container
+     */
 
-    override suspend fun <T> trace(traceName: String, block: suspend () -> T) {
+    private val traces = Hashtable<String, Trace>()
+
+    override suspend fun <T> trace(traceName: String, block: suspend () -> T): T {
         stopTrace(traceName)
-        traces[traceName] = firebasePerformance.newTrace(traceName).apply {
+        return firebasePerformance.newTrace(traceName).run {
+            traces[traceName] = this
             trace { block() }
         }
     }
@@ -38,9 +45,8 @@ class FirebasePerformanceReporter(
         traces[traceName]?.stop()
     }
 
-    override fun clearTraces() {
-        traces.values.forEach(Trace::stop)
-        traces.clear()
+    override fun stopTraces(traceNames: List<String>) {
+        traceNames.forEach { name -> traces[name]?.stop() }
     }
 
     override fun setEnabled(enabled: Boolean) {
