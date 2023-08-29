@@ -327,9 +327,11 @@ import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseC
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
+import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
 import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
+import mega.privacy.mobile.analytics.event.SearchResultOverflowMenuItemEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -4597,6 +4599,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             R.id.action_search -> {
+                if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+                    Analytics.tracker.trackEvent(CloudDriveSearchMenuToolbarEvent)
+                }
                 Timber.d("Action search selected")
                 hideItemsWhenSearchSelected()
                 true
@@ -5968,6 +5973,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     ) {
         Timber.d("showNodeOptionsPanel")
         if (node == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
+        if (drawerItem == DrawerItem.SEARCH) {
+            Analytics.tracker.trackEvent(SearchResultOverflowMenuItemEvent)
+        }
         bottomSheetDialogFragment = NodeOptionsBottomSheetDialogFragment.newInstance(
             nodeId = NodeId(node.handle),
             shareData = shareData,

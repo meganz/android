@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -74,6 +75,8 @@ import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.mobile.analytics.event.SearchItemSelected
+import mega.privacy.mobile.analytics.event.SearchItemSelectedEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
@@ -853,6 +856,13 @@ class SearchFragment : RotatableFragment() {
     fun itemClick(position: Int) {
         val node = adapter.getItem(position)
         Timber.d("Position: $position")
+        node?.let {
+            Analytics.tracker.trackEvent(
+                SearchItemSelectedEvent(
+                    if (node.isFolder) SearchItemSelected.SearchItemType.Folder else SearchItemSelected.SearchItemType.File
+                )
+            )
+        }
         if (adapter.isMultipleSelect) {
             adapter.toggleSelection(position)
             if (adapter.selectedNodes.size > 0) {

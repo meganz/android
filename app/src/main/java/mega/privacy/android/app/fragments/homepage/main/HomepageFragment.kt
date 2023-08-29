@@ -61,7 +61,11 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.mobile.analytics.event.HomeScreenAudioTilePressedEvent
+import mega.privacy.mobile.analytics.event.HomeScreenDocsTilePressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenEvent
+import mega.privacy.mobile.analytics.event.HomeScreenSearchMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.HomeScreenVideosTilePressedEvent
 import mega.privacy.mobile.analytics.event.OfflineTabEvent
 import mega.privacy.mobile.analytics.event.RecentsTabEvent
 import nz.mega.sdk.MegaBanner
@@ -138,9 +142,21 @@ class HomepageFragment : Fragment() {
         with(viewDataBinding.category) {
             val direction = when (it) {
                 categoryFavourites -> HomepageFragmentDirections.actionHomepageFragmentToFavourites()
-                categoryDocument -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
-                categoryAudio -> HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
-                categoryVideo -> HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
+                categoryDocument -> {
+                    Analytics.tracker.trackEvent(HomeScreenDocsTilePressedEvent)
+                    HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
+                }
+
+                categoryAudio -> {
+                    Analytics.tracker.trackEvent(HomeScreenAudioTilePressedEvent)
+                    HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
+                }
+
+                categoryVideo -> {
+                    Analytics.tracker.trackEvent(HomeScreenVideosTilePressedEvent)
+                    HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
+                }
+
                 else -> return@with
             }
 
@@ -380,7 +396,10 @@ class HomepageFragment : Fragment() {
         }
 
         searchInputView.setOnSearchInputClickListener {
-            doIfOnline(false) { activity.homepageToSearch() }
+            doIfOnline(false) {
+                Analytics.tracker.trackEvent(HomeScreenSearchMenuToolbarEvent)
+                activity.homepageToSearch()
+            }
         }
 
         searchInputView.setOngoingCallClickListener {

@@ -21,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -74,6 +75,10 @@ import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.mobile.analytics.event.SearchResultGetLinkMenuItemEvent
+import mega.privacy.mobile.analytics.event.SearchResultOpenWithMenuItemEvent
+import mega.privacy.mobile.analytics.event.SearchResultSaveToDeviceMenuItemEvent
+import mega.privacy.mobile.analytics.event.SearchResultShareMenuItemEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
@@ -225,12 +230,25 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionEdit.setOnClickListener { onEditClicked(node) }
                 optionLabel.setOnClickListener { onLabelClicked(node) }
                 optionFavourite.setOnClickListener { onFavouriteClicked(node) }
-                optionDownload.setOnClickListener { onDownloadClicked(node) }
+                optionDownload.setOnClickListener {
+                    if (drawerItem == DrawerItem.SEARCH) {
+                        Analytics.tracker.trackEvent(SearchResultSaveToDeviceMenuItemEvent)
+                    }
+                    onDownloadClicked(node)
+                }
                 optionOffline.setOnClickListener { onOfflineClicked(node) }
                 optionInfo.setOnClickListener { onPropertiesClicked(node) }
-                optionLink.setOnClickListener { onLinkClicked(node) }
+                optionLink.setOnClickListener {
+                    if (drawerItem == DrawerItem.SEARCH) {
+                        Analytics.tracker.trackEvent(SearchResultGetLinkMenuItemEvent)
+                    }
+                    onLinkClicked(node)
+                }
                 optionRemoveLink.setOnClickListener { onRemoveLinkClicked(node) }
                 optionShare.setOnClickListener {
+                    if (drawerItem == DrawerItem.SEARCH) {
+                        Analytics.tracker.trackEvent(SearchResultShareMenuItemEvent)
+                    }
                     shareNode(requireActivity(), node)
                 }
                 optionShareFolder.setOnClickListener { nodeOptionsViewModel.createShareKey() }
@@ -247,7 +265,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionRemove.setOnClickListener { onDeleteClicked(node) }
                 optionOpenFolder.setOnClickListener { onOpenFolderClicked(node) }
                 optionSlideshow.setOnClickListener { onSlideShowClicked(node) }
-                optionOpenWith.setOnClickListener { onOpenWithClicked(node) }
+                optionOpenWith.setOnClickListener {
+                    if (drawerItem == DrawerItem.SEARCH) {
+                        Analytics.tracker.trackEvent(SearchResultOpenWithMenuItemEvent)
+                    }
+                    onOpenWithClicked(node)
+                }
                 optionVersionsLayout.setOnClickListener { onVersionsClicked(node) }
 
                 val isTakenDown = node.isTakenDown
