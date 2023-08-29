@@ -1072,10 +1072,8 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
             if (error == null) {
                 Timber.d("Upload OK: $nodeHandle")
 
-                lifecycleScope.launch {
-                    runCatching { setNodeAttributesAfterUploadUseCase(nodeHandle, File(localPath)) }
-                        .onFailure { error -> Timber.e("Set Node Attributes error: $error") }
-                }
+                runCatching { setNodeAttributesAfterUploadUseCase(nodeHandle, File(localPath)) }
+                    .onFailure { error -> Timber.e("Set Node Attributes error: $error") }
 
                 if (isVoiceClip()) {
                     Timber.d("Is voice clip")

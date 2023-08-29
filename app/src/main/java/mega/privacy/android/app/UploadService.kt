@@ -855,10 +855,8 @@ internal class UploadService : LifecycleService() {
                         completedSuccessfully++
                     }
                 }
-                lifecycleScope.launch {
-                    runCatching { setNodeAttributesAfterUploadUseCase(nodeHandle, File(localPath)) }
-                        .onFailure { error -> Timber.e("Set Node Attributes error: $error") }
-                }
+                runCatching { setNodeAttributesAfterUploadUseCase(nodeHandle, File(localPath)) }
+                    .onFailure { error -> Timber.e("Set Node Attributes error: $error") }
             } else {
                 Timber.e(
                     "Upload Error: ${fileName}_${error.errorCode}___${error.errorString}"
