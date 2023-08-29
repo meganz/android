@@ -226,7 +226,6 @@ class MediaDiscoveryViewModel @Inject constructor(
                 it.copy(
                     loadPhotosDone = true,
                     uiPhotoList = uiPhotoList,
-                    shouldBack = shouldBack(uiPhotoList),
                     yearsCardList = yearsCardList,
                     monthsCardList = monthsCardList,
                     daysCardList = daysCardList,
@@ -238,7 +237,6 @@ class MediaDiscoveryViewModel @Inject constructor(
                     loadPhotosDone = true,
                     sourcePhotos = sourcePhotos,
                     uiPhotoList = uiPhotoList,
-                    shouldBack = shouldBack(uiPhotoList),
                     yearsCardList = yearsCardList,
                     monthsCardList = monthsCardList,
                     daysCardList = daysCardList,
@@ -258,10 +256,6 @@ class MediaDiscoveryViewModel @Inject constructor(
         Sort.OLDEST -> SortOrder.ORDER_MODIFICATION_ASC
         else -> SortOrder.ORDER_MODIFICATION_DESC
     }
-
-    private fun shouldBack(uiPhotoList: MutableList<UIPhoto>) =
-        _state.value.currentMediaType == FilterMediaType.ALL_MEDIA
-                && uiPhotoList.isEmpty()
 
     private fun needsDateSeparator(
         current: Photo,

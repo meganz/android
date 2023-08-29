@@ -25,7 +25,6 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property scrollStartIndex the start index of scroll
  * @property scrollStartOffset the start offset of scroll
  * @property mediaDiscoveryViewSettings media discovery dialog view settings
- * @property shouldBack handle empty state, when no photos then back to file list page, eg, delete.
  * @property showSortByDialog
  * @property showFilterDialog
  * @property showSlidersPopup
@@ -50,7 +49,6 @@ data class MediaDiscoveryViewState(
     val scrollStartIndex: Int = 0,
     val scrollStartOffset: Int = 0,
     val mediaDiscoveryViewSettings: Int? = null,
-    val shouldBack: Boolean = false,
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
     val showSlidersPopup: Boolean = false,

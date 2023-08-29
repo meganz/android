@@ -111,9 +111,6 @@ fun MediaDiscoveryView(
         coroutineScope.launch { modalSheetState.hide() }
     }
 
-    if (mediaDiscoveryViewState.shouldBack)
-        Back()
-
     HandleSortByDialog(
         mediaDiscoveryViewState = mediaDiscoveryViewState,
         mediaDiscoveryViewModel = mediaDiscoveryViewModel,
