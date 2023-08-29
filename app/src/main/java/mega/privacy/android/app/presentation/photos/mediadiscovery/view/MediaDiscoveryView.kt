@@ -187,7 +187,14 @@ fun MediaDiscoveryView(
                         }
                     )
                 }
-                EmptyView(mediaDiscoveryViewState.currentMediaType)
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    ListViewIconButton(
+                        onSwitchListView = onSwitchListView
+                    )
+                    EmptyView(mediaDiscoveryViewState.currentMediaType)
+                }
             }
         }
     } else {
@@ -497,10 +504,11 @@ private fun AddFabButton(
 
 @Composable
 private fun ListViewIconButton(
+    modifier: Modifier = Modifier,
     onSwitchListView: () -> Unit,
 ) {
     IconButton(
-        modifier = Modifier
+        modifier = modifier
             .padding(end = 16.dp)
             .size(16.dp),
         onClick = onSwitchListView,
