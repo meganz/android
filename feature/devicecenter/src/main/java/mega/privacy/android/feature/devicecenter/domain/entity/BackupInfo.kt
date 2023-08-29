@@ -13,12 +13,12 @@ package mega.privacy.android.feature.devicecenter.domain.entity
  * @param subState Any of the [BackupInfoSubState] values
  * @param extraInfo The extra information used as a source for extracting other details
  * @param name The Backup Name
- * @param timestamp The Backup Timestamp reported by Heartbeats
+ * @param timestamp The Backup Timestamp reported by Heartbeats, measured in seconds
  * @param status Any of the [BackupInfoHeartbeatStatus] values
  * @param progress The Backup Progress reported by Heartbeats
  * @param uploadCount The total Upload count
  * @param downloadCount The total Download count
- * @param lastActivityTimestamp The Last Activity Timestamp reported by Heartbeats
+ * @param lastActivityTimestamp The Last Activity Timestamp reported by Heartbeats, measured in seconds
  * @param lastSyncedNodeHandle The Last Synced Node Handle
  */
 data class BackupInfo(

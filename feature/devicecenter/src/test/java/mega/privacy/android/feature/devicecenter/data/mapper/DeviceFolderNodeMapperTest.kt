@@ -172,7 +172,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has an offline status when the backup is a mobile backup`(
         backupType: BackupInfoType,
     ) {
-        val currentTime = System.currentTimeMillis()
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupInfoList = listOf<BackupInfo>(
@@ -180,8 +180,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
-                on { timestamp }.thenReturn(currentTime.minus(TimeUnit.HOURS.toMillis(2)))
-                on { lastActivityTimestamp }.thenReturn(TimeUnit.HOURS.toMillis(2))
+                on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2)))
+                on { lastActivityTimestamp }.thenReturn(TimeUnit.HOURS.toSeconds(2))
                 on { rootHandle }.thenReturn(1000L)
             },
         )
@@ -205,7 +205,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has an offline status when the backup is a non mobile backup`(
         backupType: BackupInfoType,
     ) {
-        val currentTime = System.currentTimeMillis()
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupInfoList = listOf<BackupInfo>(
@@ -213,8 +213,10 @@ internal class DeviceFolderNodeMapperTest {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
-                on { timestamp }.thenReturn(currentTime.minus(7200000L))
-                on { lastActivityTimestamp }.thenReturn(currentTime.minus(7200000L))
+                on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2)))
+                on { lastActivityTimestamp }.thenReturn(
+                    currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2))
+                )
                 on { rootHandle }.thenReturn(1000L)
             },
         )
@@ -237,6 +239,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a paused status when the backup type is a two way sync`(
         backupState: BackupInfoState,
     ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.TWO_WAY_SYNC
@@ -246,6 +249,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -267,6 +272,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a paused status when the backup type is camera uploads`(
         backupState: BackupInfoState,
     ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
@@ -276,6 +282,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -297,6 +305,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a paused status when the backup type is media uploads`(
         backupState: BackupInfoState,
     ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.MEDIA_UPLOADS
@@ -306,6 +315,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -327,6 +338,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a paused status when the backup type is a download sync`(
         backupState: BackupInfoState,
     ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.DOWN_SYNC
@@ -336,6 +348,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -357,6 +371,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has a paused status when the backup type is an upload sync`(
         backupState: BackupInfoState,
     ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.UP_SYNC
@@ -366,6 +381,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
                 on { state }.thenReturn(backupState)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -387,6 +404,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has an up to date status when the heartbeat status is up to date`(
         backupState: BackupInfoState,
     ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.INVALID
@@ -397,6 +415,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { state }.thenReturn(backupState)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.UPTODATE)
                 on { type }.thenReturn(backupType)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -418,6 +438,7 @@ internal class DeviceFolderNodeMapperTest {
     fun `test that the mapped device folder has an up to date status when the heartbeat status is inactive`(
         backupState: BackupInfoState,
     ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.INVALID
@@ -428,6 +449,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { state }.thenReturn(backupState)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.INACTIVE)
                 on { type }.thenReturn(backupType)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -443,6 +466,7 @@ internal class DeviceFolderNodeMapperTest {
 
     @Test
     fun `test that the mapped device folder has an initializing status`() {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
@@ -452,6 +476,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.UNKNOWN)
                 on { type }.thenReturn(backupType)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -467,6 +493,7 @@ internal class DeviceFolderNodeMapperTest {
 
     @Test
     fun `test that the mapped device folder has a syncing status`() {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
@@ -478,6 +505,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.SYNCING)
                 on { progress }.thenReturn(backupProgress)
                 on { type }.thenReturn(backupType)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
@@ -493,6 +522,7 @@ internal class DeviceFolderNodeMapperTest {
 
     @Test
     fun `test that the mapped device folder has a scanning status`() {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
@@ -502,6 +532,8 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { status }.thenReturn(BackupInfoHeartbeatStatus.PENDING)
                 on { type }.thenReturn(backupType)
+                on { timestamp }.thenReturn(currentTimeInSeconds)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(

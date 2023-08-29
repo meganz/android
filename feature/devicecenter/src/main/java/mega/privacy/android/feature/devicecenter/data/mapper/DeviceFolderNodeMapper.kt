@@ -23,12 +23,12 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      * @return The corresponding list of [DeviceFolderNode] objects
      */
     operator fun invoke(backupInfoList: List<BackupInfo>): List<DeviceFolderNode> {
-        val currentTime = System.currentTimeMillis()
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         return backupInfoList.map { backupInfo ->
             DeviceFolderNode(
                 id = backupInfo.id.toString(),
                 name = backupInfo.name.orEmpty(),
-                status = backupInfo.getDeviceFolderStatus(currentTime),
+                status = backupInfo.getDeviceFolderStatus(currentTimeInSeconds),
                 type = backupInfo.type,
             )
         }
@@ -51,16 +51,16 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      *
      * If there is no matching Folder Status, [DeviceCenterNodeStatus.Unknown] is returned
      *
-     * @param currentTime The current time the [DeviceFolderNodeMapper] was invoked, measured in
-     * milliseconds
+     * @param currentTimeInSeconds The current time the [DeviceFolderNodeMapper] was invoked in
+     * seconds
      * @return The Folder Status
      */
-    private fun BackupInfo.getDeviceFolderStatus(currentTime: Long) = when {
+    private fun BackupInfo.getDeviceFolderStatus(currentTimeInSeconds: Long) = when {
         isStopped() -> DeviceCenterNodeStatus.Stopped
         isOverquota() -> DeviceCenterNodeStatus.Overquota
         isBlocked() -> DeviceCenterNodeStatus.Blocked(subState)
         isDisabled() -> DeviceCenterNodeStatus.Disabled
-        isOffline(currentTime) -> DeviceCenterNodeStatus.Offline
+        isOffline(currentTimeInSeconds) -> DeviceCenterNodeStatus.Offline
         isPaused() -> DeviceCenterNodeStatus.Paused
         isUpToDate() -> DeviceCenterNodeStatus.UpToDate
         isInitializing() -> DeviceCenterNodeStatus.Initializing
@@ -112,21 +112,19 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      * 3. For Other Devices, if the last Backup Heartbeat was more than 30 minutes ago
      * 4. The MEGA Folder is missing OR created more than 10 minutes ago
      *
-     * @param currentTime The current time the [DeviceFolderNodeMapper] was invoked, measured in
-     * milliseconds
+     * @param currentTimeInSeconds The current time the [DeviceFolderNodeMapper] was invoked in seconds
      * @return true if the following conditions are met, and false if otherwise
      */
-    private fun BackupInfo.isOffline(currentTime: Long): Boolean {
-        val maxLastHeartbeatTimeForMobileDevices = TimeUnit.MINUTES.toMillis(60)
-        val maxLastSyncTimeForOtherDevices = TimeUnit.MINUTES.toMillis(30)
-        val maxLastBackupType = TimeUnit.MINUTES.toMillis(10)
+    private fun BackupInfo.isOffline(currentTimeInSeconds: Long): Boolean {
+        val maxLastHeartbeatTimeForMobileDevices = TimeUnit.MINUTES.toSeconds(60)
+        val maxLastSyncTimeForOtherDevices = TimeUnit.MINUTES.toSeconds(30)
+        val maxLastBackupType = TimeUnit.MINUTES.toSeconds(10)
 
         val isMobileBackup =
             type == BackupInfoType.CAMERA_UPLOADS || type == BackupInfoType.MEDIA_UPLOADS
-        val lastBackupTimestamp = currentTime - timestamp
-        val lastBackupActivityTimestamp = currentTime - lastActivityTimestamp
-        val lastBackupHeartbeat =
-            currentTime - maxOf(lastBackupTimestamp, lastBackupActivityTimestamp)
+        val lastBackupTimestamp = currentTimeInSeconds - timestamp
+        val lastBackupActivityTimestamp = currentTimeInSeconds - lastActivityTimestamp
+        val lastBackupHeartbeat = maxOf(lastBackupTimestamp, lastBackupActivityTimestamp)
         val isLastBackupHeartbeatOutOfRange =
             (isMobileBackup && (lastBackupHeartbeat > maxLastHeartbeatTimeForMobileDevices))
                     || (!isMobileBackup && (lastBackupHeartbeat > maxLastSyncTimeForOtherDevices))
