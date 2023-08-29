@@ -54,7 +54,7 @@ internal fun SyncNewFolderScreenRoute(
         localFolderSelected = { viewModel.handleAction(LocalFolderSelected(it)) },
         folderNameChanged = { viewModel.handleAction(FolderNameChanged(it)) },
         selectMegaFolderClicked = openSelectMegaFolderScreen,
-        showDisableBatteryOptimizationsBanner = showDisableBatteryOptimizationsBanner,
+        showDisableBatteryOptimizationsBanner = showDisableBatteryOptimizationsBanner && state.value.selectedMegaFolder != null,
         batteryOptimizationAllowButtonClicked = {
             permissionsLauncher.launch(
                 syncPermissionsManager.getDisableBatteryOptimizationsIntent(
@@ -65,7 +65,7 @@ internal fun SyncNewFolderScreenRoute(
         batteryOptimizationLearnMoreButtonClicked = {
             context.startActivity(syncPermissionsManager.getLearnMorePageIntent())
         },
-        showAllFilesAccessBanner = showAllFilesAccessBanner,
+        showAllFilesAccessBanner = showAllFilesAccessBanner && state.value.selectedMegaFolder != null,
         allFilesAccessBannerClicked = {
             permissionsLauncher.launch(
                 syncPermissionsManager.getManageExternalStoragePermissionIntent(

@@ -173,7 +173,7 @@ class SyncNewFolderScreenRouteTest {
 
     @Test
     fun `test that only all files access banner is shown when all files access permission is not granted`() {
-        val emptyState = SyncNewFolderState()
+        val emptyState = SyncNewFolderState(selectedMegaFolder = RemoteFolder(0, ""))
         whenever(state.value).thenReturn(emptyState)
         whenever(viewModel.state).thenReturn(state)
         whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())
@@ -202,7 +202,7 @@ class SyncNewFolderScreenRouteTest {
 
     @Test
     fun `test that only battery optimization banner is shown when disable battery optimization permission is not granted`() {
-        val emptyState = SyncNewFolderState()
+        val emptyState = SyncNewFolderState(selectedMegaFolder = RemoteFolder(0, ""))
         whenever(state.value).thenReturn(emptyState)
         whenever(viewModel.state).thenReturn(state)
         whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())

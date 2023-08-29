@@ -1,19 +1,34 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
-import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.CurrentFolderSelected
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import nz.mega.sdk.MegaApiJava
 
 @Composable
 internal fun MegaPickerRoute(
     viewModel: MegaPickerViewModel,
+    syncPermissionsManager: SyncPermissionsManager,
     folderSelected: () -> Unit,
     backClicked: () -> Unit,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+
+    val permissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { _ ->
+        selectCurrentFolder(viewModel, syncPermissionsManager, context)
+    }
 
     state.value.nodes?.let { nodes ->
         MegaPickerScreen(
@@ -21,8 +36,7 @@ internal fun MegaPickerRoute(
             nodes = nodes,
             folderClicked = { viewModel.handleAction(FolderClicked(it)) },
             currentFolderSelected = {
-                viewModel.handleAction(CurrentFolderSelected)
-                folderSelected()
+                selectCurrentFolder(viewModel, syncPermissionsManager, context)
             },
         )
     }
@@ -35,6 +49,87 @@ internal fun MegaPickerRoute(
         }
     }
 
+    if (state.value.showAllFilesAccessDialog) {
+        AllFilesAccessDialog(
+            onConfirm = {
+                permissionsLauncher.launch(
+                    syncPermissionsManager.getManageExternalStoragePermissionIntent(
+                        context
+                    )
+                )
+                viewModel.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)
+            },
+            onDismiss = {
+                viewModel.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)
+            },
+        )
+    }
+    if (state.value.showDisableBatteryOptimizationsDialog) {
+        DisableBatteryOptimizationDialog(
+            onConfirm = {
+                permissionsLauncher.launch(
+                    syncPermissionsManager.getDisableBatteryOptimizationsIntent(
+                        context
+                    )
+                )
+                viewModel.handleAction(MegaPickerAction.DisableBatteryOptimizationsDialogShown)
+            },
+            onDismiss = {
+                viewModel.handleAction(MegaPickerAction.DisableBatteryOptimizationsDialogShown)
+            },
+        )
+    }
+
+    EventEffect(event = state.value.navigateNextEvent, onConsumed = {
+        viewModel.handleAction(MegaPickerAction.NextScreenOpened)
+    }) {
+        folderSelected()
+    }
+
     BackHandler(onBack = onBack)
 }
 
+private fun selectCurrentFolder(
+    viewModel: MegaPickerViewModel,
+    syncPermissionsManager: SyncPermissionsManager,
+    context: Context,
+) {
+    viewModel.handleAction(
+        MegaPickerAction.CurrentFolderSelected(
+            allFilesAccessPermissionGranted = syncPermissionsManager.isManageExternalStoragePermissionGranted(),
+            disableBatteryOptimizationPermissionGranted = syncPermissionsManager.isDisableBatteryOptimizationGranted(
+                context
+            )
+        )
+    )
+}
+
+@Composable
+private fun AllFilesAccessDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    MegaAlertDialog(
+        text = "Allow MEGA to read, modify or delete all files on this device.",
+        confirmButtonText = "Allow",
+        cancelButtonText = "Cancel",
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+        title = "Allow MEGA to access all files",
+    )
+}
+
+@Composable
+private fun DisableBatteryOptimizationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    MegaAlertDialog(
+        text = "Allow MEGA to read, modify or delete all files on this device.",
+        confirmButtonText = "Allow",
+        cancelButtonText = "Cancel",
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+        title = "Battery optimization",
+    )
+}

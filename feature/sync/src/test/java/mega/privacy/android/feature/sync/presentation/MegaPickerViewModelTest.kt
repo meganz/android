@@ -154,7 +154,12 @@ internal class MegaPickerViewModelTest {
         })
         initViewModel()
 
-        underTest.handleAction(MegaPickerAction.CurrentFolderSelected)
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = true,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
 
         verify(setSelectedMegaFolderUseCase).invoke(
             RemoteFolder(
@@ -163,6 +168,75 @@ internal class MegaPickerViewModelTest {
             )
         )
     }
+
+    @Test
+    fun `test that all files access permission is shown when it is not granted`() = runTest {
+        initViewModel()
+
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = false,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
+
+        underTest.state.test {
+            assertThat(awaitItem().showAllFilesAccessDialog).isEqualTo(true)
+        }
+    }
+
+    @Test
+    fun `test that all files access permission is not shown when it is granted`() = runTest {
+        initViewModel()
+
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = true,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
+
+        underTest.state.test {
+            assertThat(awaitItem().showAllFilesAccessDialog).isEqualTo(false)
+        }
+    }
+
+    @Test
+    fun `test that disable battery optimization permission is shown when it is not granted`() =
+        runTest {
+            initViewModel()
+
+            underTest.handleAction(
+                MegaPickerAction.CurrentFolderSelected(
+                    allFilesAccessPermissionGranted = true,
+                    disableBatteryOptimizationPermissionGranted = false
+                )
+            )
+
+            underTest.state.test {
+                assertThat(awaitItem().showDisableBatteryOptimizationsDialog)
+                    .isEqualTo(true)
+            }
+        }
+
+    @Test
+    fun `test that disable battery optimization permission is not shown when it is granted`() =
+        runTest {
+            initViewModel()
+
+            underTest.handleAction(
+                MegaPickerAction.CurrentFolderSelected(
+                    allFilesAccessPermissionGranted = true,
+                    disableBatteryOptimizationPermissionGranted = true
+                )
+            )
+
+            underTest.state.test {
+                assertThat(awaitItem().showDisableBatteryOptimizationsDialog).isEqualTo(
+                    false
+                )
+            }
+        }
 
     private fun initViewModel() {
         underTest = MegaPickerViewModel(

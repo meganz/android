@@ -8,5 +8,14 @@ internal sealed interface MegaPickerAction {
 
     object BackClicked : MegaPickerAction
 
-    object CurrentFolderSelected : MegaPickerAction
+    data class CurrentFolderSelected(
+        val allFilesAccessPermissionGranted: Boolean,
+        val disableBatteryOptimizationPermissionGranted: Boolean,
+    ) : MegaPickerAction
+
+    object AllFilesAccessPermissionDialogShown : MegaPickerAction
+
+    object DisableBatteryOptimizationsDialogShown : MegaPickerAction
+
+    object NextScreenOpened : MegaPickerAction
 }
