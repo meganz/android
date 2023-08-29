@@ -126,7 +126,14 @@ fun MediaDiscoveryView(
                 onSwitchListView = onSwitchListView,
             )
         } else {
-            EmptyView(mediaDiscoveryViewState.currentMediaType)
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                ListViewIconButton(
+                    onSwitchListView = onSwitchListView
+                )
+                EmptyView(mediaDiscoveryViewState.currentMediaType)
+            }
         }
     } else {
         PhotosSkeletonView()
@@ -345,10 +352,11 @@ private fun MDView(
 
 @Composable
 private fun ListViewIconButton(
+    modifier: Modifier = Modifier,
     onSwitchListView: () -> Unit,
 ) {
     IconButton(
-        modifier = Modifier
+        modifier = modifier
             .padding(end = 16.dp)
             .size(16.dp),
         onClick = onSwitchListView,
