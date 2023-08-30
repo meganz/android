@@ -7277,8 +7277,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun uploadContactInfo(info: ShareInfo?, parentNode: MegaNode?) {
         Timber.d("Upload contact info")
-        val cursorID = info?.contactUri?.let { contentResolver.query(it, null, null, null, null) }
-        if (cursorID != null) {
+        runCatching {
+            val cursorID =
+                info?.contactUri?.let { contentResolver.query(it, null, null, null, null) }
+                    ?: throw NullPointerException("Cursor of ${info?.contactUri} is null")
             if (cursorID.moveToFirst()) {
                 Timber.d("It is a contact")
                 var id: String? = null
@@ -7353,7 +7355,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 createFile(name, data.toString(), parentNode)
             }
             cursorID.close()
-        } else {
+        }.onFailure {
+            Timber.e(it)
             showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_temporary_unavaible), -1)
         }
     }
