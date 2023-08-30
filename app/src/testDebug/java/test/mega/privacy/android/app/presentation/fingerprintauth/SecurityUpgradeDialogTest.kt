@@ -32,7 +32,7 @@ class SecurityUpgradeDialogTest {
             onNodeWithTag("HeaderImage").assertIsDisplayed()
             onNodeWithText(R.string.shared_items_security_upgrade_dialog_title).assertIsDisplayed()
             onNodeWithText(R.string.shared_items_security_upgrade_dialog_content).assertIsDisplayed()
-            onNodeWithText(R.string.shared_items_security_upgrade_dialog_button_ok_got_it).assertIsDisplayed()
+            onNodeWithText(R.string.general_ok).assertIsDisplayed()
         }
     }
 }

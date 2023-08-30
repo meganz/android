@@ -681,7 +681,7 @@ private fun ErrorAccessDialog(
                 onClick = onDismiss,
                 content = {
                     Text(
-                        text = stringResource(id = R.string.album_import_error_access_confirmation),
+                        text = stringResource(id = R.string.general_ok),
                         color = teal_300,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,

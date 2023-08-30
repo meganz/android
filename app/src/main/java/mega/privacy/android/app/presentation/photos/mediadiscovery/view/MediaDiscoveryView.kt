@@ -605,7 +605,7 @@ fun OKButton(
         onClick = onOKButtonClicked
     ) {
         Text(
-            text = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
+            text = stringResource(R.string.general_ok),
             fontSize = 16.sp
         )
     }
