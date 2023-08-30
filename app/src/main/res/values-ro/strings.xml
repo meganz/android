@@ -1050,7 +1050,7 @@
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">%1$d participanţii au fost invitaţi, dar %2$d participanții nu au fost invitați</string>
     <!-- chat message when a participant was added to a group chat -->
-    <string name="message_add_participant">[A]%1$s[/A][B] s-a alăturat chatului de grup prin invitație de la [/B][C]%2$s[/C]</string>
+    <string name="message_add_participant">[A]%1$s[/A][B] s-a alăturat chatului de grup la invitația [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
     <string name="message_remove_participant">[A]%1$s[/A][B] a fost eliminat din chatul de grup de către [/B][C]%2$s[/C]</string>
     <!-- Message shown when a participant change the title of a group chat. -->
@@ -1078,7 +1078,7 @@
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Istoricul chatului a fost șters de %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
-    <string name="non_format_message_add_participant">%1$s a fost adăugat în acest chat de grup prin invitație de la %2$s</string>
+    <string name="non_format_message_add_participant">%1$s a fost adăugat în acest chat de grup la invitația %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
     <string name="non_format_message_remove_participant">%1$s a fost eliminat din chatul de grup de %2$s</string>
     <!-- Message shown when a participant change the title of a group chat. -->
@@ -3436,7 +3436,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">Alege ecranul de start</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">Change settings to choose which screen opens when you launch the MEGA app.</string>
+    <string name="choose_start_screen_text">Modificați setările pentru a alege ce ecran se deschide atunci când lansați aplicația MEGA.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">Modifică setarea</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3562,7 +3562,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Abonament %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately via %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_android_platform_subscription">Aveți un abonament MEGA activ cu %1$s. Trebuie să o anulați separat prin %2$s, deoarece MEGA nu este în măsură să o anuleze pentru dvs. Vizitați Centrul nostru de ajutor pentru mai multe informații.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Ai un abonament MEGA activ. Acesta va fi anulat automat după ștergerea contului. Vizitează centrul nostru de asistență pentru mai multe informații.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3570,7 +3570,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Vizitează %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all your stored data. Please enter your password below.</string>
+    <string name="delete_account_text_other_platform_last_step">Acesta este ultimul pas pentru a vă șterge contul. Atât contul, cât și abonamentul dvs. vor fi șterse și veți pierde definitiv toate datele stocate. Vă rugăm să introduceți parola mai jos.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">Cronologie</string>
     <!-- Title of album tab in photos section. -->
@@ -4042,7 +4042,7 @@
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">Pentru a accesa folderul partajat, persoana care l-a partajat cu tine ar trebui să te aprobe și pe tine.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Aprobați %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Se pregătește fișierul pentru previzualizare</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4139,13 +4139,15 @@
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] de la [B]%2$s la %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
-        <item quantity="one">Every day effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Every %1$d days effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">În fiecare zi, începând cu [A]%2$s%1$s[/A] de la [B]%3$s la %4$s[/B]</item>
+        <item quantity="few">La fiecare %1$d zile, începând cu [A]%2$s%1$s[/A] de la [B]%3$s la %4$s[/B]</item>
+        <item quantity="other">La fiecare %1$d de zile, începând cu [A]%2$s%1$s[/A] de la [B]%3$s la %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
-        <item quantity="one">Every day effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Every %1$d days effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">În fiecare zi, începând cu [A]%2$s până în %3$s[/A] de la [B]%4$s la %5$s[/B]</item>
+        <item quantity="few">La fiecare %1$d zile, începând cu [A]%2$s până în %3$s[/A] de la [B]%4$s la %5$s[/B]</item>
+        <item quantity="other">La fiecare %1$d de zile, începând cu [A]%2$s până în %3$s[/A] de la [B]%4$s la %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
@@ -4652,7 +4654,7 @@
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Nu se poate aproba contactul</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t approve %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Nu poți aproba pe %s deoarece nu se află în lista de contacte. Așteaptă ca această persoană să îți accepte mai întâi invitația.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Pornește</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5302,7 +5304,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Participanții adăugați de non-gazde în timpul apelurilor nu vor fi trimiși în sala de așteptare. [A]Află mai multe [/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Unele persoane de contact cu care partajați informații nu au fost aprobate de dvs. Pentru a asigura un plus de securitate, vă recomandăm să aprobați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl aprobați și atingeți Informații.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">%1$d participant a fost eliminat</item>
@@ -5330,7 +5332,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Așteptați ca gazda să vă lase să intrați</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t approved. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s este partajat de un contact pe care nu l-ați aprobat. Pentru a asigura un plus de securitate, vă recomandăm să aprobați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl aprobați și atingeți Informații.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Nu părăsiți</string>
 </resources>

@@ -2174,7 +2174,7 @@
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_deleted_chat_link">[A]%1$s[/A][B] a supprimé le lien de conversation.[/B]</string>
     <!-- Title of the option to delete a chat link -->
-    <string name="action_delete_link">Supprimer le lien de conversation</string>
+    <string name="action_delete_link">Supprimer le lien de la conversation</string>
     <!-- Title of the alert when a chat link is invalid -->
     <string name="title_alert_chat_link_error">Lien de conversation</string>
     <!-- Text of the dialog to confirm after closing all other sessions -->
