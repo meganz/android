@@ -46,6 +46,7 @@ import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.PermissionRepositoryImpl
 import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
+import mega.privacy.android.data.repository.SearchRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
@@ -87,6 +88,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.RemotePreferencesRepository
+import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SlideshowRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
@@ -278,4 +280,7 @@ internal abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun providePerformanceReporterRepository(implementation: PerformanceReporterRepositoryImpl): PerformanceReporterRepository
+
+    @Binds
+    abstract fun bindSearchRepository(implementation: SearchRepositoryImpl): SearchRepository
 }
