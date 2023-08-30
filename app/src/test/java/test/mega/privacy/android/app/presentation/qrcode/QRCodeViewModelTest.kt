@@ -1,26 +1,27 @@
 package test.mega.privacy.android.app.presentation.qrcode
 
-import android.content.Context
 import android.graphics.Bitmap
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarMapper
+import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
+import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.QRCodeViewModel
-import mega.privacy.android.app.presentation.qrcode.mapper.CombineQRCodeAndAvatarMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
+import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
@@ -59,29 +60,19 @@ class QRCodeViewModelTest {
     private val deleteQRCodeUseCase: DeleteQRCodeUseCase = mock()
     private val getQRCodeFileUseCase: GetQRCodeFileUseCase = mock()
     private val resetContactLinkUseCase: ResetContactLinkUseCase = mock()
-    private val qrCodeMapper: QRCodeMapper = mock()
-    private val avatarMapper: AvatarMapper = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
-    private val context: Context = mock()
-    private val loadBitmapFromFileMapper: LoadBitmapFromFileMapper = mock()
     private val saveBitmapToFileMapper: SaveBitmapToFileMapper = mock()
-    private val getCircleBitmapMapper: GetCircleBitmapMapper = mock()
-    private val combineQRCodeAndAvatarMapper: CombineQRCodeAndAvatarMapper = mock()
     private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
     private val inviteContactUseCase = mock<InviteContactUseCase>()
+    private val avatarContentMapper = mock<AvatarContentMapper>()
+    private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val penColor = 0xFF00000
-    private val bgColor = 0xFFFFFF
-    private val avatarBorderColor = 0x0000FF
-    private val qrCodeWidth = 100
-    private val qrCodeHeight = 100
-    private val avatarWidth = 100
-    private val avatarBorderWidth = 3
+    private val initialContactLink = "https://contact_link1"
 
     @Before
     fun setup() {
@@ -93,17 +84,14 @@ class QRCodeViewModelTest {
             getQRCodeFileUseCase = getQRCodeFileUseCase,
             deleteQRCodeUseCase = deleteQRCodeUseCase,
             resetContactLinkUseCase = resetContactLinkUseCase,
-            qrCodeMapper = qrCodeMapper,
-            avatarMapper = avatarMapper,
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             getUserFullNameUseCase = getUserFullNameUseCase,
-            loadBitmapFromFile = loadBitmapFromFileMapper,
             saveBitmapToFile = saveBitmapToFileMapper,
-            getCircleBitmap = getCircleBitmapMapper,
-            combineQRCodeAndAvatar = combineQRCodeAndAvatarMapper,
             inviteContactUseCase = inviteContactUseCase,
-            queryScannedContactLinkUseCase = queryScannedContactLinkUseCase
+            queryScannedContactLinkUseCase = queryScannedContactLinkUseCase,
+            avatarContentMapper = avatarContentMapper,
+            myQRCodeTextErrorMapper = myQRCodeTextErrorMapper
         )
     }
 
@@ -117,14 +105,15 @@ class QRCodeViewModelTest {
         underTest.uiState.test {
             val initialState = awaitItem()
             with(initialState) {
+                assertThat(myQRCodeState).isEqualTo(MyCodeUIState.Idle)
                 assertThat(contactLink).isNull()
                 assertThat(qrCodeBitmap).isNull()
                 assertThat(isInProgress).isFalse()
                 assertThat(localQRCodeFile).isNull()
                 assertThat(hasQRCodeBeenDeleted).isFalse()
                 assertThat(resultMessage).isInstanceOf(consumed<Int>().javaClass)
-                assertThat(inviteContactResult).isNull()
-                assertThat(scannedContactLinkResult).isNull()
+                assertThat(inviteContactResult).isInstanceOf(consumed<InviteContactRequest>().javaClass)
+                assertThat(scannedContactLinkResult).isInstanceOf(consumed<ScannedContactLinkResult>().javaClass)
             }
         }
     }
@@ -171,107 +160,62 @@ class QRCodeViewModelTest {
         }
 
     @Test
-    fun `test that QR code can be generated from local cache`() = runTest {
-        val localQRCodeFile = mock<File> {
-            on { exists() }.thenReturn(true)
-        }
-        val bitmap = Bitmap.createBitmap(qrCodeWidth, qrCodeHeight, Bitmap.Config.ARGB_8888)
-        val contactLink = "https://contact_link"
-        whenever(getQRCodeFileUseCase()).thenReturn(localQRCodeFile)
-        whenever(loadBitmapFromFileMapper(localQRCodeFile)).thenReturn(bitmap)
-        whenever(createContactLinkUseCase(any())).thenReturn(contactLink)
-        createQRCode()
-        underTest.uiState.test {
-            val state = awaitItem()
-            with(state) {
-                assertThat(bitmap).isEqualTo(bitmap)
-                assertThat(isInProgress).isFalse()
-                assertThat(contactLink).isEqualTo(contactLink)
-            }
-        }
-    }
-
-    @Test
-    fun `test that QR code can be generated from remote`() = runTest {
-        val localQRCodeFile = mock<File> {
-            on { exists() }.thenReturn(false)
-        }
-        val bitmap = Bitmap.createBitmap(qrCodeWidth, qrCodeHeight, Bitmap.Config.ARGB_8888)
-        val contactLink = "https://contact_link"
-        whenever(getQRCodeFileUseCase()).thenReturn(localQRCodeFile)
-        whenever(createContactLinkUseCase(any())).thenReturn(contactLink)
-        whenever(combineQRCodeAndAvatarMapper(any(), any(), any(), any(), any(), any(), any()))
-            .thenReturn(bitmap)
-        createQRCode()
-        underTest.uiState.test {
-            val state = awaitItem()
-            with(state) {
-                assertThat(bitmap).isEqualTo(bitmap)
-                assertThat(isInProgress).isFalse()
-                assertThat(contactLink).isEqualTo(contactLink)
-            }
-        }
-    }
-
-    @Test
-    fun `test that ui state can be re-used when creating QR code`() = runTest {
-        stubCommonMock()
-        createQRCode()
-        whenever(getQRCodeFileUseCase()).thenReturn(null)
-        whenever(createContactLinkUseCase(any())).thenReturn(null)
-        createQRCode()
-        underTest.uiState.test {
-            val state = awaitItem()
-            with(state) {
-                assertThat(contactLink).isNotNull()
-                assertThat(qrCodeBitmap).isNotNull()
-            }
-        }
-    }
-
-    @Test
     fun `test that QRCode can be reset successfully`() = runTest {
-        stubCommonMock()
-        createQRCode()
-        val expectedQrCodeBitmap =
-            Bitmap.createBitmap(qrCodeWidth, qrCodeHeight, Bitmap.Config.ARGB_8888)
-        val contactLink = "https://contact_link2"
-        whenever(resetContactLinkUseCase()).thenReturn(contactLink)
-        whenever(combineQRCodeAndAvatarMapper(any(), any(), any(), any(), any(), any(), any()))
-            .thenReturn(expectedQrCodeBitmap)
+        prepareQRCode()
+        val localAvatarFile = mock<File> {
+            on { exists() }.thenReturn(true)
+            on { length() }.thenReturn(100)
+        }
+        val newContactLink = "https://contact_link2"
+        whenever(resetContactLinkUseCase()).thenReturn(newContactLink)
+        whenever(getMyAvatarFileUseCase(isForceRefresh = false)).thenReturn(localAvatarFile)
+        whenever(myQRCodeTextErrorMapper(any())).thenReturn("error")
 
-        // start real testing
-        underTest.resetQRCode(
-            width = qrCodeWidth,
-            height = qrCodeHeight,
-            penColor = penColor,
-            bgColor = bgColor,
-            avatarWidth = avatarWidth,
-            avatarBorderWidth = avatarBorderWidth,
-            avatarBorderColor = avatarBorderColor
-        )
+        underTest.resetQRCode()
         underTest.uiState.test {
-            val state = awaitItem()
-            with(state) {
-                assertThat(qrCodeBitmap).isEqualTo(expectedQrCodeBitmap)
-                assertThat(contactLink).isEqualTo(contactLink)
-                assertThat(isInProgress).isFalse()
-            }
+            val result = awaitItem()
+            assertThat(result.myQRCodeState).isInstanceOf(MyCodeUIState.QRCodeAvailable::class.java)
+            assertThat((result.myQRCodeState as MyCodeUIState.QRCodeAvailable).contactLink)
+                .isEqualTo(newContactLink)
+        }
+    }
+
+    @Test
+    fun `test that QRCode reset fails when resetContactLink use case throws exception`() = runTest {
+        prepareQRCode()
+
+        whenever(resetContactLinkUseCase()).thenAnswer { throw Exception() }
+        whenever(myQRCodeTextErrorMapper(any())).thenReturn("error")
+        underTest.resetQRCode()
+        underTest.uiState.test {
+            val result = awaitItem()
+            assertThat((result.myQRCodeState as MyCodeUIState.QRCodeAvailable).contactLink)
+                .isEqualTo(initialContactLink)
         }
     }
 
     @Test
     fun `test that QR Code can be deleted successfully`() = runTest {
-        stubCommonMock()
-        createQRCode()
+        prepareQRCode()
         underTest.deleteQRCode()
         underTest.uiState.test {
             val state = awaitItem()
-            with(state) {
-                assertThat(contactLink).isNull()
-                assertThat(qrCodeBitmap).isNull()
-                assertThat(hasQRCodeBeenDeleted).isTrue()
-            }
+            assertThat(state.myQRCodeState).isInstanceOf(MyCodeUIState.QRCodeDeleted::class.java)
+        }
+    }
+
+    @Test
+    fun `test that error message is shown when delete QR code fails`() = runTest {
+        prepareQRCode()
+
+        whenever(deleteQRCodeUseCase(any())).thenAnswer { throw Exception() }
+        whenever(myQRCodeTextErrorMapper(any())).thenReturn("error")
+
+        underTest.deleteQRCode()
+        underTest.uiState.test {
+            val result = awaitItem()
+            assertThat((result.myQRCodeState as MyCodeUIState.QRCodeAvailable).contactLink)
+                .isEqualTo(initialContactLink)
         }
     }
 
@@ -282,9 +226,9 @@ class QRCodeViewModelTest {
                 .thenReturn(InviteContactRequest.Sent)
             underTest.uiState.test {
                 awaitItem()
-                underTest.sendInvite()
+                underTest.sendInvite(123L, "abc@gmail.com")
                 val newValue = awaitItem()
-                assertThat(newValue.inviteContactResult).isEqualTo(InviteContactRequest.Sent)
+                assertThat(newValue.inviteContactResult).isInstanceOf(triggered(InviteContactRequest.Sent).javaClass)
             }
         }
 
@@ -295,46 +239,32 @@ class QRCodeViewModelTest {
                 .thenAnswer { throw RuntimeException() }
             underTest.uiState.test {
                 awaitItem()
-                underTest.sendInvite()
+                underTest.sendInvite(123L, "abc@gmail.com")
                 val newValue = awaitItem()
-                assertThat(newValue.inviteContactResult).isEqualTo(InviteContactRequest.InvalidStatus)
+                assertThat(newValue.inviteContactResult).isInstanceOf(triggered(InviteContactRequest.InvalidStatus).javaClass)
             }
         }
 
-    private fun createQRCode() {
-        underTest.createQRCode(
-            width = qrCodeWidth,
-            height = qrCodeHeight,
-            penColor = penColor,
-            bgColor = bgColor,
-            avatarWidth = avatarWidth,
-            avatarBorderWidth = avatarBorderWidth,
-            avatarBorderColor = avatarBorderColor,
-        )
-    }
-
-    private suspend fun stubCommonMock() {
-        val localQRCodeFile = mock<File> {
-            on { exists() }.thenReturn(true)
-        }
+    private suspend fun prepareQRCode() {
         val localAvatarFile = mock<File> {
             on { exists() }.thenReturn(true)
             on { length() }.thenReturn(100)
         }
-        val bitmap = Bitmap.createBitmap(qrCodeWidth, qrCodeHeight, Bitmap.Config.ARGB_8888)
-        val expectedQrCodeBitmap =
-            Bitmap.createBitmap(qrCodeWidth, qrCodeHeight, Bitmap.Config.ARGB_8888)
-        val contactLink = "https://contact_link1"
-        whenever(getQRCodeFileUseCase()).thenReturn(localQRCodeFile)
-        whenever(loadBitmapFromFileMapper(localQRCodeFile)).thenReturn(bitmap)
-        whenever(createContactLinkUseCase(any())).thenReturn(contactLink)
-        whenever(qrCodeMapper(any(), any(), any(), any(), any())).thenReturn(bitmap)
-        whenever(getUserFullNameUseCase(any())).thenReturn("fullname")
-        whenever(loadBitmapFromFileMapper(any())).thenReturn(bitmap)
-        whenever(getCircleBitmapMapper(any())).thenReturn(bitmap)
-        whenever(combineQRCodeAndAvatarMapper(any(), any(), any(), any(), any(), any(), any()))
-            .thenReturn(expectedQrCodeBitmap)
-        whenever(context.getString(any())).thenReturn("first name").thenReturn("last name")
-        whenever(getMyAvatarFileUseCase(isForceRefresh = false)).thenReturn(localAvatarFile)
+
+        whenever(createContactLinkUseCase(any())).thenReturn(initialContactLink)
+        whenever(getMyAvatarFileUseCase(any())).thenReturn(localAvatarFile)
+        whenever(getUserFullNameUseCase(any())).thenReturn("FullName")
+        whenever(getMyAvatarColorUseCase()).thenReturn(0xFFFFF)
+
+        whenever(
+            avatarContentMapper.invoke(
+                fullName = "FullName",
+                localFile = localAvatarFile,
+                showBorder = true,
+                textSize = 38.sp,
+                backgroundColor = 0xFFFFF
+            )
+        ).thenReturn(PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true))
+        underTest.createQRCode()
     }
 }

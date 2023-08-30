@@ -54,6 +54,7 @@ import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.extensions.body1Medium
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -106,7 +107,9 @@ internal fun AuthenticationSetupScreen(
                     .align(CenterHorizontally)
                     .testTag(QR_CODE_TEST_TAG),
                 text = qrText,
-                qrCodeMapper = qrCodeMapper
+                qrCodeMapper = qrCodeMapper,
+                penColor = dark_grey,
+                bgColor = MaterialTheme.colors.white_grey_700
             )
             Spacer(modifier = Modifier.height(20.dp))
             SeedsBox(

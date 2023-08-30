@@ -1,7 +1,8 @@
 package mega.privacy.android.app.presentation.qrcode
 
+import android.content.Context
 import android.graphics.Bitmap
-import androidx.annotation.ColorInt
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,13 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.CombineQRCodeAndAvatarMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
+import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
+import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -43,17 +42,14 @@ class QRCodeViewModel @Inject constructor(
     private val getQRCodeFileUseCase: GetQRCodeFileUseCase,
     private val deleteQRCodeUseCase: DeleteQRCodeUseCase,
     private val resetContactLinkUseCase: ResetContactLinkUseCase,
-    private val avatarMapper: AvatarMapper,
-    private val qrCodeMapper: QRCodeMapper,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
-    private val loadBitmapFromFile: LoadBitmapFromFileMapper,
     private val saveBitmapToFile: SaveBitmapToFileMapper,
-    private val getCircleBitmap: GetCircleBitmapMapper,
-    private val combineQRCodeAndAvatar: CombineQRCodeAndAvatarMapper,
     private val queryScannedContactLinkUseCase: QueryScannedContactLinkUseCase,
     private val inviteContactUseCase: InviteContactUseCase,
+    private val avatarContentMapper: AvatarContentMapper,
+    private val myQRCodeTextErrorMapper: MyQRCodeTextErrorMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QRCodeUIState())
@@ -64,134 +60,44 @@ class QRCodeViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     /**
-     * Create QR code
-     *
-     * @param width width of target bitmap
-     * @param height height of target bitmap
-     * @param penColor color of the QR code. This is ARGB format.
-     * @param bgColor color of generated QR code. This is ARGB format.
-     * @param avatarWidth width of avatar
-     * @param avatarBorderWidth border width of avatar
-     *
+     * Create QR code.
      */
-    fun createQRCode(
-        width: Int,
-        height: Int,
-        @ColorInt penColor: Int,
-        @ColorInt bgColor: Int,
-        avatarWidth: Int,
-        avatarBorderWidth: Int,
-        @ColorInt avatarBorderColor: Int,
-    ) {
+    fun createQRCode() {
+        Timber.d("create QR code")
         viewModelScope.launch {
             runCatching {
-                val contactLink = uiState.value.contactLink
-                val qrCodeBitmap = uiState.value.qrCodeBitmap
-                val hasLoaded = contactLink != null && qrCodeBitmap != null
-                if (hasLoaded) {
-                    _uiState.update {
-                        it.copy(
-                            qrCodeBitmap = qrCodeBitmap,
-                            contactLink = contactLink,
-                            hasQRCodeBeenDeleted = false
-                        )
-                    }
-                    return@launch
-                }
-
-                _uiState.update {
-                    it.copy(isInProgress = true)
-                }
-
-                loadQRCodeBitmapFromCache()?.let { bitmap ->
-                    Timber.d("Cached QR code file loaded")
-                    _uiState.update {
-                        it.copy(qrCodeBitmap = bitmap)
-                    }
-                }
-
-                val newContactLink = createContactLinkUseCase(false)
-                generateQRCodeBitmap(
-                    contactLink = newContactLink,
-                    width = width,
-                    height = height,
-                    penColor = penColor,
-                    bgColor = bgColor,
-                    avatarWidth = avatarWidth,
-                    avatarBorderWidth = avatarBorderWidth,
-                    avatarBorderColor = avatarBorderColor,
-                ).let { combinedBitmap ->
-                    _uiState.update {
-                        it.copy(
-                            contactLink = newContactLink,
-                            qrCodeBitmap = combinedBitmap,
-                            hasQRCodeBeenDeleted = false
-                        )
-                    }
-                }
+                _uiState.update { it.copy(myQRCodeState = MyCodeUIState.CreatingQRCode) }
+                createContactLinkUseCase(renew = false)
             }.fold(
-                onSuccess = {
+                onSuccess = { contactLink ->
+                    val fullName = getUserFullNameUseCase(forceRefresh = true)
+                    val avatarBgColor = getMyAvatarColorUseCase()
+                    val localFile = getMyAvatarFileUseCase(true)
+
+                    val avatarContent =
+                        avatarContentMapper(
+                            fullName = fullName,
+                            localFile = localFile,
+                            showBorder = true,
+                            textSize = 38.sp,
+                            backgroundColor = avatarBgColor,
+                        )
                     _uiState.update {
-                        it.copy(isInProgress = false)
+                        it.copy(
+                            myQRCodeState = MyCodeUIState.QRCodeAvailable(
+                                contactLink = contactLink,
+                                avatarBgColor = avatarBgColor,
+                                avatarContent = avatarContent,
+                            )
+                        )
                     }
                 },
                 onFailure = { error ->
                     Timber.e(error)
-                    _uiState.update {
-                        it.copy(isInProgress = false)
-                    }
+                    _uiState.update { it.copy(myQRCodeState = MyCodeUIState.Idle) }
                 }
             )
         }
-    }
-
-    private suspend fun loadQRCodeBitmapFromCache(): Bitmap? =
-        getQRCodeFileUseCase()?.let { loadBitmapFromFile(it) }
-
-    private suspend fun generateQRCodeBitmap(
-        contactLink: String,
-        width: Int,
-        height: Int,
-        @ColorInt penColor: Int,
-        @ColorInt bgColor: Int,
-        avatarWidth: Int,
-        avatarBorderWidth: Int,
-        @ColorInt avatarBorderColor: Int,
-    ): Bitmap = combineQRCodeAndAvatar(
-        qrCodeBitmap = qrCodeMapper(
-            text = contactLink,
-            width = width,
-            height = height,
-            penColor = penColor,
-            bgColor = bgColor
-        ),
-        qrCodeWidth = width,
-        qrCodeBgColor = bgColor,
-        avatarBitmap = getAvatarBitmap(),
-        avatarWidth = avatarWidth,
-        avatarBorderWidth = avatarBorderWidth,
-        avatarBorderColor = avatarBorderColor,
-    ).also {
-        saveQRCodeToFile(it)
-    }
-
-    private suspend fun getAvatarBitmap(): Bitmap {
-        val userFullName = getUserFullNameUseCase(forceRefresh = false) ?: ""
-        return getMyAvatarFileUseCase(isForceRefresh = false)
-            ?.takeIf { it.exists() && it.length() > 0 }
-            ?.let { avatarFile ->
-                loadBitmapFromFile(avatarFile)
-                    ?.let { getCircleBitmap(it) }
-                    ?: avatarMapper.getDefaultAvatar(
-                        color = getMyAvatarColorUseCase(),
-                        text = userFullName,
-                        isList = true
-                    )
-            } ?: avatarMapper.getDefaultAvatar(
-            color = getMyAvatarColorUseCase(),
-            text = userFullName,
-            isList = true
-        )
     }
 
     private suspend fun saveQRCodeToFile(bitmap: Bitmap) {
@@ -202,60 +108,49 @@ class QRCodeViewModel @Inject constructor(
 
     /**
      * Reset QR code
-     *
-     * @param width width of target bitmap
-     * @param height height of target bitmap
-     * @param penColor color of the QR code. This is ARGB format.
-     * @param bgColor color of generated QR code. This is ARGB format.
-     * @param avatarWidth width of avatar
-     * @param avatarBorderWidth border width of avatar
-     *
      */
-    fun resetQRCode(
-        width: Int,
-        height: Int,
-        @ColorInt penColor: Int,
-        @ColorInt bgColor: Int,
-        avatarWidth: Int,
-        avatarBorderWidth: Int,
-        @ColorInt avatarBorderColor: Int,
-    ) {
+    fun resetQRCode() {
+        Timber.d("reset QR code")
         viewModelScope.launch {
+            val qrCodeBackup = qrCodeBackup()
             runCatching {
-                resetContactLinkUseCase().let { contactLink ->
-                    Timber.d("contact link created $contactLink")
-
-                    generateQRCodeBitmap(
-                        contactLink = contactLink,
-                        width = width,
-                        height = height,
-                        penColor = penColor,
-                        bgColor = bgColor,
-                        avatarWidth = avatarWidth,
-                        avatarBorderWidth = avatarBorderWidth,
-                        avatarBorderColor = avatarBorderColor
-                    ).let { qrCodeBitmap ->
-                        _uiState.update {
-                            it.copy(
-                                contactLink = contactLink,
-                                qrCodeBitmap = qrCodeBitmap,
-                                hasQRCodeBeenDeleted = false,
-                            )
-                        }
-                    }
-                }
+                _uiState.update { it.copy(myQRCodeState = MyCodeUIState.CreatingQRCode) }
+                resetContactLinkUseCase()
             }.fold(
-                onSuccess = {
-                    setResultMessage(R.string.qrcode_reset_successfully)
+                onSuccess = { contactLink ->
+                    _uiState.update { it.copy(myQRCodeState = MyCodeUIState.QRCodeResetDone) }
+                    val fullName = getUserFullNameUseCase(forceRefresh = true)
+                    val avatarBgColor = getMyAvatarColorUseCase()
+                    val avatarContent = avatarContentMapper(
+                        fullName = fullName,
+                        localFile = getMyAvatarFileUseCase(true),
+                        showBorder = true,
+                        textSize = 38.sp,
+                        backgroundColor = getMyAvatarColorUseCase(),
+                    )
+                    _uiState.update {
+                        it.copy(
+                            myQRCodeState = MyCodeUIState.QRCodeAvailable(
+                                contactLink = contactLink,
+                                avatarBgColor = avatarBgColor,
+                                avatarContent = avatarContent,
+                            )
+                        )
+                    }
                 },
                 onFailure = { error ->
                     Timber.e(error)
-                    setResultMessage(R.string.qrcode_reset_not_successfully)
+                    _uiState.update {
+                        it.copy(myQRCodeState = MyCodeUIState.Error(myQRCodeTextErrorMapper(error)))
+                    }
+                    qrCodeBackup?.let { _uiState.update { it.copy(myQRCodeState = qrCodeBackup) } }
                 }
-
             )
         }
     }
+
+    private fun qrCodeBackup(): MyCodeUIState.QRCodeAvailable? =
+        (uiState.value.myQRCodeState as? MyCodeUIState.QRCodeAvailable)?.copy()
 
     /**
      * Copy contact link to system clip board
@@ -273,25 +168,22 @@ class QRCodeViewModel @Inject constructor(
      */
     fun deleteQRCode() {
         Timber.d("deleteQRCode")
+        val qrCodeBackup = qrCodeBackup()
         viewModelScope.launch {
             runCatching {
-                uiState.value.contactLink?.let { contactLink ->
-                    deleteQRCodeUseCase(contactLink = contactLink)
+                (uiState.value.myQRCodeState as? MyCodeUIState.QRCodeAvailable)?.let {
+                    deleteQRCodeUseCase(contactLink = it.contactLink)
                 }
             }.fold(
                 onSuccess = {
-                    setResultMessage(R.string.qrcode_delete_successfully)
-                    _uiState.update {
-                        it.copy(
-                            contactLink = null,
-                            qrCodeBitmap = null,
-                            hasQRCodeBeenDeleted = true
-                        )
-                    }
+                    _uiState.update { it.copy(myQRCodeState = MyCodeUIState.QRCodeDeleted) }
                 },
-                onFailure = {
-                    Timber.e(it)
-                    setResultMessage(R.string.qrcode_delete_not_successfully)
+                onFailure = { error ->
+                    Timber.e(error)
+                    _uiState.update {
+                        it.copy(myQRCodeState = MyCodeUIState.Error(myQRCodeTextErrorMapper(error)))
+                    }
+                    qrCodeBackup?.let { _uiState.update { it.copy(myQRCodeState = qrCodeBackup) } }
                 }
             )
         }
@@ -326,20 +218,20 @@ class QRCodeViewModel @Inject constructor(
     /**
      * Send invitation to new contact
      */
-    fun sendInvite() {
+    fun sendInvite(contactHandle: Long, contactEmail: String) {
         viewModelScope.launch {
-            runCatching {
-                inviteContactUseCase(
-                    uiState.value.scannedContactLinkResult?.email ?: "",
-                    uiState.value.scannedContactLinkResult?.handle ?: -1,
-                    null
-                )
-            }.onSuccess { result ->
-                _uiState.update { it.copy(inviteContactResult = result) }
-            }.onFailure { throwable ->
-                Timber.e(throwable)
-                _uiState.update { it.copy(inviteContactResult = InviteContactRequest.InvalidStatus) }
-            }
+            runCatching { inviteContactUseCase(contactEmail, contactHandle, null) }
+                .onSuccess { result ->
+                    _uiState.update {
+                        it.copy(
+                            inviteContactResult = triggered(result),
+                            scannedContactEmail = contactEmail
+                        )
+                    }
+                }.onFailure { throwable ->
+                    Timber.e(throwable)
+                    _uiState.update { it.copy(inviteContactResult = triggered(InviteContactRequest.InvalidStatus)) }
+                }
         }
     }
 
@@ -348,10 +240,25 @@ class QRCodeViewModel @Inject constructor(
      *
      * @param scannedHandle Base 64 handle of the scanned qr code
      */
-    fun queryContactLink(scannedHandle: String) {
+    fun queryContactLink(context: Context, scannedHandle: String) {
         viewModelScope.launch {
             runCatching { queryScannedContactLinkUseCase(scannedHandle) }
-                .onSuccess { result -> _uiState.update { it.copy(scannedContactLinkResult = result) } }
+                .onSuccess { result ->
+                    val scannedContactAvatar = avatarContentMapper(
+                        fullName = result.contactName,
+                        localFile = result.avatarFile,
+                        backgroundColor = result.avatarColor
+                            ?: context.getColor(R.color.red_600_red_300),
+                        showBorder = false,
+                        textSize = 36.sp
+                    )
+                    _uiState.update {
+                        it.copy(
+                            scannedContactLinkResult = triggered(result),
+                            scannedContactAvatarContent = scannedContactAvatar,
+                        )
+                    }
+                }
                 .onFailure { Timber.e(it) }
         }
     }
@@ -368,4 +275,15 @@ class QRCodeViewModel @Inject constructor(
      * Reset and notify resultMessage is consumed
      */
     private fun resetResultMessage() = _uiState.update { it.copy(resultMessage = consumed()) }
+
+    /**
+     * Reset and notify scannedContactLinkResult is consumed
+     */
+    fun resetScannedContactLinkResult() =
+        _uiState.update { it.copy(scannedContactLinkResult = consumed()) }
+
+    /**
+     * Reset and notify inviteContactResult is consumed
+     */
+    fun resetInviteContactResult() = _uiState.update { it.copy(inviteContactResult = consumed()) }
 }
