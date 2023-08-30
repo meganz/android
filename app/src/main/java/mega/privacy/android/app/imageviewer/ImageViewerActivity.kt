@@ -512,7 +512,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             animateToolbar(toolbarState.show)
         }
         viewModel.onSnackBarMessage().observe(this) { message ->
-            bottomSheet?.dismissAllowingStateLoss()
+            if (bottomSheet?.isAdded == true) {
+                bottomSheet?.dismissAllowingStateLoss()
+            }
             showSnackbar(message)
         }
         viewModel.onCopyMoveException().observe(this) { error ->
@@ -522,7 +524,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             nameCollisionActivityContract?.launch(arrayListOf(collision))
         }
         viewModel.onActionBarMessage().observe(this) { message ->
-            bottomSheet?.dismissAllowingStateLoss()
+            if (bottomSheet?.isAdded == true) {
+                bottomSheet?.dismissAllowingStateLoss()
+            }
             showTransfersSnackBar(getString(message))
         }
     }
