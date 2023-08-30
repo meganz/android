@@ -290,13 +290,16 @@ class MediaPlayerFacade @Inject constructor(
                         }
                     }
 
-                    if (newIndexForCurrentItem != 0) {
-                        player.addMediaItems(0, mediaItems.subList(0, newIndexForCurrentItem))
-                    }
-                    if (newIndexForCurrentItem != mediaItems.size - 1) {
-                        player.addMediaItems(
-                            mediaItems.subList(newIndexForCurrentItem + 1, mediaItems.size)
-                        )
+                    // Check parameters to ensure "fromIndex >= 0 && toIndex <= size && toIndex >= fromIndex"
+                    if (newIndexForCurrentItem in mediaItems.indices) {
+                        if (newIndexForCurrentItem > 0) {
+                            player.addMediaItems(0, mediaItems.subList(0, newIndexForCurrentItem))
+                        }
+                        if (mediaItems.size > newIndexForCurrentItem + 1) {
+                            player.addMediaItems(
+                                mediaItems.subList(newIndexForCurrentItem + 1, mediaItems.size)
+                            )
+                        }
                     }
                 }
             }
