@@ -48,6 +48,7 @@ import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -95,6 +96,8 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeUpdateMapper: NodeUpdateMapper,
     private val accessPermissionMapper: AccessPermissionMapper,
     private val nodeShareKeyResultMapper: NodeShareKeyResultMapper,
+    private val cancelTokenProvider: CancelTokenProvider,
+    private val getLinksSortOrder: GetLinksSortOrder,
 ) : NodeRepository {
 
 
@@ -707,4 +710,100 @@ internal class NodeRepositoryImpl @Inject constructor(
                 megaApiGateway.getUserFromInShare(it, true)?.email
             }
         }
+
+    override suspend fun search(
+        nodeId: NodeId?,
+        searchType: Int,
+        query: String,
+        order: SortOrder,
+    ): List<UnTypedNode> = withContext(ioDispatcher) {
+        nodeId?.let {
+            if (query.isEmpty() || it.longValue != MegaApiJava.INVALID_HANDLE) {
+                getNodeChildren(it, order)
+            } else {
+                val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
+                megaApiGateway.getMegaNodeByHandle(it.longValue)?.let { megaNode ->
+                    if (searchType == -1) {
+                        megaApiGateway.search(
+                            parent = megaNode,
+                            query = query,
+                            megaCancelToken = megaCancelToken,
+                            order = sortOrderIntMapper(order)
+                        )
+                    } else {
+                        megaApiGateway.searchByType(
+                            parentNode = megaNode,
+                            searchString = query,
+                            cancelToken = megaCancelToken,
+                            recursive = true,
+                            order = sortOrderIntMapper(order),
+                            type = searchType
+                        )
+                    }.map { item -> convertToUnTypedNode(item) }
+                }
+            }
+        }.orEmpty()
+    }
+
+    override suspend fun searchInShares(
+        query: String,
+        order: SortOrder,
+    ): List<UnTypedNode> {
+        return withContext(ioDispatcher) {
+            val list = if (query.isEmpty()) {
+                megaApiGateway.getInShares(sortOrderIntMapper(order))
+            } else {
+                megaApiGateway.searchOnInShares(
+                    query,
+                    cancelTokenProvider.getOrCreateCancelToken(),
+                    sortOrderIntMapper(order)
+                )
+            }
+            list.map { convertToUnTypedNode(it) }
+        }
+    }
+
+    override suspend fun searchOutShares(query: String, order: SortOrder): List<UnTypedNode> =
+        withContext(ioDispatcher) {
+            if (query.isEmpty()) {
+                val searchNodes = ArrayList<MegaNode>()
+                val outShares = megaApiGateway.getOutgoingSharesNode(null)
+                val addedHandles = mutableSetOf<Long>()
+                for (outShare in outShares) {
+                    if (!addedHandles.contains(outShare.nodeHandle)) {
+                        megaApiGateway.getMegaNodeByHandle(outShare.nodeHandle)?.let {
+                            addedHandles.add(it.handle)
+                            searchNodes.add(it)
+                        }
+                    }
+                }
+                searchNodes
+            } else {
+                megaApiGateway.searchOnOutShares(
+                    query = query,
+                    megaCancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+                    order = sortOrderIntMapper(order)
+                )
+            }.map { convertToUnTypedNode(it) }
+        }
+
+    override suspend fun searchLinkShares(
+        query: String,
+        order: SortOrder,
+        isFirstLevelNavigation: Boolean,
+    ): List<UnTypedNode> = withContext(ioDispatcher) {
+        if (query.isEmpty()) {
+            megaApiGateway.getPublicLinks(
+                if (isFirstLevelNavigation) sortOrderIntMapper(
+                    getLinksSortOrder()
+                ) else sortOrderIntMapper(order)
+            )
+        } else {
+            megaApiGateway.searchOnLinkShares(
+                query,
+                cancelTokenProvider.getOrCreateCancelToken(),
+                sortOrderIntMapper(order)
+            )
+        }.map { convertToUnTypedNode(it) }
+    }
 }

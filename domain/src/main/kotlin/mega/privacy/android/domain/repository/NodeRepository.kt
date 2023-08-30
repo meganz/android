@@ -509,4 +509,50 @@ interface NodeRepository {
      * @return null if the node is not found
      */
     suspend fun getIncomingShareParentUserEmail(nodeId: NodeId): String?
+
+    /**
+     * Search node and return list of [UnTypedNode]
+     * @param nodeId [NodeId] place where needed to be searched
+     * @param searchType Filter for search
+     * @param query string to be search
+     * @param order oder in which result should be there
+     */
+    suspend fun search(
+        nodeId: NodeId?,
+        searchType: Int = -1,
+        query: String,
+        order: SortOrder
+    ): List<UnTypedNode>
+
+    /**
+     * Search Nodes in incoming shares
+     * @param query string to be search
+     * @param order oder in which result should be there
+     */
+    suspend fun searchInShares(
+        query: String,
+        order: SortOrder
+    ): List<UnTypedNode>
+
+    /**
+     * Search Nodes in incoming shares
+     * @param query string to be search
+     * @param order oder in which result should be there
+     */
+    suspend fun searchOutShares(
+        query: String,
+        order: SortOrder
+    ): List<UnTypedNode>
+
+    /**
+     * Search nodes in links
+     * @param query string to be search
+     * @param order oder in which result should be there
+     * @param isFirstLevelNavigation first level navigation
+     */
+    suspend fun searchLinkShares(
+        query: String,
+        order: SortOrder,
+        isFirstLevelNavigation: Boolean,
+    ): List<UnTypedNode>
 }
