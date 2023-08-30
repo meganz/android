@@ -2450,6 +2450,8 @@ public class ChatActivity extends PasscodeActivity
             showEndCallForAllDialog();
         }
 
+        updateCallBanner();
+
         if (isJoinCallDialogShown) {
             MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
             if (callInThisChat != null && !callInThisChat.isOnHold() && chatRoom.isGroup()) {
@@ -9234,9 +9236,6 @@ public class ChatActivity extends PasscodeActivity
                 break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                if (MegaApplication.getChatManagement().isRequestSent(callInThisChat.getCallId())) {
-                    break;
-                }
                 if (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid())) {
                     if (anotherActiveCall != null || anotherOnHoldCall != null) {
                         updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
@@ -9300,12 +9299,8 @@ public class ChatActivity extends PasscodeActivity
                 break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                if (MegaApplication.getChatManagement().isRequestSent(callInThisChat.getCallId())) {
-                    tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
-                } else {
-                    callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, com.google.android.material.R.attr.colorSecondary));
-                    updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
-                }
+                callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, com.google.android.material.R.attr.colorSecondary));
+                updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                 break;
         }
     }
