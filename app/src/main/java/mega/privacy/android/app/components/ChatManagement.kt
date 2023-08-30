@@ -54,9 +54,13 @@ class ChatManagement @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val broadcastJoinedSuccessfullyUseCase: BroadcastJoinedSuccessfullyUseCase,
 ) {
-    private val chatRoomListener: ChatRoomListener = ChatRoomListener()
     private val app: MegaApplication = getInstance()
     private var countDownTimerToEndCall: CountDownTimer? = null
+
+    /**
+     * List of chat room listeners
+     */
+    private val chatRoomListeners = HashMap<Long, ChatRoomListener>()
 
     /**
      * Counter down value used to hang a call when user is alone (empty call scenario)
@@ -126,7 +130,8 @@ class ChatManagement @Inject constructor(
      */
     fun openChatRoom(chatId: Long): Boolean {
         closeChatRoom(chatId)
-        return megaChatApi.openChatRoom(chatId, chatRoomListener)
+        chatRoomListeners[chatId] = ChatRoomListener()
+        return megaChatApi.openChatRoom(chatId, chatRoomListeners[chatId])
     }
 
     /**
@@ -134,7 +139,12 @@ class ChatManagement @Inject constructor(
      *
      * @param chatId The chat ID.
      */
-    private fun closeChatRoom(chatId: Long) = megaChatApi.closeChatRoom(chatId, chatRoomListener)
+    private fun closeChatRoom(chatId: Long) {
+        if (chatRoomListeners.containsKey(chatId)) {
+            megaChatApi.closeChatRoom(chatId, chatRoomListeners[chatId])
+            chatRoomListeners.remove(chatId)
+        }
+    }
 
     /**
      * Check if there is a pending join link
