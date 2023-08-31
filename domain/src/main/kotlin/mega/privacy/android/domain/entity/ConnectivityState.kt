@@ -11,7 +11,6 @@ sealed class ConnectivityState(val connected: Boolean) {
     /**
      * Connected
      *
-     * @property meteredConnection
      */
-    data class Connected(val meteredConnection: Boolean) : ConnectivityState(true)
+    object Connected : ConnectivityState(true)
 }

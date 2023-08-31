@@ -10,11 +10,13 @@ import androidx.core.content.ContextCompat.getSystemService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -33,6 +35,7 @@ import javax.inject.Singleton
  * @property context
  * @property megaApi
  */
+@OptIn(FlowPreview::class)
 @Singleton
 internal class DefaultNetworkRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -46,11 +49,7 @@ internal class DefaultNetworkRepository @Inject constructor(
 
     @Suppress("DEPRECATION")
     override fun getCurrentConnectivityState(): ConnectivityState {
-        return if (connectivityManager?.activeNetworkInfo?.isConnected == true) ConnectivityState.Connected(
-            meteredConnection = connectivityManager.getActiveNetworkCapabilities()?.hasCapability(
-                NetworkCapabilities.NET_CAPABILITY_NOT_METERED
-            ) != true
-        ) else ConnectivityState.Disconnected
+        return if (connectivityManager?.activeNetworkInfo?.isConnected == true) ConnectivityState.Connected else ConnectivityState.Disconnected
     }
 
     private fun ConnectivityManager?.getActiveNetworkCapabilities(): NetworkCapabilities? =
@@ -85,7 +84,7 @@ internal class DefaultNetworkRepository @Inject constructor(
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 Timber.d("onAvailable")
-                trySend(getCurrentConnectivityState())
+                trySend(ConnectivityState.Connected)
             }
 
             override fun onCapabilitiesChanged(
@@ -94,19 +93,17 @@ internal class DefaultNetworkRepository @Inject constructor(
             ) {
                 super.onCapabilitiesChanged(network, networkCapabilities)
                 Timber.d("onCapabilitiesChanged")
-                trySend(
-                    ConnectivityState.Connected(
-                        meteredConnection = !networkCapabilities.hasCapability(
-                            NetworkCapabilities.NET_CAPABILITY_NOT_METERED
-                        )
-                    )
-                )
+                trySend(getCurrentConnectivityState())
             }
         }
-        connectivityManager?.registerNetworkCallback(networkRequest, callback)
+        connectivityManager?.apply {
+            registerNetworkCallback(networkRequest, callback)
+            registerDefaultNetworkCallback(callback)
+        }
 
         awaitClose { connectivityManager?.unregisterNetworkCallback(callback) }
     }.flowOn(ioDispatcher)
+        .debounce(150L)
         .catch { Timber.e(it, "MonitorConnectivity Exception") }
         .shareIn(applicationScope, SharingStarted.Lazily)
 
