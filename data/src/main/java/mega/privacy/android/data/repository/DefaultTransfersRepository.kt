@@ -34,6 +34,7 @@ import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -552,6 +553,17 @@ internal class DefaultTransfersRepository @Inject constructor(
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
+
+    override suspend fun getAllSdTransfers(): List<SdTransfer> =
+        megaLocalRoomGateway.getAllSdTransfers()
+
+    override suspend fun deleteSdTransferByTag(tag: Int) {
+        megaLocalRoomGateway.deleteSdTransferByTag(tag)
+    }
+
+    override suspend fun insertSdTransfer(transfer: SdTransfer) {
+        megaLocalRoomGateway.insertSdTransfer(transfer)
+    }
 }
 
 private fun MegaTransfer.isCUUpload() =

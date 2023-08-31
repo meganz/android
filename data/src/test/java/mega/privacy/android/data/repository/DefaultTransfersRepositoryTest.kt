@@ -25,6 +25,7 @@ import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -795,6 +796,26 @@ class DefaultTransfersRepositoryTest {
             assertThat(awaitItem()).isEqualTo(resumeEvent)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that insertSdTransfer invokes when insertSdTransfer is called`() = runTest {
+        val sdTransfer = mock<SdTransfer>()
+        underTest.insertSdTransfer(sdTransfer)
+        verify(megaLocalRoomGateway).insertSdTransfer(sdTransfer)
+    }
+
+    @Test
+    fun `test that deleteSdTransferByTag invokes when deleteSdTransferByTag is called`() = runTest {
+        val tag = 1
+        underTest.deleteSdTransferByTag(tag)
+        verify(megaLocalRoomGateway).deleteSdTransferByTag(tag)
+    }
+
+    @Test
+    fun `test that getAllSdTransfers invokes when getAllSdTransfers is called`() = runTest {
+        underTest.getAllSdTransfers()
+        verify(megaLocalRoomGateway).getAllSdTransfers()
     }
 
     @Nested

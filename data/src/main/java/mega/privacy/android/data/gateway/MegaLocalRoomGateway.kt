@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -313,4 +314,23 @@ interface MegaLocalRoomGateway {
      * Get all syncRecord timestamps
      */
     suspend fun getAllTimestampsOfSyncRecord(isSecondary: Boolean, syncRecordType: Int): List<Long>
+
+    /**
+     * Get all sd transfers
+     *
+     * @return the list of sd transfers
+     */
+    suspend fun getAllSdTransfers(): List<SdTransfer>
+
+    /**
+     * Insert sd transfer
+     *
+     */
+    suspend fun insertSdTransfer(transfer: SdTransfer)
+
+    /**
+     * Delete sd transfer by tag
+     *
+     */
+    suspend fun deleteSdTransferByTag(tag: Int)
 }

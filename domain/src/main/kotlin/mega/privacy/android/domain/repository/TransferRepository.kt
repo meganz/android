@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -417,4 +418,25 @@ interface TransferRepository {
      * @param isPause
      */
     suspend fun pauseTransferByTag(transferTag: Int, isPause: Boolean): Boolean
+
+    /**
+     * Get all sd transfers
+     *
+     * @return the list of sd transfers
+     */
+    suspend fun getAllSdTransfers(): List<SdTransfer>
+
+    /**
+     * Insert sd transfer
+     *
+     * @param transfer sd Transfer
+     */
+    suspend fun insertSdTransfer(transfer: SdTransfer)
+
+    /**
+     * Delete sd transfer by tag
+     *
+     * @param tag tag of transfer
+     */
+    suspend fun deleteSdTransferByTag(tag: Int)
 }

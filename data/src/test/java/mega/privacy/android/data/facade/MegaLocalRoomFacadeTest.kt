@@ -10,8 +10,10 @@ import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
+import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordEntityMapper
@@ -23,6 +25,9 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapp
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
+import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -63,6 +68,9 @@ internal class MegaLocalRoomFacadeTest {
     private val syncStatusIntMapper: SyncStatusIntMapper = mock()
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper = mock()
     private val completedTransferEntityMapper: CompletedTransferEntityMapper = mock()
+    private val sdTransferDao: SdTransferDao = mock()
+    private val sdTransferEntityMapper = mock<SdTransferEntityMapper>()
+    private val sdTransferModelMapper = mock<SdTransferModelMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -82,7 +90,10 @@ internal class MegaLocalRoomFacadeTest {
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             encryptData = encryptData,
             decryptData = decryptData,
-            completedTransferEntityMapper = completedTransferEntityMapper
+            completedTransferEntityMapper = completedTransferEntityMapper,
+            sdTransferDao = sdTransferDao,
+            sdTransferEntityMapper = sdTransferEntityMapper,
+            sdTransferModelMapper = sdTransferModelMapper,
         )
     }
 
@@ -404,6 +415,23 @@ internal class MegaLocalRoomFacadeTest {
         val actual = underTest.getAllTimestampsOfSyncRecord(secondary, syncType)
         assertThat(actual).isEqualTo((1L..10L).map { it })
     }
+
+    @Test
+    fun `test that insertSdTransfer invokes correctly when call insertSdTransfer`() = runTest {
+        val sdTransferEntity = mock<SdTransferEntity>()
+        val sdTransferModel = mock<SdTransfer>()
+        whenever(sdTransferEntityMapper(sdTransferModel)).thenReturn(sdTransferEntity)
+        underTest.insertSdTransfer(sdTransferModel)
+        verify(sdTransferDao).insertSdTransfer(sdTransferEntity)
+    }
+
+    @Test
+    fun `test that deleteSdTransferByTag invokes correctly when call deleteSdTransferByTag`() =
+        runTest {
+            val tag = 1
+            underTest.deleteSdTransferByTag(tag)
+            verify(sdTransferDao).deleteSdTransferByTag(tag)
+        }
 
     private fun provideDoesFileNameExistParameters() = Stream.of(
         Arguments.of(true, 1, true),

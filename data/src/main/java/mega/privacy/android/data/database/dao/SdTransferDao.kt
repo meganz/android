@@ -16,5 +16,5 @@ internal interface SdTransferDao {
     suspend fun insertSdTransfer(entity: SdTransferEntity)
 
     @Query("DELETE FROM ${MegaDatabaseConstant.TABLE_SD_TRANSFERS} WHERE sdtransfertag = :tag")
-    suspend fun deleteSdTransfer(tag: Int)
+    suspend fun deleteSdTransferByTag(tag: Int)
 }

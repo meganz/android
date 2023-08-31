@@ -7,6 +7,7 @@ import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
@@ -19,7 +20,10 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapp
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
+import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -41,6 +45,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val syncRecordDao: SyncRecordDao,
     private val syncRecordModelMapper: SyncRecordModelMapper,
     private val syncRecordEntityMapper: SyncRecordEntityMapper,
+    private val sdTransferDao: SdTransferDao,
+    private val sdTransferModelMapper: SdTransferModelMapper,
+    private val sdTransferEntityMapper: SdTransferEntityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     private val encryptData: EncryptData,
@@ -286,4 +293,16 @@ internal class MegaLocalRoomFacade @Inject constructor(
             encryptData(isSecondary.toString()).toString(),
             syncRecordType
         ).mapNotNull { decryptData(it)?.toLongOrNull() }
+
+    override suspend fun getAllSdTransfers(): List<SdTransfer> {
+        val entities = sdTransferDao.getAllSdTransfers().first()
+        return entities.map { sdTransferModelMapper(it) }
+    }
+
+    override suspend fun insertSdTransfer(transfer: SdTransfer) =
+        sdTransferDao.insertSdTransfer(sdTransferEntityMapper(transfer))
+
+    override suspend fun deleteSdTransferByTag(tag: Int) {
+        sdTransferDao.deleteSdTransferByTag(tag)
+    }
 }
