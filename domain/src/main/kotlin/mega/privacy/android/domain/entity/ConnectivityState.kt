@@ -6,11 +6,14 @@ package mega.privacy.android.domain.entity
  * @property connected
  */
 sealed class ConnectivityState(val connected: Boolean) {
+    /**
+     *  Disconnected
+     */
     object Disconnected : ConnectivityState(false)
 
     /**
      * Connected
-     *
+     * @property isOnWifi
      */
-    object Connected : ConnectivityState(true)
+    data class Connected(val isOnWifi: Boolean) : ConnectivityState(true)
 }

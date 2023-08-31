@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.ConnectivityState
@@ -35,7 +35,6 @@ import javax.inject.Singleton
  * @property context
  * @property megaApi
  */
-@OptIn(FlowPreview::class)
 @Singleton
 internal class DefaultNetworkRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -48,9 +47,10 @@ internal class DefaultNetworkRepository @Inject constructor(
     private val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
 
     @Suppress("DEPRECATION")
-    override fun getCurrentConnectivityState(): ConnectivityState {
-        return if (connectivityManager?.activeNetworkInfo?.isConnected == true) ConnectivityState.Connected else ConnectivityState.Disconnected
-    }
+    override fun getCurrentConnectivityState(): ConnectivityState =
+        if (connectivityManager?.activeNetworkInfo?.isConnected == true) ConnectivityState.Connected(
+            isOnWifi()
+        ) else ConnectivityState.Disconnected
 
     private fun ConnectivityManager?.getActiveNetworkCapabilities(): NetworkCapabilities? =
         this?.activeNetwork?.let { network ->
@@ -67,6 +67,7 @@ internal class DefaultNetworkRepository @Inject constructor(
     // https://developer.android.com/training/basics/network-ops/reading-network-state#listening-events
     // Note: There is a limit to the number of callbacks that can be registered concurrently, so unregister callbacks once they are no longer needed so that your app can register more.
     // we can create single callback and share state in our application
+    @OptIn(FlowPreview::class)
     private val monitorConnectivity = callbackFlow {
         val networkRequest = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -84,7 +85,7 @@ internal class DefaultNetworkRepository @Inject constructor(
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 Timber.d("onAvailable")
-                trySend(ConnectivityState.Connected)
+                trySend(ConnectivityState.Connected(isOnWifi()))
             }
 
             override fun onCapabilitiesChanged(
@@ -105,7 +106,13 @@ internal class DefaultNetworkRepository @Inject constructor(
     }.flowOn(ioDispatcher)
         .debounce(150L)
         .catch { Timber.e(it, "MonitorConnectivity Exception") }
-        .shareIn(applicationScope, SharingStarted.Lazily)
+        .stateIn(
+            applicationScope,
+            started = SharingStarted.Lazily,
+            initialValue = getCurrentConnectivityState()
+        )
+
+    override fun isConnectedToInternet() = monitorConnectivity.value.connected
 
     override fun setUseHttps(enabled: Boolean) = megaApi.setUseHttpsOnly(enabled)
 

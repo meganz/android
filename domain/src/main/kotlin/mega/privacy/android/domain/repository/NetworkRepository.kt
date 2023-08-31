@@ -22,6 +22,14 @@ interface NetworkRepository {
      */
     fun monitorConnectivityChanges(): Flow<ConnectivityState>
 
+
+    /**
+     * Check whether device is connected to internet or not
+     *
+     * @return [Boolean]
+     */
+    fun isConnectedToInternet(): Boolean
+
     /**
      * Set use https
      *

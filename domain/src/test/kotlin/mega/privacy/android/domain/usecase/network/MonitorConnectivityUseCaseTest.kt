@@ -35,7 +35,7 @@ class MonitorConnectivityUseCaseTest {
     fun `test that initial value is current connected state`() = runTest {
         networkRepository.stub {
             onBlocking { getCurrentConnectivityState() }.thenReturn(
-                ConnectivityState.Connected
+                ConnectivityState.Connected(true)
             )
             on { monitorConnectivityChanges() }.thenReturn(emptyFlow())
         }
@@ -50,13 +50,32 @@ class MonitorConnectivityUseCaseTest {
         val connectivityFlow = MutableStateFlow(ConnectivityState.Disconnected)
         networkRepository.stub {
             onBlocking { getCurrentConnectivityState() }.thenReturn(
-                ConnectivityState.Connected
+                ConnectivityState.Connected(true)
             )
             on { monitorConnectivityChanges() }.thenReturn(connectivityFlow)
         }
 
         underTest().test {
             assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that connectivity state is updated if it changes`() = runTest {
+        val connectivityFlow = MutableStateFlow<ConnectivityState>(ConnectivityState.Disconnected)
+        networkRepository.stub {
+            onBlocking { getCurrentConnectivityState() }.thenReturn(
+                ConnectivityState.Connected(
+                    false
+                )
+            )
+            on { monitorConnectivityChanges() }.thenReturn(connectivityFlow)
+        }
+
+        underTest().test {
+            assertThat(awaitItem()).isFalse()
+            connectivityFlow.emit(ConnectivityState.Connected(true))
+            assertThat(awaitItem()).isTrue()
         }
     }
 }
