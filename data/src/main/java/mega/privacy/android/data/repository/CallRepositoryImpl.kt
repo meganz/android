@@ -16,6 +16,7 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
+import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
@@ -69,6 +70,7 @@ internal class CallRepositoryImpl @Inject constructor(
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
     private val megaChatCallStatusMapper: MegaChatCallStatusMapper,
     private val handleListMapper: HandleListMapper,
+    private val megaHandleListMapper: MegaHandleListMapper,
     private val megaChatScheduledMeetingFlagsMapper: MegaChatScheduledMeetingFlagsMapper,
     private val megaChatScheduledMeetingRulesMapper: MegaChatScheduledMeetingRulesMapper,
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
@@ -509,6 +511,68 @@ internal class CallRepositoryImpl @Inject constructor(
             megaChatApiGateway.releaseVideoDevice(listener)
 
             continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun pushUsersIntoWaitingRoom(
+        chatId: Long,
+        userList: List<Long>,
+        all: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = continuation.getChatRequestListener(
+                methodName = "pushUsersIntoWaitingRoom",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.pushUsersIntoWaitingRoom(
+                chatId,
+                megaHandleListMapper(userList),
+                all,
+                callback
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+        }
+    }
+
+    override suspend fun kickUsersFromCall(chatId: Long, userList: List<Long>):
+            ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = continuation.getChatRequestListener(
+                methodName = "kickUsersFromCall",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.kickUsersFromCall(
+                chatId,
+                megaHandleListMapper(userList),
+                callback
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+        }
+    }
+
+    override suspend fun allowUsersJoinCall(
+        chatId: Long,
+        userList: List<Long>,
+        all: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = continuation.getChatRequestListener(
+                methodName = "allowUsersJoinCall",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.allowUsersJoinCall(
+                chatId,
+                megaHandleListMapper(userList),
+                all,
+                callback
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 }

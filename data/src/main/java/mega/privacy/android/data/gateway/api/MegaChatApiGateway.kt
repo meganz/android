@@ -1012,4 +1012,47 @@ interface MegaChatApiGateway {
      * @param listener MegaChatRequestListener to track this request
      */
     fun releaseVideoDevice(listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Push a list of users (for all it's connected clients) into the waiting room.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param userList MegaHandleList with the users that must be pushed into waiting room.
+     * @param all if true indicates that all users with non moderator role, must be pushed into waiting room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun pushUsersIntoWaitingRoom(
+        chatId: Long,
+        userList: MegaHandleList?,
+        all: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Disconnects all clients of the specified users, regardless of whether they are in the call or in the waiting room.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param userList MegaHandleList with the users that must be disconnected from call
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun kickUsersFromCall(
+        chatId: Long,
+        userList: MegaHandleList?,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Allow a list of users in the waiting room to join the call.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param userList MegaHandleList with the users that must be allowed into waiting room.
+     * @param all if true indicates that all users with non moderator role, must be pushed into waiting room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun allowUsersJoinCall(
+        chatId: Long,
+        userList: MegaHandleList?,
+        all: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
 }

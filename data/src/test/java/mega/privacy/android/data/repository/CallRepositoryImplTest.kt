@@ -14,6 +14,7 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
+import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
@@ -73,6 +74,7 @@ class CallRepositoryImplTest {
     private val megaChatScheduledMeetingRulesMapper = mock<MegaChatScheduledMeetingRulesMapper>()
     private val megaChatScheduledMeetingFlagsMapper = mock<MegaChatScheduledMeetingFlagsMapper>()
     private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
+    private val megaHandleListMapper = mock<MegaHandleListMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val megaChatScheduledMeeting = mock<MegaChatScheduledMeeting>()
     private val chatScheduledMeeting = mock<ChatScheduledMeeting>()
@@ -131,6 +133,7 @@ class CallRepositoryImplTest {
             megaChatScheduledMeetingFlagsMapper = megaChatScheduledMeetingFlagsMapper,
             megaChatScheduledMeetingRulesMapper = megaChatScheduledMeetingRulesMapper,
             megaChatPeerListMapper = megaChatPeerListMapper,
+            megaHandleListMapper = megaHandleListMapper,
             appEventGateway = appEventGateway
         )
 

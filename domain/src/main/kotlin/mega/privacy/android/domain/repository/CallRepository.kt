@@ -336,4 +336,42 @@ interface CallRepository {
      * @return      True if the device is closed, false otherwise.
      */
     suspend fun releaseVideoDevice()
+
+    /**
+     * Push a list of users (for all it's connected clients) into the waiting room.
+     *
+     * @param chatId  Chat id
+     * @param userList List of users that must be pushed into waiting room.
+     * @param all if true indicates that all users with non moderator role, must be pushed into waiting room
+     * @return                  [ChatRequest]
+     */
+    suspend fun pushUsersIntoWaitingRoom(
+        chatId: Long,
+        userList: List<Long>,
+        all: Boolean,
+    ): ChatRequest
+
+    /**
+     * Disconnects all clients of the specified users, regardless of whether they are in the call or in the waiting room.
+     *
+     * @param chatId Chat id
+     * @param userList List of users that must be pushed into waiting room.
+     */
+    suspend fun kickUsersFromCall(
+        chatId: Long,
+        userList: List<Long>,
+    ): ChatRequest
+
+    /**
+     * Allow a list of users in the waiting room to join the call.
+     *
+     * @param chatId Chat id
+     * @param userList List of users that must be pushed into waiting room.
+     * @param all if true indicates that all users with non moderator role, must be pushed into waiting room
+     */
+    suspend fun allowUsersJoinCall(
+        chatId: Long,
+        userList: List<Long>,
+        all: Boolean,
+    ): ChatRequest
 }
