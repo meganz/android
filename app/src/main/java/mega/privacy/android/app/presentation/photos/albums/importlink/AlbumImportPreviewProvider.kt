@@ -65,6 +65,7 @@ class AlbumImportPreviewProvider @Inject constructor(
         photoIds: List<Long>,
         currentSort: Sort,
         isFolderLink: Boolean = false,
+        folderNodeId: Long? = null,
     ) {
         if (photo is Photo.Video) {
             (activity as LifecycleOwner).lifecycleScope.launch {
@@ -73,6 +74,7 @@ class AlbumImportPreviewProvider @Inject constructor(
                     photo = photo,
                     currentSort = currentSort,
                     isFolderLink = isFolderLink,
+                    folderNodeId = folderNodeId
                 )
             }
         } else {
@@ -171,6 +173,7 @@ class AlbumImportPreviewProvider @Inject constructor(
         photo: Photo,
         currentSort: Sort,
         isFolderLink: Boolean = false,
+        folderNodeId: Long? = null,
     ) {
         val nodeHandle = photo.id
         val nodeName = photo.name
@@ -179,9 +182,10 @@ class AlbumImportPreviewProvider @Inject constructor(
             putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_MEDIA_DISCOVERY)
+
             putExtra(
                 Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                getNodeParentHandle(nodeHandle)
+                folderNodeId ?: getNodeParentHandle(nodeHandle)
             )
             putExtra(
                 Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,

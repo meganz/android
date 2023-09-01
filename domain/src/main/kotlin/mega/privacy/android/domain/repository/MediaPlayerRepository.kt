@@ -352,4 +352,13 @@ interface MediaPlayerRepository {
      * @param value Int value of video repeat mode
      */
     suspend fun setVideoRepeatMode(value: Int)
+
+    /**
+     * Get videos by searchType api
+     *
+     * @param handle handle
+     * @param order SortOrder
+     * @return List<UnTypedNode>
+     */
+    suspend fun getVideosBySearchType(handle: Long, order: SortOrder): List<UnTypedNode>?
 }

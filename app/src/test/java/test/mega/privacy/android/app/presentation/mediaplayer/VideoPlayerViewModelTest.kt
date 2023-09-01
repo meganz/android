@@ -98,6 +98,7 @@ internal class VideoPlayerViewModelTest {
             fileDurationMapper = mock(),
             getSRTSubtitleFileListUseCase = mock(),
             setVideoRepeatModeUseCase = mock(),
+            getVideosBySearchTypeUseCase = mock(),
             savedStateHandle = savedStateHandle,
             monitorVideoRepeatModeUseCase = mock()
         )

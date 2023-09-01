@@ -134,6 +134,7 @@ import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -211,6 +212,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val fileDurationMapper: FileDurationMapper,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val setVideoRepeatModeUseCase: SetVideoRepeatModeUseCase,
+    private val getVideosBySearchTypeUseCase: GetVideosBySearchTypeUseCase,
     monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), SearchCallback.Data {
@@ -831,10 +833,14 @@ class VideoPlayerViewModel @Inject constructor(
                                 _playlistTitleState.update { title }
                             }
 
-                            getVideoNodesByParentHandleUseCase(
-                                parentHandle = parent.id.longValue,
-                                order = getSortOrderFromIntent(intent)
-                            )?.let { children ->
+                            if (type == FROM_MEDIA_DISCOVERY) {
+                                getVideosBySearchTypeUseCase(parentHandle, order)
+                            } else {
+                                getVideoNodesByParentHandleUseCase(
+                                    parentHandle = parent.id.longValue,
+                                    order = getSortOrderFromIntent(intent)
+                                )
+                            }?.let { children ->
                                 buildPlaySourcesByTypedNodes(
                                     type = type,
                                     typedNodes = children,

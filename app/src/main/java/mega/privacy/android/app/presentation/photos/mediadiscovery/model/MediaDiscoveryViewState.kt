@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 /**
  * Media Discovery View state
  *
+ * @property currentFolderId current folder id
  * @property sourcePhotos the photos from sdk
  * @property uiPhotoList photo list
  * @property currentZoomLevel current zoom level
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property loadPhotosDone
  */
 data class MediaDiscoveryViewState(
+    val currentFolderId: Long? = null,
     val sourcePhotos: List<Photo> = emptyList(),
     val uiPhotoList: List<UIPhoto> = emptyList(),
     val currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,

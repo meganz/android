@@ -90,7 +90,11 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val setViewType: SetViewType,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(MediaDiscoveryViewState())
+    private val _state = MutableStateFlow(
+        MediaDiscoveryViewState(
+            currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID)
+        )
+    )
     val state = _state.asStateFlow()
 
     private var fetchPhotosJob: Job? = null

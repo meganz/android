@@ -527,6 +527,23 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             } ?: user.email
         }
 
+    override suspend fun getVideosBySearchType(
+        handle: Long,
+        order: SortOrder,
+    ): List<UnTypedNode>? =
+        megaApi.getMegaNodeByHandle(nodeHandle = handle)?.let { parent ->
+            megaApi.searchByType(
+                parent,
+                "",
+                MegaCancelToken.createInstance(),
+                true,
+                sortOrderIntMapper(order),
+                FILE_TYPE_VIDEO,
+            ).map { node ->
+                convertToUnTypedNode(node)
+            }
+        }
+
     private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(
             node,

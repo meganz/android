@@ -230,6 +230,7 @@ class MediaDiscoveryFragment : Fragment() {
                 photo = photo,
                 photoIds = mediaDiscoveryViewModel.getAllPhotoIds(),
                 currentSort = mediaDiscoveryViewModel.state.value.currentSort,
+                folderNodeId = mediaDiscoveryViewModel.state.value.currentFolderId
             )
         } else if (actionMode != null) {
             mediaDiscoveryViewModel.togglePhotoSelection(photo.id)
