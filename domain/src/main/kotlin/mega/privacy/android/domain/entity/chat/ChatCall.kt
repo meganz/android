@@ -3,6 +3,7 @@ package mega.privacy.android.domain.entity.chat
 import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatWaitingRoom
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.TermCodeType
@@ -40,6 +41,7 @@ import java.time.Instant
  * @property hasLocalAudio
  * @property hasLocalVideo
  * @property hasRequestSpeak
+ * @property waitingRoom
  */
 data class ChatCall(
     val callId: Long,
@@ -48,7 +50,7 @@ data class ChatCall(
     val caller: Long? = null,
     val duration: Long? = null,
     val numParticipants: Int? = null,
-    val changes: ChatCallChanges? = null,
+    val changes: List<ChatCallChanges>? = null,
     val endCallReason: EndCallReason? = null,
     val callCompositionChange: CallCompositionChanges? = null,
     val peeridCallCompositionChange: Long? = null,
@@ -71,6 +73,7 @@ data class ChatCall(
     val hasLocalAudio: Boolean = false,
     val hasLocalVideo: Boolean = false,
     val hasRequestSpeak: Boolean = false,
+    val waitingRoom: ChatWaitingRoom? = null,
 ) {
 
     /**

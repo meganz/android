@@ -111,7 +111,6 @@ internal fun CreateScheduledMeetingView(
     onDismiss: () -> Unit,
     onResetSnackbarMessage: () -> Unit,
     onDiscardMeetingDialog: () -> Unit,
-    onLearnMoreWarningClicked: () -> Unit,
     onCloseWarningClicked: () -> Unit,
     onDescriptionValueChange: (String) -> Unit,
     onTitleValueChange: (String) -> Unit,
@@ -167,7 +166,6 @@ internal fun CreateScheduledMeetingView(
         Column {
             if (shouldShowWarningDialog) {
                 WaitingRoomWarningDialog(
-                    onLearnMoreClicked = onLearnMoreWarningClicked,
                     onCloseClicked = onCloseWarningClicked
                 )
             }
@@ -818,7 +816,6 @@ private fun PreviewCreateScheduledMeetingView() {
             onDescriptionValueChange = {},
             onTitleValueChange = {},
             onRecurrenceDialogOptionClicked = {},
-            onLearnMoreWarningClicked = {},
             onCloseWarningClicked = {},
         )
     }

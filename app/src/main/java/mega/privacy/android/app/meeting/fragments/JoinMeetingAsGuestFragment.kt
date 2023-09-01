@@ -85,7 +85,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                sharedModel.state.collect { (isMeetingEnded) ->
+                sharedModel.state.collect { (_, isMeetingEnded) ->
                     isMeetingEnded?.let {
                         if (it) {
                             MeetingHasEndedDialogFragment(object : ClickCallback {

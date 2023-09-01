@@ -376,7 +376,6 @@ class ScheduledMeetingInfoViewTest {
                 onInviteParticipantsDialog = {},
                 onSnackbarShown = {},
                 onCloseWarningClicked = {},
-                onLearnMoreWarningClicked = {},
             )
         }
     }
@@ -403,7 +402,6 @@ class ScheduledMeetingInfoViewTest {
                 onInviteParticipantsDialog = {},
                 onSnackbarShown = {},
                 onCloseWarningClicked = {},
-                onLearnMoreWarningClicked = {},
             )
         }
     }

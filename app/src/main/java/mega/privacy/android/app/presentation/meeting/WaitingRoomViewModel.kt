@@ -122,9 +122,9 @@ class WaitingRoomViewModel @Inject constructor(
             monitorChatCallUpdates()
                 .filter { call ->
                     call.chatId == _state.value.chatId
-                            && (call.changes == ChatCallChanges.Status
-                            || call.changes == ChatCallChanges.WRAllow
-                            || call.changes == ChatCallChanges.WRDeny)
+                            && (call.changes?.contains(ChatCallChanges.Status) ?: false ||
+                            call.changes?.contains(ChatCallChanges.WaitingRoomAllow) ?: false ||
+                            call.changes?.contains(ChatCallChanges.WaitingRoomDeny) ?: false)
                 }
                 .collectLatest { it.updateUiState() }
         }
@@ -221,7 +221,7 @@ class WaitingRoomViewModel @Inject constructor(
             it.copy(
                 callStarted = this.hasStarted(),
                 joinCall = this.shouldJoin(),
-                finish = changes == ChatCallChanges.WRDeny // TODO Show Dialog
+                finish = changes?.contains(ChatCallChanges.WaitingRoomDeny) ?: false // TODO Show Dialog
             )
         }
     }
@@ -230,7 +230,7 @@ class WaitingRoomViewModel @Inject constructor(
      * Check if [ChatCall] should be joined
      */
     private fun ChatCall.shouldJoin(): Boolean =
-        changes == ChatCallChanges.WRAllow || status == ChatCallStatus.Joining
+        changes?.contains(ChatCallChanges.WaitingRoomAllow) ?: false || status == ChatCallStatus.Joining
                 || status == ChatCallStatus.InProgress
 
     /**

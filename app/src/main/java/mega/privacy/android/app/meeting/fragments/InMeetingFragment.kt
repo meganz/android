@@ -213,6 +213,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
+    private var usersInWaitingRoomDialog: Dialog? = null
 
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -1159,6 +1160,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 showCallWillEndBannerAndOnlyMeDialog()
             } else {
                 hideCallBannerAndOnlyMeDialog()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state) { (_, _, _, showParticipantsInWRDialog, usersInWR) ->
+            if (showParticipantsInWRDialog) {
+                usersInWR?.let {
+                    showUsersInWaitingRoomDialog(it)
+                }
             }
         }
 
@@ -2685,6 +2694,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
+        dismissDialog(usersInWaitingRoomDialog)
         assignModeratorDialog?.dismissAllowingStateLoss()
         endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
     }
@@ -2851,6 +2861,53 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
      */
+    private fun showUsersInWaitingRoomDialog(users: Map<Long, String>) {
+        if (users.isEmpty()) return
+
+        val isOneParticipantInWR = users.size == 1
+
+        val messageText = if (isOneParticipantInWR)
+            resources.getString(
+                R.string.meetings_waiting_room_admit_user_to_call_dialog_message,
+                users.values.first()
+            )
+        else resources.getQuantityString(
+            R.plurals.meetings_waiting_room_admit_users_to_call_dialog_message,
+            users.size,
+            users.size,
+        )
+        val positiveButtonText =
+            if (isOneParticipantInWR) resources.getString(R.string.meetings_waiting_room_admit_user_to_call_dialog_admit_button)
+            else
+                resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button)
+
+        val negativeButtonText =
+            if (isOneParticipantInWR) resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_deny_button)
+            else
+                resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button)
+
+        usersInWaitingRoomDialog = MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        )
+            .setTitle(null)
+            .setMessage(messageText)
+            .setPositiveButton(positiveButtonText) { _, _ ->
+            }
+            .setNegativeButton(negativeButtonText) { _, _ ->
+            }
+            .setOnDismissListener {
+                sharedModel.setShowParticipantsInWaitingRoomDialogConsumed()
+            }
+            .setCancelable(false)
+            .create()
+
+        usersInWaitingRoomDialog?.show()
+    }
+
+    /**
+     * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
+     */
     private fun showOnlyMeInTheCallDialog() {
         if (MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
             dismissDialog(onlyMeDialog)
@@ -2869,7 +2926,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .setCancelable(false)
             .create()
         onlyMeDialog?.show()
-
     }
 
     /**

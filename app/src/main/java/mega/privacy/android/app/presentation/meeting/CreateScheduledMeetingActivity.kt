@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,7 +21,6 @@ import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
@@ -50,7 +48,6 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-
 
 /**
  * Activity which shows scheduled meeting info screen.
@@ -80,8 +77,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     internal companion object {
         const val CREATE_SCHEDULED_MEETING_TAG = "createScheduledMeetingTag"
         const val CUSTOM_RECURRENCE_TAG = "customRecurrenceTag"
-        private const val LEARN_MORE_URI =
-            "https://help.mega.io/wp-admin/post.php?post=3005&action=edit"
     }
 
     private lateinit var navController: NavHostController
@@ -207,7 +202,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onDiscardMeetingDialog = { finishCreateScheduledMeeting(RESULT_CANCELED) },
                         onDescriptionValueChange = viewModel::onDescriptionChange,
                         onTitleValueChange = viewModel::onTitleChange,
-                        onLearnMoreWarningClicked = { openBrowser() },
                         onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
                         onRecurrenceDialogOptionClicked = { optionSelected ->
                             viewModel.dismissDialog()
@@ -259,17 +253,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 }
             }
         }
-    }
-
-    /**
-     * Open browser to see more information about waiting room setting
-     */
-    private fun openBrowser() {
-        startActivity(
-            Intent(
-                this@CreateScheduledMeetingActivity,
-                WebViewActivity::class.java
-            ).apply { data = LEARN_MORE_URI.toUri() })
     }
 
     /**

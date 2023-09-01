@@ -1,28 +1,28 @@
 package mega.privacy.android.data.mapper.meeting
 
 import mega.privacy.android.data.mapper.handles.HandleListMapper
-import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.ChatWaitingRoom
 import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
-import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatWaitingRoom
 import javax.inject.Inject
 
 
 /**
- * Mapper to convert [MegaChatRoom] to [ChatRoom]
+ * Mapper to convert [MegaChatWaitingRoom] to [ChatWaitingRoom]
  */
 internal class ChatWaitingRoomMapper @Inject constructor(
     private val waitingRoomStatusMapper: WaitingRoomStatusMapper,
     private val handleListMapper: HandleListMapper,
 ) {
 
-    operator fun invoke(megaChatWaitingRoom: MegaChatWaitingRoom): ChatWaitingRoom =
-        ChatWaitingRoom(
-            size = megaChatWaitingRoom.size(),
-            peers = handleListMapper(megaChatWaitingRoom.peers),
-            peerStatus = megaChatWaitingRoom.toPeerStatusByHandles(),
-        )
+    operator fun invoke(megaChatWaitingRoom: MegaChatWaitingRoom?): ChatWaitingRoom? =
+        megaChatWaitingRoom?.let {
+            return ChatWaitingRoom(
+                size = megaChatWaitingRoom.size(),
+                peers = handleListMapper(megaChatWaitingRoom.peers),
+                peerStatus = megaChatWaitingRoom.toPeerStatusByHandles(),
+            )
+        }
 
     private fun MegaChatWaitingRoom.toPeerStatusByHandles(): Map<Long, WaitingRoomStatus> =
         (0 until peers.size()).associateWith { peerHandle ->

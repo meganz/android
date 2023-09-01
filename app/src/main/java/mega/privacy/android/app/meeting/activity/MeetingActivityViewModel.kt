@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -45,7 +47,6 @@ import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.usecase.call.GetCallUseCase
-import mega.privacy.android.app.usecase.call.GetLocalAudioChangesUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
@@ -53,10 +54,13 @@ import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.usecase.CheckChatLink
+import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -73,14 +77,23 @@ import javax.inject.Inject
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
  *
- * @property checkChatLink  [CheckChatLink]
- * @property state          Current view state as [MeetingState]
+ * @property meetingActivityRepository      [MeetingActivityRepository]
+ * @property answerChatCallUseCase          [AnswerChatCallUseCase]
+ * @property getCallUseCase                 [GetCallUseCase]
+ * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
+ * @property chatManagement                 [ChatManagement]
+ * @property setChatVideoInDeviceUseCase    [SetChatVideoInDeviceUseCase]
+ * @property checkChatLink                  [CheckChatLink]
+ * @property logoutUseCase                  [LogoutUseCase]
+ * @property monitorFinishActivityUseCase   [MonitorFinishActivityUseCase]
+ * @property monitorChatCallUpdates         [MonitorChatCallUpdates]
+ * @property getMessageSenderNameUseCase    [GetMessageSenderNameUseCase]
+ * @property state                      Current view state as [MeetingState]
  */
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
-    getLocalAudioChangesUseCase: GetLocalAudioChangesUseCase,
     private val getCallUseCase: GetCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
@@ -89,6 +102,8 @@ class MeetingActivityViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
+    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -221,6 +236,8 @@ class MeetingActivityViewModel @Inject constructor(
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
 
+        startMonitoringChatCallUpdates()
+
         getCallUseCase.getCallEnded()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -229,32 +246,6 @@ class MeetingActivityViewModel @Inject constructor(
                     currentChatId.value.let { currentChatId ->
                         if (chatIdOfCallEnded == currentChatId) {
                             _finishMeetingActivity.value = true
-                        }
-                    }
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
-
-        getLocalAudioChangesUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { call ->
-                    currentChatId.value?.let {
-                        if (call.chatid == it) {
-                            val isEnable = call.hasLocalAudio()
-                            _micLiveData.value = isEnable
-                            Timber.d("open Mic: $isEnable")
-                            tips.value = when (isEnable) {
-                                true -> context.getString(
-                                    R.string.general_mic_unmute
-                                )
-
-                                false -> context.getString(
-                                    R.string.general_mic_mute
-                                )
-                            }
                         }
                     }
                 },
@@ -291,6 +282,78 @@ class MeetingActivityViewModel @Inject constructor(
      * @return True, if I am a guest. False if not
      */
     fun amIAGuest(): Boolean = meetingActivityRepository.amIAGuest()
+
+    /**
+     * Get chat call updates
+     */
+    private fun startMonitoringChatCallUpdates() =
+        viewModelScope.launch {
+            monitorChatCallUpdates()
+                .filter { it.chatId == _state.value.chatId }
+                .collectLatest { call ->
+                    call.changes?.apply {
+                        if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
+                            Timber.d("Users entered in waiting room")
+
+                            call.waitingRoom?.apply {
+                                peers?.let {
+                                    getWaitingRoomParticipants(it)
+                                }
+                            }
+                        }
+
+                        if (contains(ChatCallChanges.LocalAVFlags)) {
+                            val isEnable = call.hasLocalAudio
+                            _micLiveData.value = isEnable
+                            Timber.d("open Mic: $isEnable")
+                            tips.value = when (isEnable) {
+                                true -> context.getString(
+                                    R.string.general_mic_unmute
+                                )
+
+                                false -> context.getString(
+                                    R.string.general_mic_mute
+                                )
+                            }
+                        }
+                    }
+                }
+        }
+
+    /**
+     * Sets setShowParticipantsInWaitingRoomDialogConsumed as consumed.
+     */
+    fun setShowParticipantsInWaitingRoomDialogConsumed() = _state.update { state ->
+        state.copy(showParticipantsInWaitingRoomDialog = false)
+    }
+
+    /**
+     * Get participants name in waiting room
+     *
+     * @param handleList
+     */
+    private fun getWaitingRoomParticipants(handleList: List<Long>) =
+        viewModelScope.launch {
+            val peerList = mutableMapOf<Long, String>()
+            handleList.forEach { handle ->
+                runCatching {
+                    getMessageSenderNameUseCase(handle, state.value.chatId)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess { name ->
+                    name?.let {
+                        peerList[handle] = name
+                    }
+                }
+            }
+
+            _state.update { state ->
+                state.copy(
+                    showParticipantsInWaitingRoomDialog = true,
+                    usersInWaitingRoom = peerList
+                )
+            }
+        }
 
     /**
      * Logout
@@ -405,6 +468,11 @@ class MeetingActivityViewModel @Inject constructor(
     fun updateChatRoomId(chatId: Long) {
         if (_currentChatId.value != chatId) {
             _currentChatId.value = chatId
+            _state.update {
+                it.copy(
+                    chatId = chatId
+                )
+            }
         }
     }
 

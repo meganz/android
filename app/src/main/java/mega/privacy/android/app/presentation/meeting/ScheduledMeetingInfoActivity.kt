@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,7 +26,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -463,21 +461,9 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     viewModel.dismissDialog()
                 },
                 onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
-                onLearnMoreWarningClicked = { openBrowser() },
                 onSnackbarShown = viewModel::snackbarShown
             )
         }
-    }
-
-    /**
-     * Open browser to see more information about waiting room setting
-     */
-    private fun openBrowser() {
-        startActivity(
-            Intent(
-                this@ScheduledMeetingInfoActivity,
-                WebViewActivity::class.java
-            ).apply { data = LEARN_MORE_URI.toUri() })
     }
 
     /**
@@ -524,7 +510,5 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         private var chatRoomId: Long = MEGACHAT_INVALID_HANDLE
         private var enabledChatNotification: Boolean = false
         private var link: String? = null
-        private const val LEARN_MORE_URI =
-            "https://help.mega.io/wp-admin/post.php?post=3005&action=edit"
     }
 }

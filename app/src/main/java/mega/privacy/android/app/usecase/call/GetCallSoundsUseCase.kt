@@ -26,7 +26,10 @@ import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
@@ -48,6 +51,7 @@ class GetCallSoundsUseCase @Inject constructor(
     private val endCallUseCase: EndCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
+    private val monitorChatCallUpdates: MonitorChatCallUpdates,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) {
 
@@ -203,22 +207,33 @@ class GetCallSoundsUseCase @Inject constructor(
                 )
                 .addTo(disposable)
 
-            getCallStatusChangesUseCase.getCallStatus()
-                .subscribeBy(
-                    onNext = { status ->
-                        if (status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
-                            Timber.d("Terminating user participation")
-                            removeWaitingForOthersCountDownTimer()
-                            MegaApplication.getChatManagement().stopCounterToFinishCall()
-                            rtcAudioManagerGateway.removeRTCAudioManager()
-                            emitter.onNext(CallSoundType.CALL_ENDED)
+            sharingScope.launch {
+                monitorChatCallUpdates()
+                    .collectLatest { call ->
+                        call.changes?.apply {
+                            Timber.d("Monitor chat call updated, changes $this")
+                            if (contains(ChatCallChanges.Status)) {
+                                when (call.status) {
+                                    ChatCallStatus.TerminatingUserParticipation -> {
+                                        Timber.d("Terminating user participation")
+                                        removeWaitingForOthersCountDownTimer()
+                                        MegaApplication.getChatManagement()
+                                            .stopCounterToFinishCall()
+                                        rtcAudioManagerGateway.removeRTCAudioManager()
+                                        emitter.onNext(CallSoundType.CALL_ENDED)
+                                    }
+
+                                    else -> {}
+
+                                }
+                            }
+                            if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
+                                emitter.onNext(CallSoundType.WAITING_ROOM_USERS_ENTERED)
+
+                            }
                         }
-                    },
-                    onError = { error ->
-                        Timber.e(error.stackTraceToString())
                     }
-                )
-                .addTo(disposable)
+            }
 
             getParticipantsChangesUseCase.getChangesFromParticipants()
                 .subscribeBy(

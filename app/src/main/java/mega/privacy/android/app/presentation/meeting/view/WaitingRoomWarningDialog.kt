@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,14 +21,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.yellow_100_yellow_700
 
@@ -36,7 +33,6 @@ import mega.privacy.android.core.ui.theme.extensions.yellow_100_yellow_700
  */
 @Composable
 fun WaitingRoomWarningDialog(
-    onLearnMoreClicked: () -> Unit,
     onCloseClicked: () -> Unit,
 ) {
     Box(
@@ -59,18 +55,15 @@ fun WaitingRoomWarningDialog(
                     .weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                MegaSpannedText(
+                Text(
                     modifier = Modifier
-                        .testTag(LEARN_MORE_TAG)
-                        .clickable { onLearnMoreClicked() }
                         .padding(top = 14.dp, bottom = 14.dp, start = 16.dp)
                         .weight(1f),
-                    value = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_warning),
-                    baseStyle = MaterialTheme.typography.subtitle1.copy(
+                    text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_warning),
+                    style = MaterialTheme.typography.subtitle1.copy(
                         fontSize = 13.sp,
                         color = MaterialTheme.colors.onPrimary
-                    ),
-                    styles = mapOf(SpanIndicator('A') to SpanStyle(textDecoration = TextDecoration.Underline)),
+                    )
                 )
             }
 
@@ -95,7 +88,6 @@ fun WaitingRoomWarningDialog(
 
 internal const val WAITING_ROOM_WARNING_DIALOG_TAG =
     "waiting_room_warning_dialog:waiting_room_warning"
-internal const val LEARN_MORE_TAG = "waiting_room_warning_dialog:learn_more"
 internal const val CLOSE_DIALOG_TAG = "waiting_room_warning_dialog:close_dialog"
 
 /**
@@ -107,7 +99,6 @@ internal const val CLOSE_DIALOG_TAG = "waiting_room_warning_dialog:close_dialog"
 fun PreviewWaitingRoomWarningDialog() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         WaitingRoomWarningDialog(
-            onLearnMoreClicked = {},
             onCloseClicked = {}
         )
     }

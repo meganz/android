@@ -33,7 +33,8 @@ class ChatRequestMapperTest {
                 EndCallReasonMapper(),
                 CallTermCodeMapper(),
                 CallCompositionChangesMapper(),
-                NetworkQualityMapper()
+                NetworkQualityMapper(),
+                ChatWaitingRoomMapper(WaitingRoomStatusMapper(), HandleListMapper())
             )
     }
 
@@ -59,7 +60,7 @@ class ChatRequestMapperTest {
     fun `test mapping chat call changes type status`() {
         val chatCall = getMockChatCall(changes = MegaChatCall.CHANGE_TYPE_STATUS)
         val actual = underTest(chatCall)
-        Truth.assertThat(actual.changes).isEqualTo(ChatCallChanges.Status)
+        Truth.assertThat(actual.changes).contains(ChatCallChanges.Status)
     }
 
     @Test

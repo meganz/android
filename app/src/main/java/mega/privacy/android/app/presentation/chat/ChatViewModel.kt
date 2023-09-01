@@ -517,23 +517,25 @@ class ChatViewModel @Inject constructor(
             monitorChatCallUpdates()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
-                    Timber.d("Monitor chat call updated, changes ${call.changes}")
-                    if (call.changes == ChatCallChanges.Status && _state.value.schedIsPending) {
-                        val scheduledMeetingStatus = when (call.status) {
-                            ChatCallStatus.UserNoPresent ->
-                                ScheduledMeetingStatus.NotJoined(call.duration)
+                    call.changes?.apply {
+                        Timber.d("Monitor chat call updated, changes ${call.changes}")
+                        if (contains(ChatCallChanges.Status) && _state.value.schedIsPending) {
+                            val scheduledMeetingStatus = when (call.status) {
+                                ChatCallStatus.UserNoPresent ->
+                                    ScheduledMeetingStatus.NotJoined(call.duration)
 
-                            ChatCallStatus.Connecting,
-                            ChatCallStatus.Joining,
-                            ChatCallStatus.InProgress,
-                            -> ScheduledMeetingStatus.Joined(call.duration)
+                                ChatCallStatus.Connecting,
+                                ChatCallStatus.Joining,
+                                ChatCallStatus.InProgress,
+                                -> ScheduledMeetingStatus.Joined(call.duration)
 
-                            else -> ScheduledMeetingStatus.NotStarted
-                        }
-                        _state.update {
-                            it.copy(
-                                scheduledMeetingStatus = scheduledMeetingStatus
-                            )
+                                else -> ScheduledMeetingStatus.NotStarted
+                            }
+                            _state.update {
+                                it.copy(
+                                    scheduledMeetingStatus = scheduledMeetingStatus
+                                )
+                            }
                         }
                     }
                 }

@@ -41,6 +41,7 @@ class CallSoundsController {
                 CallSoundType.PARTICIPANT_JOINED_CALL -> playSpecificSound(res.openRawResourceFd(R.raw.join_call))
                 CallSoundType.PARTICIPANT_LEFT_CALL -> playSpecificSound(res.openRawResourceFd(R.raw.left_call))
                 CallSoundType.CALL_RECONNECTING -> playSpecificSound(res.openRawResourceFd(R.raw.reconnecting))
+                CallSoundType.WAITING_ROOM_USERS_ENTERED -> playSpecificSound(res.openRawResourceFd(R.raw.waiting_room_user_entered))
             }
         }
     }

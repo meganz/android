@@ -683,10 +683,12 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             monitorChatCallUpdates()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
-                    Timber.d("Monitor chat call updated, changes ${call.changes}")
-                    if (call.changes == ChatCallChanges.Status) {
-                        call.status?.let {
-                            checkCallStatus(it)
+                    call.changes?.apply {
+                        Timber.d("Monitor chat call updated, changes ${call.changes}")
+                        if (contains(ChatCallChanges.Status)) {
+                            call.status?.let {
+                                checkCallStatus(it)
+                            }
                         }
                     }
                 }

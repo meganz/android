@@ -117,7 +117,6 @@ fun ScheduledMeetingInfoView(
     onLeaveGroupDialog: () -> Unit,
     onInviteParticipantsDialog: () -> Unit,
     onSnackbarShown: () -> Unit,
-    onLearnMoreWarningClicked: () -> Unit,
     onCloseWarningClicked: () -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -163,7 +162,6 @@ fun ScheduledMeetingInfoView(
         Column {
             if (shouldShowWarningDialog) {
                 WaitingRoomWarningDialog(
-                    onLearnMoreClicked = onLearnMoreWarningClicked,
                     onCloseClicked = onCloseWarningClicked
                 )
             }
@@ -1380,7 +1378,6 @@ fun PreviewScheduledMeetingInfoView() {
             onLeaveGroupDialog = {},
             onInviteParticipantsDialog = {},
             onSnackbarShown = {},
-            onLearnMoreWarningClicked = {},
             onCloseWarningClicked = {},
         )
     }

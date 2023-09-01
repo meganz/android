@@ -52,43 +52,43 @@ enum class ChatCallChanges {
     /**
      * Access to call from Waiting room, has been allowed for our own user
      */
-    WRAllow,
+    WaitingRoomAllow,
 
     /**
      * Access to call from Waiting room, has been denied for our own user
      */
-    WRDeny,
+    WaitingRoomDeny,
 
     /**
      * Waiting room composition has changed (just for moderators)
      */
-    WRComposition,
+    WaitingRoomComposition,
 
     /**
      * Notify about users that have been pushed into the waiting room  (just for moderators)
      */
-    WRUsersEntered,
+    WaitingRoomUsersEntered,
 
     /**
      * Notify about users that have been left the waiting room
      * (either entered the call or disconnected). (just for moderators)
      */
-    WRUsersLeave,
+    WaitingRoomUsersLeave,
 
     /**
      * Notify about users that have been granted to enter the call. (just for moderators)
      */
-    WRUsersAllow,
+    WaitingRoomUsersAllow,
 
     /**
      * Notify about users that have been denied to enter the call. (just for moderators)
      */
-    WRUsersDeny,
+    WaitingRoomUsersDeny,
 
     /**
      * We have been pushed into a waiting room
      */
-    WRPushedFromCall,
+    WaitingRoomPushedFromCall,
 
     /**
      * Unknown

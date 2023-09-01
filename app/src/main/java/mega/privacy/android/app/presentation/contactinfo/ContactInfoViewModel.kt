@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.OnHold
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.Status
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -255,10 +256,11 @@ class ContactInfoViewModel @Inject constructor(
 
     private fun monitorCallUpdates() = viewModelScope.launch {
         monitorChatCallUpdates()
-            .filter { it.changes in listOf(Status, OnHold) }
-            .collect { call ->
-                if (call.changes == Status) observeCallStatus(call)
-                else if (call.changes == OnHold) _state.update { it.copy(callStatusChanged = true) }
+            .collectLatest { call ->
+                call.changes?.apply {
+                    if (contains(Status)) observeCallStatus(call)
+                    if (contains(OnHold)) _state.update { it.copy(callStatusChanged = true) }
+                }
             }
     }
 
