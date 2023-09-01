@@ -1338,7 +1338,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">تم تجاوز حجم التراسل المتاح لعنوان IP هذا. قم بترقية حسابك أو انتظر%s لمتابعة التنزيل.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">شاهد باقاتنا</string>
+    <string name="plans_depleted_transfer_overquota">مشاهدة الباقات</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">الاستمرار دون حساب</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->

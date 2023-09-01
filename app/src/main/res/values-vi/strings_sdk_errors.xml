@@ -71,7 +71,7 @@
     <!-- Label to show that an error of Balance occurs during a SDK operation. -->
     <string name="payment_ebalance">Số dư tài khoản bị lỗi</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-    <string name="payment_egeneric_api_error_unknown">Lỗi không xác định được</string>
+    <string name="payment_egeneric_api_error_unknown">Lỗi không xác&#160;định được</string>
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">Lỗi HTTP</string>
     <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->

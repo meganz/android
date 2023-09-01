@@ -1145,7 +1145,7 @@
     <!-- Title of the tab section for transfers in progress -->
     <string name="title_tab_in_progress_transfers">Đang truyền</string>
     <!-- Title of the tab section for completed transfers -->
-    <string name="title_tab_completed_transfers">Hoàn Tất</string>
+    <string name="title_tab_completed_transfers">Hoàn tất</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
     <string name="transfer_paused">Đã tạm dừng</string>
     <!-- Possible state of a transfer -->
@@ -1157,7 +1157,7 @@
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfer_cancelled">Đã hủy</string>
     <!-- Possible state of a transfer -->
-    <string name="transfer_unknown">Chưa biết</string>
+    <string name="transfer_unknown">Không xác&#160;định được</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Đang tải lên tệp tin: %1$d trong tổng %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1203,7 +1203,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">Không đủ băng thông hiện đang có để truyền tải cho địa chỉ IP này. Nâng cấp tài khoản hoặc đợi %s để tiếp tục tải về.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">Xem các gói cước</string>
+    <string name="plans_depleted_transfer_overquota">Xem các gói thuê bao</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">Tiếp tục tiến hành không cần tài khoản</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
@@ -2604,7 +2604,7 @@
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
     <string name="logout_warning_offline_and_transfers">Khi đăng xuất, các tệp tin trong phần Ngoại Tuyến sẽ bị xóa khỏi máy và các phiên truyền tải chưa xong sẽ bị hủy.</string>
     <!-- Label to indicate that a name has not been possible to obtain for some reason -->
-    <string name="unknown_name_label">Không biết tên</string>
+    <string name="unknown_name_label">Tên không xác&#160;định được</string>
     <!-- Error when renaming a chat title and it is too long -->
     <string name="title_long">Tựa đề quá dài</string>
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->

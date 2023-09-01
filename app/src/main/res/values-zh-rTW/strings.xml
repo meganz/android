@@ -241,7 +241,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">選擇帳戶</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">離線使用</string>
+    <string name="file_properties_available_offline">可離線使用</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">大小</string>
     <!-- When the file/folder was last modified -->
@@ -1203,7 +1203,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">此IP位址的傳輸配額已超過。請升級您的帳戶或等待%s才能繼續下載。</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">參考我們的方案</string>
+    <string name="plans_depleted_transfer_overquota">參看方案</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">於未登入狀態下繼續使用</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
@@ -1868,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">沒有網路連線。請重新連線來開啟檔案。</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">檔案已經離線可用</string>
+    <string name="file_already_exists">檔案已經可離線使用</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">訊息未轉發</item>
@@ -3290,7 +3290,7 @@
     <!-- Message when file available offline. -->
     <string name="file_available_offline">檔案可離線使用</string>
     <!-- Message when file removed from offline. -->
-    <string name="file_removed_offline">檔案已從離線使用中移除</string>
+    <string name="file_removed_offline">檔案已從可離線使用中移除</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">打開連結</string>
     <!-- error message shown when a chat link is not well formed. -->

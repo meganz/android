@@ -1203,7 +1203,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">このIPアドレスの転送容量を超えました。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">プランを見る</string>
+    <string name="plans_depleted_transfer_overquota">計画を参照</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">アカウントを作成せず続ける</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->

@@ -1257,7 +1257,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">Cota de transfer pentru această adresă IP a fost depășită. Upgradează contul sau așteaptă %s pentru a continua descărcarea.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">Vezi planurile noastre</string>
+    <string name="plans_depleted_transfer_overquota">Vezi planurile</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">Continuă fără cont</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
@@ -5304,7 +5304,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Participanții adăugați de non-gazde în timpul apelurilor nu vor fi trimiși în sala de așteptare. [A]Află mai multe [/A]</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Unele persoane de contact cu care partajați informații nu au fost aprobate de dvs. Pentru a asigura un plus de securitate, vă recomandăm să aprobați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl aprobați și atingeți Informații.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Unele contacte cu care partajați informații nu au fost aprobate de dvs. Pentru a asigura un plus de securitate, vă recomandăm să aprobați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl aprobați și atingeți Informații.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">%1$d participant a fost eliminat</item>

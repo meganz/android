@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Title of the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_title">Rename device</string>
+    <string name="device_center_rename_device_dialog_title">Renomear dispositivo</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_positive_button">Rename</string>
+    <string name="device_center_rename_device_dialog_positive_button">Renomear</string>
     <!-- The name of the Negative Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_negative_button">Cancel</string>
+    <string name="device_center_rename_device_dialog_negative_button">Cancelar</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
-    <string name="device_center_list_view_item_header_this_device">This device</string>
+    <string name="device_center_list_view_item_header_this_device">Este dispositivo</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
-    <string name="device_center_list_view_item_header_other_devices">Other devices</string>
+    <string name="device_center_list_view_item_header_other_devices">Outros dispositivos</string>
     <!-- The name of the Device or Folder Status when no matching Status is found-->
-    <string name="device_center_list_view_item_status_unknown_status">Unknown status</string>
+    <string name="device_center_list_view_item_status_unknown_status">Status desconhecido</string>
     <!-- The name of the Device if the SDK cannot retrieve the name for that Device -->
-    <string name="device_center_list_view_item_title_unknown_device">Unknown device</string>
+    <string name="device_center_list_view_item_title_unknown_device">Dispositivo desconhecido</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
-    <string name="device_center_list_view_item_status_up_to_date">Up to date</string>
+    <string name="device_center_list_view_item_status_up_to_date">Atualizado</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">Initialising&#8230;</string>
+    <string name="device_center_list_view_item_status_initialising">Inicializando\u2026</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
-    <string name="device_center_list_view_item_status_scanning">Scanning&#8230;</string>
+    <string name="device_center_list_view_item_status_scanning">Examinando&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
-    <string name="device_center_list_view_item_status_updating">Updating&#8230;</string>
+    <string name="device_center_list_view_item_status_updating">Atualizando&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Updating&#8230;</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Atualizando&#8230;</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
-    <string name="device_center_list_view_item_status_no_camera_uploads">No camera uploads</string>
+    <string name="device_center_list_view_item_status_no_camera_uploads">Não há uploads da câmera</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
-    <string name="device_center_list_view_item_status_disabled">Disabled</string>
+    <string name="device_center_list_view_item_status_disabled">Desativada</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
     <string name="device_center_list_view_item_status_offline">Offline</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
-    <string name="device_center_list_view_item_status_paused">Paused</string>
+    <string name="device_center_list_view_item_status_paused">Pausado</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
-    <string name="device_center_list_view_item_status_backup_stopped">Backup stopped</string>
+    <string name="device_center_list_view_item_status_backup_stopped">Backup interrompido</string>
     <!-- The name of the Device or Folder Status which signifies that it has exceeded the maximum allowed Transfer quota -->
-    <string name="device_center_list_view_item_status_out_of_quota">Out of quota</string>
+    <string name="device_center_list_view_item_status_out_of_quota">Cota excedida</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
-    <string name="device_center_list_view_item_status_error">Error</string>
+    <string name="device_center_list_view_item_status_error">Erro</string>
     <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
-    <string name="device_center_list_view_item_status_blocked">Blocked</string>
+    <string name="device_center_list_view_item_status_blocked">Bloqueado</string>
 </resources>
