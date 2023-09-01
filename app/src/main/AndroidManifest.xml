@@ -421,6 +421,8 @@
         <activity
             android:name=".presentation.qrcode.QRCodeActivity" />
         <activity
+            android:name=".presentation.qrcode.QRCodeComposeActivity" />
+        <activity
             android:name=".presentation.twofactorauthentication.TwoFactorAuthenticationActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity

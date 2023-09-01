@@ -1,5 +1,8 @@
 package mega.privacy.android.app.presentation.qrcode
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -10,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -17,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.settings.SettingsActivity
+import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -27,12 +33,12 @@ import mega.privacy.android.core.ui.theme.extensions.black_white
  */
 @Composable
 internal fun QRCodeTopBar(
+    context: Context,
     isQRCodeAvailable: Boolean,
     showMoreMenu: Boolean,
     onShowMoreClicked: () -> Unit,
     onMenuDismissed: () -> Unit,
     onSave: () -> Unit,
-    onGotoSettings: () -> Unit,
     onResetQRCode: () -> Unit,
     onDeleteQRCode: () -> Unit,
     onBackPressed: () -> Unit,
@@ -87,7 +93,7 @@ internal fun QRCodeTopBar(
                     DropdownMenuItem(onClick = onSave) {
                         Text(text = stringResource(id = R.string.save_action))
                     }
-                    DropdownMenuItem(onClick = onGotoSettings) {
+                    DropdownMenuItem(onClick = { onGotoSettings(context) }) {
                         Text(text = stringResource(id = R.string.action_settings))
                     }
                     DropdownMenuItem(onClick = onResetQRCode) {
@@ -104,6 +110,15 @@ internal fun QRCodeTopBar(
     )
 }
 
+private fun onGotoSettings(context: Context) {
+    val settingsIntent =
+        SettingsActivity.getIntent(context, TargetPreference.QR).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+    context.startActivity(settingsIntent)
+    (context as? Activity)?.finish()
+}
+
 @CombinedThemePreviews
 @Composable
 private fun PreviewQRCodeTopBar(
@@ -111,12 +126,12 @@ private fun PreviewQRCodeTopBar(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         QRCodeTopBar(
+            context = LocalContext.current,
             isQRCodeAvailable = qrCodeAvailable,
             showMoreMenu = false,
             onShowMoreClicked = { },
             onMenuDismissed = { },
             onSave = { },
-            onGotoSettings = { },
             onResetQRCode = { },
             onDeleteQRCode = { },
             onBackPressed = { },

@@ -80,13 +80,12 @@ internal fun QRCodeView(
     onBackPressed: () -> Unit,
     onDeleteQRCode: () -> Unit,
     onResetQRCode: () -> Unit,
-    onGotoSettings: () -> Unit,
     onSaveQRCode: () -> Unit,
     onShareClicked: () -> Unit,
     onScanQrCodeClicked: () -> Unit,
     onCopyLinkClicked: () -> Unit,
     onViewContactClicked: () -> Unit,
-    onInviteContactClicked: () -> Unit,
+    onInviteContactClicked: (Long, String) -> Unit,
     onResultMessageConsumed: () -> Unit,
     onScannedContactLinkResultConsumed: () -> Unit,
     onInviteContactResultConsumed: () -> Unit,
@@ -130,12 +129,12 @@ internal fun QRCodeView(
         },
         topBar = {
             QRCodeTopBar(
+                context = context,
                 isQRCodeAvailable = viewState.myQRCodeState is MyCodeUIState.QRCodeAvailable,
                 showMoreMenu = showMoreMenu,
                 onShowMoreClicked = { showMoreMenu = !showMoreMenu },
                 onMenuDismissed = { showMoreMenu = false },
                 onSave = onSaveQRCode,
-                onGotoSettings = onGotoSettings,
                 onResetQRCode = onResetQRCode,
                 onDeleteQRCode = onDeleteQRCode,
                 onBackPressed = onBackPressed,
@@ -318,7 +317,7 @@ private fun InviteResultDialog(
 private fun InviteContactDialog(
     scannedContactLinkResult: ScannedContactLinkResult,
     onViewContactClicked: () -> Unit,
-    onInviteContactClicked: () -> Unit,
+    onInviteContactClicked: (Long, String) -> Unit,
     onInviteContactDialogDismiss: () -> Unit,
     avatarContent: AvatarContent? = null,
 ) {
@@ -368,7 +367,10 @@ private fun InviteContactDialog(
                     RaisedDefaultMegaButton(
                         textId = R.string.contact_invite,
                         onClick = {
-                            onInviteContactClicked()
+                            onInviteContactClicked(
+                                scannedContactLinkResult.handle,
+                                scannedContactLinkResult.email
+                            )
                             onInviteContactDialogDismiss()
                         }
                     )
@@ -400,13 +402,12 @@ private fun PreviewQRCodeView() {
             onBackPressed = { },
             onDeleteQRCode = { },
             onResetQRCode = { },
-            onGotoSettings = { },
             onSaveQRCode = { },
             onShareClicked = { },
             onScanQrCodeClicked = { },
             onCopyLinkClicked = { },
             onViewContactClicked = { },
-            onInviteContactClicked = { },
+            onInviteContactClicked = { _, _ -> },
             onResultMessageConsumed = { },
             onScannedContactLinkResultConsumed = { },
             onInviteContactResultConsumed = { }
@@ -436,7 +437,7 @@ private fun PreviewInviteContactDialog() {
         InviteContactDialog(
             scannedContactLinkResult = result,
             onViewContactClicked = {},
-            onInviteContactClicked = {},
+            onInviteContactClicked = { _, _ -> },
             onInviteContactDialogDismiss = {},
             avatarContent = avatarContent
         )

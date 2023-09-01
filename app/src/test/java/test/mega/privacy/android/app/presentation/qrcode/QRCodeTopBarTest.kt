@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.qrcode.SHARE_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class QRCodeTopBarTest {
@@ -20,12 +21,12 @@ class QRCodeTopBarTest {
     private fun setComposeContent(isQRCodeAvailable: Boolean, showMoreMenu: Boolean) {
         composeTestRule.setContent {
             QRCodeTopBar(
+                context = mock(),
                 isQRCodeAvailable = isQRCodeAvailable,
                 showMoreMenu = showMoreMenu,
                 onShowMoreClicked = { },
                 onMenuDismissed = { },
                 onSave = { },
-                onGotoSettings = { },
                 onResetQRCode = { },
                 onDeleteQRCode = { },
                 onBackPressed = { },

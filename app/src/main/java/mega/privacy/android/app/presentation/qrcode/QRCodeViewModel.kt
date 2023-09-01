@@ -157,8 +157,8 @@ class QRCodeViewModel @Inject constructor(
      */
     fun copyContactLink() {
         Timber.d("copyLink")
-        uiState.value.contactLink?.let { contactLink ->
-            copyToClipBoard(label = "contact link", contactLink)
+        (uiState.value.myQRCodeState as? MyCodeUIState.QRCodeAvailable)?.let {
+            copyToClipBoard(label = "contact link", it.contactLink)
             setResultMessage(R.string.qrcode_link_copied)
         }
     }
@@ -274,7 +274,7 @@ class QRCodeViewModel @Inject constructor(
     /**
      * Reset and notify resultMessage is consumed
      */
-    private fun resetResultMessage() = _uiState.update { it.copy(resultMessage = consumed()) }
+    fun resetResultMessage() = _uiState.update { it.copy(resultMessage = consumed()) }
 
     /**
      * Reset and notify scannedContactLinkResult is consumed
