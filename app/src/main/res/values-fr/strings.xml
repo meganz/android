@@ -1257,7 +1257,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">Le quota de transfert pour votre adresse IP a été dépassé. Surclassez votre compte ou attendez %s afin de poursuivre votre téléchargement.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">Voir nos abonnements</string>
+    <string name="plans_depleted_transfer_overquota">Voir les abonnements</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">Poursuivre sans compte</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->

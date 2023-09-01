@@ -11,7 +11,7 @@
     <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
     <string name="error_exist">Nguồn dữ liệu đã có sẵn.</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-    <string name="error_unknown">Lỗi không xác định được</string>
+    <string name="error_unknown">Lỗi không xác&#160;định được</string>
     <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
     <string name="error_toomany">Quá nhiều người đang sử dụng nguồn dữ liệu này.</string>
 </resources>

@@ -1203,7 +1203,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">Tidak ada kuota pemindahan yang cukup untuk alamat IP anda. Tingkatkan akun anda atau tunggu %s untuk melanjutkan unduhan anda.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">Lihat paket kami</string>
+    <string name="plans_depleted_transfer_overquota">Lihat rencana</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">Lanjutkan tanpa akun</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
