@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.data.gateway
 import kotlinx.coroutines.flow.Flow
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
+import nz.mega.sdk.MegaSyncStats
 
 /**
  * Gateway for accessing Sync portion of Mega API
@@ -35,6 +36,8 @@ internal interface SyncGateway {
      *
      */
     fun monitorOnSyncDeleted(): Flow<MegaSync>
+
+    fun monitorOnSyncStatsUpdated(): Flow<MegaSyncStats>
 
     /**
      * Resume all syncs

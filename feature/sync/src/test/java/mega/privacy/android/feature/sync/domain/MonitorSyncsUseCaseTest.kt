@@ -10,8 +10,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
-import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
@@ -43,7 +43,7 @@ class MonitorSyncsUseCaseTest {
             "folderPair",
             "DCIM",
             RemoteFolder(233L, "photos"),
-            FolderPairState.RUNNING
+            SyncStatus.MONITORING
         )
     )
 

@@ -39,7 +39,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.model.SyncStatus
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.views.SyncCard
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
@@ -230,7 +230,7 @@ private fun PreviewSyncListScreen() {
             SyncUiItem(
                 3,
                 folderPairName = "folderPair 3",
-                status = SyncStatus.COMPLETED,
+                status = SyncStatus.SYNCED,
                 deviceStoragePath = "deviceStoragePath",
                 megaStoragePath = "megaStoragePath",
                 method = "Two way sync",

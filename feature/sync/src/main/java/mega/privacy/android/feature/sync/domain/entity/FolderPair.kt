@@ -13,7 +13,7 @@ data class FolderPair(
     val pairName: String,
     val localFolderPath: String,
     val remoteFolder: RemoteFolder,
-    val state: FolderPairState,
+    val syncStatus: SyncStatus
 ) {
 
     companion object {
@@ -23,7 +23,7 @@ data class FolderPair(
                 pairName = "",
                 localFolderPath = "",
                 remoteFolder = RemoteFolder(-1, ""),
-                state = FolderPairState.DISABLED
+                syncStatus = SyncStatus.MONITORING
             )
     }
 }

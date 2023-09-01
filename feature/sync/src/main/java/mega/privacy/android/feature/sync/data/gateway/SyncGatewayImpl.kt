@@ -5,18 +5,21 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.data.listener.OptionalMegaListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.feature.sync.data.forEach
+import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
+import nz.mega.sdk.MegaSyncStats
 import javax.inject.Inject
 
 /**
@@ -29,11 +32,15 @@ internal class SyncGatewayImpl @Inject constructor(
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncGateway {
 
-    private val onSyncDeletedFlow = callbackFlow {
+    private val syncMegaListenerFlow = callbackFlow {
         val listener = OptionalMegaListenerInterface(
             onSyncDeleted = {
-                trySend(it)
-            })
+                trySend(MegaSyncListenerEvent.OnSyncDeleted(it))
+            },
+            onSyncStatsUpdated = {
+                trySend(MegaSyncListenerEvent.OnSyncStatsUpdated(it))
+            }
+        )
         megaApi.addListener(listener)
         awaitClose {
             megaApi.removeListener(listener)
@@ -80,7 +87,14 @@ internal class SyncGatewayImpl @Inject constructor(
     }
 
     override fun monitorOnSyncDeleted(): Flow<MegaSync> =
-        onSyncDeletedFlow
+        syncMegaListenerFlow
+            .filterIsInstance<MegaSyncListenerEvent.OnSyncDeleted>()
+            .map { it.sync }
+
+    override fun monitorOnSyncStatsUpdated(): Flow<MegaSyncStats> =
+        syncMegaListenerFlow
+            .filterIsInstance<MegaSyncListenerEvent.OnSyncStatsUpdated>()
+            .map { it.syncStats }
 
     override fun resumeAllSyncs() {
 //        megaApi.resumeAllSyncs()

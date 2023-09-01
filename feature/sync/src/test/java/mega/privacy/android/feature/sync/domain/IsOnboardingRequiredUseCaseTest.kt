@@ -8,8 +8,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
-import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import mega.privacy.android.feature.sync.domain.usecase.IsOnboardingRequiredUseCase
@@ -64,7 +64,7 @@ class IsOnboardingRequiredUseCaseTest {
             "",
             "",
             RemoteFolder(1, ""),
-            FolderPairState.RUNNING
+            SyncStatus.SYNCING
         )
         whenever(syncPreferencesRepository.getOnboardingShown()).thenReturn(false)
         whenever(syncRepository.getFolderPairs()).thenReturn(listOf(fakeFolderPair))

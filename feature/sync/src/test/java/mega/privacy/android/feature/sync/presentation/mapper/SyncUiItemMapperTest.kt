@@ -3,10 +3,9 @@ package mega.privacy.android.feature.sync.presentation.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
-import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
-import mega.privacy.android.feature.sync.ui.model.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -23,7 +22,7 @@ class SyncUiItemMapperTest {
             "folderPair",
             "DCIM",
             RemoteFolder(233L, "photos"),
-            FolderPairState.RUNNING
+            SyncStatus.SYNCING
         )
     )
 

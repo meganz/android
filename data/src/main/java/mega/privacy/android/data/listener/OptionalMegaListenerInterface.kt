@@ -10,6 +10,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSync
+import nz.mega.sdk.MegaSyncStats
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -22,6 +23,7 @@ import nz.mega.sdk.MegaUserAlert
  */
 class OptionalMegaListenerInterface(
     private val onSyncDeleted: ((sync: MegaSync) -> Unit)? = null,
+    private val onSyncStatsUpdated: ((syncStats: MegaSyncStats) -> Unit)? = null,
 ) : MegaListenerInterface {
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
@@ -109,5 +111,9 @@ class OptionalMegaListenerInterface(
 
     override fun onSyncDeleted(api: MegaApiJava, sync: MegaSync) {
         onSyncDeleted?.invoke(sync)
+    }
+
+    override fun onSyncStatsUpdated(api: MegaApiJava, syncStats: MegaSyncStats) {
+        onSyncStatsUpdated?.invoke(syncStats)
     }
 }

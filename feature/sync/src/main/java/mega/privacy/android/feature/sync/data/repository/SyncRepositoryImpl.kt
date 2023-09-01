@@ -6,11 +6,13 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
+import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
@@ -19,6 +21,7 @@ import javax.inject.Inject
 
 internal class SyncRepositoryImpl @Inject constructor(
     private val syncGateway: SyncGateway,
+    private val syncStatsCacheGateway: SyncStatsCacheGateway,
     private val megaApiGateway: MegaApiGateway,
     private val megaApi: MegaApiGateway,
     private val folderPairMapper: FolderPairMapper,
@@ -59,8 +62,12 @@ internal class SyncRepositoryImpl @Inject constructor(
                 val folderPairModel = model.get(index)
                 val megaFolderName =
                     megaApi.getMegaNodeByHandle(folderPairModel.megaHandle)?.name ?: ""
-
-                folderPairMapper(folderPairModel, megaFolderName)
+                val syncStats = syncStatsCacheGateway.getSyncStatsById(folderPairModel.backupId)
+                folderPairMapper(
+                    folderPairModel,
+                    megaFolderName,
+                    syncStats
+                )
             }
 
     override suspend fun removeFolderPair(folderPairId: Long) {
@@ -72,7 +79,9 @@ internal class SyncRepositoryImpl @Inject constructor(
     override fun monitorSyncChanges(): Flow<Unit> =
         merge(
             getOnGlobalSyncStateChangedFlow(),
-            syncGateway.monitorOnSyncDeleted()
+            syncGateway.monitorOnSyncDeleted(),
+            syncGateway.monitorOnSyncStatsUpdated()
+                .onEach { syncStatsCacheGateway.setSyncStats(it) },
         ).map { Unit }
             .flowOn(ioDispatcher)
 

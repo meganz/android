@@ -13,6 +13,8 @@ import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.SyncPreferencesDatastore
 import mega.privacy.android.feature.sync.data.gateway.SyncPreferencesDatastoreImpl
+import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
+import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStore
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStoreName
 import mega.privacy.android.feature.sync.data.repository.SyncNewFolderParamsRepositoryImpl
@@ -47,6 +49,10 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindSyncPrefsDatastore(implementation: SyncPreferencesDatastoreImpl): SyncPreferencesDatastore
+
+    @Binds
+    @Singleton
+    fun bindSyncStatsCacheGateway(implementation: SyncStatsCacheGatewayImpl): SyncStatsCacheGateway
 
     companion object {
         @Provides
