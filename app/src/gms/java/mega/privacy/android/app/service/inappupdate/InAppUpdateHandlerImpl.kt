@@ -24,6 +24,7 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
@@ -33,6 +34,10 @@ import mega.privacy.android.domain.usecase.inappupdate.ResetInAppUpdateStatistic
 import mega.privacy.android.domain.usecase.inappupdate.ShouldPromptUserForUpdateUseCase
 import mega.privacy.android.domain.usecase.inappupdate.ShouldResetInAppUpdateStatisticsUseCase
 import mega.privacy.android.domain.usecase.inappupdate.UpdateInAppUpdateStatisticsUseCase
+import mega.privacy.mobile.analytics.event.InAppUpdateCancelButtonPressedEvent
+import mega.privacy.mobile.analytics.event.InAppUpdateDownloadSuccessMessageDisplayedEvent
+import mega.privacy.mobile.analytics.event.InAppUpdateRestartButtonPressedEvent
+import mega.privacy.mobile.analytics.event.InAppUpdateUpdateButtonPressedEvent
 import org.jetbrains.anko.contentView
 import timber.log.Timber
 import javax.inject.Inject
@@ -66,12 +71,14 @@ class InAppUpdateHandlerImpl @Inject constructor(
             when (result.resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     updateInAppUpdateStatistics()
+                    Analytics.tracker.trackEvent(InAppUpdateUpdateButtonPressedEvent)
                     Timber.d("InAppUpdate: The user has accepted the update")
                 }
 
 
                 AppCompatActivity.RESULT_CANCELED -> {
                     updateInAppUpdateStatistics()
+                    Analytics.tracker.trackEvent(InAppUpdateCancelButtonPressedEvent)
                     Timber.d("InAppUpdate: The user has denied or canceled the update.")
                 }
 
@@ -149,9 +156,13 @@ class InAppUpdateHandlerImpl @Inject constructor(
                 context.getString(R.string.general_app_update_message_download_success),
                 Snackbar.LENGTH_LONG
             ).apply {
-                setAction(context.getString(R.string.general_app_update_action_restart)) { completeUpdate() }
+                setAction(context.getString(R.string.general_app_update_action_restart)) {
+                    Analytics.tracker.trackEvent(InAppUpdateRestartButtonPressedEvent)
+                    completeUpdate()
+                }
                 show()
             }
+            Analytics.tracker.trackEvent(InAppUpdateDownloadSuccessMessageDisplayedEvent)
         }
     }
 
