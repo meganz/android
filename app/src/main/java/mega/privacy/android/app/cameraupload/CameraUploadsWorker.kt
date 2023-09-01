@@ -1191,7 +1191,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         transfer: Transfer,
         error: MegaException?,
         record: SyncRecord,
-    ) = withContext(NonCancellable) {
+    ) {
         try {
             val path = transfer.localPath
             if (transfer.state == TransferState.STATE_COMPLETED) {
