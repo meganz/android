@@ -24,7 +24,9 @@ import javax.inject.Inject
 
 /**
  * Gateway implementation to access Sync API
- * Note: commented code will be uncommented in a later MR
+ * Note: calls to MegaApi here are commented out because
+ * they are only available in new sync core version of MegaApi.
+ * New sync core is still not merged to SDK develop.
  *
  */
 internal class SyncGatewayImpl @Inject constructor(
@@ -39,6 +41,9 @@ internal class SyncGatewayImpl @Inject constructor(
             },
             onSyncStatsUpdated = {
                 trySend(MegaSyncListenerEvent.OnSyncStatsUpdated(it))
+            },
+            onSyncStateChanged = {
+                trySend(MegaSyncListenerEvent.OnSyncStateChanged(it))
             }
         )
         megaApi.addListener(listener)
@@ -96,11 +101,17 @@ internal class SyncGatewayImpl @Inject constructor(
             .filterIsInstance<MegaSyncListenerEvent.OnSyncStatsUpdated>()
             .map { it.syncStats }
 
-    override fun resumeAllSyncs() {
-//        megaApi.resumeAllSyncs()
+    override fun monitorOnSyncStateChanged(): Flow<MegaSync> =
+        syncMegaListenerFlow
+            .filterIsInstance<MegaSyncListenerEvent.OnSyncStateChanged>()
+            .map { it.sync }
+
+
+    override fun resumeSync(folderPairId: Long) {
+//        megaApi.resumeSync(folderPairId)
     }
 
-    override fun pauseAllSyncs() {
-//        megaApi.pauseAllSyncs()
+    override fun pauseSync(folderPairId: Long) {
+//        megaApi.pauseSync(folderPairId)
     }
 }

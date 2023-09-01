@@ -9,8 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
+import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction.CardExpanded
@@ -22,6 +25,8 @@ internal class SyncListViewModel @Inject constructor(
     private val removeFolderPairUseCase: RemoveFolderPairUseCase,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val setOnboardingShownUseCase: SetOnboardingShownUseCase,
+    private val resumeSyncUseCase: ResumeSyncUseCase,
+    private val pauseSyncUseCase: PauseSyncUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncListState(emptyList()))
@@ -58,6 +63,16 @@ internal class SyncListViewModel @Inject constructor(
             is SyncListAction.RemoveFolderClicked -> {
                 viewModelScope.launch {
                     removeFolderPairUseCase(action.folderPairId)
+                }
+            }
+
+            is SyncListAction.PauseRunClicked -> {
+                viewModelScope.launch {
+                    if (action.syncUiItem.status != SyncStatus.PAUSED) {
+                        pauseSyncUseCase(action.syncUiItem.id)
+                    } else {
+                        resumeSyncUseCase(action.syncUiItem.id)
+                    }
                 }
             }
         }

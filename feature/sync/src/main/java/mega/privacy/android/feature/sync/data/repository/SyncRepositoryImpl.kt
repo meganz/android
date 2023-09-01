@@ -23,7 +23,6 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val syncGateway: SyncGateway,
     private val syncStatsCacheGateway: SyncStatsCacheGateway,
     private val megaApiGateway: MegaApiGateway,
-    private val megaApi: MegaApiGateway,
     private val folderPairMapper: FolderPairMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SyncRepository {
@@ -37,15 +36,15 @@ internal class SyncRepositoryImpl @Inject constructor(
             syncGateway.syncFolderPair(name, localPath, remoteFolderId)
         }
 
-    override suspend fun resumeAllSyncs() {
+    override suspend fun pauseSync(folderPairId: Long) {
         withContext(ioDispatcher) {
-            syncGateway.resumeAllSyncs()
+            syncGateway.pauseSync(folderPairId)
         }
     }
 
-    override suspend fun pauseAllSyncs() {
+    override suspend fun resumeSync(folderPairId: Long) {
         withContext(ioDispatcher) {
-            syncGateway.pauseAllSyncs()
+            syncGateway.resumeSync(folderPairId)
         }
     }
 
@@ -61,7 +60,7 @@ internal class SyncRepositoryImpl @Inject constructor(
             .map { index ->
                 val folderPairModel = model.get(index)
                 val megaFolderName =
-                    megaApi.getMegaNodeByHandle(folderPairModel.megaHandle)?.name ?: ""
+                    megaApiGateway.getMegaNodeByHandle(folderPairModel.megaHandle)?.name ?: ""
                 val syncStats = syncStatsCacheGateway.getSyncStatsById(folderPairModel.backupId)
                 folderPairMapper(
                     folderPairModel,
@@ -82,6 +81,7 @@ internal class SyncRepositoryImpl @Inject constructor(
             syncGateway.monitorOnSyncDeleted(),
             syncGateway.monitorOnSyncStatsUpdated()
                 .onEach { syncStatsCacheGateway.setSyncStats(it) },
+            syncGateway.monitorOnSyncStateChanged()
         ).map { Unit }
             .flowOn(ioDispatcher)
 

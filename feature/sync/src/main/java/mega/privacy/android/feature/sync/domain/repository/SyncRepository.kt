@@ -21,9 +21,9 @@ interface SyncRepository {
 
     suspend fun removeFolderPair(folderPairId: Long)
 
-    suspend fun resumeAllSyncs()
+    suspend fun pauseSync(folderPairId: Long)
 
-    suspend fun pauseAllSyncs()
+    suspend fun resumeSync(folderPairId: Long)
 
     fun monitorSyncChanges(): Flow<Unit>
 }

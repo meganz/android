@@ -14,7 +14,9 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
+import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -38,6 +40,8 @@ class SyncListViewModelTest {
     private val removeFolderPairUseCase: RemoveFolderPairUseCase = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
     private val setOnboardingShownUseCase: SetOnboardingShownUseCase = mock()
+    private val resumeSyncUseCase: ResumeSyncUseCase = mock()
+    private val pauseSyncUseCase: PauseSyncUseCase = mock()
 
     private lateinit var underTest: SyncListViewModel
 
@@ -75,7 +79,9 @@ class SyncListViewModelTest {
             monitorSyncsUseCase,
             syncUiItemMapper,
             removeFolderPairUseCase,
-            setOnboardingShownUseCase
+            setOnboardingShownUseCase,
+            resumeSyncUseCase,
+            pauseSyncUseCase
         )
     }
 
@@ -143,12 +149,52 @@ class SyncListViewModelTest {
         verify(setOnboardingShownUseCase).invoke(true)
     }
 
+    @Test
+    fun `test that view model pause run click pauses sync if sync is not paused`() = runTest {
+        whenever(monitorSyncsUseCase()).thenReturn(flow {
+            emit(folderPairs)
+            awaitCancellation()
+        })
+        val syncUiItem = getSyncUiItem(SyncStatus.SYNCING)
+        initViewModel()
+
+        underTest.handleAction(SyncListAction.PauseRunClicked(syncUiItem))
+
+        verify(pauseSyncUseCase).invoke(syncUiItem.id)
+    }
+
+    @Test
+    fun `test that view model pause run clicked runs sync if sync is paused`() = runTest {
+        whenever(monitorSyncsUseCase()).thenReturn(flow {
+            emit(folderPairs)
+            awaitCancellation()
+        })
+        val syncUiItem = getSyncUiItem(SyncStatus.PAUSED)
+        initViewModel()
+
+        underTest.handleAction(SyncListAction.PauseRunClicked(syncUiItem))
+
+        verify(resumeSyncUseCase).invoke(syncUiItem.id)
+    }
+
+    private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
+        id = 3L,
+        folderPairName = "folderPair",
+        status = status,
+        deviceStoragePath = "DCIM",
+        megaStoragePath = "photos",
+        method = "Two-way sync",
+        expanded = false
+    )
+
     private fun initViewModel() {
         underTest = SyncListViewModel(
             syncUiItemMapper,
             removeFolderPairUseCase,
             monitorSyncsUseCase,
-            setOnboardingShownUseCase
+            setOnboardingShownUseCase,
+            resumeSyncUseCase,
+            pauseSyncUseCase
         )
     }
 }

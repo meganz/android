@@ -8,4 +8,6 @@ internal sealed interface MegaSyncListenerEvent {
     data class OnSyncDeleted(val sync: MegaSync) : MegaSyncListenerEvent
 
     data class OnSyncStatsUpdated(val syncStats: MegaSyncStats) : MegaSyncListenerEvent
+
+    data class OnSyncStateChanged(val sync: MegaSync) : MegaSyncListenerEvent
 }

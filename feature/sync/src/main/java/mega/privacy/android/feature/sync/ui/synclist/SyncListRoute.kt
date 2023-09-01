@@ -20,6 +20,9 @@ internal fun SyncListRoute(
         cardExpanded = { syncUiItem, expanded ->
             viewModel.handleAction(CardExpanded(syncUiItem, expanded))
         },
+        pauseRunClicked = {
+            viewModel.handleAction(SyncListAction.PauseRunClicked(it))
+        },
         removeFolderClicked = {
             viewModel.handleAction(SyncListAction.RemoveFolderClicked(it))
         },

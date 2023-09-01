@@ -6,20 +6,14 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.PauseAllSyncsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.ResumeAllSyncsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -49,12 +43,6 @@ internal class SyncBackgroundService : LifecycleService() {
     internal lateinit var isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase
 
     @Inject
-    internal lateinit var pauseAllSyncsUseCase: PauseAllSyncsUseCase
-
-    @Inject
-    internal lateinit var resumeAllSyncsUseCase: ResumeAllSyncsUseCase
-
-    @Inject
     internal lateinit var monitorSyncsUseCase: MonitorSyncsUseCase
 
     override fun onCreate() {
@@ -82,23 +70,10 @@ internal class SyncBackgroundService : LifecycleService() {
             ) { connectedToInternet: Boolean, syncByWifi: Boolean, _ ->
                 Pair(connectedToInternet, syncByWifi)
             }.collect { (connectedToInternet, syncByWifi) ->
-                updateSyncState(connectedToInternet, syncByWifi)
+                // pause syncs if not on wifi, will be implemented later
             }
         }
         return START_STICKY
-    }
-
-    private suspend fun updateSyncState(
-        connectedToInternet: Boolean,
-        syncOnlyByWifi: Boolean,
-    ) {
-        val internetNotAvailable = !connectedToInternet
-        val userNotOnWifi = !isOnWifiNetworkUseCase()
-        if (internetNotAvailable || syncOnlyByWifi && userNotOnWifi) {
-            pauseAllSyncsUseCase()
-        } else {
-            resumeAllSyncsUseCase()
-        }
     }
 
     override fun onDestroy() {

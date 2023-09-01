@@ -24,6 +24,7 @@ import nz.mega.sdk.MegaUserAlert
 class OptionalMegaListenerInterface(
     private val onSyncDeleted: ((sync: MegaSync) -> Unit)? = null,
     private val onSyncStatsUpdated: ((syncStats: MegaSyncStats) -> Unit)? = null,
+    private val onSyncStateChanged: ((sync: MegaSync) -> Unit)? = null,
 ) : MegaListenerInterface {
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
@@ -115,5 +116,9 @@ class OptionalMegaListenerInterface(
 
     override fun onSyncStatsUpdated(api: MegaApiJava, syncStats: MegaSyncStats) {
         onSyncStatsUpdated?.invoke(syncStats)
+    }
+
+    override fun onSyncStateChanged(api: MegaApiJava, sync: MegaSync) {
+        onSyncStateChanged?.invoke(sync)
     }
 }

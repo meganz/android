@@ -39,16 +39,20 @@ internal interface SyncGateway {
 
     fun monitorOnSyncStatsUpdated(): Flow<MegaSyncStats>
 
-    /**
-     * Resume all syncs
-     *
-     */
-    fun resumeAllSyncs()
+    fun monitorOnSyncStateChanged(): Flow<MegaSync>
 
     /**
-     * Pause all syncs
+     * Resume sync
      *
+     * @param folderPairId - id of the folder pair to resume
      */
-    fun pauseAllSyncs()
+    fun resumeSync(folderPairId: Long)
+
+    /**
+     * Pause sync
+     *
+     * @param folderPairId - id of the folder pair to pause
+     */
+    fun pauseSync(folderPairId: Long)
 }
 

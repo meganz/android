@@ -43,7 +43,7 @@ class MonitorSyncsUseCaseTest {
             "folderPair",
             "DCIM",
             RemoteFolder(233L, "photos"),
-            SyncStatus.MONITORING
+            SyncStatus.SYNCING
         )
     )
 

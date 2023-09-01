@@ -50,6 +50,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip.COMPLETED
 internal fun SyncListScreen(
     syncUiItems: List<SyncUiItem>,
     cardExpanded: (SyncUiItem, Boolean) -> Unit,
+    pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (folderPairId: Long) -> Unit,
     addFolderClicked: () -> Unit,
 ) {
@@ -73,6 +74,7 @@ internal fun SyncListScreen(
                     .padding(16.dp),
                 syncUiItems,
                 cardExpanded,
+                pauseRunClicked,
                 removeFolderClicked,
                 addFolderClicked
             )
@@ -86,6 +88,7 @@ private fun SyncListScreenContent(
     modifier: Modifier,
     syncUiItems: List<SyncUiItem>,
     cardExpanded: (SyncUiItem, Boolean) -> Unit,
+    pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (folderPairId: Long) -> Unit,
     addFolderClicked: () -> Unit,
 ) {
@@ -130,6 +133,7 @@ private fun SyncListScreenContent(
                     syncUiItems,
                     itemIndex,
                     cardExpanded,
+                    pauseRunClicked,
                     removeFolderClicked
                 )
             }
@@ -181,10 +185,12 @@ private fun SyncItem(
     syncUiItems: List<SyncUiItem>,
     itemIndex: Int,
     cardExpanded: (SyncUiItem, Boolean) -> Unit,
+    pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (folderPairId: Long) -> Unit,
 ) {
     val sync = syncUiItems[itemIndex]
-    SyncCard(modifier,
+    SyncCard(
+        modifier = modifier,
         folderPairName = sync.folderPairName,
         status = sync.status,
         deviceStoragePath = sync.deviceStoragePath,
@@ -194,8 +200,8 @@ private fun SyncItem(
         expandClicked = {
             cardExpanded(sync, !sync.expanded)
         },
-        infoClicked = {
-            // This button will be removed
+        pauseRunClicked = {
+            pauseRunClicked(sync)
         },
         removeFolderClicked = {
             removeFolderClicked(sync.id)
@@ -236,7 +242,11 @@ private fun PreviewSyncListScreen() {
                 method = "Two way sync",
                 expanded = false,
             ),
-        ), cardExpanded = { _, _ -> }, removeFolderClicked = {}, addFolderClicked = {})
+        ),
+            cardExpanded = { _, _ -> },
+            pauseRunClicked = {},
+            removeFolderClicked = {},
+            addFolderClicked = {})
     }
 }
 
@@ -247,6 +257,7 @@ private fun PreviewEmptyScreen() {
         SyncListScreen(
             listOf(),
             cardExpanded = { _, _ -> },
+            pauseRunClicked = {},
             removeFolderClicked = {},
             addFolderClicked = {}
         )

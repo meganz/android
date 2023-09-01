@@ -6,7 +6,7 @@ package mega.privacy.android.feature.sync.domain.entity
  * @property pairName - name of the pair
  * @property localFolderPath - path to the local folder
  * @property remoteFolder - remote folder location
- * @property state - state of the sync of the pair
+ * @property syncStatus - the status of the sync
  */
 data class FolderPair(
     val id: Long,
@@ -23,7 +23,7 @@ data class FolderPair(
                 pairName = "",
                 localFolderPath = "",
                 remoteFolder = RemoteFolder(-1, ""),
-                syncStatus = SyncStatus.MONITORING
+                syncStatus = SyncStatus.SYNCED
             )
     }
 }

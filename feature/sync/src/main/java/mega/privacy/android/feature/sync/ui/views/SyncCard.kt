@@ -37,7 +37,6 @@ import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 
 @Composable
 internal fun SyncCard(
-    modifier: Modifier = Modifier,
     folderPairName: String,
     status: SyncStatus,
     deviceStoragePath: String,
@@ -45,8 +44,9 @@ internal fun SyncCard(
     method: String,
     expanded: Boolean,
     expandClicked: () -> Unit,
-    infoClicked: () -> Unit,
+    pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
 
     val roundedCornersShape = RoundedCornerShape(6.dp)
@@ -76,7 +76,14 @@ internal fun SyncCard(
             SyncCardDetailedInfo(deviceStoragePath, megaStoragePath, method)
         }
 
-        SyncCardFooter(infoClicked, removeFolderClicked)
+        SyncCardFooter(
+            isSyncRunning = status in arrayOf(
+                SyncStatus.SYNCING,
+                SyncStatus.SYNCED
+            ),
+            pauseRunClicked,
+            removeFolderClicked
+        )
     }
 }
 
@@ -114,22 +121,25 @@ private fun SyncCardHeader(
                         .height(20.dp)
                 ) {
                     Image(
-                        painter = if (status == SyncStatus.SYNCING) {
-                            painterResource(R.drawable.ic_sync_02)
-                        } else {
-                            painterResource(R.drawable.ic_check_circle)
+                        painter = when (status) {
+                            SyncStatus.SYNCING -> painterResource(R.drawable.ic_sync_02)
+                            SyncStatus.PAUSED -> painterResource(R.drawable.ic_pause)
+                            SyncStatus.ERROR -> painterResource(R.drawable.ic_alert_circle)
+                            else -> painterResource(R.drawable.ic_check_circle)
                         },
                         contentDescription = null,
                         modifier = Modifier
                             .padding(end = 8.dp)
-                            .align(Alignment.CenterVertically),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorPrimary)
+                            .align(Alignment.CenterVertically)
+                            .size(16.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorPrimary),
                     )
                     Text(
-                        text = if (status == SyncStatus.SYNCING) {
-                            "Syncing..."
-                        } else {
-                            "Synced"
+                        text = when (status) {
+                            SyncStatus.SYNCING -> "Syncing..."
+                            SyncStatus.PAUSED -> "Paused"
+                            SyncStatus.ERROR -> "Failed"
+                            else -> "Synced"
                         },
                         Modifier.align(Alignment.CenterVertically),
                         style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary),
@@ -204,7 +214,11 @@ private fun SyncCardDetailedInfo(
 }
 
 @Composable
-private fun SyncCardFooter(infoClicked: () -> Unit, removeFolderClicked: () -> Unit) {
+private fun SyncCardFooter(
+    isSyncRunning: Boolean,
+    pauseRunClicked: () -> Unit,
+    removeFolderClicked: () -> Unit,
+) {
     Box(Modifier.fillMaxWidth()) {
         Row(
             Modifier
@@ -215,9 +229,17 @@ private fun SyncCardFooter(infoClicked: () -> Unit, removeFolderClicked: () -> U
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .defaultMinSize(minWidth = 48.dp, minHeight = 36.dp),
-                onClick = infoClicked,
-                icon = R.drawable.ic_info,
-                text = "Info"
+                onClick = pauseRunClicked,
+                icon = if (isSyncRunning) {
+                    R.drawable.ic_pause
+                } else {
+                    R.drawable.ic_play_circle
+                },
+                text = if (isSyncRunning) {
+                    "Pause"
+                } else {
+                    "Run"
+                }
             )
             IconButtonWithText(
                 modifier = Modifier.padding(start = 8.dp, bottom = 16.dp),
@@ -265,7 +287,7 @@ private fun SyncCardExpandedPreview() {
             deviceStoragePath = "/storage/emulated/0/Download",
             megaStoragePath = "/Root/Competitors documentation",
             method = "Two-way",
-            infoClicked = {},
+            pauseRunClicked = {},
             expanded = true,
             expandClicked = {},
             removeFolderClicked = {},
@@ -283,7 +305,7 @@ private fun SyncCardCollapsedPreview() {
             deviceStoragePath = "/storage/emulated/0/Download",
             megaStoragePath = "/Root/Competitors documentation",
             method = "Two-way",
-            infoClicked = {},
+            pauseRunClicked = {},
             expanded = false,
             expandClicked = {},
             removeFolderClicked = {},
