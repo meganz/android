@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
@@ -140,7 +141,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val rescheduleCameraUploadUseCase: RescheduleCameraUploadUseCase,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
-    private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
+    monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -153,8 +155,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Monitor connectivity event
      */
-    val monitorConnectivityEvent =
-        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+    val monitorConnectivityEvent = monitorConnectivityUseCase()
 
     /**
      * Monitor Camera Upload Settings Actions
@@ -165,7 +166,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     init {
         initializeSettings()

@@ -74,7 +74,7 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
@@ -112,7 +112,7 @@ internal class FileInfoViewModelTest {
 
     private val fileUtilWrapper: FileUtilWrapper = mock()
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase = mock()
     private val isNodeInInboxUseCase: IsNodeInInboxUseCase = mock()
     private val isNodeInRubbish: IsNodeInRubbish = mock()
@@ -176,7 +176,7 @@ internal class FileInfoViewModelTest {
             tempMegaNodeRepository = megaNodeRepository,
             fileUtilWrapper = fileUtilWrapper,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             getFileHistoryNumVersionsUseCase = getFileHistoryNumVersionsUseCase,
             isNodeInInboxUseCase = isNodeInInboxUseCase,
             isNodeInRubbish = isNodeInRubbish,
@@ -219,7 +219,7 @@ internal class FileInfoViewModelTest {
     private suspend fun initDefaultMockBehaviour() {
         whenever(node.handle).thenReturn(NODE_HANDLE)
         whenever(typedFileNode.id).thenReturn(nodeId)
-        whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(true))
+        whenever(isConnectedToInternetUseCase.invoke()).thenReturn(true)
         whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
         whenever(isNodeInInboxUseCase(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
@@ -315,7 +315,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test NotConnected event is launched if not connected while moving`() =
         runTest {
-            whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(false))
+            whenever(isConnectedToInternetUseCase.invoke()).thenReturn(false)
             underTest.moveNodeCheckingCollisions(parentId)
             Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
                 .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
@@ -325,7 +325,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test NotConnected event is launched if not connected while copying`() =
         runTest {
-            whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(false))
+            whenever(isConnectedToInternetUseCase.invoke()).thenReturn(false)
             underTest.copyNodeCheckingCollisions(parentId)
             Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
                 .isEqualTo(FileInfoOneOffViewEvent.NotConnected)

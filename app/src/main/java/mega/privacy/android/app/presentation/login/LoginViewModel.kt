@@ -70,7 +70,7 @@ import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
@@ -88,7 +88,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val loggingSettings: LegacyLoggingSettings,
@@ -129,7 +129,7 @@ class LoginViewModel @Inject constructor(
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     private var pendingAction: String? = null
 

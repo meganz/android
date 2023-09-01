@@ -4,11 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
@@ -18,11 +16,12 @@ import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,6 +39,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RecurringMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val fetchScheduledMeetingOccurrencesByChat: FetchScheduledMeetingOccurrencesByChat,
     private val fetchNumberOfScheduledMeetingOccurrencesByChat: FetchNumberOfScheduledMeetingOccurrencesByChat,
@@ -59,14 +59,13 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     /**
      * Monitor connectivity event
      */
-    val monitorConnectivityEvent =
-        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+    val monitorConnectivityEvent = monitorConnectivityUseCase()
 
     /**
      * Is network connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     /**
      * Sets chat id

@@ -169,6 +169,7 @@ class SettingsCameraUploadsViewModelTest {
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
+            isConnectedToInternetUseCase = mock()
         )
     }
 

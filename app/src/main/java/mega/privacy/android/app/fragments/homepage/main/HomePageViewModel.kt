@@ -10,14 +10,13 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorHomeBadgeCountUseCase
 import nz.mega.sdk.MegaBanner
@@ -28,6 +27,7 @@ import javax.inject.Inject
 class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
     getCallUseCase: GetCallUseCase,
+    isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorLogoutUseCase: MonitorLogoutUseCase,
     private val monitorHomeBadgeCountUseCase: MonitorHomeBadgeCountUseCase,
@@ -48,8 +48,12 @@ class HomePageViewModel @Inject constructor(
     /**
      * Is network connected state
      */
-    val isConnected =
-        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val isConnected = isConnectedToInternetUseCase()
+
+    /**
+     * Monitor Internet Connectivity
+     */
+    val monitorConnectivity = monitorConnectivityUseCase()
 
     private val chatOnlineStatusObserver = androidx.lifecycle.Observer<Int> {
         _chatStatus.value = it

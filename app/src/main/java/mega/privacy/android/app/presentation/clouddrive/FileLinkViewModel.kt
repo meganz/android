@@ -35,7 +35,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -47,7 +47,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class FileLinkViewModel @Inject constructor(
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val hasCredentials: HasCredentials,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
@@ -70,7 +70,7 @@ class FileLinkViewModel @Inject constructor(
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     /**
      * Check if login is required

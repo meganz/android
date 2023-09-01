@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import javax.inject.Inject
 
@@ -16,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FileProviderViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
 ) : ViewModel() {
 
@@ -35,6 +36,5 @@ class FileProviderViewModel @Inject constructor(
     /**
      * Is connected
      */
-    val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+    fun isConnected() = isConnectedToInternetUseCase()
 }

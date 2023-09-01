@@ -20,8 +20,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -36,7 +34,6 @@ import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -233,15 +230,11 @@ class HomepageFragment : Fragment() {
         if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
             showChooseStartScreenDialog()
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.isConnected.flowWithLifecycle(
-                viewLifecycleOwner.lifecycle
-            ).collect { isConnected ->
-                if (isConnected) {
-                    showOnlineMode()
-                } else {
-                    showOfflineMode()
-                }
+        viewLifecycleOwner.collectFlow(viewModel.monitorConnectivity) { isConnected ->
+            if (isConnected) {
+                showOnlineMode()
+            } else {
+                showOfflineMode()
             }
         }
     }
@@ -662,7 +655,7 @@ class HomepageFragment : Fragment() {
      * @param operation the operation to be executed if online
      */
     private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
-        if (viewModel.isConnected.value && !viewModel.isRootNodeNull()) {
+        if (viewModel.isConnected && !viewModel.isRootNodeNull()) {
             operation()
         } else if (showSnackBar) {
             (activity as ManagerActivity).showSnackbar(

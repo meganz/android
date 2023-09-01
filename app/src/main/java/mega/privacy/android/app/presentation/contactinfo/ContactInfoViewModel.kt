@@ -68,7 +68,7 @@ import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import nz.mega.sdk.MegaNode
@@ -80,7 +80,7 @@ import javax.inject.Inject
  * View Model for [ContactInfoActivity]
  *
  * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
- * @property monitorConnectivityUseCase         [MonitorConnectivityUseCase]
+ * @property isConnectedToInternetUseCase       [IsConnectedToInternetUseCase]
  * @property passcodeManagement                 [PasscodeManagement]
  * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
  * @property chatManagement                     [ChatManagement]
@@ -99,7 +99,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ContactInfoViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
@@ -320,7 +320,7 @@ class ContactInfoViewModel @Inject constructor(
      *
      * @return
      */
-    fun isOnline(): Boolean = monitorConnectivityUseCase().value
+    fun isOnline(): Boolean = isConnectedToInternetUseCase()
 
     /**
      * Starts a call

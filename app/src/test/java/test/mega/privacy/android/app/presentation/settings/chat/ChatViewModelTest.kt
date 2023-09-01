@@ -10,12 +10,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.presentation.chat.ContactInvitation
 import mega.privacy.android.app.usecase.call.EndCallUseCase
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.After
@@ -59,6 +60,7 @@ class ChatViewModelTest {
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val startChatCall: StartChatCall = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
@@ -136,6 +138,7 @@ class ChatViewModelTest {
             monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates,
             monitorChatRoomUpdates = monitorChatRoomUpdates,
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase
         )
     }
 

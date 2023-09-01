@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -17,7 +16,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.CreateShareKey
@@ -63,6 +61,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -135,6 +134,7 @@ class ManagerViewModel @Inject constructor(
     private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val getActiveSubscriptionUseCase: GetActiveSubscriptionUseCase,
@@ -188,8 +188,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Monitor connectivity event
      */
-    val monitorConnectivityEvent =
-        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.Eagerly)
+    val monitorConnectivityEvent = monitorConnectivityUseCase()
 
     /**
      * Monitor Finish Activity event
@@ -222,7 +221,7 @@ class ManagerViewModel @Inject constructor(
      * Is network connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     private val isFirstLogin = savedStateHandle.getStateFlow(
         key = isFirstLoginKey,

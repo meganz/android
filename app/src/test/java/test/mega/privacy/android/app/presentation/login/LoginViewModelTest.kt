@@ -43,7 +43,7 @@ import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
@@ -73,7 +73,7 @@ internal class LoginViewModelTest {
     private val scheduler = TestCoroutineScheduler()
 
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase =
         mock { onBlocking { invoke(any()) }.thenReturn(false) }
@@ -108,7 +108,7 @@ internal class LoginViewModelTest {
 
         underTest = LoginViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             loggingSettings = loggingSettings,
@@ -237,7 +237,7 @@ internal class LoginViewModelTest {
     fun `test that snackbarMessage is updated when onLoginClicked and there is no network connection`() =
         runTest {
             whenever(ongoingTransfersExistUseCase()).thenReturn(false)
-            whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
 
             with(underTest) {
                 state.map { it.snackbarMessage }.distinctUntilChanged()
@@ -256,7 +256,7 @@ internal class LoginViewModelTest {
     @Test
     fun `test that performLogin is invoked when onLoginClick and there are no errors`() = runTest {
         whenever(ongoingTransfersExistUseCase()).thenReturn(false)
-        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(true))
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
 
         with(underTest) {
             state.test {

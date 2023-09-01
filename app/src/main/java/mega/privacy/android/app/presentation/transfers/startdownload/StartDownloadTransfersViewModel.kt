@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCa
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
@@ -45,8 +46,8 @@ class StartDownloadTransfersViewModel @Inject constructor(
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel() {
 
     private var currentInProgressJob: Job? = null
@@ -160,7 +161,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
     }
 
     private fun checkAndHandleIsDeviceConnected() =
-        if (!monitorConnectivityUseCase().value) {
+        if (!isConnectedToInternetUseCase()) {
             _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.NotConnected)
             false
         } else {

@@ -71,7 +71,7 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
@@ -96,7 +96,7 @@ class FileInfoViewModel @Inject constructor(
     private val tempMegaNodeRepository: MegaNodeRepository, //a temp use of MegaApiAndroid, just while migrating to use-cases only, to easily remove things from the activity
     private val fileUtilWrapper: FileUtilWrapper,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase,
     private val isNodeInInboxUseCase: IsNodeInInboxUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
@@ -875,7 +875,7 @@ class FileInfoViewModel @Inject constructor(
      * Is connected
      */
     private val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     /**
      * Performs a job setting [progressState] state while in progress

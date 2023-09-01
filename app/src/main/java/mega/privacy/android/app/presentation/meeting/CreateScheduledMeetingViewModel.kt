@@ -6,10 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -59,6 +57,7 @@ import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeeting
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateScheduledMeetingUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import java.time.ZoneId
@@ -95,6 +94,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateScheduledMeetingViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
@@ -129,15 +129,14 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Monitor connectivity event
      */
-    val monitorConnectivityEvent =
-        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+    val monitorConnectivityEvent = monitorConnectivityUseCase()
 
     /**
      * Is online
      *
      * @return
      */
-    fun isOnline(): Boolean = monitorConnectivityUseCase().value
+    fun isOnline(): Boolean = isConnectedToInternetUseCase()
 
     init {
         viewModelScope.launch {

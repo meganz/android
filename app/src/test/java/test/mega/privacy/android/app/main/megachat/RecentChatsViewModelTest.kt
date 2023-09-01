@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.chat.recent.RecentChatsViewModel.Co
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.GetLastContactPermissionDismissedTime
 import mega.privacy.android.domain.usecase.SetLastContactPermissionDismissedTime
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.After
 import org.junit.Before
@@ -30,6 +31,7 @@ internal class RecentChatsViewModelTest {
         mock<SetLastContactPermissionDismissedTime>()
     private val getLastContactPermissionDismissedTime =
         mock<GetLastContactPermissionDismissedTime>()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val getDeviceCurrentTimeUseCase = mock<GetDeviceCurrentTimeUseCase>()
 
@@ -53,6 +55,7 @@ internal class RecentChatsViewModelTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             getDeviceCurrentTimeUseCase = getDeviceCurrentTimeUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
         )
 
         underTest.state.test {
@@ -74,6 +77,7 @@ internal class RecentChatsViewModelTest {
                 ioDispatcher = UnconfinedTestDispatcher(),
                 getDeviceCurrentTimeUseCase = getDeviceCurrentTimeUseCase,
                 monitorConnectivityUseCase = monitorConnectivityUseCase,
+                isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             )
 
             underTest.state.test {
@@ -95,6 +99,7 @@ internal class RecentChatsViewModelTest {
                 ioDispatcher = UnconfinedTestDispatcher(),
                 getDeviceCurrentTimeUseCase = getDeviceCurrentTimeUseCase,
                 monitorConnectivityUseCase = monitorConnectivityUseCase,
+                isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             )
 
             underTest.state.test {

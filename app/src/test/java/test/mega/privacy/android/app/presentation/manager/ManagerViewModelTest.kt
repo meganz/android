@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -151,6 +152,7 @@ class ManagerViewModelTest {
         mock<AreCameraUploadsFoldersInRubbishBinUseCase>()
     private val getCloudSortOrder =
         mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val getFeatureFlagValueUseCase =
         mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(false) }
@@ -235,7 +237,6 @@ class ManagerViewModelTest {
     private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
         onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
     }
-    private val getPricing = mock<GetPricing>()
     private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
     private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
@@ -271,6 +272,7 @@ class ManagerViewModelTest {
             areCameraUploadsFoldersInRubbishBinUseCase = areCameraUploadsFoldersInRubbishBinUseCase,
             getCloudSortOrder = getCloudSortOrder,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             getExtendedAccountDetail = mock(),
             getFullAccountInfoUseCase = getFullAccountInfoUseCase,
             getActiveSubscriptionUseCase = mock(),

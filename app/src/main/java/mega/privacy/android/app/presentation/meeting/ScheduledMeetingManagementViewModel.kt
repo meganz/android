@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateOccurrenceUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import java.time.ZonedDateTime
@@ -92,6 +93,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val removeChatLink: RemoveChatLink,
     private val createChatLink: CreateChatLink,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val updateOccurrenceUseCase: UpdateOccurrenceUseCase,
@@ -111,7 +113,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      * Is network connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     init {
         viewModelScope.launch {

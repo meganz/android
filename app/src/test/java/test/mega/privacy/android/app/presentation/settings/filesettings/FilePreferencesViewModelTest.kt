@@ -16,6 +16,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import org.junit.After
@@ -33,6 +34,7 @@ internal class FilePreferencesViewModelTest {
 
     private val getFolderVersionInfo: GetFolderVersionInfo = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val getFileVersionsOption: GetFileVersionsOption = mock {
         on { runBlocking { invoke(any()) } }.thenReturn(false)
     }
@@ -59,7 +61,8 @@ internal class FilePreferencesViewModelTest {
             monitorConnectivityUseCase,
             getFileVersionsOption,
             monitorUserUpdates,
-            enableFileVersionsOption
+            enableFileVersionsOption,
+            isConnectedToInternetUseCase
         )
     }
 

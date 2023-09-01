@@ -29,7 +29,7 @@ import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -46,7 +46,7 @@ import org.mockito.kotlin.whenever
 class FileLinkViewModelTest {
 
     private lateinit var underTest: FileLinkViewModel
-    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val hasCredentials = mock<HasCredentials>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
     private val legacyCopyNodeUseCase = mock<LegacyCopyNodeUseCase>()
@@ -81,7 +81,7 @@ class FileLinkViewModelTest {
 
     private fun initViewModel() {
         underTest = FileLinkViewModel(
-            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             hasCredentials = hasCredentials,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,

@@ -5,15 +5,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.chat.model.SettingsChatState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatImageQuality
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import javax.inject.Inject
 
@@ -24,7 +23,8 @@ import javax.inject.Inject
 class SettingsChatViewModel @Inject constructor(
     private val getChatImageQuality: GetChatImageQuality,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsChatState())
@@ -33,14 +33,13 @@ class SettingsChatViewModel @Inject constructor(
     /**
      * Monitor connectivity event
      */
-    val monitorConnectivityEvent =
-        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+    val monitorConnectivityEvent = monitorConnectivityUseCase()
 
     /**
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     init {
         viewModelScope.launch(ioDispatcher) {

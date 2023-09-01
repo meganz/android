@@ -80,6 +80,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.monitoring.StopTracePerformanceUseCase
 import mega.privacy.android.domain.usecase.monitoring.StartTracePerformanceUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
@@ -204,6 +205,7 @@ class CameraUploadsWorkerTest {
         mock()
     private val startTracePerformanceUseCase: StartTracePerformanceUseCase = mock()
     private val stopTracePerformanceUseCase: StopTracePerformanceUseCase = mock()
+    private var isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
 
 
     @Before
@@ -313,6 +315,7 @@ class CameraUploadsWorkerTest {
             broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase,
             startTracePerformanceUseCase = startTracePerformanceUseCase,
             stopTracePerformanceUseCase = stopTracePerformanceUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase
         )
     }
 

@@ -6,7 +6,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -26,7 +25,7 @@ import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCa
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.transfer.StartDownloadUseCase
@@ -62,10 +61,9 @@ class StartDownloadTransfersViewModelTest {
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase = mock()
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase =
         mock()
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
-    private val monitorConnectivityFlow: StateFlow<Boolean> = mock()
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
@@ -81,8 +79,8 @@ class StartDownloadTransfersViewModelTest {
             getOfflineFileUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
-            monitorConnectivityUseCase,
             clearActiveTransfersIfFinishedUseCase,
+            isConnectedToInternetUseCase
         )
 
     }
@@ -97,10 +95,9 @@ class StartDownloadTransfersViewModelTest {
             getOfflineFileUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
-            monitorConnectivityUseCase,
+            isConnectedToInternetUseCase,
             node,
             parentNode,
-            monitorConnectivityFlow,
             clearActiveTransfersIfFinishedUseCase,
         )
     }
@@ -221,8 +218,7 @@ class StartDownloadTransfersViewModelTest {
         whenever(getNodeByIdUseCase(parentId)).thenReturn(parentNode)
         whenever(getDefaultDownloadPathForNodeUseCase(parentNode)).thenReturn(destination)
 
-        whenever(monitorConnectivityFlow.value).thenReturn(internetConnection)
-        whenever(monitorConnectivityUseCase()).thenReturn(monitorConnectivityFlow)
+        whenever(isConnectedToInternetUseCase()).thenReturn(internetConnection)
     }
 
     private fun stubStartDownload(flow: Flow<DownloadNodesEvent>) {

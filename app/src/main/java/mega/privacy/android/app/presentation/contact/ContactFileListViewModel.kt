@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ContactFileListViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
@@ -47,7 +47,7 @@ class ContactFileListViewModel @Inject constructor(
      *
      * @return
      */
-    fun isOnline(): Boolean = monitorConnectivityUseCase().value
+    fun isOnline(): Boolean = isConnectedToInternetUseCase()
 
     /**
      * Move nodes to rubbish

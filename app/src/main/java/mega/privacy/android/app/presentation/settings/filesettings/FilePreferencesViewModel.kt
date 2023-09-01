@@ -4,11 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
@@ -16,6 +14,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import timber.log.Timber
@@ -24,10 +23,11 @@ import javax.inject.Inject
 @HiltViewModel
 class FilePreferencesViewModel @Inject constructor(
     private val getFolderVersionInfo: GetFolderVersionInfo,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFileVersionsOption: GetFileVersionsOption,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val enableFileVersionsOption: EnableFileVersionsOption,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FilePreferencesState())
 
@@ -39,14 +39,13 @@ class FilePreferencesViewModel @Inject constructor(
     /**
      * Monitor connectivity event
      */
-    val monitorConnectivityEvent =
-        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+    val monitorConnectivityEvent = monitorConnectivityUseCase()
 
     /**
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivityUseCase().value
+        get() = isConnectedToInternetUseCase()
 
     init {
         viewModelScope.launch {

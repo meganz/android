@@ -42,7 +42,7 @@ import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -60,7 +60,7 @@ class FolderLinkViewModelTest {
 
     private lateinit var underTest: FolderLinkViewModel
     private val monitorViewType = mock<MonitorViewType>()
-    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val loginToFolderUseCase = mock<LoginToFolderUseCase>()
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase = mock()
@@ -99,7 +99,7 @@ class FolderLinkViewModelTest {
 
     private fun initViewModel() {
         underTest = FolderLinkViewModel(
-            monitorConnectivityUseCase,
+            isConnectedToInternetUseCase,
             monitorViewType,
             loginToFolderUseCase,
             checkNameCollisionUseCase,

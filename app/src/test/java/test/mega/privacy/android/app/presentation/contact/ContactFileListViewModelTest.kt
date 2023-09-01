@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
@@ -31,7 +31,7 @@ import org.mockito.kotlin.whenever
 internal class ContactFileListViewModelTest {
     private lateinit var underTest: ContactFileListViewModel
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase = mock()
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val moveNodesUseCase: MoveNodesUseCase = mock()
@@ -50,7 +50,7 @@ internal class ContactFileListViewModelTest {
     fun resetMocks() {
         reset(
             monitorStorageStateEventUseCase,
-            monitorConnectivityUseCase,
+            isConnectedToInternetUseCase,
             moveNodesToRubbishUseCase,
             checkNodesNameCollisionUseCase,
             moveNodesUseCase
@@ -60,7 +60,7 @@ internal class ContactFileListViewModelTest {
     private fun initTestClass() {
         underTest = ContactFileListViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase

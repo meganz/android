@@ -124,8 +124,9 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
-import mega.privacy.android.domain.usecase.monitoring.StopTracePerformanceUseCase
 import mega.privacy.android.domain.usecase.monitoring.StartTracePerformanceUseCase
+import mega.privacy.android.domain.usecase.monitoring.StopTracePerformanceUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
@@ -233,6 +234,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
     private val startTracePerformanceUseCase: StartTracePerformanceUseCase,
     private val stopTracePerformanceUseCase: StopTracePerformanceUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -1153,7 +1155,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param aborted true if the Camera Uploads has been stopped prematurely
      */
     private suspend fun sendStatusToBackupCenter(aborted: Boolean) {
-        if (monitorConnectivityUseCase().value) {
+        if (isConnectedToInternetUseCase()) {
             if (aborted)
                 sendTransfersInterruptedInfoToBackupCenter()
             else

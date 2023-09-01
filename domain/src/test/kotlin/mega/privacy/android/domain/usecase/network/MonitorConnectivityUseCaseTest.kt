@@ -2,11 +2,8 @@ package mega.privacy.android.domain.usecase.network
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ConnectivityState
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -25,24 +22,7 @@ class MonitorConnectivityUseCaseTest {
     fun setUp() {
         underTest = MonitorConnectivityUseCase(
             networkRepository = networkRepository,
-            appScope = CoroutineScope(
-                UnconfinedTestDispatcher()
-            )
         )
-    }
-
-    @Test
-    fun `test that initial value is current connected state`() = runTest {
-        networkRepository.stub {
-            onBlocking { getCurrentConnectivityState() }.thenReturn(
-                ConnectivityState.Connected(true)
-            )
-            on { monitorConnectivityChanges() }.thenReturn(emptyFlow())
-        }
-
-        underTest().test {
-            assertThat(awaitItem()).isTrue()
-        }
     }
 
     @Test

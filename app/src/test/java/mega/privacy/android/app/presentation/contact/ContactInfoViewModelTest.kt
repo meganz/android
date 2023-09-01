@@ -14,12 +14,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
-import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -55,7 +55,7 @@ import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import org.junit.jupiter.api.AfterAll
@@ -79,7 +79,7 @@ import kotlin.test.assertFalse
 class ContactInfoViewModelTest {
     private var underTest: ContactInfoViewModel = mock()
     private var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
-    private var monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private var isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private var passcodeManagement: PasscodeManagement = mock()
     private var setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
     private var chatManagement: ChatManagement = mock()
@@ -138,8 +138,6 @@ class ContactInfoViewModelTest {
         on { title }.thenReturn("Chat title")
     }
 
-    private val connectivityFlow: MutableStateFlow<Boolean> = MutableStateFlow(true)
-
     @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -159,7 +157,7 @@ class ContactInfoViewModelTest {
     private fun initViewModel() {
         underTest = ContactInfoViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             passcodeManagement = passcodeManagement,
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             chatManagement = chatManagement,
@@ -199,7 +197,7 @@ class ContactInfoViewModelTest {
             contactItem
         )
         whenever(getChatRoomByUserUseCase(contactItem.handle)).thenReturn(chatRoom)
-        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
     }
 
@@ -242,7 +240,7 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when contact info screen launched from contacts emits title`() =
         runTest {
-            whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(getChatRoom(testHandle)).thenReturn(chatRoom)
             whenever(
                 getContactFromChatUseCase(
@@ -262,7 +260,7 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when contact info screen launched from chats emits title`() =
         runTest {
-            whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(
                 getContactFromEmailUseCase(
                     testEmail,
@@ -282,7 +280,7 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when new nickname is given the nick name added snack bar message is emitted`() =
         runTest {
-            whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(
                 getContactFromEmailUseCase(
                     testEmail,
@@ -320,7 +318,7 @@ class ContactInfoViewModelTest {
     }
 
     private suspend fun initContactInfoOpenedFromContact() {
-        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true))
             .thenReturn(contactItem)
         whenever(getChatRoomByUserUseCase(userHandle = testHandle)).thenReturn(chatRoom)
@@ -370,7 +368,7 @@ class ContactInfoViewModelTest {
             val newChatRoom = mock<ChatRoom> {
                 on { chatId }.thenReturn(newChatId)
             }
-            whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true)).thenReturn(
                 contactItem
             )

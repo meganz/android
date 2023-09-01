@@ -127,7 +127,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MonitorAudioShuffleEnable
 import mega.privacy.android.domain.usecase.mediaplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SetAudioShuffleEnabledUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -148,7 +148,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val playlistItemMapper: PlaylistItemMapper,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val megaApiFolderHttpServerSetMaxBufferSizeUseCase: MegaApiFolderHttpServerSetMaxBufferSizeUseCase,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
     private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
@@ -187,6 +186,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val setAudioBackgroundPlayEnabledUseCase: SetAudioBackgroundPlayEnabledUseCase,
     private val setAudioShuffleEnabledUseCase: SetAudioShuffleEnabledUseCase,
     private val setAudioRepeatModeUseCase: SetAudioRepeatModeUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : AudioPlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener,
     SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
@@ -735,7 +735,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
             }
         }
 
-        if (nodesWithoutThumbnail.isNotEmpty() && monitorConnectivityUseCase().value) {
+        if (nodesWithoutThumbnail.isNotEmpty() && isConnectedToInternetUseCase()) {
             cancellableJobs[JOB_KEY_UPDATE_THUMBNAIL]?.cancel()
             val updateThumbnailJob = sharingScope.launch(ioDispatcher) {
                 nodesWithoutThumbnail.map {

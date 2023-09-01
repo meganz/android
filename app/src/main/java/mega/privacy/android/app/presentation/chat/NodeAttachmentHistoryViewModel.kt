@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import javax.inject.Inject
 
 /**
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NodeAttachmentHistoryViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel() {
 
     /**
@@ -28,5 +28,5 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      *
      * @return
      */
-    fun isOnline(): Boolean = monitorConnectivityUseCase().value
+    fun isOnline(): Boolean = isConnectedToInternetUseCase()
 }
