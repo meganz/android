@@ -2781,7 +2781,7 @@ class SqliteDatabaseHandler @Inject constructor(
             }
         }
 
-    override fun setSecondaryFolderPath(localPath: String) {
+    override fun setSecondaryFolderPath(localPath: String?) {
         Timber.d("setSecondaryFolderPath: %s", localPath)
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()

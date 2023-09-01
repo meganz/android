@@ -219,7 +219,7 @@ interface DatabaseHandler {
     fun setCamSyncLocalPath(localPath: String)
     fun setUriExternalSDCard(uriExternalSDCard: String?)
     fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean)
-    fun setSecondaryFolderPath(localPath: String)
+    fun setSecondaryFolderPath(localPath: String?)
     fun setCamSyncFileUpload(fileUpload: Int)
     fun setAccountDetailsTimeStamp()
     fun resetAccountDetailsTimeStamp()

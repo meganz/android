@@ -115,13 +115,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var queueSizeInput: EditText? = null
     private var mediaPermissionsDialog: AlertDialog? = null
 
-    // Secondary Folder
-    private var localSecondaryFolderPath: String? = ""
-    private var handleSecondaryMediaFolder: Long? = null
-    private var megaNodeSecondaryMediaFolder: MegaNode? = null
-    private var megaPathSecMediaFolder = ""
-    private var isExternalSDCardMU = false
-
     /**
      * Flag that control the start of the Camera Uploads when the user leaves the screen [onPause]
      * to avoid unwanted trigger when the user goes to the folder picker for choosing primary and secondary local folder
@@ -292,7 +285,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             secondaryUpload = prefs.secondaryMediaFolderEnabled.toBoolean()
             Timber.d("Secondary is: %s", secondaryUpload)
         }
-        isExternalSDCardMU = dbH.mediaFolderExternalSdCard
 
         if (savedInstanceState != null) {
             val isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false)
@@ -384,16 +376,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     secondaryMediaFolderOn?.isEnabled = false
                     localSecondaryFolder?.isEnabled = false
                     megaSecondaryFolder?.isEnabled = false
-                    if (handleSecondaryMediaFolder == null || handleSecondaryMediaFolder == MegaApiJava.INVALID_HANDLE) {
-                        megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads)
-                    }
-                    prefs = dbH.preferences
-                    checkMediaUploadsPath()
                 } else {
                     Timber.d("Disable Media Uploads.")
                     viewModel.disableMediaUploads()
                 }
-                checkIfSecondaryFolderExists()
+                checkSecondaryMediaFolder()
                 viewModel.rescheduleCameraUpload()
             }
 
@@ -542,16 +529,13 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     return
                 }
                 with(isFolderInSDCard) {
-                    isExternalSDCardMU = this
                     dbH.mediaFolderExternalSdCard = this
                 }
                 with(secondaryPath) {
-                    localSecondaryFolderPath = this
-                    dbH.setSecondaryFolderPath(this.orEmpty())
-                    dbH.uriMediaExternalSdCard = this.orEmpty()
-                    prefs.localPathSecondaryFolder = this.orEmpty()
-                    localSecondaryFolder?.summary = this.orEmpty()
+                    dbH.setSecondaryFolderPath(this)
+                    dbH.uriMediaExternalSdCard = this
                 }
+                checkSecondaryMediaFolder()
                 viewModel.restoreSecondaryTimestampsAndSyncRecordProcess()
                 viewModel.rescheduleCameraUpload()
 
@@ -1120,29 +1104,34 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Checks the Secondary Folder
      */
     private fun checkSecondaryMediaFolder() {
-        if (secondaryUpload) {
-            // Check if the node exists in MEGA
-            checkIfNodeOfSecondaryFolderExistsInMega()
-
-            // Check if the local secondary folder exists
-            checkMediaUploadsPath()
-        }
-        checkIfSecondaryFolderExists()
-    }
-
-    /**
-     * Check if the Secondary Folder exists
-     */
-    private fun checkIfSecondaryFolderExists() {
+        prefs = dbH.preferences
         if (secondaryUpload) {
             secondaryMediaFolderOn?.title = getString(R.string.settings_secondary_upload_off)
-            megaSecondaryFolder?.let {
-                it.summary = megaPathSecMediaFolder
-                preferenceScreen.addPreference(it)
-            }
-            localSecondaryFolder?.let {
-                it.summary = localSecondaryFolderPath.orEmpty()
-                preferenceScreen.addPreference(it)
+            with(prefs) {
+                // Check if the node exists in MEGA
+                val node = megaHandleSecondaryFolder?.toLongOrNull()?.let { handle ->
+                    megaApi.getNodeByHandle(handle)
+                }
+
+                megaSecondaryFolder?.let {
+                    it.summary = node?.name ?: getString(R.string.section_secondary_media_uploads)
+                    preferenceScreen.addPreference(it)
+                }
+
+                // Check if the local secondary folder exists
+                val path = localPathSecondaryFolder?.let {
+                    if (!FileUtil.isFileAvailable(File(it))) {
+                        Timber.w("Secondary ON: invalid localSecondaryFolderPath")
+                        snackbarCallBack?.showSnackbar(getString(R.string.secondary_media_service_error_local_folder))
+                        dbH.setSecondaryFolderPath(null)
+                        null
+                    } else it
+                }
+
+                localSecondaryFolder?.let {
+                    it.summary = path ?: getString(R.string.settings_empty_folder)
+                    preferenceScreen.addPreference(it)
+                }
             }
         } else {
             secondaryMediaFolderOn?.title = getString(R.string.settings_secondary_upload_on)
@@ -1168,15 +1157,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     @Synchronized
     fun setCUDestinationFolder(isSecondary: Boolean, handle: Long) {
-        val targetNode = megaApi.getNodeByHandle(handle) ?: return
         if (isSecondary) {
-            // Reset Secondary Timeline
-            handleSecondaryMediaFolder = handle
-            megaNodeSecondaryMediaFolder = targetNode
-            megaPathSecMediaFolder = megaNodeSecondaryMediaFolder?.name.orEmpty()
-            megaSecondaryFolder?.summary = megaPathSecMediaFolder
+            checkSecondaryMediaFolder()
         } else {
             // Reset Primary Timeline
+            val targetNode = megaApi.getNodeByHandle(handle) ?: return
             camSyncHandle = handle
             camSyncMegaNode = targetNode
             camSyncMegaPath = camSyncMegaNode?.name.orEmpty()
@@ -1247,35 +1232,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private fun disableCameraUploads() {
         viewModel.stopCameraUploads()
         disableCameraUploadUIProcess()
-    }
-
-    /**
-     * Checks the Media Uploads local path
-     */
-    private fun checkMediaUploadsPath() {
-        localSecondaryFolderPath = prefs.localPathSecondaryFolder
-        if (localSecondaryFolderPath.isNullOrBlank()
-            || localSecondaryFolderPath == Constants.INVALID_NON_NULL_VALUE
-            || (!isExternalSDCardMU && !FileUtil.isFileAvailable(File(localSecondaryFolderPath.orEmpty())))
-        ) {
-            Timber.w("Secondary ON: invalid localSecondaryFolderPath")
-            localSecondaryFolderPath = getString(R.string.settings_empty_folder)
-            Toast.makeText(
-                context,
-                getString(R.string.secondary_media_service_error_local_folder),
-                Toast.LENGTH_SHORT
-            ).show()
-            if (!FileUtil.isFileAvailable(File(localSecondaryFolderPath.orEmpty()))) {
-                dbH.setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
-            }
-        } else if (isExternalSDCardMU) {
-            dbH.uriMediaExternalSdCard?.let {
-                localSecondaryFolderPath = it
-            } ?: run {
-                localSecondaryFolderPath = getString(R.string.settings_empty_folder)
-                dbH.setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
-            }
-        }
     }
 
     /**
@@ -1483,33 +1439,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Checks if the Secondary Folder Node exists in MEGA
-     */
-    private fun checkIfNodeOfSecondaryFolderExistsInMega() {
-        val secHandle = prefs.megaHandleSecondaryFolder
-        megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads)
-        if (secHandle != null) {
-            if (secHandle.isNotBlank()) {
-                handleSecondaryMediaFolder = secHandle.toLong()
-
-                handleSecondaryMediaFolder?.let { longValue ->
-                    if (handleSecondaryMediaFolder != MegaApiJava.INVALID_HANDLE) {
-                        megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(longValue)
-                        megaPathSecMediaFolder = if (megaNodeSecondaryMediaFolder != null) {
-                            megaNodeSecondaryMediaFolder?.name.orEmpty()
-                        } else {
-                            getString(R.string.section_secondary_media_uploads)
-                        }
-                    }
-                }
-            }
-        } else {
-            dbH.setSecondaryFolderHandle(MegaApiJava.INVALID_HANDLE)
-            handleSecondaryMediaFolder = MegaApiJava.INVALID_HANDLE
-        }
-    }
-
-    /**
      * Setup Secondary Uploads
      */
     private fun setupSecondaryUpload() {
@@ -1519,7 +1448,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         } else {
             prefs.secondaryMediaFolderEnabled.toBoolean()
         }
-        checkSecondaryMediaFolder()
     }
 
     /**
