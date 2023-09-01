@@ -46,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -59,7 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
@@ -96,7 +97,10 @@ fun MediaDiscoveryView(
     onSwitchListView: () -> Unit,
     onUploadFiles: () -> Unit,
     onCapture: () -> Unit,
-    isNewMediaDiscoveryFabEnabled: Boolean,
+    onStartModalSheetShow: () -> Unit,
+    onEndModalSheetHide: () -> Unit,
+    isNewMediaDiscoveryFabEnabled
+    : Boolean,
 ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
     val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
@@ -108,7 +112,20 @@ fun MediaDiscoveryView(
     )
 
     BackHandler(enabled = modalSheetState.isVisible) {
-        coroutineScope.launch { modalSheetState.hide() }
+        coroutineScope.launch {
+            hideModalSheet(
+                onEndModalSheetHide = onEndModalSheetHide,
+                modalSheetState = modalSheetState,
+            )
+        }
+    }
+
+    LaunchedEffect(key1 = modalSheetState.isVisible) {
+        snapshotFlow { modalSheetState.isVisible }.distinctUntilChanged().collect { isVisible ->
+            if (!isVisible) {
+                onEndModalSheetHide()
+            }
+        }
     }
 
     HandleSortByDialog(
@@ -166,7 +183,10 @@ fun MediaDiscoveryView(
                         AddFabButton(
                             onFabClick = {
                                 coroutineScope.launch {
-                                    modalSheetState.show()
+                                    showModalSheet(
+                                        onStartModalSheetShow = onStartModalSheetShow,
+                                        modalSheetState = modalSheetState,
+                                    )
                                 }
                             }
                         )
@@ -182,7 +202,10 @@ fun MediaDiscoveryView(
                             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                         onFabClick = {
                             coroutineScope.launch {
-                                modalSheetState.show()
+                                showModalSheet(
+                                    onStartModalSheetShow = onStartModalSheetShow,
+                                    modalSheetState = modalSheetState,
+                                )
                             }
                         }
                     )
@@ -202,17 +225,31 @@ fun MediaDiscoveryView(
     }
 
     MDBottomSheet(
-        coroutineScope = coroutineScope,
         modalSheetState = modalSheetState,
-        onUploadFiles = onUploadFiles,
-        onCapture = onCapture,
+        onUploadFiles = {
+            onUploadFiles()
+            coroutineScope.launch {
+                hideModalSheet(
+                    onEndModalSheetHide = onEndModalSheetHide,
+                    modalSheetState = modalSheetState,
+                )
+            }
+        },
+        onCapture = {
+            onCapture()
+            coroutineScope.launch {
+                hideModalSheet(
+                    onEndModalSheetHide = onEndModalSheetHide,
+                    modalSheetState = modalSheetState,
+                )
+            }
+        },
     )
 }
 
 @Composable
 fun MDBottomSheet(
     modalSheetState: ModalBottomSheetState,
-    coroutineScope: CoroutineScope,
     onUploadFiles: () -> Unit,
     onCapture: () -> Unit,
 ) {
@@ -231,24 +268,34 @@ fun MDBottomSheet(
                     res = R.drawable.ic_upload_file,
                     text = R.string.upload_files,
                     description = "UploadFiles",
-                    onClick = {
-                        onUploadFiles()
-                        coroutineScope.launch { modalSheetState.hide() }
-                    }
+                    onClick = onUploadFiles
                 )
                 MenuItem(
                     modifier = Modifier,
                     res = R.drawable.ic_camera_uploads,
                     text = R.string.menu_take_picture,
                     description = "Capture",
-                    onClick = {
-                        onCapture()
-                        coroutineScope.launch { modalSheetState.hide() }
-                    }
+                    onClick = onCapture,
                 )
             }
         }
     ) {}
+}
+
+private suspend fun showModalSheet(
+    onStartModalSheetShow: () -> Unit,
+    modalSheetState: ModalBottomSheetState,
+) {
+    onStartModalSheetShow()
+    modalSheetState.show()
+}
+
+private suspend fun hideModalSheet(
+    onEndModalSheetHide: () -> Unit,
+    modalSheetState: ModalBottomSheetState,
+) {
+    modalSheetState.hide()
+    onEndModalSheetHide()
 }
 
 @Composable

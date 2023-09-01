@@ -12,11 +12,13 @@ import timber.log.Timber.Forest.e
 fun MediaDiscoveryFragment.actionSaveToDevice() {
     lifecycleScope.launch {
         val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
-        managerActivity.saveNodesToDevice(selectedNodes,
-            false,
-            false,
-            false,
-            false)
+        managerActivity?.saveNodesToDevice(
+            selectedNodes,
+            highPriority = false,
+            isFolderLink = false,
+            fromMediaViewer = false,
+            fromChat = false
+        )
     }
 }
 
@@ -40,14 +42,14 @@ fun MediaDiscoveryFragment.actionShareLink() {
 fun MediaDiscoveryFragment.actionSendToChat() {
     lifecycleScope.launch {
         val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
-        managerActivity.attachNodesToChats(selectedNodes)
+        managerActivity?.attachNodesToChats(selectedNodes)
     }
 }
 
 fun MediaDiscoveryFragment.actionShareOut() {
     lifecycleScope.launch {
         val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
-        MegaNodeUtil.shareNodes(managerActivity, selectedNodes)
+        managerActivity?.let { MegaNodeUtil.shareNodes(it, selectedNodes) }
     }
 }
 
@@ -82,11 +84,13 @@ fun MediaDiscoveryFragment.actionMoveToTrash() {
         addAll(mediaDiscoveryViewModel.getSelectedIds())
     }
     if (selectedPhotosIds.isNotEmpty()) {
-        ConfirmMoveToRubbishBinDialogFragment.newInstance(selectedPhotosIds)
-            .show(
-                managerActivity.supportFragmentManager,
-                ConfirmMoveToRubbishBinDialogFragment.TAG
-            )
+        managerActivity?.supportFragmentManager?.let {
+            ConfirmMoveToRubbishBinDialogFragment.newInstance(selectedPhotosIds)
+                .show(
+                    it,
+                    ConfirmMoveToRubbishBinDialogFragment.TAG
+                )
+        }
     }
 }
 

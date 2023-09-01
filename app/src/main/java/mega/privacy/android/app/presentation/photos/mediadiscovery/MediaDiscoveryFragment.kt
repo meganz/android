@@ -54,7 +54,7 @@ class MediaDiscoveryFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
-    internal lateinit var managerActivity: ManagerActivity
+    internal var managerActivity: ManagerActivity? = null
     private var menu: Menu? = null
 
     // Action mode
@@ -85,7 +85,7 @@ class MediaDiscoveryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        managerActivity = activity as ManagerActivity
+        managerActivity = activity as? ManagerActivity
         actionModeCallback =
             MediaDiscoveryActionModeCallback(this)
     }
@@ -119,6 +119,8 @@ class MediaDiscoveryFragment : Fragment() {
                         onSwitchListView = this@MediaDiscoveryFragment::onSwitchListView,
                         onCapture = this@MediaDiscoveryFragment::onCapture,
                         onUploadFiles = this@MediaDiscoveryFragment::onUploadFiles,
+                        onStartModalSheetShow = this@MediaDiscoveryFragment::onStartModalSheetShow,
+                        onEndModalSheetHide = this@MediaDiscoveryFragment::onEndModalSheetHide,
                         isNewMediaDiscoveryFabEnabled = isNewMediaDiscoveryFabEnabled
                     )
                 }
@@ -126,18 +128,26 @@ class MediaDiscoveryFragment : Fragment() {
         }
     }
 
+    private fun onStartModalSheetShow() {
+        managerActivity?.showHideBottomNavigationView(true)
+    }
+
+    private fun onEndModalSheetHide() {
+        managerActivity?.showHideBottomNavigationView(false)
+    }
+
     private fun onUploadFiles() {
-        (activity as ManagerActivity).uploadFiles()
+        managerActivity?.uploadFiles()
     }
 
     private fun onCapture() {
-        (activity as ManagerActivity).takePictureAndUpload()
+        managerActivity?.takePictureAndUpload()
     }
 
     private fun onSwitchListView() {
         lifecycleScope.launch {
             mediaDiscoveryViewModel.setListViewTypeClicked()
-            (activity as ManagerActivity).switchToCDFromMD()
+            managerActivity?.switchToCDFromMD()
         }
     }
 
@@ -152,13 +162,13 @@ class MediaDiscoveryFragment : Fragment() {
      * Setup ManagerActivity UI
      */
     private fun setupParentActivityUI() {
-        managerActivity.run {
+        managerActivity?.run {
             setToolbarTitle()
             invalidateOptionsMenu()
             hideFabButton()
         }
-        managerActivity.invalidateOptionsMenu()
-        managerActivity.hideFabButton()
+        managerActivity?.invalidateOptionsMenu()
+        managerActivity?.hideFabButton()
     }
 
     private fun setupFlow() {
@@ -242,16 +252,16 @@ class MediaDiscoveryFragment : Fragment() {
     }
 
     private fun enterActionMode() {
-        actionMode = managerActivity.startSupportActionMode(
+        actionMode = managerActivity?.startSupportActionMode(
             actionModeCallback
         )
-        managerActivity.showHideBottomNavigationView(true)
+        managerActivity?.showHideBottomNavigationView(true)
     }
 
     private fun exitActionMode() {
         actionMode?.finish()
         actionMode = null
-        managerActivity.showHideBottomNavigationView(false)
+        managerActivity?.showHideBottomNavigationView(false)
     }
 
     private fun handleActionMode(photo: Photo) {
@@ -269,7 +279,7 @@ class MediaDiscoveryFragment : Fragment() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
-                if (!managerActivity.isInMDMode()) {
+                if (managerActivity?.isInMDMode() == false) {
                     return
                 }
                 menuInflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
