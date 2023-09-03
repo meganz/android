@@ -5116,4 +5116,8 @@
         <item quantity="one">%1$d is waiting to join the call.</item>
         <item quantity="other">%1$d are waiting to join the call.</item>
     </plurals>
+    <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
+    <!-- Dialog button to deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Deny entry</string>
 </resources>

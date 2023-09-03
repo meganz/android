@@ -214,6 +214,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
     private var usersInWaitingRoomDialog: Dialog? = null
+    private var denyUserDialog: Dialog? = null
 
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -1163,11 +1164,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        viewLifecycleOwner.collectFlow(sharedModel.state) { (_, _, _, showParticipantsInWRDialog, usersInWR) ->
-            if (showParticipantsInWRDialog) {
-                usersInWR?.let {
+        viewLifecycleOwner.collectFlow(sharedModel.state) { (_, _, _, showParticipantsInWaitingRoomDialog, showDenyParticipantDialog, usersInWaitingRoom) ->
+            if (showParticipantsInWaitingRoomDialog) {
+                usersInWaitingRoom?.let {
                     showUsersInWaitingRoomDialog(it)
                 }
+            } else {
+                dismissDialog(usersInWaitingRoomDialog)
+            }
+
+            if (showDenyParticipantDialog && !usersInWaitingRoom.isNullOrEmpty() && usersInWaitingRoom.size == 1) {
+                val handle = usersInWaitingRoom.keys.first()
+                val name = usersInWaitingRoom[handle]
+                showDenyUserDialog(Pair(handle, name))
+
+            } else {
+                dismissDialog(denyUserDialog)
             }
         }
 
@@ -2695,6 +2707,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
         dismissDialog(usersInWaitingRoomDialog)
+        dismissDialog(denyUserDialog)
         assignModeratorDialog?.dismissAllowingStateLoss()
         endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
     }
@@ -2859,14 +2872,52 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
+     * Dialogue shown when you want to deny access to the call to a participant
+     *
+     * @param
+     */
+    private fun showDenyUserDialog(user: Pair<Long, String>) {
+        val messageText = resources.getString(
+            R.string.meetings_waiting_room_deny_user_to_call_dialog_message,
+            user.second
+        )
+
+        val positiveButtonText =
+            resources.getString(R.string.meetings_waiting_room_deny_user_to_call_dialog_button)
+
+        val negativeButtonText = resources.getString(R.string.general_cancel)
+
+        denyUserDialog = MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        )
+            .setTitle(null)
+            .setMessage(messageText)
+            .setPositiveButton(positiveButtonText) { _, _ ->
+                sharedModel.denySpecificUser(user.first)
+            }
+            .setNegativeButton(negativeButtonText) { _, _ ->
+            }
+            .setOnDismissListener {
+                sharedModel.setShowDenyParticipantDialogConsumed()
+            }
+            .setCancelable(false)
+            .create()
+
+        denyUserDialog?.show()
+    }
+
+    /**
      * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
+     *
+     * @param users
      */
     private fun showUsersInWaitingRoomDialog(users: Map<Long, String>) {
         if (users.isEmpty()) return
 
-        val isOneParticipantInWR = users.size == 1
+        val isOneParticipantInWaitingRoom = users.size == 1
 
-        val messageText = if (isOneParticipantInWR)
+        val messageText = if (isOneParticipantInWaitingRoom)
             resources.getString(
                 R.string.meetings_waiting_room_admit_user_to_call_dialog_message,
                 users.values.first()
@@ -2877,12 +2928,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             users.size,
         )
         val positiveButtonText =
-            if (isOneParticipantInWR) resources.getString(R.string.meetings_waiting_room_admit_user_to_call_dialog_admit_button)
+            if (isOneParticipantInWaitingRoom) resources.getString(R.string.meetings_waiting_room_admit_user_to_call_dialog_admit_button)
             else
                 resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button)
 
         val negativeButtonText =
-            if (isOneParticipantInWR) resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_deny_button)
+            if (isOneParticipantInWaitingRoom) resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_deny_button)
             else
                 resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button)
 
@@ -2893,8 +2944,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .setTitle(null)
             .setMessage(messageText)
             .setPositiveButton(positiveButtonText) { _, _ ->
+                if (isOneParticipantInWaitingRoom) {
+                    sharedModel.admitUsersTap(false)
+                } else {
+                    sharedModel.seeWaitingRoom()
+                }
             }
             .setNegativeButton(negativeButtonText) { _, _ ->
+                if (isOneParticipantInWaitingRoom) {
+                    sharedModel.denyUsersTap()
+                } else {
+                    sharedModel.admitUsersTap(true)
+                }
             }
             .setOnDismissListener {
                 sharedModel.setShowParticipantsInWaitingRoomDialogConsumed()

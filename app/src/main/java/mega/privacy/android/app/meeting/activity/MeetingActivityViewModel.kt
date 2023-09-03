@@ -34,6 +34,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
+import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -54,12 +55,18 @@ import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.usecase.CheckChatLink
+import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.KickUsersFromCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
@@ -88,6 +95,10 @@ import javax.inject.Inject
  * @property monitorFinishActivityUseCase   [MonitorFinishActivityUseCase]
  * @property monitorChatCallUpdates         [MonitorChatCallUpdates]
  * @property getMessageSenderNameUseCase    [GetMessageSenderNameUseCase]
+ * @property kickUsersFromCallUseCase       [KickUsersFromCallUseCase]
+ * @property allowUsersJoinCallUseCase      [AllowUsersJoinCallUseCase]
+ * @property getChatRoomUseCase             [GetChatRoomUseCase]
+ * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
  * @property state                      Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -104,6 +115,10 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
+    private val kickUsersFromCallUseCase: KickUsersFromCallUseCase,
+    private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase,
+    private val getChatRoomUseCase: GetChatRoom,
+    private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -237,6 +252,7 @@ class MeetingActivityViewModel @Inject constructor(
             .observeForever(meetingCreatedObserver)
 
         startMonitoringChatCallUpdates()
+        startMonitoringChatListItemUpdates()
 
         getCallUseCase.getCallEnded()
             .subscribeOn(Schedulers.io())
@@ -284,6 +300,48 @@ class MeetingActivityViewModel @Inject constructor(
     fun amIAGuest(): Boolean = meetingActivityRepository.amIAGuest()
 
     /**
+     * Get chat room
+     */
+    fun getChatRoom() = viewModelScope.launch {
+        runCatching {
+            getChatRoomUseCase(_state.value.chatId)
+        }.onSuccess { chatRoom ->
+            chatRoom?.let { chat ->
+                _state.update {
+                    it.copy(
+                        hasHostPermission = chat.ownPrivilege == ChatRoomPermission.Moderator,
+                    )
+                }
+            }
+
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Get chat list item updates
+     */
+    private fun startMonitoringChatListItemUpdates() =
+        viewModelScope.launch {
+            monitorChatListItemUpdates().collectLatest { item ->
+                if (item.chatId == state.value.chatId) {
+                    when (item.changes) {
+                        ChatListItemChanges.OwnPrivilege -> {
+                            _state.update {
+                                it.copy(
+                                    hasHostPermission = item.ownPrivilege == ChatRoomPermission.Moderator,
+                                )
+                            }
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+    /**
      * Get chat call updates
      */
     private fun startMonitoringChatCallUpdates() =
@@ -292,12 +350,19 @@ class MeetingActivityViewModel @Inject constructor(
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
                     call.changes?.apply {
-                        if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
+                        if (contains(ChatCallChanges.WaitingRoomUsersEntered) && state.value.hasHostPermission) {
                             Timber.d("Users entered in waiting room")
-
                             call.waitingRoom?.apply {
                                 peers?.let {
-                                    getWaitingRoomParticipants(it)
+                                    getWaitingRoomParticipants(it, true)
+                                }
+                            }
+                        }
+
+                        if (contains(ChatCallChanges.WaitingRoomUsersLeave) && state.value.hasHostPermission) {
+                            call.waitingRoom?.apply {
+                                peers?.let {
+                                    getWaitingRoomParticipants(it, false)
                                 }
                             }
                         }
@@ -321,10 +386,17 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
     /**
-     * Sets setShowParticipantsInWaitingRoomDialogConsumed as consumed.
+     * Sets showParticipantsInWaitingRoomDialog as consumed.
      */
     fun setShowParticipantsInWaitingRoomDialogConsumed() = _state.update { state ->
         state.copy(showParticipantsInWaitingRoomDialog = false)
+    }
+
+    /**
+     * Sets showDenyParticipantDialog as consumed.
+     */
+    fun setShowDenyParticipantDialogConsumed() = _state.update { state ->
+        state.copy(showDenyParticipantDialog = false)
     }
 
     /**
@@ -332,7 +404,7 @@ class MeetingActivityViewModel @Inject constructor(
      *
      * @param handleList
      */
-    private fun getWaitingRoomParticipants(handleList: List<Long>) =
+    private fun getWaitingRoomParticipants(handleList: List<Long>, showDialog: Boolean) =
         viewModelScope.launch {
             val peerList = mutableMapOf<Long, String>()
             handleList.forEach { handle ->
@@ -349,11 +421,69 @@ class MeetingActivityViewModel @Inject constructor(
 
             _state.update { state ->
                 state.copy(
-                    showParticipantsInWaitingRoomDialog = true,
+                    showParticipantsInWaitingRoomDialog = showDialog,
                     usersInWaitingRoom = peerList
                 )
             }
         }
+
+    /**
+     * Admit users to waiting room
+     *
+     * @param admitAll True, admit all users. False, otherwise.
+     */
+    fun admitUsersTap(admitAll: Boolean) {
+        if (state.value.usersInWaitingRoom.isNullOrEmpty())
+            return
+
+        val handleList: List<Long>? = state.value.usersInWaitingRoom?.toList()?.map { it.first }
+        handleList?.let {
+            viewModelScope.launch {
+                runCatching {
+                    allowUsersJoinCallUseCase(state.value.chatId, handleList, admitAll)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess {
+                    Timber.d("Users admitted to the call")
+                }
+            }
+        }
+    }
+
+    /**
+     * Deny users to waiting room
+     */
+    fun denyUsersTap() = _state.update { state ->
+        state.copy(showDenyParticipantDialog = true)
+    }
+
+    /**
+     * Deny specific user to waiting room
+     */
+    fun denySpecificUser(userHandle: Long) {
+        if (state.value.usersInWaitingRoom.isNullOrEmpty())
+            return
+
+        val handleList = mutableListOf<Long>().apply {
+            add(userHandle)
+        }
+        viewModelScope.launch {
+            runCatching {
+                kickUsersFromCallUseCase(state.value.chatId, handleList)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess {
+                Timber.d("Users kicked off the call")
+            }
+        }
+    }
+
+    /**
+     * See waiting room section
+     */
+    fun seeWaitingRoom() {
+
+    }
 
     /**
      * Logout
@@ -473,6 +603,7 @@ class MeetingActivityViewModel @Inject constructor(
                     chatId = chatId
                 )
             }
+            getChatRoom()
         }
     }
 
