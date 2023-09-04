@@ -28,11 +28,11 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val searchCategoryMapper: SearchCategoryMapper,
     private val searchCategoryIntMapper: SearchCategoryIntMapper,
     private val nodeMapper: NodeMapper,
-    private val megaApiGateway: MegaApiGateway,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val sortOrderIntMapper: SortOrderIntMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val getLinksSortOrder: GetLinksSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
+    private val megaApiGateway: MegaApiGateway,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SearchRepository {
     override fun getSearchCategories(): List<SearchCategory> = listOf(
         MegaApiAndroid.FILE_TYPE_DEFAULT,
@@ -73,7 +73,7 @@ internal class SearchRepositoryImpl @Inject constructor(
                             type = searchCategoryIntMapper(searchCategory)
                         )
                     }
-                    searchList.map { item -> convertToUnTypedNode(item) }
+                    searchList.map { item -> nodeMapper(item) }
                 }
             }
         }.orEmpty()
@@ -93,7 +93,7 @@ internal class SearchRepositoryImpl @Inject constructor(
                     sortOrderIntMapper(order)
                 )
             }
-            list.map { convertToUnTypedNode(it) }
+            list.map { nodeMapper(it) }
         }
     }
 
@@ -118,7 +118,7 @@ internal class SearchRepositoryImpl @Inject constructor(
                     megaCancelToken = cancelTokenProvider.getOrCreateCancelToken(),
                     order = sortOrderIntMapper(order)
                 )
-            }.map { convertToUnTypedNode(it) }
+            }.map { nodeMapper(it) }
         }
 
     override suspend fun searchLinkShares(
@@ -138,32 +138,25 @@ internal class SearchRepositoryImpl @Inject constructor(
                 cancelTokenProvider.getOrCreateCancelToken(),
                 sortOrderIntMapper(order)
             )
-        }.map { convertToUnTypedNode(it) }
+        }.map { nodeMapper(it) }
     }
-
-    private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
-        nodeMapper(
-            node,
-        )
 
     private suspend fun getNodeChildren(
         nodeId: NodeId,
         order: SortOrder?,
-    ): List<UnTypedNode> {
-        return withContext(ioDispatcher) {
-            return@withContext megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { parent ->
-                val childList = order?.let { sortOrder ->
-                    megaApiGateway.getChildrenByNode(
-                        parent,
-                        sortOrderIntMapper(sortOrder)
-                    )
-                } ?: run {
-                    megaApiGateway.getChildrenByNode(parent)
-                }
-                childList.map { convertToUnTypedNode(it) }
+    ): List<UnTypedNode> = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { parent ->
+            val childList = order?.let { sortOrder ->
+                megaApiGateway.getChildrenByNode(
+                    parent,
+                    sortOrderIntMapper(sortOrder)
+                )
             } ?: run {
-                emptyList()
+                megaApiGateway.getChildrenByNode(parent)
             }
+            childList.map { nodeMapper(it) }
+        } ?: run {
+            emptyList()
         }
     }
 }
