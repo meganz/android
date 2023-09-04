@@ -100,6 +100,8 @@ internal class AlbumContentViewModel @Inject constructor(
                     .collectLatest { photos ->
                         val uiAlbum = uiAlbumMapper(
                             count = 0,
+                            imageCount = 0,
+                            videoCount = 0,
                             cover = null,
                             defaultCover = null,
                             album = systemAlbum,
@@ -136,6 +138,8 @@ internal class AlbumContentViewModel @Inject constructor(
                         val uiAlbum = album?.let {
                             uiAlbumMapper(
                                 count = 0,
+                                imageCount = 0,
+                                videoCount = 0,
                                 cover = null,
                                 defaultCover = null,
                                 album = it,

@@ -13,6 +13,8 @@ import javax.inject.Inject
 class UIAlbumMapper @Inject constructor() {
     operator fun invoke(
         count: Int,
+        imageCount: Int,
+        videoCount: Int,
         cover: Photo?,
         defaultCover: Photo?,
         album: Album,
@@ -27,6 +29,8 @@ class UIAlbumMapper @Inject constructor() {
         return UIAlbum(
             title = title,
             count = count,
+            imageCount = imageCount,
+            videoCount = videoCount,
             coverPhoto = cover,
             defaultCover = defaultCover,
             photos = listOf(),

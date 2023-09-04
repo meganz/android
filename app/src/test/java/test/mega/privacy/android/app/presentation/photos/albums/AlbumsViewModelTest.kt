@@ -142,27 +142,33 @@ class AlbumsViewModelTest {
                 UIAlbum(
                     title = AlbumTitle.StringTitle("Favourite"),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = null,
                     photos = emptyList(),
-                    id = Album.FavouriteAlbum
+                    id = Album.FavouriteAlbum,
                 )
             )
             whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle("GIFs"),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = null,
                     photos = emptyList(),
-                    id = Album.GifAlbum
+                    id = Album.GifAlbum,
                 )
             )
             whenever(uiAlbumMapper(any(), eq(Album.RawAlbum), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle("RAW"),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = null,
                     photos = emptyList(),
-                    id = Album.RawAlbum
+                    id = Album.RawAlbum,
                 )
             )
 
@@ -187,18 +193,22 @@ class AlbumsViewModelTest {
             UIAlbum(
                 title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = null,
                 photos = emptyList(),
-                id = Album.FavouriteAlbum
+                id = Album.FavouriteAlbum,
             )
         )
         whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("GIFs"),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = null,
                 photos = emptyList(),
-                id = Album.GifAlbum
+                id = Album.GifAlbum,
             )
         )
 
@@ -224,9 +234,11 @@ class AlbumsViewModelTest {
             UIAlbum(
                 title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = null,
                 photos = emptyList(),
-                id = Album.FavouriteAlbum
+                id = Album.FavouriteAlbum,
             )
         )
 
@@ -252,27 +264,33 @@ class AlbumsViewModelTest {
             UIAlbum(
                 title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = null,
                 photos = emptyList(),
-                id = Album.FavouriteAlbum
+                id = Album.FavouriteAlbum,
             )
         )
         whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("GIFs"),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = null,
                 photos = emptyList(),
-                id = Album.GifAlbum
+                id = Album.GifAlbum,
             )
         )
         whenever(uiAlbumMapper(any(), eq(Album.RawAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("RAW"),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = null,
                 photos = emptyList(),
-                id = Album.RawAlbum
+                id = Album.RawAlbum,
             )
         )
 
@@ -308,6 +326,8 @@ class AlbumsViewModelTest {
             UIAlbum(
                 title = AlbumTitle.StringTitle("Favourites"),
                 count = testPhotosList.size,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = createImage(id = 1L, modificationTime = LocalDateTime.MAX),
                 photos = testPhotosList,
                 id = Album.FavouriteAlbum,
@@ -336,6 +356,8 @@ class AlbumsViewModelTest {
             UIAlbum(
                 title = AlbumTitle.StringTitle(newAlbum1.title),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = newAlbum1.cover,
                 photos = emptyList(),
                 id = newAlbum1,
@@ -346,6 +368,8 @@ class AlbumsViewModelTest {
             UIAlbum(
                 title = AlbumTitle.StringTitle(newAlbum2.title),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = newAlbum2.cover,
                 photos = emptyList(),
                 id = newAlbum2,
@@ -356,6 +380,8 @@ class AlbumsViewModelTest {
             UIAlbum(
                 title = AlbumTitle.StringTitle(newAlbum3.title),
                 count = 0,
+                imageCount = 0,
+                videoCount = 0,
                 coverPhoto = newAlbum3.cover,
                 photos = emptyList(),
                 id = newAlbum3,
@@ -435,6 +461,8 @@ class AlbumsViewModelTest {
                 UIAlbum(
                     title = AlbumTitle.StringTitle(newUserAlbum.title),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = newUserAlbum.cover,
                     photos = emptyList(),
                     id = newUserAlbum,
@@ -471,6 +499,8 @@ class AlbumsViewModelTest {
                 UIAlbum(
                     title = AlbumTitle.StringTitle(newAlbum1.title),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = newAlbum1.cover,
                     photos = emptyList(),
                     id = newAlbum1,
@@ -481,6 +511,8 @@ class AlbumsViewModelTest {
                 UIAlbum(
                     title = AlbumTitle.StringTitle(newAlbum2.title),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = newAlbum2.cover,
                     photos = emptyList(),
                     id = newAlbum2,
@@ -520,9 +552,11 @@ class AlbumsViewModelTest {
                 UIAlbum(
                     title = AlbumTitle.StringTitle("Favourites"),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = null,
                     photos = emptyList(),
-                    id = Album.FavouriteAlbum
+                    id = Album.FavouriteAlbum,
                 )
             )
 
@@ -556,9 +590,11 @@ class AlbumsViewModelTest {
                 UIAlbum(
                     title = AlbumTitle.StringTitle("Favourites"),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = null,
                     photos = emptyList(),
-                    id = Album.FavouriteAlbum
+                    id = Album.FavouriteAlbum,
                 )
             )
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
@@ -608,6 +644,8 @@ class AlbumsViewModelTest {
                 UIAlbum(
                     title = AlbumTitle.StringTitle(newAlbum1.title),
                     count = 0,
+                    imageCount = 0,
+                    videoCount = 0,
                     coverPhoto = newAlbum1.cover,
                     photos = emptyList(),
                     id = newAlbum1,

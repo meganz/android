@@ -9,6 +9,8 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property id
  * @property title          The album title
  * @property count          The count of photos items inside the album
+ * @property imageCount     The count of images in the album
+ * @property videoCount     The count of videos in the album
  * @property coverPhoto     The selected photos used as the cover
  * @property defaultCover   The fallback cover if main cover is null
  * @property photos         The list of all photos in the albums
@@ -18,6 +20,8 @@ data class UIAlbum(
     val id: Album,
     val title: AlbumTitle,
     val count: Int,
+    val imageCount: Int,
+    val videoCount: Int,
     val coverPhoto: Photo?,
     val defaultCover: Photo? = null,
     val photos: List<Photo>,

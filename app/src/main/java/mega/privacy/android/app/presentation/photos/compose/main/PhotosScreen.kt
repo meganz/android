@@ -35,7 +35,6 @@ import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.AlbumSelected
 import mega.privacy.mobile.analytics.event.AlbumSelectedEvent
@@ -156,24 +155,27 @@ fun PhotosScreen(
                 allPhotos = timelineViewState.photos,
                 clearAlbumDeletedMessage = { albumsViewModel.updateAlbumDeletedMessage(message = "") },
                 onAlbumSelection = { album ->
-                    if (album.id in albumsViewState.selectedAlbumIds) {
-                        Analytics.tracker.trackEvent(
-                            AlbumSelectedEvent(
-                                selectionType = AlbumSelected.SelectionType.MultiRemove,
-                                imageCount = null,
-                                videoCount = null,
+                    if (album.id is Album.UserAlbum) {
+                        val userAlbum = album.id
+                        if (userAlbum.id in albumsViewState.selectedAlbumIds) {
+                            Analytics.tracker.trackEvent(
+                                AlbumSelectedEvent(
+                                    selectionType = AlbumSelected.SelectionType.MultiRemove,
+                                    imageCount = null,
+                                    videoCount = null,
+                                )
                             )
-                        )
-                        albumsViewModel.unselectAlbum(album)
-                    } else {
-                        Analytics.tracker.trackEvent(
-                            AlbumSelectedEvent(
-                                selectionType = AlbumSelected.SelectionType.MultiAdd,
-                                imageCount = null,
-                                videoCount = null,
+                            albumsViewModel.unselectAlbum(userAlbum)
+                        } else {
+                            Analytics.tracker.trackEvent(
+                                AlbumSelectedEvent(
+                                    selectionType = AlbumSelected.SelectionType.MultiAdd,
+                                    imageCount = getSelectedAlbumImageCount(album),
+                                    videoCount = getSelectedAlbumVideoCount(album),
+                                )
                             )
-                        )
-                        albumsViewModel.selectAlbum(album)
+                            albumsViewModel.selectAlbum(album.id)
+                        }
                     }
                 },
                 closeDeleteAlbumsConfirmation = {
@@ -219,10 +221,10 @@ fun PhotosScreen(
 private fun getSelectedAlbumImageCount(album: UIAlbum): Int? = if (album.id !is Album.UserAlbum) {
     null
 } else {
-    album.photos.filterIsInstance<Photo.Image>().size
+    album.imageCount
 }
 private fun getSelectedAlbumVideoCount(album: UIAlbum): Int? = if (album.id !is Album.UserAlbum) {
     null
 } else {
-    album.photos.filterIsInstance<Photo.Video>().size
+    album.videoCount
 }

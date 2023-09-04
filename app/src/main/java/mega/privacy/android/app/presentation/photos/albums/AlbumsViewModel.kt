@@ -148,7 +148,15 @@ class AlbumsViewModel @Inject constructor(
                             val cover = withContext(defaultDispatcher) {
                                 it.maxByOrNull { photo -> photo.modificationTime }
                             }
-                            uiAlbumMapper(it.size, cover, cover, key)
+                            val imageVideoCount = getImageAndVideoCount(it)
+                            uiAlbumMapper(
+                                count = it.size,
+                                imageCount = imageVideoCount.first,
+                                videoCount = imageVideoCount.second,
+                                cover = cover,
+                                defaultCover = cover,
+                                album = key
+                            )
                         }
                     }
                 }.collectLatest { systemAlbums ->
@@ -235,7 +243,15 @@ class AlbumsViewModel @Inject constructor(
             } else {
                 val cover = userAlbum.cover
                 val defaultCover = uiAlbum?.photos?.maxByOrNull { it.modificationTime }
-                uiAlbumMapper(uiAlbum?.count ?: 0, cover, defaultCover, userAlbum)
+                val imageVideoCount = getImageAndVideoCount(uiAlbum?.photos ?: emptyList())
+                uiAlbumMapper(
+                    count = uiAlbum?.count ?: 0,
+                    imageCount = imageVideoCount.first,
+                    videoCount = imageVideoCount.second,
+                    cover = cover,
+                    defaultCover = defaultCover,
+                    album = userAlbum
+                )
             }
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.creationTime }
 
@@ -276,7 +292,15 @@ class AlbumsViewModel @Inject constructor(
                 } else {
                     val cover = uiAlbum.id.cover
                     val defaultCover = photos.maxByOrNull { it.modificationTime }
-                    uiAlbumMapper(photos.size, cover, defaultCover, uiAlbum.id)
+                    val imageVideoCount = getImageAndVideoCount(photos)
+                    uiAlbumMapper(
+                        count = photos.size,
+                        imageCount = imageVideoCount.first,
+                        videoCount = imageVideoCount.second,
+                        cover = cover,
+                        defaultCover = defaultCover,
+                        album = uiAlbum.id,
+                    )
                 }
             } else {
                 uiAlbum
@@ -653,4 +677,13 @@ class AlbumsViewModel @Inject constructor(
             checkLatestNameInputValidity()
         }
     }
+
+    private suspend fun getImageAndVideoCount(photos: List<Photo>): Pair<Int, Int> =
+        withContext(defaultDispatcher) {
+            val imageCount = photos.filterIsInstance<Photo.Image>().size
+            val videoCount = photos.size - imageCount
+            imageCount to videoCount
+        }
+
+
 }

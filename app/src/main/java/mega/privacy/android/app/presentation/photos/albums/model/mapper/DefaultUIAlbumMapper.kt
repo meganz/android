@@ -22,6 +22,8 @@ class DefaultUIAlbumMapper @Inject constructor() :
         }
         val defaultCover = { photos.maxByOrNull { it.modificationTime } }
 
+        val imageCount = photos.filterIsInstance<Photo.Image>().size
+
         return UIAlbum(
             title = title,
             count = photos.size,
@@ -30,6 +32,8 @@ class DefaultUIAlbumMapper @Inject constructor() :
             } else {
                 defaultCover()
             },
+            imageCount = imageCount,
+            videoCount = photos.size - imageCount,
             photos = photos,
             id = album,
             isLoadingDone = isLoadingDone,

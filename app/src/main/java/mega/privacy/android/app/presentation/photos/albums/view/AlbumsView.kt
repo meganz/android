@@ -110,7 +110,7 @@ fun AlbumsView(
     setIsAlbumCreatedSuccessfully: (Boolean) -> Unit = {},
     allPhotos: List<Photo> = emptyList(),
     clearAlbumDeletedMessage: () -> Unit = {},
-    onAlbumSelection: (Album.UserAlbum) -> Unit = {},
+    onAlbumSelection: (UIAlbum) -> Unit = {},
     closeDeleteAlbumsConfirmation: () -> Unit = {},
     deleteAlbums: (albumIds: List<AlbumId>) -> Unit = {},
     lazyGridState: LazyGridState = LazyGridState(),
@@ -502,21 +502,21 @@ private fun handleAlbumClicked(
     album: UIAlbum,
     numSelectedAlbums: Int,
     openAlbum: (UIAlbum) -> Unit,
-    onAlbumSelection: (Album.UserAlbum) -> Unit,
+    onAlbumSelection: (UIAlbum) -> Unit,
 ) {
     if (numSelectedAlbums == 0) {
         openAlbum(album)
     } else if (album.id is Album.UserAlbum) {
-        onAlbumSelection(album.id)
+        onAlbumSelection(album)
     }
 }
 
 private fun handleAlbumLongPressed(
     album: UIAlbum,
-    onAlbumSelection: (Album.UserAlbum) -> Unit,
+    onAlbumSelection: (UIAlbum) -> Unit,
 ) {
     if (album.id is Album.UserAlbum) {
-        onAlbumSelection(album.id)
+        onAlbumSelection(album)
     }
 }
 
