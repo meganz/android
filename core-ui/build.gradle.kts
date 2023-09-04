@@ -97,4 +97,7 @@ dependencies {
     androidTestImplementation(testlib.espresso)
 
     testImplementation(testlib.compose.junit)
+
+    debugImplementation(lib.kotlinpoet)
+    debugImplementation(google.gson)
 }
