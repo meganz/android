@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -18,7 +19,9 @@ import javax.inject.Inject
 
 /**
  * [Fragment] that is the entrypoint to the Device Center feature. The Device Center shows the list
- * of Devices that have uploaded content through Camera Uploads or Backups
+ * of Devices that have uploaded content through Camera Uploads or Backups.
+ *
+ * Selecting a Device will display the list of Device Folders
  */
 @AndroidEntryPoint
 class DeviceCenterFragment : Fragment() {
@@ -30,6 +33,11 @@ class DeviceCenterFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     /**
+     * The View Model for the Device Center feature
+     */
+    private val viewModel by viewModels<DeviceCenterViewModel>()
+
+    /**
      * Initialize the Device Center
      */
     override fun onCreateView(
@@ -39,10 +47,17 @@ class DeviceCenterFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
+                val uiState by viewModel.state.collectAsStateWithLifecycle()
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
-                    DeviceCenterScreen()
+                    DeviceCenterScreen(
+                        uiState = uiState,
+                        onDeviceClicked = viewModel::showDeviceFolders,
+                        onBackPressed = viewModel::handleBackPress,
+                        onFeatureExited = viewModel::resetExitFeature,
+                    )
                 }
             }
         }

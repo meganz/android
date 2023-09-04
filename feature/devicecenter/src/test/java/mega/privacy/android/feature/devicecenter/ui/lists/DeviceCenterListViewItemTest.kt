@@ -31,7 +31,8 @@ internal class DeviceCenterListViewItemTest {
                     status = DeviceCenterUINodeStatus.UpToDate,
                     folders = emptyList(),
                 ),
-                onMenuClick = {},
+                onDeviceClicked = {},
+                onMenuClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_LIST_VIEW_ITEM_TAG).assertIsDisplayed()

@@ -4,33 +4,39 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 /**
- * Top app bar with title and optional subtitle.
+ * A [Composable] inheriting from [SimpleTopAppBar] with an optional Toolbar Subtitle
+ *
+ * @param title The Toolbar Title
+ * @param elevation if true, Toolbar elevation is added. Otherwise, no elevation is added
+ * @param modifier The [Modifier] class
+ * @param isEnabled if true, enables the Back Button. Otherwise, it is disabled
+ * @param onBackPressed Lambda that performs a specific action when a Back Press event is detected
  */
 @Composable
 fun TopAppBar(
-    modifier: Modifier = Modifier,
     title: String,
-    subtitle: String? = null,
     elevation: Boolean,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
     isEnabled: Boolean = true,
     onBackPressed: () -> Unit,
 ) {
     if (subtitle == null) {
         SimpleTopAppBar(
-            modifier,
-            title,
-            elevation,
-            isEnabled,
-            onBackPressed
+            title = title,
+            elevation = elevation,
+            modifier = modifier,
+            isEnabled = isEnabled,
+            onBackPressed = onBackPressed,
         )
     } else {
         SimpleTopAppBarWithSubtitle(
-            modifier,
-            title,
-            subtitle,
-            elevation,
-            isEnabled,
-            onBackPressed
+            modifier = modifier,
+            title = title,
+            subtitle = subtitle,
+            elevation = elevation,
+            isEnabled = isEnabled,
+            onBackPressed = onBackPressed,
         )
     }
 }

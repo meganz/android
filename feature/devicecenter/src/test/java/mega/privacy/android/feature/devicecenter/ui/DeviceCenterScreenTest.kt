@@ -4,17 +4,16 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
+import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
 
 /**
  * Test class for [DeviceCenterScreen]
@@ -25,24 +24,37 @@ internal class DeviceCenterScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val deviceCenterViewModel = mock<DeviceCenterViewModel>()
-
     @Test
-    fun `test that the device center screen is shown`() {
-        val uiState = DeviceCenterState(nodes = emptyList())
-        deviceCenterViewModel.stub { on { state }.thenReturn(MutableStateFlow(uiState)) }
-        composeTestRule.setContent { DeviceCenterScreen(deviceCenterViewModel) }
-
-        composeTestRule.onNodeWithTag(DEVICE_CENTER_SCREEN_TAG).assertIsDisplayed()
+    fun `test that the top app bar is shown`() {
+        val ownDeviceUINode = OwnDeviceUINode(
+            id = "1234-5678",
+            name = "Own Device",
+            icon = DeviceIconType.Android,
+            status = DeviceCenterUINodeStatus.UpToDate,
+            folders = emptyList(),
+        )
+        val uiState = DeviceCenterState(devices = listOf(ownDeviceUINode))
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = uiState,
+                onDeviceClicked = {},
+                onBackPressed = {},
+                onFeatureExited = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(DEVICE_CENTER_TOOLBAR).assertIsDisplayed()
     }
 
     @Test
-    fun `test that no device section is displayed if the user backup information is empty`() {
-        val uiState = DeviceCenterState(nodes = emptyList())
-        deviceCenterViewModel.stub { on { state }.thenReturn(MutableStateFlow(uiState)) }
-        composeTestRule.setContent { DeviceCenterScreen(deviceCenterViewModel) }
-
-        composeTestRule.onNodeWithTag(DEVICE_CENTER_LIST_VIEW).assertDoesNotExist()
+    fun `test that nothing is displayed if the user backup information is empty`() {
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = DeviceCenterState(),
+                onDeviceClicked = {},
+                onBackPressed = {},
+                onFeatureExited = {},
+            )
+        }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertDoesNotExist()
         composeTestRule.onNodeWithTag(DEVICE_CENTER_OTHER_DEVICES_HEADER).assertDoesNotExist()
     }
@@ -56,11 +68,15 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(nodes = listOf(ownDeviceUINode))
-        deviceCenterViewModel.stub { on { state }.thenReturn(MutableStateFlow(uiState)) }
-        composeTestRule.setContent { DeviceCenterScreen(deviceCenterViewModel) }
-
-        composeTestRule.onNodeWithTag(DEVICE_CENTER_LIST_VIEW).assertIsDisplayed()
+        val uiState = DeviceCenterState(devices = listOf(ownDeviceUINode))
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = uiState,
+                onDeviceClicked = {},
+                onBackPressed = {},
+                onFeatureExited = {},
+            )
+        }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertIsDisplayed()
         composeTestRule.onNodeWithTag(DEVICE_CENTER_OTHER_DEVICES_HEADER).assertDoesNotExist()
     }
@@ -74,11 +90,15 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(nodes = listOf(otherDeviceUINode))
-        deviceCenterViewModel.stub { on { state }.thenReturn(MutableStateFlow(uiState)) }
-        composeTestRule.setContent { DeviceCenterScreen(deviceCenterViewModel) }
-
-        composeTestRule.onNodeWithTag(DEVICE_CENTER_LIST_VIEW).assertIsDisplayed()
+        val uiState = DeviceCenterState(devices = listOf(otherDeviceUINode))
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = uiState,
+                onDeviceClicked = {},
+                onBackPressed = {},
+                onFeatureExited = {},
+            )
+        }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertDoesNotExist()
         composeTestRule.onNodeWithTag(DEVICE_CENTER_OTHER_DEVICES_HEADER).assertIsDisplayed()
     }
@@ -99,12 +119,47 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(nodes = listOf(ownDeviceUINode, otherDeviceUINode))
-        deviceCenterViewModel.stub { on { state }.thenReturn(MutableStateFlow(uiState)) }
-        composeTestRule.setContent { DeviceCenterScreen(deviceCenterViewModel) }
-
-        composeTestRule.onNodeWithTag(DEVICE_CENTER_LIST_VIEW).assertIsDisplayed()
+        val uiState = DeviceCenterState(devices = listOf(ownDeviceUINode, otherDeviceUINode))
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = uiState,
+                onDeviceClicked = {},
+                onBackPressed = {},
+                onFeatureExited = {},
+            )
+        }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertIsDisplayed()
         composeTestRule.onNodeWithTag(DEVICE_CENTER_OTHER_DEVICES_HEADER).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that no device sections are displayed when in folder view`() {
+        val ownDeviceFolderUINode = DeviceFolderUINode(
+            id = "ABCD-EFGH",
+            name = "Camera uploads",
+            icon = FolderIconType.CameraUploads,
+            status = DeviceCenterUINodeStatus.UpToDate,
+        )
+        val ownDeviceUINode = OwnDeviceUINode(
+            id = "1234-5678",
+            name = "Own Device",
+            icon = DeviceIconType.Android,
+            status = DeviceCenterUINodeStatus.UpToDate,
+            folders = listOf(ownDeviceFolderUINode),
+        )
+        val uiState = DeviceCenterState(
+            devices = listOf(ownDeviceUINode),
+            selectedDevice = ownDeviceUINode,
+        )
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = uiState,
+                onDeviceClicked = {},
+                onBackPressed = {},
+                onFeatureExited = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(DEVICE_CENTER_OTHER_DEVICES_HEADER).assertDoesNotExist()
     }
 }

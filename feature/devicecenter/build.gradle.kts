@@ -99,6 +99,7 @@ dependencies {
     implementation(lib.compose.state.events)
     implementation(androidx.hilt.navigation)
     implementation(androidx.constraintlayout.compose)
+    implementation(lib.compose.state.events)
 
     testImplementation(testlib.junit)
     testImplementation(testlib.junit.test.ktx)

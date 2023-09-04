@@ -19,6 +19,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
@@ -38,12 +39,14 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
  * in the Device Center. Each entry also shows a [CustomDivider]
  *
  * @param uiNode The [DeviceCenterUINode] to be displayed
- * @param onMenuClick Lambda that performs a specific action when the Menu icon is clicked
+ * @param onMenuClicked Lambda that performs a specific action when the Menu icon is clicked
+ * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
  */
 @Composable
 internal fun DeviceCenterListViewItem(
     uiNode: DeviceCenterUINode,
-    onMenuClick: () -> Unit,
+    onDeviceClicked: (DeviceUINode) -> Unit = {},
+    onMenuClicked: () -> Unit,
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -78,7 +81,8 @@ internal fun DeviceCenterListViewItem(
             isFavourite = false,
             isSharedWithPublicLink = false,
             imageState = remember { mutableStateOf(null as File?) },
-            onClick = onMenuClick,
+            onClick = { if (uiNode is DeviceUINode) onDeviceClicked(uiNode) },
+            onMenuClick = onMenuClicked,
         )
         CustomDivider(
             modifier = Modifier
@@ -123,7 +127,7 @@ private fun getStatusColor(uiNodeStatus: DeviceCenterUINodeStatus) =
  */
 @CombinedThemePreviews
 @Composable
-private fun DeviceCenterListViewItemPreview() {
+private fun PreviewDeviceCenterListViewItem() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
@@ -133,7 +137,8 @@ private fun DeviceCenterListViewItemPreview() {
                 status = DeviceCenterUINodeStatus.UpToDate,
                 folders = emptyList(),
             ),
-            onMenuClick = {},
+            onDeviceClicked = {},
+            onMenuClicked = {},
         )
     }
 }
@@ -144,7 +149,7 @@ private fun DeviceCenterListViewItemPreview() {
  */
 @CombinedThemePreviews
 @Composable
-private fun DeviceCenterListViewItemWithEmptyTitle() {
+private fun PreviewDeviceCenterListViewItemWithEmptyTitle() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
@@ -154,7 +159,8 @@ private fun DeviceCenterListViewItemWithEmptyTitle() {
                 status = DeviceCenterUINodeStatus.UpToDate,
                 folders = emptyList(),
             ),
-            onMenuClick = {},
+            onDeviceClicked = {},
+            onMenuClicked = {},
         )
     }
 }

@@ -15,35 +15,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
- * Top app bar with title.
+ * A [Composable] that displays a Top App Bar with a Title and Back Button
+ *
+ * @param titleId A [StringRes] used to display the Toolbar Title
+ * @param elevation if true, Toolbar elevation is added. Otherwise, no elevation is added
+ * @param modifier The [Modifier] class
+ * @param isEnabled if true, enables the Back Button. Otherwise, it is disabled
+ * @param onBackPressed Lambda that performs a specific action when a Back Press event is detected
  */
 @Composable
 fun SimpleTopAppBar(
-    modifier: Modifier = Modifier,
     @StringRes titleId: Int,
     elevation: Boolean,
+    modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
     onBackPressed: () -> Unit,
 ) {
     SimpleTopAppBar(
-        modifier,
-        stringResource(titleId),
-        elevation,
-        isEnabled,
-        onBackPressed
+        title = stringResource(titleId),
+        elevation = elevation,
+        modifier = modifier,
+        isEnabled = isEnabled,
+        onBackPressed = onBackPressed,
     )
 }
 
+/**
+ * Another variation of the [SimpleTopAppBar] Composable that accepts a plain [String] for the
+ * Toolbar Title
+ *
+ * @param title The Toolbar Title
+ * @param elevation if true, Toolbar elevation is added. Otherwise, no elevation is added
+ * @param modifier The [Modifier] class
+ * @param isEnabled if true, enables the Back Button. Otherwise, it is disabled
+ * @param onBackPressed Lambda that performs a specific action when a Back Press event is detected
+ */
 @Composable
 fun SimpleTopAppBar(
-    modifier: Modifier = Modifier,
     title: String,
     elevation: Boolean,
+    modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
     onBackPressed: () -> Unit,
 ) {
@@ -53,7 +70,9 @@ fun SimpleTopAppBar(
             Text(
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         },
         navigationIcon = {
@@ -70,6 +89,9 @@ fun SimpleTopAppBar(
     )
 }
 
+/**
+ * A Preview Composable that displays the Top App Bar
+ */
 @CombinedThemePreviews
 @Composable
 private fun PreviewSimpleTopAppBar() {
@@ -77,6 +99,21 @@ private fun PreviewSimpleTopAppBar() {
         SimpleTopAppBar(titleId = 0,
             elevation = false,
             onBackPressed = {}
+        )
+    }
+}
+
+/**
+ * A Preview Composable that simulates a very long Toolbar Title
+ */
+@CombinedThemePreviews
+@Composable
+private fun PreviewSimpleTopAppBarWithOverflowText() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        SimpleTopAppBar(
+            title = "This is a very long toolbar title that can overflow",
+            elevation = false,
+            onBackPressed = {},
         )
     }
 }

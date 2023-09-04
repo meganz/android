@@ -2911,10 +2911,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem == null) {
             return@launch
         }
-        if (drawerItem != DrawerItem.SYNC) {
-            supportActionBar?.show()
-        } else {
+        if (listOf(DrawerItem.SYNC, DrawerItem.DEVICE_CENTER).contains(drawerItem)) {
             supportActionBar?.hide()
+        } else {
+            supportActionBar?.show()
         }
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
@@ -2952,15 +2952,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            DrawerItem.SYNC -> {
-                viewModel.setIsFirstNavigationLevel(false)
-            }
-
-            DrawerItem.DEVICE_CENTER -> {
-                supportActionBar?.let {
-                    it.subtitle = null
-                    it.title = getString(R.string.device_center_list_of_devices_toolbar_title)
-                }
+            DrawerItem.SYNC,
+            DrawerItem.DEVICE_CENTER
+            -> {
                 viewModel.setIsFirstNavigationLevel(false)
             }
 
@@ -3730,6 +3724,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 supportInvalidateOptionsMenu()
                 deviceCenterFragment?.let { replaceFragment(it, FragmentTag.DEVICE_CENTER.tag) }
+                showFabButton()
             }
 
             DrawerItem.SYNC -> {

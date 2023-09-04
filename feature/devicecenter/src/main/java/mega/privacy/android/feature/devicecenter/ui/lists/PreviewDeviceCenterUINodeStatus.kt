@@ -17,7 +17,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  */
 @CombinedThemePreviews
 @Composable
-private fun DeviceCenterUINodeStatusPreview(
+private fun PreviewDeviceCenterUINodeStatus(
     @PreviewParameter(DeviceCenterUINodeStatusProvider::class) status: DeviceCenterUINodeStatus
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -29,7 +29,8 @@ private fun DeviceCenterUINodeStatusPreview(
                 status = status,
                 folders = emptyList(),
             ),
-            onMenuClick = {},
+            onDeviceClicked = {},
+            onMenuClicked = {},
         )
     }
 }
