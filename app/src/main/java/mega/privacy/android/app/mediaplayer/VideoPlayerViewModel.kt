@@ -698,14 +698,15 @@ class VideoPlayerViewModel @Inject constructor(
             .setUri(firstPlayUri)
             .setMediaId(firstPlayHandle.toString())
             .build()
-        _playerSourcesState.update {
-            MediaPlaySources(
-                listOf(mediaItem),
-                // we will emit a single item list at first, and the current playing item
-                // will always be at index 0 in that single item list.
-                if (samePlaylist && firstPlayHandle == playingHandle) 0 else INVALID_VALUE,
-                if (displayNodeNameFirst) firstPlayNodeName else null
-            )
+        MediaPlaySources(
+            listOf(mediaItem),
+            // we will emit a single item list at first, and the current playing item
+            // will always be at index 0 in that single item list.
+            if (samePlaylist && firstPlayHandle == playingHandle) 0 else INVALID_VALUE,
+            if (displayNodeNameFirst) firstPlayNodeName else null
+        ).let { playSource ->
+            playSource(playSource)
+            _playerSourcesState.value = playSource
         }
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
@@ -1157,7 +1158,8 @@ class VideoPlayerViewModel @Inject constructor(
         items: List<PlaylistItem>,
         firstPlayIndex: Int,
     ) {
-        if (mediaItems.isNotEmpty() && items.isNotEmpty()) {
+        // If the playlist items are not more than 1, don't need to update play sources.
+        if (mediaItems.size > 1 && items.size > 1) {
             _playerSourcesState.update {
                 MediaPlaySources(mediaItems, firstPlayIndex, null)
             }
