@@ -14,10 +14,12 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.search.IncomingSharesTabSearchUseCase
 import mega.privacy.android.domain.usecase.search.LinkSharesTabSearchUseCase
@@ -29,6 +31,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
@@ -48,6 +51,7 @@ class SearchActivityViewModelTest {
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase = mock()
     private val getInboxNodeUseCase: GetInboxNodeUseCase = mock()
     private val getParentNodeHandle: GetParentNodeHandle = mock()
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase = mock()
 
     @BeforeAll
     fun setUp() {
@@ -62,7 +66,8 @@ class SearchActivityViewModelTest {
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             getInboxNodeUseCase = getInboxNodeUseCase,
-            getParentNodeHandle = getParentNodeHandle
+            getParentNodeHandle = getParentNodeHandle,
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase
         )
     }
 
@@ -103,9 +108,11 @@ class SearchActivityViewModelTest {
             searchInNodesUseCase(
                 nodeId = searchNodeId,
                 query = query,
-                searchType = -1
+                searchCategory = SearchCategory.ALL
             )
         ).thenReturn(typedFolderNodes)
+        whenever(isAvailableOfflineUseCase(any())).thenReturn(false)
+
         underTest.performSearch(
             query = query,
             isFirstLevel = isFirstLevel,
@@ -156,7 +163,7 @@ class SearchActivityViewModelTest {
             searchInNodesUseCase(
                 nodeId = searchNodeId,
                 query = query,
-                searchType = -1
+                searchCategory = SearchCategory.ALL
             )
         ).thenReturn(typedFolderNodes)
         underTest.performSearch(
@@ -209,7 +216,7 @@ class SearchActivityViewModelTest {
             searchInNodesUseCase(
                 nodeId = searchNodeId,
                 query = query,
-                searchType = -1
+                searchCategory = SearchCategory.ALL
             )
         ).thenReturn(typedFolderNodes)
         underTest.performSearch(

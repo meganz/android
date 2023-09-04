@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import org.junit.Before
@@ -19,14 +19,14 @@ import org.mockito.kotlin.whenever
 class OutgoingSharesTabSearchUseCaseTest {
     private lateinit var underTest: OutgoingSharesTabSearchUseCase
     private val addNodeType: AddNodeType = mock()
-    private val nodeRepository: NodeRepository = mock()
+    private val searchRepository: SearchRepository = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
 
     @Before
     fun setUp() {
         underTest = OutgoingSharesTabSearchUseCase(
             addNodeType = addNodeType,
-            nodeRepository = nodeRepository,
+            searchRepository = searchRepository,
             getCloudSortOrder = getCloudSortOrder
         )
     }
@@ -54,7 +54,7 @@ class OutgoingSharesTabSearchUseCaseTest {
             }
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_DESC)
             whenever(
-                nodeRepository.searchOutShares(
+                searchRepository.searchOutShares(
                     query = query,
                     order = getCloudSortOrder()
                 )
@@ -86,7 +86,7 @@ class OutgoingSharesTabSearchUseCaseTest {
             }
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(
-                nodeRepository.searchOutShares(
+                searchRepository.searchOutShares(
                     query = query,
                     order = getCloudSortOrder()
                 )

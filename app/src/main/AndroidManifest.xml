@@ -504,6 +504,9 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity android:name=".presentation.search.SearchActivity"
+            android:launchMode="singleTop"/>
+
         <service
             android:name=".main.megachat.ChatUploadService"
             android:exported="false"

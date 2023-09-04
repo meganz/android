@@ -95,8 +95,6 @@ class NodeRepositoryImplTest {
     private val accessPermissionMapper: AccessPermissionMapper = mock()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
     private val fetChildrenMapper = mock<FetchChildrenMapper>()
-    private val cancelTokenProvider: CancelTokenProvider = mock()
-    private val getLinksSortOrder: GetLinksSortOrder = mock()
 
     private val nodeMapper: NodeMapper = NodeMapper(
         fileNodeMapper = FileNodeMapper(
@@ -133,8 +131,6 @@ class NodeRepositoryImplTest {
             nodeUpdateMapper = nodeUpdateMapper,
             accessPermissionMapper = accessPermissionMapper,
             nodeShareKeyResultMapper = nodeShareKeyResultMapper,
-            cancelTokenProvider = cancelTokenProvider,
-            getLinksSortOrder = getLinksSortOrder,
         )
     }
 
@@ -656,98 +652,6 @@ class NodeRepositoryImplTest {
             assertThrows<MegaException> {
                 underTest.exportNode(node, expireTime)
             }
-        }
-
-    @Test
-    fun `test that when search called with empty query calls getNodeChildren() once`() = runTest {
-        whenever(sortOrderIntMapper(any())).thenReturn(0)
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
-
-        val nodeId = NodeId(1L)
-        val list = underTest.search(
-            nodeId = nodeId,
-            searchType = -1,
-            query = "",
-            order = SortOrder.ORDER_NONE
-        )
-        assertThat(list).isEmpty()
-    }
-
-    @Test
-    fun `test that when search called with some query calls search() once`() = runTest {
-        whenever(sortOrderIntMapper(any())).thenReturn(0)
-        val nodeID = NodeId(-1L)
-        val megaNode: MegaNode = mock()
-        val megaCancelToken: MegaCancelToken = mock()
-        val query = "Some query"
-        val order = SortOrder.ORDER_NONE
-
-        whenever(megaNode.handle).thenReturn(-1L)
-        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(megaCancelToken)
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeID.longValue)).thenReturn(megaNode)
-
-        whenever(
-            megaApiGateway.search(
-                parent = megaNode,
-                query = query,
-                megaCancelToken = megaCancelToken,
-                order = sortOrderIntMapper(order)
-            )
-        ).thenReturn(emptyList())
-
-        underTest.search(
-            nodeId = nodeID,
-            searchType = -1,
-            query = query,
-            order = order
-        )
-        verify(megaApiGateway).search(
-            megaNode,
-            query,
-            megaCancelToken,
-            sortOrderIntMapper(SortOrder.ORDER_NONE)
-        )
-    }
-
-    @Test
-    fun `test that when search called with some query and search type calls search() once`() =
-        runTest {
-            whenever(sortOrderIntMapper(any())).thenReturn(0)
-            val nodeID = NodeId(-1L)
-            val megaNode: MegaNode = mock()
-            val megaCancelToken: MegaCancelToken = mock()
-            val query = "Some query"
-            val order = SortOrder.ORDER_NONE
-
-            whenever(megaNode.handle).thenReturn(-1L)
-            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(megaCancelToken)
-            whenever(megaApiGateway.getMegaNodeByHandle(nodeID.longValue)).thenReturn(megaNode)
-            whenever(
-                megaApiGateway.searchByType(
-                    parentNode = megaNode,
-                    searchString = query,
-                    cancelToken = megaCancelToken,
-                    recursive = true,
-                    order = sortOrderIntMapper(SortOrder.ORDER_NONE),
-                    type = 1
-                )
-            ).thenReturn(emptyList())
-
-            underTest.search(
-                nodeId = nodeID,
-                searchType = 1,
-                query = query,
-                order = order
-            )
-
-            verify(megaApiGateway).searchByType(
-                parentNode = megaNode,
-                searchString = query,
-                cancelToken = megaCancelToken,
-                recursive = true,
-                order = sortOrderIntMapper(SortOrder.ORDER_NONE),
-                type = 1
-            )
         }
 
     companion object {

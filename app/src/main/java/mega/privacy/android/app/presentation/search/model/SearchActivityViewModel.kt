@@ -9,13 +9,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.search.IncomingSharesTabSearchUseCase
 import mega.privacy.android.domain.usecase.search.LinkSharesTabSearchUseCase
@@ -49,6 +52,7 @@ class SearchActivityViewModel @Inject constructor(
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val getInboxNodeUseCase: GetInboxNodeUseCase,
     private val getParentNodeHandle: GetParentNodeHandle,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase
 ) : ViewModel() {
     /**
      * private UI state
@@ -97,7 +101,7 @@ class SearchActivityViewModel @Inject constructor(
                         sharesTab = sharesTab
                     )
                     _state.update {
-                        it.copy(searchItemList = searchList, isInProgress = false)
+                        it.copy(searchItemList = getNodeUiItems(searchList), isInProgress = false)
                     }
                 } else {
                     _state.update {
@@ -201,7 +205,7 @@ class SearchActivityViewModel @Inject constructor(
                         searchInNodesUseCase(
                             nodeId = node?.id,
                             query = query,
-                            searchType = -1
+                            searchCategory = state.value.searchType
                         )
                     }
                 }
@@ -211,8 +215,23 @@ class SearchActivityViewModel @Inject constructor(
                 searchInNodesUseCase(
                     nodeId = node?.id,
                     query = query,
-                    searchType = -1
+                    searchCategory = state.value.searchType
                 )
             }
         }
+
+    /**
+     * This will map list of [Node] to [NodeUIItem]
+     */
+    private suspend fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
+        val existingNodeList = state.value.searchItemList
+        return nodeList.mapIndexed { index, node ->
+            NodeUIItem(
+                node = node,
+                isSelected = false,
+                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
+                isAvailableOffline = isAvailableOfflineUseCase(node)
+            )
+        }
+    }
 }
