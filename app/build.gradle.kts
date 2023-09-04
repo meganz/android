@@ -294,8 +294,6 @@ dependencies {
     implementation(project(":data"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     "baselineProfile"(project(":baselineprofile"))
-    debugImplementation(project(":nocturn"))
-    debugImplementation(project(":xray"))
     "qaImplementation"(project(":screenshot"))
     implementation(project(":liveeventbus-x"))
     implementation(project(":analytics"))
@@ -419,6 +417,8 @@ dependencies {
     implementation(lib.compose.state.events)
     implementation(testlib.hamcrest)
     implementation(lib.mega.analytics)
+    debugImplementation(lib.nocturn)
+    debugImplementation(lib.xray)
 
     coreLibraryDesugaring(lib.desugar)
 

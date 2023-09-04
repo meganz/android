@@ -21,6 +21,8 @@ rx-kotlin = "3.0.1"
 showkase = '1.0.0-beta17'
 simplestorage = "1.1.0"
 compose-state-events = "1.2.3"
+xray = "1.0"
+nocturn = "1.0"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
@@ -71,6 +73,8 @@ vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
 compose-state-events = { module = "com.github.leonard-palm:compose-state-events", version.ref = "compose-state-events" }
 mega-analytics = "mega.privacy.mobile:analytics-events-android:+"
 balloon = "com.github.skydoves:balloon-compose:1.5.4"
+xray = { module = "mega.privacy.android.xray:xray", version.ref = "xray" }
+nocturn = { module = "mega.privacy.android.nocturn:nocturn", version.ref = "nocturn" }
 
 [bundles]
 fresco = ["fresco", "fresco-gif", "fresco-webp", "fresco-webpsupport"]

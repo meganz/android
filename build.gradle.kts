@@ -42,6 +42,10 @@ allprojects {
             url =
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mobile-analytics")
         }
+        maven {
+            url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/dev-tools")
+        }
     }
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")
