@@ -2750,6 +2750,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onJoinedChat(chatId: Long, userHandle: Long) {
         Timber.d("Joined to the chat")
+        chatManagement.removeJoiningChatId(chatId)
+        chatManagement.removeJoiningChatId(userHandle)
+        chatManagement.broadcastJoinedSuccessfully()
         controlWhenJoinedAChat(chatId)
     }
 
@@ -2809,6 +2812,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onErrorJoinedChat(chatId: Long, userHandle: Long, error: Int) {
         Timber.d("Error joining the meeting so close it, error code is $error")
+        chatManagement.removeJoiningChatId(chatId)
+        chatManagement.removeJoiningChatId(userHandle)
         finishActivity()
     }
 

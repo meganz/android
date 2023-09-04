@@ -165,11 +165,14 @@ class ChatManagement @Inject constructor(
      *
      * @param joiningChatId The joining chat ID
      */
-    fun removeJoiningChatId(joiningChatId: Long) {
-        if (joiningChatIds.remove(joiningChatId)) {
-            applicationScope.launch {
-                broadcastJoinedSuccessfullyUseCase()
-            }
+    fun removeJoiningChatId(joiningChatId: Long) = joiningChatIds.remove(joiningChatId)
+
+    /**
+     * Broadcasting that successfully joined to a chat
+     */
+    fun broadcastJoinedSuccessfully() {
+        applicationScope.launch {
+            broadcastJoinedSuccessfullyUseCase()
         }
     }
 

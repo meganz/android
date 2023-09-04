@@ -154,6 +154,7 @@ class MegaChatRequestHandler @Inject constructor(
         } else if (request.type == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
             chatManagement.removeJoiningChatId(request.chatHandle)
             chatManagement.removeJoiningChatId(request.userHandle)
+            chatManagement.broadcastJoinedSuccessfully()
         } else if (request.type == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
             && request.userHandle == MegaApiJava.INVALID_HANDLE
         ) {

@@ -1045,6 +1045,7 @@ public class ChatActivity extends PasscodeActivity
 
             if (errorCode == MegaChatError.ERROR_OK && openingAndJoining) {
                 if (!isAlreadyJoining(idChat)) {
+                    addJoiningChatId(idChat);
                     megaChatApi.autojoinPublicChat(idChat, ChatActivity.this);
                 }
 
@@ -1056,6 +1057,8 @@ public class ChatActivity extends PasscodeActivity
                     openingAndJoining = false;
                 }
                 if (!isAlreadyJoining(idChat) && !isAlreadyJoining(request.getUserHandle())) {
+                    addJoiningChatId(idChat);
+                    addJoiningChatId(request.getUserHandle());
                     megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
                 }
             }
@@ -4520,6 +4523,7 @@ public class ChatActivity extends PasscodeActivity
             if (chatC.isInAnonymousMode()) {
                 ifAnonymousModeLogin(true);
             } else if (!isAlreadyJoining(idChat)) {
+                addJoiningChatId(idChat);
                 setJoiningOrLeaving(R.string.joining_label);
                 megaChatApi.autojoinPublicChat(idChat, this);
             }
@@ -9894,17 +9898,21 @@ public class ChatActivity extends PasscodeActivity
     }
 
     /**
-     * Checks if the chat is already joining before add it to the list.
+     * Checks if the chat is already joining.
      *
      * @return True if the chat is already joining, false otherwise.
      */
     private boolean isAlreadyJoining(long id) {
-        if (MegaApplication.getChatManagement().isAlreadyJoining(id)) {
-            return true;
-        }
+        return MegaApplication.getChatManagement().isAlreadyJoining(id);
+    }
 
+    /**
+     * Add joining chat ID
+     *
+     * @param id The joining chat ID
+     */
+    private void addJoiningChatId(long id) {
         MegaApplication.getChatManagement().addJoiningChatId(id);
-        return false;
     }
 
     public void setLastIdMsgSeen(long lastIdMsgSeen) {
