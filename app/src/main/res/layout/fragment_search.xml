@@ -32,7 +32,7 @@
                     android:id="@+id/file_grid_empty_text_first"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
             </LinearLayout>
         </RelativeLayout>
 
@@ -45,32 +45,33 @@
                 android:id="@+id/layout_transfer_over_quota_banner"
                 layout="@layout/transfer_over_quota_banner" />
 
-            <RelativeLayout
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/filter_chips_horizontal_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content" />
 
-                <mega.privacy.android.app.components.NewGridRecyclerView
-                    android:id="@+id/file_grid_view_browser"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:choiceMode="multipleChoice"
-                    android:columnWidth="172dp"
-                    android:paddingLeft="4dp"
-                    android:paddingRight="4dp" />
 
-                <mega.privacy.android.app.components.scrollBar.FastScroller
-                    android:id="@+id/fastscroll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:gravity="end"
-                    android:orientation="vertical" />
-            </RelativeLayout>
+            <mega.privacy.android.app.components.NewGridRecyclerView
+                android:id="@+id/file_grid_view_browser"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="multipleChoice"
+                android:columnWidth="172dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp" />
+
+            <mega.privacy.android.app.components.scrollBar.FastScroller
+                android:id="@+id/fastscroll"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:gravity="end"
+                android:orientation="vertical" />
         </LinearLayout>
     </RelativeLayout>
 
     <include
         android:id="@+id/layout_general_progress_bar"
-        layout="@layout/general_progress_bar"/>
+        layout="@layout/general_progress_bar" />
 
 </RelativeLayout>

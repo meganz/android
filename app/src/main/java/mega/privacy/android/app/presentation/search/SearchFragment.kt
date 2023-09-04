@@ -23,10 +23,14 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.view.ActionMode
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.FileProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,11 +57,13 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.inbox.InboxViewModel
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.model.SearchState
+import mega.privacy.android.app.presentation.search.view.SearchFilterChipsView
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
 import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
@@ -73,8 +79,11 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDow
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.displayMetrics
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.mobile.analytics.event.SearchItemSelected
 import mega.privacy.mobile.analytics.event.SearchItemSelectedEvent
 import nz.mega.sdk.MegaApiAndroid
@@ -108,6 +117,12 @@ class SearchFragment : RotatableFragment() {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    /**
+     * Get system's default theme mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
     private lateinit var adapter: MegaNodeAdapter
 
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
@@ -127,6 +142,7 @@ class SearchFragment : RotatableFragment() {
     private lateinit var fastScroller: FastScroller
     private lateinit var contentLayout: RelativeLayout
     private lateinit var searchProgressBar: ProgressBar
+    private lateinit var searchFilterChipsView: ComposeView
 
     //Bindings
     private var _binding: FragmentSearchBinding? = null
@@ -195,6 +211,7 @@ class SearchFragment : RotatableFragment() {
             )
             adapter.isMultipleSelect = false
         }
+        updateChipsView()
         recyclerView?.adapter = adapter
         return binding.root
     }
@@ -235,6 +252,26 @@ class SearchFragment : RotatableFragment() {
         }
     }
 
+    private fun updateChipsView() {
+        searchFilterChipsView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode()
+                    .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val uiState by searchViewModel.state.collectAsStateWithLifecycle()
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    if (uiState.showChips) {
+                        SearchFilterChipsView(
+                            filters = uiState.filters,
+                            selectedFilter = uiState.selectedFilter,
+                            updateFilter = searchViewModel::updateFilter
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * init views
      */
@@ -249,6 +286,7 @@ class SearchFragment : RotatableFragment() {
         emptyImageView = binding.fileGridEmptyImage
         emptyTextView = binding.fileGridEmptyText
         emptyTextViewFirst = binding.fileGridEmptyTextFirst
+        searchFilterChipsView = binding.filterChipsHorizontalView
     }
 
     /**

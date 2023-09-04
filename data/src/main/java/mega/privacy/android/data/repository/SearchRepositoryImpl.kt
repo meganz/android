@@ -15,11 +15,11 @@ internal class SearchRepositoryImpl @Inject constructor(
     val searchCategoryMapper: SearchCategoryMapper,
 ) : SearchRepository {
     override fun getSearchCategories(): List<SearchCategory> = listOf(
-        MegaApiAndroid.FILE_TYPE_PHOTO,
-        MegaApiAndroid.FILE_TYPE_VIDEO,
-        MegaApiAndroid.FILE_TYPE_AUDIO,
         MegaApiAndroid.FILE_TYPE_DEFAULT,
+        MegaApiAndroid.FILE_TYPE_PHOTO,
         MegaApiAndroid.FILE_TYPE_DOCUMENT,
+        MegaApiAndroid.FILE_TYPE_AUDIO,
+        MegaApiAndroid.FILE_TYPE_VIDEO,
     ).map {
         searchCategoryMapper(it)
     }

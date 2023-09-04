@@ -14,9 +14,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.search.SearchNodesUseCase
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
+import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -24,6 +28,8 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -49,7 +55,10 @@ class SearchViewModel @Inject constructor(
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getSearchParentNodeHandle: GetParentNodeHandle,
-    private val cancelCancelTokenUseCase: CancelCancelTokenUseCase
+    private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
+    private val searchFilterMapper: SearchFilterMapper,
 ) : ViewModel() {
 
     /**
@@ -80,6 +89,35 @@ class SearchViewModel @Inject constructor(
                 if (event is TransferEvent.TransferFinishEvent && !event.transfer.isFolderTransfer) {
                     setTextSubmitted(true)
                 }
+            }
+        }
+    }
+
+    private fun getSearchFilterCategories() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.SearchWithChipsMVP)
+            }.onSuccess { isEnabled ->
+                val shouldShow = isEnabled && arrayOf(
+                    DrawerItem.HOMEPAGE,
+                    DrawerItem.CLOUD_DRIVE
+                ).contains(state.value.searchDrawerItem)
+                _state.update { it.copy(showChips = shouldShow) }
+                if (shouldShow) {
+                    runCatching { getSearchCategoriesUseCase().map { searchFilterMapper(it) } }
+                        .onSuccess { filters ->
+                            _state.update {
+                                it.copy(
+                                    filters = filters,
+                                    selectedFilter = filters.first { filter -> filter.filter == SearchCategory.ALL }
+                                )
+                            }
+                        }.onFailure {
+                            Timber.e("Get search categories failed $it")
+                        }
+                }
+            }.onFailure {
+                Timber.e("Feature flag check failed $it")
             }
         }
     }
@@ -287,6 +325,7 @@ class SearchViewModel @Inject constructor(
      */
     fun setSearchDrawerItem(drawerItem: DrawerItem) = viewModelScope.launch {
         _state.update { it.copy(searchDrawerItem = drawerItem) }
+        getSearchFilterCategories()
     }
 
     /**
@@ -369,5 +408,14 @@ class SearchViewModel @Inject constructor(
      */
     fun setCurrentViewType(newViewType: ViewType) {
         _state.update { it.copy(currentViewType = newViewType) }
+    }
+
+    /**
+     * Update search filter on selection
+     *
+     * @param selectedChip
+     */
+    fun updateFilter(selectedChip: SearchFilter) {
+        _state.update { it.copy(selectedFilter = selectedChip) }
     }
 }

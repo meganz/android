@@ -12,7 +12,7 @@ import javax.inject.Inject
  *
  * These strings are shown to the users as filter chips
  */
-internal class SearchFilterMapper @Inject constructor(
+class SearchFilterMapper @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 

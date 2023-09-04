@@ -20,6 +20,9 @@ import nz.mega.sdk.MegaNode
  * @param isInProgress current progress state of the search request
  * @param isMandatoryFingerPrintVerificationRequired - isMandatoryFingerPrintVerificationRequired
  * @param currentViewType [ViewType]
+ * @param showChips checks flag and shows chip filtering to the user
+ * @param filters search filter categories
+ * @param selectedFilter selected filter which is enabled on chips
  */
 data class SearchState(
     val nodes: List<MegaNode>?,
@@ -32,4 +35,7 @@ data class SearchState(
     val isInProgress: Boolean,
     val isMandatoryFingerPrintVerificationRequired: Boolean = false,
     val currentViewType: ViewType = ViewType.LIST,
+    val showChips: Boolean = false,
+    val filters: List<SearchFilter> = emptyList(),
+    val selectedFilter: SearchFilter? = null,
 )
