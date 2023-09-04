@@ -1,3 +1,5 @@
+import src.main.kotlin.PreReleaseTask
+
 apply(from = "tools/util.gradle")
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
@@ -90,3 +92,5 @@ val shouldSuppressWarnings by extra(
 if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     apply(from = "${project.rootDir}/tools/prebuilt-sdk.gradle")
 }
+
+tasks.register<PreReleaseTask>("preRelease")
