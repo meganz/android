@@ -333,4 +333,11 @@ interface MegaLocalRoomGateway {
      *
      */
     suspend fun deleteSdTransferByTag(tag: Int)
+
+    /**
+     * Get completed transfer by id
+     *
+     * @param id the id of the completed transfer
+     */
+    suspend fun getCompletedTransferById(id: Int): CompletedTransfer?
 }

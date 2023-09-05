@@ -439,4 +439,11 @@ interface TransferRepository {
      * @param tag tag of transfer
      */
     suspend fun deleteSdTransferByTag(tag: Int)
+
+    /**
+     * Get completed transfer by id
+     *
+     * @param id id of completed transfer
+     */
+    suspend fun getCompletedTransferById(id: Int): CompletedTransfer?
 }

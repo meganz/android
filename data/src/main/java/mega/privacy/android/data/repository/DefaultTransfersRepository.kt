@@ -564,6 +564,10 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun insertSdTransfer(transfer: SdTransfer) {
         megaLocalRoomGateway.insertSdTransfer(transfer)
     }
+
+    override suspend fun getCompletedTransferById(id: Int) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.getCompletedTransferById(id)
+    }
 }
 
 private fun MegaTransfer.isCUUpload() =

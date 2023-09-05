@@ -433,6 +433,21 @@ internal class MegaLocalRoomFacadeTest {
             verify(sdTransferDao).deleteSdTransferByTag(tag)
         }
 
+    @Test
+    fun `test that getCompletedTransferById returns correctly when call getCompletedTransferById`() =
+        runTest {
+            val id = 1
+            val completedTransferEntity = mock<CompletedTransferEntity>()
+            val completedTransferModel = mock<CompletedTransfer>()
+            whenever(completedTransferModelMapper(completedTransferEntity)).thenReturn(
+                completedTransferModel
+            )
+            whenever(completedTransferDao.getCompletedTransferById(id)).thenReturn(
+                completedTransferEntity
+            )
+            assertThat(underTest.getCompletedTransferById(id)).isEqualTo(completedTransferModel)
+        }
+
     private fun provideDoesFileNameExistParameters() = Stream.of(
         Arguments.of(true, 1, true),
         Arguments.of(false, 1, true),

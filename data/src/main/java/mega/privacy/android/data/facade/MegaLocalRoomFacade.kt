@@ -305,4 +305,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteSdTransferByTag(tag: Int) {
         sdTransferDao.deleteSdTransferByTag(tag)
     }
+
+    override suspend fun getCompletedTransferById(id: Int) = completedTransferDao
+        .getCompletedTransferById(id)?.let { completedTransferModelMapper(it) }
 }

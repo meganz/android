@@ -818,6 +818,14 @@ class DefaultTransfersRepositoryTest {
         verify(megaLocalRoomGateway).getAllSdTransfers()
     }
 
+    @Test
+    fun `test that getCompletedTransferById invokes when getCompletedTransferById is called`() =
+        runTest {
+            val id = 1
+            underTest.getCompletedTransferById(id)
+            verify(megaLocalRoomGateway).getCompletedTransferById(id)
+        }
+
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class PendingCounters {
