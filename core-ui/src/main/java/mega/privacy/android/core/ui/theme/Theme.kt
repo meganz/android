@@ -2,7 +2,12 @@ package mega.privacy.android.core.ui.theme
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalView
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -18,10 +23,16 @@ fun AndroidTheme(
     isDark: Boolean,
     content: @Composable () -> Unit,
 ) {
-    val colors = if (isDark) {
-        DarkColorPalette
+    val legacyColors = if (isDark) {
+        LegacyDarkColorPalette
     } else {
-        LightColorPalette
+        LegacyLightColorPalette
+    }
+
+    val colors = if (isDark) {
+        darkColorPalette
+    } else {
+        lightColorPalette
     }
 
     val view = LocalView.current
@@ -29,17 +40,36 @@ fun AndroidTheme(
         val systemUiController = rememberSystemUiController()
         SideEffect {
             systemUiController.setSystemBarsColor(
-                color = colors.primary,
+                color = legacyColors.primary,
                 darkIcons = !isDark
             )
         }
     }
-
-    MaterialTheme(
-        colors = colors,
-        typography = Typography,
-        shapes = Shapes,
-        content = content
-    )
+    val colorPalette by remember(colors) {
+        mutableStateOf(colors)
+    }
+    CompositionLocalProvider(
+        LocalMegaColors provides colorPalette,
+    ) {
+        //we need to keep `MaterialTheme` for now as not all the components are migrated to our Design System.
+        MaterialTheme(
+            colors = legacyColors,
+            typography = Typography,
+            shapes = Shapes,
+            content = content
+        )
+    }
 }
+
+internal object MegaTheme {
+    val colors: MegaColors
+        @Composable
+        get() = LocalMegaColors.current
+}
+
+@Suppress("PrivatePropertyName") //convention for staticCompositionLocalOf is Uppercase
+private val LocalMegaColors = staticCompositionLocalOf {
+    testColorPalette
+}
+
 

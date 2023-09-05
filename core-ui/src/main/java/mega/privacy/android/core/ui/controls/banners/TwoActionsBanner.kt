@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
  * Warning banner with two actions compose view
@@ -32,7 +33,7 @@ fun TwoActionsBanner(
             text = mainText,
             modifier = Modifier.padding(horizontal = 16.dp),
             style = MaterialTheme.typography.body2,
-            color = MaterialTheme.colors.onPrimary
+            color = MegaTheme.colors.textPrimary
         )
         Row(Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.weight(1f))

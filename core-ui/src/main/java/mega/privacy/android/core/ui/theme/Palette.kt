@@ -1,125 +1,41 @@
 package mega.privacy.android.core.ui.theme
 
-import android.annotation.SuppressLint
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
-import com.airbnb.android.showkase.annotation.ShowkaseColor
-
-//Light theme colours
+import androidx.compose.ui.graphics.Color
+import mega.privacy.android.core.ui.theme.tokens.Dark
+import mega.privacy.android.core.ui.theme.tokens.Light
 
 /**
- * Primary light.
+ * [MegaColors] palette to be used in Light Theme
  */
-@ShowkaseColor("Primary", "Light Theme")
-val primary_light = white
-
-/**
- * Primary variant light.
- */
-@ShowkaseColor("PrimaryVariant", "Light Theme")
-val primary_variant_light = white
-
-/**
- * Secondary light.
- */
-@ShowkaseColor("Secondary", "Light Theme")
-val secondary_light = teal_300
-
-/**
- * Surface light.
- */
-@ShowkaseColor("Surface", "Light Theme")
-val surface_light = white
-
-/**
- * Error light.
- */
-@ShowkaseColor("Error", "Light Theme")
-val error_light = red_900
-
-/**
- * On primary light.
- */
-@ShowkaseColor("OnPrimary", "Light Theme")
-val on_primary_light = grey_alpha_087
-
-/**
- * On secondary light.
- */
-@ShowkaseColor("OnSecondary", "Light Theme")
-val on_secondary_light = white_alpha_087
-
-//Dark theme colours
-
-/**
- * Primary dark.
- */
-@ShowkaseColor("Primary", "Dark Theme")
-val primary_dark = dark_grey
-
-/**
- * Primary variant dark.
- */
-@ShowkaseColor("PrimaryVariant", "Dark Theme")
-val primary_variant_dark = dark_grey
-
-/**
- * Secondary dark.
- */
-@ShowkaseColor("Secondary", "Dark Theme")
-val secondary_dark = teal_200
-
-/**
- * Surface dark.
- */
-@ShowkaseColor("Surface", "Dark Theme")
-val surface_dark = dark_grey
-
-/**
- * Error dark.
- */
-@ShowkaseColor("Error", "Dark Theme")
-val error_dark = red_400
-
-/**
- * On primary dark.
- */
-@ShowkaseColor("OnPrimary", "Dark Theme")
-val on_primary_dark = white_alpha_087
-
-/**
- * On secondary dark.
- */
-@ShowkaseColor("OnSecondary", "Dark Theme")
-val on_secondary_dark = dark_grey
-
-
-//Palettes
-
-/**
- * Light color palette.
- */
-@SuppressLint("ConflictingOnColor")
-val LightColorPalette = lightColors(
-    primary = primary_light,
-    primaryVariant = primary_variant_light,
-    secondary = secondary_light,
-    surface = surface_light,
-    error = error_light,
-    onPrimary = on_primary_light,
-    onSecondary = on_secondary_light
+internal val lightColorPalette = MegaColors(
+    buttonPrimary = Light.Button.colorButtonPrimary,
+    textPrimary = Light.Text.colorTextPrimary,
+    textInverse = Light.Text.ColorTextInverse,
+    textWarning = Light.Text.colorTextWarning,
+    notificationWarning = Light.Notifications.colorNotificationWarning,
+    isLight = true
 )
 
 /**
- * Dark color palette.
+ * [MegaColors] palette to be used in Dark Theme
  */
-@SuppressLint("ConflictingOnColor")
-val DarkColorPalette = darkColors(
-    primary = primary_dark,
-    primaryVariant = primary_variant_dark,
-    secondary = teal_200,
-    surface = surface_dark,
-    error = error_dark,
-    onPrimary = on_primary_dark,
-    onSecondary = on_secondary_dark
+internal val darkColorPalette = MegaColors(
+    buttonPrimary = Dark.Button.colorButtonPrimary,
+    textPrimary = Dark.Text.colorTextPrimary,
+    textInverse = Dark.Text.ColorTextInverse,
+    textWarning = Dark.Text.colorTextWarning,
+    notificationWarning = Dark.Notifications.colorNotificationWarning,
+    isLight = false
+)
+
+/**
+ * [MegaColors] default palette for testing purposes, all magenta to easily detect it.
+ */
+internal val testColorPalette = MegaColors(
+    Color.Magenta,
+    Color.Magenta,
+    Color.Magenta,
+    Color.Magenta,
+    Color.Magenta,
+    false,
 )

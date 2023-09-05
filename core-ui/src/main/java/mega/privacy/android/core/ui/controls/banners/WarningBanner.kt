@@ -25,8 +25,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.black_yellow_700
-import mega.privacy.android.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
  * Warning banner compose view
@@ -57,7 +56,7 @@ fun WarningBanner(
     onCloseClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val foregroundColor = MaterialTheme.colors.black_yellow_700
+    val foregroundColor = MegaTheme.colors.textWarning
     ProvideTextStyle(
         MaterialTheme.typography.caption.copy(color = foregroundColor)
     ) {
@@ -113,7 +112,7 @@ private fun BannerContent(
 ) {
     Row(
         modifier = modifier
-            .background(MaterialTheme.colors.yellow_100_yellow_700_alpha_015),
+            .background(MegaTheme.colors.notificationWarning),
         verticalAlignment = verticalAlignment
     ) {
         Box(

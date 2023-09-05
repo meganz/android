@@ -57,6 +57,13 @@ import mega.privacy.android.core.ui.theme.yellow_600
 import mega.privacy.android.core.ui.theme.yellow_700
 import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
 
+
+/**
+ * IMPORTANT: DEPRECATED This colors and Theme.colors should not be used anymore. Please use MegaTheme.colors in core-ui components instead:
+ * https://confluence.developers.mega.co.nz/pages/viewpage.action?pageId=81175839
+ */
+
+
 /**
  * Text Color Primary for Composable
  */
