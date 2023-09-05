@@ -8,7 +8,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.TextUtil
@@ -172,7 +171,7 @@ object CameraUploadSyncManager {
             else -> 0
         }
 
-        if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
+        if (cuBackup != null && isPrimaryFolderEnabled()) {
             Timber.d("Sending Primary Folder Heartbeat, backupId = ${cuBackup.backupId}, Heartbeat Status = ${heartbeatStatus.name}")
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
@@ -205,7 +204,7 @@ object CameraUploadSyncManager {
             else -> 0
         }
 
-        if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
+        if (muBackup != null && isSecondaryFolderEnabled()) {
             Timber.d("Sending Secondary Folder Heartbeat, backupId = ${muBackup.backupId}, Heartbeat Status = ${heartbeatStatus.name}")
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
@@ -235,7 +234,7 @@ object CameraUploadSyncManager {
      * @param newTargetNode The new target node
      */
     fun updatePrimaryFolderTargetNode(newTargetNode: Long) {
-        if (!CameraUploadUtil.isPrimaryEnabled()) {
+        if (!isPrimaryFolderEnabled()) {
             Timber.d("Primary Folder is disabled. Unable to update Primary Folder node")
             return
         }
@@ -274,7 +273,7 @@ object CameraUploadSyncManager {
      * @param newTargetNode The new target node
      */
     fun updateSecondaryFolderTargetNode(newTargetNode: Long) {
-        if (!CameraUploadUtil.isSecondaryEnabled()) {
+        if (!isSecondaryFolderEnabled()) {
             Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder node")
             return
         }
@@ -307,7 +306,7 @@ object CameraUploadSyncManager {
      * @param newLocalFolder The path of the new Primary local folder
      */
     fun updatePrimaryLocalFolder(newLocalFolder: String?) {
-        if (!CameraUploadUtil.isPrimaryEnabled()) {
+        if (!isPrimaryFolderEnabled()) {
             Timber.d("Primary Folder is disabled. Unable to update primary local folder")
             return
         }
@@ -340,7 +339,7 @@ object CameraUploadSyncManager {
      * @param newLocalFolder The path of the new Secondary local folder
      */
     fun updateSecondaryLocalFolder(newLocalFolder: String?) {
-        if (!CameraUploadUtil.isSecondaryEnabled()) {
+        if (!isSecondaryFolderEnabled()) {
             Timber.d("Secondary Folder is disabled. Unable to update secondary local folder")
             return
         }
@@ -374,7 +373,7 @@ object CameraUploadSyncManager {
         replaceWith = ReplaceWith("UpdatePrimaryFolderBackupNameUseCase")
     )
     fun updatePrimaryBackupName() {
-        if (!CameraUploadUtil.isPrimaryEnabled()) {
+        if (!isPrimaryFolderEnabled()) {
             Timber.d("Primary Folder is disabled. Unable to update Primary Folder backup name")
             return
         }
@@ -401,7 +400,7 @@ object CameraUploadSyncManager {
         replaceWith = ReplaceWith("UpdateSecondaryFolderBackupNameUseCase")
     )
     fun updateSecondaryBackupName() {
-        if (!CameraUploadUtil.isSecondaryEnabled()) {
+        if (!isSecondaryFolderEnabled()) {
             Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder backup name")
             return
         }
@@ -428,7 +427,7 @@ object CameraUploadSyncManager {
         replaceWith = ReplaceWith("UpdateCameraUploadsBackupUseCase")
     )
     fun updatePrimaryFolderBackupState(backupState: BackupState) {
-        if (!CameraUploadUtil.isPrimaryEnabled()) {
+        if (!isPrimaryFolderEnabled()) {
             Timber.d("Primary Folder is disabled. Unable to update Primary Folder backup state")
             return
         }
@@ -455,7 +454,7 @@ object CameraUploadSyncManager {
         replaceWith = ReplaceWith("UpdateMediaUploadsBackupUseCase")
     )
     fun updateSecondaryFolderBackupState(backupState: BackupState) {
-        if (!CameraUploadUtil.isSecondaryEnabled()) {
+        if (!isSecondaryFolderEnabled()) {
             Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder backup state")
             return
         }
@@ -674,4 +673,29 @@ object CameraUploadSyncManager {
                 which
             ).setPackage(megaApplication.applicationContext.packageName)
         )
+
+    /**
+     * Checks whether the Camera Uploads Primary Folder is enabled or not
+     *
+     * @return true if the Primary Folder is enabled, and false if otherwise
+     */
+    @Deprecated(
+        message = "Replace all calls with IsCameraUploadsEnabledUseCase",
+        replaceWith = ReplaceWith("IsCameraUploadsEnabledUseCase"),
+        level = DeprecationLevel.WARNING,
+    )
+    fun isPrimaryFolderEnabled() = databaseHandler.preferences?.camSyncEnabled.toBoolean()
+
+    /**
+     * Checks whether the Camera Uploads Secondary Folder is enabled or not
+     *
+     * @return true if the Secondary Folder is enabled, and false if otherwise
+     */
+    @Deprecated(
+        message = "Replace all calls with IsSecondaryFolderEnabled",
+        replaceWith = ReplaceWith("IsSecondaryFolderEnabled"),
+        level = DeprecationLevel.WARNING,
+    )
+    fun isSecondaryFolderEnabled() =
+        databaseHandler.preferences?.secondaryMediaFolderEnabled.toBoolean()
 }

@@ -33,9 +33,11 @@ class CUBackupInitializeChecker(
                         megaApi.setDeviceName(Util.getDeviceName(),
                             OptionalMegaRequestListenerInterface(
                                 onRequestFinish = { setDeviceNameRequest, setDeviceNameError ->
-                                    Timber.d("${setDeviceNameRequest.requestString} " +
-                                            "finished with ${setDeviceNameError.errorCode}" +
-                                            ": ${setDeviceNameError.errorString}")
+                                    Timber.d(
+                                        "${setDeviceNameRequest.requestString} " +
+                                                "finished with ${setDeviceNameError.errorCode}" +
+                                                ": ${setDeviceNameError.errorString}"
+                                    )
                                 }
                             ))
                     } else {
@@ -47,14 +49,14 @@ class CUBackupInitializeChecker(
 
         val dbH = MegaApplication.getInstance().dbH
 
-        if (CameraUploadUtil.isPrimaryEnabled() && dbH.cuBackup == null) {
+        if (CameraUploadSyncManager.isPrimaryFolderEnabled() && dbH.cuBackup == null) {
             CameraUploadSyncManager.setPrimaryBackup()
         } else if (dbH.cuBackup != null) {
             // Update to make sure backup name is applied on startup.
             CameraUploadSyncManager.updatePrimaryBackupName()
         }
 
-        if (CameraUploadUtil.isSecondaryEnabled() && dbH.muBackup == null) {
+        if (CameraUploadSyncManager.isSecondaryFolderEnabled() && dbH.muBackup == null) {
             CameraUploadSyncManager.setSecondaryBackup()
         } else if (dbH.muBackup != null) {
             // Update to make sure backup name is applied on startup.
