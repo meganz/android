@@ -11,6 +11,7 @@ import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CA
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -26,7 +27,13 @@ class CreateChatNotificationChannelsUseCase @Inject constructor(
      * Create chat channels
      */
     operator fun invoke() {
-        val currentChannels = notificationManager.notificationChannelsCompat.map { it.id }
+        var currentChannels: List<String> = emptyList()
+        try {
+            currentChannels = notificationManager.notificationChannelsCompat.map { it.id }
+        } catch (e: Exception) {
+            Timber.e(e, "Error when trying to get notification channel")
+        }
+
         val newChannels = mutableListOf<NotificationChannelCompat>()
 
         if (currentChannels.none { it == NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2 }) {
