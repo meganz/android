@@ -166,6 +166,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
             val textFileIntent = Intent(activity, TextEditorActivity::class.java)
             textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
                 .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
+                .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
             textFileIntent
 
         } else if (MimeTypeList.typeForName(fileNode.name).isVideoMimeType ||
