@@ -337,6 +337,13 @@ class ManagerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * A shorthand way of retrieving the [ManagerState]
+     *
+     * @return the [ManagerState]
+     */
+    fun state() = _state.value
+
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
             AppFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },

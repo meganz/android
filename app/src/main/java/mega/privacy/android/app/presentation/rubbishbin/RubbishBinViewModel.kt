@@ -79,6 +79,13 @@ class RubbishBinViewModel @Inject constructor(
     }
 
     /**
+     * A shorthand way of retrieving the [RubbishBinState]
+     *
+     * @return the [RubbishBinState]
+     */
+    fun state() = _state.value
+
+    /**
      * This method will monitor view type and update it on state
      */
     private fun checkViewType() {

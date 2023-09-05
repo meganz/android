@@ -102,6 +102,13 @@ class FileBrowserViewModel @Inject constructor(
         changeTransferOverQuotaBannerVisibility()
     }
 
+    /**
+     * A shorthand way of retrieving the [FileBrowserState]
+     *
+     * @return the [FileBrowserState]
+     */
+    fun state() = _state.value
+
     private fun monitorRefreshSession() {
         viewModelScope.launch {
             monitorRefreshSessionUseCase().collect {

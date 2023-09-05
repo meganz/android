@@ -73,6 +73,13 @@ class OutgoingSharesViewModel @Inject constructor(
     }
 
     /**
+     * A shorthand way of retrieving the [OutgoingSharesState]
+     *
+     * @return the [OutgoingSharesState]
+     */
+    fun state() = _state.value
+
+    /**
      * Refresh outgoing shares node
      */
     fun refreshOutgoingSharesNode() = viewModelScope.launch {

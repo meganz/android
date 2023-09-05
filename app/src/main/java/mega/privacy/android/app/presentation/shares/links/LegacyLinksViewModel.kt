@@ -53,6 +53,13 @@ class LegacyLinksViewModel @Inject constructor(
     }
 
     /**
+     * A shorthand way of retrieving the [LegacyLinksState]
+     *
+     * @return the [LegacyLinksState]
+     */
+    fun state() = _state.value
+
+    /**
      * Refresh links shares node
      */
     fun refreshLinksSharesNode() = viewModelScope.launch {

@@ -63,6 +63,13 @@ class IncomingSharesViewModel @Inject constructor(
     val state: StateFlow<IncomingSharesState> = _state
 
     /**
+     * A shorthand way of retrieving the [IncomingSharesState]
+     *
+     * @return the [IncomingSharesState]
+     */
+    fun state() = _state.value
+
+    /**
      * Serves as the original View Type.
      * When an update from MonitorViewType is received, this value is used to determine if the View Type changed & also updated
      */

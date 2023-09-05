@@ -72,6 +72,13 @@ class BackupsViewModel @Inject constructor(
     }
 
     /**
+     * A shorthand way of retrieving the [BackupsState]
+     *
+     * @return the [BackupsState]
+     */
+    fun state() = _state.value
+
+    /**
      * Uses [monitorNodeUpdates] to observe any Node updates
      *
      * A received Node update will refresh the list of nodes and hide the multiple item selection feature
