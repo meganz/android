@@ -11,7 +11,12 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
+import androidx.compose.ui.test.filter
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.DrawableResId
@@ -61,3 +66,13 @@ internal fun hasDrawable(@DrawableRes id: Int): SemanticsMatcher =
     SemanticsMatcher.expectValue(
         DrawableResId, id
     )
+
+internal fun ComposeContentTestRule.performClickOnAllNodes(testTag: String) {
+    onAllNodesWithTag(testTag)
+        .filter(hasClickAction())
+        .apply {
+            fetchSemanticsNodes().forEachIndexed { i, _ ->
+                get(i).performSemanticsAction(SemanticsActions.OnClick)
+            }
+        }
+}

@@ -80,6 +80,7 @@ dependencies {
     implementation(google.accompanist.systemui)
     implementation(androidx.compose.activity)
     implementation(androidx.lifecycle.runtime)
+    implementation(androidx.lifecycle.runtime.compose)
     implementation(lib.showkase)
     implementation(lib.compose.state.events)
     implementation(lib.coil.compose)

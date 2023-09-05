@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -77,6 +78,8 @@ class WaitingRoomActivity : PasscodeActivity() {
                 onMicToggleChange = viewModel::onMicEnabled,
                 onCameraToggleChange = viewModel::onCameraEnabled,
                 onSpeakerToggleChange = viewModel::onSpeakerEnabled,
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow(),
             )
         }
     }

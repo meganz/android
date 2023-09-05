@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -64,13 +65,13 @@ fun ToggleMegaButton(
     } else {
         iconRes = enabledIcon
         tintColor = MaterialTheme.colors.onSurface
-        backgroundColor = MaterialTheme.colors.surface
+        backgroundColor = Color.Transparent
     }
     val animatedTintColor by animateColorAsState(targetValue = tintColor, label = "tint")
     val animatedBackgroundColor by animateColorAsState(targetValue = backgroundColor, label = "bg")
 
     Column(
-        modifier = modifier,
+        modifier = modifier.heightIn(64.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         IconToggleButton(

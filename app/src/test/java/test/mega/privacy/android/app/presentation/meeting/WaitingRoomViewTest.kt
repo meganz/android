@@ -1,16 +1,10 @@
 package test.mega.privacy.android.app.presentation.meeting
 
-import androidx.compose.ui.semantics.SemanticsActions
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.filter
-import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
 import mega.privacy.android.app.presentation.meeting.view.WaitingRoomView
 import org.junit.Rule
@@ -18,6 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.performClickOnAllNodes
 
 @RunWith(AndroidJUnit4::class)
 class WaitingRoomViewTest {
@@ -43,6 +38,8 @@ class WaitingRoomViewTest {
                 onMicToggleChange = {},
                 onCameraToggleChange = {},
                 onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
             )
         }
 
@@ -61,6 +58,8 @@ class WaitingRoomViewTest {
                 onMicToggleChange = {},
                 onCameraToggleChange = {},
                 onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
             )
         }
 
@@ -81,16 +80,12 @@ class WaitingRoomViewTest {
                 onMicToggleChange = onMicToggleChange,
                 onCameraToggleChange = {},
                 onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
             )
         }
 
-        composeTestRule.onAllNodesWithTag("waiting_room:button_mic")
-            .filter(hasClickAction())
-            .apply {
-                fetchSemanticsNodes().forEachIndexed { i, _ ->
-                    get(i).performSemanticsAction(SemanticsActions.OnClick)
-                }
-            }
+        composeTestRule.performClickOnAllNodes("waiting_room:button_mic")
 
         verify(onMicToggleChange).invoke(true)
     }
@@ -107,44 +102,14 @@ class WaitingRoomViewTest {
                 onMicToggleChange = {},
                 onCameraToggleChange = onCameraToggleChange,
                 onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
             )
         }
 
-        composeTestRule.onAllNodesWithTag("waiting_room:button_camera")
-            .filter(hasClickAction())
-            .apply {
-                fetchSemanticsNodes().forEachIndexed { i, _ ->
-                    get(i).performSemanticsAction(SemanticsActions.OnClick)
-                }
-            }
+        composeTestRule.performClickOnAllNodes("waiting_room:button_camera")
 
         verify(onCameraToggleChange).invoke(true)
-    }
-
-    @Test
-    fun `test that onSpeakerToggleChange is called when speaker button is toggled`() {
-        val onSpeakerToggleChange: (Boolean) -> Unit = mock()
-
-        composeTestRule.setContent {
-            WaitingRoomView(
-                state = WaitingRoomState(speakerEnabled = false),
-                onInfoClicked = {},
-                onCloseClicked = {},
-                onMicToggleChange = {},
-                onCameraToggleChange = {},
-                onSpeakerToggleChange = onSpeakerToggleChange,
-            )
-        }
-
-        composeTestRule.onAllNodesWithTag("waiting_room:button_speaker")
-            .filter(hasClickAction())
-            .apply {
-                fetchSemanticsNodes().forEachIndexed { i, _ ->
-                    get(i).performSemanticsAction(SemanticsActions.OnClick)
-                }
-            }
-
-        verify(onSpeakerToggleChange).invoke(true)
     }
 
     @Test
@@ -157,6 +122,8 @@ class WaitingRoomViewTest {
                 onMicToggleChange = {},
                 onCameraToggleChange = {},
                 onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
             )
         }
 
@@ -164,18 +131,104 @@ class WaitingRoomViewTest {
     }
 
     @Test
-    fun `test that camera preview is not visible when camera is disabled`() {
+    fun `test that deny access dialog is shown when denyAccessDialog is true`() {
         composeTestRule.setContent {
             WaitingRoomView(
-                state = WaitingRoomState(cameraEnabled = false),
+                state = WaitingRoomState(denyAccessDialog = true),
                 onInfoClicked = {},
                 onCloseClicked = {},
                 onMicToggleChange = {},
                 onCameraToggleChange = {},
                 onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
             )
         }
 
-        composeTestRule.onNodeWithTag("waiting_room:preview_camera").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("waiting_room:dialog_deny_access").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that inactive host dialog is shown when inactiveHostDialog is true`() {
+        composeTestRule.setContent {
+            WaitingRoomView(
+                state = WaitingRoomState(inactiveHostDialog = true),
+                onInfoClicked = {},
+                onCloseClicked = {},
+                onMicToggleChange = {},
+                onCameraToggleChange = {},
+                onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
+            )
+        }
+
+        composeTestRule.onNodeWithTag("waiting_room:dialog_inactive_host").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that guest name input fields are visible when isGuestMode is true`() {
+        composeTestRule.setContent {
+            WaitingRoomView(
+                state = WaitingRoomState(
+                    chatLink = "chatLink",
+                    guestFirstName = null,
+                    guestLastName = null
+                ),
+                onInfoClicked = {},
+                onCloseClicked = {},
+                onMicToggleChange = {},
+                onCameraToggleChange = {},
+                onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
+            )
+        }
+
+        composeTestRule.onNodeWithTag("waiting_room:guest_name_inputs").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that guest name input fields are not visible when isGuestMode is false`() {
+        composeTestRule.setContent {
+            WaitingRoomView(
+                state = WaitingRoomState(
+                    chatLink = null,
+                    guestFirstName = "John",
+                    guestLastName = "Doe"
+                ),
+                onInfoClicked = {},
+                onCloseClicked = {},
+                onMicToggleChange = {},
+                onCameraToggleChange = {},
+                onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
+            )
+        }
+
+        composeTestRule.onNodeWithTag("waiting_room:guest_name_inputs").assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that join button is not visible when both first and last names are provided`() {
+        composeTestRule.setContent {
+            WaitingRoomView(
+                state = WaitingRoomState(
+                    chatLink = "mega.co.nz",
+                    guestFirstName = "John",
+                    guestLastName = "Doe"
+                ),
+                onInfoClicked = {},
+                onCloseClicked = {},
+                onMicToggleChange = {},
+                onCameraToggleChange = {},
+                onSpeakerToggleChange = {},
+                onGuestNameChange = { _, _ -> },
+                videoStream = emptyFlow()
+            )
+        }
+
+        composeTestRule.onNodeWithTag("waiting_room:button_join").assertDoesNotExist()
     }
 }

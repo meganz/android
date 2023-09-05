@@ -5126,4 +5126,12 @@
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
     <!-- Dialog button to deny entry to a participant in the call -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Deny entry</string>
+    <!-- Dialog title when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_title">Host didn’t let you in</string>
+    <!-- Dialog description when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_description">You’ll be removed from the waiting room.</string>
+    <!-- Dialog title when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_title">Host didn’t respond</string>
+    <!-- Dialog description when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_description">There is no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
 </resources>
