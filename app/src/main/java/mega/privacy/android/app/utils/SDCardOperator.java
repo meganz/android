@@ -379,17 +379,16 @@ public class SDCardOperator {
      * @param downloadedFile Downloaded file to move.
      * @param targetPath     Path where the file has to be moved.
      * @param uri            Uri to init SD card operator.
-     * @param tag            Identifier of the SD transfer on DB.
      */
-    public void moveDownloadedFileToDestinationPath(File downloadedFile, String targetPath, String uri, int tag) {
+    public boolean moveDownloadedFileToDestinationPath(File downloadedFile, String targetPath, String uri) {
         if (!downloadedFile.exists()) {
             Timber.e("Download file doesn't exist!");
-            return;
+            return false;
         }
 
         if (TextUtil.isTextEmpty(targetPath)) {
             Timber.e("Target path is empty!");
-            return;
+            return false;
         }
 
         MegaApplication app = MegaApplication.getInstance();
@@ -403,12 +402,13 @@ public class SDCardOperator {
             if (!newFile.exists() || newFile.length() != downloadedFile.length()) {
                 Timber.e("Error moving file to the sd card path");
             } else {
-                app.getDbH().removeSDTransfer(tag);
+                return true;
             }
         } catch (Exception e) {
             Timber.e(e, "Error moving file to the sd card path");
         } finally {
             downloadedFile.delete();
         }
+        return false;
     }
 }

@@ -88,6 +88,8 @@ import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.monitorpaused.MonitorDownloadTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfer.sd.DeleteSdTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.sd.InsertSdTransferUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -188,6 +190,12 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
 
     @Inject
     lateinit var monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase
+
+    @Inject
+    lateinit var insertSdTransferUseCase: InsertSdTransferUseCase
+
+    @Inject
+    lateinit var deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -1340,7 +1348,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         }
         val appData = transfer.appData
         if (appData.contains(Constants.APP_DATA_SD_CARD)) {
-            dbH.addSDTransfer(
+            insertSdTransferUseCase(
                 SdTransfer(
                     transfer.tag,
                     transfer.fileName,
@@ -1424,12 +1432,14 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
                     val source = File(path)
                     try {
                         val sdCardOperator = SDCardOperator(this@DownloadService)
-                        sdCardOperator.moveDownloadedFileToDestinationPath(
+                        val isSuccess = sdCardOperator.moveDownloadedFileToDestinationPath(
                             source,
                             targetPath,
                             SDCardUtils.getSDCardTargetUri(transfer.appData),
-                            transfer.tag
                         )
+                        if (isSuccess) {
+                            deleteSdTransferByTagUseCase(transfer.tag)
+                        }
                     } catch (e: Exception) {
                         Timber.e(e, "Error moving file to the sd card path.")
                     }

@@ -16,23 +16,31 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.toTransferStage
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -42,10 +50,14 @@ import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferIfNotExi
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastFailedTransfer
 import mega.privacy.android.domain.usecase.transfer.BroadcastStopTransfersWorkUseCase
+import mega.privacy.android.domain.usecase.transfer.sd.DeleteSdTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.sd.GetAllSdTransfersUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -57,6 +69,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class TransfersManagement @Inject constructor(
+    @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
@@ -65,6 +78,8 @@ class TransfersManagement @Inject constructor(
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val broadcastStopTransfersWorkUseCase: BroadcastStopTransfersWorkUseCase,
     private val addCompletedTransferIfNotExistUseCase: AddCompletedTransferIfNotExistUseCase,
+    private val deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase,
+    private val getAllSdTransfersUseCase: GetAllSdTransfersUseCase,
 ) {
 
     companion object {
@@ -300,11 +315,9 @@ class TransfersManagement @Inject constructor(
      *
      */
     fun checkResumedPendingTransfers() {
-        val app = MegaApplication.getInstance()
-
         if (megaApi.rootNode != null) {
             applicationScope.launch {
-                val completedTransfers = SDCardUtils.checkSDCardCompletedTransfers()
+                val completedTransfers = checkSDCardCompletedTransfers()
                 addCompletedTransferIfNotExistUseCase(completedTransfers)
             }
         }
@@ -324,36 +337,100 @@ class TransfersManagement @Inject constructor(
                 @Suppress("DEPRECATION")
                 if (megaApi.numPendingDownloads > 0) {
                     val downloadServiceIntent =
-                        Intent(app, DownloadService::class.java)
+                        Intent(context, DownloadService::class.java)
                             .setAction(Constants.ACTION_RESTART_SERVICE)
 
                     if (shouldStartForeground) {
-                        app.startForegroundService(downloadServiceIntent)
+                        context.startForegroundService(downloadServiceIntent)
                     } else {
-                        app.startService(downloadServiceIntent)
+                        context.startService(downloadServiceIntent)
                     }
                 }
 
                 @Suppress("DEPRECATION")
                 if (megaApi.numPendingUploads > 0) {
-                    val uploadServiceIntent = Intent(app, UploadService::class.java)
+                    val uploadServiceIntent = Intent(context, UploadService::class.java)
                         .setAction(Constants.ACTION_RESTART_SERVICE)
 
-                    val chatUploadServiceIntent = Intent(app, ChatUploadService::class.java)
+                    val chatUploadServiceIntent = Intent(context, ChatUploadService::class.java)
                         .setAction(Constants.ACTION_RESTART_SERVICE)
 
                     if (shouldStartForeground) {
-                        app.startForegroundService(uploadServiceIntent)
-                        app.startForegroundService(chatUploadServiceIntent)
+                        context.startForegroundService(uploadServiceIntent)
+                        context.startForegroundService(chatUploadServiceIntent)
                     } else {
-                        app.startService(uploadServiceIntent)
-                        app.startService(chatUploadServiceIntent)
+                        context.startService(uploadServiceIntent)
+                        context.startService(chatUploadServiceIntent)
                     }
                 }
             } catch (e: Exception) {
                 Timber.w(e, "Exception checking pending transfers")
             }
         }, WAIT_TIME_TO_RESTART_SERVICES)
+    }
+
+
+    /**
+     * Checks if there are incomplete movements of SD card downloads and tries to complete them.
+     */
+    private suspend fun checkSDCardCompletedTransfers(): List<CompletedTransfer> {
+        val sdTransfers = getAllSdTransfersUseCase()
+        if (sdTransfers.isEmpty()) return emptyList()
+        val completedTransfers = ArrayList<CompletedTransfer>()
+        for (sdtransfer in sdTransfers) {
+            val transfer = megaApi.getTransferByTag(sdtransfer.tag)
+            if (transfer != null && transfer.state < MegaTransfer.STATE_COMPLETED) {
+                continue
+            }
+            val originalDownload = File(sdtransfer.path)
+            if (!FileUtil.isFileAvailable(originalDownload)) {
+                deleteSdTransferByTagUseCase(sdtransfer.tag)
+                continue
+            }
+            val appData = sdtransfer.appData
+            val targetPath = SDCardUtils.getSDCardTargetPath(appData)
+            if (isFinalDownloadFileExist(sdtransfer, originalDownload, targetPath)) continue
+            Timber.w("Movement incomplete")
+            moveSdTransferToTargetPath(originalDownload, targetPath, appData, sdtransfer)
+            val androidCompletedTransfer = AndroidCompletedTransfer(sdtransfer, context)
+            val completedTransfer = LegacyCompletedTransferMapper().invoke(androidCompletedTransfer)
+            completedTransfers.add(completedTransfer)
+        }
+        return completedTransfers
+    }
+
+    private suspend fun isFinalDownloadFileExist(
+        sdtransfer: SdTransfer,
+        originalDownload: File,
+        targetPath: String?,
+    ): Boolean {
+        val finalDownload = File(targetPath + File.separator + originalDownload.name)
+        if (finalDownload.exists() && finalDownload.length() == originalDownload.length()) {
+            originalDownload.delete()
+            deleteSdTransferByTagUseCase(sdtransfer.tag)
+            return true
+        }
+        return false
+    }
+
+    private suspend fun moveSdTransferToTargetPath(
+        originalDownload: File,
+        targetPath: String?,
+        appData: String,
+        sdtransfer: SdTransfer,
+    ) {
+        try {
+            val sdCardOperator = SDCardOperator(getInstance())
+            val isSuccess = sdCardOperator.moveDownloadedFileToDestinationPath(
+                originalDownload, targetPath,
+                SDCardUtils.getSDCardTargetUri(appData)
+            )
+            if (isSuccess) {
+                deleteSdTransferByTagUseCase(sdtransfer.tag)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error moving file to the sd card path")
+        }
     }
 
     /**
