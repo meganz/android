@@ -214,21 +214,18 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
             // Folder Download link
             matchRegexs(url, FOLDER_LINK_REGEXS) -> {
-                lifecycleScope.launch {
-                    val intent =
-                        Intent(this@OpenLinkActivity, FolderLinkComposeActivity::class.java)
-                    startActivity(
-                        intent
-                            .putExtra(
-                                OPENED_FROM_CHAT,
-                                intent.getBooleanExtra(OPENED_FROM_CHAT, false)
-                            )
-                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                            .setAction(ACTION_OPEN_MEGA_FOLDER_LINK)
-                            .setData(Uri.parse(url))
-                    )
-                    finish()
-                }
+                val intent = Intent(this@OpenLinkActivity, FolderLinkComposeActivity::class.java)
+                startActivity(
+                    intent
+                        .putExtra(
+                            OPENED_FROM_CHAT,
+                            intent.getBooleanExtra(OPENED_FROM_CHAT, false)
+                        )
+                        .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                        .setAction(ACTION_OPEN_MEGA_FOLDER_LINK)
+                        .setData(Uri.parse(url))
+                )
+                finish()
             }
             // Chat link or Meeting link
             matchRegexs(url, CHAT_LINK_REGEXS) -> {

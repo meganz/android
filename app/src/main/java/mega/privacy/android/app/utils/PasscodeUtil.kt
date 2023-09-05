@@ -10,6 +10,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -320,7 +321,7 @@ class PasscodeUtil @Inject constructor(
      * Called after resume some activity to check if should lock or not the app.
      */
     fun resume() {
-        scope.launch {
+        runBlocking {
             if (shouldLock()) {
                 showLockScreen()
             }
