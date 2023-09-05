@@ -5,6 +5,8 @@ import nz.mega.sdk.MegaNode
 /**
  * Data object that encapsulates an item representing a Mega Node with extra information.
  *
+ * @property name               The Node Name
+ * @property handle             The Node Handle
  * @property node               MegaNode itself
  * @property hasReadAccess      Flag indicating if current user can read the node.
  * @property hasReadWriteAccess Flag indicating if current user can read and write the node.
@@ -12,7 +14,7 @@ import nz.mega.sdk.MegaNode
  * @property hasOwnerAccess     Flag indicating if current user is the owner of the node.
  * @property isFromIncoming     Flag indicating if node is an Incoming node.
  * @property isFromRubbishBin   Flag indicating if node is a child of Rubbish bin node.
- * @property isFromInbox        Flag indicating if node is a child of Inbox node.
+ * @property isFromBackups      Flag indicating if node is a child of the Backups node.
  * @property isFromRoot         Flag indicating if node is a child of Root node.
  * @property isExternalNode     Flag indicating if node is external.
  * @property isAvailableOffline Flag indicating if node is available offline.
@@ -27,7 +29,7 @@ data class MegaNodeItem constructor(
     val hasOwnerAccess: Boolean = false,
     val isFromIncoming: Boolean = false,
     val isFromRubbishBin: Boolean = false,
-    val isFromInbox: Boolean = false,
+    val isFromBackups: Boolean = false,
     val isFromRoot: Boolean = false,
     val isExternalNode: Boolean = false,
     val hasVersions: Boolean = false,
@@ -40,6 +42,7 @@ data class MegaNodeItem constructor(
                 super.equals(other)
                         && this.node?.fingerprint == other.node?.fingerprint
             }
+
             else -> false
         }
 

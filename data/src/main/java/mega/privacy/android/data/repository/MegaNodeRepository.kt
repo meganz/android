@@ -4,7 +4,6 @@ import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
@@ -46,18 +45,18 @@ interface MegaNodeRepository {
     suspend fun getRootNode(): MegaNode?
 
     /**
-     * Get the inbox node
+     * Get the Backups node
      *
-     * @return A node corresponding to the Inbox node, null if cannot be retrieved
+     * @return A node corresponding to the Backups node, null if cannot be retrieved
      */
-    suspend fun getInboxNode(): MegaNode?
+    suspend fun getBackupsNode(): MegaNode?
 
     /**
-     * check whether the node is in inbox or not
+     * check whether the node is in Backups or not
      *
-     * @return Boolean
+     * @return true if the Node is in Backups, and false if otherwise
      */
-    suspend fun isNodeInInbox(megaNode: MegaNode): Boolean
+    suspend fun isNodeInBackups(megaNode: MegaNode): Boolean
 
     /**
      * Get the rubbish root node
@@ -168,11 +167,11 @@ interface MegaNodeRepository {
     suspend fun isPendingShare(node: MegaNode): Boolean
 
     /**
-     * Checks if Inbox node has children.
+     * Checks if the Backups node has children.
      *
-     * @return True if Inbox has children, false otherwise.
+     * @return True if the Backups node has children, false otherwise.
      */
-    suspend fun hasInboxChildren(): Boolean
+    suspend fun hasBackupsChildren(): Boolean
 
     /**
      * Check access error extended

@@ -420,7 +420,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionRestoreFromRubbish.visibility = View.GONE
                     }
 
-                    INBOX_MODE -> {
+                    BACKUPS_MODE -> {
                         Timber.d("show My Backups bottom sheet")
                         counterModify--
                         optionRestoreFromRubbish.visibility = View.GONE
@@ -908,9 +908,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     Constants.OUTGOING_SHARES_ADAPTER
                 )
             }
-        } else if (drawerItem === DrawerItem.INBOX) {
+        } else if (drawerItem === DrawerItem.BACKUPS) {
             if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
-                fileInfoIntent.putExtra(INTENT_EXTRA_KEY_FROM, Constants.FROM_INBOX)
+                fileInfoIntent.putExtra(INTENT_EXTRA_KEY_FROM, Constants.FROM_BACKUPS)
             }
         } else if (drawerItem === DrawerItem.SEARCH && nodeController.nodeComesFromIncoming(
                 node
@@ -1079,7 +1079,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun refreshView() {
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE, DrawerItem.RUBBISH_BIN -> (requireActivity() as ManagerActivity).onNodesCloudDriveUpdate()
-            DrawerItem.INBOX -> (requireActivity() as ManagerActivity).onNodesInboxUpdate()
+            DrawerItem.BACKUPS -> (requireActivity() as ManagerActivity).onNodesBackupsUpdate()
             DrawerItem.SHARED_ITEMS -> (requireActivity() as ManagerActivity).refreshSharesFragments()
             DrawerItem.SEARCH -> (requireActivity() as ManagerActivity).onNodesSearchUpdate()
             DrawerItem.HOMEPAGE -> LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE)
@@ -1097,7 +1097,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun saveForOffline(node: MegaNode?) {
         var adapterType = Constants.FROM_OTHERS
         when (drawerItem) {
-            DrawerItem.INBOX -> adapterType = Constants.FROM_INBOX
+            DrawerItem.BACKUPS -> adapterType = Constants.FROM_BACKUPS
             DrawerItem.SHARED_ITEMS -> if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
                 adapterType = Constants.FROM_INCOMING_SHARES
             }
@@ -1146,7 +1146,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> mode = CLOUD_DRIVE_MODE
             DrawerItem.RUBBISH_BIN -> mode = RUBBISH_BIN_MODE
-            DrawerItem.INBOX -> mode = INBOX_MODE
+            DrawerItem.BACKUPS -> mode = BACKUPS_MODE
             DrawerItem.SHARED_ITEMS -> mode = SHARED_ITEMS_MODE
             DrawerItem.SEARCH -> mode = SEARCH_MODE
             else -> {}
@@ -1157,7 +1157,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         get() = when (mode) {
             CLOUD_DRIVE_MODE -> Constants.FILE_BROWSER_ADAPTER
             RUBBISH_BIN_MODE -> Constants.RUBBISH_BIN_ADAPTER
-            INBOX_MODE -> Constants.INBOX_ADAPTER
+            BACKUPS_MODE -> Constants.BACKUPS_ADAPTER
             SHARED_ITEMS_MODE -> when ((requireActivity() as ManagerActivity).tabItemShares) {
                 SharesTab.INCOMING_TAB -> Constants.INCOMING_SHARES_ADAPTER
                 SharesTab.OUTGOING_TAB -> Constants.OUTGOING_SHARES_ADAPTER
@@ -1278,9 +1278,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         const val RUBBISH_BIN_MODE = 2
 
         /**
-         * For Inbox
+         * For Backups
          */
-        const val INBOX_MODE = 3
+        const val BACKUPS_MODE = 3
 
         /**
          * For Shared items

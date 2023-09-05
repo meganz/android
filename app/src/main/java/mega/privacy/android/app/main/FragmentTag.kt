@@ -4,7 +4,7 @@ internal enum class FragmentTag {
     CLOUD_DRIVE,
     HOMEPAGE,
     PHOTOS,
-    INBOX,
+    BACKUPS,
     INCOMING_SHARES,
     OUTGOING_SHARES,
     SEARCH,
@@ -30,7 +30,7 @@ internal enum class FragmentTag {
             SYNC -> "syncFragment"
             RUBBISH_BIN -> "rubbishBinFragment"
             PHOTOS -> "photosFragment"
-            INBOX -> "inboxFragment"
+            BACKUPS -> "backupsFragment"
             INCOMING_SHARES -> "incomingSharesFragment"
             OUTGOING_SHARES -> "outgoingSharesFragment"
             SEARCH -> "searchFragment"

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.inbox
+package mega.privacy.android.app.presentation.backups
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.presentation.inbox.model.InboxState
+import mega.privacy.android.app.presentation.backups.model.BackupsState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -26,7 +26,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * [ViewModel] class associated to InboxFragment
+ * [ViewModel] class associated to [BackupsFragment]
  *
  * @property getChildrenNode [GetChildrenNode]
  * @property getCloudSortOrder [GetCloudSortOrder]
@@ -37,7 +37,7 @@ import javax.inject.Inject
  * @property monitorViewType [MonitorViewType]
  */
 @HiltViewModel
-class InboxViewModel @Inject constructor(
+class BackupsViewModel @Inject constructor(
     private val getChildrenNode: GetChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getNodeByHandle: GetNodeByHandle,
@@ -48,14 +48,14 @@ class InboxViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
-     * The Inbox UI State
+     * The Backups UI State
      */
-    private val _state = MutableStateFlow(InboxState())
+    private val _state = MutableStateFlow(BackupsState())
 
     /**
-     * The Inbox UI State accessible outside the ViewModel
+     * The Backups UI State accessible outside the ViewModel
      */
-    val state: StateFlow<InboxState> = _state
+    val state: StateFlow<BackupsState> = _state
 
     /**
      * The My Backups Folder Node
@@ -112,7 +112,7 @@ class InboxViewModel @Inject constructor(
      *
      * Processes updates received from the My Backups Folder
      *
-     * If the Inbox Handle is invalid, use the My Backups Folder Handle to refresh the
+     * If the Backups Handle is invalid, use the My Backups Folder Handle to refresh the
      * list of Nodes
      *
      * Update the UI State values after performing a successful refresh
@@ -122,27 +122,26 @@ class InboxViewModel @Inject constructor(
     private suspend fun onMyBackupsFolderUpdateReceived(newMyBackupsFolder: NodeId) {
         myBackupsFolderNode = newMyBackupsFolder
 
-        _state.update { inboxState ->
-            if (inboxState.inboxHandle == -1L) {
+        _state.update { backupsState ->
+            if (backupsState.backupsHandle == -1L) {
                 refreshNodes(newMyBackupsFolder.longValue).let { updatedNodes ->
-                    inboxState.copy(
-                        inboxHandle = newMyBackupsFolder.longValue,
+                    backupsState.copy(
+                        backupsHandle = newMyBackupsFolder.longValue,
                         nodes = updatedNodes,
                     )
                 }
             } else {
                 refreshNodes().let { updatedNodes ->
-                    inboxState.copy(nodes = updatedNodes)
+                    backupsState.copy(nodes = updatedNodes)
                 }
             }
         }
     }
 
     /**
-     * Refresh inbox nodes and hide selection
-     *
+     * Refreshes Backups nodes and hides the selection
      */
-    fun refreshInboxNodesAndHideSelection() = viewModelScope.launch {
+    fun refreshBackupsNodesAndHideSelection() = viewModelScope.launch {
         refreshNodes().let { updatedNodes ->
             _state.update {
                 it.copy(
@@ -154,24 +153,24 @@ class InboxViewModel @Inject constructor(
     }
 
     /**
-     * Refreshes the list of Inbox Nodes
+     * Refreshes the list of Backups Nodes
      */
-    fun refreshInboxNodes() = viewModelScope.launch {
+    fun refreshBackupsNodes() = viewModelScope.launch {
         refreshNodes().also { setNodes(it) }
     }
 
     /**
      * Retrieves the list of Nodes by performing the following steps:
      *
-     * 2. Check if [InboxState.inboxHandle] equals -1L or [MegaApiJava.INVALID_HANDLE]. If either condition is true, return an empty list
-     * 3. Call the Use Case [getNodeByHandle] to retrieve the Parent Node from [InboxState.inboxHandle]. If the Parent Node is null, return an empty list
+     * 2. Check if [BackupsState.backupsHandle] equals -1L or [MegaApiJava.INVALID_HANDLE]. If either condition is true, return an empty list
+     * 3. Call the Use Case [getNodeByHandle] to retrieve the Parent Node from [BackupsState.backupsHandle]. If the Parent Node is null, return an empty list
      * 4. Call the Use Case [getChildrenNode] to retrieve and return the list of Nodes under the Parent Node
      *
-     * @param nodeHandle The Node Handle used to retrieve the current list of Nodes. Defaults to [InboxState.inboxHandle]
+     * @param nodeHandle The Node Handle used to retrieve the current list of Nodes. Defaults to [BackupsState.backupsHandle]
      *
-     * @return a List of Inbox Nodes
+     * @return a List of Backup Nodes
      */
-    private suspend fun refreshNodes(nodeHandle: Long = _state.value.inboxHandle): List<MegaNode> =
+    private suspend fun refreshNodes(nodeHandle: Long = _state.value.backupsHandle): List<MegaNode> =
         if (nodeHandle != -1L) {
             getNodeByHandle(nodeHandle)?.let { parentNode ->
                 getChildrenNode(
@@ -184,7 +183,7 @@ class InboxViewModel @Inject constructor(
         }
 
     /**
-     * Handles the Back Press Behavior from Inbox after checking certain conditions
+     * Handles the Back Press Behavior from Backups after checking certain conditions
      */
     fun handleBackPress() {
         viewModelScope.launch {
@@ -192,45 +191,45 @@ class InboxViewModel @Inject constructor(
             // 1. The My Backups Folder Handle is -1L
             // 2. The Handles of the My Backups Folder and the UI State are the same
             // 3. The retrieved Parent Node Handle does not exist
-            val inboxHandle = _state.value.inboxHandle
+            val backupsHandle = _state.value.backupsHandle
 
-            if (myBackupsFolderNode.longValue == -1L || myBackupsFolderNode.longValue == inboxHandle) {
-                onExitInbox(true)
+            if (myBackupsFolderNode.longValue == -1L || myBackupsFolderNode.longValue == backupsHandle) {
+                onExitBackups(true)
             } else {
-                getParentNodeHandle(inboxHandle)?.let { parentNodeHandle ->
+                getParentNodeHandle(backupsHandle)?.let { parentNodeHandle ->
                     // Proceed to retrieve the Nodes of the Parent Node
-                    _state.update { inboxState ->
+                    _state.update { backupsState ->
                         refreshNodes(parentNodeHandle).let { updatedNodes ->
-                            inboxState.copy(
-                                inboxHandle = parentNodeHandle,
+                            backupsState.copy(
+                                backupsHandle = parentNodeHandle,
                                 triggerBackPress = true,
                                 nodes = updatedNodes,
                             )
                         }
                     }
-                } ?: run { onExitInbox(true) }
+                } ?: run { onExitBackups(true) }
             }
         }
     }
 
     /**
-     * Notifies [InboxState.shouldExitInbox] that the Inbox screen has acknowledged to exit the screen
+     * Notifies [BackupsState.shouldExitBackups] that the Backups screen has acknowledged to exit the screen
      */
-    fun exitInboxHandled() {
-        onExitInbox(false)
+    fun exitBackupsHandled() {
+        onExitBackups(false)
     }
 
     /**
-     * Updates the value of [InboxState.shouldExitInbox]
+     * Updates the value of [BackupsState.shouldExitBackups]
      *
-     * @param exitInbox Whether the User should exit the Inbox or not
+     * @param exitBackups Whether the User should exit the Backups page or not
      */
-    private fun onExitInbox(exitInbox: Boolean) {
-        _state.update { it.copy(shouldExitInbox = exitInbox) }
+    private fun onExitBackups(exitBackups: Boolean) {
+        _state.update { it.copy(shouldExitBackups = exitBackups) }
     }
 
     /**
-     * Notifies [InboxState.triggerBackPress] that the Inbox screen has handled the Back Press
+     * Notifies [BackupsState.triggerBackPress] that the Backups screen has handled the Back Press
      * behavior by setting its value to false
      */
     fun triggerBackPressHandled() {
@@ -238,7 +237,7 @@ class InboxViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [InboxState.nodes]
+     * Updates the value of [BackupsState.nodes]
      *
      * @param nodes The List of Nodes
      */
@@ -247,35 +246,35 @@ class InboxViewModel @Inject constructor(
     }
 
     /**
-     * Notifies [InboxState.inboxHandle] that the Inbox screen has handled the Inbox Handle
+     * Notifies [BackupsState.backupsHandle] that the Backups screen has handled the Backups Handle
      *
-     * @param nodeHandle The new Inbox Handle
+     * @param nodeHandle The new Backups Handle
      */
-    fun updateInboxHandle(nodeHandle: Long) {
-        onInboxHandle(nodeHandle)
+    fun updateBackupsHandle(nodeHandle: Long) {
+        onBackupsHandle(nodeHandle)
     }
 
     /**
-     * Checks whether the the Inbox screen is currently on the Backups Folder level by comparing
-     * the Node Handles of [InboxState.inboxHandle] and [myBackupsFolderNode]
+     * Checks whether the the Backups screen is currently on the Backups Folder level by comparing
+     * the Node Handles of [BackupsState.backupsHandle] and [myBackupsFolderNode]
      *
-     * @return true if both values are equal or [InboxState.inboxHandle] is -1L, and false if otherwise
+     * @return true if both values are equal or [BackupsState.backupsHandle] is -1L, and false if otherwise
      */
     fun isCurrentlyOnBackupFolderLevel(): Boolean = with(_state.value) {
-        (this.inboxHandle == myBackupsFolderNode.longValue) || this.inboxHandle == -1L
+        (this.backupsHandle == myBackupsFolderNode.longValue) || this.backupsHandle == -1L
     }
 
     /**
-     * Given a [Long], the function updates the value of [InboxState.inboxHandle]
+     * Given a [Long], the function updates the value of [BackupsState.backupsHandle]
      *
-     * @param inboxHandle The Inbox Handle
+     * @param backupsHandle The Backups Handle
      */
-    private fun onInboxHandle(inboxHandle: Long) {
-        _state.update { it.copy(inboxHandle = inboxHandle) }
+    private fun onBackupsHandle(backupsHandle: Long) {
+        _state.update { it.copy(backupsHandle = backupsHandle) }
     }
 
     /**
-     * Notifies [InboxState.hideMultipleItemSelection] that the Inbox screen has handled the hiding
+     * Notifies [BackupsState.hideMultipleItemSelection] that the Backups screen has handled the hiding
      * of the Multiple Item Selection by setting its value to false
      *
      */

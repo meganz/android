@@ -64,7 +64,7 @@ import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
-import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
+import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
@@ -112,7 +112,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
-import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
+import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -193,7 +193,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val getLocalLinkFromMegaApiUseCase: GetLocalLinkFromMegaApiUseCase,
-    private val getInboxNodeUseCase: GetInboxNodeUseCase,
+    private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
     private val getParentNodeFromMegaApiFolderUseCase: GetParentNodeFromMegaApiFolderUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getRootNodeFromMegaApiFolderUseCase: GetRootNodeFromMegaApiFolderUseCase,
@@ -739,7 +739,7 @@ class VideoPlayerViewModel @Inject constructor(
 
                     FILE_BROWSER_ADAPTER,
                     RUBBISH_BIN_ADAPTER,
-                    INBOX_ADAPTER,
+                    BACKUPS_ADAPTER,
                     LINKS_ADAPTER,
                     INCOMING_SHARES_ADAPTER,
                     OUTGOING_SHARES_ADAPTER,
@@ -814,7 +814,7 @@ class VideoPlayerViewModel @Inject constructor(
                         if (parentHandle == INVALID_HANDLE) {
                             when (type) {
                                 RUBBISH_BIN_ADAPTER -> getRubbishNodeUseCase()
-                                INBOX_ADAPTER -> getInboxNodeUseCase()
+                                BACKUPS_ADAPTER -> getBackupsNodeUseCase()
                                 else -> getRootNodeUseCase()
                             }
                         } else {
@@ -824,7 +824,7 @@ class VideoPlayerViewModel @Inject constructor(
                                 context.getString(
                                     when (type) {
                                         RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
-                                        INBOX_ADAPTER -> R.string.home_side_menu_backups_title
+                                        BACKUPS_ADAPTER -> R.string.home_side_menu_backups_title
                                         else -> R.string.section_cloud_drive
                                     }
                                 )
@@ -1270,7 +1270,7 @@ class VideoPlayerViewModel @Inject constructor(
 
             FILE_BROWSER_ADAPTER,
             RUBBISH_BIN_ADAPTER,
-            INBOX_ADAPTER,
+            BACKUPS_ADAPTER,
             LINKS_ADAPTER,
             INCOMING_SHARES_ADAPTER,
             OUTGOING_SHARES_ADAPTER,

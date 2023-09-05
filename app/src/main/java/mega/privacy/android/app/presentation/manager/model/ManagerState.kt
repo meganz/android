@@ -11,9 +11,8 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  *
  * @property isFirstNavigationLevel
  * @property sharesTab
- * @property transfersTab
  * @property isFirstLogin
- * @property hasInboxChildren
+ * @property hasBackupsChildren
  * @property nodeUpdateReceived
  * @property pendingActionsCount
  * @property shouldAlertUserAboutSecurityUpgrade
@@ -23,7 +22,6 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property enabledFlags
  * @property isPushNotificationSettingsUpdatedEvent
  * @property titleChatArchivedEvent
- * @property cancelTransfersResult
  * @property restoreNodeResult
  * @property nodeNameCollisionResult
  * @property moveRequestResult
@@ -32,7 +30,7 @@ data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
     val sharesTab: SharesTab = SharesTab.INCOMING_TAB,
     val isFirstLogin: Boolean = false,
-    val hasInboxChildren: Boolean = false,
+    val hasBackupsChildren: Boolean = false,
     val nodeUpdateReceived: Boolean = false,
     val pendingActionsCount: Int = 0,
     val shouldAlertUserAboutSecurityUpgrade: Boolean = false,

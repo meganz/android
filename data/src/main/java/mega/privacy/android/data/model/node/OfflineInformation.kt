@@ -40,10 +40,10 @@ data class OfflineInformation(
         /** Value to indicate that the origin of the node available offline is an incoming share */
         const val INCOMING = 1
 
-        /** Value to indicate that the origin of the node available offline is the inbox */
-        const val INBOX = 2
+        /** Value to indicate that the origin of the node available offline is the Backups */
+        const val BACKUPS = 2
 
-        /** Value to indicate that the origin of the node available offline is other different than an incoming share or inbox */
+        /** Value to indicate that the origin of the node available offline is other different than an incoming share or Backups */
         const val OTHER = 0
     }
 }

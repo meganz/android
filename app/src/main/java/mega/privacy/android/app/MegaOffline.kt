@@ -15,7 +15,7 @@ import mega.privacy.android.app.utils.OfflineUtils
  * @property name           Name of the node available offline
  * @property parentId       ID of the parent node of the node available offline
  * @property type           Type of the node available offline (file or folder)
- * @property origin         Origin of the node available offline (Incoming share, Inbox or Other)
+ * @property origin         Origin of the node available offline (Incoming share, Backups or Other)
  * @property handleIncoming Handle of the node available offline in case it comes from an incoming share
  */
 @Deprecated(
@@ -87,16 +87,13 @@ data class MegaOffline(
         /** Value to indicate that the node available offline is a folder */
         const val FOLDER = "1"
 
-        /** Value to indicate that the node available offline is a file */
-        const val FILE = "0"
-
         /** Value to indicate that the origin of the node available offline is an incoming share */
         const val INCOMING = 1
 
-        /** Value to indicate that the origin of the node available offline is the inbox */
-        const val INBOX = 2
+        /** Value to indicate that the origin of the node available offline is the Backups */
+        const val BACKUPS = 2
 
-        /** Value to indicate that the origin of the node available offline is other different than an incoming share or inbox */
+        /** Value to indicate that the origin of the node available offline is other different than an incoming share or Backups */
         const val OTHER = 0
     }
 }

@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.model.node.OfflineInformation
-import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
@@ -18,7 +18,7 @@ internal fun toOfflineNodeInformation(offline: OfflineInformation): OfflineNodeI
             isFolder = offline.isFolder,
         )
 
-        OfflineInformation.INBOX -> InboxOfflineNodeInformation(
+        OfflineInformation.BACKUPS -> BackupsOfflineNodeInformation(
             path = offline.path,
             name = offline.name,
             handle = offline.handle,

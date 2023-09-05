@@ -5,14 +5,14 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultGetInboxChildrenNodes
+import mega.privacy.android.app.domain.usecase.DefaultGetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
-import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.HasBackupsChildren
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -22,36 +22,36 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
- * Test class of [DefaultGetInboxChildrenNodes]
+ * Test class of [DefaultGetBackupsChildrenNodes]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetInboxChildrenNodesTest {
+class DefaultGetBackupsChildrenNodesTest {
 
-    private lateinit var underTest: DefaultGetInboxChildrenNodes
+    private lateinit var underTest: DefaultGetBackupsChildrenNodes
 
     private val getChildrenNode = mock<GetChildrenNode>()
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_NONE)
     }
-    private val getInboxNode = mock<GetInboxNode>()
-    private val hasInboxChildren = mock<HasInboxChildren>()
+    private val getBackupsNode = mock<GetBackupsNode>()
+    private val hasBackupsChildren = mock<HasBackupsChildren>()
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetInboxChildrenNodes(
+        underTest = DefaultGetBackupsChildrenNodes(
             getChildrenNode = getChildrenNode,
             getCloudSortOrder = getCloudSortOrder,
-            getInboxNode = getInboxNode,
-            hasInboxChildren = hasInboxChildren,
+            getBackupsNode = getBackupsNode,
+            hasBackupsChildren = hasBackupsChildren,
             monitorNodeUpdates = monitorNodeUpdates,
         )
     }
 
     @Test
-    fun `test that an empty list is returned if the inbox node is null`() = runTest {
-        whenever(hasInboxChildren()).thenReturn(true)
-        whenever(getInboxNode()).thenReturn(null)
+    fun `test that an empty list is returned if the backups node is null`() = runTest {
+        whenever(hasBackupsChildren()).thenReturn(true)
+        whenever(getBackupsNode()).thenReturn(null)
 
         underTest().test {
             assertThat(awaitItem()).isEmpty()
@@ -60,9 +60,9 @@ class DefaultGetInboxChildrenNodesTest {
     }
 
     @Test
-    fun `test that an empty list is returned if the inbox node does not have children nodes`() =
+    fun `test that an empty list is returned if the backups node does not have children nodes`() =
         runTest {
-            whenever(hasInboxChildren()).thenReturn(false)
+            whenever(hasBackupsChildren()).thenReturn(false)
 
             underTest().test {
                 assertThat(awaitItem()).isEmpty()
@@ -71,15 +71,15 @@ class DefaultGetInboxChildrenNodesTest {
         }
 
     @Test
-    fun `test that the inbox children nodes are returned`() = runTest {
-        val testInboxNode = mock<MegaNode>()
+    fun `test that the backups children nodes are returned`() = runTest {
+        val testBackupsNode = mock<MegaNode>()
         val testChildNode = mock<MegaNode>()
 
-        whenever(hasInboxChildren()).thenReturn(true)
-        whenever(getInboxNode()).thenReturn(testInboxNode)
+        whenever(hasBackupsChildren()).thenReturn(true)
+        whenever(getBackupsNode()).thenReturn(testBackupsNode)
         whenever(
             getChildrenNode(
-                parent = testInboxNode,
+                parent = testBackupsNode,
                 order = getCloudSortOrder(),
             )
         ).thenReturn(listOf(testChildNode))
@@ -91,19 +91,19 @@ class DefaultGetInboxChildrenNodesTest {
     }
 
     @Test
-    fun `test that whenever a node update occurs, the use case to retrieve the inbox children nodes is called`() =
+    fun `test that whenever a node update occurs, the use case to retrieve the backups children nodes is called`() =
         runTest {
-            val testInboxNode = mock<MegaNode>()
+            val testBackupsNode = mock<MegaNode>()
 
             whenever(monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(emptyMap())))
-            whenever(getInboxNode()).thenReturn(testInboxNode)
-            whenever(hasInboxChildren()).thenReturn(true)
+            whenever(getBackupsNode()).thenReturn(testBackupsNode)
+            whenever(hasBackupsChildren()).thenReturn(true)
 
             underTest().test {
                 // The use case is called on ViewModel initialization and
                 // when a Node Update occurs
                 verify(getChildrenNode, times(2)).invoke(
-                    parent = testInboxNode,
+                    parent = testBackupsNode,
                     order = getCloudSortOrder()
                 )
                 cancelAndIgnoreRemainingEvents()

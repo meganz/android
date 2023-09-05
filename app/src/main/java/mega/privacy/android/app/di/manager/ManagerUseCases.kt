@@ -9,7 +9,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.DefaultGetInboxChildrenNodes
+import mega.privacy.android.app.domain.usecase.DefaultGetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetParentNodeHandle
@@ -17,8 +17,8 @@ import mega.privacy.android.app.domain.usecase.DefaultGetPublicLinks
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.GetInboxChildrenNodes
-import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
+import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
@@ -30,7 +30,7 @@ import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 
 /**
@@ -53,7 +53,7 @@ abstract class ManagerUseCases {
     abstract fun bindGetBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode
 
     @Binds
-    abstract fun bindGetInboxChildrenNodes(useCase: DefaultGetInboxChildrenNodes): GetInboxChildrenNodes
+    abstract fun bindGetBackupsChildrenNodes(useCase: DefaultGetBackupsChildrenNodes): GetBackupsChildrenNodes
 
     @Binds
     abstract fun bindGetIncomingSharesChildrenNode(useCase: DefaultGetIncomingSharesChildrenNode): GetIncomingSharesChildrenNode
@@ -77,8 +77,8 @@ abstract class ManagerUseCases {
             GetRootFolder(megaNodeRepository::getRootNode)
 
         @Provides
-        fun provideHasInboxChildren(megaNodeRepository: MegaNodeRepository): HasInboxChildren =
-            HasInboxChildren(megaNodeRepository::hasInboxChildren)
+        fun provideHasBackupsChildren(megaNodeRepository: MegaNodeRepository): HasBackupsChildren =
+            HasBackupsChildren(megaNodeRepository::hasBackupsChildren)
 
         @Provides
         fun provideMonitorUserAlerts(notificationsRepository: NotificationsRepository): MonitorUserAlertUpdates =
@@ -89,7 +89,7 @@ abstract class ManagerUseCases {
             AuthorizeNode(megaNodeRepository::authorizeNode)
 
         @Provides
-        fun provideGetInboxNode(megaNodeRepository: MegaNodeRepository): GetInboxNode =
-            GetInboxNode(megaNodeRepository::getInboxNode)
+        fun provideGetBackupsNode(megaNodeRepository: MegaNodeRepository): GetBackupsNode =
+            GetBackupsNode(megaNodeRepository::getBackupsNode)
     }
 }

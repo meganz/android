@@ -444,7 +444,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
 
-    override suspend fun getInboxNode(): MegaNode? = megaApi.inboxNode
+    override suspend fun getBackupsNode(): MegaNode? = megaApi.inboxNode
 
     override suspend fun hasChildren(node: MegaNode): Boolean = megaApi.hasChildren(node)
 
@@ -592,7 +592,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun isInRubbish(node: MegaNode): Boolean = megaApi.isInRubbish(node)
 
-    override suspend fun isInInbox(node: MegaNode): Boolean = megaApi.isInInbox(node)
+    override suspend fun isInBackups(node: MegaNode): Boolean = megaApi.isInInbox(node)
 
     override suspend fun isInCloudDrive(node: MegaNode): Boolean = megaApi.isInCloud(node)
 

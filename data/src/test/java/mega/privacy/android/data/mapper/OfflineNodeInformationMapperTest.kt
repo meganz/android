@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.data.model.node.OfflineInformation.Companion.FILE
 import mega.privacy.android.data.model.node.OfflineInformation.Companion.FOLDER
-import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import org.junit.jupiter.api.TestInstance
@@ -38,12 +38,14 @@ internal class OfflineNodeInformationMapperTest {
 
     @ParameterizedTest(name = "folder node: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that inbox offline node is the correct type and contains correct values`(isFolderNode: Boolean) {
-        val origin = OfflineInformation.INBOX
+    fun `test that the backups offline node is the correct type and contains correct values`(
+        isFolderNode: Boolean,
+    ) {
+        val origin = OfflineInformation.BACKUPS
         val input = getInput(origin, isFolderNode)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
-            InboxOfflineNodeInformation(
+            BackupsOfflineNodeInformation(
                 path = expectedPath,
                 name = expectedName,
                 handle = expectedHandle,

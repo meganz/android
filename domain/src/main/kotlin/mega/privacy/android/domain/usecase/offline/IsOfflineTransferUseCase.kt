@@ -18,5 +18,5 @@ class IsOfflineTransferUseCase @Inject constructor(
      */
     suspend operator fun invoke(transfer: Transfer) =
         transfer.localPath.startsWith(fileSystemRepository.getOfflinePath())
-                || transfer.localPath.startsWith(fileSystemRepository.getOfflineInboxPath())
+                || transfer.localPath.startsWith(fileSystemRepository.getOfflineBackupsPath())
 }

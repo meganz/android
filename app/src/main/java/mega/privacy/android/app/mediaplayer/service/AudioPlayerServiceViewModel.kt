@@ -43,7 +43,7 @@ import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
-import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
+import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
@@ -99,7 +99,7 @@ import mega.privacy.android.domain.usecase.GetAudioNodesFromOutSharesUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinksUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesUseCase
 import mega.privacy.android.domain.usecase.GetAudiosByParentHandleFromMegaApiFolderUseCase
-import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
+import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -163,7 +163,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val getLocalLinkFromMegaApiUseCase: GetLocalLinkFromMegaApiUseCase,
     private val getThumbnailFromMegaApiUseCase: GetThumbnailFromMegaApiUseCase,
     private val getThumbnailFromMegaApiFolderUseCase: GetThumbnailFromMegaApiFolderUseCase,
-    private val getInboxNodeUseCase: GetInboxNodeUseCase,
+    private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
     private val getParentNodeFromMegaApiFolderUseCase: GetParentNodeFromMegaApiFolderUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getRootNodeFromMegaApiFolderUseCase: GetRootNodeFromMegaApiFolderUseCase,
@@ -376,7 +376,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
                     FILE_BROWSER_ADAPTER,
                     RUBBISH_BIN_ADAPTER,
-                    INBOX_ADAPTER,
+                    BACKUPS_ADAPTER,
                     LINKS_ADAPTER,
                     INCOMING_SHARES_ADAPTER,
                     OUTGOING_SHARES_ADAPTER,
@@ -444,7 +444,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         if (parentHandle == INVALID_HANDLE) {
                             when (type) {
                                 RUBBISH_BIN_ADAPTER -> getRubbishNodeUseCase()
-                                INBOX_ADAPTER -> getInboxNodeUseCase()
+                                BACKUPS_ADAPTER -> getBackupsNodeUseCase()
                                 else -> getRootNodeUseCase()
                             }
                         } else {
@@ -454,7 +454,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                                 context.getString(
                                     when (type) {
                                         RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
-                                        INBOX_ADAPTER -> R.string.home_side_menu_backups_title
+                                        BACKUPS_ADAPTER -> R.string.home_side_menu_backups_title
                                         else -> R.string.section_cloud_drive
                                     }
                                 )
@@ -912,7 +912,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
             FILE_BROWSER_ADAPTER,
             RUBBISH_BIN_ADAPTER,
-            INBOX_ADAPTER,
+            BACKUPS_ADAPTER,
             LINKS_ADAPTER,
             INCOMING_SHARES_ADAPTER,
             OUTGOING_SHARES_ADAPTER,

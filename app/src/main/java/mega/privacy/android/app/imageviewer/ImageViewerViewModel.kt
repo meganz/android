@@ -596,7 +596,7 @@ class ImageViewerViewModel @Inject constructor(
             node = nodeItem.node,
             setOffline = !nodeItem.isAvailableOffline,
             isFromIncomingShares = nodeItem.isFromIncoming,
-            isFromInbox = nodeItem.isFromInbox,
+            isFromBackups = nodeItem.isFromBackups,
             activity = activity
         ).subscribeAndComplete {
             loadSingleNode(nodeItem.handle)

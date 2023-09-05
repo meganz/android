@@ -20,7 +20,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CreateShareKey
-import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.data.model.GlobalUpdate
@@ -52,8 +52,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
-import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -111,8 +110,8 @@ class ManagerViewModelTest {
     private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
     private val getNumUnreadUserAlertsUseCase =
         mock<GetNumUnreadUserAlertsUseCase> { onBlocking { invoke() }.thenReturn(0) }
-    private val hasInboxChildren =
-        mock<HasInboxChildren> { onBlocking { invoke() }.thenReturn(false) }
+    private val hasBackupsChildren =
+        mock<HasBackupsChildren> { onBlocking { invoke() }.thenReturn(false) }
     private val monitorContactRequestUpdates = MutableStateFlow(emptyList<ContactRequest>())
 
     private val initialIsFirsLoginValue = true
@@ -122,7 +121,7 @@ class ManagerViewModelTest {
             ManagerViewModel.isFirstLoginKey to initialIsFirsLoginValue
         )
     )
-    private val getInboxNode = mock<GetInboxNode> { onBlocking { invoke() }.thenReturn(null) }
+    private val getBackupsNode = mock<GetBackupsNode> { onBlocking { invoke() }.thenReturn(null) }
     private val monitorStorageState = mock<MonitorStorageStateEventUseCase> {
         onBlocking { invoke() }.thenReturn(
             MutableStateFlow(
@@ -261,10 +260,10 @@ class ManagerViewModelTest {
                 onBlocking { invoke() }.thenReturn(monitorContactRequestUpdates)
             },
             getNumUnreadUserAlertsUseCase = getNumUnreadUserAlertsUseCase,
-            hasInboxChildren = hasInboxChildren,
+            hasBackupsChildren = hasBackupsChildren,
             sendStatisticsMediaDiscoveryUseCase = sendStatisticsMediaDiscoveryUseCase,
             savedStateHandle = savedStateHandle,
-            getInboxNode = getInboxNode,
+            getBackupsNode = getBackupsNode,
             monitorStorageStateEventUseCase = monitorStorageState,
             monitorCameraUploadFolderIconUpdateUseCase = monitorCameraUploadFolderIconUpdateUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,

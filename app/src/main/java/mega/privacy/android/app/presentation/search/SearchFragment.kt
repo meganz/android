@@ -58,7 +58,7 @@ import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDi
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.inbox.InboxViewModel
+import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
@@ -130,7 +130,7 @@ class SearchFragment : RotatableFragment() {
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val incomingSharesViewModel: IncomingSharesViewModel by activityViewModels()
     private val outgoingSharesViewModel: OutgoingSharesViewModel by activityViewModels()
-    private val inboxViewModel: InboxViewModel by activityViewModels()
+    private val backupsViewModel: BackupsViewModel by activityViewModels()
     private val legacyLinksViewModel: LegacyLinksViewModel by activityViewModels()
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
@@ -675,7 +675,7 @@ class SearchFragment : RotatableFragment() {
         searchViewModel.performSearch(
             fileBrowserViewModel.state.value.fileBrowserHandle,
             rubbishBinViewModel.state.value.rubbishBinHandle,
-            inboxViewModel.state.value.inboxHandle,
+            backupsViewModel.state.value.backupsHandle,
             incomingSharesViewModel.state.value.incomingHandle,
             outgoingSharesViewModel.state.value.outgoingHandle,
             legacyLinksViewModel.state.value.linksHandle,

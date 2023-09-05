@@ -39,12 +39,12 @@ data class OtherOfflineNodeInformation(
 ) : OfflineNodeInformation
 
 /**
- * Inbox offline node information
+ * Backups offline node information
  *
  * @property path
  * @property name
  */
-data class InboxOfflineNodeInformation(
+data class BackupsOfflineNodeInformation(
     override val path: String,
     override val name: String,
     override val handle: String,

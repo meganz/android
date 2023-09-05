@@ -89,9 +89,9 @@ class SearchNodesUseCase @Inject constructor(
                         }
                     }
 
-                    DrawerItem.INBOX -> {
+                    DrawerItem.BACKUPS -> {
                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                            megaNodeRepository.getInboxNode()
+                            megaNodeRepository.getBackupsNode()
                         } else {
                             megaNodeRepository.getNodeByHandle(parentHandle)
                         }

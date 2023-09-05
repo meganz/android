@@ -10,8 +10,8 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.manager.ManagerUseCases
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.GetInboxChildrenNodes
-import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
+import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
@@ -22,7 +22,7 @@ import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.HasBackupsChildren
 import nz.mega.sdk.MegaNode
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -63,12 +63,12 @@ object TestManagerUseCases {
     }
 
     @Provides
-    fun provideHasInboxChildren() = mock<HasInboxChildren> {
+    fun provideHasBackupsChildren() = mock<HasBackupsChildren> {
         onBlocking { invoke() }.thenReturn(false)
     }
 
     @Provides
-    fun provideGetInboxChildrenNodes() = mock<GetInboxChildrenNodes> {
+    fun provideGetBackupsChildrenNodes() = mock<GetBackupsChildrenNodes> {
         onBlocking { invoke() }.thenReturn(flowOf(any()))
     }
 
@@ -96,7 +96,7 @@ object TestManagerUseCases {
     fun provideGetParentNodeHandle() = mock<GetParentNodeHandle> {}
 
     @Provides
-    fun provideGetInboxNode() = mock<GetInboxNode> {
+    fun provideGetBackupsNode() = mock<GetBackupsNode> {
         onBlocking { invoke() }.thenReturn(MegaNode())
     }
 

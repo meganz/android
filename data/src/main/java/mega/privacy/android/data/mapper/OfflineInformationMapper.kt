@@ -3,7 +3,7 @@ package mega.privacy.android.data.mapper
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.data.model.node.OfflineInformation.Companion.FILE
 import mega.privacy.android.data.model.node.OfflineInformation.Companion.FOLDER
-import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import javax.inject.Inject
@@ -27,7 +27,7 @@ internal class OfflineInformationMapper @Inject constructor() {
     private fun OfflineNodeInformation.getOrigin() =
         when (this) {
             is IncomingShareOfflineNodeInformation -> OfflineInformation.INCOMING
-            is InboxOfflineNodeInformation -> OfflineInformation.INBOX
+            is BackupsOfflineNodeInformation -> OfflineInformation.BACKUPS
             else -> OfflineInformation.OTHER
         }
 

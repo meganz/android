@@ -78,10 +78,10 @@ import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
-import mega.privacy.android.app.utils.Constants.FROM_INBOX
+import mega.privacy.android.app.utils.Constants.FROM_BACKUPS
 import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
 import mega.privacy.android.app.utils.Constants.HANDLE
-import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
+import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
@@ -527,10 +527,10 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                                 intent.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false)
                             }
 
-                            adapterType == INBOX_ADAPTER -> {
+                            adapterType == BACKUPS_ADAPTER -> {
                                 intent.putExtra(
                                     INTENT_EXTRA_KEY_FROM,
-                                    FROM_INBOX
+                                    FROM_BACKUPS
                                 )
                             }
                         }

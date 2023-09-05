@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.inbox
+package mega.privacy.android.app.presentation.backups
 
 import android.app.ActivityManager
 import android.content.Context
@@ -75,7 +75,7 @@ import javax.inject.Inject
  */
 @OptIn(FlowPreview::class)
 @AndroidEntryPoint
-class InboxFragment : RotatableFragment() {
+class BackupsFragment : RotatableFragment() {
 
     /**
      * Inject [MegaApiAndroid] to the Fragment
@@ -85,7 +85,7 @@ class InboxFragment : RotatableFragment() {
     lateinit var megaApi: MegaApiAndroid
 
     /**
-     * Retrieves the UI state from [InboxViewModel]
+     * Retrieves the UI state from [BackupsViewModel]
      *
      * @return the UI State
      */
@@ -101,7 +101,7 @@ class InboxFragment : RotatableFragment() {
     private var lastPositionStack: Stack<Int>? = null
     private var actionMode: ActionMode? = null
 
-    private val viewModel by activityViewModels<InboxViewModel>()
+    private val viewModel by activityViewModels<BackupsViewModel>()
     private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
 
     /**
@@ -142,7 +142,7 @@ class InboxFragment : RotatableFragment() {
         observeDragSupportEvents(
             lifecycleOwner = viewLifecycleOwner,
             rv = binding?.backupsRecyclerView,
-            viewerFrom = Constants.VIEWER_FROM_INBOX,
+            viewerFrom = Constants.VIEWER_FROM_BACKUPS,
         )
         observeUiState()
     }
@@ -274,7 +274,7 @@ class InboxFragment : RotatableFragment() {
 
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             val inflater = mode.menuInflater
-            inflater.inflate(R.menu.inbox_action, menu)
+            inflater.inflate(R.menu.backups_action, menu)
             checkScroll()
             return true
         }
@@ -336,9 +336,9 @@ class InboxFragment : RotatableFragment() {
             requireActivity(),
             this,
             emptyList(),
-            state().inboxHandle,
+            state().backupsHandle,
             binding?.backupsRecyclerView,
-            Constants.INBOX_ADAPTER,
+            Constants.BACKUPS_ADAPTER,
             if (state().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
             sortByHeaderViewModel,
         )
@@ -365,7 +365,7 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
-     * Observes changes to the UI State from [InboxViewModel]
+     * Observes changes to the UI State from [BackupsViewModel]
      */
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -383,11 +383,11 @@ class InboxFragment : RotatableFragment() {
                         hideMultipleSelect()
                     }
 
-                    // If the user wants to exit the Inbox screen, instruct the ViewModel that
+                    // If the user wants to exit the Backups page, instruct the ViewModel that
                     // it has been handled, and execute the behavior
-                    if (it.shouldExitInbox) {
-                        viewModel.exitInboxHandled()
-                        (requireActivity() as ManagerActivity).exitInboxScreen()
+                    if (it.shouldExitBackups) {
+                        viewModel.exitBackupsHandled()
+                        (requireActivity() as ManagerActivity).exitBackupsPage()
                     }
 
                     // Whenever the User performs a Back Press navigation, execute the behavior and
@@ -403,7 +403,7 @@ class InboxFragment : RotatableFragment() {
         viewLifecycleOwner.collectFlow(viewModel.state.map { it.isPendingRefresh }
             .sample(500L)) { isPendingRefresh ->
             if (isPendingRefresh) {
-                viewModel.refreshInboxNodesAndHideSelection()
+                viewModel.refreshBackupsNodesAndHideSelection()
                 viewModel.markHandledPendingRefresh()
             }
         }
@@ -412,16 +412,16 @@ class InboxFragment : RotatableFragment() {
             EventObserver { showSortByPanel() }
         )
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.refreshInboxNodes()
+            viewModel.refreshBackupsNodes()
         })
     }
 
     /**
-     * When receiving a View Type update from [InboxViewModel], this switches the View Type if
-     * [megaNodeAdapter] has a different View Type from [InboxViewModel], as changing the View Type
+     * When receiving a View Type update from [BackupsViewModel], this switches the View Type if
+     * [megaNodeAdapter] has a different View Type from [BackupsViewModel], as changing the View Type
      * will cause the scroll position to be lost
      *
-     * @param newViewType The updated [ViewType] from [InboxViewModel]
+     * @param newViewType The updated [ViewType] from [BackupsViewModel]
      */
     private fun handleViewTypeUpdate(newViewType: ViewType) {
         val adapterViewType = megaNodeAdapter?.adapterType ?: MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
@@ -432,7 +432,7 @@ class InboxFragment : RotatableFragment() {
 
     /**
      * Switches how items in the [MegaNodeAdapter] are being displayed, based on the current
-     * [ViewType] in [InboxViewModel]
+     * [ViewType] in [BackupsViewModel]
      */
     private fun switchViewType() = binding?.backupsRecyclerView?.run {
         when (state().currentViewType) {
@@ -456,7 +456,7 @@ class InboxFragment : RotatableFragment() {
     /**
      * Invalidates the [NewGridRecyclerView]
      *
-     * This function is used by [ManagerActivity.refreshInboxList]
+     * This function is used by [ManagerActivity.refreshBackupsList]
      */
     fun invalidateRecyclerView() = binding?.backupsRecyclerView?.invalidate()
 
@@ -518,7 +518,7 @@ class InboxFragment : RotatableFragment() {
                 launchIntent = intent,
                 rv = binding?.backupsRecyclerView,
                 position = position,
-                viewerFrom = Constants.VIEWER_FROM_INBOX,
+                viewerFrom = Constants.VIEWER_FROM_BACKUPS,
                 thumbnailGetter = megaNodeAdapter
             )
             startActivity(intent)
@@ -563,7 +563,7 @@ class InboxFragment : RotatableFragment() {
                 launchIntent = mediaIntent,
                 rv = binding?.backupsRecyclerView,
                 position = position,
-                viewerFrom = Constants.VIEWER_FROM_INBOX,
+                viewerFrom = Constants.VIEWER_FROM_BACKUPS,
                 thumbnailGetter = megaNodeAdapter
             )
 
@@ -573,7 +573,7 @@ class InboxFragment : RotatableFragment() {
             )
             mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
             mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, node.name)
-            mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.INBOX_ADAPTER)
+            mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.BACKUPS_ADAPTER)
 
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
@@ -642,7 +642,7 @@ class InboxFragment : RotatableFragment() {
             val mimeType = MimeTypeList.typeForName(node.name).type
             val pdfIntent = Intent(requireActivity(), PdfViewerActivity::class.java)
             pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-            pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.INBOX_ADAPTER)
+            pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.BACKUPS_ADAPTER)
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
                 val mediaFile = File(localPath)
@@ -689,7 +689,7 @@ class InboxFragment : RotatableFragment() {
                 launchIntent = pdfIntent,
                 rv = binding?.backupsRecyclerView,
                 position = position,
-                viewerFrom = Constants.VIEWER_FROM_INBOX,
+                viewerFrom = Constants.VIEWER_FROM_BACKUPS,
                 thumbnailGetter = megaNodeAdapter,
             )
             if (MegaApiUtils.isIntentAvailable(requireActivity(), pdfIntent)) {
@@ -712,7 +712,7 @@ class InboxFragment : RotatableFragment() {
         } else if (MimeTypeList.typeForName(node.name).isURL) {
             manageURLNode(requireActivity(), megaApi, node)
         } else if (MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)) {
-            manageTextFileIntent(requireContext(), node, Constants.INBOX_ADAPTER)
+            manageTextFileIntent(requireContext(), node, Constants.BACKUPS_ADAPTER)
         } else {
             megaNodeAdapter?.notifyDataSetChanged()
             onNodeTapped(
@@ -747,10 +747,10 @@ class InboxFragment : RotatableFragment() {
                     // Update the last position stack
                     pushLastPositionStack()
 
-                    // Update to the new Inbox Handle in the ViewModel and update the list of Inbox Nodes
+                    // Update to the new Backups Handle in the ViewModel and update the list of Backups Nodes
                     with(viewModel) {
-                        updateInboxHandle(selectedNode.handle)
-                        refreshInboxNodes()
+                        updateBackupsHandle(selectedNode.handle)
+                        refreshBackupsNodes()
                     }
                     // Notify ManagerActivity to invalidate the Options Menu and set the new Toolbar Title
                     with(requireActivity() as ManagerActivity) {
@@ -795,7 +795,7 @@ class InboxFragment : RotatableFragment() {
     /**
      * Hides the Multiple Selection option
      *
-     * This function is also used by [ManagerActivity.onNodesInboxUpdate] and [MegaNodeAdapter.hideMultipleSelect]
+     * This function is also used by [ManagerActivity.onNodesBackupsUpdate] and [MegaNodeAdapter.hideMultipleSelect]
      */
     fun hideMultipleSelect() {
         Timber.d("hideMultipleSelect()")
@@ -812,17 +812,17 @@ class InboxFragment : RotatableFragment() {
         with(requireActivity() as ManagerActivity) {
             if (megaNodeAdapter == null) {
                 // Call the method from ManagerActivity to move back to the previous Drawer Item
-                exitInboxScreen()
-            } else if (comesFromNotifications && comesFromNotificationHandle == state().inboxHandle) {
-                // Handle behavior if the Inbox is accessed through a Notification
+                exitBackupsPage()
+            } else if (comesFromNotifications && comesFromNotificationHandle == state().backupsHandle) {
+                // Handle behavior if the Backups Page is accessed through a Notification
                 comesFromNotifications = false
                 comesFromNotificationHandle = -1
                 selectDrawerItem(DrawerItem.NOTIFICATIONS)
-                this@InboxFragment.viewModel.updateInboxHandle(comesFromNotificationHandle)
+                this@BackupsFragment.viewModel.updateBackupsHandle(comesFromNotificationHandle)
                 comesFromNotificationHandleSaved = -1
             } else {
                 // Otherwise, instruct the ViewModel to handle the Back Press
-                this@InboxFragment.viewModel.handleBackPress()
+                this@BackupsFragment.viewModel.handleBackPress()
             }
         }
     }
@@ -970,11 +970,11 @@ class InboxFragment : RotatableFragment() {
 
     companion object {
         /**
-         * Creates a new instance of [InboxFragment]
+         * Creates a new instance of [BackupsFragment]
          */
-        fun newInstance(): InboxFragment {
+        fun newInstance(): BackupsFragment {
             Timber.d("newInstance()")
-            return InboxFragment()
+            return BackupsFragment()
         }
     }
 }

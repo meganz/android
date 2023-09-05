@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.favourites
 
-import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
@@ -23,17 +23,19 @@ class GetOfflineFileUseCase @Inject constructor(
      */
     suspend operator fun invoke(offlineInformation: OfflineNodeInformation): File {
         return when (offlineInformation) {
-            is InboxOfflineNodeInformation -> getFile(
-                fileSystemRepository.getOfflineInboxPath(),
+            is BackupsOfflineNodeInformation -> getFile(
+                fileSystemRepository.getOfflineBackupsPath(),
                 offlineInformation.path,
                 offlineInformation.name
             )
+
             is IncomingShareOfflineNodeInformation -> getFile(
                 fileSystemRepository.getOfflinePath(),
                 offlineInformation.incomingHandle,
                 offlineInformation.path,
                 offlineInformation.name
             )
+
             is OtherOfflineNodeInformation -> getFile(
                 fileSystemRepository.getOfflinePath(),
                 offlineInformation.path,

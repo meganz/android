@@ -128,9 +128,6 @@ class TextEditorViewModel @Inject constructor(
         const val CREATE_MODE = "CREATE_MODE"
         const val VIEW_MODE = "VIEW_MODE"
         const val EDIT_MODE = "EDIT_MODE"
-        const val NON_UPDATE_FINISH_ACTION = 0
-        const val SUCCESS_FINISH_ACTION = 1
-        const val ERROR_FINISH_ACTION = 2
         const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
     }
 
@@ -176,9 +173,11 @@ class TextEditorViewModel @Inject constructor(
     fun getNode(): MegaNode? = textEditorData.value?.node
 
     /**
-     * Checks whether the [MegaNode] is a Backup Node or not
+     * Checks whether the [MegaNode] exists in Backups or not
+     *
+     * @return true if the [MegaNode] exists in Backups, and false if otherwise
      */
-    fun isNodeInInbox(): Boolean = getNode()?.let {
+    private fun isNodeInBackups(): Boolean = getNode()?.let {
         megaApi.isInInbox(it)
     } ?: false
 
@@ -260,7 +259,7 @@ class TextEditorViewModel @Inject constructor(
 
     fun canShowEditFab(): Boolean =
         isViewMode() && isEditableAdapter() && !needsReadOrIsReadingContent()
-                && thereIsNoErrorSettingContent() && !isNodeInInbox()
+                && thereIsNoErrorSettingContent() && !isNodeInBackups()
 
     /**
      * Checks if the file can be editable depending on the current adapter.

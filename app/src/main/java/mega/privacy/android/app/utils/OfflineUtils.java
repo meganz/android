@@ -2,7 +2,7 @@ package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
-import static mega.privacy.android.app.utils.Constants.FROM_INBOX;
+import static mega.privacy.android.app.utils.Constants.FROM_BACKUPS;
 import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
 import static mega.privacy.android.app.utils.Constants.OFFLINE_ROOT;
 import static mega.privacy.android.app.utils.Constants.SEPARATOR;
@@ -62,7 +62,7 @@ import timber.log.Timber;
 public class OfflineUtils {
 
     public static final String OFFLINE_DIR = "MEGA Offline";
-    public static final String OFFLINE_INBOX_DIR = OFFLINE_DIR + File.separator + "in";
+    public static final String OFFLINE_BACKUPS_DIR = OFFLINE_DIR + File.separator + "in";
 
     public static final String OLD_OFFLINE_DIR = MAIN_DIR + File.separator + OFFLINE_DIR;
 
@@ -274,7 +274,7 @@ public class OfflineUtils {
         }
 
         File grandParentFile = parentFile.getParentFile();
-        if ((grandParentFile != null && OFFLINE_INBOX_DIR.equals(grandParentFile.getName()
+        if ((grandParentFile != null && OFFLINE_BACKUPS_DIR.equals(grandParentFile.getName()
                 + File.separator + parentFile.getName()))
                 || OFFLINE_DIR.equals(parentFile.getName())) {
             return context.getString(R.string.section_saved_for_offline_new);
@@ -308,8 +308,8 @@ public class OfflineUtils {
                 path = path + OFFLINE_DIR + File.separator + offlineNode.getHandleIncoming();
                 break;
             }
-            case MegaOffline.INBOX: {
-                path = path + OFFLINE_INBOX_DIR;
+            case MegaOffline.BACKUPS: {
+                path = path + OFFLINE_BACKUPS_DIR;
                 break;
             }
             default: {
@@ -335,8 +335,8 @@ public class OfflineUtils {
                 path = path + OFFLINE_DIR + File.separator + findIncomingParentHandle(node, megaApi);
                 break;
             }
-            case FROM_INBOX: {
-                path = path + OFFLINE_INBOX_DIR;
+            case FROM_BACKUPS: {
+                path = path + OFFLINE_BACKUPS_DIR;
                 break;
             }
             default: {
@@ -403,7 +403,7 @@ public class OfflineUtils {
             nodesToDB.add(document);
         }
 
-        insertDB(context, megaApi, dbH, nodesToDB, path.contains(OFFLINE_INBOX_DIR));
+        insertDB(context, megaApi, dbH, nodesToDB, path.contains(OFFLINE_BACKUPS_DIR));
     }
 
     public static void saveOfflineChatFile(LegacyDatabaseHandler dbH, Transfer transfer) {
@@ -423,15 +423,15 @@ public class OfflineUtils {
         return DB_FOLDER;
     }
 
-    private static int comesFromInbox(boolean fromInbox) {
-        if (fromInbox) {
-            return MegaOffline.INBOX;
+    private static int comesFromBackups(boolean fromBackups) {
+        if (fromBackups) {
+            return MegaOffline.BACKUPS;
         }
 
         return MegaOffline.OTHER;
     }
 
-    private static void insertDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromInbox) {
+    private static void insertDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromBackups) {
         Timber.d("insertDB");
 
         MegaNode parentNode;
@@ -443,7 +443,7 @@ public class OfflineUtils {
         for (int i = nodesToDB.size() - 1; i >= 0; i--) {
             nodeToInsert = nodesToDB.get(i);
             String fileOrFolder = isFileOrFolder(nodeToInsert);
-            int origin = comesFromInbox(fromInbox);
+            int origin = comesFromBackups(fromBackups);
             int parentId = -1;
             String handleIncoming = "-1";
 
@@ -462,7 +462,7 @@ public class OfflineUtils {
                     //If the parent is not in the DB
                     //Insert the parent in the DB
                     if (mOffParent == null) {
-                        insertParentDB(context, megaApi, dbH, parentNode, fromInbox);
+                        insertParentDB(context, megaApi, dbH, parentNode, fromBackups);
                     }
 
                     mOffNode = dbH.findByHandle(nodeToInsert.getHandle());
@@ -564,11 +564,11 @@ public class OfflineUtils {
         Timber.d("Test insert B: %s", checkInsert);
     }
 
-    private static void insertParentDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, MegaNode parentNode, boolean fromInbox) {
+    private static void insertParentDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, MegaNode parentNode, boolean fromBackups) {
         Timber.d("insertParentDB");
 
         String fileOrFolder = isFileOrFolder(parentNode);
-        int origin = comesFromInbox(fromInbox);
+        int origin = comesFromBackups(fromBackups);
         MegaOffline mOffParentParent;
         String path = getNodePath(context, parentNode);
         MegaNode parentparentNode = megaApi.getParentNode(parentNode);
@@ -583,12 +583,12 @@ public class OfflineUtils {
             mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
             if (mOffParentParent == null) {
                 Timber.w("mOffParentParent==null");
-                insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromInbox);
+                insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromBackups);
                 //Insert the parent node
                 mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
                 if (mOffParentParent == null) {
                     Timber.d("call again");
-                    insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromInbox);
+                    insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromBackups);
                     return;
                 } else {
                     parentId = mOffParentParent.getId();
@@ -630,13 +630,13 @@ public class OfflineUtils {
         MegaApiAndroid megaApi = app.getMegaApi();
 
         File filesDir = app.getFilesDir();
-        File inboxOfflineFolder = new File(filesDir + SEPARATOR + OFFLINE_INBOX_DIR);
+        File backupsOfflineFolder = new File(filesDir + SEPARATOR + OFFLINE_BACKUPS_DIR);
         MegaNode transferNode = megaApi.getNodeByHandle(handle);
         File incomingFolder = new File(filesDir + SEPARATOR + OFFLINE_DIR + SEPARATOR
                 + findIncomingParentHandle(transferNode, megaApi));
 
-        if (inboxOfflineFolder.exists() && path.startsWith(inboxOfflineFolder.getAbsolutePath())) {
-            path = path.replace(inboxOfflineFolder.getPath(), "");
+        if (backupsOfflineFolder.exists() && path.startsWith(backupsOfflineFolder.getAbsolutePath())) {
+            path = path.replace(backupsOfflineFolder.getPath(), "");
         } else if (incomingFolder.exists() && path.startsWith(incomingFolder.getAbsolutePath())) {
             path = path.replace(incomingFolder.getPath(), "");
         } else {

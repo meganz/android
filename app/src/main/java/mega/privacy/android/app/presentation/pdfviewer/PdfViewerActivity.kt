@@ -1330,8 +1330,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", Constants.FROM_INCOMING_SHARES)
                 i.putExtra(Constants.INTENT_EXTRA_KEY_FIRST_LEVEL, false)
-            } else if (type == Constants.INBOX_ADAPTER) {
-                i.putExtra("from", Constants.FROM_INBOX)
+            } else if (type == Constants.BACKUPS_ADAPTER) {
+                i.putExtra("from", Constants.FROM_BACKUPS)
             }
         }
         startActivity(i)

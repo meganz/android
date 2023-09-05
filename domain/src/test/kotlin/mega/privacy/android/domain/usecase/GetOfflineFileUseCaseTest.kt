@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -19,12 +19,12 @@ class GetOfflineFileUseCaseTest {
 
     private val fileName = "fileName"
     private val offlinePath = "Offline path"
-    private val offlineInboxPath = "Offline inbox path"
+    private val offlineBackupsPath = "Offline backups path"
     private val handle = "handle"
 
     private val fileSystemRepository = mock<FileSystemRepository> {
         onBlocking { getOfflinePath() }.thenReturn(offlinePath)
-        onBlocking { getOfflineInboxPath() }.thenReturn(offlineInboxPath)
+        onBlocking { getOfflineBackupsPath() }.thenReturn(offlineBackupsPath)
     }
 
     @Before
@@ -84,15 +84,15 @@ class GetOfflineFileUseCaseTest {
         }
 
     @Test
-    fun `test that InboxOfflineNodeInformation returns a file with the offline inbox path and the file name if the path is a file separator`() =
+    fun `test that BackupsOfflineNodeInformation returns a file with the offline backups path and the file name if the path is a file separator`() =
         runTest {
-            val input = InboxOfflineNodeInformation(
+            val input = BackupsOfflineNodeInformation(
                 path = File.separator,
                 name = fileName,
                 handle = handle,
                 isFolder = false,
             )
-            val expected = offlineInboxPath + File.separator + fileName
+            val expected = offlineBackupsPath + File.separator + fileName
 
             val actual = underTest(input)
 
@@ -100,15 +100,15 @@ class GetOfflineFileUseCaseTest {
         }
 
     @Test
-    fun `test that InboxOfflineNodeInformation returns a file with the offline inbox path and the file name if the path is empty`() =
+    fun `test that BackupsOfflineNodeInformation returns a file with the offline backups path and the file name if the path is empty`() =
         runTest {
-            val input = InboxOfflineNodeInformation(
+            val input = BackupsOfflineNodeInformation(
                 path = "",
                 name = fileName,
                 handle = handle,
                 isFolder = false,
             )
-            val expected = offlineInboxPath + File.separator + fileName
+            val expected = offlineBackupsPath + File.separator + fileName
 
             val actual = underTest(input)
 
@@ -116,16 +116,16 @@ class GetOfflineFileUseCaseTest {
         }
 
     @Test
-    fun `test that InboxOfflineNodeInformation returns a file with the offline inbox path, the file path, and the file name if the path is not empty`() =
+    fun `test that BackupsOfflineNodeInformation returns a file with the offline backups path, the file path, and the file name if the path is not empty`() =
         runTest {
             val path = "path/to/file"
-            val input = InboxOfflineNodeInformation(
+            val input = BackupsOfflineNodeInformation(
                 path = path,
                 name = fileName,
                 handle = handle,
                 isFolder = false,
             )
-            val expected = offlineInboxPath + File.separator + path + File.separator + fileName
+            val expected = offlineBackupsPath + File.separator + path + File.separator + fileName
 
             val actual = underTest(input)
 
@@ -133,7 +133,7 @@ class GetOfflineFileUseCaseTest {
         }
 
     @Test
-    fun `test that IncomingShareOfflineNodeInformation returns a file with the inbox path, incoming handle, and the file name if the path is a file separator`() =
+    fun `test that IncomingShareOfflineNodeInformation returns a file with the backups path, incoming handle, and the file name if the path is a file separator`() =
         runTest {
             val incomingHandle = "handle"
             val input = IncomingShareOfflineNodeInformation(
@@ -151,7 +151,7 @@ class GetOfflineFileUseCaseTest {
         }
 
     @Test
-    fun `test that IncomingShareOfflineNodeInformation returns a file with the inbox path, incoming handle, and the file name if the path is empty`() =
+    fun `test that IncomingShareOfflineNodeInformation returns a file with the backups path, incoming handle, and the file name if the path is empty`() =
         runTest {
             val incomingHandle = "handle"
             val input = IncomingShareOfflineNodeInformation(
@@ -169,7 +169,7 @@ class GetOfflineFileUseCaseTest {
         }
 
     @Test
-    fun `test that IncomingShareOfflineNodeInformation returns a file with the inbox path, incoming handle, the file path, and the file name if the path is not empty`() =
+    fun `test that IncomingShareOfflineNodeInformation returns a file with the backups path, incoming handle, the file path, and the file name if the path is not empty`() =
         runTest {
             val incomingHandle = "handle"
             val path = "path/to/file"

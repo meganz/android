@@ -4,7 +4,7 @@ import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.CONTACT_SHARED_FOLDER_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
@@ -87,7 +87,7 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
-import mega.privacy.android.app.presentation.inbox.InboxFragment;
+import mega.privacy.android.app.presentation.backups.BackupsFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
 import mega.privacy.android.app.presentation.shares.links.LinksFragment;
@@ -417,8 +417,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     void hideMultipleSelect() {
         if (selectedItems.size() <= 0) {
-            if (type == INBOX_ADAPTER) {
-                ((InboxFragment) fragment).hideMultipleSelect();
+            if (type == BACKUPS_ADAPTER) {
+                ((BackupsFragment) fragment).hideMultipleSelect();
             } else if (type == INCOMING_SHARES_ADAPTER) {
                 ((IncomingSharesFragment) fragment).hideMultipleSelect();
             } else if (type == OUTGOING_SHARES_ADAPTER) {
@@ -624,9 +624,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
                 break;
             }
-            case INBOX_ADAPTER: {
-                Timber.d("onCreate INBOX_ADAPTER");
-                ((ManagerActivity) context).setParentHandleInbox(parentHandle);
+            case BACKUPS_ADAPTER: {
+                Timber.d("onCreate BACKUPS_ADAPTER");
+                ((ManagerActivity) context).setParentHandleBackups(parentHandle);
                 break;
             }
             default: {
@@ -1308,8 +1308,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     private void fileClicked(int currentPosition) {
-        if (type == INBOX_ADAPTER) {
-            ((InboxFragment) fragment).onNodeSelected(currentPosition);
+        if (type == BACKUPS_ADAPTER) {
+            ((BackupsFragment) fragment).onNodeSelected(currentPosition);
         } else if (type == INCOMING_SHARES_ADAPTER) {
             ((IncomingSharesFragment) fragment).itemClick(currentPosition);
         } else if (type == OUTGOING_SHARES_ADAPTER) {
@@ -1335,8 +1335,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (isMultipleSelect()) {
-            if (type == INBOX_ADAPTER) {
-                ((InboxFragment) fragment).onNodeSelected(currentPosition);
+            if (type == BACKUPS_ADAPTER) {
+                ((BackupsFragment) fragment).onNodeSelected(currentPosition);
             } else if (type == INCOMING_SHARES_ADAPTER) {
                 ((IncomingSharesFragment) fragment).itemClick(currentPosition);
             } else if (type == OUTGOING_SHARES_ADAPTER) {
@@ -1374,9 +1374,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
         int currentPosition = holder.getAdapterPosition();
-        if (type == INBOX_ADAPTER) {
-            ((InboxFragment) fragment).activateActionMode();
-            ((InboxFragment) fragment).onNodeSelected(currentPosition);
+        if (type == BACKUPS_ADAPTER) {
+            ((BackupsFragment) fragment).activateActionMode();
+            ((BackupsFragment) fragment).onNodeSelected(currentPosition);
         } else if (type == INCOMING_SHARES_ADAPTER) {
             ((IncomingSharesFragment) fragment).activateActionMode();
             ((IncomingSharesFragment) fragment).itemClick(currentPosition);

@@ -6,11 +6,11 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.usecase.node.GetNestedParentFoldersUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -27,7 +27,7 @@ import java.io.File
 internal class GetOfflineNodeInformationUseCaseTest {
 
     private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase = mock()
-    private val isNodeInInboxUseCase: IsNodeInInboxUseCase = mock()
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val getNestedParentFoldersUseCase: GetNestedParentFoldersUseCase = mock()
     private val node = mock<FileNode>()
     private val parent = mock<FolderNode>()
@@ -38,14 +38,14 @@ internal class GetOfflineNodeInformationUseCaseTest {
     @BeforeAll
     fun setup() {
         underTest = GetOfflineNodeInformationUseCase(
-            getNestedParentFoldersUseCase, isNodeInCloudDriveUseCase, isNodeInInboxUseCase
+            getNestedParentFoldersUseCase, isNodeInCloudDriveUseCase, isNodeInBackupsUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            getNestedParentFoldersUseCase, isNodeInCloudDriveUseCase, isNodeInInboxUseCase,
+            getNestedParentFoldersUseCase, isNodeInCloudDriveUseCase, isNodeInBackupsUseCase,
             node, parent, grandParent
         )
     }
@@ -92,13 +92,13 @@ internal class GetOfflineNodeInformationUseCaseTest {
     }
 
     @Test
-    fun `test that invoke returns an InboxOfflineNodeInformation when node is a backup file`() =
+    fun `test that invoke returns a BackupsOfflineNodeInformation when node is a backup file`() =
         runTest {
             stubNodes()
             stubFolderTree()
             stubInBackup()
             val actual = underTest.invoke(node)
-            assertThat(actual).isInstanceOf(InboxOfflineNodeInformation::class.java)
+            assertThat(actual).isInstanceOf(BackupsOfflineNodeInformation::class.java)
         }
 
     @Test
@@ -136,12 +136,12 @@ internal class GetOfflineNodeInformationUseCaseTest {
 
     private suspend fun stubFolderTree() {
         whenever(getNestedParentFoldersUseCase(node)).thenReturn(listOf(grandParent, parent))
-        whenever(isNodeInInboxUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
         whenever(isNodeInCloudDriveUseCase(any())).thenReturn(false)
     }
 
     private suspend fun stubInBackup() {
-        whenever(isNodeInInboxUseCase(any())).thenReturn(true)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(true)
     }
 
     private suspend fun stubInCloudDrive() {

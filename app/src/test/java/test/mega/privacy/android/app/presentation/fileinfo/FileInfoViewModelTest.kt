@@ -77,7 +77,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -114,7 +114,7 @@ internal class FileInfoViewModelTest {
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase = mock()
-    private val isNodeInInboxUseCase: IsNodeInInboxUseCase = mock()
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val isNodeInRubbish: IsNodeInRubbish = mock()
     private val checkNameCollision: CheckNameCollision = mock()
     private val moveNodeUseCase: MoveNodeUseCase = mock()
@@ -178,7 +178,7 @@ internal class FileInfoViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             getFileHistoryNumVersionsUseCase = getFileHistoryNumVersionsUseCase,
-            isNodeInInboxUseCase = isNodeInInboxUseCase,
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             isNodeInRubbish = isNodeInRubbish,
             checkNameCollision = checkNameCollision,
             moveNodeUseCase = moveNodeUseCase,
@@ -221,7 +221,7 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.id).thenReturn(nodeId)
         whenever(isConnectedToInternetUseCase.invoke()).thenReturn(true)
         whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
-        whenever(isNodeInInboxUseCase(NODE_HANDLE)).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
         whenever(previewFile.exists()).thenReturn(true)
         whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
@@ -262,12 +262,12 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
-    fun `test that viewModel state's isNodeInInbox property reflects the value of the isNodeInInbox use case after updating the node`() =
+    fun `test that viewModel state's isNodeInBackups property reflects the value of the isNodeInBackups use case after updating the node`() =
         runTest {
-            suspend fun verify(isNodeInInbox: Boolean) {
-                whenever(isNodeInInboxUseCase(NODE_HANDLE)).thenReturn(isNodeInInbox)
+            suspend fun verify(isNodeInBackups: Boolean) {
+                whenever(isNodeInBackupsUseCase(NODE_HANDLE)).thenReturn(isNodeInBackups)
                 underTest.setNode(node.handle, true)
-                Truth.assertThat(underTest.uiState.value.isNodeInInbox).isEqualTo(isNodeInInbox)
+                Truth.assertThat(underTest.uiState.value.isNodeInBackups).isEqualTo(isNodeInBackups)
             }
             verify(true)
             verify(false)

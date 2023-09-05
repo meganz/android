@@ -116,7 +116,7 @@ class RubbishBinViewModel @Inject constructor(
      * Retrieves the list of Nodes
      * Call the Use Case [getRubbishBinChildren] to retrieve and return the list of Nodes
      *
-     * @return a List of Inbox Nodes
+     * @return a List of Rubbish Bin Nodes
      */
     fun refreshNodes() {
         viewModelScope.launch {

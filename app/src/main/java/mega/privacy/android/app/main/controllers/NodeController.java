@@ -361,10 +361,10 @@ public class NodeController {
                             firstNavigationLevel = true;
                             ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
                         } else if (parentIntentN.getHandle() == megaApi.getInboxNode().getHandle()) {
-                            Timber.d("Navigate to INBOX first level%s", parentIntentN.getName());
+                            Timber.d("Navigate to BACKUPS first level%s", parentIntentN.getName());
                             firstNavigationLevel = true;
-                            ((ManagerActivity) context).setParentHandleInbox(parentIntentN.getHandle());
-                            drawerItem = DrawerItem.INBOX;
+                            ((ManagerActivity) context).setParentHandleBackups(parentIntentN.getHandle());
+                            drawerItem = DrawerItem.BACKUPS;
                         } else {
                             int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
                             Timber.d("The parent result is: %s", parent);
@@ -386,9 +386,9 @@ public class NodeController {
                                     break;
                                 }
                                 case 2: {
-                                    Timber.d("Navigate to INBOX WITH parentHandle");
-                                    drawerItem = DrawerItem.INBOX;
-                                    ((ManagerActivity) context).setParentHandleInbox(parentIntentN.getHandle());
+                                    Timber.d("Navigate to BACKUPS WITH parentHandle");
+                                    drawerItem = DrawerItem.BACKUPS;
+                                    ((ManagerActivity) context).setParentHandleBackups(parentIntentN.getHandle());
                                     firstNavigationLevel = false;
                                     break;
                                 }
@@ -457,7 +457,7 @@ public class NodeController {
                 Timber.d("The parent is the RUBBISH");
                 return 1;
             } else if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()) {
-                Timber.d("The parent is the INBOX");
+                Timber.d("The parent is the BACKUPS");
                 return 2;
             } else if (parentNode.getHandle() == -1) {
                 Timber.w("The parent is -1");

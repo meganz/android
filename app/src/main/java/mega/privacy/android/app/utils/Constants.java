@@ -287,7 +287,7 @@ public class Constants {
     public static final int ZIP_ADAPTER = 2008;
     public static final int OUTGOING_SHARES_ADAPTER = 2009;
     public static final int INCOMING_SHARES_ADAPTER = 2010;
-    public static final int INBOX_ADAPTER = 2011;
+    public static final int BACKUPS_ADAPTER = 2011;
     public static final int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
     public static final int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
     public static final int SEARCH_BY_ADAPTER = 2018;
@@ -319,7 +319,7 @@ public class Constants {
     public static final int VIEWER_FROM_FOLDER_LINK = 12;
     public static final int VIEWER_FROM_ZIP_BROWSER = 13;
     public static final int VIEWER_FROM_FILE_BROWSER = 14;
-    public static final int VIEWER_FROM_INBOX = 15;
+    public static final int VIEWER_FROM_BACKUPS = 15;
     public static final int VIEWER_FROM_SEARCH = 17;
     public static final int VIEWER_FROM_FILE_VERSIONS = 18;
 
@@ -465,7 +465,7 @@ public class Constants {
     public static final Pattern NODE_NAME_REGEX = Pattern.compile("[*|\\?:\"<>\\\\\\\\/]");
 
     public static final int FROM_INCOMING_SHARES = 140;
-    public static final int FROM_INBOX = 150;
+    public static final int FROM_BACKUPS = 150;
     public static final int FROM_OTHERS = 0;
 
     public static final int SNACKBAR_TYPE = 0;

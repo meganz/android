@@ -207,7 +207,7 @@ class SearchViewModel @Inject constructor(
      *
      * @param browserParentHandle
      * @param rubbishBinParentHandle
-     * @param inboxParentHandle
+     * @param backupsParentHandle
      * @param incomingParentHandle
      * @param outgoingParentHandle
      * @param linksParentHandle
@@ -216,7 +216,7 @@ class SearchViewModel @Inject constructor(
     fun performSearch(
         browserParentHandle: Long,
         rubbishBinParentHandle: Long,
-        inboxParentHandle: Long,
+        backupsParentHandle: Long,
         incomingParentHandle: Long,
         outgoingParentHandle: Long,
         linksParentHandle: Long,
@@ -234,7 +234,7 @@ class SearchViewModel @Inject constructor(
             getParentHandleForSearch(
                 browserParentHandle,
                 rubbishBinParentHandle,
-                inboxParentHandle,
+                backupsParentHandle,
                 incomingParentHandle,
                 outgoingParentHandle,
                 linksParentHandle
@@ -260,7 +260,7 @@ class SearchViewModel @Inject constructor(
      *
      * @param browserParentHandle
      * @param rubbishBinParentHandle
-     * @param inboxParentHandle
+     * @param backupsParentHandle
      * @param incomingParentHandle
      * @param outgoingParentHandle
      * @param linksParentHandle
@@ -270,7 +270,7 @@ class SearchViewModel @Inject constructor(
     private suspend fun getParentHandleForSearch(
         browserParentHandle: Long,
         rubbishBinParentHandle: Long,
-        inboxParentHandle: Long,
+        backupsParentHandle: Long,
         incomingParentHandle: Long,
         outgoingParentHandle: Long,
         linksParentHandle: Long,
@@ -286,7 +286,7 @@ class SearchViewModel @Inject constructor(
                 }
 
             DrawerItem.RUBBISH_BIN -> rubbishBinParentHandle
-            DrawerItem.INBOX -> inboxParentHandle
+            DrawerItem.BACKUPS -> backupsParentHandle
             else -> getRootFolder()?.handle ?: INVALID_HANDLE
         }
     }

@@ -558,11 +558,11 @@ interface MegaApiGateway {
     suspend fun getNumUnreadUserAlerts(): Int
 
     /**
-     * Inbox node of the account
+     * Backups node of the account
      *
-     * @return The Inbox node if exists, null otherwise.
+     * @return The Backups node if exists, null otherwise.
      */
-    suspend fun getInboxNode(): MegaNode?
+    suspend fun getBackupsNode(): MegaNode?
 
     /**
      * Checks if the provided node has children.
@@ -871,12 +871,12 @@ interface MegaApiGateway {
     suspend fun isInRubbish(node: MegaNode): Boolean
 
     /**
-     * Check is megaNode in Inbox
+     * Checks whether the Node is in Backups or not
      *
-     * @param node MegaNode
-     * @return True in, else not in
+     * @param node The [MegaNode]
+     * @return true if the Node is in Backups, and false if otherwise
      */
-    suspend fun isInInbox(node: MegaNode): Boolean
+    suspend fun isInBackups(node: MegaNode): Boolean
 
     /**
      * Check is megaNode in Cloud drive

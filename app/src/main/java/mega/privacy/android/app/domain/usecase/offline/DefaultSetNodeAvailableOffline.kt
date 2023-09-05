@@ -22,13 +22,13 @@ class DefaultSetNodeAvailableOffline @Inject constructor(
     ) {
         megaNodeRepository.getNodeByHandle(nodeId.longValue)?.let { megaNode ->
             val fromIncomingShare = megaNodeRepository.getUserFromInShare(megaNode, true) != null
-            val fromInbox = megaNodeRepository.isNodeInInbox(megaNode)
+            val fromBackups = megaNodeRepository.isNodeInBackups(megaNode)
             activity.get()?.let { activity ->
                 getNodeUseCase.setNodeAvailableOffline(
                     node = megaNode,
                     setOffline = availableOffline,
                     isFromIncomingShares = fromIncomingShare,
-                    isFromInbox = fromInbox,
+                    isFromBackups = fromBackups,
                     activity = activity
                 ).await()
             }

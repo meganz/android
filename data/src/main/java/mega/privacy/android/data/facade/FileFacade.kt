@@ -162,7 +162,7 @@ class FileFacade @Inject constructor(
     override suspend fun getOfflineFilesRootPath() =
         context.filesDir.absolutePath + File.separator + OFFLINE_DIR
 
-    override suspend fun getOfflineFilesInboxRootPath() =
+    override suspend fun getOfflineFilesBackupsRootPath() =
         context.filesDir.absolutePath + File.separator + OFFLINE_DIR + File.separator + "in"
 
     override suspend fun removeGPSCoordinates(filePath: String) {

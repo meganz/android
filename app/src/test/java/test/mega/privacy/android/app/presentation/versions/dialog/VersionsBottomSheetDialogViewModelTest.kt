@@ -14,7 +14,7 @@ import mega.privacy.android.app.modalbottomsheet.VersionsBottomSheetDialogFragme
 import mega.privacy.android.app.presentation.versions.dialog.VersionsBottomSheetDialogViewModel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterAll
@@ -44,7 +44,7 @@ class VersionsBottomSheetDialogViewModelTest {
 
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val isNodeInInboxUseCase = mock<IsNodeInInboxUseCase>()
+    private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -53,7 +53,7 @@ class VersionsBottomSheetDialogViewModelTest {
 
     @BeforeEach
     fun reset() {
-        reset(getNodeAccessPermission, getNodeByHandle, isNodeInInboxUseCase)
+        reset(getNodeAccessPermission, getNodeByHandle, isNodeInBackupsUseCase)
     }
 
     fun initViewModel(nodeHandle: Long?, selectedNodePosition: Int, versionsCount: Int) {
@@ -67,7 +67,7 @@ class VersionsBottomSheetDialogViewModelTest {
         underTest = VersionsBottomSheetDialogViewModel(
             getNodeAccessPermission = getNodeAccessPermission,
             getNodeByHandle = getNodeByHandle,
-            isNodeInInboxUseCase = isNodeInInboxUseCase,
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -91,7 +91,7 @@ class VersionsBottomSheetDialogViewModelTest {
             assertThat(state.node).isNull()
         }
 
-        verifyNoInteractions(getNodeAccessPermission, getNodeByHandle, isNodeInInboxUseCase)
+        verifyNoInteractions(getNodeAccessPermission, getNodeByHandle, isNodeInBackupsUseCase)
     }
 
     @Test
@@ -100,7 +100,7 @@ class VersionsBottomSheetDialogViewModelTest {
 
         whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
         whenever(getNodeByHandle(any())).thenReturn(testNode)
-        whenever(isNodeInInboxUseCase(any())).thenReturn(any())
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(any())
 
         initViewModel(
             nodeHandle = 123456L,
@@ -117,7 +117,7 @@ class VersionsBottomSheetDialogViewModelTest {
         runTest {
             whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
-            whenever(isNodeInInboxUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
 
             initViewModel(
                 nodeHandle = 123456,
@@ -136,7 +136,7 @@ class VersionsBottomSheetDialogViewModelTest {
     ) = runTest {
         whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(accessPermission)
         whenever(getNodeByHandle(any())).thenReturn(mock())
-        whenever(isNodeInInboxUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
 
         initViewModel(
             nodeHandle = 123456,
@@ -154,7 +154,7 @@ class VersionsBottomSheetDialogViewModelTest {
     fun `test that the current version backup node cannot be deleted`() = runTest {
         whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
         whenever(getNodeByHandle(any())).thenReturn(mock())
-        whenever(isNodeInInboxUseCase(any())).thenReturn(true)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(true)
 
         initViewModel(
             nodeHandle = 123456L,
@@ -176,7 +176,7 @@ class VersionsBottomSheetDialogViewModelTest {
                 runTest {
                     whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(accessPermission)
                     whenever(getNodeByHandle(any())).thenReturn(mock())
-                    whenever(isNodeInInboxUseCase(any())).thenReturn(false)
+                    whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
 
                     initViewModel(
                         nodeHandle = 123456L,
@@ -190,22 +190,23 @@ class VersionsBottomSheetDialogViewModelTest {
             }
         }
 
-    @ParameterizedTest(name = "is node in inbox: {0}")
+    @ParameterizedTest(name = "is node in backups: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that the current version node cannot be reverted`(isNodeInInbox: Boolean) = runTest {
-        whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
-        whenever(getNodeByHandle(any())).thenReturn(mock())
-        whenever(isNodeInInboxUseCase(any())).thenReturn(isNodeInInbox)
+    fun `test that the current version node cannot be reverted`(isNodeInBackups: Boolean) =
+        runTest {
+            whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
+            whenever(getNodeByHandle(any())).thenReturn(mock())
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(isNodeInBackups)
 
-        initViewModel(
-            nodeHandle = 123456L,
-            selectedNodePosition = 0,
-            versionsCount = 1,
-        )
-        underTest.state.test {
-            assertThat(awaitItem().canRevertVersion).isEqualTo(false)
+            initViewModel(
+                nodeHandle = 123456L,
+                selectedNodePosition = 0,
+                versionsCount = 1,
+            )
+            underTest.state.test {
+                assertThat(awaitItem().canRevertVersion).isEqualTo(false)
+            }
         }
-    }
 
     @TestFactory
     fun `test that a previous version non-backup node could be reverted`() =
@@ -217,7 +218,7 @@ class VersionsBottomSheetDialogViewModelTest {
                 runTest {
                     whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(accessPermission)
                     whenever(getNodeByHandle(any())).thenReturn(mock())
-                    whenever(isNodeInInboxUseCase(any())).thenReturn(false)
+                    whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
 
                     initViewModel(
                         nodeHandle = 123456L,

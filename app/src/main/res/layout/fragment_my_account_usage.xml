@@ -75,7 +75,7 @@
 
         </RelativeLayout>
 
-        <!--inbox-->
+        <!-- Backups Section -->
         <RelativeLayout
             android:id="@+id/backups_storage_container"
             android:layout_width="match_parent"

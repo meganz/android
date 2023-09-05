@@ -74,7 +74,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -98,7 +98,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase,
-    private val isNodeInInboxUseCase: IsNodeInInboxUseCase,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val checkNameCollision: CheckNameCollision,
     private val moveNodeUseCase: MoveNodeUseCase,
@@ -722,7 +722,7 @@ class FileInfoViewModel @Inject constructor(
                 typedNode = typedNode,
             ).copy(
                 iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
-                isNodeInInbox = isNodeInInboxUseCase(typedNode.id.longValue),
+                isNodeInBackups = isNodeInBackupsUseCase(typedNode.id.longValue),
                 isNodeInRubbish = isNodeInRubbish,
                 jobInProgressState = null,
                 isAvailableOffline = isAvailableOfflineUseCase(typedNode),

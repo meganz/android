@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.inbox
+package test.mega.privacy.android.app.presentation.backups
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.presentation.inbox.InboxViewModel
+import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -38,12 +38,12 @@ import test.mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 /**
- * Test class for [InboxViewModel]
+ * Test class for [BackupsViewModel]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class InboxViewModelTest {
-    private lateinit var underTest: InboxViewModel
+internal class BackupsViewModelTest {
+    private lateinit var underTest: BackupsViewModel
 
     private val getChildrenNode = mock<GetChildrenNode>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
@@ -79,7 +79,7 @@ internal class InboxViewModelTest {
     }
 
     private fun setUnderTest() {
-        underTest = InboxViewModel(
+        underTest = BackupsViewModel(
             getChildrenNode = getChildrenNode,
             getCloudSortOrder = getCloudSortOrder,
             getNodeByHandle = getNodeByHandle,
@@ -97,9 +97,9 @@ internal class InboxViewModelTest {
         underTest.state.test {
             val initialState = awaitItem()
             assertThat(initialState.hideMultipleItemSelection).isFalse()
-            assertThat(initialState.inboxHandle).isEqualTo(-1L)
+            assertThat(initialState.backupsHandle).isEqualTo(-1L)
             assertThat(initialState.nodes).isEmpty()
-            assertThat(initialState.shouldExitInbox).isFalse()
+            assertThat(initialState.shouldExitBackups).isFalse()
             assertThat(initialState.triggerBackPress).isFalse()
             assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
         }
@@ -107,24 +107,24 @@ internal class InboxViewModelTest {
 
     @Test
     internal fun `test that isPendingRefresh is true when receiving a node update`() = runTest {
-        val inboxNode = mock<MegaNode> {
-            on { this.handle }.thenReturn(INBOX_NODE_HANDLE)
+        val backupsNode = mock<MegaNode> {
+            on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
         }
         val retrievedNode = mock<MegaNode> {
             on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
         }
-        whenever(getNodeByHandle(any())).thenReturn(inboxNode)
+        whenever(getNodeByHandle(any())).thenReturn(backupsNode)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(
             getChildrenNode(
-                parent = inboxNode,
+                parent = backupsNode,
                 order = getCloudSortOrder(),
             )
         ).thenReturn(listOf(retrievedNode))
 
         setUnderTest()
 
-        underTest.updateInboxHandle(INBOX_NODE_HANDLE)
+        underTest.updateBackupsHandle(BACKUPS_NODE_HANDLE)
         monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
 
         underTest.state.test {
@@ -134,19 +134,19 @@ internal class InboxViewModelTest {
     }
 
     @Test
-    internal fun `test that nodes are not refreshed when receiving a node update and the inbox handle is invalid`() =
+    internal fun `test that nodes are not refreshed when receiving a node update and the backups handle is invalid`() =
         runTest {
-            val inboxNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(INBOX_NODE_HANDLE)
+            val backupsNode = mock<MegaNode> {
+                on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
             }
             val retrievedNode = mock<MegaNode> {
                 on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
             }
-            whenever(getNodeByHandle(any())).thenReturn(inboxNode)
+            whenever(getNodeByHandle(any())).thenReturn(backupsNode)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(
                 getChildrenNode(
-                    parent = inboxNode,
+                    parent = backupsNode,
                     order = getCloudSortOrder(),
                 )
             ).thenReturn(listOf(retrievedNode))
@@ -165,8 +165,8 @@ internal class InboxViewModelTest {
     @Test
     internal fun `test that when receiving a my backups folder update, the nodes are refreshed`() =
         runTest {
-            val inboxNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(INBOX_NODE_HANDLE)
+            val backupsNode = mock<MegaNode> {
+                on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
             }
             val myBackupsNode = mock<NodeId> {
                 on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
@@ -174,23 +174,23 @@ internal class InboxViewModelTest {
             val retrievedNode = mock<MegaNode> {
                 on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
             }
-            whenever(getNodeByHandle(any())).thenReturn(inboxNode)
+            whenever(getNodeByHandle(any())).thenReturn(backupsNode)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(
                 getChildrenNode(
-                    parent = inboxNode,
+                    parent = backupsNode,
                     order = getCloudSortOrder(),
                 )
             ).thenReturn(listOf(retrievedNode))
 
             setUnderTest()
 
-            underTest.updateInboxHandle(INBOX_NODE_HANDLE)
+            underTest.updateBackupsHandle(BACKUPS_NODE_HANDLE)
             monitorBackupFolder.emit(Result.success(myBackupsNode))
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.inboxHandle).isEqualTo(INBOX_NODE_HANDLE)
+                assertThat(state.backupsHandle).isEqualTo(BACKUPS_NODE_HANDLE)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
         }
@@ -198,8 +198,8 @@ internal class InboxViewModelTest {
     @Test
     internal fun `test that when receiving a my backups folder update, the nodes are refreshed using the my backups folder node handle`() =
         runTest {
-            val inboxNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(INBOX_NODE_HANDLE)
+            val backupsNode = mock<MegaNode> {
+                on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
             }
             val myBackupsNode = mock<NodeId> {
                 on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
@@ -207,11 +207,11 @@ internal class InboxViewModelTest {
             val retrievedNode = mock<MegaNode> {
                 on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
             }
-            whenever(getNodeByHandle(any())).thenReturn(inboxNode)
+            whenever(getNodeByHandle(any())).thenReturn(backupsNode)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(
                 getChildrenNode(
-                    parent = inboxNode,
+                    parent = backupsNode,
                     order = getCloudSortOrder(),
                 )
             ).thenReturn(listOf(retrievedNode))
@@ -222,20 +222,20 @@ internal class InboxViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.inboxHandle).isEqualTo(myBackupsNode.longValue)
+                assertThat(state.backupsHandle).isEqualTo(myBackupsNode.longValue)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
         }
 
     @Test
-    internal fun `test that the inbox handle is updated if a new value is provided`() = runTest {
+    internal fun `test that the backups handle is updated if a new value is provided`() = runTest {
         setUnderTest()
 
-        underTest.state.map { it.inboxHandle }.distinctUntilChanged()
+        underTest.state.map { it.backupsHandle }.distinctUntilChanged()
             .test {
                 val newHandle = 123456L
                 assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.updateInboxHandle(newHandle)
+                underTest.updateBackupsHandle(newHandle)
                 assertThat(awaitItem()).isEqualTo(newHandle)
             }
     }
@@ -253,14 +253,14 @@ internal class InboxViewModelTest {
     }
 
     @Test
-    internal fun `test that exiting the inbox has been handled`() = runTest {
+    internal fun `test that exiting the backups page has been handled`() = runTest {
         setUnderTest()
 
-        underTest.exitInboxHandled()
+        underTest.exitBackupsHandled()
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.shouldExitInbox).isFalse()
+            assertThat(state.shouldExitBackups).isFalse()
         }
     }
 
@@ -281,17 +281,17 @@ internal class InboxViewModelTest {
         val myBackupsNode = mock<NodeId> {
             on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
         }
-        val inboxNode = mock<MegaNode> {
-            on { this.handle }.thenReturn(INBOX_NODE_HANDLE)
+        val backupsNode = mock<MegaNode> {
+            on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
         }
         val retrievedNode = mock<MegaNode> {
             on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
         }
-        whenever(getNodeByHandle(any())).thenReturn(inboxNode)
+        whenever(getNodeByHandle(any())).thenReturn(backupsNode)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(
             getChildrenNode(
-                parent = inboxNode,
+                parent = backupsNode,
                 order = getCloudSortOrder(),
             )
         ).thenReturn(listOf(retrievedNode))
@@ -303,30 +303,30 @@ internal class InboxViewModelTest {
         assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.inboxHandle).isEqualTo(myBackupsNode.longValue)
+            assertThat(state.backupsHandle).isEqualTo(myBackupsNode.longValue)
         }
     }
 
     @Test
-    internal fun `test that the user is currently on the backup folder level if the inbox handle is invalid`() =
+    internal fun `test that the user is currently on the backup folder level if the backups handle is invalid`() =
         runTest {
             setUnderTest()
 
             assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.inboxHandle).isEqualTo(-1L)
+                assertThat(state.backupsHandle).isEqualTo(-1L)
             }
         }
 
     @Test
-    internal fun `test that the user exits the inbox on back press if the my backups folder handle is -1L`() =
+    internal fun `test that the user exits the backups page on back press if the my backups folder handle is -1L`() =
         runTest {
             setUnderTest()
 
             monitorBackupFolder.emit(Result.success(NodeId(-1L)))
 
-            underTest.state.map { it.shouldExitInbox }.distinctUntilChanged()
+            underTest.state.map { it.shouldExitBackups }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isFalse()
                     underTest.handleBackPress()
@@ -335,7 +335,7 @@ internal class InboxViewModelTest {
         }
 
     @Test
-    internal fun `test that the user exits the inbox on back press if both the my backups folder and inbox ui state have the same handles`() =
+    internal fun `test that the user exits the backups page on back press if both the my backups folder and backups ui state have the same handles`() =
         runTest {
             val myBackupsNode = mock<NodeId> {
                 on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
@@ -344,11 +344,11 @@ internal class InboxViewModelTest {
 
             monitorBackupFolder.emit(Result.success(myBackupsNode))
 
-            underTest.state.map { it.shouldExitInbox }.distinctUntilChanged()
+            underTest.state.map { it.shouldExitBackups }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isFalse()
                     with(underTest) {
-                        updateInboxHandle(MY_BACKUPS_HANDLE)
+                        updateBackupsHandle(MY_BACKUPS_HANDLE)
                         handleBackPress()
                     }
                     assertThat(awaitItem()).isTrue()
@@ -356,7 +356,7 @@ internal class InboxViewModelTest {
         }
 
     @Test
-    internal fun `test that the user exits the inbox on back press if the parent node handle is null`() =
+    internal fun `test that the user exits the backups page on back press if the parent node handle is null`() =
         runTest {
             val myBackupsNode = mock<NodeId> {
                 on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
@@ -367,11 +367,11 @@ internal class InboxViewModelTest {
 
             monitorBackupFolder.emit(Result.success(myBackupsNode))
 
-            underTest.state.map { it.shouldExitInbox }.distinctUntilChanged()
+            underTest.state.map { it.shouldExitBackups }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isFalse()
                     with(underTest) {
-                        updateInboxHandle(INBOX_NODE_HANDLE)
+                        updateBackupsHandle(BACKUPS_NODE_HANDLE)
                         handleBackPress()
                     }
                     assertThat(awaitItem()).isTrue()
@@ -404,13 +404,13 @@ internal class InboxViewModelTest {
         monitorBackupFolder.emit(Result.success(myBackupsNode))
 
         with(underTest) {
-            updateInboxHandle(INBOX_NODE_HANDLE)
+            updateBackupsHandle(BACKUPS_NODE_HANDLE)
             handleBackPress()
         }
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.inboxHandle).isEqualTo(654L)
+            assertThat(state.backupsHandle).isEqualTo(654L)
             assertThat(state.triggerBackPress).isTrue()
             assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
         }
@@ -428,7 +428,7 @@ internal class InboxViewModelTest {
 
     internal companion object {
         private const val MY_BACKUPS_HANDLE = 12L
-        private const val INBOX_NODE_HANDLE = 34L
+        private const val BACKUPS_NODE_HANDLE = 34L
         private const val RETRIEVED_NODE_HANDLE = 56L
     }
 }

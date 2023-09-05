@@ -37,7 +37,7 @@ enum class DrawerItem {
     /**
      * Backups
      */
-    INBOX,
+    BACKUPS,
 
     /**
      * Search

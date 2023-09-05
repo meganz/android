@@ -1239,7 +1239,7 @@ object MegaNodeUtil {
             val grandParentName = file.parentFile?.parentFile?.name
             val location = when {
                 grandParentName != null
-                        && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_INBOX_DIR -> {
+                        && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_BACKUPS_DIR -> {
                     app.getString(R.string.section_saved_for_offline_new)
                 }
 

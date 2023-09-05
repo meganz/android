@@ -157,10 +157,10 @@ class SearchNodesUseCaseTest {
         }
 
     @Test
-    fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item INBOX returns empty list`() =
+    fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item BACKUPS returns empty list`() =
         runTest {
             val parent: MegaNode = mock()
-            whenever(megaNodeRepository.getInboxNode()).thenReturn(parent)
+            whenever(megaNodeRepository.getBackupsNode()).thenReturn(parent)
             whenever(
                 getSearchFromMegaNodeParent(
                     query = query,
@@ -175,7 +175,7 @@ class SearchNodesUseCaseTest {
                 query = query,
                 parentHandleSearch = invalidParentHandleSearch,
                 parentHandle = invalidParentHandle,
-                drawerItem = DrawerItem.INBOX,
+                drawerItem = DrawerItem.BACKUPS,
                 sharesTab = 0,
                 isFirstLevel = true
             )

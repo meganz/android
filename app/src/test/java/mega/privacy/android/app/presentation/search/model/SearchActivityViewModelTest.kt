@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
+import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
@@ -49,7 +49,7 @@ class SearchActivityViewModelTest {
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase = mock()
-    private val getInboxNodeUseCase: GetInboxNodeUseCase = mock()
+    private val getBackupsNodeUseCase: GetBackupsNodeUseCase = mock()
     private val getParentNodeHandle: GetParentNodeHandle = mock()
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase = mock()
 
@@ -65,9 +65,9 @@ class SearchActivityViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
-            getInboxNodeUseCase = getInboxNodeUseCase,
+            getBackupsNodeUseCase = getBackupsNodeUseCase,
             getParentNodeHandle = getParentNodeHandle,
-            isAvailableOfflineUseCase = isAvailableOfflineUseCase
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
         )
     }
 
@@ -88,7 +88,7 @@ class SearchActivityViewModelTest {
         whenever(getRootNodeUseCase()).thenReturn(node)
         whenever(getNodeByHandleUseCase(underTest.state.value.parentHandle)).thenReturn(unTypedNode)
         whenever(getRubbishNodeUseCase()).thenReturn(unTypedNode)
-        whenever(getInboxNodeUseCase()).thenReturn(unTypedNode)
+        whenever(getBackupsNodeUseCase()).thenReturn(unTypedNode)
 
         whenever(node.id).thenReturn(searchNodeId)
         whenever(unTypedNode.id).thenReturn(searchNodeId)
@@ -143,7 +143,7 @@ class SearchActivityViewModelTest {
         whenever(getRootNodeUseCase()).thenReturn(node)
         whenever(getNodeByHandleUseCase(underTest.state.value.parentHandle)).thenReturn(unTypedNode)
         whenever(getRubbishNodeUseCase()).thenReturn(unTypedNode)
-        whenever(getInboxNodeUseCase()).thenReturn(unTypedNode)
+        whenever(getBackupsNodeUseCase()).thenReturn(unTypedNode)
 
         whenever(node.id).thenReturn(searchNodeId)
         whenever(unTypedNode.id).thenReturn(searchNodeId)
@@ -196,7 +196,7 @@ class SearchActivityViewModelTest {
         whenever(getRootNodeUseCase()).thenReturn(node)
         whenever(getNodeByHandleUseCase(underTest.state.value.parentHandle)).thenReturn(unTypedNode)
         whenever(getRubbishNodeUseCase()).thenReturn(unTypedNode)
-        whenever(getInboxNodeUseCase()).thenReturn(unTypedNode)
+        whenever(getBackupsNodeUseCase()).thenReturn(unTypedNode)
 
         whenever(node.id).thenReturn(searchNodeId)
         whenever(unTypedNode.id).thenReturn(searchNodeId)
@@ -242,7 +242,7 @@ class SearchActivityViewModelTest {
         Arguments.of("Query", false, DrawerItem.SHARED_ITEMS, 2, 1),
         Arguments.of("Query", false, null, -1, 1),
         Arguments.of("Query", false, DrawerItem.RUBBISH_BIN, -1, 1),
-        Arguments.of("Query", false, DrawerItem.INBOX, -1, 1)
+        Arguments.of("Query", false, DrawerItem.BACKUPS, -1, 1)
     )
 
     @AfterAll

@@ -26,11 +26,11 @@ interface FileSystemRepository {
     suspend fun getOfflinePath(): String
 
     /**
-     * Get offline inbox path
+     * Get offline Backups path
      *
-     * @return offline files inbox path
+     * @return offline files Backups path
      */
-    suspend fun getOfflineInboxPath(): String
+    suspend fun getOfflineBackupsPath(): String
 
     /**
      * Create Folder

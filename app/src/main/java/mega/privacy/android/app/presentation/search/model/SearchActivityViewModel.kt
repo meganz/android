@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
+import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
@@ -37,7 +37,7 @@ import javax.inject.Inject
  * @property getRootNodeUseCase [GetRootNodeUseCase]
  * @property getNodeByHandleUseCase [GetNodeByHandleUseCase]
  * @property getRubbishNodeUseCase [GetRubbishNodeUseCase]
- * @property getInboxNodeUseCase [GetInboxNodeUseCase]
+ * @property getBackupsNodeUseCase [GetBackupsNodeUseCase]
  * @property getParentNodeHandle [GetParentNodeHandle]
  */
 @HiltViewModel
@@ -50,7 +50,7 @@ class SearchActivityViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
-    private val getInboxNodeUseCase: GetInboxNodeUseCase,
+    private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase
 ) : ViewModel() {
@@ -149,8 +149,8 @@ class SearchActivityViewModel @Inject constructor(
                             getRubbishNodeUseCase()
                         }
 
-                        DrawerItem.INBOX -> {
-                            getInboxNodeUseCase()
+                        DrawerItem.BACKUPS -> {
+                            getBackupsNodeUseCase()
                         }
 
                         else -> {

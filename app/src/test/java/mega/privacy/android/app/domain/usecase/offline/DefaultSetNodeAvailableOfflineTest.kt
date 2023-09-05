@@ -50,7 +50,7 @@ class DefaultSetNodeAvailableOfflineTest {
                 node = any(),
                 setOffline = any(),
                 isFromIncomingShares = any(),
-                isFromInbox = any(),
+                isFromBackups = any(),
                 activity = any(),
             )
         ).thenReturn(
@@ -71,24 +71,24 @@ class DefaultSetNodeAvailableOfflineTest {
     }
 
     @Test
-    fun `test when node is in inbox getNodeUseCase is called with isFromIncomingShares set to true`() =
+    fun `test when node is in backups getNodeUseCase is called with isFromIncomingShares set to true`() =
         testIsFromIncomingShares(true)
 
     @Test
-    fun `test when node is not in inbox getNodeUseCase is called with isFromIncomingShares set to false`() =
+    fun `test when node is not in backups getNodeUseCase is called with isFromIncomingShares set to false`() =
         testIsFromIncomingShares(false)
 
     @Test
     fun `test when node is from incoming getNodeUseCase is called with isFromIncomingShares set to true`() =
-        testIsFromInbox(true)
+        testIsFromBackups(true)
 
     @Test
     fun `test when node is not from incoming getNodeUseCase is called with isFromIncomingShares set to false`() =
-        testIsFromInbox(false)
+        testIsFromBackups(false)
 
     private fun testIsFromIncomingShares(isFromIncomingShares: Boolean) = runTest {
         whenever(megaNodeRepository.getNodeByHandle(id.longValue)).thenReturn(node)
-        whenever(megaNodeRepository.isNodeInInbox(node)).thenReturn(false)
+        whenever(megaNodeRepository.isNodeInBackups(node)).thenReturn(false)
         whenever(megaNodeRepository.getUserFromInShare(node, true)).thenReturn(
             if (isFromIncomingShares) mock() else null
         )
@@ -97,21 +97,21 @@ class DefaultSetNodeAvailableOfflineTest {
             node = node,
             setOffline = true,
             isFromIncomingShares = isFromIncomingShares,
-            isFromInbox = false,
+            isFromBackups = false,
             activity = activity
         )
     }
 
-    private fun testIsFromInbox(isFromInbox: Boolean) = runTest {
+    private fun testIsFromBackups(isFromBackups: Boolean) = runTest {
         whenever(megaNodeRepository.getNodeByHandle(id.longValue)).thenReturn(node)
-        whenever(megaNodeRepository.isNodeInInbox(node)).thenReturn(isFromInbox)
+        whenever(megaNodeRepository.isNodeInBackups(node)).thenReturn(isFromBackups)
         whenever(megaNodeRepository.getUserFromInShare(node, true)).thenReturn(null)
         underTest(id, true, WeakReference(activity))
         verify(getNodeUseCase, times(1)).setNodeAvailableOffline(
             node = node,
             setOffline = true,
             isFromIncomingShares = false,
-            isFromInbox = isFromInbox,
+            isFromBackups = isFromBackups,
             activity = activity
         )
     }

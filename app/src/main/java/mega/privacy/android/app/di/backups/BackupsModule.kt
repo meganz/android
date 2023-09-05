@@ -1,4 +1,4 @@
-package mega.privacy.android.app.di.backup
+package mega.privacy.android.app.di.backups
 
 import dagger.Binds
 import dagger.Module
@@ -9,11 +9,11 @@ import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import javax.inject.Singleton
 
 /**
- * Inbox module
+ * Backups module
  */
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class InboxModule {
+abstract class BackupsModule {
 
     /**
      * Binds the default implementation to [MonitorBackupFolder]

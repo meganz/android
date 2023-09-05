@@ -117,13 +117,13 @@ class CompletedTransferMapperTest {
                 transferType = TransferType.TYPE_DOWNLOAD,
                 parentPath = "$directoryPath/$offlineDirectory/$path/"
             )
-            val mock1 = mock<MegaNode>() {
+            val mock1 = mock<MegaNode> {
                 on { handle }.thenReturn(1L)
             }
-            val mock2 = mock<MegaNode>() {
+            val mock2 = mock<MegaNode> {
                 on { handle }.thenReturn(2L)
             }
-            val mock3 = mock<MegaNode>() {
+            val mock3 = mock<MegaNode> {
                 on { handle }.thenReturn(3L)
             }
             whenever(megaApiGateway.getParentNode(mock1)).thenReturn(mock2)
@@ -132,7 +132,7 @@ class CompletedTransferMapperTest {
             val nodes = listOf(mock1, mock2, mock3)
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
             whenever(megaApiGateway.getMegaNodeByHandle(nodes.first().handle)).thenReturn(nodes.first())
-            whenever(fileGateway.getOfflineFilesInboxRootPath()).thenReturn("$directoryPath/$offlineDirectory/in")
+            whenever(fileGateway.getOfflineFilesBackupsRootPath()).thenReturn("$directoryPath/$offlineDirectory/in")
             whenever(fileGateway.getOfflineFilesRootPath()).thenReturn("$directoryPath/$offlineDirectory")
             whenever(fileGateway.getAbsolutePath("$directoryPath/$offlineDirectory/3.jpg")).thenReturn(
                 "$directoryPath/$offlineDirectory/3.jpg"
@@ -172,14 +172,14 @@ class CompletedTransferMapperTest {
             val transfer = mockTransfer(
                 transferType = TransferType.TYPE_UPLOAD,
             )
-            val node1 = mock<MegaNode>() {
+            val node1 = mock<MegaNode> {
                 on { handle }.thenReturn(4)
                 on { it.isInShare }.thenReturn(isInShare)
             }
-            val node2 = mock<MegaNode>() {
+            val node2 = mock<MegaNode> {
                 on { handle }.thenReturn(2L)
             }
-            val node3 = mock<MegaNode>() {
+            val node3 = mock<MegaNode> {
                 on { handle }.thenReturn(rootNodeHandle)
             }
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")

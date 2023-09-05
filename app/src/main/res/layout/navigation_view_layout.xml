@@ -176,12 +176,12 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/inbox_section"
+                android:id="@+id/backups_section"
                 android:layout_width="match_parent"
                 android:layout_height="56dp">
 
                 <TextView
-                    android:id="@+id/inbox_section_text"
+                    android:id="@+id/backups_section_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"

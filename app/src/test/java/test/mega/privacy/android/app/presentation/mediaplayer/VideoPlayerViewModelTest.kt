@@ -79,7 +79,7 @@ internal class VideoPlayerViewModelTest {
             getLocalFolderLinkFromMegaApiFolderUseCase = mock(),
             getLocalFolderLinkFromMegaApiUseCase = mock(),
             getLocalLinkFromMegaApiUseCase = mock(),
-            getInboxNodeUseCase = mock(),
+            getBackupsNodeUseCase = mock(),
             getParentNodeFromMegaApiFolderUseCase = mock(),
             getRootNodeUseCase = mock(),
             getRootNodeFromMegaApiFolderUseCase = mock(),

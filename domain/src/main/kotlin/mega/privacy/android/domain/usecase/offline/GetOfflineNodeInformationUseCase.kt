@@ -2,14 +2,14 @@ package mega.privacy.android.domain.usecase.offline
 
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNestedParentFoldersUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.joinAsPath
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class GetOfflineNodeInformationUseCase @Inject constructor(
     private val getNestedParentFoldersUseCase: GetNestedParentFoldersUseCase,
     private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
-    private val isNodeInInboxUseCase: IsNodeInInboxUseCase,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
 ) {
     /**
      * Invoke the use case
@@ -38,17 +38,17 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
                 node.takeIf { it.isIncomingShare }
                     ?: parents.firstOrNull()?.takeIf { it.isIncomingShare }
                 )?.id
-        val isInInbox = isNodeInInboxUseCase(node.id.longValue)
+        val isInBackups = isNodeInBackupsUseCase(node.id.longValue)
         val isInCloudDrive = isNodeInCloudDriveUseCase(node.id.longValue)
-        if (parents.isNotEmpty() && (isInCloudDrive || isInInbox)) {
+        if (parents.isNotEmpty() && (isInCloudDrive || isInBackups)) {
             //we don't need the root backup parent (Vault) or root drive parent
             parents = parents.drop(1)
         }
         val path = parents.joinAsPath()
 
         return when {
-            isInInbox -> {
-                InboxOfflineNodeInformation(
+            isInBackups -> {
+                BackupsOfflineNodeInformation(
                     path = path,
                     name = node.name,
                     handle = node.id.longValue.toString(),

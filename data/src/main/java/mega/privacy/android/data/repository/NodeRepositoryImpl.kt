@@ -141,10 +141,10 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun isNodeInInbox(handle: Long) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInInbox(it) }
+    override suspend fun isNodeInBackups(handle: Long) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInBackups(it) }
             ?: run {
-                Timber.w("isNodeInInbox returns false because the node with handle $handle was not found")
+                Timber.w("isNodeInBackups returns false because the node with handle $handle was not found")
                 false
             }
     }
@@ -625,9 +625,9 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getInboxNode(): UnTypedNode? =
+    override suspend fun getBackupsNode(): UnTypedNode? =
         withContext(ioDispatcher) {
-            megaApiGateway.getInboxNode()?.let { megaNode ->
+            megaApiGateway.getBackupsNode()?.let { megaNode ->
                 convertToUnTypedNode(megaNode)
             }
         }

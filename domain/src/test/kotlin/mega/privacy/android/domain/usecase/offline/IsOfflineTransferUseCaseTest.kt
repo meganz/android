@@ -58,7 +58,7 @@ class IsOfflineTransferUseCaseTest {
 
     private fun stubPaths() = runTest {
         whenever(fileSystemRepository.getOfflinePath()).thenReturn(offlinePath)
-        whenever(fileSystemRepository.getOfflineInboxPath()).thenReturn(offlineBackupPath)
+        whenever(fileSystemRepository.getOfflineBackupsPath()).thenReturn(offlineBackupPath)
     }
 
     companion object {

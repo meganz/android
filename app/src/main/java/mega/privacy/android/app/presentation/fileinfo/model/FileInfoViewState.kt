@@ -22,7 +22,7 @@ import nz.mega.sdk.MegaShare
  * @param downloadEvent one-off event to start downloading the node
  * @param jobInProgressState indicates if there are any job in progress that needs to be notified
  * @param historyVersions the num of history versions that this file contains, 0 if it's not a file or doesn't contain history versions
- * @param isNodeInInbox determines if the node is in the inbox or not (aka backup)
+ * @param isNodeInBackups determines if the node is in Backups or not
  * @param isNodeInRubbish determines if the node is in the rubbish bin or not
  * @param previewUriString the uri of the file containing the preview
  * @param thumbnailUriString the uri of the file containing the thumbnail, just as a fallback in case there's no [previewUriString]
@@ -59,7 +59,7 @@ internal data class FileInfoViewState(
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val jobInProgressState: FileInfoJobInProgressState? = FileInfoJobInProgressState.InitialLoading,
     val historyVersions: Int = 0,
-    val isNodeInInbox: Boolean = false,
+    val isNodeInBackups: Boolean = false,
     val isNodeInRubbish: Boolean = false,
     val previewUriString: String? = null,
     val thumbnailUriString: String? = null,

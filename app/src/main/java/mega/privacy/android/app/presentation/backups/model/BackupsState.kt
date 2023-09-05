@@ -1,25 +1,25 @@
-package mega.privacy.android.app.presentation.inbox.model
+package mega.privacy.android.app.presentation.backups.model
 
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
 /**
- * Inbox UI State
+ * The Backups UI State
  *
  * @property currentViewType The current [ViewType]
  * @property hideMultipleItemSelection Whether to hide the Multiple Item Selection or not
- * @property inboxHandle The current Inbox Handle
- * @property nodes List of Inbox Nodes
- * @property shouldExitInbox Whether the User should leave the Inbox screen or not
+ * @property backupsHandle The current Backups Handle
+ * @property nodes The list of Backups Nodes
+ * @property shouldExitBackups Whether the User should leave the Backups page or not
  * @property triggerBackPress Whether the User has triggered a Back Press behavior or not
- * @property isPendingRefresh
+ * @property isPendingRefresh Whether a refresh of the Backup Contents is needed or not
  */
-data class InboxState(
+data class BackupsState(
     val currentViewType: ViewType = ViewType.LIST,
     val hideMultipleItemSelection: Boolean = false,
-    val inboxHandle: Long = -1L,
+    val backupsHandle: Long = -1L,
     val nodes: List<MegaNode> = emptyList(),
-    val shouldExitInbox: Boolean = false,
+    val shouldExitBackups: Boolean = false,
     val triggerBackPress: Boolean = false,
     val isPendingRefresh: Boolean = false,
 )

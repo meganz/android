@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.CreateShareKey
-import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -85,9 +85,9 @@ import javax.inject.Inject
  * Manager view model
  *
  * @property monitorGlobalUpdates
- * @property getInboxNode
+ * @property getBackupsNode
  * @property getNumUnreadUserAlertsUseCase
- * @property hasInboxChildren
+ * @property hasBackupsChildren
  * @property sendStatisticsMediaDiscoveryUseCase
  * @property savedStateHandle
  * @property monitorStorageStateEventUseCase
@@ -122,9 +122,9 @@ class ManagerViewModel @Inject constructor(
     monitorContactUpdates: MonitorContactUpdates,
     private val monitorGlobalUpdates: MonitorGlobalUpdates,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
-    private val getInboxNode: GetInboxNode,
+    private val getBackupsNode: GetBackupsNode,
     private val getNumUnreadUserAlertsUseCase: GetNumUnreadUserAlertsUseCase,
-    private val hasInboxChildren: HasInboxChildren,
+    private val hasBackupsChildren: HasBackupsChildren,
     private val sendStatisticsMediaDiscoveryUseCase: SendStatisticsMediaDiscoveryUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
@@ -181,9 +181,9 @@ class ManagerViewModel @Inject constructor(
     val state: StateFlow<ManagerState> = _state
 
     /**
-     * private Inbox Node
+     * private Backups Node
      */
-    private var inboxNode: MegaNode? = null
+    private var backupsNode: MegaNode? = null
 
     /**
      * Monitor connectivity event
@@ -257,7 +257,7 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             monitorNodeUpdates().collect {
                 val nodeList = it.changes.keys.toList()
-                checkItemForInbox(nodeList)
+                checkItemForBackups(nodeList)
                 onReceiveNodeUpdate(true)
                 checkCameraUploadFolder(nodeList)
                 checkUnverifiedSharesCount()
@@ -358,11 +358,11 @@ class ManagerViewModel @Inject constructor(
             }
     }
 
-    private fun checkItemForInbox(updatedNodes: List<Node>) {
-        //Verify is it is a new item to the inbox
-        inboxNode?.let { node ->
+    private fun checkItemForBackups(updatedNodes: List<Node>) {
+        // Verify if it is a new item to Backups
+        backupsNode?.let { node ->
             updatedNodes.find { node.handle == it.parentId.longValue }
-                ?.run { updateInboxSectionVisibility() }
+                ?.run { updateBackupsSectionVisibility() }
         }
     }
 
@@ -430,12 +430,12 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Checks the Inbox section visibility.
+     * Checks the Backups section visibility.
      */
-    fun updateInboxSectionVisibility() {
+    fun updateBackupsSectionVisibility() {
         viewModelScope.launch {
             _state.update {
-                it.copy(hasInboxChildren = hasInboxChildren())
+                it.copy(hasBackupsChildren = hasBackupsChildren())
             }
         }
     }
@@ -457,11 +457,11 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Set Inbox Node state in ViewModel initially
+     * Set Backups Node State in ViewModel initially
      */
-    fun setInboxNode() {
+    fun setBackupsNode() {
         viewModelScope.launch {
-            inboxNode = getInboxNode()
+            backupsNode = getBackupsNode()
         }
     }
 
@@ -563,7 +563,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Set last used path of copy as target path for next copy
      */
-    fun setCopyTargetPath(path: Long) {
+    private fun setCopyTargetPath(path: Long) {
         viewModelScope.launch {
             runCatching { setCopyLatestTargetPathUseCase(path) }
                 .onFailure { Timber.e(it) }
@@ -573,7 +573,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Set last used path of move as target path for next move
      */
-    fun setMoveTargetPath(path: Long) {
+    private fun setMoveTargetPath(path: Long) {
         viewModelScope.launch {
             runCatching { setMoveLatestTargetPathUseCase(path) }
                 .onFailure { Timber.e(it) }

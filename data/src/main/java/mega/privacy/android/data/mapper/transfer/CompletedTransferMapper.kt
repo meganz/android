@@ -181,7 +181,7 @@ class CompletedTransferMapper @Inject constructor(
      */
     private suspend fun formatOfflineNodePath(parentPath: String, handle: Long): String {
         val node = megaApiGateway.getMegaNodeByHandle(handle) ?: return ""
-        val inboxOfflineFolder = fileGateway.getOfflineFilesInboxRootPath()
+        val backupsOfflineFolder = fileGateway.getOfflineFilesBackupsRootPath()
         val offlineFolder = fileGateway.getOfflineFilesRootPath()
         val incomingOfflineFolderPath = node.let {
             val rootParent = findRootParentNode(node)
@@ -189,8 +189,8 @@ class CompletedTransferMapper @Inject constructor(
         }
         val path = parentPath.run {
             when {
-                startsWith(inboxOfflineFolder) ->
-                    removePrefix(inboxOfflineFolder)
+                startsWith(backupsOfflineFolder) ->
+                    removePrefix(backupsOfflineFolder)
 
                 incomingOfflineFolderPath != null && startsWith(incomingOfflineFolderPath) ->
                     removePrefix(incomingOfflineFolderPath)

@@ -131,12 +131,12 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getRootNode()
     }
 
-    override suspend fun getInboxNode(): MegaNode? = withContext(ioDispatcher) {
-        megaApiGateway.getInboxNode()
+    override suspend fun getBackupsNode(): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getBackupsNode()
     }
 
-    override suspend fun isNodeInInbox(megaNode: MegaNode) = withContext(ioDispatcher) {
-        megaApiGateway.isInInbox(megaNode)
+    override suspend fun isNodeInBackups(megaNode: MegaNode) = withContext(ioDispatcher) {
+        megaApiGateway.isInBackups(megaNode)
     }
 
     override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
@@ -209,8 +209,8 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.isPendingShare(node)
     }
 
-    override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {
-        megaApiGateway.getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
+    override suspend fun hasBackupsChildren(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.getBackupsNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
 
 

@@ -118,7 +118,7 @@ class GetNodeUseCase @Inject constructor(
      * @param node  MegaNode
      * @return      Single with Mega Node Item
      */
-    fun getNodeItem(node: MegaNode?): Single<MegaNodeItem> =
+    private fun getNodeItem(node: MegaNode?): Single<MegaNodeItem> =
         Single.fromCallable {
             requireNotNull(node)
 
@@ -157,11 +157,11 @@ class GetNodeUseCase @Inject constructor(
             val rootParentNode = megaApi.getRootParentNode(node)
             val isFromIncoming = rootParentNode.isInShare
             var isFromRubbishBin = false
-            var isFromInbox = false
+            var isFromBackups = false
             var isFromRoot = false
             when (rootParentNode.handle) {
                 megaApi.rootNode?.handle -> isFromRoot = true
-                megaApi.inboxNode?.handle -> isFromInbox = true
+                megaApi.inboxNode?.handle -> isFromBackups = true
                 megaApi.rubbishNode?.handle -> isFromRubbishBin = true
             }
 
@@ -174,7 +174,7 @@ class GetNodeUseCase @Inject constructor(
                 hasOwnerAccess = hasOwnerAccess,
                 isFromIncoming = isFromIncoming,
                 isFromRubbishBin = isFromRubbishBin,
-                isFromInbox = isFromInbox,
+                isFromBackups = isFromBackups,
                 isFromRoot = isFromRoot,
                 isExternalNode = isExternalNode,
                 hasVersions = hasVersions,
@@ -219,7 +219,7 @@ class GetNodeUseCase @Inject constructor(
                         hasOwnerAccess = false,
                         isFromIncoming = offlineNode.origin == MegaOffline.INCOMING,
                         isFromRubbishBin = false,
-                        isFromInbox = offlineNode.origin == MegaOffline.INBOX,
+                        isFromBackups = offlineNode.origin == MegaOffline.BACKUPS,
                         isFromRoot = false,
                         hasVersions = false,
                         isExternalNode = false,
@@ -281,7 +281,7 @@ class GetNodeUseCase @Inject constructor(
      * @param isFavorite    Flag to mark/unmark as favorite
      * @return              Completable
      */
-    fun markAsFavorite(node: MegaNode?, isFavorite: Boolean): Completable =
+    private fun markAsFavorite(node: MegaNode?, isFavorite: Boolean): Completable =
         Completable.create { emitter ->
             if (node == null) {
                 emitter.onError(IllegalArgumentException("Null node"))
@@ -305,7 +305,7 @@ class GetNodeUseCase @Inject constructor(
      * @param nodeHandle    Mega Node handle to check
      * @return              Single with true if it's available, false otherwise
      */
-    fun isNodeAvailableOffline(nodeHandle: Long): Single<Boolean> =
+    private fun isNodeAvailableOffline(nodeHandle: Long): Single<Boolean> =
         Single.fromCallable {
             databaseHandler.findByHandle(nodeHandle)?.let { offlineNode ->
                 val offlineFile = OfflineUtils.getOfflineFile(context, offlineNode)
@@ -323,47 +323,20 @@ class GetNodeUseCase @Inject constructor(
         }
 
     /**
-     * Set node as available offline given its Node Handle.
-     *
-     * @param nodeHandle            Node handle to set available offline
-     * @param setOffline            Flag to set/unset available offline
-     * @param activity              Activity context needed to create file
-     * @param isFromIncomingShares  Flag indicating if node is from incoming shares.
-     * @param isFromInbox           Flag indicating if node is from inbox.
-     * @return                      Completable
-     */
-    fun setNodeAvailableOffline(
-        nodeHandle: Long,
-        setOffline: Boolean,
-        isFromIncomingShares: Boolean = false,
-        isFromInbox: Boolean = false,
-        activity: Activity,
-    ): Completable =
-        get(nodeHandle).flatMapCompletable {
-            setNodeAvailableOffline(
-                it,
-                setOffline,
-                isFromIncomingShares,
-                isFromInbox,
-                activity
-            )
-        }
-
-    /**
      * Set node as available offline
      *
      * @param node                  Node to set available offline
      * @param setOffline            Flag to set/unset available offline
      * @param activity              Activity context needed to create file
      * @param isFromIncomingShares  Flag indicating if node is from incoming shares.
-     * @param isFromInbox           Flag indicating if node is from inbox.
+     * @param isFromBackups         Flag indicating if node is from Backups.
      * @return                      Completable
      */
     fun setNodeAvailableOffline(
         node: MegaNode?,
         setOffline: Boolean,
         isFromIncomingShares: Boolean = false,
-        isFromInbox: Boolean = false,
+        isFromBackups: Boolean = false,
         activity: Activity,
     ): Completable =
         Completable.fromCallable {
@@ -374,7 +347,7 @@ class GetNodeUseCase @Inject constructor(
                 setOffline && !isAvailableOffline -> {
                     val from = when {
                         isFromIncomingShares -> Constants.FROM_INCOMING_SHARES
-                        isFromInbox -> Constants.FROM_INBOX
+                        isFromBackups -> Constants.FROM_BACKUPS
                         else -> Constants.FROM_OTHERS
                     }
 

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.data.model.node.OfflineInformation.Companion.FILE
 import mega.privacy.android.data.model.node.OfflineInformation.Companion.FOLDER
-import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import org.junit.jupiter.api.BeforeAll
@@ -39,7 +39,7 @@ internal class OfflineInformationMapperTest {
                     incomingHandle = expectedIncomingHandle,
                     isFolder = isFolderNode,
                 ),
-                OfflineInformation.INBOX to InboxOfflineNodeInformation(
+                OfflineInformation.BACKUPS to BackupsOfflineNodeInformation(
                     path = expectedPath,
                     name = expectedName,
                     handle = expectedHandle,

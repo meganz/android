@@ -91,11 +91,11 @@ interface FileGateway {
     suspend fun getOfflineFilesRootPath(): String
 
     /**
-     * Get offline files inbox root path
+     * Get offline files Backups root path
      *
-     * @return the root path of inbox offline files
+     * @return the root path of Backups offline files
      */
-    suspend fun getOfflineFilesInboxRootPath(): String
+    suspend fun getOfflineFilesBackupsRootPath(): String
 
     /**
      * remove GPS CoOrdinates from the file

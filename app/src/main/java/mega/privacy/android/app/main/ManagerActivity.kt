@@ -189,14 +189,14 @@ import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
-import mega.privacy.android.app.presentation.inbox.InboxFragment
-import mega.privacy.android.app.presentation.inbox.InboxViewModel
+import mega.privacy.android.app.presentation.backups.BackupsFragment
+import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.manager.fileBrowserState
-import mega.privacy.android.app.presentation.manager.inboxState
+import mega.privacy.android.app.presentation.manager.backupsState
 import mega.privacy.android.app.presentation.manager.incomingSharesState
 import mega.privacy.android.app.presentation.manager.linksState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
@@ -390,7 +390,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val fileBrowserViewModel: FileBrowserViewModel by viewModels()
     internal val incomingSharesViewModel: IncomingSharesViewModel by viewModels()
     internal val outgoingSharesViewModel: OutgoingSharesViewModel by viewModels()
-    internal val inboxViewModel: InboxViewModel by viewModels()
+    internal val backupsViewModel: BackupsViewModel by viewModels()
     internal val legacyLinksViewModel: LegacyLinksViewModel by viewModels()
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     internal val searchViewModel: SearchViewModel by viewModels()
@@ -562,7 +562,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
     private var syncFragment: SyncFragment? = null
     private var deviceCenterFragment: DeviceCenterFragment? = null
-    private var inboxFragment: InboxFragment? = null
+    private var backupsFragment: BackupsFragment? = null
     private var incomingSharesFragment: MegaNodeBaseFragment? = null
     private var outgoingSharesFragment: MegaNodeBaseFragment? = null
     private var linksFragment: MegaNodeBaseFragment? = null
@@ -604,7 +604,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var myAccountHeader: RelativeLayout
     private lateinit var contactStatus: ImageView
     private lateinit var myAccountSection: RelativeLayout
-    private lateinit var inboxSection: RelativeLayout
+    private lateinit var backupsSection: RelativeLayout
     private lateinit var contactsSection: RelativeLayout
     private lateinit var notificationsSection: RelativeLayout
     private lateinit var syncSection: RelativeLayout
@@ -1089,7 +1089,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         myAccountHeader = findViewById(R.id.navigation_drawer_account_section)
         contactStatus = findViewById(R.id.contact_state)
         myAccountSection = findViewById(R.id.my_account_section)
-        inboxSection = findViewById(R.id.inbox_section)
+        backupsSection = findViewById(R.id.backups_section)
         contactsSection = findViewById(R.id.contacts_section)
         notificationsSection = findViewById(R.id.notifications_section)
         notificationsSectionText = findViewById(R.id.notification_section_text)
@@ -1186,7 +1186,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         })
         myAccountHeader.setOnClickListener(this)
         myAccountSection.setOnClickListener(this)
-        inboxSection.setOnClickListener(this)
+        backupsSection.setOnClickListener(this)
         contactsSection.setOnClickListener(this)
         notificationsSection.setOnClickListener(this)
         findViewById<View>(R.id.offline_section).setOnClickListener(this)
@@ -1391,7 +1391,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             return true
         } else {
-            viewModel.setInboxNode()
+            viewModel.setBackupsNode()
             attr = dbH.attributes
             if (attr?.invalidateSdkCache.toBoolean()) {
                 Timber.d("megaApi.invalidateCache();")
@@ -1485,8 +1485,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     }
 
                                     megaApi.inboxNode?.handle -> {
-                                        drawerItem = DrawerItem.INBOX
-                                        inboxViewModel.updateInboxHandle(handleIntent)
+                                        drawerItem = DrawerItem.BACKUPS
+                                        backupsViewModel.updateBackupsHandle(handleIntent)
                                         selectDrawerItem(drawerItem)
                                         selectDrawerItemPending = false
                                     }
@@ -1981,7 +1981,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (!canVerifyPhoneNumber) {
                 hideAddPhoneNumberButton()
             }
-            updateInboxSectionVisibility(managerState.hasInboxChildren)
+            updateBackupsSectionVisibility(managerState.hasBackupsChildren)
             if (managerState.enabledFlags.contains(AppFeatures.AndroidSync)) {
                 syncSection.visibility = View.VISIBLE
                 syncNavigator.startSyncService(this)
@@ -2442,8 +2442,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 rubbishBinViewModel.setRubbishBinHandle(handleIntent)
                 DrawerItem.RUBBISH_BIN
             } else if (megaApi.isInInbox(parentIntentN)) {
-                inboxViewModel.updateInboxHandle(handleIntent)
-                DrawerItem.INBOX
+                backupsViewModel.updateBackupsHandle(handleIntent)
+                DrawerItem.BACKUPS
             } else {
                 fileBrowserViewModel.setBrowserParentHandle(handleIntent)
                 DrawerItem.CLOUD_DRIVE
@@ -2979,17 +2979,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setToolbarForSharedItemsDrawerItem()
             }
 
-            DrawerItem.INBOX -> {
+            DrawerItem.BACKUPS -> {
                 supportActionBar?.subtitle = null
-                // If the Inbox Parent Handle is equal to the My Backups Folder Handle or is -1L,
+                // If the Backups Parent Handle is equal to the My Backups Folder Handle or is -1L,
                 // then set the corresponding title and first navigation level
-                if (inboxViewModel.isCurrentlyOnBackupFolderLevel()) {
+                if (backupsViewModel.isCurrentlyOnBackupFolderLevel()) {
                     supportActionBar?.title =
                         resources.getString(R.string.home_side_menu_backups_title)
                     viewModel.setIsFirstNavigationLevel(true)
                 } else {
                     val node = withContext(ioDispatcher) {
-                        megaApi.getNodeByHandle(this@ManagerActivity.inboxState().inboxHandle)
+                        megaApi.getNodeByHandle(this@ManagerActivity.backupsState().backupsHandle)
                     }
                     supportActionBar?.title = node?.name
                     viewModel.setIsFirstNavigationLevel(false)
@@ -3172,7 +3172,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val totalNotifications = numUnreadUserAlerts + totalIncomingContactRequestCount
         if (totalNotifications == 0) {
             if (isFirstNavigationLevel) {
-                if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.INBOX || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
+                if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
                     supportActionBar?.setHomeAsUpIndicator(
                         tintIcon(
                             this,
@@ -3192,7 +3192,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         } else {
             if (isFirstNavigationLevel) {
-                if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.INBOX || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
+                if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
                     badgeDrawable?.progress = 1.0f
                 } else {
                     badgeDrawable?.progress = 0.0f
@@ -3338,7 +3338,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
             }
 
-            DrawerItem.SEARCH, DrawerItem.TRANSFERS, DrawerItem.NOTIFICATIONS, DrawerItem.INBOX -> {
+            DrawerItem.SEARCH, DrawerItem.TRANSFERS, DrawerItem.NOTIFICATIONS, DrawerItem.BACKUPS -> {
                 setBottomNavigationMenuItemChecked(NO_BNV)
             }
 
@@ -3785,17 +3785,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            DrawerItem.INBOX -> {
+            DrawerItem.BACKUPS -> {
                 showHideBottomNavigationView(true)
                 appBarLayout.visibility = View.VISIBLE
-                inboxFragment =
-                    supportFragmentManager.findFragmentByTag(FragmentTag.INBOX.tag) as? InboxFragment
-                if (inboxFragment == null) {
-                    inboxFragment = InboxFragment.newInstance()
+                backupsFragment =
+                    supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+                if (backupsFragment == null) {
+                    backupsFragment = BackupsFragment.newInstance()
                 }
-                inboxFragment?.let { replaceFragment(it, FragmentTag.INBOX.tag) }
+                backupsFragment?.let { replaceFragment(it, FragmentTag.BACKUPS.tag) }
                 if (openFolderRefresh) {
-                    onNodesInboxUpdate()
+                    onNodesBackupsUpdate()
                     openFolderRefresh = false
                 }
                 supportInvalidateOptionsMenu()
@@ -4042,11 +4042,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            DrawerItem.INBOX -> {
-                inboxFragment =
-                    supportFragmentManager.findFragmentByTag(FragmentTag.INBOX.tag) as? InboxFragment
-                if (inboxFragment != null) {
-                    inboxFragment?.checkScroll()
+            DrawerItem.BACKUPS -> {
+                backupsFragment =
+                    supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+                if (backupsFragment != null) {
+                    backupsFragment?.checkScroll()
                 }
             }
 
@@ -4317,7 +4317,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         searchViewModel.performSearch(
                             fileBrowserState().fileBrowserHandle,
                             rubbishBinState().rubbishBinHandle,
-                            inboxState().inboxHandle,
+                            backupsState().backupsHandle,
                             incomingSharesState().incomingHandle,
                             outgoingSharesState().outgoingHandle,
                             linksState().linksHandle,
@@ -4376,9 +4376,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
                 DrawerItem.PHOTOS -> {}
-                DrawerItem.INBOX -> {
+                DrawerItem.BACKUPS -> {
                     moreMenuItem.isVisible = false
-                    if ((getInboxFragment()?.getNodeCount() ?: 0) > 0) {
+                    if ((getBackupsFragment()?.getNodeCount() ?: 0) > 0) {
                         searchMenuItem?.isVisible = true
                     }
                 }
@@ -4514,7 +4514,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         return when (item.itemId) {
             android.R.id.home -> {
                 if (isFirstNavigationLevel && drawerItem !== DrawerItem.SEARCH) {
-                    if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.INBOX || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.TRANSFERS) {
+                    if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.TRANSFERS) {
                         backToDrawerItem(bottomNavigationCurrentItem)
                         if (transfersToImageViewer) {
                             switchImageViewerToFront()
@@ -4560,11 +4560,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
                             onBackPressedDispatcher.onBackPressed()
                         }
-                    } else if (drawerItem === DrawerItem.INBOX) {
-                        inboxFragment =
-                            supportFragmentManager.findFragmentByTag(FragmentTag.INBOX.tag) as? InboxFragment
-                        if (inboxFragment != null) {
-                            inboxFragment?.onBackPressed()
+                    } else if (drawerItem === DrawerItem.BACKUPS) {
+                        backupsFragment =
+                            supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+                        if (backupsFragment != null) {
+                            backupsFragment?.onBackPressed()
                             return true
                         }
                     } else if (drawerItem === DrawerItem.SEARCH) {
@@ -4649,8 +4649,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         fullscreenOfflineFragment?.selectAll()
                     }
 
-                    DrawerItem.INBOX -> if (getInboxFragment() != null) {
-                        inboxFragment?.selectAll()
+                    DrawerItem.BACKUPS -> if (getBackupsFragment() != null) {
+                        backupsFragment?.selectAll()
                     }
 
                     DrawerItem.SEARCH -> if (getSearchFragment() != null) {
@@ -4768,8 +4768,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("refreshAfterMovingToRubbish")
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             refreshCloudDrive()
-        } else if (drawerItem === DrawerItem.INBOX) {
-            onNodesInboxUpdate()
+        } else if (drawerItem === DrawerItem.BACKUPS) {
+            onNodesBackupsUpdate()
         } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
             onNodesSharedUpdate()
         } else if (drawerItem === DrawerItem.SEARCH) {
@@ -4786,11 +4786,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Refreshes the contents of InboxFragment once a sorting method has been selected
+     * Refreshes the contents of [BackupsFragment] once a sorting method has been selected
      */
-    private fun refreshInboxFragment() {
-        if (inboxFragment != null) {
-            inboxViewModel.refreshInboxNodes()
+    private fun refreshBackupsFragment() {
+        if (backupsFragment != null) {
+            backupsViewModel.refreshBackupsNodes()
         }
     }
 
@@ -4854,13 +4854,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (transfersToImageViewer) {
                 switchImageViewerToFront()
             }
-        } else if (drawerItem === DrawerItem.INBOX) {
-            inboxFragment = supportFragmentManager
-                .findFragmentByTag(FragmentTag.INBOX.tag) as? InboxFragment
-            if (inboxFragment == null) {
+        } else if (drawerItem === DrawerItem.BACKUPS) {
+            backupsFragment = supportFragmentManager
+                .findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+            if (backupsFragment == null) {
                 backToDrawerItem(bottomNavigationCurrentItem)
             } else {
-                inboxFragment?.onBackPressed()
+                backupsFragment?.onBackPressed()
             }
         } else if (drawerItem === DrawerItem.NOTIFICATIONS) {
             backToDrawerItem(bottomNavigationCurrentItem)
@@ -4986,9 +4986,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Exit the Inbox Screen
+     * Exits the Backups Page
      */
-    fun exitInboxScreen() {
+    fun exitBackupsPage() {
         backToDrawerItem(bottomNavigationCurrentItem)
     }
 
@@ -5224,9 +5224,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     refreshCloudDrive()
                 }
 
-                DrawerItem.INBOX -> {
-                    inboxViewModel.updateInboxHandle(oldParentHandle)
-                    refreshInboxList()
+                DrawerItem.BACKUPS -> {
+                    backupsViewModel.updateBackupsHandle(oldParentHandle)
+                    refreshBackupsList()
                 }
 
                 DrawerItem.SHARED_ITEMS -> {
@@ -5569,7 +5569,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.CLOUD_DRIVE -> parentHandle =
                     fileBrowserViewModel.getSafeBrowserParentHandle()
 
-                DrawerItem.INBOX -> parentHandle = this.inboxState().inboxHandle
+                DrawerItem.BACKUPS -> parentHandle = this.backupsState().backupsHandle
                 DrawerItem.RUBBISH_BIN -> parentHandle =
                     this@ManagerActivity.rubbishBinState().rubbishBinHandle
 
@@ -5608,7 +5608,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 else -> {}
                             }
 
-                            DrawerItem.INBOX -> parentHandle = this.inboxState().inboxHandle
+                            DrawerItem.BACKUPS -> parentHandle = this.backupsState().backupsHandle
                             else -> {}
                         }
                     }
@@ -6200,8 +6200,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         // Refresh Rubbish Fragment
         refreshRubbishBin()
 
-        // Refresh Inbox Fragment
-        refreshInboxFragment()
+        // Refresh Backups Fragment
+        refreshBackupsFragment()
         onNodesSharedUpdate()
         refreshSearch()
     }
@@ -6225,9 +6225,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         rubbishBinViewModel.setRubbishBinHandle(parentHandleRubbish)
     }
 
-    fun setParentHandleInbox(parentHandleInbox: Long) {
-        Timber.d("setParentHandleInbox: %s", parentHandleInbox)
-        inboxViewModel.updateInboxHandle(parentHandleInbox)
+    fun setParentHandleBackups(parentHandleBackups: Long) {
+        Timber.d("setParentHandleBackups: %s", parentHandleBackups)
+        backupsViewModel.updateBackupsHandle(parentHandleBackups)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -6329,9 +6329,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            R.id.inbox_section -> {
+            R.id.backups_section -> {
                 sectionClicked = true
-                drawerItem = DrawerItem.INBOX
+                drawerItem = DrawerItem.BACKUPS
             }
 
             R.id.contacts_section -> {
@@ -6932,7 +6932,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         myAccountSection.findViewById<TextView>(R.id.my_account_section_text).setTextColor(
             ContextCompat.getColor(this, R.color.grey_038_white_038)
         )
-        viewModel.updateInboxSectionVisibility()
+        viewModel.updateBackupsSectionVisibility()
         contactsSection.isEnabled = false
         contactsSectionText.alpha = 0.38f
         notificationsSection.isEnabled = false
@@ -6980,7 +6980,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         myAccountSection.findViewById<TextView>(R.id.my_account_section_text).setTextColor(
             ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary)
         )
-        viewModel.updateInboxSectionVisibility()
+        viewModel.updateBackupsSectionVisibility()
         contactsSection.isEnabled = true
         contactsSectionText.alpha = 1f
         notificationsSection.isEnabled = true
@@ -7869,11 +7869,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             megaApi.inboxNode?.handle -> {
-                //Inbox
-                drawerItem = DrawerItem.INBOX
+                // Backups
+                drawerItem = DrawerItem.BACKUPS
                 openFolderRefresh = true
-                comesFromNotificationHandleSaved = this.inboxState().inboxHandle
-                inboxViewModel.updateInboxHandle(nodeHandle)
+                comesFromNotificationHandleSaved = this.backupsState().backupsHandle
+                backupsViewModel.updateBackupsHandle(nodeHandle)
                 selectDrawerItem(drawerItem)
             }
 
@@ -7904,11 +7904,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         refreshCloudDrive()
     }
 
-    fun onNodesInboxUpdate() {
-        inboxFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.INBOX.tag) as? InboxFragment
-        inboxFragment?.hideMultipleSelect()
-        inboxViewModel.refreshInboxNodes()
+    fun onNodesBackupsUpdate() {
+        backupsFragment =
+            supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+        backupsFragment?.hideMultipleSelect()
+        backupsViewModel.refreshBackupsNodes()
     }
 
     fun onNodesSearchUpdate() {
@@ -7928,10 +7928,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         legacyLinksViewModel.refreshLinksSharesNode()
     }
 
-    fun refreshInboxList() {
-        inboxFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.INBOX.tag) as? InboxFragment
-        inboxFragment?.invalidateRecyclerView()
+    fun refreshBackupsList() {
+        backupsFragment =
+            supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+        backupsFragment?.invalidateRecyclerView()
     }
 
     fun refreshSharesFragments() {
@@ -8344,9 +8344,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 refreshSharesPageAdapter()
             }
 
-            DrawerItem.INBOX -> {
-                inboxViewModel.updateInboxHandle(node.handle)
-                refreshFragment(FragmentTag.INBOX.tag)
+            DrawerItem.BACKUPS -> {
+                backupsViewModel.updateBackupsHandle(node.handle)
+                refreshFragment(FragmentTag.BACKUPS.tag)
             }
 
             else -> {}
@@ -8592,8 +8592,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             refreshSharesPageAdapter()
             selectDrawerItem(DrawerItem.SHARED_ITEMS)
         } else if (parentNode.handle == megaApi.inboxNode?.handle) {
-            refreshFragment(FragmentTag.INBOX.tag)
-            selectDrawerItem(DrawerItem.INBOX)
+            refreshFragment(FragmentTag.BACKUPS.tag)
+            selectDrawerItem(DrawerItem.BACKUPS)
         }
     }
 
@@ -8649,9 +8649,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun getInboxFragment(): InboxFragment? {
-        return (supportFragmentManager.findFragmentByTag(FragmentTag.INBOX.tag) as? InboxFragment).also {
-            inboxFragment = it
+    private fun getBackupsFragment(): BackupsFragment? {
+        return (supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment).also {
+            backupsFragment = it
         }
     }
 
@@ -8703,7 +8703,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> refreshCloudDrive()
             DrawerItem.RUBBISH_BIN -> refreshRubbishBin()
-            DrawerItem.INBOX -> refreshInboxList()
+            DrawerItem.BACKUPS -> refreshBackupsList()
             DrawerItem.SHARED_ITEMS -> {
                 refreshOutgoingShares()
                 refreshIncomingShares()
@@ -8989,20 +8989,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Updates Inbox section visibility depending on if it has children.
+     * Updates Backups section visibility depending on if it has children.
      *
-     * @param hasChildren True if the Inbox node has children, false otherwise.
+     * @param hasChildren True if the Backups node has children, false otherwise.
      */
-    private fun updateInboxSectionVisibility(hasChildren: Boolean) {
-        Timber.d("updateInboxSectionVisibility")
+    private fun updateBackupsSectionVisibility(hasChildren: Boolean) {
+        Timber.d("updateBackupsSectionVisibility")
         if (hasChildren) {
-            inboxSection.isEnabled = true
-            inboxSection.visibility = View.VISIBLE
-            inboxSection.findViewById<TextView>(R.id.inbox_section_text).setTextColor(
+            backupsSection.isEnabled = true
+            backupsSection.visibility = View.VISIBLE
+            backupsSection.findViewById<TextView>(R.id.backups_section_text).setTextColor(
                 ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary)
             )
         } else {
-            inboxSection.visibility = View.GONE
+            backupsSection.visibility = View.GONE
         }
     }
 

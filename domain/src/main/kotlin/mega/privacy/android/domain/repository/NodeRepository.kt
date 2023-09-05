@@ -65,11 +65,11 @@ interface NodeRepository {
     suspend fun isNodeInRubbish(handle: Long): Boolean
 
     /**
-     * check whether the node is in inbox or not
+     * check whether the node is in Backups or not
      *
      * @return Boolean
      */
-    suspend fun isNodeInInbox(handle: Long): Boolean
+    suspend fun isNodeInBackups(handle: Long): Boolean
 
     /**
      * check whether the node is in cloud drive or not
@@ -437,11 +437,11 @@ interface NodeRepository {
     suspend fun getRubbishNode(): UnTypedNode?
 
     /**
-     * Get inbox node
+     * Get the Backups node
      *
      * @return [UnTypedNode]?
      */
-    suspend fun getInboxNode(): UnTypedNode?
+    suspend fun getBackupsNode(): UnTypedNode?
 
     /**
      * MegaApiFolder gets root node

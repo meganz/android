@@ -175,8 +175,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getOfflinePath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesRootPath() }
 
-    override suspend fun getOfflineInboxPath() =
-        withContext(ioDispatcher) { fileGateway.getOfflineFilesInboxRootPath() }
+    override suspend fun getOfflineBackupsPath() =
+        withContext(ioDispatcher) { fileGateway.getOfflineFilesBackupsRootPath() }
 
     override suspend fun createFolder(name: String) = withContext(ioDispatcher) {
         val megaNode = megaApiGateway.getRootNode()

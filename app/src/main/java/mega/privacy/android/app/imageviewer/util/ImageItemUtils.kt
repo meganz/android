@@ -8,7 +8,7 @@ fun ImageItem.shouldShowInfoOption(isUserLoggedIn: Boolean): Boolean =
 
 fun ImageItem.shouldShowFavoriteOption(): Boolean =
     this !is ImageItem.OfflineNode && this !is ImageItem.ChatNode && nodeItem?.hasFullAccess == true
-            && nodeItem?.isFromRubbishBin != true && nodeItem?.node?.isTakenDown != true && nodeItem?.isFromInbox == false
+            && nodeItem?.isFromRubbishBin != true && nodeItem?.node?.isTakenDown != true && nodeItem?.isFromBackups == false
 
 fun ImageItem.shouldShowLabelOption(): Boolean =
     shouldShowFavoriteOption()
@@ -55,7 +55,7 @@ fun ImageItem.shouldShowShareOption(): Boolean =
 
 fun ImageItem.shouldShowRenameOption(): Boolean =
     this !is ImageItem.OfflineNode && nodeItem?.isFromRubbishBin != true && nodeItem?.hasFullAccess == true
-            && this !is ImageItem.ChatNode && nodeItem?.isFromInbox == false
+            && this !is ImageItem.ChatNode && nodeItem?.isFromBackups == false
 
 fun ImageItem.shouldShowMoveOption(): Boolean =
     shouldShowRenameOption()
@@ -72,4 +72,4 @@ fun ImageItem.shouldShowChatRemoveOption(): Boolean =
     this is ImageItem.ChatNode && isDeletable
 
 fun ImageItem.shouldShowRubbishBinOption(): Boolean =
-    nodeItem?.hasFullAccess == true && nodeItem?.isFromInbox == false && this !is ImageItem.ChatNode
+    nodeItem?.hasFullAccess == true && nodeItem?.isFromBackups == false && this !is ImageItem.ChatNode
