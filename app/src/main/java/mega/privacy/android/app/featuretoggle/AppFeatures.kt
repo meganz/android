@@ -168,7 +168,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * InAppUpdate toggle
      */
-    InAppUpdate("Enable In-App Update", false),
+    InAppUpdate("Enable In-App Update", true),
 
     /**
      * InAppUpdate Incremental Prompt toggle

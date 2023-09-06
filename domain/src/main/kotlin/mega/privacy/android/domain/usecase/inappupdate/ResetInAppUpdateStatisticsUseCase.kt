@@ -8,6 +8,7 @@ import javax.inject.Inject
 class ResetInAppUpdateStatisticsUseCase @Inject constructor(
     private val setLastInAppUpdatePromptTimeUseCase: SetLastInAppUpdatePromptTimeUseCase,
     private val setInAppUpdatePromptCountUseCase: SetInAppUpdatePromptCountUseCase,
+    private val setInAppUpdateNeverShowAgainUseCase: SetInAppUpdateNeverShowAgainUseCase,
 ) {
 
     /**
@@ -16,5 +17,6 @@ class ResetInAppUpdateStatisticsUseCase @Inject constructor(
     suspend operator fun invoke() {
         setLastInAppUpdatePromptTimeUseCase(0L)
         setInAppUpdatePromptCountUseCase(0)
+        setInAppUpdateNeverShowAgainUseCase(false)
     }
 }

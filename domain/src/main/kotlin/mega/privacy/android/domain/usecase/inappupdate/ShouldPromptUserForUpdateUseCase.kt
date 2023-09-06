@@ -9,6 +9,7 @@ import javax.inject.Inject
 class ShouldPromptUserForUpdateUseCase @Inject constructor(
     private val getLastInAppUpdatePromptTimeUseCase: GetLastInAppUpdatePromptTimeUseCase,
     private val getInAppUpdatePromptCountUseCase: GetInAppUpdatePromptCountUseCase,
+    private val getInAppUpdateNeverShowAgainUseCase: GetInAppUpdateNeverShowAgainUseCase,
 ) {
 
     /**
@@ -22,7 +23,9 @@ class ShouldPromptUserForUpdateUseCase @Inject constructor(
     ): Boolean {
         val lastInAppUpdateTime = getLastInAppUpdatePromptTimeUseCase()
         val inAppUpdatePromptCount = getInAppUpdatePromptCountUseCase()
-        return if (isIncrementalPromptEnabled) {
+        val neverShowAgain = getInAppUpdateNeverShowAgainUseCase()
+        return if (neverShowAgain) false
+        else if (isIncrementalPromptEnabled) {
             if (inAppUpdatePromptCount == 0) { // First time prompt
                 true
             } else if (inAppUpdatePromptCount > incrementalPromptStopCount) { // stop prompting if INCREMENTAL_PROMPT_STOP_COUNT reached

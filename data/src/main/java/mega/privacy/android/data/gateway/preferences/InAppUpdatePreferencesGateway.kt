@@ -41,4 +41,15 @@ interface InAppUpdatePreferencesGateway {
      * Set Last InAppUpdate Prompt version
      */
     suspend fun setLastInAppUpdatePromptVersion(version: Int)
+
+    /**
+     * Get InAppUpdate Never show again
+     */
+    suspend fun getInAppUpdateNeverShowAgain(): Boolean
+
+
+    /**
+     * Set InAppUpdate Never show again
+     */
+    suspend fun setInAppUpdateNeverShowAgain(value: Boolean)
 }

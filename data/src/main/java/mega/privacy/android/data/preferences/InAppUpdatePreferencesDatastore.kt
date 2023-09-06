@@ -3,6 +3,7 @@ package mega.privacy.android.data.preferences
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -61,6 +62,16 @@ internal class InAppUpdatePreferencesDatastore @Inject constructor(
         }
     }
 
+    override suspend fun getInAppUpdateNeverShowAgain(): Boolean =
+        context.appInfoPreferenceDataStore.monitor(KEY_IN_APP_UPDATE_NEVER_SHOW_AGAIN).firstOrNull()
+            ?: false
+
+    override suspend fun setInAppUpdateNeverShowAgain(value: Boolean) {
+        context.appInfoPreferenceDataStore.edit {
+            it[KEY_IN_APP_UPDATE_NEVER_SHOW_AGAIN] = value
+        }
+    }
+
 
     companion object {
         private val KEY_LAST_IN_APP_UPDATE_PROMPT_TIME =
@@ -71,6 +82,9 @@ internal class InAppUpdatePreferencesDatastore @Inject constructor(
 
         private val KEY_IN_APP_UPDATE_PROMPT_VERSION =
             intPreferencesKey("KEY_IN_APP_UPDATE_PROMPT_VERSION")
+
+        private val KEY_IN_APP_UPDATE_NEVER_SHOW_AGAIN =
+            booleanPreferencesKey("KEY_IN_APP_UPDATE_NEVER_SHOW_AGAIN")
     }
 
 }

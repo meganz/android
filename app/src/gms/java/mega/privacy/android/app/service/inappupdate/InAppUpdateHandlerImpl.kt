@@ -64,20 +64,22 @@ class InAppUpdateHandlerImpl @Inject constructor(
     private val incrementalFrequencyInDays = 10 //n
     private val incrementalPromptStopCount = 4 // This will stop prompts after x + 3n
 
+    private var availableVersionCode: Int = 0
+
     private val updateFlowResultLauncher: ActivityResultLauncher<IntentSenderRequest>? =
         (context as? ComponentActivity)?.registerForActivityResult(
             ActivityResultContracts.StartIntentSenderForResult(),
         ) { result ->
             when (result.resultCode) {
                 AppCompatActivity.RESULT_OK -> {
-                    updateInAppUpdateStatistics()
+                    updateInAppUpdateStatistics(neverShowAgain = false)
                     Analytics.tracker.trackEvent(InAppUpdateUpdateButtonPressedEvent)
                     Timber.d("InAppUpdate: The user has accepted the update")
                 }
 
 
                 AppCompatActivity.RESULT_CANCELED -> {
-                    updateInAppUpdateStatistics()
+                    updateInAppUpdateStatistics(neverShowAgain = true)
                     Analytics.tracker.trackEvent(InAppUpdateCancelButtonPressedEvent)
                     Timber.d("InAppUpdate: The user has denied or canceled the update.")
                 }
@@ -88,9 +90,9 @@ class InAppUpdateHandlerImpl @Inject constructor(
             }
         }
 
-    private fun updateInAppUpdateStatistics() {
+    private fun updateInAppUpdateStatistics(neverShowAgain: Boolean) {
         applicationScope.launch {
-            updateInAppUpdateStatisticsUseCase()
+            updateInAppUpdateStatisticsUseCase(neverShowAgain, availableVersionCode)
         }
     }
 
@@ -98,11 +100,11 @@ class InAppUpdateHandlerImpl @Inject constructor(
      * Check for App Updates
      */
     override suspend fun checkForAppUpdates() {
-        if (shouldResetInAppUpdateStatisticsUseCase()) {
+        val appUpdateInfo = appUpdateManager.requestAppUpdateInfo()
+        if (shouldResetInAppUpdateStatisticsUseCase(appUpdateInfo.availableVersionCode())) {
             resetInAppUpdateStatisticsUseCase()
         }
         if (shouldPromptUserForUpdate()) {
-            val appUpdateInfo = appUpdateManager.requestAppUpdateInfo()
             if (canUpdate(appUpdateInfo)) {
                 return suspendCancellableCoroutine { continuation ->
                     val installStateUpdatedListener = getInstallStateListener(continuation)
@@ -177,6 +179,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
         appUpdateInfo: AppUpdateInfo,
         intentSenderForResultStarter: IntentSenderForResultStarter,
     ) {
+        availableVersionCode = appUpdateInfo.availableVersionCode()
         appUpdateManager.startUpdateFlowForResult(
             appUpdateInfo, intentSenderForResultStarter, AppUpdateOptions.newBuilder(
                 AppUpdateType.FLEXIBLE

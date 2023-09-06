@@ -52,4 +52,13 @@ internal class InAppUpdateRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getInAppUpdateNeverShowAgain(): Boolean = withContext(ioDispatcher) {
+        inAppUpdatePreferencesGateway.getInAppUpdateNeverShowAgain()
+    }
+
+    override suspend fun setInAppUpdateNeverShowAgain(value: Boolean) {
+        withContext(ioDispatcher) {
+            inAppUpdatePreferencesGateway.setInAppUpdateNeverShowAgain(value)
+        }
+    }
 }
