@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Title of the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_title">Rename device</string>
+    <string name="device_center_rename_device_dialog_title">장치 이름 변경</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_positive_button">이름 바꾸기</string>
     <!-- The name of the Negative Button for the Rename Device Dialog -->
@@ -11,7 +11,7 @@
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
     <string name="device_center_list_view_item_header_other_devices">다른 장치</string>
     <!-- The name of the Device or Folder Status when no matching Status is found-->
-    <string name="device_center_list_view_item_status_unknown_status">Unknown status</string>
+    <string name="device_center_list_view_item_status_unknown_status">알 수 없는 상태</string>
     <!-- The name of the Device if the SDK cannot retrieve the name for that Device -->
     <string name="device_center_list_view_item_title_unknown_device">알 수 없는 장치</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
@@ -40,4 +40,6 @@
     <string name="device_center_list_view_item_status_error">오류</string>
     <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
     <string name="device_center_list_view_item_status_blocked">차단됨</string>
+    <!-- The title of the Device Center feature -->
+    <string name="device_center_top_app_bar_title">장치 센터</string>
 </resources>

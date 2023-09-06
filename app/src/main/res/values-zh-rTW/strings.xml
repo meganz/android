@@ -1203,7 +1203,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">此IP位址的傳輸配額已超過。請升級您的帳戶或等待%s才能繼續下載。</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">參看方案</string>
+    <string name="plans_depleted_transfer_overquota">檢視方案</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">於未登入狀態下繼續使用</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
@@ -1375,7 +1375,7 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">邀請獎勵</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">安裝MEGA手機應用程式</string>
+    <string name="title_install_app">安裝MEGA行動應用程式</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">註冊獎勵</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -4848,7 +4848,7 @@
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">只有主持人允許的使用者才可以加入會議。</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">通話期間由非主持人加入的與會者不會被傳送到等候室。[A]瞭解更多[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">通話期間由非主持人加入的與會者不會被傳送到等候室。</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">您與之共享資訊的某些聯絡人尚未獲得您的批准。為了確保額外的安全性，我們建議您在聯絡人中批准他們的憑證。點選您要批准的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
@@ -4879,4 +4879,32 @@
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未批准的聯絡人共享。為了確保額外的安全性，我們建議您在聯絡人中批准他們的憑證。點選您要批准的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">不要離開</string>
+    <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">允許</string>
+    <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">允許全部</string>
+    <!-- Deny button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">拒絕</string>
+    <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s正在等待加入通話。</string>
+    <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">查看等候室</string>
+    <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
+        <item quantity="other">%1$d正在等待加入通話。</item>
+    </plurals>
+    <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">是否拒絕%1$s進入？</string>
+    <!-- Dialog button to deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">拒絕進入</string>
+    <!-- Dialog title when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_title">主持人沒有讓您進入</string>
+    <!-- Dialog description when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_description">你將從等候室被移除。</string>
+    <!-- Dialog title when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_title">主持人沒有回應</string>
+    <!-- Dialog description when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_description">你加入會議的請求沒有得到回應。你將從等候室被移除。請稍後再次嘗試加入。</string>
+    <!-- Message after selected albums are deleted (singular) -->
+    <string name="photos_album_deleted_message_singular">“%s” deleted</string>
 </resources>

@@ -4848,7 +4848,7 @@
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">호스트가 승인한 이용자만 회의에 참여할 수 있습니다</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">통화 중에 호스트가 아닌 사람으로부터 추가된 참여자들은 대기실에 보내질 수 없습니다. [A]더 알아보기[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">통화 중에 호스트가 아닌 사람으로부터 추가된 참여자들은 대기실에 보내질 수 없습니다.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">정보를 공유하는 연락처 중 일부가 당신에 의해 확인되지 않았습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 확인할 것을 권장합니다. 확인하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
@@ -4879,4 +4879,32 @@
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s은/는 당신이 확인하지 않은 연락처에 의해 공유되었습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 확인할 것을 권장합니다. 확인하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">떠나지 않기</string>
+    <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">허용</string>
+    <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">모두 허용</string>
+    <!-- Deny button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">거부</string>
+    <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s is waiting to join the call.</string>
+    <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">See waiting room</string>
+    <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
+    <!-- Dialog button to deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Deny entry</string>
+    <!-- Dialog title when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_title">주최자가 당신을 들어오게 하지 않았습니다</string>
+    <!-- Dialog description when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_description">You’ll be removed from the waiting room.</string>
+    <!-- Dialog title when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_title">주최자가 응답하지 않았습니다</string>
+    <!-- Dialog description when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_description">There was no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
+    <!-- Message after selected albums are deleted (singular) -->
+    <string name="photos_album_deleted_message_singular">“%s” deleted</string>
 </resources>

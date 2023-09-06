@@ -1868,7 +1868,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Tidak ada koneksi jaringan. Sambungkan kembali untuk membuka file.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">File already available Offline</string>
+    <string name="file_already_exists">File sudah tersedia Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">Pesan tidak diteruskan</item>
@@ -2076,7 +2076,7 @@
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">Rotasi kunci enkripsi dinonaktifkan untuk percakapan dengan lebih dari 100 peserta.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">The chat could not be converted to private because the number of participants exceeds the limit for private chats.</string>
+    <string name="warning_make_chat_private">Obrolan tidak dapat diubah menjadi pribadi karena jumlah peserta melebihi batas obrolan pribadi.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B] membuat Tautan Obrolan.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Verifikasi kredensial</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Not approved</string>
+    <string name="label_not_verified">Tidak disetujui</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Approved</string>
+    <string name="label_verified">Disetujui</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Kredensial autentikasi</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3250,7 +3250,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">Pilih layar mulai anda</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">Change settings to choose which screen opens when you launch the MEGA app.</string>
+    <string name="choose_start_screen_text">Ubah pengaturan untuk memilih layar mana yang terbuka saat anda meluncurkan aplikasi MEGA.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">Ubah pengaturan</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -3376,7 +3376,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Langganan %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately via %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_android_platform_subscription">Anda memiliki langganan MEGA yang aktif dengan %1$s. Anda harus membatalkannya secara terpisah melalui %2$s, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Anda memiliki langganan MEGA yang aktif. Ini akan dibatalkan secara otomatis setelah akun dihapus. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3384,7 +3384,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Kunjungi %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all your stored data. Please enter your password below.</string>
+    <string name="delete_account_text_other_platform_last_step">Ini adalah langkah terakhir untuk menghapus akun anda. Akun dan langganan anda akan dihapus dan anda akan kehilangan semua data yang tersimpan secara permanen. Silakan masukkan kata sandi anda di bawah ini.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">Linimasa</string>
     <!-- Title of album tab in photos section. -->
@@ -3722,9 +3722,9 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Di sinilah file dan folder yang dicadangkan disimpan. Item yang dicadangkan “hanya-baca” untuk melindunginya agar tidak dimodifikasi secara tidak sengaja di drive cloud anda.Anda dapat mencadangkan item dari komputer anda ke MEGA menggunakan aplikasi desktop kami.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck our email for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Akun MEGA anda telah ditangguhkan karena tuduhan pelanggaran hak cipta berulang kali. Ini berarti anda tidak dapat mengakses akun atau data anda di dalamnya.\nPeriksa email kami untuk informasi lebih lanjut tentang cara mengajukan pemberitahuan tanggapan.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to register a new MEGA account.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Akun anda dihentikan karena pelanggaran Ketentuan Layanan MEGA.\nAnda tidak akan bisa mendapatkan kembali akses ke data yang disimpan atau diberi wewenang untuk mendaftarkan akun MEGA baru.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Pertemuan</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3834,9 +3834,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Folder tidak terdekripsi]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should approve you, too.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Untuk mengakses folder bersama, orang yang membagikannya dengan anda juga harus menyetujui anda.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Setujui %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Mempersiapkan file untuk pratinjau</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -3929,13 +3929,11 @@
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] dari [B]%2$s ke %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
-        <item quantity="one">Every day effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Every %1$d days effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Setiap %1$d hari efektif [A]%2$s[/A] dari [B]%3$s hingga %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_until">
-        <item quantity="one">Every day effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Every %1$d days effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Setiap %1$d hari efektif [A]%2$s sampai %3$s[/A] dari [B]%4$s hingga %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
@@ -4286,9 +4284,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">Anda hanya dapat menambahkan hingga 150 item sekaligus ke album.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot approve contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Tidak dapat menyetujui kontak</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t approve %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Anda tidak dapat menyetujui %s karena mereka tidak ada dalam daftar kontak anda. Tunggu hingga mereka menerima undangan anda terlebih dahulu.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Mulai</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4594,13 +4592,13 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Jadwalkan pembersihan tempat sampah antara 7 hari dan 10 tahun</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Beli Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Beli Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Beli Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Beli Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Persyaratan Layanan</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4776,7 +4774,7 @@
     <!--Description text from Meeting List screen empty view-->
     <string name="meeting_list_empty_description">Bicaralah dengan aman dan pribadi di panggilan audio atau video dengan teman dan kolega di seluruh dunia.</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_dialog_title">Cancel “%1$s”?</string>
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Batalkan “%1$s”?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Rapat ini akan diarsipkan dan semua peserta akan diberi tahu.</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
@@ -4792,21 +4790,21 @@
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Rapat dibatalkan</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Cancel the %1$s occurrence?</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Batalkan kejadian ke %1$s?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Hanya kejadian ini yang akan dibatalkan. Semua kejadian lainnya akan berjalan sesuai jadwal.</string>
     <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Batalkan kejadian dan pertemuan?</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be archived and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Ini adalah satu-satunya kejadian pertemuan berulang. Membatalkan kejadian ini akan membatalkan pertemuan.\nJika dibatalkan, rapat akan diarsipkan dan semua peserta akan diberitahu.</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be placed under Past meetings and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Ini adalah satu-satunya kejadian pertemuan berulang. Membatalkan kejadian ini akan membatalkan pertemuan.\nJika dibatalkan, rapat akan ditempatkan di Rapat sebelumnya dan semua peserta akan diberitahu.</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s occurrence cancelled</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s kejadian dibatalkan</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Batalkan kejadian</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
-    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] memperbarui pertemuan[/B]</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Rapat ini dan semua kejadiannya akan diarsipkan dan semua peserta akan diberitahu.</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
@@ -4814,33 +4812,33 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Sekarang anda dapat menjadwalkan rapat satu kali dan berulang.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">You can start the meeting before its scheduled time by tapping [A]Start meeting[/A] in the meeting room.</string>
+    <string name="meeting_list_tooltip_sched_description">Anda dapat memulai rapat sebelum waktu yang dijadwalkan dengan mengetuk [A]Mulai rapat[/A] di ruang pertemuan.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Kelola rapat berulang</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting [A]Occurrences[/A].</string>
+    <string name="meeting_list_tooltip_recurring_description">Anda dapat melihat, membatalkan, atau mengedit kejadian rapat berulang dengan mengetuk tiga titik di sebelah kanan dan memilih [A]Kejadian[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Kirimkan undangan kalender melalui email kepada peserta sehingga mereka dapat menambahkan rapat ke kalender mereka.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Rapat diperbarui</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Ubah kejadian</string>
     <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
     <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Perbarui</string>
     <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Tanggal</string>
     <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Waktu mulai</string>
     <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Pilih tanggal mulai</string>
     <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
-    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Waktu akhir</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Kejadian rapat diperbarui</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to approve the contacts you share information with or receive data from.</string>
+    <string name="contact_approve_credentials_secure_share_description">Kami melindungi data anda dengan enkripsi tanpa pengetahuan sehingga semua informasi yang anda simpan, bagikan, dan terima di MEGA aman. Untuk memastikan keamanan ekstra, kami meminta anda untuk menyetujui kontak yang anda bagikan informasi atau terima datanya.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">To approve your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Untuk menyetujui kontak anda, pastikan kredensial yang anda lihat di atas cocok dengan kredensial akun mereka. Anda dapat meminta mereka untuk membagikan kredensialnya kepada anda.</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">Setujui</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4848,38 +4846,65 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Ruang tunggu</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only users admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Hanya pengguna yang diakui oleh penyelenggara yang dapat bergabung dalam rapat.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">Peserta yang ditambahkan oleh bukan penyelenggara selama panggilan tidak akan dikirim ke ruang tunggu. [A]Pelajari selengkapnya[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">Peserta yang ditambahkan oleh non-host selama panggilan tidak akan dikirim ke ruang tunggu.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Beberapa kontak yang anda bagikan informasi belum anda setujui. Untuk memastikan keamanan ekstra, kami menyarankan anda menyetujui kredensial mereka di Kontak. Ketuk tiga titik di sebelah kontak yang ingin anda setujui dan ketuk Info.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
-        <item quantity="one">Removed %1$d participant</item>
-        <item quantity="other">Removed %1$d participants</item>
+        <item quantity="other">Menghapus %1$d peserta</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <string name="general_app_update_message_download_success">Pembaruan baru saja diunduh</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Restart</string>
     <!-- Title of the screen asking permissions for Audio files -->
-    <string name="allow_access_audio_title">Allow access to audio files</string>
+    <string name="allow_access_audio_title">Izinkan akses ke file audio</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Approved</string>
+    <string name="contact_approve_credentials_approved_text">Disetujui</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Not approved</string>
+    <string name="contact_approve_credentials_not_approved_text">Tidak disetujui</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Perbesar</string>
     <!-- Photos action menu zoom out -->
     <string name="photos_action_zoom_out">Perkecil</string>
     <!-- Message of adding subtitle failed for video player-->
-    <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
+    <string name="media_player_video_message_adding_subtitle_failed">Item tidak dapat ditambahkan</string>
     <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Wait for host to start the meeting</string>
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Tunggu tuan rumah memulai pertemuan</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wait for host to let you in</string>
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Tunggu tuan rumah mengizinkan anda masuk</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t approved. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s dibagikan oleh kontak yang belum anda setujui. Untuk memastikan keamanan ekstra, kami menyarankan anda menyetujui kredensial mereka di Kontak. Ketuk tiga titik di sebelah kontak yang ingin anda setujui dan ketuk Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
-    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Don’t leave</string>
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Jangan pergi</string>
+    <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">Akui</string>
+    <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">Akui semuanya</string>
+    <!-- Deny button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Tolak</string>
+    <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s is waiting to join the call.</string>
+    <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Lihat ruang tunggu</string>
+    <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
+    <!-- Dialog button to deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Tolak masuk</string>
+    <!-- Dialog title when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_title">Host didn’t let you in</string>
+    <!-- Dialog description when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_description">You’ll be removed from the waiting room.</string>
+    <!-- Dialog title when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_title">Host didn’t respond</string>
+    <!-- Dialog description when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_description">There was no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
+    <!-- Message after selected albums are deleted (singular) -->
+    <string name="photos_album_deleted_message_singular">“%s” deleted</string>
 </resources>

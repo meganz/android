@@ -4848,7 +4848,7 @@
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">เฉพาะผู้ใช้ที่ได้รับอนุญาตจากผู้จัดการประชุมเท่านั้นที่สามารถเข้าร่วมการประชุมได้</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">ในระหว่างการโทร ผู้เข้าร่วมที่เพิ่มจากผู้ที่ไม่ใช่ผู้จัดการประชุมจะไม่ถูกจัดให้อยู่ในห้องนั่งรอ [A]เรียนรู้เพิ่มเติม[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">ในระหว่างการโทร ผู้เข้าร่วมที่เพิ่มจากผู้ที่ไม่ใช่ผู้จัดการประชุมจะไม่ถูกจัดให้อยู่ในห้องนั่งรอ</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">ผู้ติดต่อบางรายที่คุณแชร์ข้อมูลด้วยยังไม่ได้รับการอนุมัติจากคุณ เพื่อความปลอดภัยมากยิ่งขึ้น เราขอแนะนำให้คุณอนุมัติข้อมูลประจำตัวของพวกเขาในรายชื่อติดต่อ โดยแตะที่จุดสามจุดถัดจากรายชื่อติดต่อที่คุณต้องการอนุมัติและแตะข้อมูล</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
@@ -4879,4 +4879,32 @@
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s ถูกแชร์โดยผู้ติดต่อที่คุณยังไม่ได้รับการอนุมัติ เพื่อความปลอดภัยมากยิ่งขึ้น เราขอแนะนำให้คุณอนุมัติข้อมูลประจำตัวของพวกเขาในรายชื่อติดต่อ โดยแตะที่จุดสามจุดถัดจากรายชื่อติดต่อที่คุณต้องการอนุมัติและแตะข้อมูล</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">ไม่ต้องออก</string>
+    <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">ยอมรับ</string>
+    <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">ยอมรับทั้งหมด</string>
+    <!-- Deny button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">ปฏิเสธ</string>
+    <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s is waiting to join the call.</string>
+    <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">ดูห้องนั่งรอ</string>
+    <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
+    <!-- Dialog button to deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">ปฏิเสธเข้าร่วมสาย</string>
+    <!-- Dialog title when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_title">ผู้จัดการประชุมไม่อนุญาตให้คุณเข้า</string>
+    <!-- Dialog description when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_description">You’ll be removed from the waiting room.</string>
+    <!-- Dialog title when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_title">ผู้จัดการประชุมไม่ตอบสนอง</string>
+    <!-- Dialog description when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_description">ไม่มีการตอบกลับคำขอเข้าร่วมการประชุมของคุณ คุณจะถูกนำออกจากห้องนั่งรอ ลองเข้าร่วมใหม่อีกครั้งในภายหลัง</string>
+    <!-- Message after selected albums are deleted (singular) -->
+    <string name="photos_album_deleted_message_singular">“%s” deleted</string>
 </resources>

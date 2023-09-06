@@ -5302,7 +5302,7 @@
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">Seuls les utilisateurs admis par l’hôte peuvent se joindre à la réunion.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">Les participants ajoutés par des non-hôtes pendant les appels ne seront pas envoyés dans la salle d’attente. [A]En apprendre davantage[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">Les participants ajoutés par des non-hôtes pendant les appels ne seront pas envoyés dans la salle d’attente.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">Certains des contacts avec lesquels vous partagez des données n’ont pas été approuvés par vous. Pour renforcer la sécurité, nous vous recommandons d’approuver leur numéro d’identification dans Contacts. Touchez les trois points à côté du contact que vous souhaitez approuver et touchez Renseignements.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
@@ -5335,4 +5335,34 @@
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s est partagé par un contact que vous n’avez pas approuvé. Pour renforcer la sécurité, nous vous recommandons d’approuver son numéro d’identification dans Contacts. Touchez les trois points situés à côté du contact que vous souhaitez approuver, puis touchez Renseignements</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Ne pas la quitter</string>
+    <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">L’accueillir</string>
+    <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">Les accueillir</string>
+    <!-- Deny button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Refuser</string>
+    <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s attend de se joindre à l’appel.</string>
+    <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Afficher la salle d’attente</string>
+    <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
+        <item quantity="one">%1$d attend de se joindre à l’appel.</item>
+        <item quantity="many">%1$d attendent de se joindre à l’appel.</item>
+        <item quantity="other">%1$d attendent de se joindre à l’appel.</item>
+    </plurals>
+    <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Refuser l’entrée à %1$s&#64; ?</string>
+    <!-- Dialog button to deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Refuser l’entrée</string>
+    <!-- Dialog title when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_title">L’hôte ne vous a pas accueilli</string>
+    <!-- Dialog description when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_description">Vous quitterez la salle d’attente.</string>
+    <!-- Dialog title when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_title">L’hôte n’a pas répondu</string>
+    <!-- Dialog description when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_description">Votre demande de participation à la réunion n’a pas reçu réponse. Vous quitterez la salle d’attente. Réessayez plus tard.</string>
+    <!-- Message after selected albums are deleted (singular) -->
+    <string name="photos_album_deleted_message_singular">«&#160;%s&#160;» a été supprimé</string>
 </resources>

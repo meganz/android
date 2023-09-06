@@ -40,4 +40,6 @@
     <string name="device_center_list_view_item_status_error">Erro</string>
     <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
     <string name="device_center_list_view_item_status_blocked">Bloqueado</string>
+    <!-- The title of the Device Center feature -->
+    <string name="device_center_top_app_bar_title">Central de dispositivos</string>
 </resources>

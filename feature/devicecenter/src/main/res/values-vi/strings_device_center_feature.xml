@@ -23,7 +23,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">Đang cập nhật&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Updating&#8230;</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Đang cập nhật&#8230;</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">Không có đăng tải camêra</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
@@ -40,4 +40,6 @@
     <string name="device_center_list_view_item_status_error">Lỗi</string>
     <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
     <string name="device_center_list_view_item_status_blocked">Bị chặn</string>
+    <!-- The title of the Device Center feature -->
+    <string name="device_center_top_app_bar_title">Trung&#160;tâm thiết&#160;bị</string>
 </resources>

@@ -1629,7 +1629,7 @@
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]No hay [/B][A]carpetas compartidas entrantes[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]No hay [/B][A]carpetas compartidas salientes[/A]</string>
+    <string name="context_empty_outgoing">[B]No hay [/B][A]carpetas compartidas por mí[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
     <string name="context_empty_links">[B]No hay [/B][A]enlaces públicos[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
@@ -4058,9 +4058,9 @@
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
     <string name="settings_camera_uploads_grant_media_permissions_body">Para activar las subidas desde la cámara, permite a MEGA acceder a tus fotos y vídeos entu dispositivo.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Permitir acceso</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Conceder acceso</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
-    <string name="settings_camera_uploads_grant_media_permissions_negative_button">No permitir</string>
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">No conceder</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
         <item quantity="one">Se ha eliminado %1$d elemento de “%2$s”</item>
@@ -5302,7 +5302,7 @@
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">Solo los usuarios admitidos por el anfitrión pueden unirse a la reunión.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">Los participantes que han sido añadidos a las llamadas por usuarios que no son anfitriones no serán enviados a la sala de espera. [A]Más información[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">Los participantes que han sido añadidos a las llamadas por usuarios que no son anfitriones no serán enviados a la sala de espera.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">Todavía no has aprobado algunos de los contactos con los que compartes información. Para más seguridad, te recomendamos que apruebes sus credenciales en Contactos. Toca los tres puntos junto al contacto que deseas aprobar y toca Información.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
@@ -5335,4 +5335,34 @@
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s está siendo compartida por un contacto que no has aprobado. Para más seguridad, te recomendamos que apruebes sus credenciales en Contactos. Toca los tres puntos junto al contacto que deseas aprobar y toca Información.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">No abandonar</string>
+    <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">Admitir</string>
+    <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">Admitir a todos</string>
+    <!-- Deny button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Denegar</string>
+    <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s is waiting to join the call.</string>
+    <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">See waiting room</string>
+    <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
+    <!-- Dialog button to deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Deny entry</string>
+    <!-- Dialog title when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_title">El anfitrión no te ha dejado entrar</string>
+    <!-- Dialog description when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_description">You’ll be removed from the waiting room.</string>
+    <!-- Dialog title when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_title">El anfitrión no ha respondido</string>
+    <!-- Dialog description when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_description">There was no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
+    <!-- Message after selected albums are deleted (singular) -->
+    <string name="photos_album_deleted_message_singular">“%s” ha sido eliminado</string>
 </resources>

@@ -4848,7 +4848,7 @@
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">ホストによって許可されたユーザーのみがミーティングに参加できます。</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">通話中に主催者以外によって追加された参加者は待合室に送られません。[A]詳細[/A]</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">通話中に主催者以外によって追加された参加者は待合室に送られません。</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">情報を共有している連絡先の一部は、あなたによって承認されていません。さらなるセキュリティを確保するために、連絡先で認証情報を承認することをお勧めします。承認したい連絡先の横にある3つの点をタップし、「情報」をタップします。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
@@ -4879,4 +4879,32 @@
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%sは、あなたが承認していない連絡先によって共有されています。セキュリティをさらに強化するために、連絡先で認証情報を承認することをお勧めします。承認したい連絡先の横にある三点をタップして、「情報」をタップします。</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">退室しない</string>
+    <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">受け入れる</string>
+    <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">すべて受け入れる</string>
+    <!-- Deny button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">拒否する</string>
+    <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$sさんが通話への参加を待っています。</string>
+    <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">待合室を見る</string>
+    <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
+        <item quantity="other">%1$dが通話への参加を待っています。</item>
+    </plurals>
+    <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">%1$sさんの入室を拒否しますか？</string>
+    <!-- Dialog button to deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">入室を拒否</string>
+    <!-- Dialog title when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_title">主催者があなたを参加させませんでした</string>
+    <!-- Dialog description when a participant has been denied entry to the call -->
+    <string name="meetings_waiting_room_deny_user_dialog_description">待合室から退出させられます。</string>
+    <!-- Dialog title when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_title">主催者が応答しませんでした</string>
+    <!-- Dialog description when waiting room has been inactive for a while -->
+    <string name="meetings_waiting_room_inactive_host_dialog_description">ミーティングへの参加リクエストに対する応答がありませんでした。そのため、待合室から退出させられます。後でもう一度参加してみてください。</string>
+    <!-- Message after selected albums are deleted (singular) -->
+    <string name="photos_album_deleted_message_singular">「%s」が削除されました</string>
 </resources>

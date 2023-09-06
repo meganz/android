@@ -13,7 +13,7 @@
     <!-- The name of the Device or Folder Status when no matching Status is found-->
     <string name="device_center_list_view_item_status_unknown_status">Unknown status</string>
     <!-- The name of the Device if the SDK cannot retrieve the name for that Device -->
-    <string name="device_center_list_view_item_title_unknown_device">Unknown device</string>
+    <string name="device_center_list_view_item_title_unknown_device">Perangkat tidak dikenal</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">Terkini</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
@@ -40,4 +40,6 @@
     <string name="device_center_list_view_item_status_error">Kesalahan</string>
     <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
     <string name="device_center_list_view_item_status_blocked">Terblokir</string>
+    <!-- The title of the Device Center feature -->
+    <string name="device_center_top_app_bar_title">Pusat perangkat</string>
 </resources>
