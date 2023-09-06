@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -236,7 +235,7 @@ fun NodeListViewItem(
                     .padding(start = 12.dp)
                     .fillMaxWidth()
             ) {
-                val (nodeInfo, threeDots, titleText, infoRow, availableOffline) = createRefs()
+                val (nodeInfo, threeDots, infoRow, availableOffline) = createRefs()
                 Image(
                     painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                     contentDescription = "3 dots",
@@ -250,20 +249,27 @@ fun NodeListViewItem(
                         }
                         .clickable { onMenuClick() }
                 )
-                Row(modifier = Modifier
-                    .constrainAs(nodeInfo) {
-                        top.linkTo(parent.top)
-                        end.linkTo(threeDots.start)
-                    }
-                    .padding(end = 4.dp),
+
+                Row(
+                    modifier = Modifier
+                        .constrainAs(nodeInfo) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(threeDots.start)
+                            width = Dimension.fillToConstraints
+                        }
+                        .padding(end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End
                 ) {
                     val iconModifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .absolutePadding(left = 4.dp)
+                        .padding(start = 4.dp)
 
-
+                    MiddleEllipsisText(
+                        text = name,
+                        style = MaterialTheme.typography.subtitle1,
+                        color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
+                    )
                     labelColor?.let {
                         Box(
                             modifier = iconModifier
@@ -287,6 +293,7 @@ fun NodeListViewItem(
                         Image(
                             alignment = Alignment.Center,
                             modifier = iconModifier
+                                .size(16.dp)
                                 .testTag(EXPORTED_TEST_TAG),
                             painter = painterResource(id = R.drawable.link_ic),
                             contentDescription = "Link",
@@ -305,22 +312,11 @@ fun NodeListViewItem(
                         )
                     }
                 }
-                MiddleEllipsisText(
-                    modifier = Modifier.constrainAs(titleText) {
-                        start.linkTo(parent.start)
-                        end.linkTo(nodeInfo.start)
-                        top.linkTo(parent.top)
-                        width = Dimension.fillToConstraints
-                    },
-                    text = name,
-                    style = MaterialTheme.typography.subtitle1,
-                    color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
-                )
                 Row(
                     modifier = Modifier
                         .padding(top = 1.dp)
                         .constrainAs(infoRow) {
-                            top.linkTo(titleText.bottom)
+                            top.linkTo(nodeInfo.bottom)
                             start.linkTo(parent.start)
                         },
                     verticalAlignment = Alignment.CenterVertically,
