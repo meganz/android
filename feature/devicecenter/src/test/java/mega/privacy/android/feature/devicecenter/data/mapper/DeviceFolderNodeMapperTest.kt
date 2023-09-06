@@ -302,130 +302,10 @@ internal class DeviceFolderNodeMapperTest {
     )
     fun `test that the mapped device folder has a paused status when the backup type is a two way sync`(
         backupState: BackupInfoState,
-    ) {
-        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
-        val backupId = 123456L
-        val backupName = "Backup One"
-        val backupType = BackupInfoType.TWO_WAY_SYNC
-        val backupInfoList = listOf<BackupInfo>(
-            mock {
-                on { id }.thenReturn(backupId)
-                on { name }.thenReturn(backupName)
-                on { type }.thenReturn(backupType)
-                on { state }.thenReturn(backupState)
-                on { timestamp }.thenReturn(currentTimeInSeconds)
-                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
-            },
-        )
-        val expected = listOf(
-            DeviceFolderNode(
-                id = backupId.toString(),
-                name = backupName,
-                status = DeviceCenterNodeStatus.Paused,
-                type = backupType,
-            )
-        )
-        assertThat(underTest(backupInfoList)).isEqualTo(expected)
-    }
-
-    @ParameterizedTest(name = "and backup state is {0}")
-    @EnumSource(
-        value = BackupInfoState::class,
-        names = ["PAUSE_UP", "PAUSE_FULL"]
+    ) = testPausedStatus(
+        backupType = BackupInfoType.TWO_WAY_SYNC,
+        backupState = backupState,
     )
-    fun `test that the mapped device folder has a paused status when the backup type is camera uploads`(
-        backupState: BackupInfoState,
-    ) {
-        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
-        val backupId = 123456L
-        val backupName = "Backup One"
-        val backupType = BackupInfoType.CAMERA_UPLOADS
-        val backupInfoList = listOf<BackupInfo>(
-            mock {
-                on { id }.thenReturn(backupId)
-                on { name }.thenReturn(backupName)
-                on { type }.thenReturn(backupType)
-                on { state }.thenReturn(backupState)
-                on { timestamp }.thenReturn(currentTimeInSeconds)
-                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
-            },
-        )
-        val expected = listOf(
-            DeviceFolderNode(
-                id = backupId.toString(),
-                name = backupName,
-                status = DeviceCenterNodeStatus.Paused,
-                type = backupType,
-            )
-        )
-        assertThat(underTest(backupInfoList)).isEqualTo(expected)
-    }
-
-    @ParameterizedTest(name = "and backup state is {0}")
-    @EnumSource(
-        value = BackupInfoState::class,
-        names = ["PAUSE_UP", "PAUSE_FULL"]
-    )
-    fun `test that the mapped device folder has a paused status when the backup type is media uploads`(
-        backupState: BackupInfoState,
-    ) {
-        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
-        val backupId = 123456L
-        val backupName = "Backup One"
-        val backupType = BackupInfoType.MEDIA_UPLOADS
-        val backupInfoList = listOf<BackupInfo>(
-            mock {
-                on { id }.thenReturn(backupId)
-                on { name }.thenReturn(backupName)
-                on { type }.thenReturn(backupType)
-                on { state }.thenReturn(backupState)
-                on { timestamp }.thenReturn(currentTimeInSeconds)
-                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
-            },
-        )
-        val expected = listOf(
-            DeviceFolderNode(
-                id = backupId.toString(),
-                name = backupName,
-                status = DeviceCenterNodeStatus.Paused,
-                type = backupType,
-            )
-        )
-        assertThat(underTest(backupInfoList)).isEqualTo(expected)
-    }
-
-    @ParameterizedTest(name = "and backup state is {0}")
-    @EnumSource(
-        value = BackupInfoState::class,
-        names = ["PAUSE_DOWN", "PAUSE_FULL", "DELETED"]
-    )
-    fun `test that the mapped device folder has a paused status when the backup type is a download sync`(
-        backupState: BackupInfoState,
-    ) {
-        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
-        val backupId = 123456L
-        val backupName = "Backup One"
-        val backupType = BackupInfoType.DOWN_SYNC
-        val backupInfoList = listOf<BackupInfo>(
-            mock {
-                on { id }.thenReturn(backupId)
-                on { name }.thenReturn(backupName)
-                on { type }.thenReturn(backupType)
-                on { state }.thenReturn(backupState)
-                on { timestamp }.thenReturn(currentTimeInSeconds)
-                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
-            },
-        )
-        val expected = listOf(
-            DeviceFolderNode(
-                id = backupId.toString(),
-                name = backupName,
-                status = DeviceCenterNodeStatus.Paused,
-                type = backupType,
-            )
-        )
-        assertThat(underTest(backupInfoList)).isEqualTo(expected)
-    }
 
     @ParameterizedTest(name = " and backup state is {0}")
     @EnumSource(
@@ -434,11 +314,63 @@ internal class DeviceFolderNodeMapperTest {
     )
     fun `test that the mapped device folder has a paused status when the backup type is an upload sync`(
         backupState: BackupInfoState,
-    ) {
+    ) = testPausedStatus(
+        backupType = BackupInfoType.UP_SYNC,
+        backupState = backupState,
+    )
+
+    @ParameterizedTest(name = "and backup state is {0}")
+    @EnumSource(
+        value = BackupInfoState::class,
+        names = ["PAUSE_UP", "PAUSE_FULL"]
+    )
+    fun `test that the mapped device folder has a paused status when the backup type is camera uploads`(
+        backupState: BackupInfoState,
+    ) = testPausedStatus(
+        backupType = BackupInfoType.CAMERA_UPLOADS,
+        backupState = backupState,
+    )
+
+    @ParameterizedTest(name = "and backup state is {0}")
+    @EnumSource(
+        value = BackupInfoState::class,
+        names = ["PAUSE_UP", "PAUSE_FULL"]
+    )
+    fun `test that the mapped device folder has a paused status when the backup type is media uploads`(
+        backupState: BackupInfoState,
+    ) = testPausedStatus(
+        backupType = BackupInfoType.MEDIA_UPLOADS,
+        backupState = backupState,
+    )
+
+    @ParameterizedTest(name = "and backup state is {0}")
+    @EnumSource(
+        value = BackupInfoState::class,
+        names = ["PAUSE_UP", "PAUSE_FULL"]
+    )
+    fun `test that the mapped device folder has a paused status when the backup type is a backup upload`(
+        backupState: BackupInfoState,
+    ) = testPausedStatus(
+        backupType = BackupInfoType.BACKUP_UPLOAD,
+        backupState = backupState,
+    )
+
+    @ParameterizedTest(name = "and backup state is {0}")
+    @EnumSource(
+        value = BackupInfoState::class,
+        names = ["PAUSE_DOWN", "PAUSE_FULL", "DELETED"]
+    )
+    fun `test that the mapped device folder has a paused status when the backup type is a download sync`(
+        backupState: BackupInfoState,
+    ) = testPausedStatus(
+        backupType = BackupInfoType.DOWN_SYNC,
+        backupState = backupState,
+    )
+
+    private fun testPausedStatus(backupType: BackupInfoType, backupState: BackupInfoState) {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
-        val backupType = BackupInfoType.UP_SYNC
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)

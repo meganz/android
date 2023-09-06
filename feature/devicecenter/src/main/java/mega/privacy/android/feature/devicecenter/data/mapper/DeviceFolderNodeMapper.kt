@@ -172,6 +172,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
             BackupInfoType.UP_SYNC,
             BackupInfoType.CAMERA_UPLOADS,
             BackupInfoType.MEDIA_UPLOADS,
+            BackupInfoType.BACKUP_UPLOAD,
         ) && state in listOf(BackupInfoState.PAUSE_UP, BackupInfoState.PAUSE_FULL)
 
     /**
