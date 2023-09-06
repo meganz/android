@@ -186,13 +186,22 @@ fun PhotosScreen(
                     albumsViewModel.deleteAlbums(albumIds)
 
                     val albums = albumsViewState.albums
-                    val message = context.resources.getQuantityString(
-                        R.plurals.photos_album_deleted_message,
-                        albumIds.size,
-                        albumIds.size.takeIf { it > 1 } ?: albums.find {
-                            it.id is Album.UserAlbum && it.id.id == albumIds.firstOrNull()
-                        }?.title?.getTitleString(context),
-                    )
+                    val message = if (albumIds.size == 1) {
+                        context.resources.getString(
+                            R.string.photos_album_deleted_message_singular,
+                            albums.find {
+                                it.id is Album.UserAlbum && it.id.id == albumIds.firstOrNull()
+                            }?.title?.getTitleString(context),
+                        )
+                    } else {
+                        context.resources.getQuantityString(
+                            R.plurals.photos_album_deleted_message,
+                            albumIds.size,
+                            albumIds.size.takeIf { it > 1 } ?: albums.find {
+                                it.id is Album.UserAlbum && it.id.id == albumIds.firstOrNull()
+                            }?.title?.getTitleString(context),
+                        )
+                    }
                     albumsViewModel.updateAlbumDeletedMessage(message)
                 },
                 lazyGridState = albumsLazyGridState,

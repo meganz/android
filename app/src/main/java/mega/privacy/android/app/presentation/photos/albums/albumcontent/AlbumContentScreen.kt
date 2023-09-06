@@ -91,9 +91,8 @@ internal fun AlbumContentScreen(
         )
 
         albumsViewModel.updateAlbumDeletedMessage(
-            message = pluralStringResource(
-                id = R.plurals.photos_album_deleted_message,
-                count = 1,
+            message = stringResource(
+                id = R.string.photos_album_deleted_message_singular,
                 albumContentState.uiAlbum?.title?.getTitleString(context).orEmpty(),
             ),
         )
