@@ -1,25 +1,39 @@
 package mega.privacy.android.app.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.passcode.view.PasscodeDialog
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -29,6 +43,9 @@ class PasscodeUtil @Inject constructor(
     private val passcodePreferenceWrapper: PasscodePreferenceWrapper,
     @ApplicationScope private val scope: CoroutineScope,
     private val passcodeManagement: PasscodeManagement,
+    private val monitorPasscodeLockStateUseCase: MonitorPasscodeLockStateUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getThemeMode: GetThemeMode,
 ) {
 
     companion object {
@@ -345,10 +362,38 @@ class PasscodeUtil @Inject constructor(
     /**
      * Launches an intent to show passcode screen when the app is locked
      */
-    private fun showLockScreen() {
-        context.startActivity(
-            Intent(context, PasscodeLockActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        )
+    private suspend fun showLockScreen() {
+        val uiFlag = getFeatureFlagValueUseCase(AppFeatures.Passcode)
+        val backendFlag = getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)
+        if (uiFlag && backendFlag) {
+            val activity = context as Activity
+            val themeMode = getThemeMode().first()
+            val view = ComposeView(activity)
+                .apply {
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                    setContent {
+                        val locked: Boolean by monitorPasscodeLockStateUseCase().collectAsStateWithLifecycle(
+                            initialValue = true
+                        )
+                        if (locked) {
+                            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                                PasscodeDialog()
+                            }
+                        }
+                    }
+                }
+
+            activity.addContentView(
+                view,
+                (activity.findViewById(android.R.id.content) as ViewGroup).layoutParams
+            )
+
+        } else {
+            context.startActivity(
+                Intent(context, PasscodeLockActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        }
+
     }
 }

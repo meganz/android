@@ -56,6 +56,7 @@ import mega.privacy.android.core.ui.controls.textfields.PasscodeField
 import mega.privacy.android.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
@@ -109,7 +110,7 @@ internal fun PasscodeDialog(
                 Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
             }
             when (val currentState = uiState) {
-                PasscodeUnlockState.Loading -> TODO()
+                PasscodeUnlockState.Loading -> {}
                 is PasscodeUnlockState.Data -> {
                     DialogContent(
                         onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
@@ -252,6 +253,10 @@ private fun DialogContent(
             }
         }
         if (logoutDialog) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.grey_100_alpha_060_dark_grey,
+            ){}
             LogoutConfirmationDialog(
                 onDismissed = { logoutDialog = false }
             )
