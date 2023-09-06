@@ -8,6 +8,7 @@ import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoSubStat
 import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfoType
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
+import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -164,12 +165,12 @@ internal class DeviceFolderNodeMapperTest {
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
     }
 
-    @ParameterizedTest(name = "mobile backup type: {0}")
+    @ParameterizedTest(name = "backup type: {0}")
     @EnumSource(
         value = BackupInfoType::class,
         names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"]
     )
-    fun `test that the mapped device folder has an offline status when the backup is a mobile backup`(
+    fun `test that the mapped mobile device folder has an offline status if it is beyond the maximum created backup time`(
         backupType: BackupInfoType,
     ) {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
@@ -181,7 +182,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2)))
-                on { lastActivityTimestamp }.thenReturn(TimeUnit.HOURS.toSeconds(2))
+                on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(1000L)
             },
         )
@@ -196,13 +197,12 @@ internal class DeviceFolderNodeMapperTest {
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
     }
 
-    @ParameterizedTest(name = "non mobile backup type: {0}")
+    @ParameterizedTest(name = "backup type: {0}")
     @EnumSource(
         value = BackupInfoType::class,
-        names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"],
-        mode = EnumSource.Mode.EXCLUDE,
+        names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"]
     )
-    fun `test that the mapped device folder has an offline status when the backup is a non mobile backup`(
+    fun `test that the mapped mobile device folder has an offline status if it has an invalid handle`(
         backupType: BackupInfoType,
     ) {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
@@ -214,10 +214,74 @@ internal class DeviceFolderNodeMapperTest {
                 on { name }.thenReturn(backupName)
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2)))
-                on { lastActivityTimestamp }.thenReturn(
-                    currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2))
-                )
+                on { lastActivityTimestamp }.thenReturn(0L)
+                on { rootHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+            },
+        )
+        val expected = listOf(
+            DeviceFolderNode(
+                id = backupId.toString(),
+                name = backupName,
+                status = DeviceCenterNodeStatus.Offline,
+                type = backupType,
+            )
+        )
+        assertThat(underTest(backupInfoList)).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "backup type: {0}")
+    @EnumSource(
+        value = BackupInfoType::class,
+        names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that the mapped non-mobile device folder has an offline status if it is beyond the maximum created backup time`(
+        backupType: BackupInfoType,
+    ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
+        val backupId = 123456L
+        val backupName = "Backup One"
+        val backupInfoList = listOf<BackupInfo>(
+            mock {
+                on { id }.thenReturn(backupId)
+                on { name }.thenReturn(backupName)
+                on { type }.thenReturn(backupType)
+                on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(1)))
+                on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(1000L)
+            },
+        )
+        val expected = listOf(
+            DeviceFolderNode(
+                id = backupId.toString(),
+                name = backupName,
+                status = DeviceCenterNodeStatus.Offline,
+                type = backupType,
+            )
+        )
+        assertThat(underTest(backupInfoList)).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "backup type: {0}")
+    @EnumSource(
+        value = BackupInfoType::class,
+        names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that the mapped non-mobile device folder has an offline status if it is has an invalid handle`(
+        backupType: BackupInfoType,
+    ) {
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000L
+        val backupId = 123456L
+        val backupName = "Backup One"
+        val backupInfoList = listOf<BackupInfo>(
+            mock {
+                on { id }.thenReturn(backupId)
+                on { name }.thenReturn(backupName)
+                on { type }.thenReturn(backupType)
+                on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(1)))
+                on { lastActivityTimestamp }.thenReturn(0L)
+                on { rootHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
             },
         )
         val expected = listOf(

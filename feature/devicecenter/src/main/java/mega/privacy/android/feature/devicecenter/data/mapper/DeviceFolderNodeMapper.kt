@@ -118,19 +118,21 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
     private fun BackupInfo.isOffline(currentTimeInSeconds: Long): Boolean {
         val maxLastHeartbeatTimeForMobileDevices = TimeUnit.MINUTES.toSeconds(60)
         val maxLastSyncTimeForOtherDevices = TimeUnit.MINUTES.toSeconds(30)
-        val maxLastBackupType = TimeUnit.MINUTES.toSeconds(10)
+        val maxCreatedBackupTime = TimeUnit.MINUTES.toSeconds(10)
 
         val isMobileBackup =
             type == BackupInfoType.CAMERA_UPLOADS || type == BackupInfoType.MEDIA_UPLOADS
-        val lastBackupTimestamp = currentTimeInSeconds - timestamp
-        val lastBackupActivityTimestamp = currentTimeInSeconds - lastActivityTimestamp
-        val lastBackupHeartbeat = maxOf(lastBackupTimestamp, lastBackupActivityTimestamp)
+        val lastBackupHeartbeat = maxOf(timestamp, lastActivityTimestamp)
+        // How much time has passed since the last Heartbeat
+        val backupHeartbeatTimeDifference = currentTimeInSeconds - lastBackupHeartbeat
         val isLastBackupHeartbeatOutOfRange =
-            (isMobileBackup && (lastBackupHeartbeat > maxLastHeartbeatTimeForMobileDevices))
-                    || (!isMobileBackup && (lastBackupHeartbeat > maxLastSyncTimeForOtherDevices))
+            (isMobileBackup && (backupHeartbeatTimeDifference > maxLastHeartbeatTimeForMobileDevices))
+                    || (!isMobileBackup && (backupHeartbeatTimeDifference > maxLastSyncTimeForOtherDevices))
 
         return if (isLastBackupHeartbeatOutOfRange) {
-            val isBackupOld = lastBackupTimestamp > maxLastBackupType
+            // How much time has passed since the Backup was created
+            val createdBackupTimeDifference = currentTimeInSeconds - timestamp
+            val isBackupOld = createdBackupTimeDifference > maxCreatedBackupTime
             val isCurrentBackupFolderExisting = rootHandle != MegaApiJava.INVALID_HANDLE
 
             isCurrentBackupFolderExisting || isBackupOld
