@@ -31,6 +31,7 @@
             app:tint="?android:attr/textColorSecondary" />
 
         <LinearLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toStartOf="@+id/three_dots"
@@ -142,6 +143,14 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="72dp"
+            android:layout_alignBottom="@+id/content"
+            android:background="@color/grey_012_white_012" />
 
     </RelativeLayout>
 

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Divider
@@ -71,7 +72,7 @@ fun <T : TypedNode> NodeListView(
                 key = "header"
             ) {
                 HeaderViewItem(
-                    modifier = modifier,
+                    modifier = Modifier.padding(horizontal = 8.dp),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
@@ -134,7 +135,8 @@ fun <T : TypedNode> NodeListView(
             )
             Divider(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(start = 72.dp),
                 color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                 thickness = 1.dp
             )
@@ -181,7 +183,7 @@ fun <T : TypedNode> NodeListView(
                 key = "header"
             ) {
                 HeaderViewItem(
-                    modifier = modifier,
+                    modifier = Modifier.padding(horizontal = 8.dp),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
@@ -239,7 +241,8 @@ fun <T : TypedNode> NodeListView(
             )
             Divider(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(start = 72.dp),
                 color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                 thickness = 1.dp
             )

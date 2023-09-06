@@ -823,6 +823,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun hideNodeActions(nodeShareInformation: NodeShareInformation, node: MegaNode) {
         val optionVerifyUser = contentView.findViewById<TextView>(R.id.verify_user_option)
         optionVerifyUser.visibility = View.VISIBLE
+        contentView.findViewById<View>(R.id.separator_info_option).visibility = View.VISIBLE
         if (!nodeShareInformation.isVerified) {
             optionVerifyUser.text = getString(
                 R.string.shared_items_bottom_sheet_menu_verify_user,
