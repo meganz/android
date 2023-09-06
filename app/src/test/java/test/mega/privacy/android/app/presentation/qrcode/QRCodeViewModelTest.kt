@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.QRCodeViewModel
@@ -21,6 +22,7 @@ import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapp
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -68,6 +70,7 @@ class QRCodeViewModelTest {
     private val inviteContactUseCase = mock<InviteContactUseCase>()
     private val avatarContentMapper = mock<AvatarContentMapper>()
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
+    private val scannerHandler = mock<ScannerHandler>()
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -91,7 +94,8 @@ class QRCodeViewModelTest {
             inviteContactUseCase = inviteContactUseCase,
             queryScannedContactLinkUseCase = queryScannedContactLinkUseCase,
             avatarContentMapper = avatarContentMapper,
-            myQRCodeTextErrorMapper = myQRCodeTextErrorMapper
+            myQRCodeTextErrorMapper = myQRCodeTextErrorMapper,
+            scannerHandler = scannerHandler
         )
     }
 
@@ -242,6 +246,83 @@ class QRCodeViewModelTest {
                 underTest.sendInvite(123L, "abc@gmail.com")
                 val newValue = awaitItem()
                 assertThat(newValue.inviteContactResult).isInstanceOf(triggered(InviteContactRequest.InvalidStatus).javaClass)
+            }
+        }
+
+    @Test
+    fun `test that scannedContactLinkResult is set correctly when queryContactLink is invoked`() =
+        runTest {
+            val handle = "1234"
+            val name = "abc"
+            val avatarFile = mock<File> {
+                on { exists() }.thenReturn(true)
+                on { length() }.thenReturn(100)
+            }
+            val avatarColor = 4040
+            val scanResult = ScannedContactLinkResult(
+                name,
+                "abc@gmail.com",
+                12345,
+                false,
+                QRCodeQueryResults.CONTACT_QUERY_OK,
+                avatarFile,
+                avatarColor
+            )
+            val avatar = PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true)
+            whenever(avatarContentMapper(name, avatarFile, false, 36.sp, avatarColor))
+                .thenReturn(avatar)
+
+            whenever(queryScannedContactLinkUseCase(handle)).thenReturn(scanResult)
+            underTest.queryContactLink(mock(), handle)
+            underTest.uiState.test {
+                val result = awaitItem()
+                assertThat(result.scannedContactLinkResult).isInstanceOf(triggered(scanResult).javaClass)
+                assertThat(result.scannedContactAvatarContent).isEqualTo(avatar)
+            }
+        }
+
+    @Test
+    fun `test that scannedContactAvatarContent is set to null when resetScannedContactAvatarContent is invoked`() =
+        runTest {
+            val handle = "1234"
+            val name = "abc"
+            val avatarFile = mock<File> {
+                on { exists() }.thenReturn(true)
+                on { length() }.thenReturn(100)
+            }
+            val avatarColor = 4040
+            val scanResult = ScannedContactLinkResult(
+                name,
+                "abc@gmail.com",
+                12345,
+                false,
+                QRCodeQueryResults.CONTACT_QUERY_OK,
+                avatarFile,
+                avatarColor
+            )
+            whenever(
+                avatarContentMapper(name, avatarFile, false, 36.sp, avatarColor)
+            ).thenReturn(PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true))
+
+            whenever(queryScannedContactLinkUseCase(handle)).thenReturn(scanResult)
+            underTest.queryContactLink(mock(), handle)
+            underTest.uiState.test {
+                underTest.resetScannedContactAvatar()
+                val result = expectMostRecentItem()
+                assertThat(result.scannedContactAvatarContent).isNull()
+            }
+        }
+
+    @Test
+    fun `test that scannedContactEmail is set to null when resetScannedContactEmail is invoked`() =
+        runTest {
+            whenever(inviteContactUseCase(any(), any(), anyOrNull()))
+                .thenReturn(InviteContactRequest.Sent)
+            underTest.sendInvite(123L, "abc@gmail.com")
+            underTest.uiState.test {
+                underTest.resetScannedContactEmail()
+                val result = expectMostRecentItem()
+                assertThat(result.scannedContactEmail).isNull()
             }
         }
 

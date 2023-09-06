@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -49,17 +50,24 @@ class QRCodeComposeActivity : ComponentActivity() {
                     onResetQRCode = viewModel::resetQRCode,
                     onSaveQRCode = { },
                     onShareClicked = { },
-                    onScanQrCodeClicked = { },
+                    onScanQrCodeClicked = { viewModel.scanCode(this) },
                     onCopyLinkClicked = viewModel::copyContactLink,
-                    onViewContactClicked = { },
+                    onViewContactClicked = ::onViewContact,
                     onInviteContactClicked = viewModel::sendInvite,
                     onResultMessageConsumed = viewModel::resetResultMessage,
                     onScannedContactLinkResultConsumed = viewModel::resetScannedContactLinkResult,
                     onInviteContactResultConsumed = viewModel::resetInviteContactResult,
+                    onInviteContactDialogDismiss = viewModel::resetScannedContactAvatar,
+                    onInviteResultDialogDismiss = viewModel::resetScannedContactEmail,
                     qrCodeMapper = qrCodeMapper,
                 )
             }
         }
         viewModel.createQRCode()
+    }
+
+    private fun onViewContact(email: String) {
+        ContactUtil.openContactInfoActivity(this, email)
+        finish()
     }
 }

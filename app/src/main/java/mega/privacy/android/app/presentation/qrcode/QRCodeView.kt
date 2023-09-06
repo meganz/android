@@ -84,11 +84,13 @@ internal fun QRCodeView(
     onShareClicked: () -> Unit,
     onScanQrCodeClicked: () -> Unit,
     onCopyLinkClicked: () -> Unit,
-    onViewContactClicked: () -> Unit,
+    onViewContactClicked: (String) -> Unit,
     onInviteContactClicked: (Long, String) -> Unit,
     onResultMessageConsumed: () -> Unit,
     onScannedContactLinkResultConsumed: () -> Unit,
     onInviteContactResultConsumed: () -> Unit,
+    onInviteResultDialogDismiss: () -> Unit,
+    onInviteContactDialogDismiss: () -> Unit,
     qrCodeMapper: QRCodeMapper,
 ) {
     val context = LocalContext.current
@@ -238,7 +240,10 @@ internal fun QRCodeView(
                 InviteResultDialog(
                     title = stringResource(id = it.dialogTitle),
                     text = contentText,
-                    onConfirmButtonClick = { showInviteContactResult = null }
+                    onInviteResultDialogDismiss = {
+                        onInviteResultDialogDismiss()
+                        showInviteContactResult = null
+                    }
                 )
             }
 
@@ -249,7 +254,10 @@ internal fun QRCodeView(
                             scannedContactLinkResult = it,
                             onViewContactClicked = onViewContactClicked,
                             onInviteContactClicked = onInviteContactClicked,
-                            onInviteContactDialogDismiss = { showScannedContactLinkResult = null },
+                            onInviteContactDialogDismiss = {
+                                showScannedContactLinkResult = null
+                                onInviteContactDialogDismiss()
+                            },
                             avatarContent = viewState.scannedContactAvatarContent,
                         )
                     }
@@ -261,7 +269,10 @@ internal fun QRCodeView(
                                 id = R.string.invite_not_sent_text_already_contact,
                                 it.email
                             ),
-                            onConfirmButtonClick = { showScannedContactLinkResult = null }
+                            onInviteResultDialogDismiss = {
+                                onInviteResultDialogDismiss()
+                                showScannedContactLinkResult = null
+                            }
                         )
                     }
 
@@ -269,7 +280,10 @@ internal fun QRCodeView(
                         InviteResultDialog(
                             title = stringResource(id = R.string.invite_not_sent),
                             text = stringResource(id = R.string.invite_not_sent_text),
-                            onConfirmButtonClick = { showScannedContactLinkResult = null }
+                            onInviteResultDialogDismiss = {
+                                onInviteResultDialogDismiss()
+                                showScannedContactLinkResult = null
+                            }
                         )
                     }
                 }
@@ -301,22 +315,22 @@ private fun ShowSnackBar(
 private fun InviteResultDialog(
     title: String,
     text: String,
-    onConfirmButtonClick: () -> Unit,
+    onInviteResultDialogDismiss: () -> Unit,
 ) {
     MegaAlertDialog(
         title = title,
         text = text,
         confirmButtonText = stringResource(id = R.string.general_ok),
         cancelButtonText = null,
-        onConfirm = onConfirmButtonClick,
-        onDismiss = {}
+        onConfirm = onInviteResultDialogDismiss,
+        onDismiss = onInviteResultDialogDismiss
     )
 }
 
 @Composable
 private fun InviteContactDialog(
     scannedContactLinkResult: ScannedContactLinkResult,
-    onViewContactClicked: () -> Unit,
+    onViewContactClicked: (String) -> Unit,
     onInviteContactClicked: (Long, String) -> Unit,
     onInviteContactDialogDismiss: () -> Unit,
     avatarContent: AvatarContent? = null,
@@ -355,7 +369,7 @@ private fun InviteContactDialog(
                     RaisedDefaultMegaButton(
                         textId = R.string.contact_view,
                         onClick = {
-                            onViewContactClicked()
+                            onViewContactClicked(scannedContactLinkResult.email)
                             onInviteContactDialogDismiss()
                         }
                     )
@@ -410,7 +424,9 @@ private fun PreviewQRCodeView() {
             onInviteContactClicked = { _, _ -> },
             onResultMessageConsumed = { },
             onScannedContactLinkResultConsumed = { },
-            onInviteContactResultConsumed = { }
+            onInviteContactResultConsumed = { },
+            onInviteResultDialogDismiss = { },
+            onInviteContactDialogDismiss = { }
         ) { _, _, _, _, _ ->
             Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
         }
@@ -451,7 +467,7 @@ private fun PreviewInviteResultDialog() {
         InviteResultDialog(
             title = "Title",
             text = "Message content text",
-            onConfirmButtonClick = {}
+            onInviteResultDialogDismiss = {}
         )
     }
 }

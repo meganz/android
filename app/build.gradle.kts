@@ -363,6 +363,7 @@ dependencies {
     "gmsImplementation"(google.services.location)
     "gmsImplementation"(google.services.maps)
     "gmsImplementation"(google.maps.utils)
+    "gmsImplementation"(google.code.scanner)
 
     // Firebase
     "gmsImplementation"(platform(google.firebase.bom))

@@ -13,11 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
+import mega.privacy.android.app.presentation.qrcode.model.ScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -50,6 +53,7 @@ class QRCodeViewModel @Inject constructor(
     private val inviteContactUseCase: InviteContactUseCase,
     private val avatarContentMapper: AvatarContentMapper,
     private val myQRCodeTextErrorMapper: MyQRCodeTextErrorMapper,
+    private val scannerHandler: ScannerHandler,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QRCodeUIState())
@@ -264,6 +268,36 @@ class QRCodeViewModel @Inject constructor(
     }
 
     /**
+     * Start scanning of qr code
+     */
+    fun scanCode(context: Context) {
+        viewModelScope.launch {
+            runCatching { scannerHandler.scan() }
+                .onSuccess {
+                    when (it) {
+                        is ScanResult.Success -> {
+                            val contactLink = it.rawValue
+                            contactLink?.let {
+                                val s = contactLink.split("C!").toTypedArray()
+                                if (s.size <= 1 || s[0] != Constants.SCANNED_CONTACT_BASE_URL) {
+                                    setResultMessage(R.string.invalid_code)
+                                } else {
+                                    queryContactLink(context, s[1])
+                                }
+                            }
+                        }
+
+                        ScanResult.Cancel -> {}
+                    }
+                }
+                .onFailure { error ->
+                    Timber.e(error)
+                    setResultMessage(R.string.general_text_error)
+                }
+        }
+    }
+
+    /**
      * Show result message of a operation
      *
      * @param messageId String ID of the message
@@ -286,4 +320,15 @@ class QRCodeViewModel @Inject constructor(
      * Reset and notify inviteContactResult is consumed
      */
     fun resetInviteContactResult() = _uiState.update { it.copy(inviteContactResult = consumed()) }
+
+    /**
+     * Reset scannedContactEmail
+     */
+    fun resetScannedContactEmail() = _uiState.update { it.copy(scannedContactEmail = null) }
+
+    /**
+     * Reset scannedContactAvatarContent
+     */
+    fun resetScannedContactAvatar() =
+        _uiState.update { it.copy(scannedContactAvatarContent = null) }
 }

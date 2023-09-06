@@ -50,6 +50,8 @@ class QRCodeViewTest {
                 onResultMessageConsumed = { },
                 onScannedContactLinkResultConsumed = { },
                 onInviteContactResultConsumed = { },
+                onInviteContactDialogDismiss = { },
+                onInviteResultDialogDismiss = { },
                 qrCodeMapper = qrCodeMapper
             )
         }

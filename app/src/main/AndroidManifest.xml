@@ -143,6 +143,10 @@
             android:name="firebase_performance_logcat_enabled"
             android:value="false" />
 
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode_ui"/>
+
         <activity
             android:name=".presentation.login.LoginActivity"
             android:label="@string/login_text"

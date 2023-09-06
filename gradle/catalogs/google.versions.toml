@@ -18,6 +18,7 @@ protobuff = "3.19.3"
 services-location = "21.0.1"
 services-maps = "18.1.0"
 zxing = "3.4.0"
+code-scanner = "16.1.0"
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist-pager" }
@@ -52,6 +53,7 @@ protobuff = { module = "com.google.protobuf:protobuf-java", version.ref = "proto
 services-location = { module = "com.google.android.gms:play-services-location", version.ref = "services-location" }
 services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "services-maps" }
 zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
+code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "code-scanner"}
 
 [bundles]
 firebase-bom = ["firebase-crashlytics-ndk", "firebase-crashlytics-ktx", "firebase-messaging-ktx", "firebase-perf-ktx"]

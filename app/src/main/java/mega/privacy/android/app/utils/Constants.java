@@ -149,6 +149,7 @@ public class Constants {
     public static final long SECONDS_TO_WAIT_ALONE_ON_THE_CALL = 2 * SECONDS_IN_MINUTE;
     public static final long SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL = 5 * SECONDS_IN_MINUTE;
 
+    public static final String SCANNED_CONTACT_BASE_URL = "https://mega.nz/";
     public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
     public static final String DISPUTE_URL = "https://mega.nz/dispute";
     public static final String TAKEDOWN_URL = "https://mega.nz/takedown";
