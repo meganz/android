@@ -24,6 +24,7 @@ compose-state-events = "1.2.3"
 kotlinpoet = "1.14.2"
 xray = "1.0"
 nocturn = "1.0"
+karma = "1.2"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
@@ -77,6 +78,9 @@ kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 balloon = "com.github.skydoves:balloon-compose:1.5.4"
 xray = { module = "mega.privacy.android.xray:xray", version.ref = "xray" }
 nocturn = { module = "mega.privacy.android.nocturn:nocturn", version.ref = "nocturn" }
+karma-annotation = { module = "com.mega.karma:annotation", version.ref = "karma" }
+karma-compiler = { module = "com.mega.karma:compiler", version.ref = "karma" }
+karma-core = { module = "com.mega.karma:core", version.ref = "karma" }
 
 [bundles]
 fresco = ["fresco", "fresco-gif", "fresco-webp", "fresco-webpsupport"]

@@ -270,6 +270,21 @@ Long getNocturnTimeout() {
 }
 
 /**
+ * Get Karma ADB plugin port.
+ */
+Integer getKarmaPluginPort() {
+    def defaultPort = 6379
+
+    def file = rootProject.file('local.properties')
+    if (file.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(file))
+        return props["karma_plugin_port"]?.toInteger() ?: defaultPort
+    }
+    return defaultPort
+}
+
+/**
  * Check if the gradle command parameter matches the build type.
  *
  * @param type the type keyword to check. Possible values:
@@ -327,4 +342,5 @@ ext {
     nativeLibsDir = this.&nativeLibsDir
     isCiBuild = this.&isCiBuild
     buildTypeMatches = this.&buildTypeMatches
+    getKarmaPluginPort = this.&getKarmaPluginPort
 }

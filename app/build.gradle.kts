@@ -87,6 +87,9 @@ android {
         val getNocturnTimeout: Closure<Long> by extra
         buildConfigField("long", "NOCTURN_TIMEOUT", "${getNocturnTimeout()}")
 
+        val getKarmaPluginPort: Closure<Int> by extra
+        buildConfigField("int", "KARMA_PLUGIN_PORT", "${getKarmaPluginPort()}")
+
         resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
 
         val megaSdkVersion: String by rootProject.extra
@@ -420,6 +423,11 @@ dependencies {
     implementation(lib.mega.analytics)
     debugImplementation(lib.nocturn)
     debugImplementation(lib.xray)
+
+    // Karma
+    compileOnly(lib.karma.annotation)
+    debugKotlinCompilerPluginClasspath(gradle.startParameter, lib.karma.compiler)
+    debugImplementation(lib.karma.core)
 
     coreLibraryDesugaring(lib.desugar)
 
