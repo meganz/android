@@ -247,6 +247,7 @@ class VideoPlayerFragment : Fragment() {
     private fun setupPlayer() {
         playerViewHolder?.let { viewHolder ->
             videoPlayerView = viewHolder.binding.playerView
+            videoPlayerView?.keepScreenOn = !viewModel.mediaPlaybackState.value
             with(viewHolder) {
                 setTrackNameVisible(activity?.configuration?.orientation != ORIENTATION_LANDSCAPE)
 
