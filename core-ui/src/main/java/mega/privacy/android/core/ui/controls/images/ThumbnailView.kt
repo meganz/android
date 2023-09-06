@@ -66,8 +66,8 @@ fun ThumbnailView(
                 .crossfade(true)
                 .build(),
             contentDescription = contentDescription,
-            placeholder = painterResource(id = R.drawable.ic_image_thumbnail),
-            error = painterResource(id = R.drawable.ic_image_thumbnail),
+            placeholder = painterResource(id = defaultImage),
+            error = painterResource(id = defaultImage),
             contentScale = contentScale,
             modifier = modifier
                 .aspectRatio(1f)
