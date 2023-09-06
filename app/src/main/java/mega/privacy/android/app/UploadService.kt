@@ -194,6 +194,7 @@ internal class UploadService : LifecycleService() {
     private var monitorPausedTransfersJob: Job? = null
     private var monitorStopTransfersWorkJob: Job? = null
     private var monitorTransferEventsJob: Job? = null
+    private var lastUpdated: Long = 0
 
     override fun onCreate() {
         super.onCreate()
@@ -691,7 +692,14 @@ internal class UploadService : LifecycleService() {
     }
 
     private fun updateProgressNotification(pausedTransfers: Boolean = false) {
-        val transfers: Collection<Transfer> = ArrayList(mapProgressFileTransfers.values)
+        val now = System.currentTimeMillis()
+        lastUpdated =
+            if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS || pausedTransfers) {
+                now
+            } else {
+                return
+            }
+        val transfers = mapProgressFileTransfers.values.toList()
         val up = getInProgressNotification(transfers)
         val total = up.total
         val inProgress = up.inProgress
@@ -1058,5 +1066,6 @@ internal class UploadService : LifecycleService() {
         var EXTRA_LAST_MODIFIED = "MEGA_FILE_LAST_MODIFIED"
         var EXTRA_PARENT_HASH = "MEGA_PARENT_HASH"
         var EXTRA_UPLOAD_TXT = "EXTRA_UPLOAD_TXT"
+        private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
     }
 }
