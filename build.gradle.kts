@@ -1,4 +1,3 @@
-import src.main.kotlin.PreReleaseTask
 
 apply(from = "tools/util.gradle")
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -7,6 +6,10 @@ buildscript {
         google()
         maven { url = uri("https://plugins.gradle.org/m2/") }
         jcenter()
+        maven {
+            url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/megagradle")
+        }
     }
     dependencies {
         classpath(plugin.build.tools)
@@ -23,6 +26,7 @@ buildscript {
         classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
         classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.2.0-beta02")
+        classpath("mega.privacy:megagradle:0.1")
     }
 }
 
@@ -97,4 +101,5 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     apply(from = "${project.rootDir}/tools/prebuilt-sdk.gradle")
 }
 
-tasks.register<PreReleaseTask>("preRelease")
+tasks.register<mega.privacy.megagradle.PreReleaseTask>("preRelease")
+tasks.register<mega.privacy.megagradle.ReleaseTask>("release")
