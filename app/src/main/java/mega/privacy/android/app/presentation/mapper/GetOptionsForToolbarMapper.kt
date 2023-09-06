@@ -68,7 +68,10 @@ class GetOptionsForToolbarMapper @Inject constructor(
                 }
             }
         } else if (allHaveOwnerAccessAndNotTakenDown(selectedNodeHandleList)) {
-            control.rename().isVisible = true
+            control.link.apply {
+                isVisible = true
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+            }
         }
 
         var showSendToChat = true
@@ -171,17 +174,13 @@ class GetOptionsForToolbarMapper @Inject constructor(
      */
     private suspend fun allHaveOwnerAccessAndNotTakenDown(selectedNodeHandleList: List<Long>): Boolean {
         selectedNodeHandleList.forEach {
-            getNodeByIdUseCase(NodeId(it))?.let { node ->
-                getNodeByHandle(it)?.let { megaNode ->
-                    if ((checkAccessErrorExtended(
-                            megaNode,
-                            MegaShare.ACCESS_OWNER
-                        ).errorCode != MegaError.API_OK) ||
-                        node.isTakenDown
-                    )
-                        return false
-                } ?: run {
-                    return true
+            getNodeByHandle(it)?.let { megaNode ->
+                if ((checkAccessErrorExtended(
+                        megaNode,
+                        MegaShare.ACCESS_OWNER
+                    ).errorCode != MegaError.API_OK) || megaNode.isTakenDown
+                ) {
+                    return false
                 }
             }
         }
