@@ -1,23 +1,27 @@
 package mega.privacy.android.app.namecollision.usecase
 
 import android.content.Context
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -39,6 +43,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
     private val getNodeUseCase: GetNodeUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
+    @ApplicationScope private val scope: CoroutineScope,
 ) {
 
     /**
@@ -102,48 +107,42 @@ class GetNameCollisionResultUseCase @Inject constructor(
                 }
 
                 if (handle != null) {
-                    getThumbnailUseCase.get(handle).blockingSubscribeBy(
-                        onError = { error ->
-                            Timber.w(error, "No thumbnail")
-                            thumbnailRequests--
+                    scope.launch {
+                        runCatching { getThumbnailUseCase(handle, true) }
+                            .onFailure { error ->
+                                Timber.w(error, "No thumbnail")
+                                thumbnailRequests--
 
-                            if (thumbnailRequests == 0) {
-                                emitter.onComplete()
+                                if (thumbnailRequests == 0) emitter.onComplete()
                             }
-                        },
-                        onSuccess = { thumbnailUri ->
-                            nameCollisionResult.thumbnail = thumbnailUri
-                            emitter.onNext(nameCollisionResult)
-                            thumbnailRequests--
+                            .onSuccess { thumbnailFile ->
+                                nameCollisionResult.thumbnail = thumbnailFile?.toUri()
+                                emitter.onNext(nameCollisionResult)
+                                thumbnailRequests--
 
-                            if (thumbnailRequests == 0) {
-                                emitter.onComplete()
+                                if (thumbnailRequests == 0) emitter.onComplete()
                             }
-                        }
-                    )
+                    }
                 } else if (collision is NameCollision.Import) {
                     if (nodes != null) {
                         for (node in nodes) {
                             if (node.handle == collision.nodeHandle) {
-                                getThumbnailUseCase.get(node).blockingSubscribeBy(
-                                    onError = { error ->
-                                        Timber.w(error, "No thumbnail")
-                                        thumbnailRequests--
+                                scope.launch {
+                                    runCatching { getThumbnailUseCase(node.handle, true) }
+                                        .onFailure { error ->
+                                            Timber.w(error, "No thumbnail")
+                                            thumbnailRequests--
 
-                                        if (thumbnailRequests == 0) {
-                                            emitter.onComplete()
+                                            if (thumbnailRequests == 0) emitter.onComplete()
                                         }
-                                    },
-                                    onSuccess = { thumbnailUri ->
-                                        nameCollisionResult.thumbnail = thumbnailUri
-                                        emitter.onNext(nameCollisionResult)
-                                        thumbnailRequests--
+                                        .onSuccess { thumbnailFile ->
+                                            nameCollisionResult.thumbnail = thumbnailFile?.toUri()
+                                            emitter.onNext(nameCollisionResult)
+                                            thumbnailRequests--
 
-                                        if (thumbnailRequests == 0) {
-                                            emitter.onComplete()
+                                            if (thumbnailRequests == 0) emitter.onComplete()
                                         }
-                                    }
-                                )
+                                }
                                 break
                             }
                         }
@@ -151,25 +150,24 @@ class GetNameCollisionResultUseCase @Inject constructor(
                 }
 
                 if (collision.isFile) {
-                    getThumbnailUseCase.get(this).blockingSubscribeBy(
-                        onError = { error ->
-                            Timber.w(error, "No thumbnail")
-                            thumbnailRequests--
+                    scope.launch {
+                        runCatching { getThumbnailUseCase(collisionNode.handle, true) }
+                            .onFailure { error ->
+                                Timber.w(error, "No thumbnail")
+                                thumbnailRequests--
 
-                            if (thumbnailRequests == 0) {
-                                emitter.onComplete()
+                                if (thumbnailRequests == 0) emitter.onComplete()
                             }
-                        },
-                        onSuccess = { thumbnailUri ->
-                            nameCollisionResult.collisionThumbnail = thumbnailUri
-                            emitter.onNext(nameCollisionResult)
-                            thumbnailRequests--
+                            .onSuccess { thumbnailFile ->
+                                nameCollisionResult.collisionThumbnail = thumbnailFile?.toUri()
+                                emitter.onNext(nameCollisionResult)
+                                thumbnailRequests--
 
-                            if (thumbnailRequests == 0) {
-                                emitter.onComplete()
+                                if (thumbnailRequests == 0) {
+                                    emitter.onComplete()
+                                }
                             }
-                        }
-                    )
+                    }
                 }
 
                 if (thumbnailRequests == 0) {

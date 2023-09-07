@@ -5,22 +5,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.data.LinkItem
-import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -164,15 +162,17 @@ class GetSeveralLinksViewModel @Inject constructor(
      * @param pendingThumbnails List of nodes to get their thumbnails.
      */
     private fun requestThumbnails(pendingThumbnails: List<MegaNode>) {
-        if (pendingThumbnails.isNotEmpty()) {
-            getThumbnailUseCase.get(pendingThumbnails)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { handle -> notifyThumbnailUpdate(handle) },
-                    onError = Timber::e
-                )
-                .addTo(composite)
+        viewModelScope.launch {
+            pendingThumbnails.map {
+                async {
+                    runCatching {
+                        getThumbnailUseCase(it.handle, true)
+                        notifyThumbnailUpdate(it.handle)
+                    }.onFailure {
+                        Timber.e(it, "Exception getting thumbnail for $this")
+                    }
+                }
+            }.awaitAll()
         }
     }
 
