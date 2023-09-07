@@ -57,7 +57,7 @@ API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
 if [[ "$OSTYPE" == "darwin"* ]]; then
     JOBS=$(sysctl -n hw.ncpu)
 else
-    JOBS=8
+    JOBS=$(nproc)
 fi
 
 if [ -z "${LOG_FILE}" ]; then
@@ -224,11 +224,15 @@ function downloadCheckAndUnpack()
         local CURRENTSHA1=`sha1sum ${FILENAME} | cut -d " " -f 1`
         if [ "${SHA1}" != "${CURRENTSHA1}" ]; then
             echo "* Invalid hash. Redownloading..."
-            wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+            # if wget fails, try with curl
+            wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE} || \
+                curl -L -o ${FILENAME} ${URL} &>> ${LOG_FILE}
         fi
     else
         echo "* Downloading '${FILENAME}' ..."
-        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+        # if wget fails, try with curl
+        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE} || \
+            curl -L -o ${FILENAME} ${URL} &>> ${LOG_FILE}
     fi
 
     local NEWSHA1=`sha1sum ${FILENAME} | cut -d " " -f 1`
@@ -261,7 +265,8 @@ function downloadAndUnpack()
         echo "* Already downloaded: '${FILENAME}'"
     else
         echo "* Downloading '${FILENAME}' ..."
-        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE} || \
+            curl -L -o ${FILENAME} ${URL} &>> ${LOG_FILE}
     fi
 
     if [[ "${FILENAME}" =~ \.tar\.[^\.]+$ ]]; then
@@ -534,10 +539,14 @@ else
     echo "* WebRTC is not needed"
 fi
 
+
+
 echo "* Setting up crashlytics"
 if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
-    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE} &>> ${LOG_FILE}
-    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C} &>> ${LOG_FILE}
+    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE} &>> ${LOG_FILE} || \
+        curl -L -o ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE} ${CRASHLYTICS_DOWNLOAD_URL} &>> ${LOG_FILE}
+    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C} &>> ${LOG_FILE} || \
+        curl -L -o ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C} ${CRASHLYTICS_DOWNLOAD_URL_C} &>> ${LOG_FILE}
 
     touch ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
 fi
