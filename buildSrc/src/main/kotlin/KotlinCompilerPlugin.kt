@@ -1,16 +1,24 @@
-import org.gradle.StartParameter
+import groovy.lang.Closure
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
+import org.gradle.api.invocation.Gradle
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.DependencyHandlerScope
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.provideDelegate
 
-fun DependencyHandlerScope.debugKotlinCompilerPluginClasspath(
-    startParameter: StartParameter,
-    dependency: Provider<MinimalExternalModuleDependency>
+fun DependencyHandlerScope.debugLocalKotlinCompilerPluginClasspath(
+    gradle: Gradle,
+    extra: ExtraPropertiesExtension,
+    dependency: Provider<MinimalExternalModuleDependency>,
 ) {
-    startParameter.taskNames.forEach { taskName ->
-        val normalizedTaskName = taskName.lowercase()
-        if (normalizedTaskName.contains("debug") && !normalizedTaskName.contains("test")) {
+    val isServerBuild: Closure<Boolean> by extra
+
+    for (taskName in gradle.startParameter.taskNames) {
+        val name = taskName.lowercase()
+        if (name.contains("debug") && !name.contains("test") && !isServerBuild()) {
             "kotlinCompilerPluginClasspath"(dependency)
+            break
         }
     }
 }

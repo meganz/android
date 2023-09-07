@@ -117,7 +117,11 @@ dependencies {
 
     // Karma
     compileOnly(lib.karma.annotation)
-    debugKotlinCompilerPluginClasspath(gradle.startParameter, lib.karma.compiler)
+    debugLocalKotlinCompilerPluginClasspath(
+        gradle,
+        rootProject.extra,
+        lib.karma.compiler,
+    )
     debugImplementation(lib.karma.core)
 
     // Testing dependencies
