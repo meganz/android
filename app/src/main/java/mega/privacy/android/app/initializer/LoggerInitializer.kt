@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -31,6 +32,11 @@ class LoggerInitializer : Initializer<Unit> {
          *
          */
         fun initialiseLogging(): InitialiseLogging
+
+        /**
+         * Mega chat api android
+         */
+        fun loggingRepository(): LoggingRepository
 
         /**
          * Enable log all to console
@@ -60,6 +66,7 @@ class LoggerInitializer : Initializer<Unit> {
         val entryPoint =
             EntryPointAccessors.fromApplication(context, LoggerInitializerEntryPoint::class.java)
 
+        entryPoint.loggingRepository()
         entryPoint.appScope().launch {
             entryPoint.enableLogAllToConsole().invoke()
             val permanentEnabled =

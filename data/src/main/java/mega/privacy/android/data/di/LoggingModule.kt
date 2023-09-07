@@ -29,9 +29,11 @@ internal abstract class LoggingModule {
     @Binds
     abstract fun bindLoggingRepository(repository: TimberLoggingRepository): LoggingRepository
 
+    @Singleton
     @Binds
     abstract fun bindMegaChatLoggerInterface(implementation: TimberChatLogger): MegaChatLoggerInterface
 
+    @Singleton
     @Binds
     abstract fun bindMegaLoggerInterface(implementation: TimberMegaLogger): MegaLoggerInterface
 
