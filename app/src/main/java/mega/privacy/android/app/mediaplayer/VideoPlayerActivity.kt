@@ -44,6 +44,8 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
@@ -719,7 +721,9 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
 
             // Put in the Activity to avoid Fragment recreate to cause the state changes when the screen rotated
-            collectFlow(subtitleDisplayState) { state ->
+            collectFlow(
+                uiState.map { it.subtitleDisplayState }.distinctUntilChanged()
+            ) { state ->
                 // According to the state of the subtitle dialog displayed and the
                 // state of the playback position dialog displayed to pause or play the video.
                 mediaPlayerGateway.setPlayWhenReady(

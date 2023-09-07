@@ -116,20 +116,20 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that the initial state is returned`() = runTest {
         val expectedState = SubtitleDisplayState()
-        underTest.subtitleDisplayState.test {
-            assertThat(awaitItem()).isEqualTo(expectedState)
+        underTest.uiState.test {
+            assertThat(awaitItem().subtitleDisplayState).isEqualTo(expectedState)
         }
     }
 
     @Test
     internal fun `test that showAddSubtitleDialog function is invoked`() = runTest {
         underTest.showAddSubtitleDialog()
-        underTest.subtitleDisplayState.test {
-            val initial = awaitItem()
+        underTest.uiState.test {
+            val initial = awaitItem().subtitleDisplayState
             assertThat(initial.isSubtitleShown).isFalse()
             assertThat(initial.isAddSubtitle).isFalse()
             assertThat(initial.isSubtitleDialogShown).isFalse()
-            val actual = awaitItem()
+            val actual = awaitItem().subtitleDisplayState
             assertThat(actual.isSubtitleShown).isTrue()
             assertThat(actual.isAddSubtitle).isFalse()
             assertThat(actual.isSubtitleDialogShown).isTrue()
@@ -139,11 +139,11 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that onAddedSubtitleOptionClicked function is invoked`() = runTest {
         underTest.onAddedSubtitleOptionClicked()
-        underTest.subtitleDisplayState.test {
-            val initial = awaitItem()
+        underTest.uiState.test {
+            val initial = awaitItem().subtitleDisplayState
             assertThat(initial.isSubtitleShown).isFalse()
             assertThat(initial.isSubtitleDialogShown).isFalse()
-            val actual = awaitItem()
+            val actual = awaitItem().subtitleDisplayState
             assertThat(actual.isSubtitleShown).isTrue()
             assertThat(actual.isSubtitleDialogShown).isFalse()
         }
@@ -162,8 +162,8 @@ internal class VideoPlayerViewModelTest {
                 )
             )
             advanceUntilIdle()
-            underTest.subtitleDisplayState.test {
-                val actual = awaitItem()
+            underTest.uiState.test {
+                val actual = awaitItem().subtitleDisplayState
                 assertThat(actual.isSubtitleShown).isTrue()
                 assertThat(actual.isAddSubtitle).isTrue()
                 assertThat(actual.subtitleFileInfo?.id).isEqualTo(expectedId)
@@ -178,8 +178,8 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that onAddSubtitleFile function is invoked when info is null`() = runTest {
         underTest.onAddSubtitleFile(null)
-        underTest.subtitleDisplayState.test {
-            val actual = awaitItem()
+        underTest.uiState.test {
+            val actual = awaitItem().subtitleDisplayState
             assertThat(actual.isSubtitleShown).isFalse()
             assertThat(actual.isAddSubtitle).isFalse()
             assertThat(actual.isSubtitleDialogShown).isFalse()
@@ -202,8 +202,8 @@ internal class VideoPlayerViewModelTest {
                 SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
             )
             underTest.onAddSubtitleFile(null, true)
-            underTest.subtitleDisplayState.test {
-                val actual = awaitItem()
+            underTest.uiState.test {
+                val actual = awaitItem().subtitleDisplayState
                 assertThat(actual.isSubtitleShown).isFalse()
                 assertThat(actual.isAddSubtitle).isFalse()
                 assertThat(actual.isSubtitleDialogShown).isFalse()
@@ -222,8 +222,8 @@ internal class VideoPlayerViewModelTest {
             )
         )
         advanceUntilIdle()
-        underTest.subtitleDisplayState.test {
-            val actual = awaitItem()
+        underTest.uiState.test {
+            val actual = awaitItem().subtitleDisplayState
             assertThat(actual.isSubtitleShown).isTrue()
             assertThat(actual.isAddSubtitle).isTrue()
             assertThat(actual.subtitleFileInfo?.id).isEqualTo(expectedId)
@@ -236,8 +236,8 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that onOffItemClicked function is invoked`() = runTest {
         underTest.onOffItemClicked()
-        underTest.subtitleDisplayState.test {
-            val actual = awaitItem()
+        underTest.uiState.test {
+            val actual = awaitItem().subtitleDisplayState
             assertThat(actual.isSubtitleShown).isFalse()
             assertThat(actual.isAddSubtitle).isFalse()
             assertThat(actual.isSubtitleDialogShown).isFalse()
@@ -248,8 +248,8 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that onDismissRequest function is invoked`() = runTest {
         underTest.onDismissRequest()
-        underTest.subtitleDisplayState.test {
-            val actual = awaitItem()
+        underTest.uiState.test {
+            val actual = awaitItem().subtitleDisplayState
             assertThat(actual.isSubtitleShown).isFalse()
             assertThat(actual.isAddSubtitle).isFalse()
             assertThat(actual.isSubtitleDialogShown).isFalse()

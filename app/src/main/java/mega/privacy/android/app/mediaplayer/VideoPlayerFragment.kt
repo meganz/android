@@ -29,9 +29,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -126,7 +131,7 @@ class VideoPlayerFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View = FragmentVideoPlayerBinding.inflate(inflater, container, false).let {
         binding = it
-        playerViewHolder = VideoPlayerViewHolder(binding)
+        playerViewHolder = VideoPlayerViewHolder(binding.root)
         binding.root
     }
 
@@ -224,7 +229,9 @@ class VideoPlayerFragment : Fragment() {
                     }
                 }
 
-                viewLifecycleOwner.collectFlow(subtitleDisplayState) { state ->
+                viewLifecycleOwner.collectFlow(
+                    uiState.map { it.subtitleDisplayState }.distinctUntilChanged()
+                ) { state ->
                     playerViewHolder?.updateSubtitleButtonUI(state.isSubtitleShown)
                     if (!state.isSubtitleDialogShown) {
                         delayHideToolbar()
@@ -240,13 +247,28 @@ class VideoPlayerFragment : Fragment() {
                         mediaPlayerGateway.hideSubtitle()
                     }
                 }
+
+                viewLifecycleOwner.collectFlow(
+                    uiState.map { it.isFullScreen }.distinctUntilChanged()
+                ) { isFullScreen ->
+                    playerViewHolder?.updateFullScreenUI(isFullScreen)
+                    binding.playerView.resizeMode = if (isFullScreen) {
+                        if (activity?.configuration?.orientation == ORIENTATION_LANDSCAPE) {
+                            RESIZE_MODE_FIXED_WIDTH
+                        } else {
+                            RESIZE_MODE_FIXED_HEIGHT
+                        }
+                    } else {
+                        RESIZE_MODE_FIT
+                    }
+                }
             }
         }
     }
 
     private fun setupPlayer() {
         playerViewHolder?.let { viewHolder ->
-            videoPlayerView = viewHolder.binding.playerView
+            videoPlayerView = viewHolder.playerView
             videoPlayerView?.keepScreenOn = !viewModel.mediaPlaybackState.value
             with(viewHolder) {
                 setTrackNameVisible(activity?.configuration?.orientation != ORIENTATION_LANDSCAPE)
@@ -271,13 +293,17 @@ class VideoPlayerFragment : Fragment() {
                     }
                 }
 
-                initAddSubtitleDialog(viewHolder.binding.addSubtitleDialog)
+                setupFullScreen(viewModel.uiState.value.isFullScreen) {
+                    viewModel.updateIsFullScreen(!viewModel.uiState.value.isFullScreen)
+                }
+
+                initAddSubtitleDialog(binding.addSubtitleDialog)
 
                 viewLifecycleOwner.lifecycleScope.launch {
                     setupSubtitleButton(
                         // Add feature flag, and will be removed after the feature is finished.
                         isShow = showSubtitleIcon(),
-                        isSubtitleShown = viewModel.subtitleDisplayState.value.isSubtitleShown
+                        isSubtitleShown = viewModel.uiState.value.subtitleDisplayState.isSubtitleShown
                     ) {
                         viewModel.showAddSubtitleDialog()
                     }
@@ -288,7 +314,8 @@ class VideoPlayerFragment : Fragment() {
                         getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
                     val screenshotsFolderPath =
                         "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
-                    viewHolder.binding.playerView.videoSurfaceView?.let { view ->
+
+                    binding.playerView.videoSurfaceView?.let { view ->
                         viewModel.screenshotWhenVideoPlaying(
                             rootFolderPath = screenshotsFolderPath,
                             captureView = view
@@ -309,7 +336,7 @@ class VideoPlayerFragment : Fragment() {
                 }
             }
 
-            setupPlayerView(viewHolder.binding.playerView)
+            setupPlayerView(binding.playerView)
 
             initRepeatToggleButtonForVideo(viewHolder)
         }
@@ -482,18 +509,18 @@ class VideoPlayerFragment : Fragment() {
      * @param dragToExit DragToExitSupport
      */
     fun runEnterAnimation(dragToExit: DragToExitSupport) {
-        val binding = playerViewHolder?.binding ?: return
+        videoPlayerView?.let { playerView ->
+            dragToExit.runEnterAnimation(requireActivity().intent, playerView) {
+                if (it) {
+                    updateViewForAnimation()
+                } else if (isResumed) {
+                    showToolbar()
+                    playerViewHolder?.showController()
 
-        dragToExit.runEnterAnimation(requireActivity().intent, binding.playerView) {
-            if (it) {
-                updateViewForAnimation()
-            } else if (isResumed) {
-                showToolbar()
-                playerViewHolder?.showController()
+                    binding.root.setBackgroundColor(Color.BLACK)
 
-                binding.root.setBackgroundColor(Color.BLACK)
-
-                delayHideToolbar()
+                    delayHideToolbar()
+                }
             }
         }
     }
@@ -509,12 +536,12 @@ class VideoPlayerFragment : Fragment() {
             delayHideToolbarCanceled = true
             updateViewForAnimation()
 
-            playerViewHolder?.binding?.playerView?.videoSurfaceView.let { videoSurfaceView ->
+            binding.playerView.videoSurfaceView.let { videoSurfaceView ->
                 dragToExit.setCurrentView(videoSurfaceView)
             }
         } else {
             RunOnUIThreadUtils.runDelay(300L) {
-                playerViewHolder?.binding?.root?.setBackgroundColor(Color.BLACK)
+                binding.root.setBackgroundColor(Color.BLACK)
             }
         }
     }
@@ -523,7 +550,7 @@ class VideoPlayerFragment : Fragment() {
         hideToolbar(animate = false)
         playerViewHolder?.hideController()
 
-        playerViewHolder?.binding?.root?.setBackgroundColor(Color.TRANSPARENT)
+        binding.root.setBackgroundColor(Color.TRANSPARENT)
     }
 
     /**
@@ -535,7 +562,8 @@ class VideoPlayerFragment : Fragment() {
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                if (viewModel.subtitleDisplayState.collectAsState().value.isSubtitleDialogShown) {
+                val subtitleState = viewModel.uiState.collectAsState().value.subtitleDisplayState
+                if (subtitleState.isSubtitleDialogShown) {
                     AddSubtitleDialog(
                         selectOptionState = viewModel.selectOptionState,
                         matchedSubtitleFileUpdate = {
@@ -563,7 +591,7 @@ class VideoPlayerFragment : Fragment() {
                                 ).apply {
                                     putExtra(
                                         INTENT_KEY_SUBTITLE_FILE_ID,
-                                        viewModel.subtitleDisplayState.value.subtitleFileInfo?.id
+                                        subtitleState.subtitleFileInfo?.id
                                     )
                                 }
                             )

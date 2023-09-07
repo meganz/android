@@ -171,6 +171,18 @@
                 app:tint="@color/white" />
 
             <ImageButton
+                android:id="@+id/full_screen"
+                style="@style/VideoPlayerButton"
+                android:enabled="false"
+                android:src="@drawable/ic_full_screen"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.85"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/white"
+                android:visibility="gone"/>
+
+            <ImageButton
                 android:id="@+id/playlist"
                 style="@style/VideoPlayerButton"
                 android:enabled="false"

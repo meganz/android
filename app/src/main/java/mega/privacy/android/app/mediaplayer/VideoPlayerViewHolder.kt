@@ -3,13 +3,15 @@ package mega.privacy.android.app.mediaplayer
 import android.content.Context
 import android.os.Build
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -18,19 +20,21 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 /**
  * A view holder for video player, implementing the UI logic of video player.
  *
- * @property binding FragmentVideoPlayerBinding
+ * @property container view for VideoPlayerFragment
  */
-class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
+class VideoPlayerViewHolder(val container: ViewGroup) {
 
-    private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
-    private val trackName = binding.root.findViewById<TextView>(R.id.track_name)
-    private val repeatToggleButton = binding.root.findViewById<ImageButton>(R.id.repeat_toggle)
-    private val lockButton = binding.root.findViewById<ImageButton>(R.id.image_button_lock)
-    private val unlockButton = binding.root.findViewById<ImageButton>(R.id.image_button_unlock)
-    private val playerLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_player)
-    private val unlockLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_unlock)
-    private val screenshotButton = binding.root.findViewById<ImageButton>(R.id.image_screenshot)
-    private val subtitleButton = binding.root.findViewById<ImageButton>(R.id.subtitle)
+    private val playlist = container.findViewById<ImageButton>(R.id.playlist)
+    private val trackName = container.findViewById<TextView>(R.id.track_name)
+    private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
+    private val lockButton = container.findViewById<ImageButton>(R.id.image_button_lock)
+    private val unlockButton = container.findViewById<ImageButton>(R.id.image_button_unlock)
+    private val playerLayout = container.findViewById<ConstraintLayout>(R.id.layout_player)
+    private val unlockLayout = container.findViewById<ConstraintLayout>(R.id.layout_unlock)
+    private val screenshotButton = container.findViewById<ImageButton>(R.id.image_screenshot)
+    private val subtitleButton = container.findViewById<ImageButton>(R.id.subtitle)
+    private val fullScreenButton = container.findViewById<ImageButton>(R.id.full_screen)
+    internal val playerView = container.findViewById<StyledPlayerView>(R.id.player_view)
 
     /**
      * Setup playlist button.
@@ -105,6 +109,33 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     }
 
     /**
+     * Setup the full screen button
+     *
+     * @param isFullScreen for update the full screen button UI
+     * @param fullscreenCallback the callback for the full screen button is clicked
+     */
+    fun setupFullScreen(isFullScreen: Boolean, fullscreenCallback: () -> Unit) {
+        updateFullScreenUI(isFullScreen)
+        fullScreenButton.setOnClickListener {
+            fullscreenCallback()
+        }
+    }
+
+    /**
+     * Update the full screen button UI
+     *
+     * @param isFullScreen true shows the original icon, otherwise shows the full screen icon
+     */
+    fun updateFullScreenUI(isFullScreen: Boolean) =
+        fullScreenButton.setImageResource(
+            if (isFullScreen) {
+                R.drawable.ic_original
+            } else {
+                R.drawable.ic_full_screen
+            }
+        )
+
+    /**
      * Setup subtitle button
      *
      * @param isShow the addSubtitle icon whether is shown
@@ -172,18 +203,19 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
      * @param playbackState the state of player
      */
     fun updateLoadingAnimation(@Player.State playbackState: Int?) {
-        binding.loading.isVisible = playbackState == Player.STATE_BUFFERING
+        container.findViewById<ProgressBar>(R.id.loading).isVisible =
+            playbackState == Player.STATE_BUFFERING
     }
 
     /**
      * Hide player controller.
      */
-    fun hideController() = binding.playerView.hideController()
+    fun hideController() = playerView.hideController()
 
     /**
      * Show player controller.
      */
-    fun showController() = binding.playerView.showController()
+    fun showController() = playerView.showController()
 
     /**
      * Display node metadata.

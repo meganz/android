@@ -141,6 +141,18 @@
                 app:tint="@color/white" />
 
             <ImageButton
+                android:id="@+id/full_screen"
+                style="@style/VideoPlayerButton"
+                android:enabled="false"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/ic_full_screen"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/image_screenshot"
+                app:tint="@color/white"
+                android:visibility="gone" />
+
+            <ImageButton
                 android:id="@+id/image_screenshot"
                 style="@style/VideoPlayerButton"
                 android:layout_marginEnd="5dp"

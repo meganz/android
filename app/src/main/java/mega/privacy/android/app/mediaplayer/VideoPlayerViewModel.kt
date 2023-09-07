@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -45,6 +46,7 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.app.mediaplayer.model.VideoControllerPadding
+import mega.privacy.android.app.mediaplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_NEXT
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PLAYING
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
@@ -56,6 +58,7 @@ import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -64,7 +67,6 @@ import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
-import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
@@ -223,16 +225,8 @@ class VideoPlayerViewModel @Inject constructor(
 
     private var currentMediaPlayerMediaId: String? = null
 
-    /**
-     * The subtitle file info by add subtitles
-     */
-    internal var subtitleInfoByAddSubtitles: SubtitleFileInfo? = null
-        private set
-
-    private val _addSubtitleState = MutableStateFlow(false)
-
-    private val _subtitleDisplayState = MutableStateFlow(SubtitleDisplayState())
-    internal val subtitleDisplayState: StateFlow<SubtitleDisplayState> = _subtitleDisplayState
+    private val _state = MutableStateFlow(VideoPlayerUiState())
+    internal val uiState = _state.asStateFlow()
 
     /**
      * SelectState for updating the background color of add subtitle dialog options
@@ -283,6 +277,8 @@ class VideoPlayerViewModel @Inject constructor(
     internal val playerControllerPaddingState: StateFlow<VideoControllerPadding> =
         _playerControllerPaddingState
 
+    private val _isFullScreenState = MutableStateFlow(false)
+
     internal var videoPlayType = VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
         private set
 
@@ -303,6 +299,14 @@ class VideoPlayerViewModel @Inject constructor(
     private var isPlayingReverted = false
 
     private var cancelToken: MegaCancelToken? = null
+
+    /**
+     * The subtitle file info by add subtitles
+     */
+    internal var subtitleInfoByAddSubtitles: SubtitleFileInfo? = null
+        private set
+
+    private val _addSubtitleState = MutableStateFlow(false)
 
     internal val subtitleDialogShowKey = "SUBTITLE_DIALOG_SHOW"
     internal val subtitleShowKey = "SUBTITLE_SHOW"
@@ -343,9 +347,10 @@ class VideoPlayerViewModel @Inject constructor(
                 _isSubtitleDialogShown,
                 _addSubtitleState,
                 _currentSubtitleFileInfo,
-                ::mapToSubtitleDisplayState
+                _isFullScreenState,
+                ::mapToVideoPlayerUIState
             ).collectLatest { newState ->
-                _subtitleDisplayState.update {
+                _state.update {
                     newState
                 }
             }
@@ -368,6 +373,9 @@ class VideoPlayerViewModel @Inject constructor(
         _playerControllerPaddingState.update {
             it.copy(paddingLeft = left, paddingRight = right, paddingBottom = bottom)
         }
+
+    internal fun updateIsFullScreen(isFullScreen: Boolean) =
+        _isFullScreenState.update { isFullScreen }
 
     /**
      * Get video repeat mode
@@ -401,16 +409,20 @@ class VideoPlayerViewModel @Inject constructor(
         _mediaPlaybackState.update { newState }
     }
 
-    private fun mapToSubtitleDisplayState(
+    private fun mapToVideoPlayerUIState(
         subtitleShown: Boolean,
         subtitleDialogShown: Boolean,
         isAddSubtitle: Boolean,
         subtitleFileInfo: SubtitleFileInfo?,
-    ) = SubtitleDisplayState(
-        isSubtitleShown = subtitleShown,
-        isSubtitleDialogShown = subtitleDialogShown,
-        isAddSubtitle = isAddSubtitle,
-        subtitleFileInfo = subtitleFileInfo
+        isFullScreen: Boolean,
+    ) = VideoPlayerUiState(
+        subtitleDisplayState = SubtitleDisplayState(
+            isSubtitleShown = subtitleShown,
+            isSubtitleDialogShown = subtitleDialogShown,
+            isAddSubtitle = isAddSubtitle,
+            subtitleFileInfo = subtitleFileInfo
+        ),
+        isFullScreen = isFullScreen
     )
 
     /**
@@ -450,7 +462,9 @@ class VideoPlayerViewModel @Inject constructor(
      */
     internal fun updateAddSubtitleState() =
         _addSubtitleState.update {
-            subtitleDisplayState.value.isAddSubtitle && subtitleDisplayState.value.subtitleFileInfo == null
+            _state.value.subtitleDisplayState.let { subtitleState ->
+                subtitleState.isAddSubtitle && subtitleState.subtitleFileInfo == null
+            }
         }
 
     /**
