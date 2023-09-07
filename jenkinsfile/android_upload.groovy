@@ -458,9 +458,9 @@ pipeline {
             }
         }
 
-        stage('Upload Code Coverage') {
+        stage('Collect and Upload Code Coverage') {
             when {
-                expression { triggerByUploadCoverage() }
+                expression { triggerByUploadCoverage() || triggerByPushToDevelop() }
             }
             steps {
                 script {
