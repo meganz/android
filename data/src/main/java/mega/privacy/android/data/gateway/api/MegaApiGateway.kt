@@ -2680,6 +2680,25 @@ interface MegaApiGateway {
     )
 
     /**
+     * Returns the name previously set for a device
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_DEVICE_NAMES
+     * - MegaRequest::getText - Returns passed device id (or the value returned by getDeviceId()
+     * if deviceId was initially passed as null).
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getName - Returns device name.
+     *
+     * @param deviceId The id of the device to get the name for. If null, the value returned
+     * by getDeviceId() will be used instead.
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getDeviceName(deviceId: String, listener: MegaRequestListenerInterface?)
+
+    /**
      * Sets name for specified device
      *
      * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER

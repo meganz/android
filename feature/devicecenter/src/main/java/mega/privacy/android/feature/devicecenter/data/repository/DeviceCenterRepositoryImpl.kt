@@ -6,10 +6,10 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupDeviceNamesMapper
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupInfoListMapper
 import mega.privacy.android.feature.devicecenter.data.mapper.DeviceNodeMapper
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
 import nz.mega.sdk.MegaApiJava
 import javax.inject.Inject
@@ -67,6 +67,21 @@ internal class DeviceCenterRepositoryImpl @Inject constructor(
             }
             megaApiGateway.getUserAttribute(
                 attributeIdentifier = MegaApiJava.USER_ATTR_DEVICE_NAMES,
+                listener = listener,
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun getDeviceName(deviceId: String): String? = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("getDeviceName") {
+                it.name
+            }
+            megaApiGateway.getDeviceName(
+                deviceId = deviceId,
                 listener = listener,
             )
             continuation.invokeOnCancellation {
