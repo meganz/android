@@ -287,7 +287,6 @@ interface DatabaseHandler {
     fun removePendingMessageById(idMsg: Long)
     fun setAutoPlayEnabled(enabled: String)
     fun setShowInviteBanner(show: String)
-    fun removeSDTransfer(tag: Int)
     fun setBackupAsOutdated(id: Long)
 
     /**

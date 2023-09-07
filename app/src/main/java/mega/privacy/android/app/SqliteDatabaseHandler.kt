@@ -43,7 +43,6 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
@@ -3925,58 +3924,6 @@ class SqliteDatabaseHandler @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
         }
-    }
-
-    override val sdTransfers: ArrayList<SdTransfer>
-        get() {
-            val sdTransfers = ArrayList<SdTransfer>()
-            val selectQuery = "SELECT * FROM $TABLE_SD_TRANSFERS"
-            try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
-                    if (cursor.moveToLast()) {
-                        do {
-                            val tag = cursor.getString(1).toInt()
-                            val name = decrypt(cursor.getString(2))
-                            val size = decrypt(cursor.getString(3))
-                            val nodeHandle = decrypt(cursor.getString(4))
-                            val path = decrypt(cursor.getString(5))
-                            val appData = decrypt(cursor.getString(6))
-                            sdTransfers.add(
-                                SdTransfer(
-                                    tag,
-                                    name!!,
-                                    size!!,
-                                    nodeHandle!!,
-                                    path!!,
-                                    appData!!
-                                )
-                            )
-                        } while (cursor.moveToPrevious())
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return sdTransfers
-        }
-
-    override fun addSDTransfer(transfer: SdTransfer): Long {
-        val values = ContentValues()
-        values.put(KEY_SD_TRANSFERS_TAG, transfer.tag)
-        values.put(KEY_SD_TRANSFERS_NAME, encrypt(transfer.name))
-        values.put(KEY_SD_TRANSFERS_SIZE, encrypt(transfer.size))
-        values.put(KEY_SD_TRANSFERS_HANDLE, encrypt(transfer.nodeHandle))
-        values.put(KEY_SD_TRANSFERS_PATH, encrypt(transfer.path))
-        values.put(KEY_SD_TRANSFERS_APP_DATA, encrypt(transfer.appData))
-        return db.insert(TABLE_SD_TRANSFERS, null, values)
-    }
-
-    override fun removeSDTransfer(tag: Int) {
-        db.delete(
-            TABLE_SD_TRANSFERS,
-            "$KEY_SD_TRANSFERS_TAG=$tag",
-            null
-        )
     }
 
     override fun saveBackup(backup: Backup): Boolean {
