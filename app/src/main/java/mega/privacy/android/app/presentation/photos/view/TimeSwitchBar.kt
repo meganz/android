@@ -87,7 +87,7 @@ fun TimeSwitchBar(
                 ) {
                     Text(
                         text = stringResource(id = timeBarTabTextResId),
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         letterSpacing = 0.15.sp
                     )
