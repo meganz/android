@@ -295,8 +295,9 @@ class FileLinkViewModel @Inject constructor(
      */
     fun handleSaveFile() {
         viewModelScope.launch {
-            val publicNode = MegaNode.unserialize(state.value.serializedData)
-            _state.update { it.copy(downloadFile = triggered(publicNode)) }
+            MegaNode.unserialize(state.value.serializedData)?.let { publicNode ->
+                _state.update { it.copy(downloadFile = triggered(publicNode)) }
+            } ?: Timber.e("PublicNode is NULL")
         }
     }
 
