@@ -2626,6 +2626,46 @@ interface MegaApiGateway {
     suspend fun isForeignNode(handle: Long): Boolean
 
     /**
+     * @param backupType  back up type requested for the service
+     * @param targetNode  MEGA folder to hold the backups
+     * @param localFolder Local path of the folder
+     * @param backupName  Name of the backup
+     * @param state       state
+     * @param subState    subState
+     * @param listener    MegaRequestListener to track this request
+     *                    Registers a backup to display in Backup Centre
+     *                    <p>
+     *                    Apps should register backups, like CameraUploads, in order to be listed in the
+     *                    BackupCentre. The client should send heartbeats to indicate the progress of the
+     *                    backup (see \c MegaApi::sendBackupHeartbeats).
+     *                    <p>
+     *                    Possible types of backups:
+     *                    BACKUP_TYPE_CAMERA_UPLOADS = 3,
+     *                    BACKUP_TYPE_MEDIA_UPLOADS = 4,   // Android has a secondary CU
+     *                    <p>
+     *                    Note that the backup name is not registered in the API as part of the data of this
+     *                    backup. It will be stored in a user's attribute after this request finished. For
+     *                    more information, see \c MegaApi::setBackupName and MegaApi::getBackupName.
+     *                    <p>
+     *                    The associated request type with this request is MegaRequest::TYPE_BACKUP_PUT
+     *                    Valid data in the MegaRequest object received on callbacks:
+     *                    - MegaRequest::getParentHandle - Returns the backupId
+     *                    - MegaRequest::getNodeHandle - Returns the target node of the backup
+     *                    - MegaRequest::getName - Returns the backup name of the remote location
+     *                    - MegaRequest::getAccess - Returns the backup state
+     *                    - MegaRequest::getFile - Returns the path of the local folder
+     *                    - MegaRequest::getTotalBytes - Returns the backup type
+     *                    - MegaRequest::getNumDetails - Returns the backup substate
+     *                    - MegaRequest::getFlag - Returns true
+     *                    - MegaRequest::getListener - Returns the MegaRequestListener to track this request
+     */
+
+    fun setBackup(
+        backupType: Int, targetNode: Long, localFolder: String, backupName: String,
+        state: Int, subState: Int, listener: MegaRequestListenerInterface,
+    )
+
+    /**
      * @param backupId backup id identifying the backup to be removed
      * @param listener MegaRequestListener to track this request
      *                 Unregister a backup already registered for the Backup Centre

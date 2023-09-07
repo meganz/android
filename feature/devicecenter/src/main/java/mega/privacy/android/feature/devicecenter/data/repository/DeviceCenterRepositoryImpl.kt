@@ -30,6 +30,7 @@ internal class DeviceCenterRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaApiGateway: MegaApiGateway,
 ) : DeviceCenterRepository {
+
     override suspend fun getBackupInfo() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("getBackupInfo") {
@@ -67,21 +68,6 @@ internal class DeviceCenterRepositoryImpl @Inject constructor(
             }
             megaApiGateway.getUserAttribute(
                 attributeIdentifier = MegaApiJava.USER_ATTR_DEVICE_NAMES,
-                listener = listener,
-            )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    override suspend fun getDeviceName(deviceId: String): String? = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("getDeviceName") {
-                it.name
-            }
-            megaApiGateway.getDeviceName(
-                deviceId = deviceId,
                 listener = listener,
             )
             continuation.invokeOnCancellation {

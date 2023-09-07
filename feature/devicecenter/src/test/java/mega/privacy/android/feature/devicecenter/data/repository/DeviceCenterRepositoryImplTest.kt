@@ -6,10 +6,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupDeviceNamesMapper
 import mega.privacy.android.feature.devicecenter.data.mapper.BackupInfoListMapper
 import mega.privacy.android.feature.devicecenter.data.mapper.DeviceNodeMapper
+import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
@@ -64,7 +64,12 @@ internal class DeviceCenterRepositoryImplTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(backupDeviceNamesMapper, backupInfoListMapper, deviceNodeMapper, megaApiGateway)
+        reset(
+            backupDeviceNamesMapper,
+            backupInfoListMapper,
+            deviceNodeMapper,
+            megaApiGateway
+        )
     }
 
     @Test

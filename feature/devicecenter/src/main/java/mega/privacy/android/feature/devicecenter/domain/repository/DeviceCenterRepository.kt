@@ -47,15 +47,6 @@ interface DeviceCenterRepository {
      */
     suspend fun getDeviceIdAndNameMap(): Map<String, String>
 
-
-    /**
-     * Get the Device Name from Server
-     *
-     * @param deviceId The Device ID identifying the Device
-     * @return [String] Device Name
-     */
-    suspend fun getDeviceName(deviceId: String): String?
-
     /**
      * Renames a Device
      *

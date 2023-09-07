@@ -1289,6 +1289,24 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun isForeignNode(handle: Long) = megaApi.isForeignNode(handle)
 
+    override fun setBackup(
+        backupType: Int,
+        targetNode: Long,
+        localFolder: String,
+        backupName: String,
+        state: Int,
+        subState: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.setBackup(
+        backupType,
+        targetNode,
+        localFolder,
+        backupName,
+        state,
+        subState,
+        listener,
+    )
+
     override fun removeBackup(backupId: Long, listener: MegaRequestListenerInterface) {
         megaApi.removeBackup(backupId, listener)
     }
