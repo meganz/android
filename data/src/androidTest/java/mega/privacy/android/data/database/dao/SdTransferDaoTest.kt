@@ -68,7 +68,7 @@ class SdTransferDaoTest {
         sdTransferDao.insertSdTransfer(sdTransfer)
         val totalRecordBeforeDelete = sdTransferDao.getAllSdTransfers().first().size
         Truth.assertThat(totalRecordBeforeDelete).isEqualTo(1)
-        sdTransferDao.deleteSdTransfer(sdTransfer.tag ?: 0)
+        sdTransferDao.deleteSdTransferByTag(sdTransfer.tag ?: 0)
         val totalRecordAfterDelete = sdTransferDao.getAllSdTransfers().first().size
         Truth.assertThat(totalRecordAfterDelete).isEqualTo(0)
     }
