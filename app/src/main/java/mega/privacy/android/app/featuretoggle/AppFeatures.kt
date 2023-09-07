@@ -194,8 +194,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Clean refactored search implementation
      */
-    SearchWithChips("Advanced search implementation in clean architecture", false)
+    SearchWithChips("Advanced search implementation in clean architecture", false),
 
+    /**
+     * In-App Ads toggle
+     */
+    InAppAdvertisement("Enable In-App Ads", false)
     ;
 
     companion object : FeatureFlagValueProvider {
