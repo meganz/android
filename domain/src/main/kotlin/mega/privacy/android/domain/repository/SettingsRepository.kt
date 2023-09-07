@@ -78,6 +78,20 @@ interface SettingsRepository {
     suspend fun setMediaDiscoveryView(value: Int)
 
     /**
+     * Monitor subfolder media discovery setting
+     *
+     * @return subfolder media discovery option enabled status as a flow
+     */
+    fun monitorSubfolderMediaDiscoveryEnabled(): Flow<Boolean?>
+
+    /**
+     * Set subfolder media discovery Enabled
+     *
+     * @param enabled
+     */
+    suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
+
+    /**
      * Get always ask for storage value
      *
      * @return isStorageAskAlways as [Boolean]

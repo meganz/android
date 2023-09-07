@@ -62,4 +62,18 @@ interface UIPreferencesGateway {
      * @param value
      */
     suspend fun setMediaDiscoveryView(value: Int)
+
+    /**
+     * Monitor subfolder media discovery setting
+     *
+     * @return subfolder media discovery option enabled status as a flow
+     */
+    fun monitorSubfolderMediaDiscoveryEnabled(): Flow<Boolean?>
+
+    /**
+     * set subfolder media discovery  enabled
+     *
+     * @param enabled
+     */
+    suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
 }

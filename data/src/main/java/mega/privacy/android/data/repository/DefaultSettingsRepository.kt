@@ -189,6 +189,12 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setMediaDiscoveryView(value: Int) =
         uiPreferencesGateway.setMediaDiscoveryView(value)
 
+    override fun monitorSubfolderMediaDiscoveryEnabled(): Flow<Boolean?> =
+        uiPreferencesGateway.monitorSubfolderMediaDiscoveryEnabled()
+
+    override suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean) =
+        uiPreferencesGateway.setSubfolderMediaDiscoveryEnabled(enabled)
+
     override suspend fun getStorageDownloadAskAlways(): Boolean {
         return megaLocalStorageGateway.getStorageAskAlways()
     }

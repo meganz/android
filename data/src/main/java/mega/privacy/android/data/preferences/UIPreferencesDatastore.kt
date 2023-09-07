@@ -21,6 +21,7 @@ private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
 private const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
 private const val HIDE_RECENT_ACTIVITY = "HIDE_RECENT_ACTIVITY"
 private const val MEDIA_DISCOVERY_VIEW = "MEDIA_DISCOVERY_VIEW"
+private const val SUBFOLDER_MEDIA_DISCOVERY = "SUBFOLDER_MEDIA_DISCOVERY"
 private const val VIEW_TYPE = "VIEW_TYPE"
 private const val uiPreferenceFileName = USER_INTERFACE_PREFERENCES
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -44,6 +45,7 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val preferredStartScreenKey = intPreferencesKey(PREFERRED_START_SCREEN)
     private val hideRecentActivityKey = booleanPreferencesKey(HIDE_RECENT_ACTIVITY)
     private val mediaDiscoveryViewKey = intPreferencesKey(MEDIA_DISCOVERY_VIEW)
+    private val subFolderMediaDiscoveryKey = booleanPreferencesKey(SUBFOLDER_MEDIA_DISCOVERY)
     private val viewTypeKey = intPreferencesKey(VIEW_TYPE)
 
     override fun monitorPreferredStartScreen() = context.uiPreferenceDataStore.data
@@ -110,6 +112,24 @@ internal class UIPreferencesDatastore @Inject constructor(
     override suspend fun setMediaDiscoveryView(value: Int) {
         context.uiPreferenceDataStore.edit {
             it[mediaDiscoveryViewKey] = value
+        }
+    }
+
+    override fun monitorSubfolderMediaDiscoveryEnabled(): Flow<Boolean?> =
+        context.uiPreferenceDataStore.data
+            .catch { exception ->
+                if (exception is IOException)
+                    emit(emptyPreferences())
+                else
+                    throw exception
+            }.map {
+                it[subFolderMediaDiscoveryKey]
+            }
+
+
+    override suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean) {
+        context.uiPreferenceDataStore.edit {
+            it[subFolderMediaDiscoveryKey] = enabled
         }
     }
 }
