@@ -272,7 +272,7 @@ pipeline {
                             }
                         }
                         cleanup {
-                            cleanWs(cleanWhenFailure: false)
+                            cleanWs(cleanWhenFailure: true)
                         }
                     }
                 } //stage('Build APK (GMS+QA)')
@@ -370,7 +370,7 @@ pipeline {
                             }
                         }
                         cleanup {
-                            cleanWs(cleanWhenFailure: false)
+                            cleanWs(cleanWhenFailure: true)
                         }
                     }
                 } //stage('Unit Test and Code Coverage')
@@ -418,7 +418,7 @@ pipeline {
                             }
                         }
                         cleanup {
-                            cleanWs(cleanWhenFailure: false)
+                            cleanWs(cleanWhenFailure: true)
                         }
                     }
                 }  //stage('Lint Check')
