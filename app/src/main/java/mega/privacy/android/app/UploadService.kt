@@ -400,8 +400,8 @@ internal class UploadService : LifecycleService() {
         }
     }
 
-    private fun checkUploads() {
-        if (uploadCount == 0) {
+    private suspend fun checkUploads() {
+        if (getNumberOfPendingUploadsUseCase() == 0) {
             stopForeground()
         } else {
             updateProgressNotification()
