@@ -113,10 +113,6 @@ internal class BackupInfoSubStateMapperTest {
             BackupInfoSubState.TOO_MANY_ACTION_PACKETS,
         ),
         Arguments.of(Error.LOGGED_OUT.swigValue(), BackupInfoSubState.LOGGED_OUT),
-        Arguments.of(
-            Error.WHOLE_ACCOUNT_REFETCHED.swigValue(),
-            BackupInfoSubState.WHOLE_ACCOUNT_REFETCHED,
-        ),
         Arguments.of(Error.MISSING_PARENT_NODE.swigValue(), BackupInfoSubState.MISSING_PARENT_NODE),
         Arguments.of(Error.BACKUP_MODIFIED.swigValue(), BackupInfoSubState.BACKUP_MODIFIED),
         Arguments.of(

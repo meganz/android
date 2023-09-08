@@ -141,12 +141,6 @@ enum class BackupInfoSubState {
     LOGGED_OUT,
 
     /**
-     * Represents a Sub State in which the whole Account was reloaded and the missing Action Packet
-     * changes could not have been applied
-     */
-    WHOLE_ACCOUNT_REFETCHED,
-
-    /**
      * Represents a Sub State in which setting a new Parent to a Parent whose Local Node is missing
      * its corresponding Node cross reference
      */
