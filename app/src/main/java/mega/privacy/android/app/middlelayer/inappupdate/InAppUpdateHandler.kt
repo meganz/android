@@ -10,6 +10,11 @@ interface InAppUpdateHandler {
     suspend fun checkForAppUpdates()
 
     /**
+     * Check for App Update Installation Status
+     */
+    suspend fun checkForInAppUpdateInstallStatus()
+
+    /**
      * Complete the update
      */
     fun completeUpdate()
