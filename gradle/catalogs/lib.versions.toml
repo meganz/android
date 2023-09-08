@@ -24,7 +24,7 @@ compose-state-events = "1.2.3"
 kotlinpoet = "1.14.2"
 xray = "1.0"
 nocturn = "1.0"
-karma = "1.2"
+karma = "1.3"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }

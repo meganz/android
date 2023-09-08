@@ -2,7 +2,6 @@ package mega.privacy.android.app.initializer
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.mega.karma.core.Karma
 import mega.privacy.android.app.BuildConfig
 
 /**
@@ -10,7 +9,7 @@ import mega.privacy.android.app.BuildConfig
  */
 class KarmaInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        Karma.karmaPluginPort = BuildConfig.KARMA_PLUGIN_PORT
+        // Karma.karmaPluginPort = BuildConfig.KARMA_PLUGIN_PORT
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()

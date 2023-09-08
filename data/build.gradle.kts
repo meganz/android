@@ -115,15 +115,6 @@ dependencies {
     implementation(google.autovalue.annotations)
     kapt(google.autovalue)
 
-    // Karma
-    compileOnly(lib.karma.annotation)
-    debugLocalKotlinCompilerPluginClasspath(
-        gradle,
-        rootProject.extra,
-        lib.karma.compiler,
-    )
-    debugImplementation(lib.karma.core)
-
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.truth.ext)

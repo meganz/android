@@ -424,15 +424,6 @@ dependencies {
     debugImplementation(lib.nocturn)
     debugImplementation(lib.xray)
 
-    // Karma
-    compileOnly(lib.karma.annotation)
-    debugLocalKotlinCompilerPluginClasspath(
-        gradle,
-        rootProject.extra,
-        lib.karma.compiler,
-    )
-    debugImplementation(lib.karma.core)
-
     coreLibraryDesugaring(lib.desugar)
 
     val shouldUsePrebuiltSdk: Closure<Boolean> by rootProject.extra
