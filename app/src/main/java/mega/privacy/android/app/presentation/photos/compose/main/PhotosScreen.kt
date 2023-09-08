@@ -129,7 +129,8 @@ fun PhotosScreen(
                         onFABClick = onNavigatePhotosFilter,
                         setEnableCUPage = timelineViewModel::shouldEnableCUPage,
                     )
-                }
+                },
+                isNewCUEnabled = { getFeatureFlagUseCase(AppFeatures.NewCU) },
             )
         },
         albumsView = {

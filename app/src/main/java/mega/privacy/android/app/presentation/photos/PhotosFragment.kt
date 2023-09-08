@@ -145,11 +145,16 @@ class PhotosFragment : Fragment() {
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
+    private var isNewCUEnabled: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
         timelineActionModeCallback = TimelineActionModeCallback(this)
         albumsActionModeCallback = AlbumsActionModeCallback(this)
+        lifecycleScope.launch {
+            isNewCUEnabled = getFeatureFlagUseCase(AppFeatures.NewCU)
+        }
     }
 
     override fun onCreateView(
@@ -380,6 +385,12 @@ class PhotosFragment : Fragment() {
                 it.title = s
             }
         }
+        menu?.findItem(R.id.action_zoom_in_secondary)?.let {
+            it.isVisible = state.enableZoomIn && isShowMenu && isNewCUEnabled
+        }
+        menu?.findItem(R.id.action_zoom_out_secondary)?.let {
+            it.isVisible = state.enableZoomOut && isShowMenu && isNewCUEnabled
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -398,10 +409,14 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleMenuIcons(isShowing: Boolean) {
-        this.menu?.findItem(R.id.action_zoom_in)?.isVisible = isShowing
-        this.menu?.findItem(R.id.action_zoom_out)?.isVisible = isShowing
+        this.menu?.findItem(R.id.action_cu_status)?.isVisible = isShowing && isNewCUEnabled
+        this.menu?.findItem(R.id.action_zoom_in)?.isVisible = isShowing && !isNewCUEnabled
+        this.menu?.findItem(R.id.action_zoom_out)?.isVisible = isShowing && !isNewCUEnabled
         this.menu?.findItem(R.id.action_photos_filter)?.isVisible = isShowing
         this.menu?.findItem(R.id.action_photos_sortby)?.isVisible = isShowing
+        this.menu?.findItem(R.id.action_zoom_in_secondary)?.isVisible = isShowing && isNewCUEnabled
+        this.menu?.findItem(R.id.action_zoom_out_secondary)?.isVisible = isShowing && isNewCUEnabled
+        this.menu?.findItem(R.id.action_cu_settings)?.isVisible = isShowing && isNewCUEnabled
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -470,6 +485,26 @@ class PhotosFragment : Fragment() {
                         timelineViewModel.showingSortByDialog(false)
                     }
                 )
+                true
+            }
+
+            R.id.action_cu_status -> {
+                Toast.makeText(requireContext(), "Whoever invented the knock-knock joke, should get a no bell prize.", Toast.LENGTH_SHORT).show()
+                true
+            }
+
+            R.id.action_zoom_in_secondary -> { // +
+                handleZoomIn()
+                true
+            }
+
+            R.id.action_zoom_out_secondary -> { // -
+                handleZoomOut()
+                true
+            }
+
+            R.id.action_cu_settings -> {
+                Toast.makeText(requireContext(), "Why is Peter Pan always flying? Because he Neverlands", Toast.LENGTH_SHORT).show()
                 true
             }
 

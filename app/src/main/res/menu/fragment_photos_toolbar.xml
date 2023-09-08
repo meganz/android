@@ -2,6 +2,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_cu_status"
+        android:icon="@drawable/ic_cu_status"
+        android:orderInCategory="80"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_zoom_out"
         android:icon="@drawable/ic_zoom_out"
         android:orderInCategory="85"
@@ -32,6 +40,28 @@
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="110"
         android:title="@string/action_sort_by"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_zoom_in_secondary"
+        android:orderInCategory="120"
+        android:title="@string/photos_action_zoom_in"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_zoom_out_secondary"
+        android:orderInCategory="130"
+        android:title="@string/photos_action_zoom_out"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_cu_settings"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="140"
+        android:title="@string/action_settings"
         android:visible="false"
         app:showAsAction="never" />
 

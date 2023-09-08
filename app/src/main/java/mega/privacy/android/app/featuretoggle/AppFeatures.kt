@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables revamp CU interface
+     */
+    NewCU(
+        "Enables revamp CU interface",
+        false,
+    ),
+
+    /**
      * Enables new media discovery fab
      */
     NewMediaDiscoveryFab(
