@@ -93,7 +93,6 @@ dependencies {
     implementation(androidx.datastore.preferences)
     implementation(androidx.preferences)
     implementation(androidx.lifecycle.process)
-    implementation(lib.fresco)
     implementation(androidx.work.ktx)
     implementation(androidx.room)
     implementation(androidx.hilt.work)

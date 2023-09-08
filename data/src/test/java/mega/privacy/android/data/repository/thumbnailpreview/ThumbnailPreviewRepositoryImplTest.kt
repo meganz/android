@@ -8,6 +8,7 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import nz.mega.sdk.MegaApiJava
@@ -36,6 +37,7 @@ class ThumbnailPreviewRepositoryImplTest {
     private val megaApi = mock<MegaApiGateway>()
     private val megaApiFolder = mock<MegaApiFolderGateway>()
     private val cacheGateway = mock<CacheGateway>()
+    private val stringWrapper = mock<StringWrapper>()
 
     private val cacheDir = File("cache")
     private val thumbnailName = "thumbnailName"
@@ -52,6 +54,7 @@ class ThumbnailPreviewRepositoryImplTest {
             megaApiFolder = megaApiFolder,
             ioDispatcher = UnconfinedTestDispatcher(),
             cacheGateway = cacheGateway,
+            stringWrapper = stringWrapper,
         )
     }
 
@@ -196,8 +199,65 @@ class ThumbnailPreviewRepositoryImplTest {
     }
 
     @Test
-    fun `test that get thumbnail or preview file name returns correctly`() = runTest {
-        val expected = megaApi.handleToBase64(nodeHandle) + ".jpg"
-        assertThat(underTest.getThumbnailOrPreviewFileName(nodeHandle)).isEqualTo(expected)
-    }
+    fun `test that get thumbnail or preview file name returns correctly for nodeHandle`() =
+        runTest {
+            val expected = megaApi.handleToBase64(nodeHandle) + ".jpg"
+            assertThat(underTest.getThumbnailOrPreviewFileName(nodeHandle)).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that get thumbnail or preview file name returns correctly for string`() =
+        runTest {
+            val testString = "test"
+            val testStringEncoded = "testEncoded"
+            whenever(stringWrapper.encodeBase64(testString)).thenReturn(
+                testStringEncoded
+            )
+            val expected = "$testStringEncoded.jpg"
+            assertThat(underTest.getThumbnailOrPreviewFileName(testString)).isEqualTo(
+                expected
+            )
+        }
+
+    @Test
+    fun `test that createPreview throws IllegalArgumentException if previewFile is null`() =
+        runTest {
+            val testString = "test"
+            val testStringEncoded = "testEncoded"
+            val previewFileName = "$testStringEncoded.jpg"
+            whenever(underTest.getThumbnailOrPreviewFileName(testString)).thenReturn(
+                previewFileName
+            )
+            whenever(cacheGateway.getCacheFile(any(), any())).thenReturn(null)
+            assertThrows<IllegalArgumentException> {
+                underTest.createPreview(testString, mock())
+            }
+
+        }
+
+    @Test
+    fun `test that createPreview invokes createPreview of SDK and returns expected result`() =
+        runTest {
+            val testString = "test"
+            val testStringEncoded = "testEncoded"
+            val previewFileName = "$testStringEncoded.jpg"
+            val file = mock<File>()
+            val previewFile = mock<File>()
+            val sourcePath = "../cache/sample.jpg"
+            val destinationPath = ".../previewsMEGA/$previewFileName"
+            whenever(underTest.getThumbnailOrPreviewFileName(testString)).thenReturn(
+                previewFileName
+            )
+            whenever(
+                cacheGateway.getCacheFile(
+                    any(),
+                    any()
+                )
+            ).thenReturn(previewFile)
+            whenever(file.absolutePath).thenReturn(sourcePath)
+            whenever(previewFile.absolutePath).thenReturn(destinationPath)
+            val expected = true
+            whenever(megaApi.createPreview(sourcePath, destinationPath)).thenReturn(expected)
+            assertThat(underTest.createPreview(testString, file)).isEqualTo(expected)
+        }
 }

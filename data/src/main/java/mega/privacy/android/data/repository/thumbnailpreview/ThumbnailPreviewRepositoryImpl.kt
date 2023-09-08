@@ -12,6 +12,7 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import nz.mega.sdk.MegaError
@@ -24,6 +25,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     private val megaApiFolder: MegaApiFolderGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
+    private val stringWrapper: StringWrapper,
 ) : ThumbnailPreviewRepository {
 
     override suspend fun getThumbnailFromLocal(handle: Long): File? =
@@ -252,6 +254,14 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         megaApi.createPreview(file.absolutePath, previewFile.absolutePath)
     }
 
+    override suspend fun createPreview(name: String, file: File) =
+        withContext(ioDispatcher) {
+            val previewFileName = getThumbnailOrPreviewFileName(name)
+            val previewFile = getPreviewFile(previewFileName)
+            requireNotNull(previewFile)
+            megaApi.createPreview(file.absolutePath, previewFile.absolutePath)
+        }
+
     override suspend fun deleteThumbnail(handle: Long) = withContext(ioDispatcher) {
         val thumbnailFileName = getThumbnailOrPreviewFileName(handle)
         getThumbnailFile(thumbnailFileName)?.takeIf { it.exists() }?.delete()
@@ -265,6 +275,11 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     override suspend fun getThumbnailOrPreviewFileName(nodeHandle: Long) =
         withContext(ioDispatcher) {
             "${megaApi.handleToBase64(nodeHandle)}.jpg"
+        }
+
+    override suspend fun getThumbnailOrPreviewFileName(name: String) =
+        withContext(ioDispatcher) {
+            "${stringWrapper.encodeBase64(name)}.jpg"
         }
 
     override suspend fun setThumbnail(nodeHandle: Long, srcFilePath: String) =

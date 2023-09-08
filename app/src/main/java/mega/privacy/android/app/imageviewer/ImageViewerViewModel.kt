@@ -401,7 +401,7 @@ class ImageViewerViewModel @Inject constructor(
                 }
 
                 is ImageItem.OfflineNode -> runCatching {
-                    getImageByOfflineNodeHandleUseCase(imageItem.handle, highPriority)
+                    getImageByOfflineNodeHandleUseCase(imageItem.handle)
                 }.onSuccess {
                     onLoadSingleImageSuccess(itemId, it)
                 }.onFailure {
@@ -431,7 +431,7 @@ class ImageViewerViewModel @Inject constructor(
 
                 is ImageItem.File,
                 -> runCatching {
-                    getImageFromFileUseCase(imageItem.fileUri.toFile(), highPriority)
+                    getImageFromFileUseCase(imageItem.fileUri.toFile())
                 }.onSuccess {
                     onLoadSingleImageSuccess(itemId, it)
                 }.onFailure {

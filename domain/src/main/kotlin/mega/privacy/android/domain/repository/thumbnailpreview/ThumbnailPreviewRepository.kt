@@ -121,6 +121,16 @@ interface ThumbnailPreviewRepository {
     suspend fun createPreview(handle: Long, file: File): Boolean
 
     /**
+     * Create a preview for an image or video
+     *
+     * @param name
+     * @param file
+     * @return True if the preview was successfully created, otherwise false.
+     */
+
+    suspend fun createPreview(name: String, file: File): Boolean
+
+    /**
      * Delete a thumbnail for node
      *
      * @param handle
@@ -144,6 +154,14 @@ interface ThumbnailPreviewRepository {
      * @return The name.
      */
     suspend fun getThumbnailOrPreviewFileName(nodeHandle: Long): String
+
+    /**
+     * Get thumbnail or preview file name based on the string.
+     *
+     * @param name
+     * @return The name.
+     */
+    suspend fun getThumbnailOrPreviewFileName(name: String): String
 
     /**
      * Set the thumbnail of a MegaNode
