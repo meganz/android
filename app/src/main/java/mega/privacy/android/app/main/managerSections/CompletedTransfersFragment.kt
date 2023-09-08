@@ -9,8 +9,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.main.adapters.MegaCompletedTransfersAdapter
+import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 
 /**
  * The Fragment is used for displaying the finished items of transfer.
@@ -18,7 +20,10 @@ import mega.privacy.android.app.utils.Util
 @AndroidEntryPoint
 class CompletedTransfersFragment : TransfersBaseFragment() {
     private val adapter: MegaCompletedTransfersAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        MegaCompletedTransfersAdapter(requireActivity())
+        MegaCompletedTransfersAdapter(
+            context = requireActivity(),
+            onShowTransferOptionPanel = ::showTransferOptionPanel
+        )
     }
 
     override fun onCreateView(
@@ -60,6 +65,15 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
             }
             setEmptyView(completedTransfers.size)
         }
+    }
+
+    private fun showTransferOptionPanel(completedTransfer: CompletedTransfer) {
+        val id = completedTransfer.id
+        if (childFragmentManager.findFragmentByTag(ManageTransferBottomSheetDialogFragment.TAG) != null || id == null) {
+            return
+        }
+        ManageTransferBottomSheetDialogFragment.newInstance(id)
+            .show(childFragmentManager, ManageTransferBottomSheetDialogFragment.TAG)
     }
 
     companion object {

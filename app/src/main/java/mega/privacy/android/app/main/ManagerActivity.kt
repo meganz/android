@@ -174,6 +174,8 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.app.presentation.backups.BackupsFragment
+import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
@@ -189,8 +191,6 @@ import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
-import mega.privacy.android.app.presentation.backups.BackupsFragment
-import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
@@ -466,7 +466,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             AlertsAndWarnings.showSaveToDeviceConfirmDialog(this)
         )
     }
-    private var selectedTransfer: CompletedTransfer? = null
 
     private val badgeDrawable: BadgeDrawerArrowDrawable by lazy {
         BadgeDrawerArrowDrawable(
@@ -5948,18 +5947,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         (supportFragmentManager.findFragmentByTag(FragmentTag.PHOTOS.tag) as? PhotosFragment)?.refreshViewLayout()
     }
 
-    /**
-     * Shows the bottom sheet to manage a completed transfer.
-     *
-     * @param transfer the completed transfer to manage.
-     */
-    fun showManageTransferOptionsPanel(transfer: CompletedTransfer?) {
-        if (transfer == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        selectedTransfer = transfer
-        bottomSheetDialogFragment = ManageTransferBottomSheetDialogFragment()
-        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
-    }
-
     @JvmOverloads
     fun showNodeOptionsPanel(
         node: MegaNode?,
@@ -8064,10 +8051,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             else -> hideFabButton()
         }
-    }
-
-    fun getSelectedTransfer(): CompletedTransfer? {
-        return selectedTransfer
     }
 
     private fun onChatListItemUpdate(item: MegaChatListItem?) {

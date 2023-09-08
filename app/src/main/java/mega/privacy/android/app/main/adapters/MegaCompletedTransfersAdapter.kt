@@ -14,7 +14,6 @@ import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fetcher.ThumbnailRequest
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.Util.dp2px
@@ -31,6 +30,7 @@ import timber.log.Timber
  */
 class MegaCompletedTransfersAdapter(
     private val context: Context,
+    private val onShowTransferOptionPanel: (CompletedTransfer) -> Unit,
 ) : ListAdapter<CompletedTransfer, TransferViewHolder>(COMPLETED_TRANSFER_DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransferViewHolder {
@@ -52,9 +52,7 @@ class MegaCompletedTransfersAdapter(
 
             itemLayout.setOnClickListener {
                 Timber.d("onClick")
-                (context as? ManagerActivity)?.showManageTransferOptionsPanel(
-                    getItem(holder.absoluteAdapterPosition)
-                )
+                getItem(holder.absoluteAdapterPosition)?.let(onShowTransferOptionPanel)
             }
         }
         view.tag = view
