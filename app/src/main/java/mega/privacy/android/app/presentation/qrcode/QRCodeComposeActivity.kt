@@ -1,5 +1,8 @@
 package mega.privacy.android.app.presentation.qrcode
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -49,7 +52,6 @@ class QRCodeComposeActivity : ComponentActivity() {
                     onDeleteQRCode = viewModel::deleteQRCode,
                     onResetQRCode = viewModel::resetQRCode,
                     onSaveQRCode = { },
-                    onShareClicked = { },
                     onScanQrCodeClicked = { viewModel.scanCode(this) },
                     onCopyLinkClicked = viewModel::copyContactLink,
                     onViewContactClicked = ::onViewContact,
@@ -57,8 +59,8 @@ class QRCodeComposeActivity : ComponentActivity() {
                     onResultMessageConsumed = viewModel::resetResultMessage,
                     onScannedContactLinkResultConsumed = viewModel::resetScannedContactLinkResult,
                     onInviteContactResultConsumed = viewModel::resetInviteContactResult,
-                    onInviteContactDialogDismiss = viewModel::resetScannedContactAvatar,
                     onInviteResultDialogDismiss = viewModel::resetScannedContactEmail,
+                    onInviteContactDialogDismiss = viewModel::resetScannedContactAvatar,
                     qrCodeMapper = qrCodeMapper,
                 )
             }
@@ -70,4 +72,13 @@ class QRCodeComposeActivity : ComponentActivity() {
         ContactUtil.openContactInfoActivity(this, email)
         finish()
     }
+}
+
+/**
+ * Find the Activity in a given Context.
+ */
+internal fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

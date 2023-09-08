@@ -23,11 +23,13 @@ sealed interface MyCodeUIState {
      * @property contactLink
      * @property avatarContent
      * @property avatarBgColor
+     * @property qrCodeFilePath
      */
     data class QRCodeAvailable(
         val contactLink: String,
         val avatarContent: AvatarContent,
         @ColorInt val avatarBgColor: Int,
+        val qrCodeFilePath: String? = null,
     ) : MyCodeUIState
 
     /**

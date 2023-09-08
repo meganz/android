@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.qrcode
 
 import android.content.Context
-import android.graphics.Bitmap
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -92,6 +91,7 @@ class QRCodeViewModel @Inject constructor(
                                 contactLink = contactLink,
                                 avatarBgColor = avatarBgColor,
                                 avatarContent = avatarContent,
+                                qrCodeFilePath = getQRCodeFileUseCase()?.absolutePath,
                             )
                         )
                     }
@@ -101,12 +101,6 @@ class QRCodeViewModel @Inject constructor(
                     _uiState.update { it.copy(myQRCodeState = MyCodeUIState.Idle) }
                 }
             )
-        }
-    }
-
-    private suspend fun saveQRCodeToFile(bitmap: Bitmap) {
-        getQRCodeFileUseCase()?.let { file ->
-            saveBitmapToFile(bitmap, file)
         }
     }
 
@@ -138,6 +132,7 @@ class QRCodeViewModel @Inject constructor(
                                 contactLink = contactLink,
                                 avatarBgColor = avatarBgColor,
                                 avatarContent = avatarContent,
+                                qrCodeFilePath = getQRCodeFileUseCase()?.absolutePath,
                             )
                         )
                     }
@@ -189,32 +184,6 @@ class QRCodeViewModel @Inject constructor(
                     }
                     qrCodeBackup?.let { _uiState.update { it.copy(myQRCodeState = qrCodeBackup) } }
                 }
-            )
-        }
-    }
-
-    /**
-     * Start showing the share dialog.
-     */
-    fun startSharing() {
-        viewModelScope.launch {
-            runCatching { getQRCodeFileUseCase() }
-                .onSuccess { file ->
-                    file?.let { localFile ->
-                        _uiState.update { it.copy(localQRCodeFile = localFile) }
-                    }
-                }
-                .onFailure { Timber.e(it) }
-        }
-    }
-
-    /**
-     * Reset the sharing state, indicating sharing is finished.
-     */
-    fun finishSharing() {
-        _uiState.update {
-            it.copy(
-                localQRCodeFile = null
             )
         }
     }

@@ -136,34 +136,6 @@ class QRCodeViewModelTest {
     }
 
     @Test
-    fun `test that QR code file can be shared when it exists`() = runTest {
-        val file: File = mock {
-            on { exists() }.thenReturn(true)
-        }
-        whenever(getQRCodeFileUseCase()).thenReturn(file)
-        underTest.startSharing()
-        underTest.uiState.test {
-            assertThat(awaitItem().localQRCodeFile).isEqualTo(file)
-        }
-    }
-
-    @Test
-    fun `test that QR code file is not shared when it does not exist`() = runTest {
-        whenever(getQRCodeFileUseCase()).thenReturn(null)
-        underTest.startSharing()
-        underTest.uiState.test {
-            assertThat(awaitItem().localQRCodeFile).isNull()
-        }
-    }
-
-    @Test
-    fun `test that exception is captured when getQR Code file throws exception when sharing`() =
-        runTest {
-            whenever(getQRCodeFileUseCase()).thenAnswer { throw Exception() }
-            underTest.startSharing()
-        }
-
-    @Test
     fun `test that QRCode can be reset successfully`() = runTest {
         prepareQRCode()
         val localAvatarFile = mock<File> {

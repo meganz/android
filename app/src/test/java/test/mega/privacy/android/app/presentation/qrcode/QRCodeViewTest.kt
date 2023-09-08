@@ -42,7 +42,6 @@ class QRCodeViewTest {
                 onDeleteQRCode = { },
                 onResetQRCode = { },
                 onSaveQRCode = { },
-                onShareClicked = { },
                 onScanQrCodeClicked = { },
                 onCopyLinkClicked = { },
                 onViewContactClicked = { },
@@ -50,8 +49,8 @@ class QRCodeViewTest {
                 onResultMessageConsumed = { },
                 onScannedContactLinkResultConsumed = { },
                 onInviteContactResultConsumed = { },
-                onInviteContactDialogDismiss = { },
                 onInviteResultDialogDismiss = { },
+                onInviteContactDialogDismiss = { },
                 qrCodeMapper = qrCodeMapper
             )
         }

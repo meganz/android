@@ -1,7 +1,18 @@
 package mega.privacy.android.app.presentation.qrcode
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.net.Uri
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.view.PixelCopy
+import android.view.View
+import android.view.Window
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -31,9 +42,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -43,9 +59,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.FileProvider
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
@@ -57,6 +75,7 @@ import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
@@ -69,6 +88,12 @@ import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * View to render the QR code Screen, including toolbar, content, etc.
@@ -81,7 +106,6 @@ internal fun QRCodeView(
     onDeleteQRCode: () -> Unit,
     onResetQRCode: () -> Unit,
     onSaveQRCode: () -> Unit,
-    onShareClicked: () -> Unit,
     onScanQrCodeClicked: () -> Unit,
     onCopyLinkClicked: () -> Unit,
     onViewContactClicked: (String) -> Unit,
@@ -93,6 +117,7 @@ internal fun QRCodeView(
     onInviteContactDialogDismiss: () -> Unit,
     qrCodeMapper: QRCodeMapper,
 ) {
+    val view: View = LocalView.current
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
@@ -100,6 +125,7 @@ internal fun QRCodeView(
     var showMoreMenu by remember { mutableStateOf(false) }
     var showScannedContactLinkResult by remember { mutableStateOf<ScannedContactLinkResult?>(null) }
     var showInviteContactResult by remember { mutableStateOf<InviteContactRequest?>(null) }
+    var qrCodeComposableBounds by remember { mutableStateOf<Rect?>(null) }
 
     EventEffect(
         event = viewState.resultMessage,
@@ -140,7 +166,20 @@ internal fun QRCodeView(
                 onResetQRCode = onResetQRCode,
                 onDeleteQRCode = onDeleteQRCode,
                 onBackPressed = onBackPressed,
-                onShare = onShareClicked
+                onShare = {
+                    context.findActivity()?.let { activity ->
+                        qrCodeComposableBounds?.let { viewBounds ->
+                            handleShare(
+                                activity,
+                                view,
+                                viewBounds,
+                                viewState.myQRCodeState,
+                                coroutineScope,
+                                snackBarHostState
+                            )
+                        }
+                    }
+                }
             )
         }
     ) {
@@ -168,7 +207,15 @@ internal fun QRCodeView(
                         modifier = Modifier
                             .padding(top = 60.dp)
                             .size(280.dp)
-                            .testTag(QRCODE_TAG),
+                            .testTag(QRCODE_TAG)
+                            .onGloballyPositioned {
+                                qrCodeComposableBounds =
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        it.boundsInWindow()
+                                    } else {
+                                        it.boundsInRoot()
+                                    }
+                            },
                         contentAlignment = Alignment.Center,
                     ) {
                         QRCode(
@@ -394,6 +441,115 @@ private fun InviteContactDialog(
     }
 }
 
+private fun handleShare(
+    activity: Activity,
+    view: View,
+    viewBounds: Rect,
+    myQRCodeState: MyCodeUIState,
+    coroutineScope: CoroutineScope,
+    snackBarHostState: SnackbarHostState
+) {
+    coroutineScope.launch {
+        (myQRCodeState as? MyCodeUIState.QRCodeAvailable)?.qrCodeFilePath?.let { qrFilePath ->
+            runCatching {
+                val bitmap = captureViewToBitmap(view, activity.window, viewBounds)
+                bitmap?.let {
+                    val file = saveBitmap(bitmap, qrFilePath)
+                    val uri = getFileUri(activity, file)
+                    shareImage(activity, uri)
+                } ?: snackBarHostState.showSnackbar(activity.getString(R.string.error_share_qr))
+            }.onFailure { snackBarHostState.showSnackbar(activity.getString(R.string.error_share_qr)) }
+        }
+    }
+}
+
+private suspend fun captureViewToBitmap(view: View, window: Window, bounds: Rect): Bitmap? {
+    return suspendCancellableCoroutine { continuation ->
+        with(view) {
+            val bitmap = Bitmap.createBitmap(
+                bounds.width.toInt(),
+                bounds.height.toInt(),
+                Bitmap.Config.ARGB_8888,
+            )
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                PixelCopy.request(
+                    window,
+                    android.graphics.Rect(
+                        bounds.left.toInt(),
+                        bounds.top.toInt(),
+                        bounds.right.toInt(),
+                        bounds.bottom.toInt()
+                    ),
+                    bitmap,
+                    { copyResult ->
+                        if (copyResult == PixelCopy.SUCCESS) {
+                            continuation.resume(bitmap)
+                        } else {
+                            continuation.resume(null)
+                        }
+                    },
+                    Handler(Looper.getMainLooper())
+                )
+            } else {
+                val canvas = Canvas(bitmap)
+                    .apply {
+                        translate(-bounds.left, -bounds.top)
+                    }
+                this.draw(canvas)
+                canvas.setBitmap(null)
+                continuation.resume(bitmap)
+            }
+        }
+    }
+}
+
+private suspend fun getFileUri(context: Context, file: File): Uri? {
+    return suspendCancellableCoroutine { continuation ->
+        runCatching {
+            FileProvider.getUriForFile(context, Constants.AUTHORITY_STRING_FILE_PROVIDER, file)
+        }.onSuccess {
+            continuation.resume(it)
+        }.onFailure {
+            continuation.resumeWithException(it)
+        }
+    }
+}
+
+private suspend fun saveBitmap(bitmap: Bitmap, destPath: String): File {
+    return suspendCancellableCoroutine { continuation ->
+        runCatching {
+            val out: OutputStream
+            val file = File(destPath)
+            out = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+            out.close()
+            continuation.resume(file)
+        }.onFailure {
+            Timber.e(it)
+            continuation.resumeWithException(it)
+        }
+    }
+}
+
+private fun shareImage(activity: Activity, uri: Uri?) {
+    uri?.let {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/*"
+            putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        activity.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                activity.getString(R.string.context_share)
+            )
+        )
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun PreviewQRCodeView() {
@@ -417,7 +573,6 @@ private fun PreviewQRCodeView() {
             onDeleteQRCode = { },
             onResetQRCode = { },
             onSaveQRCode = { },
-            onShareClicked = { },
             onScanQrCodeClicked = { },
             onCopyLinkClicked = { },
             onViewContactClicked = { },
