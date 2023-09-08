@@ -44,6 +44,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.app.mediaplayer.model.VideoControllerPadding
 import mega.privacy.android.app.mediaplayer.model.VideoPlayerUiState
@@ -277,8 +278,6 @@ class VideoPlayerViewModel @Inject constructor(
     internal val playerControllerPaddingState: StateFlow<VideoControllerPadding> =
         _playerControllerPaddingState
 
-    private val _isFullScreenState = MutableStateFlow(false)
-
     internal var videoPlayType = VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
         private set
 
@@ -347,7 +346,6 @@ class VideoPlayerViewModel @Inject constructor(
                 _isSubtitleDialogShown,
                 _addSubtitleState,
                 _currentSubtitleFileInfo,
-                _isFullScreenState,
                 ::mapToVideoPlayerUIState
             ).collectLatest { newState ->
                 _state.update {
@@ -375,7 +373,13 @@ class VideoPlayerViewModel @Inject constructor(
         }
 
     internal fun updateIsFullScreen(isFullScreen: Boolean) =
-        _isFullScreenState.update { isFullScreen }
+        _state.update { it.copy(isFullScreen = isFullScreen) }
+
+    internal fun updateIsSpeedPopupShown(isShown: Boolean) =
+        _state.update { it.copy(isSpeedPopupShown = isShown) }
+
+    internal fun updateCurrentSpeedPlaybackItem(item: SpeedPlaybackItem) =
+        _state.update { it.copy(currentSpeedPlayback = item) }
 
     /**
      * Get video repeat mode
@@ -414,15 +418,13 @@ class VideoPlayerViewModel @Inject constructor(
         subtitleDialogShown: Boolean,
         isAddSubtitle: Boolean,
         subtitleFileInfo: SubtitleFileInfo?,
-        isFullScreen: Boolean,
     ) = VideoPlayerUiState(
         subtitleDisplayState = SubtitleDisplayState(
             isSubtitleShown = subtitleShown,
             isSubtitleDialogShown = subtitleDialogShown,
             isAddSubtitle = isAddSubtitle,
             subtitleFileInfo = subtitleFileInfo
-        ),
-        isFullScreen = isFullScreen
+        )
     )
 
     /**

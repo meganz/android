@@ -175,9 +175,14 @@ class VideoPlayerActivity : MediaPlayerActivity() {
      */
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            retryConnectionsAndSignalPresence()
-            if (!navController.navigateUp()) {
-                finish()
+            // If isSpeedPopupShown is true, close the speed popup when the back button is pressed
+            if (videoViewModel.uiState.value.isSpeedPopupShown) {
+                videoViewModel.updateIsSpeedPopupShown(false)
+            } else {
+                retryConnectionsAndSignalPresence()
+                if (!navController.navigateUp()) {
+                    finish()
+                }
             }
         }
     }
@@ -918,6 +923,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        onBackPressedCallback.remove()
         contentResolver.unregisterContentObserver(rotationContentObserver)
         if (isFinishing) {
             mediaPlayerGateway.playerStop()

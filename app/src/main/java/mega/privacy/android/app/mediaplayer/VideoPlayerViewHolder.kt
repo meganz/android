@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.platform.ComposeView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.google.android.exoplayer2.Player
@@ -34,7 +36,9 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
     private val screenshotButton = container.findViewById<ImageButton>(R.id.image_screenshot)
     private val subtitleButton = container.findViewById<ImageButton>(R.id.subtitle)
     private val fullScreenButton = container.findViewById<ImageButton>(R.id.full_screen)
+    internal val speedPlaybackButton = container.findViewById<ImageButton>(R.id.speed_playback)
     internal val playerView = container.findViewById<StyledPlayerView>(R.id.player_view)
+    internal val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
 
     /**
      * Setup playlist button.
@@ -106,6 +110,15 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
         unlockButton.setOnClickListener {
             updateUI(false, lockCallback)
         }
+    }
+
+    /**
+     * Update the speed playback icon according to the playback speed
+     *
+     * @param iconId icon resources id
+     */
+    fun updateSpeedPlaybackIcon(@DrawableRes iconId: Int) {
+        speedPlaybackButton.setImageResource(iconId)
     }
 
     /**

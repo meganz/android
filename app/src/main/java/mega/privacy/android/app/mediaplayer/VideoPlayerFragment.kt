@@ -25,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.MediaItem
@@ -45,6 +46,7 @@ import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -262,6 +264,13 @@ class VideoPlayerFragment : Fragment() {
                         RESIZE_MODE_FIT
                     }
                 }
+
+                viewLifecycleOwner.collectFlow(
+                    uiState.map { it.currentSpeedPlayback }.distinctUntilChanged()
+                ) { item ->
+                    playerViewHolder?.updateSpeedPlaybackIcon(item.iconId)
+                    mediaPlayerGateway.updatePlaybackSpeed(item.speed)
+                }
             }
         }
     }
@@ -298,6 +307,11 @@ class VideoPlayerFragment : Fragment() {
                 }
 
                 initAddSubtitleDialog(binding.addSubtitleDialog)
+                initSpeedPlaybackPopup(viewHolder.speedPlaybackPopup)
+
+                viewHolder.speedPlaybackButton.setOnClickListener {
+                    viewModel.updateIsSpeedPopupShown(true)
+                }
 
                 viewLifecycleOwner.lifecycleScope.launch {
                     setupSubtitleButton(
@@ -553,6 +567,24 @@ class VideoPlayerFragment : Fragment() {
         binding.root.setBackgroundColor(Color.TRANSPARENT)
     }
 
+    private fun initSpeedPlaybackPopup(composeView: ComposeView) {
+        composeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val state = viewModel.uiState.collectAsStateWithLifecycle().value
+                SpeedSelectedPopup(
+                    items = speedPlaybackList,
+                    isShown = state.isSpeedPopupShown,
+                    currentPlaybackSpeed = state.currentSpeedPlayback,
+                    onDismissRequest = { viewModel.updateIsSpeedPopupShown(false) }
+                ) { speedPlaybackItem ->
+                    viewModel.updateCurrentSpeedPlaybackItem(speedPlaybackItem)
+                    viewModel.updateIsSpeedPopupShown(false)
+                }
+            }
+        }
+    }
+
     /**
      * Init the add subtitle dialog
      *
@@ -562,7 +594,8 @@ class VideoPlayerFragment : Fragment() {
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val subtitleState = viewModel.uiState.collectAsState().value.subtitleDisplayState
+                val subtitleState =
+                    viewModel.uiState.collectAsStateWithLifecycle().value.subtitleDisplayState
                 if (subtitleState.isSubtitleDialogShown) {
                     AddSubtitleDialog(
                         selectOptionState = viewModel.selectOptionState,
@@ -675,5 +708,17 @@ class VideoPlayerFragment : Fragment() {
          * The intent key for passing subtitle file id
          */
         const val INTENT_KEY_SUBTITLE_FILE_ID = "INTENT_KEY_SUBTITLE_FILE_ID"
+
+        private const val SPEED_PLAYBACK_0_5_X = 0.5F
+        internal const val SPEED_PLAYBACK_1_X = 1F
+        private const val SPEED_PLAYBACK_1_5_X = 1.5F
+        private const val SPEED_PLAYBACK_2_X = 2F
+
+        internal val speedPlaybackList = listOf(
+            SpeedPlaybackItem(SPEED_PLAYBACK_0_5_X, R.drawable.ic_playback_0_5x),
+            SpeedPlaybackItem(),
+            SpeedPlaybackItem(SPEED_PLAYBACK_1_5_X, R.drawable.ic_playback_1_5x),
+            SpeedPlaybackItem(SPEED_PLAYBACK_2_X, R.drawable.ic_playback_2x),
+        )
     }
 }

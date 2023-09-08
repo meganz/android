@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Player.STATE_ENDED
 import com.google.android.exoplayer2.Player.STATE_IDLE
@@ -396,6 +397,10 @@ class MediaPlayerFacade @Inject constructor(
     override fun hideSubtitle() {
         trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true).build()
+    }
+
+    override fun updatePlaybackSpeed(speed: Float) {
+        player?.playbackParameters = PlaybackParameters(speed)
     }
 
     companion object {

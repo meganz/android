@@ -183,6 +183,19 @@
                 android:visibility="gone"/>
 
             <ImageButton
+                android:id="@+id/speed_playback"
+                style="@style/VideoPlayerButton"
+                android:enabled="false"
+                android:src="@drawable/ic_playback_1x"
+                android:padding="6dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/white"
+                android:visibility="gone"/>
+
+            <ImageButton
                 android:id="@+id/playlist"
                 style="@style/VideoPlayerButton"
                 android:enabled="false"
@@ -194,6 +207,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/white"
                 tools:visibility="visible" />
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/speed_playback_popup"
+                android:layout_gravity="bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/image_button_lock"
+                app:layout_constraintBottom_toBottomOf="@id/image_button_lock"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

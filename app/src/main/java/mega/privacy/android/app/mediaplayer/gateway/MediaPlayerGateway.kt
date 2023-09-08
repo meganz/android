@@ -217,4 +217,11 @@ interface MediaPlayerGateway {
      * For hide subtitle after the subtitle file has been set
      */
     fun hideSubtitle()
+
+    /**
+     * Update the playback speed
+     *
+     * @param speed playback speed
+     */
+    fun updatePlaybackSpeed(speed: Float)
 }
