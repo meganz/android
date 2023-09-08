@@ -1,15 +1,15 @@
-package mega.privacy.android.feature.devicecenter.domain.usecase
+package mega.privacy.android.domain.usecase.backup
 
-import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
+import mega.privacy.android.domain.repository.BackupRepository
 import javax.inject.Inject
 
 /**
  * Use Case that renames the User's selected Device
  *
- * @property deviceCenterRepository [DeviceCenterRepository]
+ * @property backupRepository [BackupRepository]
  */
 class RenameDeviceUseCase @Inject constructor(
-    private val deviceCenterRepository: DeviceCenterRepository,
+    private val backupRepository: BackupRepository,
 ) {
     /**
      * Invocation function
@@ -18,7 +18,7 @@ class RenameDeviceUseCase @Inject constructor(
      * @param deviceName The new Device Name
      */
     suspend operator fun invoke(deviceId: String, deviceName: String) =
-        deviceCenterRepository.renameDevice(
+        backupRepository.renameDevice(
             deviceId = deviceId,
             deviceName = deviceName,
         )

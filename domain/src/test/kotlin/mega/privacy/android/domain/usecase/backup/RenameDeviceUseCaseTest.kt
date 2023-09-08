@@ -1,8 +1,8 @@
-package mega.privacy.android.feature.devicecenter.domain.usecase
+package mega.privacy.android.domain.usecase.backup
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
+import mega.privacy.android.domain.repository.BackupRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,16 +20,16 @@ internal class RenameDeviceUseCaseTest {
 
     private lateinit var underTest: RenameDeviceUseCase
 
-    private val deviceCenterRepository = mock<DeviceCenterRepository>()
+    private val backupRepository = mock<BackupRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = RenameDeviceUseCase(deviceCenterRepository)
+        underTest = RenameDeviceUseCase(backupRepository)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(deviceCenterRepository)
+        reset(backupRepository)
     }
 
     @Test
@@ -41,7 +41,7 @@ internal class RenameDeviceUseCaseTest {
             deviceId = deviceId,
             deviceName = deviceName,
         )
-        verify(deviceCenterRepository).renameDevice(
+        verify(backupRepository).renameDevice(
             deviceId = deviceId,
             deviceName = deviceName,
         )

@@ -1,8 +1,8 @@
-package mega.privacy.android.feature.devicecenter.domain.entity
+package mega.privacy.android.domain.entity.backup
 
 /**
  * Enum class representing the different Backup Sub States mapped from
- * [nz.mega.sdk.MegaBackupInfo.substate]
+ * nz.mega.sdk.MegaBackupInfo.substate
  */
 enum class BackupInfoSubState {
 

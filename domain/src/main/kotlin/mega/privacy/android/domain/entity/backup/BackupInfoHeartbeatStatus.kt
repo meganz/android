@@ -1,8 +1,8 @@
-package mega.privacy.android.feature.devicecenter.domain.entity
+package mega.privacy.android.domain.entity.backup
 
 /**
  * Enum class representing the different Backup Heartbeat Statuses mapped from
- * [nz.mega.sdk.MegaBackupInfo.status]
+ * nz.mega.sdk.MegaBackupInfo.status
  */
 enum class BackupInfoHeartbeatStatus {
 

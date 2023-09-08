@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.AndroidBillingRepository
+import mega.privacy.android.data.repository.BackupRepositoryImpl
 import mega.privacy.android.data.repository.CallRepositoryImpl
 import mega.privacy.android.data.repository.ChatRepositoryImpl
 import mega.privacy.android.data.repository.DefaultAlbumRepository
@@ -60,6 +61,7 @@ import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRep
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
+import mega.privacy.android.domain.repository.BackupRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.repository.CallRepository
@@ -283,4 +285,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindSearchRepository(implementation: SearchRepositoryImpl): SearchRepository
+
+    @Binds
+    abstract fun bindBackupRepository(implementation: BackupRepositoryImpl): BackupRepository
 }

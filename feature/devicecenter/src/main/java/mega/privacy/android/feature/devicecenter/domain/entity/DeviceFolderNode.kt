@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.devicecenter.domain.entity
 
+import mega.privacy.android.domain.entity.backup.BackupInfoType
+
 /**
  * A domain data class representing a Backup Folder of a Backup Device
  *

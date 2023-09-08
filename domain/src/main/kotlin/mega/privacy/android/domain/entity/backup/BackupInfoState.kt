@@ -1,7 +1,7 @@
-package mega.privacy.android.feature.devicecenter.domain.entity
+package mega.privacy.android.domain.entity.backup
 
 /**
- * Enum class representing the different Backup States mapped from [nz.mega.sdk.MegaBackupInfo.state]
+ * Enum class representing the different Backup States mapped from nz.mega.sdk.MegaBackupInfo.state
  */
 enum class BackupInfoState {
 

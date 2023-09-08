@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.data.mapper
+package mega.privacy.android.data.mapper.backup
 
 import mega.privacy.android.data.wrapper.StringWrapper
 import nz.mega.sdk.MegaStringMap

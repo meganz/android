@@ -1,8 +1,8 @@
-package mega.privacy.android.feature.devicecenter.domain.entity
+package mega.privacy.android.domain.entity.backup
 
 /**
  * Data class representing the User's Backup information from the "sf" API Call. This class is
- * mapped from [nz.mega.sdk.MegaBackupInfo]
+ * mapped from nz.mega.sdk.MegaBackupInfo
  *
  * @param id The Backup ID
  * @param type Any of the [BackupInfoType] values

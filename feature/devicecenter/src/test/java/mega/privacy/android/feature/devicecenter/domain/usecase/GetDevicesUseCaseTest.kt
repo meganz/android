@@ -3,8 +3,11 @@ package mega.privacy.android.feature.devicecenter.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.backup.BackupInfo
+import mega.privacy.android.domain.usecase.backup.GetBackupInfoUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceIdAndNameMapUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
-import mega.privacy.android.feature.devicecenter.domain.entity.BackupInfo
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
@@ -27,19 +30,31 @@ internal class GetDevicesUseCaseTest {
     private lateinit var underTest: GetDevicesUseCase
 
     private val deviceCenterRepository = mock<DeviceCenterRepository>()
+    private val getBackupInfoUseCase = mock<GetBackupInfoUseCase>()
+    private val getDeviceIdAndNameMapUseCase = mock<GetDeviceIdAndNameMapUseCase>()
+    private val getDeviceIdUseCase = mock<GetDeviceIdUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetDevicesUseCase(
             deviceCenterRepository = deviceCenterRepository,
+            getBackupInfoUseCase = getBackupInfoUseCase,
+            getDeviceIdAndNameMapUseCase = getDeviceIdAndNameMapUseCase,
+            getDeviceIdUseCase = getDeviceIdUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(deviceCenterRepository, isCameraUploadsEnabledUseCase)
+        reset(
+            deviceCenterRepository,
+            getBackupInfoUseCase,
+            getDeviceIdAndNameMapUseCase,
+            getDeviceIdUseCase,
+            isCameraUploadsEnabledUseCase,
+        )
     }
 
     @ParameterizedTest(name = "is camera uploads enabled: {0}")
@@ -57,9 +72,9 @@ internal class GetDevicesUseCaseTest {
             )
 
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
-            whenever(deviceCenterRepository.getDeviceId()).thenReturn(currentDeviceId)
-            whenever(deviceCenterRepository.getBackupInfo()).thenReturn(backupInfoList)
-            whenever(deviceCenterRepository.getDeviceIdAndNameMap()).thenReturn(deviceIdAndNameMap)
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getBackupInfoUseCase()).thenReturn(backupInfoList)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(deviceIdAndNameMap)
             whenever(
                 deviceCenterRepository.getDevices(
                     backupInfoList = backupInfoList,
