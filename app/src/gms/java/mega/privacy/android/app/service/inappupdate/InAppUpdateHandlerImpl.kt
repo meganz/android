@@ -122,6 +122,14 @@ class InAppUpdateHandlerImpl @Inject constructor(
         }
     }
 
+    override suspend fun checkForInAppUpdateInstallStatus() {
+        val appUpdateInfo = appUpdateManager.requestAppUpdateInfo()
+        // If the update is downloaded but not installed, notify the user to complete the update.
+        if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+            popupSnackBarForCompleteUpdate()
+        }
+    }
+
     private fun canUpdate(appUpdateInfo: AppUpdateInfo) =
         appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
             AppUpdateType.FLEXIBLE
@@ -134,7 +142,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
                 InstallStatus.DOWNLOADED -> {
                     continuation.resumeWith(Result.success(Unit))
                     Timber.d("InAppUpdate: The user has downloaded the update")
-                    showSnackBar()
+                    popupSnackBarForCompleteUpdate()
                 }
 
                 InstallStatus.FAILED -> {
@@ -151,12 +159,12 @@ class InAppUpdateHandlerImpl @Inject constructor(
             }
         }
 
-    private fun showSnackBar() {
+    private fun popupSnackBarForCompleteUpdate() {
         (context as? Activity)?.contentView?.let { view ->
             Snackbar.make(
                 view,
                 context.getString(R.string.general_app_update_message_download_success),
-                Snackbar.LENGTH_LONG
+                Snackbar.LENGTH_INDEFINITE
             ).apply {
                 setAction(context.getString(R.string.general_app_update_action_restart)) {
                     Analytics.tracker.trackEvent(InAppUpdateRestartButtonPressedEvent)

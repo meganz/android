@@ -2341,6 +2341,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         checkTransferOverQuotaOnResume()
         LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
             .observeForever(fabChangeObserver)
+        checkForInAppUpdateInstallStatus()
+    }
+
+    private fun checkForInAppUpdateInstallStatus() {
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.InAppUpdate)) {
+                runCatching {
+                    inAppUpdateHandler.checkForInAppUpdateInstallStatus()
+                }
+            }
+        }
     }
 
     private fun queryIfNotificationsAreOn() {
