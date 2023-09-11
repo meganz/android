@@ -378,6 +378,9 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun updateIsSpeedPopupShown(isShown: Boolean) =
         _state.update { it.copy(isSpeedPopupShown = isShown) }
 
+    internal fun updateIsVideoOptionPopupShown(isShown: Boolean) =
+        _state.update { it.copy(isVideoOptionPopupShown = isShown) }
+
     internal fun updateCurrentSpeedPlaybackItem(item: SpeedPlaybackItem) =
         _state.update { it.copy(currentSpeedPlayback = item) }
 

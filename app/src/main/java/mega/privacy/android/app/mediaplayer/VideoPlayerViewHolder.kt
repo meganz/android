@@ -37,8 +37,10 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
     private val subtitleButton = container.findViewById<ImageButton>(R.id.subtitle)
     private val fullScreenButton = container.findViewById<ImageButton>(R.id.full_screen)
     internal val speedPlaybackButton = container.findViewById<ImageButton>(R.id.speed_playback)
+    internal val moreOptionButton = container.findViewById<ImageButton>(R.id.more_option)
     internal val playerView = container.findViewById<StyledPlayerView>(R.id.player_view)
     internal val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
+    internal val videoOptionPopup = container.findViewById<ComposeView>(R.id.video_option_popup)
 
     /**
      * Setup playlist button.
@@ -102,14 +104,25 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
      * @param lockCallback the callback regarding lock feature
      */
     fun setupLockUI(defaultLockStatus: Boolean, lockCallback: (isLock: Boolean) -> Unit) {
-        playerLayout.isVisible = !defaultLockStatus
-        unlockLayout.isVisible = defaultLockStatus
+        updateLockUI(defaultLockStatus)
         lockButton.setOnClickListener {
-            updateUI(true, lockCallback)
+            updateLockUI(true)
+            lockCallback(true)
         }
         unlockButton.setOnClickListener {
-            updateUI(false, lockCallback)
+            updateLockUI(false)
+            lockCallback(false)
         }
+    }
+
+    /**
+     * Update the lock UI
+     *
+     * @param isLock true is shown the lock UI, otherwise is false
+     */
+    fun updateLockUI(isLock: Boolean) {
+        playerLayout.isVisible = !isLock
+        unlockLayout.isVisible = isLock
     }
 
     /**
@@ -189,12 +202,6 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
                 R.drawable.ic_subtitles_disable
             }
         )
-
-    private fun updateUI(isLock: Boolean, lockCallback: (isLock: Boolean) -> Unit) {
-        playerLayout.isVisible = !isLock
-        unlockLayout.isVisible = isLock
-        lockCallback(isLock)
-    }
 
     /**
      * Toggle the playlist button.

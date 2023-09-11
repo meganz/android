@@ -175,13 +175,20 @@ class VideoPlayerActivity : MediaPlayerActivity() {
      */
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            // If isSpeedPopupShown is true, close the speed popup when the back button is pressed
-            if (videoViewModel.uiState.value.isSpeedPopupShown) {
-                videoViewModel.updateIsSpeedPopupShown(false)
-            } else {
-                retryConnectionsAndSignalPresence()
-                if (!navController.navigateUp()) {
-                    finish()
+            videoViewModel.uiState.value.let { state ->
+                // If popup is shown, close the popup when the back button is pressed
+                if (state.isSpeedPopupShown || state.isVideoOptionPopupShown) {
+                    if (state.isSpeedPopupShown) {
+                        videoViewModel.updateIsSpeedPopupShown(false)
+                    }
+                    if (state.isVideoOptionPopupShown) {
+                        videoViewModel.updateIsVideoOptionPopupShown(false)
+                    }
+                } else {
+                    retryConnectionsAndSignalPresence()
+                    if (!navController.navigateUp()) {
+                        finish()
+                    }
                 }
             }
         }
@@ -889,6 +896,12 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             navController.popBackStack()
             navController.navigate(R.id.video_main_player)
             updateToolbarTitleBasedOnOrientation(videoViewModel.metadataState.value)
+            // The video option popup is closed when the screen orientation is landscape.
+            if (newConfig.orientation == ORIENTATION_LANDSCAPE &&
+                videoViewModel.uiState.value.isVideoOptionPopupShown
+            ) {
+                videoViewModel.updateIsVideoOptionPopupShown(false)
+            }
         }
     }
 

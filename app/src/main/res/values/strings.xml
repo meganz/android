@@ -5142,4 +5142,12 @@
     </plurals>
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">“%s” deleted</string>
+    <!-- Title of video option of snapshot-->
+    <string name="media_player_video_option_snapshot_title">Snapshot</string>
+    <!-- Title of video option of lock-->
+    <string name="media_player_video_option_lock_title">Lock</string>
+    <!-- Title of video option of zoom to fill-->
+    <string name="media_player_video_option_zoom_to_fill_title">Zoom to fill</string>
+    <!-- Title of video option of original-->
+    <string name="media_player_video_option_original_title">Original</string>
 </resources>

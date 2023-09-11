@@ -17,10 +17,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -47,6 +47,7 @@ import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -293,24 +294,23 @@ class VideoPlayerFragment : Fragment() {
                 }
 
                 setupLockUI(viewModel.screenLockState.value) { isLock ->
-                    viewModel.updateLockStatus(isLock)
-                    if (isLock) {
-                        delayHideWhenLocked()
-                        viewModel.sendScreenLockedEvent()
-                    } else {
-                        viewModel.sendScreenUnlockedEvent()
-                    }
+                    lockButtonClicked(isLock)
                 }
 
                 setupFullScreen(viewModel.uiState.value.isFullScreen) {
-                    viewModel.updateIsFullScreen(!viewModel.uiState.value.isFullScreen)
+                    fullScreenButtonClicked(!viewModel.uiState.value.isFullScreen)
                 }
 
                 initAddSubtitleDialog(binding.addSubtitleDialog)
+                initVideoOptionPopup(viewHolder.videoOptionPopup)
                 initSpeedPlaybackPopup(viewHolder.speedPlaybackPopup)
 
                 viewHolder.speedPlaybackButton.setOnClickListener {
                     viewModel.updateIsSpeedPopupShown(true)
+                }
+
+                viewHolder.moreOptionButton.setOnClickListener {
+                    viewModel.updateIsVideoOptionPopupShown(true)
                 }
 
                 viewLifecycleOwner.lifecycleScope.launch {
@@ -324,29 +324,7 @@ class VideoPlayerFragment : Fragment() {
                 }
 
                 setupScreenshotButton {
-                    val rootPath =
-                        getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
-                    val screenshotsFolderPath =
-                        "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
-
-                    binding.playerView.videoSurfaceView?.let { view ->
-                        viewModel.screenshotWhenVideoPlaying(
-                            rootFolderPath = screenshotsFolderPath,
-                            captureView = view
-                        ) { bitmap ->
-                            viewModel.sendSnapshotButtonClickedEvent()
-                            requireActivity().runOnUiThread {
-                                showCaptureScreenshotAnimation(
-                                    view = binding.screenshotScaleAnimationView,
-                                    layout = binding.screenshotScaleAnimationLayout,
-                                    bitmap = bitmap
-                                )
-                                videoPlayerActivity?.showSnackBarForVideoPlayer(
-                                    getString(R.string.media_player_video_snackbar_screenshot_saved)
-                                )
-                            }
-                        }
-                    }
+                    screenshotButtonClicked()
                 }
             }
 
@@ -354,6 +332,46 @@ class VideoPlayerFragment : Fragment() {
 
             initRepeatToggleButtonForVideo(viewHolder)
         }
+    }
+
+    private fun lockButtonClicked(isLock: Boolean) {
+        viewModel.updateLockStatus(isLock)
+        if (isLock) {
+            delayHideWhenLocked()
+            viewModel.sendScreenLockedEvent()
+        } else {
+            viewModel.sendScreenUnlockedEvent()
+        }
+    }
+
+    private fun screenshotButtonClicked() {
+        val rootPath =
+            getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
+        val screenshotsFolderPath =
+            "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
+
+        binding.playerView.videoSurfaceView?.let { view ->
+            viewModel.screenshotWhenVideoPlaying(
+                rootFolderPath = screenshotsFolderPath,
+                captureView = view
+            ) { bitmap ->
+                viewModel.sendSnapshotButtonClickedEvent()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    showCaptureScreenshotAnimation(
+                        view = binding.screenshotScaleAnimationView,
+                        layout = binding.screenshotScaleAnimationLayout,
+                        bitmap = bitmap
+                    )
+                    videoPlayerActivity?.showSnackBarForVideoPlayer(
+                        getString(R.string.media_player_video_snackbar_screenshot_saved)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun fullScreenButtonClicked(isFullScreen: Boolean) {
+        viewModel.updateIsFullScreen(isFullScreen)
     }
 
     private fun showCaptureScreenshotAnimation(
@@ -571,7 +589,7 @@ class VideoPlayerFragment : Fragment() {
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val state = viewModel.uiState.collectAsStateWithLifecycle().value
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
                 SpeedSelectedPopup(
                     items = speedPlaybackList,
                     isShown = state.isSpeedPopupShown,
@@ -580,6 +598,51 @@ class VideoPlayerFragment : Fragment() {
                 ) { speedPlaybackItem ->
                     viewModel.updateCurrentSpeedPlaybackItem(speedPlaybackItem)
                     viewModel.updateIsSpeedPopupShown(false)
+                }
+            }
+        }
+    }
+
+    private fun initVideoOptionPopup(composeView: ComposeView) {
+        composeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                val videoOptions = remember(state.isFullScreen) {
+                    listOf(
+                        VideoOptionItem.VIDEO_OPTION_SNAPSHOT,
+                        VideoOptionItem.VIDEO_OPTION_LOCK,
+                        if (state.isFullScreen) {
+                            VideoOptionItem.VIDEO_OPTION_ORIGINAL
+                        } else {
+                            VideoOptionItem.VIDEO_OPTION_ZOOM_TO_FILL
+                        }
+                    )
+                }
+                VideoOptionPopup(
+                    items = videoOptions,
+                    isShown = state.isVideoOptionPopupShown,
+                    onDismissRequest = { viewModel.updateIsVideoOptionPopupShown(false) }
+                ) { videOption ->
+                    when (videOption) {
+                        VideoOptionItem.VIDEO_OPTION_SNAPSHOT -> {
+                            screenshotButtonClicked()
+                        }
+
+                        VideoOptionItem.VIDEO_OPTION_LOCK -> {
+                            playerViewHolder?.updateLockUI(true)
+                            lockButtonClicked(true)
+                        }
+
+                        VideoOptionItem.VIDEO_OPTION_ZOOM_TO_FILL -> {
+                            fullScreenButtonClicked(true)
+                        }
+
+                        else -> {
+                            fullScreenButtonClicked(false)
+                        }
+                    }
+                    viewModel.updateIsVideoOptionPopupShown(false)
                 }
             }
         }
@@ -594,44 +657,42 @@ class VideoPlayerFragment : Fragment() {
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val subtitleState =
-                    viewModel.uiState.collectAsStateWithLifecycle().value.subtitleDisplayState
-                if (subtitleState.isSubtitleDialogShown) {
-                    AddSubtitleDialog(
-                        selectOptionState = viewModel.selectOptionState,
-                        matchedSubtitleFileUpdate = {
-                            viewModel.getMatchedSubtitleFileInfoForPlayingItem()
-                        },
-                        subtitleFileName = viewModel.subtitleInfoByAddSubtitles?.name,
-                        onOffClicked = {
-                            viewModel.onOffItemClicked()
-                        },
-                        onAddedSubtitleClicked = {
-                            viewModel.onAddedSubtitleOptionClicked()
-                        },
-                        onAutoMatch = { info ->
-                            if (info.url == null) {
-                                showAddingSubtitleFailedMessage()
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                AddSubtitleDialog(
+                    isShown = state.subtitleDisplayState.isSubtitleDialogShown,
+                    selectOptionState = viewModel.selectOptionState,
+                    matchedSubtitleFileUpdate = {
+                        viewModel.getMatchedSubtitleFileInfoForPlayingItem()
+                    },
+                    subtitleFileName = viewModel.subtitleInfoByAddSubtitles?.name,
+                    onOffClicked = {
+                        viewModel.onOffItemClicked()
+                    },
+                    onAddedSubtitleClicked = {
+                        viewModel.onAddedSubtitleOptionClicked()
+                    },
+                    onAutoMatch = { info ->
+                        if (info.url == null) {
+                            showAddingSubtitleFailedMessage()
+                        }
+                        viewModel.onAutoMatchItemClicked(info)
+                    },
+                    onToSelectSubtitle = {
+                        viewModel.sendOpenSelectSubtitlePageEvent()
+                        selectSubtitleFileActivityLauncher.launch(
+                            Intent(
+                                requireActivity(),
+                                SelectSubtitleFileActivity::class.java
+                            ).apply {
+                                putExtra(
+                                    INTENT_KEY_SUBTITLE_FILE_ID,
+                                    state.subtitleDisplayState.subtitleFileInfo?.id
+                                )
                             }
-                            viewModel.onAutoMatchItemClicked(info)
-                        },
-                        onToSelectSubtitle = {
-                            viewModel.sendOpenSelectSubtitlePageEvent()
-                            selectSubtitleFileActivityLauncher.launch(
-                                Intent(
-                                    requireActivity(),
-                                    SelectSubtitleFileActivity::class.java
-                                ).apply {
-                                    putExtra(
-                                        INTENT_KEY_SUBTITLE_FILE_ID,
-                                        subtitleState.subtitleFileInfo?.id
-                                    )
-                                }
-                            )
-                        }) {
-                        // onDismissRequest
-                        viewModel.onDismissRequest()
-                    }
+                        )
+                    }) {
+                    // onDismissRequest
+                    viewModel.onDismissRequest()
                 }
             }
         }
@@ -684,8 +745,12 @@ class VideoPlayerFragment : Fragment() {
      * @param bottom padding bottom
      */
     private fun updatePlayerControllerPadding(left: Int, right: Int, bottom: Int) {
-        binding.root.findViewById<ConstraintLayout>(R.id.controls_view)
-            .updatePadding(left = left, top = 0, right = right, bottom = bottom)
+        binding.playerControlsLayout.updatePadding(
+            left = left,
+            top = 0,
+            right = right,
+            bottom = bottom
+        )
     }
 
     companion object {
@@ -709,16 +774,16 @@ class VideoPlayerFragment : Fragment() {
          */
         const val INTENT_KEY_SUBTITLE_FILE_ID = "INTENT_KEY_SUBTITLE_FILE_ID"
 
-        private const val SPEED_PLAYBACK_0_5_X = 0.5F
+        internal const val SPEED_PLAYBACK_0_5_X = 0.5F
         internal const val SPEED_PLAYBACK_1_X = 1F
-        private const val SPEED_PLAYBACK_1_5_X = 1.5F
-        private const val SPEED_PLAYBACK_2_X = 2F
+        internal const val SPEED_PLAYBACK_1_5_X = 1.5F
+        internal const val SPEED_PLAYBACK_2_X = 2F
 
         internal val speedPlaybackList = listOf(
-            SpeedPlaybackItem(SPEED_PLAYBACK_0_5_X, R.drawable.ic_playback_0_5x),
-            SpeedPlaybackItem(),
-            SpeedPlaybackItem(SPEED_PLAYBACK_1_5_X, R.drawable.ic_playback_1_5x),
-            SpeedPlaybackItem(SPEED_PLAYBACK_2_X, R.drawable.ic_playback_2x),
+            SpeedPlaybackItem.PLAYBACK_SPEED_0_5_X,
+            SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
+            SpeedPlaybackItem.PLAYBACK_SPEED_1_5_X,
+            SpeedPlaybackItem.PLAYBACK_SPEED_2_X,
         )
     }
 }

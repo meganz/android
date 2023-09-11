@@ -69,6 +69,35 @@
             app:layout_constraintTop_toTopOf="@id/exo_next"
             app:tint="@color/white" />
 
+        <ImageButton
+            android:id="@+id/image_button_lock"
+            style="@style/VideoPlayerButton"
+            android:layout_marginEnd="15dp"
+            android:enabled="false"
+            android:src="@drawable/ic_lock"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/full_screen"
+            style="@style/VideoPlayerButton"
+            android:enabled="false"
+            android:src="@drawable/ic_full_screen"
+            app:layout_constraintStart_toStartOf="@id/image_button_lock"
+            app:layout_constraintTop_toBottomOf="@id/image_button_lock"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/image_screenshot"
+            style="@style/VideoPlayerButton"
+            android:enabled="false"
+            android:src="@drawable/ic_screenshot"
+            app:layout_constraintBottom_toTopOf="@id/image_button_lock"
+            app:layout_constraintStart_toStartOf="@id/image_button_lock"
+            app:tint="@color/white" />
+
         <TextView
             android:id="@+id/track_name"
             android:layout_width="0dp"
@@ -95,17 +124,58 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <com.google.android.exoplayer2.ui.DefaultTimeBar
-                android:id="@id/exo_progress"
-                style="@style/Widget.Mega.TimeBar"
-                android:layout_width="0dp"
-                android:layout_height="26dp"
-                android:layout_marginBottom="70dp"
-                app:buffered_color="@color/grey_300"
+            <ImageButton
+                android:id="@+id/speed_playback"
+                style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:enabled="false"
+                android:padding="6dp"
+                android:src="@drawable/ic_playback_1x"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/repeat_toggle"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/repeat_toggle"
+                style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/ic_repeat"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/subtitle"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/subtitle"
+                style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/ic_subtitles_disable"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/playlist"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/playlist"
+                style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:enabled="false"
+                android:src="@drawable/ic_player_queue"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:tint="@color/white"
+                tools:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/more_option"
+                style="@style/VideoPlayerButton"
+                android:enabled="false"
+                android:src="@drawable/ic_more_horizontal"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.925"
                 app:layout_constraintStart_toStartOf="parent"
-                app:unplayed_color="@color/grey_600" />
+                app:tint="@color/white" />
 
             <TextView
                 android:id="@id/exo_position"
@@ -114,8 +184,8 @@
                 android:layout_marginStart="8dp"
                 android:textColor="@color/white_alpha_038"
                 android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/exo_progress"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/exo_progress"
                 tools:text="00:30" />
 
             <TextView
@@ -125,97 +195,35 @@
                 android:layout_marginEnd="8dp"
                 android:textColor="@color/white_alpha_038"
                 android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/exo_progress"
+                app:layout_constraintBottom_toBottomOf="@id/exo_progress"
+                app:layout_constraintEnd_toStartOf="@id/speed_playback"
                 tools:text="04:30" />
 
-            <ImageButton
-                android:id="@+id/image_button_lock"
-                style="@style/VideoPlayerButton"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:enabled="false"
-                android:src="@drawable/ic_lock"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/full_screen"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:src="@drawable/ic_full_screen"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/image_screenshot"
-                app:tint="@color/white"
-                android:visibility="gone" />
-
-            <ImageButton
-                android:id="@+id/speed_playback"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:src="@drawable/ic_playback_1x"
-                android:padding="6dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/full_screen"
-                app:tint="@color/white"
-                android:visibility="gone" />
-
-            <ImageButton
-                android:id="@+id/image_screenshot"
-                style="@style/VideoPlayerButton"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:enabled="false"
-                android:src="@drawable/ic_screenshot"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/subtitle"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/subtitle"
-                style="@style/VideoPlayerButton"
-                android:src="@drawable/ic_subtitles_disable"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/repeat_toggle"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/repeat_toggle"
-                style="@style/VideoPlayerButton"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:src="@drawable/ic_repeat"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/playlist"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/playlist"
-                style="@style/VideoPlayerButton"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:enabled="false"
-                android:src="@drawable/ic_player_queue"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:tint="@color/white"
-                tools:visibility="visible" />
+            <com.google.android.exoplayer2.ui.DefaultTimeBar
+                android:id="@id/exo_progress"
+                style="@style/Widget.Mega.TimeBar"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                app:buffered_color="@color/grey_300"
+                app:layout_constraintBottom_toBottomOf="@id/speed_playback"
+                app:layout_constraintEnd_toStartOf="@id/exo_duration"
+                app:layout_constraintStart_toEndOf="@id/exo_position"
+                app:layout_constraintTop_toTopOf="@id/speed_playback"
+                app:unplayed_color="@color/grey_600" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/speed_playback_popup"
-                android:layout_gravity="bottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@id/speed_playback"
-                app:layout_constraintBottom_toBottomOf="@id/speed_playback"/>
+                app:layout_constraintBottom_toBottomOf="@id/speed_playback"
+                app:layout_constraintStart_toStartOf="@id/exo_duration" />
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/video_option_popup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@id/more_option"
+                app:layout_constraintBottom_toBottomOf="@id/more_option"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -49,6 +49,7 @@ import timber.log.Timber
  */
 @Composable
 fun AddSubtitleDialog(
+    isShown: Boolean,
     selectOptionState: Int,
     matchedSubtitleFileUpdate: suspend () -> SubtitleFileInfo?,
     onOffClicked: () -> Unit,
@@ -69,72 +70,74 @@ fun AddSubtitleDialog(
     val addedSubtitleFileName by remember(subtitleFileName) {
         mutableStateOf(subtitleFileName)
     }
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
-            usePlatformDefaultWidth = false,
-        )
-    ) {
-        Surface(
-            modifier = Modifier
-                .wrapContentWidth()
-                .padding(
-                    horizontal =
-                    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT)
-                        40.dp
-                    else
-                        200.dp
-                ),
-            shape = RoundedCornerShape(5.dp)
+    if (isShown) {
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false,
+            )
         ) {
-            Column(
+            Surface(
                 modifier = Modifier
-                    .background(
-                        color = colorResource(id = R.color.grey_800)
-                    )
-            ) {
-                Text(
-                    modifier = Modifier.padding(
-                        start = 24.dp,
-                        end = 24.dp,
-                        top = 20.dp,
-                        bottom = 20.dp
+                    .wrapContentWidth()
+                    .padding(
+                        horizontal =
+                        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT)
+                            40.dp
+                        else
+                            200.dp
                     ),
-                    text = stringResource(id = R.string.media_player_video_enable_subtitle_dialog_title),
-                    color = Color.White,
-                    fontSize = 20.sp
-                )
-                Divider(
-                    color = colorResource(id = R.color.grey_300_alpha_026),
-                    thickness = 1.dp
-                )
-                OptionText(
-                    text = stringResource(id = R.string.media_player_video_enable_subtitle_dialog_option_off),
-                    onClick = onOffClicked,
-                    isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_OFF
-                )
-                addedSubtitleFileName?.let {
+                shape = RoundedCornerShape(5.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            color = colorResource(id = R.color.grey_800)
+                        )
+                ) {
+                    Text(
+                        modifier = Modifier.padding(
+                            start = 24.dp,
+                            end = 24.dp,
+                            top = 20.dp,
+                            bottom = 20.dp
+                        ),
+                        text = stringResource(id = R.string.media_player_video_enable_subtitle_dialog_title),
+                        color = Color.White,
+                        fontSize = 20.sp
+                    )
+                    Divider(
+                        color = colorResource(id = R.color.grey_300_alpha_026),
+                        thickness = 1.dp
+                    )
                     OptionText(
-                        text = it,
-                        isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM,
-                        onClick = onAddedSubtitleClicked
+                        text = stringResource(id = R.string.media_player_video_enable_subtitle_dialog_option_off),
+                        onClick = onOffClicked,
+                        isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_OFF
+                    )
+                    addedSubtitleFileName?.let {
+                        OptionText(
+                            text = it,
+                            isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM,
+                            onClick = onAddedSubtitleClicked
+                        )
+                    }
+                    subtitleFileInfo?.let {
+                        OptionText(
+                            text = it.name,
+                            isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_MATCHED_ITEM,
+                            onClick = {
+                                onAutoMatch(it)
+                            }
+                        )
+                    }
+                    OptionText(
+                        text = stringResource(id = R.string.media_player_video_enable_subtitle_dialog_option_add_subtitle),
+                        onClick = onToSelectSubtitle
                     )
                 }
-                subtitleFileInfo?.let {
-                    OptionText(
-                        text = it.name,
-                        isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_MATCHED_ITEM,
-                        onClick = {
-                            onAutoMatch(it)
-                        }
-                    )
-                }
-                OptionText(
-                    text = stringResource(id = R.string.media_player_video_enable_subtitle_dialog_option_add_subtitle),
-                    onClick = onToSelectSubtitle
-                )
             }
         }
     }
@@ -174,6 +177,7 @@ private fun OptionText(
 @Composable
 private fun PreviewAddSubtitleDialogWithMatchedName() {
     AddSubtitleDialog(
+        isShown = true,
         selectOptionState = SUBTITLE_SELECTED_STATE_MATCHED_ITEM,
         matchedSubtitleFileUpdate = { null },
         subtitleFileName = "subtitleFile.srt",
@@ -196,6 +200,7 @@ private fun PreviewAddSubtitleDialogWithMatchedName() {
 @Composable
 private fun PreviewAddSubtitleDialogWithoutMatchedName() {
     AddSubtitleDialog(
+        isShown = true,
         selectOptionState = SUBTITLE_SELECTED_STATE_OFF,
         matchedSubtitleFileUpdate = { null },
         onOffClicked = {},
