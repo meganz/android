@@ -699,4 +699,11 @@ interface MegaLocalStorageGateway {
      * @param isPause
      */
     suspend fun setTransferQueueStatus(isPause: Boolean)
+
+    /**
+     * Save a backup to Database
+     *
+     * @param backup [Backup]
+     */
+    suspend fun saveBackup(backup: Backup)
 }

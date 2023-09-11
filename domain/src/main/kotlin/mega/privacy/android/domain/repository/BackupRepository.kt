@@ -75,4 +75,11 @@ interface BackupRepository {
      * @param backupInfoType [BackupInfoType]
      */
     suspend fun broadCastBackupInfoType(backupInfoType: BackupInfoType)
+
+    /**
+     * Save a backup to Database
+     *
+     * @param backup [Backup]
+     */
+    suspend fun saveBackup(backup: Backup)
 }

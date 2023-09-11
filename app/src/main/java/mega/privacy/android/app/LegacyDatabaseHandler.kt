@@ -3,7 +3,6 @@ package mega.privacy.android.app
 import android.database.sqlite.SQLiteDatabase
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.chat.PendingMessage
 
 /**
@@ -60,5 +59,4 @@ interface LegacyDatabaseHandler : DatabaseHandler {
     ): Long
 
     fun findPendingMessageById(messageId: Long): PendingMessage?
-    fun saveBackup(backup: Backup): Boolean
 }

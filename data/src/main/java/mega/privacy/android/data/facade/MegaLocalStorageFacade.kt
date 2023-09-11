@@ -368,6 +368,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.transferQueueStatus = isPause
     }
 
+    override suspend fun saveBackup(backup: Backup) {
+        dbHandler.saveBackup(backup)
+    }
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }

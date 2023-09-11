@@ -357,4 +357,6 @@ interface DatabaseHandler {
      * @return A list of [AndroidMegaChatMessage].
      */
     fun findPendingMessagesNotSent(chatId: Long): List<AndroidMegaChatMessage>
+
+    fun saveBackup(backup: Backup): Boolean
 }
