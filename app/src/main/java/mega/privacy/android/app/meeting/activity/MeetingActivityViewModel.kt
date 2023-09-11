@@ -58,7 +58,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.usecase.CheckChatLink
+import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
@@ -90,7 +90,7 @@ import javax.inject.Inject
  * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
  * @property chatManagement                 [ChatManagement]
  * @property setChatVideoInDeviceUseCase    [SetChatVideoInDeviceUseCase]
- * @property checkChatLink                  [CheckChatLink]
+ * @property checkChatLink                  [CheckChatLinkUseCase]
  * @property logoutUseCase                  [LogoutUseCase]
  * @property monitorFinishActivityUseCase   [MonitorFinishActivityUseCase]
  * @property monitorChatCallUpdates         [MonitorChatCallUpdates]
@@ -109,7 +109,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
-    private val checkChatLink: CheckChatLink,
+    private val checkChatLink: CheckChatLinkUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,

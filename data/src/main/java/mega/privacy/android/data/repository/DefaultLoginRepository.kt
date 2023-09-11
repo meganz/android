@@ -229,6 +229,10 @@ internal class DefaultLoginRepository @Inject constructor(
                         }
                     }
                 }
+
+                else -> {
+                    continuation.resumeWith(Result.success(Unit))
+                }
             }
         }
     }

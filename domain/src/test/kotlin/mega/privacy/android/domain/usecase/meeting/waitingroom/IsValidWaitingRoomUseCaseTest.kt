@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.usecase.meeting.waitingroom
 
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -14,6 +16,7 @@ class IsValidWaitingRoomUseCaseTest {
 
     private lateinit var underTest: IsValidWaitingRoomUseCase
     private val chatRepository = Mockito.mock(ChatRepository::class.java)
+    private val checkChatLink = Mockito.mock(CheckChatLinkUseCase::class.java)
 
     private val mainChatRoom = ChatRoom(
         chatId = 1L,
@@ -44,7 +47,7 @@ class IsValidWaitingRoomUseCaseTest {
 
     @Before
     fun setUp() {
-        underTest = IsValidWaitingRoomUseCase(chatRepository)
+        underTest = IsValidWaitingRoomUseCase(chatRepository, checkChatLink)
     }
 
     @Test(expected = ChatRoomDoesNotExistException::class)
@@ -76,4 +79,32 @@ class IsValidWaitingRoomUseCaseTest {
             whenever(chatRepository.getChatRoom(1L)).thenReturn(chatRoom)
             assert(!underTest.invoke(1L))
         }
+
+    @Test
+    fun `test that invoke() returns true when chat link is valid and has waiting room options`() =
+        runBlocking {
+            val chatRequest = Mockito.mock(ChatRequest::class.java)
+            whenever(chatRequest.privilege).thenReturn(1)
+            whenever(checkChatLink("validChatLink")).thenReturn(chatRequest)
+            whenever(chatRepository.hasWaitingRoomChatOptions(1)).thenReturn(true)
+            assert(underTest.invoke("validChatLink"))
+        }
+
+    @Test
+    fun `test that invoke() returns false when chat link is valid but does not have waiting room options`() =
+        runBlocking {
+            val chatRequest = Mockito.mock(ChatRequest::class.java)
+            whenever(chatRequest.privilege).thenReturn(1)
+            whenever(checkChatLink("validChatLink")).thenReturn(chatRequest)
+            whenever(chatRepository.hasWaitingRoomChatOptions(1)).thenReturn(false)
+            assert(!underTest.invoke("validChatLink"))
+        }
+
+    @Test(expected = IllegalStateException::class)
+    fun `test that exception is thrown when chat link is invalid`(): Unit = runBlocking {
+        val chatRequest = Mockito.mock(ChatRequest::class.java)
+        whenever(chatRequest.privilege).thenReturn(null)
+        whenever(checkChatLink("invalidChatLink")).thenReturn(chatRequest)
+        underTest.invoke("invalidChatLink")
+    }
 }

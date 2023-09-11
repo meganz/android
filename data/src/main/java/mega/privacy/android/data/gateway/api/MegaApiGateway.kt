@@ -2943,4 +2943,35 @@ interface MegaApiGateway {
      * if any sharing is coming un verified contact
      */
     suspend fun getContactVerificationWarningEnabled(): Boolean
+
+    /**
+     * Create Ephemeral++ account
+     *
+     * This kind of account allows to join chat links and to keep the session in the device
+     * where it was created.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CREATE_ACCOUNT.
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getName - Returns the firstname of the user
+     * - MegaRequest::getText - Returns the lastname of the user
+     * - MegaRequest::getParamType - Returns the value MegaApi:CREATE_EPLUSPLUS_ACCOUNT
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getSessionKey - Returns the session id to resume the process
+     *
+     * If this request succeeds, a new ephemeral++ account will be created for the new user.
+     * The app may resume the create-account process by using MegaApi::resumeCreateAccountEphemeralPlusPlus.
+     *
+     * @note This account should be confirmed in same device it was created
+     *
+     * @param firstName Firstname of the user
+     * @param lastName Lastname of the user
+     * @param listener MegaRequestListener to track this request
+     */
+    fun createEphemeralAccountPlusPlus(
+        firstName: String,
+        lastName: String,
+        listener: MegaRequestListenerInterface
+    )
 }

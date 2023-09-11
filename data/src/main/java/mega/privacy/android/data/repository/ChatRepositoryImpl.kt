@@ -16,6 +16,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -380,28 +381,86 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun checkChatLink(link: String): ChatRequest =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.checkChatLink(
-                    link,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCompleted(continuation)
-                    )
-                )
+    override suspend fun openChatPreview(link: String): ChatRequest = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
+                    if (error.errorCode == MegaChatError.ERROR_OK || error.errorCode == MegaChatError.ERROR_EXIST) {
+                        continuation.resume(chatRequestMapper(request))
+                    } else {
+                        continuation.failWithError(error, "openChatPreview")
+                    }
+                }
+            )
+
+            megaChatApiGateway.openChatPreview(link, listener)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun checkChatLink(link: String): ChatRequest = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("checkChatLink") {
+                chatRequestMapper(it)
+            }
+
+            megaChatApiGateway.checkChatLink(link, listener)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun queryChatLink(chatId: Long): ChatRequest =
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("queryChatLink") {
+                chatRequestMapper(it)
+            }
+
+            megaChatApiGateway.queryChatLink(chatId, listener)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
             }
         }
 
-    override suspend fun queryChatLink(chatId: Long): ChatRequest =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.queryChatLink(
-                    chatId,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestQueryChatLinkCompleted(continuation)
-                    )
-                )
+    override suspend fun autojoinPublicChat(chatId: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("autojoinPublicChat") {}
+
+            megaChatApiGateway.autojoinPublicChat(chatId, listener)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
             }
+        }
+    }
+
+    override suspend fun autorejoinPublicChat(
+        chatId: Long,
+        publicHandle: Long,
+    ) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("autorejoinPublicChat") {}
+
+            megaChatApiGateway.autorejoinPublicChat(chatId, publicHandle, listener)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun hasWaitingRoomChatOptions(chatOptionsBitMask: Int): Boolean =
+        withContext(ioDispatcher) {
+            MegaChatApi.hasChatOptionEnabled(
+                MegaChatApi.CHAT_OPTION_WAITING_ROOM,
+                chatOptionsBitMask
+            )
         }
 
     private fun onRequestQueryChatLinkCompleted(continuation: Continuation<ChatRequest>) =
@@ -767,5 +826,26 @@ internal class ChatRepositoryImpl @Inject constructor(
             nodeHandle,
             state
         )
+    }
+
+    override suspend fun createEphemeralAccountPlusPlus(
+        firstName: String,
+        lastName: String,
+    ): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("createEphemeralAccountPlusPlus") {
+                it.sessionKey
+            }
+
+            megaApiGateway.createEphemeralAccountPlusPlus(
+                firstName = firstName,
+                lastName = lastName,
+                listener = listener,
+            )
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
     }
 }

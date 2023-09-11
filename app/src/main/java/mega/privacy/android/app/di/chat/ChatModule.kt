@@ -9,7 +9,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatParticipants
@@ -158,13 +157,6 @@ abstract class ChatModule {
         @Provides
         fun provideQueryChatLink(chatRepository: ChatRepository): QueryChatLink =
             QueryChatLink(chatRepository::queryChatLink)
-
-        /**
-         * Provides the Use Case [CheckChatLink]
-         */
-        @Provides
-        fun provideCheckChatLink(chatRepository: ChatRepository): CheckChatLink =
-            CheckChatLink(chatRepository::checkChatLink)
 
         /**
          * Provides the Use Case [MonitorScheduledMeetingOccurrencesUpdates]

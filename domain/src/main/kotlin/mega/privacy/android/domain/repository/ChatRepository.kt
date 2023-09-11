@@ -197,6 +197,14 @@ interface ChatRepository {
     suspend fun removeChatLink(chatId: Long): ChatRequest
 
     /**
+     * Allows any user to preview a public chat without being a participant
+     *
+     * @param link  Public chat link.
+     * @return      [ChatRequest]
+     */
+    suspend fun openChatPreview(link: String): ChatRequest
+
+    /**
      * Obtain basic information abouts a public chat.
      *
      * @param link  Public chat link.
@@ -213,6 +221,31 @@ interface ChatRepository {
      * @return          [ChatRequest]
      */
     suspend fun queryChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Allow a user to add himself to an existing public chat. To do this the public chat must be in preview mode,
+     * the result of a previous call to openChatPreview(), and the public handle contained in the chat-link must be still valid.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     */
+    suspend fun autojoinPublicChat(chatId: Long)
+
+    /**
+     * Allow a user to rejoin to an existing public chat. To do this the public chat
+     * must have a valid public handle.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param publicHandle MegaChatHandle that corresponds with the public handle of chat room
+     */
+    suspend fun autorejoinPublicChat(chatId: Long, publicHandle: Long)
+
+    /**
+     * Checks if a Waiting Room chat option is enabled in a bitmask
+     *
+     * @param chatOptionsBitMask Bitmask that represents a set of chat options
+     * @return True if specified option is enabled in the bitmask
+     */
+    suspend fun hasWaitingRoomChatOptions(chatOptionsBitMask: Int): Boolean
 
     /**
      * Update chat permissions
@@ -528,4 +561,16 @@ interface ChatRepository {
         nodeHandle: String?,
         state: Int,
     )
+
+    /**
+     * Create Ephemeral++ account
+     *
+     * This kind of account allows to join chat links and to keep the session in the device
+     * where it was created.
+     *
+     * @param firstName Firstname of the user
+     * @param lastName Lastname of the user
+     * @return Session id to resume the process
+     */
+    suspend fun createEphemeralAccountPlusPlus(firstName: String, lastName: String): String
 }

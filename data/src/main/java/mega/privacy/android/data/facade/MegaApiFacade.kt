@@ -1390,4 +1390,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getContactVerificationWarningEnabled(): Boolean =
         megaApi.contactVerificationWarningEnabled()
+
+    override fun createEphemeralAccountPlusPlus(
+        firstName: String,
+        lastName: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
 }

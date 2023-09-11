@@ -17,10 +17,10 @@ class ChatLogoutUseCase @Inject constructor(
      *
      * @param disableChatApiUseCase Temporary param for disabling megaChatApi.
      */
-    suspend operator fun invoke(disableChatApiUseCase: DisableChatApiUseCase) {
+    suspend operator fun invoke(disableChatApiUseCase: DisableChatApiUseCase? = null) {
         runCatching { loginRepository.chatLogout() }
             .onSuccess {
-                disableChatApiUseCase()
+                disableChatApiUseCase?.invoke()
                 resetSdkLogger()
             }
     }

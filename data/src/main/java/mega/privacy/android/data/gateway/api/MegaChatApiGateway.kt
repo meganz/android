@@ -544,6 +544,17 @@ interface MegaChatApiGateway {
     fun inviteToChat(chatId: Long, userHandle: Long, listener: MegaChatRequestListenerInterface?)
 
     /**
+     * Allows any user to preview a public chat without being a participant
+     *
+     * This function loads the required data to preview a public chat referenced by a
+     * chat-link.
+     *
+     * @param link Null-terminated character string with the public chat link
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface?)
+
+    /**
      * Get basic information about a public chat.
      *
      * @param link      Public chat link.
@@ -584,6 +595,56 @@ interface MegaChatApiGateway {
      * @param listener      Listener.
      */
     fun createChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Allow a user to add himself to an existing public chat. To do this the public chat must be in preview mode,
+     * the result of a previous call to openChatPreview(), and the public handle contained in the chat-link must be still valid.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_AUTOJOIN_PUBLIC_CHAT
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getUserHandle - Returns invalid handle to identify that is an autojoin
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ARGS  - If the chatroom is not groupal, public or is not in preview mode.
+     * - MegaChatError::ERROR_NOENT - If the chat room does not exists, the chatid is not valid or the
+     * public handle is not valid.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun autojoinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Allow a user to rejoin to an existing public chat. To do this the public chat
+     * must have a valid public handle.
+     *
+     * This function must be called only after calling:
+     * - MegaChatApi::openChatPreview and receive MegaChatError::ERROR_EXIST for a chatroom where
+     * your own privilege is MegaChatRoom::PRIV_RM (You are trying to preview a public chat which
+     * you were part of, so you have to rejoin it)
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_AUTOJOIN_PUBLIC_CHAT
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getUserHandle - Returns the public handle of the chat to identify that
+     * is a rejoin
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ARGS - If the chatroom is not groupal, the chatroom is not public
+     * or the chatroom is in preview mode.
+     * - MegaChatError::ERROR_NOENT - If the chatid is not valid, there isn't any chat with the specified
+     * chatid or the chat doesn't have a valid public handle.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param publicHandle MegaChatHandle that corresponds with the public handle of chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun autorejoinPublicChat(
+        chatId: Long,
+        publicHandle: Long,
+        listener: MegaChatRequestListenerInterface?,
+    )
 
     /**
      * Get my user handle

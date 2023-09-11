@@ -410,6 +410,11 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD, listener)
 
+    override fun openChatPreview(
+        link: String,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.openChatPreview(link, listener)
+
     override fun checkChatLink(
         link: String,
         listener: MegaChatRequestListenerInterface?,
@@ -434,6 +439,17 @@ internal class MegaChatApiFacade @Inject constructor(
         chatId: Long,
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.createChatLink(chatId, listener)
+
+    override fun autojoinPublicChat(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.autojoinPublicChat(chatId, listener)
+
+    override fun autorejoinPublicChat(
+        chatId: Long,
+        publicHandle: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.autorejoinPublicChat(chatId, publicHandle, listener)
 
     override fun getOnlineStatus(): Int =
         chatApi.onlineStatus
