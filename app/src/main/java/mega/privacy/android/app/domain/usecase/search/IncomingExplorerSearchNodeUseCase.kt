@@ -1,5 +1,6 @@
 package mega.privacy.android.app.domain.usecase.search
 
+import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.data.repository.MegaNodeRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -23,13 +24,13 @@ class IncomingExplorerSearchNodeUseCase @Inject constructor(
      * @param query Query to be searched
      * @param parentHandle
      * @param parentHandleSearch
-     * @param searchType
+     * @param searchFilter
      */
     suspend operator fun invoke(
         query: String?,
         parentHandle: Long,
         parentHandleSearch: Long,
-        searchType: Int = -1
+        searchFilter: SearchFilter?
     ): List<MegaNode> {
         return query?.let {
             if (parentHandle == MegaApiJava.INVALID_HANDLE) {
@@ -40,7 +41,7 @@ class IncomingExplorerSearchNodeUseCase @Inject constructor(
                 query = query,
                 parentHandleSearch = parentHandleSearch,
                 parent = parent,
-                searchType = searchType
+                searchFilter = searchFilter
             )
         } ?: run {
             emptyList()

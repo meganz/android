@@ -83,6 +83,8 @@ class SearchViewModel @Inject constructor(
      */
     private val lastPositionStack: Stack<Int> = Stack()
 
+    private var firstNavigationLevel = false
+
     init {
         viewModelScope.launch {
             monitorTransferEventsUseCase().collect { event ->
@@ -104,12 +106,15 @@ class SearchViewModel @Inject constructor(
                 ).contains(state.value.searchDrawerItem)
                 _state.update { it.copy(showChips = shouldShow) }
                 if (shouldShow) {
-                    runCatching { getSearchCategoriesUseCase().map { searchFilterMapper(it) } }
+                    runCatching {
+                        getSearchCategoriesUseCase().map { searchFilterMapper(it) }
+                            .filterNot { it.filter == SearchCategory.ALL }
+                    }
                         .onSuccess { filters ->
                             _state.update {
                                 it.copy(
                                     filters = filters,
-                                    selectedFilter = filters.first { filter -> filter.filter == SearchCategory.ALL }
+                                    selectedFilter = null
                                 )
                             }
                         }.onFailure {
@@ -227,9 +232,7 @@ class SearchViewModel @Inject constructor(
             return@launch
         }
 
-        val query = _state.value.searchQuery
-        val parentHandleSearch = _state.value.searchParentHandle
-        val drawerItem = _state.value.searchDrawerItem
+        firstNavigationLevel = isFirstNavigationLevel
         val parentHandle =
             getParentHandleForSearch(
                 browserParentHandle,
@@ -239,20 +242,31 @@ class SearchViewModel @Inject constructor(
                 outgoingParentHandle,
                 linksParentHandle
             )
-        val sharesTab = _state.value.searchSharesTab.position
+        _state.update {
+            it.copy(searchHandle = parentHandle)
+        }
 
         cancelSearch()
         setIsInSearchProgress(true)
-        val nodes = searchNodesUseCase(
-            query = query,
-            parentHandleSearch = parentHandleSearch,
-            parentHandle = parentHandle,
-            drawerItem = drawerItem,
-            sharesTab = sharesTab,
-            isFirstLevel = isFirstNavigationLevel,
-        )
-        finishSearch(nodes ?: emptyList())
+        startSearch()
+    }
 
+    /**
+     * Start search by calling search api
+     */
+    private suspend fun startSearch() {
+        with(state.value) {
+            val nodes = searchNodesUseCase(
+                query = searchQuery,
+                parentHandleSearch = searchParentHandle,
+                parentHandle = searchHandle,
+                drawerItem = searchDrawerItem,
+                sharesTab = searchSharesTab.position,
+                isFirstLevel = firstNavigationLevel,
+                searchFilter = selectedFilter
+            )
+            finishSearch(nodes ?: emptyList())
+        }
     }
 
     /**
@@ -416,6 +430,12 @@ class SearchViewModel @Inject constructor(
      * @param selectedChip
      */
     fun updateFilter(selectedChip: SearchFilter) {
-        _state.update { it.copy(selectedFilter = selectedChip) }
+        val searchFilter = if (selectedChip.filter != state.value.selectedFilter?.filter) {
+            selectedChip
+        } else {
+            null
+        }
+        _state.update { it.copy(selectedFilter = searchFilter) }
+        viewModelScope.launch { startSearch() }
     }
 }

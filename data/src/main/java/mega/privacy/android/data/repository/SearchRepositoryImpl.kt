@@ -51,7 +51,9 @@ internal class SearchRepositoryImpl @Inject constructor(
         order: SortOrder,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         nodeId?.let {
-            if (query.isEmpty() || it.longValue != MegaApiJava.INVALID_HANDLE) {
+            if ((query.isEmpty() || it.longValue != MegaApiJava.INVALID_HANDLE) &&
+                searchCategory == SearchCategory.ALL
+            ) {
                 getNodeChildren(it, order)
             } else {
                 val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()

@@ -2,6 +2,7 @@ package mega.privacy.android.app.domain.usecase.search
 
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.data.repository.MegaNodeRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -32,6 +33,7 @@ class SearchNodesUseCase @Inject constructor(
      * @param drawerItem [DrawerItem]
      * @param sharesTab sharesTab
      * @param isFirstLevel firstLevel
+     * @param searchFilter [SearchFilter]
      */
     suspend operator fun invoke(
         query: String?,
@@ -40,7 +42,7 @@ class SearchNodesUseCase @Inject constructor(
         drawerItem: DrawerItem?,
         sharesTab: Int,
         isFirstLevel: Boolean,
-        searchType: Int = -1
+        searchFilter: SearchFilter? = null
     ): List<MegaNode>? {
         return query?.let {
             val parent = if (parentHandleSearch == MegaApiJava.INVALID_HANDLE) {
@@ -107,7 +109,7 @@ class SearchNodesUseCase @Inject constructor(
                 query = query,
                 parentHandleSearch = parentHandleSearch,
                 parent = parent,
-                searchType = searchType
+                searchFilter = searchFilter
             )
         } ?: run {
             emptyList()

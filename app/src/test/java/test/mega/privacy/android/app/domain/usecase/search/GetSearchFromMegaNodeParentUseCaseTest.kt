@@ -4,8 +4,11 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
+import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.data.mapper.search.SearchCategoryIntMapper
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaNode
 import org.junit.Before
@@ -24,23 +27,25 @@ class GetSearchFromMegaNodeParentUseCaseTest {
     private val parent: MegaNode = mock()
     private val parentHandleSearch = 0L
     private val invalidParentHandleSearch = -1L
-    private val searchType = -1
+    private val searchCategoryIntMapper = SearchCategoryIntMapper()
 
     @Before
     fun setUp() {
         underTest = GetSearchFromMegaNodeParentUseCase(
             megaNodeRepository = megaNodeRepository,
-            getCloudSortOrder = getCloudSortOrder
+            getCloudSortOrder = getCloudSortOrder,
+            searchCategoryIntMapper = searchCategoryIntMapper
         )
     }
 
     @Test
     fun `test search when parent is null returns empty list`() = runTest {
+        val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
         val list = underTest(
             parent = null,
             parentHandleSearch = parentHandleSearch,
             query = query,
-            searchType = searchType
+            searchFilter = searchFilter
         )
         Truth.assertThat(list).isEmpty()
     }
@@ -54,11 +59,12 @@ class GetSearchFromMegaNodeParentUseCaseTest {
                 mock()
             )
         )
+        val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
         val list = underTest(
             parent = parent,
             parentHandleSearch = parentHandleSearch,
             query = "",
-            searchType = searchType
+            searchFilter = searchFilter
         )
         verify(megaNodeRepository, times(1)).getChildrenNode(
             parentNode = parent,
@@ -73,15 +79,18 @@ class GetSearchFromMegaNodeParentUseCaseTest {
         whenever(megaNodeRepository.getChildrenNode(parent, getCloudSortOrder())).thenReturn(
             emptyList()
         )
+        val searchFilter = SearchFilter(filter = SearchCategory.IMAGES, name = "Images")
         val list = underTest(
             parent = parent,
             parentHandleSearch = parentHandleSearch,
             query = query,
-            searchType = searchType
+            searchFilter = searchFilter
         )
-        verify(megaNodeRepository, times(1)).getChildrenNode(
+        verify(megaNodeRepository, times(1)).search(
             parentNode = parent,
-            order = getCloudSortOrder()
+            query = query,
+            order = getCloudSortOrder(),
+            searchType = searchCategoryIntMapper(searchFilter.filter)
         )
         Truth.assertThat(list).isEmpty()
     }
@@ -96,11 +105,12 @@ class GetSearchFromMegaNodeParentUseCaseTest {
                 order = getCloudSortOrder()
             )
         ).thenReturn(listOf(mock()))
+        val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
         val list = underTest(
             parent = parent,
             query = query,
             parentHandleSearch = invalidParentHandleSearch,
-            searchType = searchType
+            searchFilter = searchFilter
         )
 
         verify(megaNodeRepository, times(1)).search(

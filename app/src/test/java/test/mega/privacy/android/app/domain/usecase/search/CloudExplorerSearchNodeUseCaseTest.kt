@@ -5,7 +5,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.search.CloudExplorerSearchNodeUseCase
 import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
+import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.search.SearchCategory
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -19,7 +21,6 @@ class CloudExplorerSearchNodeUseCaseTest {
     private lateinit var underTest: CloudExplorerSearchNodeUseCase
     private val megaNodeRepository: MegaNodeRepository = mock()
     private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParentUseCase = mock()
-    private val searchType = -1
 
     @Before
     fun setUp() {
@@ -34,14 +35,16 @@ class CloudExplorerSearchNodeUseCaseTest {
         val list = underTest(
             query = null,
             parentHandle = -1L,
-            parentHandleSearch = -1L
+            parentHandleSearch = -1L,
+            searchFilter = null
         )
         Truth.assertThat(list).isEmpty()
     }
 
     @Test
-    fun `test that when searched any query in cloud explorer it returns some items in list`() =
+    fun `test that some items should be returned when any search query is invoked in cloud explorer`() =
         runTest {
+            val searchFilter = SearchFilter(SearchCategory.ALL, "All")
             val parentHandle = -1L
             val parent: MegaNode = mock()
             val query = "Some query"
@@ -51,20 +54,21 @@ class CloudExplorerSearchNodeUseCaseTest {
                     query = query,
                     parentHandleSearch = parentHandle,
                     parent = parent,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(listOf(mock()))
             val list = underTest(
                 query = query,
                 parentHandle = parentHandle,
-                parentHandleSearch = parentHandle
+                parentHandleSearch = parentHandle,
+                searchFilter = searchFilter
             )
             verify(megaNodeRepository, times(1)).getNodeByHandle(parentHandle)
             verify(getSearchFromMegaNodeParent, times(1)).invoke(
                 query = query,
                 parentHandleSearch = parentHandle,
                 parent = parent,
-                searchType = searchType
+                searchFilter = searchFilter
             )
             Truth.assertThat(list).hasSize(1)
         }

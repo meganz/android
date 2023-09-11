@@ -9,7 +9,9 @@ import mega.privacy.android.app.domain.usecase.search.GetSearchLinkSharesNodesUs
 import mega.privacy.android.app.domain.usecase.search.GetSearchOutSharesNodesUseCase
 import mega.privacy.android.app.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.search.SearchCategory
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -31,7 +33,6 @@ class SearchNodesUseCaseTest {
     private val invalidParentHandleSearch = -1L
     private val invalidParentHandle = -1L
     private val query = "Some Query"
-    private val searchType = -1
 
     @Before
     fun setUp() {
@@ -60,6 +61,7 @@ class SearchNodesUseCaseTest {
     @Test
     fun `test when search query is something with a valid parent handle valid parent handle search returns some search items`() =
         runTest {
+            val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
             val parent: MegaNode = mock()
             whenever(megaNodeRepository.getNodeByHandle(parentHandleSearch)).thenReturn(parent)
             whenever(
@@ -67,7 +69,7 @@ class SearchNodesUseCaseTest {
                     query = query,
                     parentHandleSearch = parentHandleSearch,
                     parent = parent,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(listOf(mock(), mock()))
             val list = underTest(
@@ -76,7 +78,8 @@ class SearchNodesUseCaseTest {
                 parentHandle = parentHandle,
                 drawerItem = null,
                 sharesTab = 0,
-                isFirstLevel = true
+                isFirstLevel = true,
+                searchFilter = searchFilter
             )
             verify(megaNodeRepository, times(1)).getNodeByHandle(parentHandleSearch)
             Truth.assertThat(list).hasSize(2)
@@ -85,6 +88,7 @@ class SearchNodesUseCaseTest {
     @Test
     fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item HOMEPAGE returns some search items`() =
         runTest {
+            val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
             val parent: MegaNode = mock()
             whenever(megaNodeRepository.getRootNode()).thenReturn(parent)
             whenever(
@@ -92,7 +96,7 @@ class SearchNodesUseCaseTest {
                     query = query,
                     parentHandleSearch = invalidParentHandleSearch,
                     parent = parent,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(
                 listOf(mock(), mock())
@@ -103,7 +107,8 @@ class SearchNodesUseCaseTest {
                 parentHandle = invalidParentHandle,
                 drawerItem = DrawerItem.HOMEPAGE,
                 sharesTab = 0,
-                isFirstLevel = true
+                isFirstLevel = true,
+                searchFilter = searchFilter
             )
             Truth.assertThat(list).hasSize(2)
         }
@@ -111,6 +116,7 @@ class SearchNodesUseCaseTest {
     @Test
     fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item CLOUD_DRIVE returns some search items`() =
         runTest {
+            val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
             val parent: MegaNode = mock()
             whenever(megaNodeRepository.getNodeByHandle(invalidParentHandle)).thenReturn(parent)
             whenever(
@@ -118,7 +124,7 @@ class SearchNodesUseCaseTest {
                     parent = parent,
                     query = query,
                     parentHandleSearch = invalidParentHandle,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(
                 listOf(mock(), mock())
@@ -129,7 +135,8 @@ class SearchNodesUseCaseTest {
                 parentHandle = invalidParentHandle,
                 drawerItem = DrawerItem.CLOUD_DRIVE,
                 sharesTab = 0,
-                isFirstLevel = true
+                isFirstLevel = true,
+                searchFilter = searchFilter
             )
             Truth.assertThat(list).hasSize(2)
         }
@@ -137,12 +144,13 @@ class SearchNodesUseCaseTest {
     @Test
     fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item RUBBISH_BIN returns empty list`() =
         runTest {
+            val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
             whenever(
                 getSearchFromMegaNodeParent(
                     query = query,
                     parentHandleSearch = invalidParentHandleSearch,
                     parent = null,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(emptyList())
             val list = underTest(
@@ -151,7 +159,8 @@ class SearchNodesUseCaseTest {
                 parentHandle = invalidParentHandle,
                 drawerItem = DrawerItem.RUBBISH_BIN,
                 sharesTab = 0,
-                isFirstLevel = true
+                isFirstLevel = true,
+                searchFilter = searchFilter
             )
             Truth.assertThat(list).isEmpty()
         }
@@ -159,6 +168,7 @@ class SearchNodesUseCaseTest {
     @Test
     fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item BACKUPS returns empty list`() =
         runTest {
+            val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
             val parent: MegaNode = mock()
             whenever(megaNodeRepository.getBackupsNode()).thenReturn(parent)
             whenever(
@@ -166,7 +176,7 @@ class SearchNodesUseCaseTest {
                     query = query,
                     parentHandleSearch = invalidParentHandleSearch,
                     parent = parent,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(
                 emptyList()
@@ -177,7 +187,8 @@ class SearchNodesUseCaseTest {
                 parentHandle = invalidParentHandle,
                 drawerItem = DrawerItem.BACKUPS,
                 sharesTab = 0,
-                isFirstLevel = true
+                isFirstLevel = true,
+                searchFilter = searchFilter
             )
             Truth.assertThat(list).isEmpty()
         }
@@ -185,6 +196,7 @@ class SearchNodesUseCaseTest {
     @Test
     fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item SHARED_ITEMS returns some items`() =
         runTest {
+            val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
             val parent: MegaNode = mock()
             whenever(megaNodeRepository.getNodeByHandle(invalidParentHandle)).thenReturn(parent)
             whenever(
@@ -192,7 +204,7 @@ class SearchNodesUseCaseTest {
                     query = query,
                     parentHandleSearch = invalidParentHandleSearch,
                     parent = parent,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(emptyList())
             val list = underTest(
@@ -201,7 +213,8 @@ class SearchNodesUseCaseTest {
                 parentHandle = invalidParentHandle,
                 drawerItem = DrawerItem.SHARED_ITEMS,
                 sharesTab = 0,
-                isFirstLevel = true
+                isFirstLevel = true,
+                searchFilter = searchFilter
             )
             verify(getSearchInSharesNodes, times(1)).invoke(query)
             Truth.assertThat(list).isEmpty()
@@ -210,6 +223,7 @@ class SearchNodesUseCaseTest {
     @Test
     fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item OUTGOING_SHARED_ITEMS returns some items`() =
         runTest {
+            val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
             val parent: MegaNode = mock()
             whenever(megaNodeRepository.getNodeByHandle(invalidParentHandle)).thenReturn(parent)
             whenever(
@@ -217,7 +231,7 @@ class SearchNodesUseCaseTest {
                     query = query,
                     parentHandleSearch = invalidParentHandleSearch,
                     parent = parent,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(emptyList())
             val list = underTest(
@@ -226,7 +240,8 @@ class SearchNodesUseCaseTest {
                 parentHandle = invalidParentHandle,
                 drawerItem = DrawerItem.SHARED_ITEMS,
                 sharesTab = 1,
-                isFirstLevel = true
+                isFirstLevel = true,
+                searchFilter = searchFilter
             )
             verify(getSearchOutSharesNodes, times(1)).invoke(query)
             Truth.assertThat(list).isEmpty()
@@ -235,6 +250,7 @@ class SearchNodesUseCaseTest {
     @Test
     fun `test when search query is something with a invalid ParentHandle invalid ParentSearchHandle and drawer item LINKS_SHARED_ITEMS returns some items`() =
         runTest {
+            val searchFilter = SearchFilter(filter = SearchCategory.ALL, name = "All")
             val parent: MegaNode = mock()
             whenever(megaNodeRepository.getNodeByHandle(invalidParentHandle)).thenReturn(parent)
             whenever(
@@ -242,7 +258,7 @@ class SearchNodesUseCaseTest {
                     query = query,
                     parentHandleSearch = invalidParentHandleSearch,
                     parent = parent,
-                    searchType = searchType
+                    searchFilter = searchFilter
                 )
             ).thenReturn(emptyList())
             val list = underTest(
@@ -251,7 +267,8 @@ class SearchNodesUseCaseTest {
                 parentHandle = invalidParentHandle,
                 drawerItem = DrawerItem.SHARED_ITEMS,
                 sharesTab = 2,
-                isFirstLevel = true
+                isFirstLevel = true,
+                searchFilter = searchFilter
             )
             verify(getSearchLinkSharesNodes, times(1)).invoke(query, true)
             Truth.assertThat(list).isEmpty()

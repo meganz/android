@@ -23,6 +23,7 @@ import nz.mega.sdk.MegaNode
  * @param showChips checks flag and shows chip filtering to the user
  * @param filters search filter categories
  * @param selectedFilter selected filter which is enabled on chips
+ * @param searchHandle handle for search from where search should begin
  */
 data class SearchState(
     val nodes: List<MegaNode>?,
@@ -38,4 +39,5 @@ data class SearchState(
     val showChips: Boolean = false,
     val filters: List<SearchFilter> = emptyList(),
     val selectedFilter: SearchFilter? = null,
+    val searchHandle: Long = -1
 )

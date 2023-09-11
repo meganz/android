@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
@@ -236,7 +237,7 @@ interface MegaNodeRepository {
         parentNode: MegaNode,
         query: String,
         order: SortOrder,
-        searchType: Int = -1,
+        searchType: Int = MegaApiAndroid.FILE_TYPE_DEFAULT,
     ): List<MegaNode>
 
     /**

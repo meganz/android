@@ -88,9 +88,8 @@ internal class SearchStatePreviewsProvider : PreviewParameterProvider<SearchStat
             searchQuery = "query",
             textSubmitted = true,
             searchDepth = 1,
-            selectedFilter = SearchFilter(SearchCategory.ALL, "All"),
+            selectedFilter = SearchFilter(SearchCategory.IMAGES, "Images"),
             filters = listOf(
-                SearchFilter(SearchCategory.ALL, "All"),
                 SearchFilter(SearchCategory.IMAGES, "Images"),
                 SearchFilter(SearchCategory.DOCUMENTS, "Docs"),
                 SearchFilter(SearchCategory.AUDIO, "Audio"),

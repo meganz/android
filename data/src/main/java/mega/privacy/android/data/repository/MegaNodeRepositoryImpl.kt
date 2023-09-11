@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -311,7 +312,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     ): List<MegaNode> {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
         return withContext(ioDispatcher) {
-            return@withContext if (searchType == -1) {
+            return@withContext if (searchType == MegaApiAndroid.FILE_TYPE_DEFAULT) {
                 megaApiGateway.search(
                     parentNode, query, megaCancelToken, sortOrderIntMapper(order)
                 )

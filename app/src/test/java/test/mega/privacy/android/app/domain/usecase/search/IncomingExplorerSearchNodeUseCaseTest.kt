@@ -6,7 +6,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.search.IncomingExplorerSearchNodeUseCase
 import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
 import mega.privacy.android.app.domain.usecase.search.GetSearchInSharesNodesUseCase
+import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.search.SearchCategory
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +23,6 @@ class IncomingExplorerSearchNodeUseCaseTest {
     private val megaNodeRepository: MegaNodeRepository = mock()
     private val getSearchFromMegaNodeParentUseCase: GetSearchFromMegaNodeParentUseCase = mock()
     private val getSearchInSharesNodesUseCase: GetSearchInSharesNodesUseCase = mock()
-    private val searchType = -1
 
     @Before
     fun setUp() {
@@ -38,13 +39,14 @@ class IncomingExplorerSearchNodeUseCaseTest {
             query = null,
             parentHandle = 0L,
             parentHandleSearch = 0L,
-            searchType = searchType
+            searchFilter = null
         )
         Truth.assertThat(list).isEmpty()
     }
 
     @Test
     fun `test incoming explorer search when parent handle is invalid handle`() = runTest {
+        val searchFilter = SearchFilter(SearchCategory.VIDEO, "Video")
         val parentHandle = -1L
         val parent: MegaNode = mock()
         val query = "Some Query"
@@ -54,14 +56,14 @@ class IncomingExplorerSearchNodeUseCaseTest {
                 parentHandleSearch = parentHandle,
                 parent = parent,
                 query = query,
-                searchType = searchType
+                searchFilter = searchFilter
             )
         ).thenReturn(listOf(mock()))
         val list = underTest(
             query = query,
             parentHandleSearch = parentHandle,
             parentHandle = parentHandle,
-            searchType = searchType
+            searchFilter = searchFilter
         )
         verify(megaNodeRepository, times(1)).getNodeByHandle(parentHandle)
         verify(getSearchInSharesNodesUseCase, times(1)).invoke(
@@ -71,7 +73,7 @@ class IncomingExplorerSearchNodeUseCaseTest {
             parentHandleSearch = parentHandle,
             parent = parent,
             query = query,
-            searchType = searchType
+            searchFilter = searchFilter
         )
         Truth.assertThat(list).hasSize(1)
     }

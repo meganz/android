@@ -847,7 +847,7 @@ class SearchFragment : RotatableFragment() {
     }
 
     /**
-     * This function will perfoem click action
+     * This function will perform click action
      */
     private fun clickAction() {
         newSearchNodesTask()
