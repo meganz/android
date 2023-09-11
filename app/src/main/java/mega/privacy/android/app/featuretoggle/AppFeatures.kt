@@ -164,11 +164,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     PlansPageUpdate("Enable new design for Upgrade account view", false),
 
     /**
-     * To switch into new FileBrowser Compose UI
-     */
-    FileBrowserCompose("Enable compose for FileBrowser", true),
-
-    /**
      * Meeting notification settings
      */
     MeetingNotificationSettings("Enable Meeting notification settings", false),

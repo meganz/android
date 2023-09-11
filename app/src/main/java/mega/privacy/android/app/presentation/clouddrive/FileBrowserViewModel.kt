@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
-import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -25,6 +24,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -44,7 +44,6 @@ import javax.inject.Inject
  * ViewModel associated to FileBrowserFragment
  *
  * @param getRootFolder Fetch the root node
- * @param getBrowserChildrenNode Fetch the cloud drive nodes
  * @param monitorMediaDiscoveryView Monitor media discovery view settings
  * @param monitorNodeUpdates Monitor node updates
  * @param getFileBrowserParentNodeHandle To get parent handle of current node
@@ -63,7 +62,6 @@ import javax.inject.Inject
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
-    private val getBrowserChildrenNode: GetBrowserChildrenNode,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
@@ -90,7 +88,6 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * Stack to maintain folder navigation clicks
      */
-    private val lastPositionStack = Stack<Int>()
     private val handleStack = Stack<Long>()
 
     init {
@@ -147,7 +144,7 @@ class FileBrowserViewModel @Inject constructor(
 
     /**
      * This will monitor FileBrowserNodeUpdates from [MonitorNodeUpdates] and
-     * will update [FileBrowserState.nodes]
+     * will update [FileBrowserState.nodesList]
      */
     private fun monitorFileBrowserChildrenNodes() {
         viewModelScope.launch {
@@ -240,12 +237,12 @@ class FileBrowserViewModel @Inject constructor(
         parentHandle: Long,
         mediaDiscoveryViewSettings: Int,
     ): Boolean =
-        getBrowserChildrenNode(parentHandle)?.let { nodes ->
+        getFileBrowserChildrenUseCase(parentHandle).let { nodes ->
             if (nodes.isEmpty() || mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.DISABLED.ordinal) {
                 false
             } else {
                 nodes.firstOrNull { node ->
-                    node.isFolder
+                    node is TypedFolderNode
                             || MimeTypeList.typeForName(node.name).isSvgMimeType
                             || (!MimeTypeList.typeForName(node.name).isImage
                             && !MimeTypeList.typeForName(node.name).isVideoMimeType)
@@ -253,10 +250,10 @@ class FileBrowserViewModel @Inject constructor(
                     false
                 } ?: true
             }
-        } ?: false
+        }
 
     /**
-     * This will refresh file browser nodes and update [FileBrowserState.nodes]
+     * This will refresh file browser nodes and update [FileBrowserState.nodesList]
      */
     fun refreshNodes() {
         viewModelScope.launch {
@@ -267,13 +264,11 @@ class FileBrowserViewModel @Inject constructor(
     private suspend fun refreshNodesState() {
         val typedNodeList = getFileBrowserChildrenUseCase(_state.value.fileBrowserHandle)
         val nodeList = getNodeUiItems(typedNodeList)
-        val nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList()
         val hasMediaFile: Boolean = containsMediaItemUseCase(typedNodeList)
         val isRootNode = getRootFolder()?.handle == _state.value.fileBrowserHandle
         _state.update {
             it.copy(
                 showMediaDiscoveryIcon = !isRootNode && hasMediaFile,
-                nodes = nodes,
                 parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle),
                 nodesList = nodeList,
                 sortOrder = getCloudSortOrder(),
@@ -313,27 +308,10 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
-     * Pop scroll position for previous depth
-     *
-     * @return last position saved
-     */
-    fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
-
-    /**
-     * Push lastPosition to stack
-     * @param lastPosition last position to be added to stack
-     */
-    private fun pushPositionOnStack(lastPosition: Int) {
-        lastPositionStack.push(lastPosition)
-    }
-
-    /**
      * Performs action when folder is clicked from adapter
-     * @param lastFirstVisiblePosition visible position based on listview type
      * @param handle node handle
      */
     fun onFolderItemClicked(
-        lastFirstVisiblePosition: Int,
         handle: Long,
     ) {
         viewModelScope.launch {
@@ -349,8 +327,6 @@ class FileBrowserViewModel @Inject constructor(
                         showMediaDiscoveryIcon = true
                     )
                 }
-            } else {
-                pushPositionOnStack(lastFirstVisiblePosition)
             }
         }
     }
@@ -467,7 +443,7 @@ class FileBrowserViewModel @Inject constructor(
                 }
 
             } else {
-                onFolderItemClicked(0, nodeUIItem.id.longValue)
+                onFolderItemClicked(nodeUIItem.id.longValue)
             }
         }
     }

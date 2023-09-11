@@ -8,7 +8,6 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
-import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetOutgoingSharesChildrenNode
@@ -16,7 +15,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetParentNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetPublicLinks
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
@@ -48,9 +46,6 @@ abstract class ManagerUseCases {
 
     @Binds
     abstract fun bindGetParentNode(useCase: DefaultGetParentNodeHandle): GetParentNodeHandle
-
-    @Binds
-    abstract fun bindGetBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode
 
     @Binds
     abstract fun bindGetBackupsChildrenNodes(useCase: DefaultGetBackupsChildrenNodes): GetBackupsChildrenNodes

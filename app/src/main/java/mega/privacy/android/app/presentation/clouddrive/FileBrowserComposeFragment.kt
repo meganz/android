@@ -262,7 +262,7 @@ class FileBrowserComposeFragment : Fragment() {
             }
         }
 
-        viewLifecycleOwner.collectFlow(fileBrowserViewModel.state.map { it.nodes.isEmpty() }
+        viewLifecycleOwner.collectFlow(fileBrowserViewModel.state.map { it.nodesList.isEmpty() }
             .distinctUntilChanged()) {
             setupToolbar()
         }
@@ -322,7 +322,6 @@ class FileBrowserComposeFragment : Fragment() {
                     fileBrowserViewModel.onBackPressed()
                     invalidateOptionsMenu()
                     setToolbarTitle()
-                    fileBrowserViewModel.popLastPositionStack()
                     2
                 } ?: run {
                     0

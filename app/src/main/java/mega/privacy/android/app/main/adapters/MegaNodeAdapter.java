@@ -86,7 +86,6 @@ import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment;
-import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.backups.BackupsFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
@@ -431,8 +430,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((SearchFragment) fragment).hideMultipleSelect();
             } else if (type == LINKS_ADAPTER) {
                 ((LinksFragment) fragment).hideMultipleSelect();
-            } else {
-                ((FileBrowserFragment) fragment).hideMultipleSelect();
             }
         }
     }
@@ -1322,9 +1319,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             ((SearchFragment) fragment).itemClick(currentPosition);
         } else if (type == LINKS_ADAPTER) {
             ((LinksFragment) fragment).itemClick(currentPosition);
-        } else {
-            Timber.d("layout FileBrowserFragment!");
-            ((FileBrowserFragment) fragment).itemClick(currentPosition);
         }
     }
 
@@ -1349,9 +1343,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((SearchFragment) fragment).itemClick(currentPosition);
             } else if (type == LINKS_ADAPTER) {
                 ((LinksFragment) fragment).itemClick(currentPosition);
-            } else {
-                Timber.d("click layout FileBrowserFragment!");
-                ((FileBrowserFragment) fragment).itemClick(currentPosition);
             }
         } else {
             if (type == CONTACT_FILE_ADAPTER) {
@@ -1396,10 +1387,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             Timber.d("FOLDER_LINK_ADAPTER");
             ((LinksFragment) fragment).activateActionMode();
             ((LinksFragment) fragment).itemClick(currentPosition);
-        } else {
-            Timber.d("click layout FileBrowserFragment!");
-            ((FileBrowserFragment) fragment).activateActionMode();
-            ((FileBrowserFragment) fragment).itemClick(currentPosition);
         }
 
         return true;

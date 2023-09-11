@@ -39,7 +39,6 @@ data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
     val fileBrowserHandle: Long = -1L,
     val mediaDiscoveryViewSettings: Int = MediaDiscoveryViewSettings.INITIAL.ordinal,
-    val nodes: List<MegaNode> = emptyList(),
     val parentHandle: Long? = null,
     val mediaHandle: Long = -1L,
     val isPendingRefresh: Boolean = false,

@@ -31,10 +31,11 @@ internal class FabButtonListener(val context: Context) : View.OnClickListener {
                                 )
                                 return
                             }
-                            context.showUploadPanelForBackup(
-                                UploadBottomSheetDialogFragment.GENERAL_UPLOAD, ACTION_BACKUP_FAB
+                            context.showUploadPanel(
+                                UploadBottomSheetDialogFragment.GENERAL_UPLOAD
                             )
                         }
+
                         DrawerItem.SEARCH, DrawerItem.SHARED_ITEMS -> {
                             Timber.d("Cloud Drive SECTION")
                             if (!Util.isOnline(context)) {
@@ -47,10 +48,12 @@ internal class FabButtonListener(val context: Context) : View.OnClickListener {
                             }
                             context.showUploadPanel()
                         }
+
                         else -> {}
                     }
                 }
             }
+
             R.id.floating_button_contact_file_list -> {
                 if (!Util.isOnline(context)) {
                     if (context is ContactFileListActivity) {

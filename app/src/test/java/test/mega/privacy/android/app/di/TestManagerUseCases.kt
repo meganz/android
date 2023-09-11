@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.manager.ManagerUseCases
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
-import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
@@ -40,11 +39,6 @@ object TestManagerUseCases {
     @Provides
     fun provideMonitorNodeUpdates() = mock<MonitorNodeUpdates> {
         on { run { invoke() } }.thenReturn(flowOf(any()))
-    }
-
-    @Provides
-    fun provideBrowserChildrenNode() = mock<GetBrowserChildrenNode> {
-        on { runBlocking { invoke(0) } }.thenReturn(emptyList())
     }
 
     @Provides
