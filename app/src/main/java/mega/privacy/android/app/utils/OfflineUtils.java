@@ -111,10 +111,8 @@ public class OfflineUtils {
                 return;
             }
 
-            String url = null;
             Intent service = new Intent(activity, DownloadService.class);
             service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-            service.putExtra(DownloadService.EXTRA_URL, url);
             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
             service.putExtra(DownloadService.EXTRA_PATH, path);
             service.putExtra(DownloadService.EXTRA_DOWNLOAD_FOR_OFFLINE, true);

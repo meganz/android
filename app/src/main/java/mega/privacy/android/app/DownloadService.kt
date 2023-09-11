@@ -91,11 +91,8 @@ import mega.privacy.android.domain.usecase.transfer.monitorpaused.MonitorDownloa
 import mega.privacy.android.domain.usecase.transfer.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.sd.InsertSdTransferUseCase
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
@@ -111,7 +108,7 @@ import kotlin.coroutines.coroutineContext
  * Background service to download files
  */
 @AndroidEntryPoint
-internal class DownloadService : LifecycleService(), MegaRequestListenerInterface {
+internal class DownloadService : LifecycleService() {
 
     @Inject
     lateinit var crashReporter: CrashReporter
@@ -247,7 +244,6 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         canceled = false
         mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         startForeground()
-        megaApi.addRequestListener(this@DownloadService)
         initialiseWifiLock()
         initialiseWakeLock()
         setReceivers()
@@ -378,7 +374,6 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
     override fun onDestroy() {
         Timber.d("onDestroy")
         releaseLocks()
-        megaApi.removeRequestListener(this)
         // remove all the generated folders in cache folder on SD card.
         val fs = externalCacheDirs
         if (fs.size > 1 && fs[1] != null) {
@@ -461,7 +456,6 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
 
     private suspend fun processIntent(intent: Intent): Boolean {
         if (addPendingIntentIfNotLoggedIn(intent)) return false
-        if (handlePublicNode(intent)) return false
 
         val isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false)
         val fromMV = intent.getBooleanExtra(EXTRA_FROM_MV, false)
@@ -547,16 +541,6 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         }
 
         return false
-    }
-
-    private fun handlePublicNode(intent: Intent): Boolean {
-        val url = intent.getStringExtra(EXTRA_URL) ?: return false
-        Timber.d("Public node")
-        val path = intent.getStringExtra(EXTRA_PATH) ?: return false
-        currentDir = File(path)
-        currentDir?.mkdirs()
-        megaApi.getPublicNode(url)
-        return true
     }
 
     private suspend fun addPendingIntentIfNotLoggedIn(intent: Intent): Boolean {
@@ -1621,73 +1605,9 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         }
     }
 
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestStart: %s", request.requestString)
-    }
-
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish")
-        Timber.d("Public node received")
-        if (e.errorCode != MegaError.API_OK) {
-            Timber.e("Public node error")
-            return
-        }
-        val node = request.publicMegaNode
-        if (node == null) {
-            Timber.e("Public node is null")
-            return
-        }
-        if (currentDir == null) {
-            Timber.e("currentDir is null")
-            return
-        }
-        currentFile = if (currentDir?.isDirectory == true) {
-            File(
-                currentDir,
-                megaApi.escapeFsIncompatible(
-                    node.name,
-                    currentDir?.absolutePath + Constants.SEPARATOR
-                )
-            )
-        } else {
-            currentDir
-        }
-        val appData = getSDCardAppData(intent)
-        Timber.d("Public node download launched")
-        acquireLocks()
-        if (currentDir?.isDirectory == true) {
-            Timber.d("To downloadPublic(dir)")
-            val localPath = currentDir?.absolutePath + "/"
-            currentDocument?.let {
-                val token = transfersManagement.addScanningTransfer(
-                    MegaTransfer.TYPE_DOWNLOAD,
-                    localPath, it, it.isFolder
-                )
-                megaApi.startDownload(
-                    currentDocument,
-                    localPath,
-                    it.name,
-                    appData,
-                    false,
-                    token,
-                    MegaTransfer.COLLISION_CHECK_FINGERPRINT,
-                    MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
-                )
-            }
-        }
-    }
-
     private fun acquireLocks() {
         if (!wakeLock.isHeld) wakeLock.acquire()
         if (!wifiLock.isHeld) wifiLock.acquire()
-    }
-
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.w("Node handle: %s", request.nodeHandle)
-    }
-
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestUpdate")
     }
 
     private fun refreshOfflineFragment() {
@@ -1706,14 +1626,12 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         const val ACTION_CANCEL = "CANCEL_DOWNLOAD"
         const val EXTRA_SIZE = "DOCUMENT_SIZE"
         const val EXTRA_HASH = "DOCUMENT_HASH"
-        const val EXTRA_URL = "DOCUMENT_URL"
         const val EXTRA_DOWNLOAD_TO_SDCARD = "download_to_sdcard"
         const val EXTRA_TARGET_PATH = "target_path"
         const val EXTRA_TARGET_URI = "target_uri"
         const val EXTRA_PATH = "SAVE_PATH"
         const val EXTRA_FOLDER_LINK = "FOLDER_LINK"
         const val EXTRA_FROM_MV = "fromMV"
-        const val EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY"
         const val EXTRA_OPEN_FILE = "OPEN_FILE"
         const val EXTRA_CONTENT_URI = "CONTENT_URI"
         const val EXTRA_DOWNLOAD_FOR_PREVIEW = "EXTRA_DOWNLOAD_FOR_PREVIEW"
