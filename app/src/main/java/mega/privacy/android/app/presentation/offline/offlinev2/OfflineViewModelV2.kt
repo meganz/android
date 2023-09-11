@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.offline.offlinev2.model.OfflineNodeUIItem
 import mega.privacy.android.app.presentation.offline.offlinev2.model.OfflineUIState
+import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.LoadOfflineNodesUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,6 +33,23 @@ class OfflineViewModelV2 @Inject constructor(
         loadOfflineNodes()
     }
 
+
+    /**
+     * map a list of [OfflineNodeInformation] to [OfflineNodeUIItem] to be used in the presentation layer
+     */
+    private fun getOfflineNodeUiItems(nodeList: List<OfflineNodeInformation>): List<OfflineNodeUIItem<OfflineNodeInformation>> {
+        val offlineNodeList = _uiState.value.offlineNodes
+        return nodeList.mapIndexed { index, it ->
+            val isSelected =
+                _uiState.value.selectedNodeHandles.contains(it.handle)
+            OfflineNodeUIItem(
+                offlineNode = it,
+                isSelected = if (index < offlineNodeList.size) isSelected else false,
+                isInvisible = if (index > offlineNodeList.size) offlineNodeList[index].isInvisible else false
+            )
+        }
+    }
+
     /**
      * get the offline nodes
      * @param path the provided path to fetch the offline nodes from
@@ -44,13 +63,14 @@ class OfflineViewModelV2 @Inject constructor(
             runCatching {
                 loadOfflineNodesUseCase(path = path, searchQuery = searchQuery)
             }.onSuccess {
+                val offlineNodes = getOfflineNodeUiItems(it)
                 _uiState.update { state ->
-                    state.copy(offlineNodes = it, isLoading = false)
+                    state.copy(offlineNodes = offlineNodes, isLoading = false)
                 }
             }.onFailure {
                 Timber.e(it, "Exception fetching offline nodes")
                 _uiState.update { state ->
-                    state.copy(offlineNodes = null, isLoading = false)
+                    state.copy(offlineNodes = emptyList(), isLoading = false)
                 }
             }
         }

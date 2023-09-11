@@ -80,7 +80,7 @@ internal class OfflineViewModelV2Test {
             underTest.loadOfflineNodes()
             underTest.uiState.test {
                 val state = awaitItem()
-                Truth.assertThat(state.offlineNodes).isNull()
+                Truth.assertThat(state.offlineNodes).isEmpty()
             }
         }
 
