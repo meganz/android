@@ -18,7 +18,7 @@ internal class DeviceCenterStateTest {
 
     private lateinit var underTest: DeviceCenterState
 
-    private val ownDeviceFolderUINode = DeviceFolderUINode(
+    private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
         id = "ABCD-EFGH",
         name = "Camera uploads",
         icon = FolderIconType.CameraUploads,

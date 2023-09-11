@@ -4,13 +4,16 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
+import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
+import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -39,11 +42,48 @@ internal class DeviceFolderUINodeListMapperTest {
     }
 
     @Test
-    fun `test that the mapping is correct`() {
+    fun `test that the mapping results in a backup folder`() {
         val folderId = "12345-6789"
         val folderName = "Backup Folder One"
         val folderStatus = DeviceCenterNodeStatus.UpToDate
-        val folderType = BackupInfoType.CAMERA_UPLOADS
+        val folderType = BackupInfoType.BACKUP_UPLOAD
+        val folderList = listOf(
+            DeviceFolderNode(
+                id = folderId,
+                name = folderName,
+                status = folderStatus,
+                type = folderType,
+            )
+        )
+        val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
+        val expectedFolderUINodeIcon = FolderIconType.Backup
+
+        whenever(deviceCenterUINodeStatusMapper(folderStatus)).thenReturn(expectedUINodeStatus)
+        whenever(deviceFolderUINodeIconMapper(folderType)).thenReturn(expectedFolderUINodeIcon)
+
+        assertThat(underTest(folderList)).isEqualTo(
+            listOf(
+                BackupDeviceFolderUINode(
+                    id = folderId,
+                    name = folderName,
+                    icon = expectedFolderUINodeIcon,
+                    status = expectedUINodeStatus,
+                )
+            )
+        )
+    }
+
+    @ParameterizedTest(name = "when the backup type is {0}")
+    @EnumSource(
+        value = BackupInfoType::class, names = ["BACKUP_UPLOAD"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that the mapping results in a non backup folder`(
+        folderType: BackupInfoType,
+    ) {
+        val folderId = "12345-6789"
+        val folderName = "Backup Folder One"
+        val folderStatus = DeviceCenterNodeStatus.UpToDate
         val folderList = listOf(
             DeviceFolderNode(
                 id = folderId,
@@ -60,7 +100,7 @@ internal class DeviceFolderUINodeListMapperTest {
 
         assertThat(underTest(folderList)).isEqualTo(
             listOf(
-                DeviceFolderUINode(
+                NonBackupDeviceFolderUINode(
                     id = folderId,
                     name = folderName,
                     icon = expectedFolderUINodeIcon,

@@ -6,7 +6,7 @@ package mega.privacy.android.feature.devicecenter.domain.entity
  * @property id The Current Device ID
  * @property name The Current Device Name
  * @property status The Current Device Status
- * @property folders The list of Backup Folders linked to that Device
+ * @property folders The list of Folders linked to that Device
  */
 data class OwnDeviceNode(
     override val id: String,

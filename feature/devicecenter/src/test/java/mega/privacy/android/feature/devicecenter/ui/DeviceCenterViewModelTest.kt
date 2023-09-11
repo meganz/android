@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
+import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
@@ -39,7 +39,7 @@ internal class DeviceCenterViewModelTest {
     private val getDevicesUseCase = mock<GetDevicesUseCase>()
     private val deviceUINodeListMapper = mock<DeviceUINodeListMapper>()
 
-    private val ownDeviceFolderUINode = DeviceFolderUINode(
+    private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
         id = "ABCD-EFGH",
         name = "Camera uploads",
         icon = FolderIconType.CameraUploads,

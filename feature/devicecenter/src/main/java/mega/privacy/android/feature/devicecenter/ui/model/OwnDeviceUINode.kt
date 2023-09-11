@@ -10,7 +10,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  * @property name The Current Device Name
  * @property icon The Current Device Icon from [DeviceCenterUINodeIcon]
  * @property status The Current Device Status from [DeviceCenterUINodeStatus]
- * @property folders The list of Backup Folders linked to that Device as [DeviceFolderUINode] objects
+ * @property folders The list of Folders linked to that Device as [DeviceFolderUINode] objects
  */
 data class OwnDeviceUINode(
     override val id: String,

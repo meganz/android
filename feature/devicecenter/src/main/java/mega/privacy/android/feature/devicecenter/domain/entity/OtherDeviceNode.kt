@@ -6,7 +6,7 @@ package mega.privacy.android.feature.devicecenter.domain.entity
  * @property id The Other Device ID
  * @property name The Other Device Name
  * @property status The Other Device Status
- * @property folders The list of Backup Folders linked to that Device
+ * @property folders The list of Folders linked to that Device
  */
 data class OtherDeviceNode(
     override val id: String,

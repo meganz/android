@@ -6,7 +6,7 @@ import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeS
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
+import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
@@ -90,7 +90,7 @@ internal class DeviceUINodeListMapperTest {
         val expectedDeviceUINodeIcon = DeviceIconType.Mobile
         val expectedFolderUINodeIcon = FolderIconType.Backup
         val expectedFolderUINodeList = listOf(
-            DeviceFolderUINode(
+            BackupDeviceFolderUINode(
                 id = folderId,
                 name = folderName,
                 icon = expectedFolderUINodeIcon,

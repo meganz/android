@@ -22,6 +22,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
@@ -251,14 +252,14 @@ private fun PreviewDeviceCenterContentWithBothDeviceSections() {
     }
 }
 
-private val ownDeviceFolderUINode = DeviceFolderUINode(
+private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
     id = "ABCD-EFGH",
     name = "Camera uploads",
     icon = FolderIconType.CameraUploads,
     status = DeviceCenterUINodeStatus.UpToDate
 )
 
-private val ownDeviceFolderUINodeTwo = DeviceFolderUINode(
+private val ownDeviceFolderUINodeTwo = NonBackupDeviceFolderUINode(
     id = "IJKL-MNOP",
     name = "Media uploads",
     icon = FolderIconType.CameraUploads,

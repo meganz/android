@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
+import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
@@ -134,7 +134,7 @@ internal class DeviceCenterScreenTest {
 
     @Test
     fun `test that no device sections are displayed when in folder view`() {
-        val ownDeviceFolderUINode = DeviceFolderUINode(
+        val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
             id = "ABCD-EFGH",
             name = "Camera uploads",
             icon = FolderIconType.CameraUploads,
