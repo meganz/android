@@ -34,6 +34,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_500_grey_400
 import mega.privacy.android.core.ui.theme.extensions.grey_900_grey_100
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -158,6 +159,7 @@ private fun NotificationTitleRow(
                 SpanIndicator('A') to SpanStyle(color = MaterialTheme.colors.grey_900_grey_100),
                 SpanIndicator('B') to SpanStyle(color = MaterialTheme.colors.grey_500_grey_400)
             ),
+            color = MaterialTheme.colors.black_white,
             maxLines = titleMaxLines,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
@@ -202,6 +204,7 @@ private fun NotificationDescription(description: String) {
             SpanIndicator('A') to SpanStyle(color = MaterialTheme.colors.grey_900_grey_100),
             SpanIndicator('B') to SpanStyle(color = MaterialTheme.colors.grey_500_grey_400)
         ),
+        color = MaterialTheme.colors.black_white,
         overflow = TextOverflow.Ellipsis,
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp, top = 3.dp)
