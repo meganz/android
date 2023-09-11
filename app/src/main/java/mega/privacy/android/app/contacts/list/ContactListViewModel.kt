@@ -27,6 +27,7 @@ import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.notifyObserver
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
+import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -76,8 +78,12 @@ class ContactListViewModel @Inject constructor(
     private val contactActions: MutableLiveData<List<ContactActionItem>> = MutableLiveData()
 
     init {
-        retrieveContactActions()
-        retrieveContacts()
+        viewModelScope.launch {
+            CacheFolderManager.getCacheFolderAsync(CacheFolderManager.AVATAR_FOLDER)?.let {
+                retrieveContacts(it)
+            }
+            retrieveContactActions()
+        }
     }
 
     private fun retrieveContactActions() {
@@ -100,8 +106,8 @@ class ContactListViewModel @Inject constructor(
             .addTo(composite)
     }
 
-    private fun retrieveContacts() {
-        getContactsUseCase.get()
+    private fun retrieveContacts(avatarFolder: File) {
+        getContactsUseCase.get(avatarFolder)
             .debounceImmediate(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

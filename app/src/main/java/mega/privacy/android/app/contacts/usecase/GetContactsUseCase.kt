@@ -9,7 +9,6 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -64,192 +63,219 @@ class GetContactsUseCase @Inject constructor(
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase
 ) {
 
-    fun get(): Flowable<List<ContactItem.Data>> =
-        Flowable.create({ emitter ->
-            val disposable = CompositeDisposable()
-            val contacts = megaApi.contacts
-                .filter { it.visibility == VISIBILITY_VISIBLE }
-                .map { it.toContactItem() }
-                .toMutableList()
+    /**
+     * Gets contacts.
+     *
+     * @param avatarFolder Avatar folder in cache.
+     */
+    fun get(avatarFolder: File): Flowable<List<ContactItem.Data>> = Flowable.create({ emitter ->
+        val disposable = CompositeDisposable()
+        val contacts = megaApi.contacts
+            .filter { it.visibility == VISIBILITY_VISIBLE }
+            .map { it.toContactItem(avatarFolder) }
+            .toMutableList()
 
-            emitter.onNext(contacts.sortedAlphabetically())
+        emitter.onNext(contacts.sortedAlphabetically())
 
-            val userAttrsListener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
+        val userAttrsListener = OptionalMegaRequestListenerInterface(
+            onRequestFinish = { request, error ->
+                if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
 
-                    if (error.errorCode == MegaError.API_OK) {
-                        val index = contacts.indexOfFirst { it.email == request.email }
-                        if (index != INVALID_POSITION) {
-                            val currentContact = contacts[index]
+                if (error.errorCode == MegaError.API_OK) {
+                    val index = contacts.indexOfFirst { it.email == request.email }
+                    if (index != INVALID_POSITION) {
+                        val currentContact = contacts[index]
 
-                            when (request.paramType) {
-                                USER_ATTR_AVATAR -> {
-                                    if (!request.file.isNullOrBlank()) {
-                                        contacts[index] = currentContact.copy(
-                                            avatarUri = File(request.file).toUri()
-                                        )
-                                    }
-                                }
-                                USER_ATTR_FIRSTNAME, USER_ATTR_LASTNAME ->
+                        when (request.paramType) {
+                            USER_ATTR_AVATAR -> {
+                                if (!request.file.isNullOrBlank()) {
                                     contacts[index] = currentContact.copy(
-                                        fullName = megaChatApi.getUserFullnameFromCache(currentContact.handle)
+                                        avatarUri = File(request.file).toUri()
                                     )
-                                USER_ATTR_ALIAS ->
-                                    contacts[index] = currentContact.copy(
-                                        alias = request.text
-                                    )
-                            }
-
-                            emitter.onNext(contacts.sortedAlphabetically())
-                        } else if (request.paramType == USER_ATTR_ALIAS) {
-                            val requestAliases = request.megaStringMap.getDecodedAliases()
-
-                            contacts.forEachIndexed { indexToUpdate, contact ->
-                                var newAlias: String? = null
-                                if (requestAliases.isNotEmpty() && requestAliases.containsKey(contact.handle)) {
-                                    newAlias = requestAliases[contact.handle]
-                                }
-                                if (newAlias != contact.alias) {
-                                    contacts[indexToUpdate] = contact.copy(alias = newAlias)
                                 }
                             }
 
-                            emitter.onNext(contacts.sortedAlphabetically())
+                            USER_ATTR_FIRSTNAME, USER_ATTR_LASTNAME ->
+                                contacts[index] = currentContact.copy(
+                                    fullName = megaChatApi.getUserFullnameFromCache(currentContact.handle)
+                                )
+
+                            USER_ATTR_ALIAS ->
+                                contacts[index] = currentContact.copy(
+                                    alias = request.text
+                                )
                         }
-                    } else {
-                        Timber.e(error.toThrowable())
+
+                        emitter.onNext(contacts.sortedAlphabetically())
+                    } else if (request.paramType == USER_ATTR_ALIAS) {
+                        val requestAliases = request.megaStringMap.getDecodedAliases()
+
+                        contacts.forEachIndexed { indexToUpdate, contact ->
+                            var newAlias: String? = null
+                            if (requestAliases.isNotEmpty() && requestAliases.containsKey(contact.handle)) {
+                                newAlias = requestAliases[contact.handle]
+                            }
+                            if (newAlias != contact.alias) {
+                                contacts[indexToUpdate] = contact.copy(alias = newAlias)
+                            }
+                        }
+
+                        emitter.onNext(contacts.sortedAlphabetically())
                     }
-                },
-                onRequestTemporaryError = { _, error ->
+                } else {
                     Timber.e(error.toThrowable())
                 }
-            )
+            },
+            onRequestTemporaryError = { _, error ->
+                Timber.e(error.toThrowable())
+            }
+        )
 
-            getChatChangesUseCase.get()
-                .filter { it is OnChatOnlineStatusUpdate || it is OnChatPresenceLastGreen || it is OnChatConnectionStateUpdate }
-                .subscribeBy(
-                    onNext = { change ->
-                        if (emitter.isCancelled) return@subscribeBy
+        getChatChangesUseCase.get()
+            .filter { it is OnChatOnlineStatusUpdate || it is OnChatPresenceLastGreen || it is OnChatConnectionStateUpdate }
+            .subscribeBy(
+                onNext = { change ->
+                    if (emitter.isCancelled) return@subscribeBy
 
-                        when (change) {
-                            is OnChatOnlineStatusUpdate -> {
-                                val index = contacts.indexOfFirst { it.handle == change.userHandle }
-                                if (index != INVALID_POSITION) {
-                                    val currentContact = contacts[index]
-                                    contacts[index] = currentContact.copy(
-                                        status = change.status,
-                                        statusColor = getUserStatusColor(change.status),
-                                        lastSeen = if (change.status == STATUS_ONLINE) {
-                                            context.getString(R.string.online_status)
-                                        } else {
-                                            megaChatApi.requestLastGreen(change.userHandle, null)
-                                            currentContact.lastSeen
-                                        }
-                                    )
+                    when (change) {
+                        is OnChatOnlineStatusUpdate -> {
+                            val index = contacts.indexOfFirst { it.handle == change.userHandle }
+                            if (index != INVALID_POSITION) {
+                                val currentContact = contacts[index]
+                                contacts[index] = currentContact.copy(
+                                    status = change.status,
+                                    statusColor = getUserStatusColor(change.status),
+                                    lastSeen = if (change.status == STATUS_ONLINE) {
+                                        context.getString(R.string.online_status)
+                                    } else {
+                                        megaChatApi.requestLastGreen(change.userHandle, null)
+                                        currentContact.lastSeen
+                                    }
+                                )
 
-                                    emitter.onNext(contacts.sortedAlphabetically())
-                                }
-                            }
-                            is OnChatPresenceLastGreen -> {
-                                val index = contacts.indexOfFirst { it.handle == change.userHandle }
-                                if (index != INVALID_POSITION) {
-                                    val currentContact = contacts[index]
-                                    contacts[index] = currentContact.copy(
-                                        lastSeen = TimeUtils.unformattedLastGreenDate(
-                                            context,
-                                            change.lastGreen
-                                        )
-                                    )
-
-                                    emitter.onNext(contacts.sortedAlphabetically())
-                                }
-                            }
-                            is OnChatConnectionStateUpdate -> {
-                                val index = contacts.indexOfFirst {
-                                    it.isNew && change.chatid == megaChatApi.getChatRoomByUser(it.handle)?.chatId
-                                }
-                                if (index != INVALID_POSITION) {
-                                    val currentContact = contacts[index]
-                                    contacts[index] = currentContact.copy(
-                                        isNew = false
-                                    )
-
-                                    emitter.onNext(contacts.sortedAlphabetically())
-                                }
-                            }
-                            else -> {
-                                // Nothing to do
+                                emitter.onNext(contacts.sortedAlphabetically())
                             }
                         }
-                    },
-                    onError = Timber::e
-                ).addTo(disposable)
 
-            getGlobalChangesUseCase.get()
-                .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
-                .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
-                .subscribeBy(
-                    onNext = { users ->
-                        if (emitter.isCancelled) return@subscribeBy
+                        is OnChatPresenceLastGreen -> {
+                            val index = contacts.indexOfFirst { it.handle == change.userHandle }
+                            if (index != INVALID_POSITION) {
+                                val currentContact = contacts[index]
+                                contacts[index] = currentContact.copy(
+                                    lastSeen = TimeUtils.unformattedLastGreenDate(
+                                        context,
+                                        change.lastGreen
+                                    )
+                                )
 
-                        users.forEach { user ->
-                            val index = contacts.indexOfFirst { it.handle == user.handle }
-                            when {
-                                index != INVALID_POSITION -> {
-                                    when {
-                                        user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) ->
-                                            megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
-                                        user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ->
-                                            megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-                                        user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ->
-                                            megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
-                                        user.visibility != VISIBILITY_VISIBLE -> {
-                                            contacts.removeAt(index)
-                                            emitter.onNext(contacts.sortedAlphabetically())
-                                        }
+                                emitter.onNext(contacts.sortedAlphabetically())
+                            }
+                        }
+
+                        is OnChatConnectionStateUpdate -> {
+                            val index = contacts.indexOfFirst {
+                                it.isNew && change.chatid == megaChatApi.getChatRoomByUser(it.handle)?.chatId
+                            }
+                            if (index != INVALID_POSITION) {
+                                val currentContact = contacts[index]
+                                contacts[index] = currentContact.copy(
+                                    isNew = false
+                                )
+
+                                emitter.onNext(contacts.sortedAlphabetically())
+                            }
+                        }
+
+                        else -> {
+                            // Nothing to do
+                        }
+                    }
+                },
+                onError = Timber::e
+            ).addTo(disposable)
+
+        getGlobalChangesUseCase.get()
+            .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
+            .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
+            .subscribeBy(
+                onNext = { users ->
+                    if (emitter.isCancelled) return@subscribeBy
+
+                    users.forEach { user ->
+                        val index = contacts.indexOfFirst { it.handle == user.handle }
+                        when {
+                            index != INVALID_POSITION -> {
+                                when {
+                                    user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) ->
+                                        megaApi.getUserAttribute(
+                                            user.email,
+                                            USER_ATTR_ALIAS,
+                                            userAttrsListener
+                                        )
+
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ->
+                                        megaApi.getUserAttribute(
+                                            user.email,
+                                            USER_ATTR_FIRSTNAME,
+                                            userAttrsListener
+                                        )
+
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ->
+                                        megaApi.getUserAttribute(
+                                            user.email,
+                                            USER_ATTR_LASTNAME,
+                                            userAttrsListener
+                                        )
+
+                                    user.visibility != VISIBILITY_VISIBLE -> {
+                                        contacts.removeAt(index)
+                                        emitter.onNext(contacts.sortedAlphabetically())
                                     }
                                 }
-                                user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) -> {
-                                    megaApi.getUserAttribute(user, USER_ATTR_ALIAS, userAttrsListener)
-                                }
-                                user.visibility == VISIBILITY_VISIBLE -> { // New contact
-                                    val contact = user.toContactItem()
-                                    contacts.add(contact)
-                                    emitter.onNext(contacts.sortedAlphabetically())
-                                    contact.requestMissingFields(userAttrsListener)
-                                }
-                                user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING.toLong()) -> {
-                                    mutableListOf<ContactItem.Data>()
-                                        .apply { addAll(contacts) }
-                                        .forEachIndexed { i, _ ->
-                                            val currentContact = contacts[i]
-                                            val currentUser =
-                                                megaApi.getContact(currentContact.email)
+                            }
 
-                                            currentUser?.let {
-                                                val isVerified = megaApi.areCredentialsVerified(it)
+                            user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) -> {
+                                megaApi.getUserAttribute(user, USER_ATTR_ALIAS, userAttrsListener)
+                            }
 
-                                                if (currentContact.isVerified != isVerified) {
-                                                    contacts[i] = currentContact.copy(
-                                                        isVerified = isVerified
-                                                    )
-                                                }
+                            user.visibility == VISIBILITY_VISIBLE -> { // New contact
+                                val contact = user.toContactItem(avatarFolder)
+                                contacts.add(contact)
+                                emitter.onNext(contacts.sortedAlphabetically())
+                                contact.requestMissingFields(avatarFolder, userAttrsListener)
+                            }
+
+                            user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING.toLong()) -> {
+                                mutableListOf<ContactItem.Data>()
+                                    .apply { addAll(contacts) }
+                                    .forEachIndexed { i, _ ->
+                                        val currentContact = contacts[i]
+                                        val currentUser =
+                                            megaApi.getContact(currentContact.email)
+
+                                        currentUser?.let {
+                                            val isVerified = megaApi.areCredentialsVerified(it)
+
+                                            if (currentContact.isVerified != isVerified) {
+                                                contacts[i] = currentContact.copy(
+                                                    isVerified = isVerified
+                                                )
                                             }
                                         }
+                                    }
 
-                                    emitter.onNext(contacts.sortedAlphabetically())
-                                }
+                                emitter.onNext(contacts.sortedAlphabetically())
                             }
                         }
-                    },
-                    onError = Timber::e
-                ).addTo(disposable)
+                    }
+                },
+                onError = Timber::e
+            ).addTo(disposable)
 
-            contacts.forEach { it.requestMissingFields(userAttrsListener) }
+        contacts.forEach { it.requestMissingFields(avatarFolder, userAttrsListener) }
 
-            emitter.setCancellable { disposable.clear() }
-        }, BackpressureStrategy.LATEST)
+        emitter.setCancellable { disposable.clear() }
+    }, BackpressureStrategy.LATEST)
 
     /**
      * Get MegaUser from email
@@ -266,9 +292,10 @@ class GetContactsUseCase @Inject constructor(
     /**
      * Build ContactItem.Data from MegaUser object
      *
+     * @param avatarFolder Avatar folder in cache.
      * @return  ContactItem.Data
      */
-    private fun MegaUser.toContactItem(): ContactItem.Data {
+    private fun MegaUser.toContactItem(avatarFolder: File): ContactItem.Data {
         val alias = megaChatApi.getUserAliasFromCache(handle)
         val fullName = megaChatApi.getUserFullnameFromCache(handle)
         val userStatus = megaChatApi.getUserOnlineStatus(handle)
@@ -279,8 +306,8 @@ class GetContactsUseCase @Inject constructor(
             else -> email
         }
         val placeholder = getImagePlaceholder(title, userImageColor)
-        val userAvatarFile = AvatarUtil.getUserAvatarFile(context, email)
-        val userAvatar = if (userAvatarFile?.exists() == true) {
+        val userAvatarFile = File(avatarFolder, "$email.jpg")
+        val userAvatar = if (userAvatarFile.exists()) {
             userAvatarFile.toUri()
         } else {
             null
@@ -305,11 +332,15 @@ class GetContactsUseCase @Inject constructor(
     /**
      * Request missing fields for current `ContactItem.Data`
      *
+     * @param avatarFolder Avatar folder in cache.
      * @param listener  Callback to retrieve requested fields
      */
-    private fun ContactItem.Data.requestMissingFields(listener: MegaRequestListenerInterface) {
+    private fun ContactItem.Data.requestMissingFields(
+        avatarFolder: File,
+        listener: MegaRequestListenerInterface,
+    ) {
         if (avatarUri == null) {
-            val userAvatarFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath
+            val userAvatarFile = File(avatarFolder, "$email.jpg").absolutePath
             megaApi.getUserAvatar(email, userAvatarFile, listener)
         }
         if (fullName.isNullOrBlank()) {
