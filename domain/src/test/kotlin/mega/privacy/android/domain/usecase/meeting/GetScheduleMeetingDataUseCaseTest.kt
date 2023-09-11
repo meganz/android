@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

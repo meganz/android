@@ -8,6 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.meeting.view.formatRetentionTimeInSecondsToString
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -224,8 +225,7 @@ class ScheduledMeetingInfoViewTest {
                 isPublic = false,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState()
-
+            ScheduledMeetingManagementState(),
         )
         composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .assertExists()
@@ -242,7 +242,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingManagementState(
                 enabledMeetingLinkOption = true,
                 waitingRoomReminder = WaitingRoomReminders.Enabled
-            )
+            ),
         )
         composeRule.onNodeWithText(R.string.add_participants_menu_item)
             .assertExists()
@@ -363,6 +363,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoView(
                 state = state,
                 managementState = managementState,
+                waitingRoomManagementState = WaitingRoomManagementState(),
                 onButtonClicked = {},
                 onEditClicked = {},
                 onAddParticipantsClicked = {},
@@ -374,8 +375,11 @@ class ScheduledMeetingInfoViewTest {
                 onDismiss = {},
                 onLeaveGroupDialog = {},
                 onInviteParticipantsDialog = {},
-                onSnackbarShown = {},
+                onResetStateSnackbarMessage = {},
                 onCloseWarningClicked = {},
+                onAdmitUsersInWaitingRoomClicked = {},
+                onSeeWaitingRoomClicked = {},
+                onDismissWaitingRoomDialog = {},
             )
         }
     }
@@ -389,6 +393,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoView(
                 state = state,
                 managementState = managementState,
+                waitingRoomManagementState = WaitingRoomManagementState(),
                 onButtonClicked = onButtonClicked,
                 onEditClicked = {},
                 onAddParticipantsClicked = {},
@@ -400,8 +405,11 @@ class ScheduledMeetingInfoViewTest {
                 onDismiss = {},
                 onLeaveGroupDialog = {},
                 onInviteParticipantsDialog = {},
-                onSnackbarShown = {},
+                onResetStateSnackbarMessage = {},
                 onCloseWarningClicked = {},
+                onAdmitUsersInWaitingRoomClicked = {},
+                onSeeWaitingRoomClicked = {},
+                onDismissWaitingRoomDialog = {},
             )
         }
     }

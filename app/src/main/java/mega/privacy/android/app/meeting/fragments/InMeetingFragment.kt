@@ -27,10 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
@@ -38,7 +35,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -213,8 +209,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
-    private var usersInWaitingRoomDialog: Dialog? = null
-    private var denyUserDialog: Dialog? = null
 
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -911,17 +905,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Init View Models
      */
     private fun initViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                inMeetingViewModel.state.collect { (error, enabled) ->
-                    if (error != null) {
-                        sharedModel.showSnackBar(getString(error))
-                        bottomFloatingPanelViewHolder?.checkErrorAllowAddParticipants()
-                    } else if (enabled != null) {
-                        bottomFloatingPanelViewHolder?.updateShareAndInviteButton()
-                        bottomFloatingPanelViewHolder?.updateAllowAddParticipantsSwitch(enabled)
-                    }
-                }
+        collectFlow(inMeetingViewModel.state) { inMeetingState ->
+            if (inMeetingState.error != null) {
+                sharedModel.showSnackBar(getString(inMeetingState.error))
+                bottomFloatingPanelViewHolder?.checkErrorAllowAddParticipants()
+            } else if (inMeetingState.resultSetOpenInvite != null) {
+                bottomFloatingPanelViewHolder?.updateShareAndInviteButton()
+                bottomFloatingPanelViewHolder?.updateAllowAddParticipantsSwitch(inMeetingState.resultSetOpenInvite)
             }
         }
 
@@ -1161,25 +1151,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 showCallWillEndBannerAndOnlyMeDialog()
             } else {
                 hideCallBannerAndOnlyMeDialog()
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(sharedModel.state) { (_, _, _, showParticipantsInWaitingRoomDialog, showDenyParticipantDialog, usersInWaitingRoom) ->
-            if (showParticipantsInWaitingRoomDialog) {
-                usersInWaitingRoom?.let {
-                    showUsersInWaitingRoomDialog(it)
-                }
-            } else {
-                dismissDialog(usersInWaitingRoomDialog)
-            }
-
-            if (showDenyParticipantDialog && !usersInWaitingRoom.isNullOrEmpty() && usersInWaitingRoom.size == 1) {
-                val handle = usersInWaitingRoom.keys.first()
-                val name = usersInWaitingRoom[handle]
-                showDenyUserDialog(Pair(handle, name))
-
-            } else {
-                dismissDialog(denyUserDialog)
             }
         }
 
@@ -2706,8 +2677,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
-        dismissDialog(usersInWaitingRoomDialog)
-        dismissDialog(denyUserDialog)
         assignModeratorDialog?.dismissAllowingStateLoss()
         endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
     }
@@ -2874,101 +2843,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }.start()
         }
-    }
-
-    /**
-     * Dialogue shown when you want to deny access to the call to a participant
-     *
-     * @param
-     */
-    private fun showDenyUserDialog(user: Pair<Long, String>) {
-        val messageText = resources.getString(
-            R.string.meetings_waiting_room_deny_user_to_call_dialog_message,
-            user.second
-        )
-
-        val positiveButtonText =
-            resources.getString(R.string.meetings_waiting_room_deny_user_to_call_dialog_button)
-
-        val negativeButtonText = resources.getString(R.string.general_cancel)
-
-        denyUserDialog = MaterialAlertDialogBuilder(
-            requireContext(),
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        )
-            .setTitle(null)
-            .setMessage(messageText)
-            .setPositiveButton(positiveButtonText) { _, _ ->
-                sharedModel.denySpecificUser(user.first)
-            }
-            .setNegativeButton(negativeButtonText) { _, _ ->
-            }
-            .setOnDismissListener {
-                sharedModel.setShowDenyParticipantDialogConsumed()
-            }
-            .setCancelable(false)
-            .create()
-
-        denyUserDialog?.show()
-    }
-
-    /**
-     * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
-     *
-     * @param users
-     */
-    private fun showUsersInWaitingRoomDialog(users: Map<Long, String>) {
-        if (users.isEmpty()) return
-
-        val isOneParticipantInWaitingRoom = users.size == 1
-
-        val messageText = if (isOneParticipantInWaitingRoom)
-            resources.getString(
-                R.string.meetings_waiting_room_admit_user_to_call_dialog_message,
-                users.values.first()
-            )
-        else resources.getQuantityString(
-            R.plurals.meetings_waiting_room_admit_users_to_call_dialog_message,
-            users.size,
-            users.size,
-        )
-        val positiveButtonText =
-            if (isOneParticipantInWaitingRoom) resources.getString(R.string.meetings_waiting_room_admit_user_to_call_dialog_admit_button)
-            else
-                resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button)
-
-        val negativeButtonText =
-            if (isOneParticipantInWaitingRoom) resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_deny_button)
-            else
-                resources.getString(R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button)
-
-        usersInWaitingRoomDialog = MaterialAlertDialogBuilder(
-            requireContext(),
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        )
-            .setTitle(null)
-            .setMessage(messageText)
-            .setPositiveButton(positiveButtonText) { _, _ ->
-                if (isOneParticipantInWaitingRoom) {
-                    sharedModel.admitUsersTap(false)
-                } else {
-                    sharedModel.seeWaitingRoom()
-                }
-            }
-            .setNegativeButton(negativeButtonText) { _, _ ->
-                if (isOneParticipantInWaitingRoom) {
-                    sharedModel.denyUsersTap()
-                } else {
-                    sharedModel.admitUsersTap(true)
-                }
-            }
-            .setOnDismissListener {
-                sharedModel.setShowParticipantsInWaitingRoomDialogConsumed()
-            }
-            .setCancelable(false)
-            .create()
-
-        usersInWaitingRoomDialog?.show()
     }
 
     /**

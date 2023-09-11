@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.NormalEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
-import mega.privacy.android.domain.usecase.GetScheduledMeeting
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -61,7 +61,8 @@ class DefaultNotificationsRepositoryTest {
             )
         }
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
-    private val fetchSchedOccurrencesByChatUseCase = mock<FetchNumberOfScheduledMeetingOccurrencesByChat>()
+    private val fetchSchedOccurrencesByChatUseCase =
+        mock<FetchNumberOfScheduledMeetingOccurrencesByChat>()
     private val getScheduledMeetingUseCase = mock<GetScheduledMeeting>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
 
@@ -83,7 +84,6 @@ class DefaultNotificationsRepositoryTest {
             .thenReturn(flowOf(CallsMeetingInvitations.Enabled))
     }
 
-    @Suppress("UNCHECKED_CAST")
     @Test
     fun `test that user alert email is fetched locally`() = runTest {
         val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock()))
@@ -244,9 +244,13 @@ class DefaultNotificationsRepositoryTest {
             on { eventString }.thenReturn(expectedEvent.eventString)
         }
         val globalUpdate = GlobalUpdate.OnEvent(megaEvent)
-        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate,
-            globalUpdate,
-            globalUpdate))
+        whenever(megaApiGateway.globalUpdates).thenReturn(
+            flowOf(
+                globalUpdate,
+                globalUpdate,
+                globalUpdate
+            )
+        )
         whenever(eventMapper(megaEvent)).thenReturn(expectedEvent)
 
         underTest.monitorEvent().test {

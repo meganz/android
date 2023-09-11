@@ -50,6 +50,7 @@ fun MegaAlertDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     title: String? = null,
+    onCancel: () -> Unit = onDismiss,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
 ) = CompositionLocalProvider(LocalAbsoluteElevation provides 24.dp) {
@@ -84,7 +85,7 @@ fun MegaAlertDialog(
                     TextMegaButton(
                         modifier = Modifier.testTag(CANCEL_TAG),
                         text = cancelButtonText,
-                        onClick = onDismiss,
+                        onClick = onCancel,
                     )
                 }
                 TextMegaButton(

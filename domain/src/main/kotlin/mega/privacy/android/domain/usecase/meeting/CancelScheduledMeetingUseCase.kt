@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.meeting
 
-import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import javax.inject.Inject
 
 /**

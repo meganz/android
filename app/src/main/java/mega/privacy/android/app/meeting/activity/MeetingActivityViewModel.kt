@@ -61,12 +61,9 @@ import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
-import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
-import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.KickUsersFromCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
@@ -94,9 +91,6 @@ import javax.inject.Inject
  * @property logoutUseCase                  [LogoutUseCase]
  * @property monitorFinishActivityUseCase   [MonitorFinishActivityUseCase]
  * @property monitorChatCallUpdates         [MonitorChatCallUpdates]
- * @property getMessageSenderNameUseCase    [GetMessageSenderNameUseCase]
- * @property kickUsersFromCallUseCase       [KickUsersFromCallUseCase]
- * @property allowUsersJoinCallUseCase      [AllowUsersJoinCallUseCase]
  * @property getChatRoomUseCase             [GetChatRoomUseCase]
  * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
  * @property state                      Current view state as [MeetingState]
@@ -114,9 +108,6 @@ class MeetingActivityViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
-    private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
-    private val kickUsersFromCallUseCase: KickUsersFromCallUseCase,
-    private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase,
     private val getChatRoomUseCase: GetChatRoom,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     @ApplicationContext private val context: Context,
@@ -350,23 +341,6 @@ class MeetingActivityViewModel @Inject constructor(
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
                     call.changes?.apply {
-                        if (contains(ChatCallChanges.WaitingRoomUsersEntered) && state.value.hasHostPermission) {
-                            Timber.d("Users entered in waiting room")
-                            call.waitingRoom?.apply {
-                                peers?.let {
-                                    getWaitingRoomParticipants(it, true)
-                                }
-                            }
-                        }
-
-                        if (contains(ChatCallChanges.WaitingRoomUsersLeave) && state.value.hasHostPermission) {
-                            call.waitingRoom?.apply {
-                                peers?.let {
-                                    getWaitingRoomParticipants(it, false)
-                                }
-                            }
-                        }
-
                         if (contains(ChatCallChanges.LocalAVFlags)) {
                             val isEnable = call.hasLocalAudio
                             _micLiveData.value = isEnable
@@ -384,106 +358,6 @@ class MeetingActivityViewModel @Inject constructor(
                     }
                 }
         }
-
-    /**
-     * Sets showParticipantsInWaitingRoomDialog as consumed.
-     */
-    fun setShowParticipantsInWaitingRoomDialogConsumed() = _state.update { state ->
-        state.copy(showParticipantsInWaitingRoomDialog = false)
-    }
-
-    /**
-     * Sets showDenyParticipantDialog as consumed.
-     */
-    fun setShowDenyParticipantDialogConsumed() = _state.update { state ->
-        state.copy(showDenyParticipantDialog = false)
-    }
-
-    /**
-     * Get participants name in waiting room
-     *
-     * @param handleList
-     */
-    private fun getWaitingRoomParticipants(handleList: List<Long>, showDialog: Boolean) =
-        viewModelScope.launch {
-            val peerList = mutableMapOf<Long, String>()
-            handleList.forEach { handle ->
-                runCatching {
-                    getMessageSenderNameUseCase(handle, state.value.chatId)
-                }.onFailure { exception ->
-                    Timber.e(exception)
-                }.onSuccess { name ->
-                    name?.let {
-                        peerList[handle] = name
-                    }
-                }
-            }
-
-            _state.update { state ->
-                state.copy(
-                    showParticipantsInWaitingRoomDialog = showDialog,
-                    usersInWaitingRoom = peerList
-                )
-            }
-        }
-
-    /**
-     * Admit users to waiting room
-     *
-     * @param admitAll True, admit all users. False, otherwise.
-     */
-    fun admitUsersTap(admitAll: Boolean) {
-        if (state.value.usersInWaitingRoom.isNullOrEmpty())
-            return
-
-        val handleList: List<Long>? = state.value.usersInWaitingRoom?.toList()?.map { it.first }
-        handleList?.let {
-            viewModelScope.launch {
-                runCatching {
-                    allowUsersJoinCallUseCase(state.value.chatId, handleList, admitAll)
-                }.onFailure { exception ->
-                    Timber.e(exception)
-                }.onSuccess {
-                    Timber.d("Users admitted to the call")
-                }
-            }
-        }
-    }
-
-    /**
-     * Deny users to waiting room
-     */
-    fun denyUsersTap() = _state.update { state ->
-        state.copy(showDenyParticipantDialog = true)
-    }
-
-    /**
-     * Deny specific user to waiting room
-     */
-    fun denySpecificUser(userHandle: Long) {
-        if (state.value.usersInWaitingRoom.isNullOrEmpty())
-            return
-
-        val handleList = mutableListOf<Long>().apply {
-            add(userHandle)
-        }
-        viewModelScope.launch {
-            runCatching {
-                kickUsersFromCallUseCase(state.value.chatId, handleList)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess {
-                Timber.d("Users kicked off the call")
-            }
-        }
-    }
-
-    /**
-     * See waiting room section
-     */
-    fun seeWaitingRoom() {
-
-    }
 
     /**
      * Logout

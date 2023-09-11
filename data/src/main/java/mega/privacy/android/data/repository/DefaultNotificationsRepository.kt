@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NotificationsRepository
-import mega.privacy.android.domain.usecase.GetScheduledMeeting
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser

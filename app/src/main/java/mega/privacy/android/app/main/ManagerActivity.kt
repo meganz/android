@@ -53,8 +53,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
@@ -63,12 +65,14 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
 import androidx.navigation.NavController
@@ -191,6 +195,7 @@ import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
@@ -202,6 +207,8 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
@@ -300,12 +307,14 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -390,6 +399,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val searchViewModel: SearchViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val transferPageViewModel: TransferPageViewModel by viewModels()
+    private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
@@ -512,6 +522,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     override var drawerItem: DrawerItem? = null
     private lateinit var fragmentLayout: LinearLayout
+    private lateinit var waitingRoomComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
     private lateinit var usedSpaceLayout: RelativeLayout
@@ -1074,6 +1085,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
+        waitingRoomComposeView = findViewById(R.id.waiting_room_dialog_compose_view)
+
         fragmentLayout = findViewById(R.id.fragment_layout)
         bottomNavigationView =
             findViewById(R.id.bottom_navigation_view)
@@ -1138,6 +1151,26 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             ) else Color.WHITE
         )
         callInProgressLayout.visibility = View.GONE
+
+        waitingRoomComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
+                AndroidTheme(isDark = isDark) {
+                    UsersInWaitingRoomDialog(
+                        state = waitingRoomState,
+                        onAdmitClick = {
+                            waitingRoomManagementViewModel.admitUsersClick()
+                            waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                        },
+                        onSeeWaitingRoomClick = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
+                        onDismiss = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() })
+                }
+            }
+        }
     }
 
     private fun setViewListeners() {
@@ -2074,6 +2107,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         collectFlow(viewModel.incomingContactRequests) { pendingRequest ->
             setContactTitleSection(pendingRequest.size)
+        }
+
+        collectFlow(waitingRoomManagementViewModel.state) { state ->
+            state.snackbarString?.let {
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    it,
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+                waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 import androidx.recyclerview.widget.DiffUtil
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
@@ -28,7 +30,6 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property isPublic                                   If chat room is public.
  * @property seeMoreVisible                             True if see more option is visible, false otherwise.
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
- * @property snackBar                                   String resource id for showing an snackBar.
  * @property leaveGroupDialog                           True if show leave group alert dialog, false if not.
  * @property addParticipantsNoContactsDialog            True if show add participants no contacts dialog, false if not.
  * @property addParticipantsNoContactsLeftToAddDialog   True if show add participants no contacts left to add dialog, false if not.
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property numOfParticipants                          Number of participants.
  * @property is24HourFormat                             True, if it's 24 hour format.
  * @property enabledWaitingRoomOption                   True if is enabled waiting room option, false otherwise.
+ * @property snackbarMsg                                State to show snackbar message
  */
 data class ScheduledMeetingInfoState(
     val chatId: Long = -1L,
@@ -59,7 +61,6 @@ data class ScheduledMeetingInfoState(
     val isPublic: Boolean = false,
     val seeMoreVisible: Boolean = true,
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
-    val snackBar: Int? = null,
     val leaveGroupDialog: Boolean = false,
     val addParticipantsNoContactsDialog: Boolean = false,
     val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
@@ -70,6 +71,7 @@ data class ScheduledMeetingInfoState(
     val numOfParticipants: Int = 0,
     val is24HourFormat: Boolean = false,
     val enabledWaitingRoomOption: Boolean = true,
+    val snackbarMsg: StateEventWithContent<String> = consumed(),
 ) {
 
     /**

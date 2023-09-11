@@ -25,6 +25,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -32,6 +34,7 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -72,8 +75,11 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -89,9 +95,12 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -113,11 +122,17 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
     private val collapsingAppBar get() = activityChatContactBinding.collapsingAppBar
+
     private val callInProgress get() = contentContactProperties.callInProgress
     private val viewModel by viewModels<ContactInfoViewModel>()
+    private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
+
     private var permissionsDialog: AlertDialog? = null
     private var statusDialog: AlertDialog? = null
     private var setNicknameDialog: AlertDialog? = null
@@ -505,6 +520,26 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     this@ContactInfoActivity,
                     passcodeManagement
                 )
+            }
+        }
+
+        activityChatContactBinding.waitingRoomDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
+                AndroidTheme(isDark = isDark) {
+                    UsersInWaitingRoomDialog(
+                        state = waitingRoomState,
+                        onAdmitClick = {
+                            waitingRoomManagementViewModel.admitUsersClick()
+                            waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                        },
+                        onSeeWaitingRoomClick = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
+                        onDismiss = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() })
+                }
             }
         }
     }
@@ -896,6 +931,17 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             updateBasicInfo(contactInfoState)
             setFoldersButtonText(contactInfoState.inShares)
             updateUI()
+        }
+
+        collectFlow(waitingRoomManagementViewModel.state) { state ->
+            state.snackbarString?.let {
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    it,
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+                waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
+            }
         }
     }
 

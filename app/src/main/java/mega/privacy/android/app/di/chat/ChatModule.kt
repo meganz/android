@@ -13,8 +13,8 @@ import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.GetScheduledMeeting
-import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat

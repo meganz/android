@@ -4503,18 +4503,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5119,8 +5113,8 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">See waiting room</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d is waiting to join the call.</item>
-        <item quantity="other">%1$d are waiting to join the call.</item>
+        <item quantity="one">%1$d participant is waiting to join the call</item>
+        <item quantity="other">%1$d participants are waiting to join the call</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
@@ -5133,7 +5127,19 @@
     <!-- Dialog title when waiting room has been inactive for a while -->
     <string name="meetings_waiting_room_inactive_host_dialog_title">Host didn’t respond</string>
     <!-- Dialog description when waiting room has been inactive for a while -->
-    <string name="meetings_waiting_room_inactive_host_dialog_description">There was no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
+    <string name="meetings_waiting_room_inactive_host_dialog_description">There is no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s is waiting to join “%2$s”.</string>
+    <!-- Success message when participants was added to the call from waiting room -->
+    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
+        <item quantity="one">%1$d participant joined the call</item>
+        <item quantity="other">%1$d participants joined the call</item>
+    </plurals>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
+        <item quantity="one">%1$d participant is waiting to join “%2$s”.</item>
+        <item quantity="other">%1$d participants are waiting to join “%2$s”.</item>
+    </plurals>
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">“%s” deleted</string>
 </resources>

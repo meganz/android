@@ -15,18 +15,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -42,6 +39,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -86,6 +84,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
     private val viewModel by viewModels<ScheduledMeetingInfoViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
+    private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
     private lateinit var sendToChatLauncher: ActivityResultLauncher<Unit?>
@@ -101,87 +100,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, finish, openAddContact, dndSecond, _, _, openSendToChat, openRemoveParticipantDialog, selected, openChatRoom, showChangePermissionsDialog, openChatCall) ->
-                    if (finish) {
-                        Timber.d("Finish activity")
-                        finish()
-                    }
-
-                    if (chatRoomId != chatId) {
-                        chatRoomId = chatId
-                    }
-
-                    enabledChatNotification = dndSecond == null
-
-                    if (openSendToChat) {
-                        viewModel.openSendToChat(false)
-                        sendToChatLauncher.launch(Unit)
-                    }
-
-                    showChangePermissionsDialog?.let {
-                        viewModel.showChangePermissionsDialog(null)
-                        showChangePermissionsDialog(it)
-                    }
-
-                    openChatRoom?.let {
-                        viewModel.openChatRoom(null)
-                        openChatRoom(it)
-                    }
-
-                    openChatCall?.let {
-                        viewModel.openChatCall(null)
-                        openChatCall(it)
-                    }
-
-                    selected?.let {
-                        if (openRemoveParticipantDialog) {
-                            viewModel.onRemoveParticipantTap(false)
-                            showRemoveParticipantDialog(it)
-                        }
-                    }
-
-                    openAddContact?.let { shouldOpen ->
-                        if (shouldOpen) {
-                            viewModel.removeAddContact()
-                            Timber.d("Open Invite participants screen")
-                            addContactLauncher.launch(
-                                Intent(
-                                    this@ScheduledMeetingInfoActivity,
-                                    AddContactActivity::class.java
-                                )
-                                    .putExtra(
-                                        INTENT_EXTRA_KEY_CONTACT_TYPE,
-                                        Constants.CONTACT_TYPE_MEGA
-                                    )
-                                    .putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                                    .putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
-                                    .putExtra(
-                                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                                        getString(R.string.add_participants_menu_item)
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                scheduledMeetingManagementViewModel.state.collect { (finish, _, _, _, _, _, _, _, _, meetingLink) ->
-                    if (finish) {
-                        Timber.d("Finish activity")
-                        finish()
-                    }
-
-                    if (link != meetingLink) {
-                        link = meetingLink
-                    }
-                }
-            }
-        }
+        collectFlows()
 
         val chatId = intent.getLongExtra(CHAT_ID, -1L)
         val schedId = intent.getLongExtra(
@@ -223,6 +142,90 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     scheduledMeetingManagementViewModel.checkWaitingRoomWarning()
                 }
             }
+    }
+
+    private fun collectFlows() {
+        collectFlow(scheduledMeetingManagementViewModel.state) { scheduledMeetingManagementState ->
+            if (scheduledMeetingManagementState.finish) {
+                Timber.d("Finish activity")
+                finish()
+            }
+
+            if (scheduledMeetingManagementState.meetingLink != link) {
+                link = scheduledMeetingManagementState.meetingLink
+            }
+        }
+
+        collectFlow(waitingRoomManagementViewModel.state) { waitingRoomManagementState ->
+            waitingRoomManagementState.snackbarString?.let {
+                viewModel.triggerSnackbarMessage(it)
+                waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
+            }
+        }
+
+        collectFlow(viewModel.state) { state ->
+            if (state.finish) {
+                Timber.d("Finish activity")
+                finish()
+            }
+
+            if (chatRoomId != state.chatId) {
+                chatRoomId = state.chatId
+            }
+
+            enabledChatNotification = state.dndSeconds == null
+
+            if (state.openSendToChat) {
+                viewModel.openSendToChat(false)
+                sendToChatLauncher.launch(Unit)
+            }
+
+            state.showChangePermissionsDialog?.let {
+                viewModel.showChangePermissionsDialog(null)
+                showChangePermissionsDialog(it)
+            }
+
+            state.openChatRoom?.let {
+                viewModel.openChatRoom(null)
+                openChatRoom(it)
+            }
+
+            state.openChatCall?.let {
+                viewModel.openChatCall(null)
+                openChatCall(it)
+            }
+
+            state.selected?.let {
+                if (state.openRemoveParticipantDialog) {
+                    viewModel.onRemoveParticipantTap(false)
+                    showRemoveParticipantDialog(it)
+                }
+            }
+
+            state.openAddContact?.let { shouldOpen ->
+                if (shouldOpen) {
+                    viewModel.removeAddContact()
+                    Timber.d("Open Invite participants screen")
+                    addContactLauncher.launch(
+                        Intent(
+                            this@ScheduledMeetingInfoActivity,
+                            AddContactActivity::class.java
+                        )
+                            .putExtra(
+                                INTENT_EXTRA_KEY_CONTACT_TYPE,
+                                Constants.CONTACT_TYPE_MEGA
+                            )
+                            .putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                            .putExtra(INTENT_EXTRA_KEY_CHAT_ID, state.chatId)
+                            .putExtra(
+                                INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                                getString(R.string.add_participants_menu_item)
+                            )
+                    )
+                }
+            }
+
+        }
     }
 
     /**
@@ -442,10 +445,13 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
+        val waitingRoomManagementState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
+
         AndroidTheme(isDark = isDark) {
             ScheduledMeetingInfoView(
                 state = uiState,
                 managementState = managementState,
+                waitingRoomManagementState = waitingRoomManagementState,
                 onButtonClicked = ::onActionTap,
                 onEditClicked = { onEditTap() },
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
@@ -461,7 +467,13 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     viewModel.dismissDialog()
                 },
                 onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
-                onSnackbarShown = viewModel::snackbarShown
+                onResetStateSnackbarMessage = viewModel::onSnackbarMessageConsumed,
+                onAdmitUsersInWaitingRoomClicked = {
+                    waitingRoomManagementViewModel.admitUsersClick()
+                    waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                },
+                onSeeWaitingRoomClicked = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
+                onDismissWaitingRoomDialog = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
             )
         }
     }

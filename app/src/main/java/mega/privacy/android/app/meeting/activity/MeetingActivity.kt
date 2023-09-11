@@ -10,9 +10,13 @@ import android.view.ViewGroup
 import android.view.WindowInsets
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
@@ -33,10 +37,16 @@ import mega.privacy.android.app.meeting.fragments.MakeModeratorFragment
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.PasscodeUtil
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -85,6 +95,9 @@ class MeetingActivity : BaseActivity() {
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
     /**
      * Rtc audio manager gateway
      */
@@ -93,6 +106,7 @@ class MeetingActivity : BaseActivity() {
 
     lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
+    private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
 
     private var meetingAction: String? = null
 
@@ -182,6 +196,41 @@ class MeetingActivity : BaseActivity() {
         initActionBar()
         initNavigation()
         setStatusBarTranslucent()
+        binding.waitingRoomDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
+                AndroidTheme(isDark = isDark) {
+                    UsersInWaitingRoomDialog(
+                        state = waitingRoomState,
+                        onAdmitClick = {
+                            waitingRoomManagementViewModel.admitUsersClick()
+                        },
+                        onDenyClick = {
+                            waitingRoomManagementViewModel.denyUsersClick()
+                        },
+                        onDenyEntryClick = {
+                            waitingRoomManagementViewModel.denyEntryClick()
+                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
+                        },
+                        onSeeWaitingRoomClick = {
+                            waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
+                        },
+                        onDismiss = {
+                            waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                        },
+                        onDismissDenyParticipantDialog = {
+                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
+                        },
+                    )
+                }
+            }
+        }
+
         collectFlows()
 
         collectFlow(meetingViewModel.finishMeetingActivity) { shouldFinish ->
@@ -212,6 +261,10 @@ class MeetingActivity : BaseActivity() {
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 )
                 finish()
+            }
+
+            if (state.chatId != -1L) {
+                waitingRoomManagementViewModel.setChatIdCallOpened(state.chatId)
             }
         }
     }

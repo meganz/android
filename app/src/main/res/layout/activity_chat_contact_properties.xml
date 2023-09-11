@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_container"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="wrap_content">
 
-    <include
-        android:id="@+id/collapsing_app_bar"
-        layout="@layout/collapsing_app_bar_contact" />
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
-    <include
-        android:id="@+id/content_contact_properties"
-        layout="@layout/content_chat_contact_properties_activity" />
+        <include
+            android:id="@+id/collapsing_app_bar"
+            layout="@layout/collapsing_app_bar_contact" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <include
+            android:id="@+id/content_contact_properties"
+            layout="@layout/content_chat_contact_properties_activity" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/waiting_room_dialog_compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</FrameLayout>

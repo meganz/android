@@ -373,6 +373,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel;
 import mega.privacy.android.app.presentation.chat.ContactInvitation;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment;
@@ -384,6 +385,7 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
+import mega.privacy.android.app.presentation.meeting.UsersInWaitingRoomDialogFragment;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
@@ -420,6 +422,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState;
 import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
+import mega.privacy.android.domain.usecase.GetThemeMode;
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -529,6 +532,9 @@ public class ChatActivity extends PasscodeActivity
     private final static int SIXTH_RANGE = 6;
 
     @Inject
+    GetThemeMode getThemeMode;
+
+    @Inject
     FilePrepareUseCase filePrepareUseCase;
     @Inject
     PasscodeManagement passcodeManagement;
@@ -573,6 +579,8 @@ public class ChatActivity extends PasscodeActivity
 
     private ChatViewModel viewModel;
 
+    private WaitingRoomManagementViewModel waitingRoomManagementViewModel;
+
     private int currentRecordButtonState;
     private String mOutputFilePath;
     private boolean getMoreHistory;
@@ -596,6 +604,7 @@ public class ChatActivity extends PasscodeActivity
 
     AlertDialog dialog;
     AlertDialog statusDialog;
+    private UsersInWaitingRoomDialogFragment usersInWaitingRoomDialogFragment;
 
     boolean retryHistory = false;
     boolean isStartAndRecordVoiceClip = false;
@@ -1452,6 +1461,7 @@ public class ChatActivity extends PasscodeActivity
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+        waitingRoomManagementViewModel = new ViewModelProvider(this).get(WaitingRoomManagementViewModel.class);
 
         if (shouldRefreshSessionDueToKarere()) {
             return;
@@ -1540,7 +1550,7 @@ public class ChatActivity extends PasscodeActivity
                         showSnackbar(Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE,
                                 fragmentContainer,
                                 getString(R.string.allow_acces_calls_subtitle_microphone),
-                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                                MEGACHAT_INVALID_HANDLE
                         );
                     }
                 });
@@ -1995,6 +2005,18 @@ public class ChatActivity extends PasscodeActivity
         Timber.d("FINISH on Create");
     }
 
+    /**
+     * Show waiting room dialog
+     */
+    private void showWaitingRoomDialog() {
+        if (usersInWaitingRoomDialogFragment != null) {
+            usersInWaitingRoomDialogFragment.dismissAllowingStateLoss();
+        }
+
+        usersInWaitingRoomDialogFragment = UsersInWaitingRoomDialogFragment.Companion.newInstance();
+        usersInWaitingRoomDialogFragment.show(getSupportFragmentManager(), usersInWaitingRoomDialogFragment.getTag());
+    }
+
     private boolean isAllowedToRecord() {
         Timber.d("isAllowedToRecord ");
         if (participatingInACall()) return false;
@@ -2114,6 +2136,15 @@ public class ChatActivity extends PasscodeActivity
             return Unit.INSTANCE;
         });
         viewModel.onPendingMessageLoaded().observe(this, this::onPendingMessageLoaded);
+        ViewExtensionsKt.collectFlow(this, waitingRoomManagementViewModel.getState(), Lifecycle.State.STARTED, waitingRoomManagementState -> {
+            if (waitingRoomManagementState.getShowParticipantsInWaitingRoomDialog()) {
+                showWaitingRoomDialog();
+            } else if (usersInWaitingRoomDialogFragment != null) {
+                usersInWaitingRoomDialogFragment.dismissAllowingStateLoss();
+            }
+
+            return Unit.INSTANCE;
+        });
     }
 
     public void checkScroll() {

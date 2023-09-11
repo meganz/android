@@ -42,7 +42,7 @@ import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink

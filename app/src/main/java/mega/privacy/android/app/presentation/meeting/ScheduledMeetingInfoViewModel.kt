@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -18,6 +20,7 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -34,7 +37,7 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
@@ -82,6 +85,7 @@ import javax.inject.Inject
  * @property deviceGateway                                  [DeviceGateway]
  * @property setWaitingRoomUseCase                          [SetWaitingRoomUseCase]
  * @property setWaitingRoomRemindersUseCase                 [SetWaitingRoomRemindersUseCase]
+ * @property getStringFromStringResMapper                   [GetStringFromStringResMapper]
  * @property state                    Current view state as [ScheduledMeetingInfoState]
 
  */
@@ -112,6 +116,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -582,7 +587,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         } else {
-            showSnackBar(R.string.check_internet_connection_error)
+            triggerSnackbarMessage(
+                getStringFromStringResMapper(
+                    R.string.check_internet_connection_error
+                )
+            )
         }
     }
 
@@ -600,14 +609,22 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         )
                     }.onFailure { exception ->
                         Timber.e(exception)
-                        showSnackBar(R.string.general_text_error)
+                        triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.general_text_error
+                            )
+                        )
                     }.onSuccess { chatId ->
                         Timber.d("Open chat room")
                         openChatRoom(chatId)
                     }
                 }
             } else {
-                showSnackBar(R.string.check_internet_connection_error)
+                triggerSnackbarMessage(
+                    getStringFromStringResMapper(
+                        R.string.check_internet_connection_error
+                    )
+                )
             }
         }
 
@@ -626,13 +643,21 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         )
                     }.onFailure { exception ->
                         Timber.d(exception)
-                        showSnackBar(R.string.general_text_error)
+                        triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.general_text_error
+                            )
+                        )
                     }.onSuccess { chatCallId ->
                         openOrStartChatCall(chatCallId)
                     }
                 }
             } else {
-                showSnackBar(R.string.check_internet_connection_error)
+                triggerSnackbarMessage(
+                    getStringFromStringResMapper(
+                        R.string.check_internet_connection_error
+                    )
+                )
             }
         }
 
@@ -694,16 +719,57 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     inviteContact(participant.email)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    showSnackBar(R.string.general_error)
+                    triggerSnackbarMessage(
+                        getStringFromStringResMapper(
+                            R.string.general_error
+                        )
+                    )
                 }.onSuccess { request ->
                     when (request) {
-                        InviteContactRequest.Sent -> showSnackBar(R.string.context_contact_request_sent)
-                        InviteContactRequest.Resent -> showSnackBar(R.string.context_contact_invitation_resent)
-                        InviteContactRequest.Deleted -> showSnackBar(R.string.context_contact_invitation_deleted)
-                        InviteContactRequest.AlreadySent -> showSnackBar(R.string.invite_not_sent_already_sent)
-                        InviteContactRequest.AlreadyContact -> showSnackBar(R.string.context_contact_already_exists)
-                        InviteContactRequest.InvalidEmail -> showSnackBar(R.string.context_contact_already_exists)
-                        else -> showSnackBar(R.string.general_error)
+                        InviteContactRequest.Sent -> triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.context_contact_request_sent,
+                                participant.email
+                            )
+                        )
+
+                        InviteContactRequest.Resent -> triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.context_contact_invitation_resent
+                            )
+                        )
+
+                        InviteContactRequest.Deleted -> triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.context_contact_invitation_deleted
+                            )
+                        )
+
+                        InviteContactRequest.AlreadySent -> triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.invite_not_sent_already_sent,
+                                participant.email
+                            )
+                        )
+
+                        InviteContactRequest.AlreadyContact -> triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.context_contact_already_exists,
+                                participant.email
+                            )
+                        )
+
+                        InviteContactRequest.InvalidEmail -> triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.error_own_email_as_contact
+                            )
+                        )
+
+                        else -> triggerSnackbarMessage(
+                            getStringFromStringResMapper(
+                                R.string.general_error
+                            )
+                        )
                     }
                 }
             }
@@ -727,7 +793,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         viewModelScope.launch {
             inviteToChat(_state.value.chatId, contacts)
         }
-        showSnackBar(R.string.invite_sent)
+        triggerSnackbarMessage(
+            getStringFromStringResMapper(
+                R.string.invite_sent
+            )
+        )
     }
 
     /**
@@ -760,7 +830,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e(exception)
                 dismissDialog()
-                showSnackBar(R.string.general_error)
+                triggerSnackbarMessage(
+                    getStringFromStringResMapper(
+                        R.string.general_error
+                    )
+                )
             }.onSuccess { result ->
                 Timber.d("Chat left ")
                 if (result.userHandle == MegaApiJava.INVALID_HANDLE) {
@@ -795,7 +869,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     setOpenInvite(state.value.chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    showSnackBar(R.string.general_text_error)
+                    triggerSnackbarMessage(
+                        getStringFromStringResMapper(
+                            R.string.general_text_error
+                        )
+                    )
                 }.onSuccess { isAllowAddParticipantsEnabled ->
                     _state.update { state ->
                         state.copy(
@@ -810,7 +888,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         } else {
-            showSnackBar(R.string.check_internet_connection_error)
+            triggerSnackbarMessage(
+                getStringFromStringResMapper(
+                    R.string.check_internet_connection_error
+                )
+            )
         }
     }
 
@@ -851,14 +933,22 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun enableEncryptedKeyRotation() {
         if (_state.value.participantItemList.size > MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE) {
-            showSnackBar(R.string.warning_make_chat_private)
+            triggerSnackbarMessage(
+                getStringFromStringResMapper(
+                    R.string.warning_make_chat_private
+                )
+            )
         } else {
             viewModelScope.launch {
                 runCatching {
                     getPublicChatToPrivate(state.value.chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    showSnackBar(R.string.general_error)
+                    triggerSnackbarMessage(
+                        getStringFromStringResMapper(
+                            R.string.general_error
+                        )
+                    )
                 }.onSuccess { _ ->
                     _state.update { it.copy(isPublic = false) }
                 }
@@ -904,7 +994,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     updateChatPermissions(state.value.chatId, participant.handle, permission)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    showSnackBar(R.string.general_error)
+                    triggerSnackbarMessage(
+                        getStringFromStringResMapper(
+                            R.string.general_error
+                        )
+                    )
                 }.onSuccess {}
             }
         }
@@ -919,9 +1013,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     removeFromChat(state.value.chatId, participant.handle)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    showSnackBar(R.string.general_error)
+                    triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_error))
                 }.onSuccess {
-                    showSnackBar(R.string.remove_participant_success)
+                    triggerSnackbarMessage(
+                        getStringFromStringResMapper(
+                            R.string.remove_participant_success
+                        )
+                    )
                 }
             }
         }
@@ -930,22 +1028,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Scheduled meeting updated
      */
     fun scheduledMeetingUpdated() {
-        showSnackBar(R.string.meetings_edit_scheduled_meeting_success_snackbar)
+        triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_edit_scheduled_meeting_success_snackbar))
         getChat()
     }
-
-    /**
-     * Show snackBar with a text
-     *
-     * @param stringId String id.
-     */
-    private fun showSnackBar(stringId: Int) =
-        _state.update { it.copy(snackBar = stringId) }
-
-    /**
-     * Updates state after shown snackBar.
-     */
-    fun snackbarShown() = _state.update { it.copy(snackBar = null) }
 
     /**
      * Open send to screen
@@ -959,9 +1044,26 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun checkInitialSnackbar(shouldBeShown: Boolean) {
         if (shouldBeShown) {
-            showSnackBar(R.string.meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success)
+            triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success))
         }
     }
+
+    /**
+     * Trigger event to show Snackbar message
+     *
+     * @param message     Content for snack bar
+     */
+    fun triggerSnackbarMessage(message: String) =
+        _state.update { it.copy(snackbarMsg = triggered(message)) }
+
+    /**
+     * Reset and notify that snackbarMessage is consumed
+     */
+    fun onSnackbarMessageConsumed() =
+        _state.update {
+            it.copy(snackbarMsg = consumed())
+        }
+
 
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100

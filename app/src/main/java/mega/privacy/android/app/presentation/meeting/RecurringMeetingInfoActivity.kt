@@ -73,8 +73,6 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
                 Timber.d("Finish activity")
                 finish()
             }
-
-
         }
 
         collectFlow(scheduledMeetingManagementViewModel.state) { (finish) ->

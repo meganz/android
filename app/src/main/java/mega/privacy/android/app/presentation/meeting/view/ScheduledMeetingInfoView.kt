@@ -27,10 +27,8 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -39,7 +37,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -61,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.contact.view.ContactStatus
@@ -74,6 +72,7 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.divider.CustomDivider
@@ -105,6 +104,7 @@ import java.util.Locale
 fun ScheduledMeetingInfoView(
     state: ScheduledMeetingInfoState,
     managementState: ScheduledMeetingManagementState,
+    waitingRoomManagementState: WaitingRoomManagementState,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
@@ -116,8 +116,11 @@ fun ScheduledMeetingInfoView(
     onDismiss: () -> Unit,
     onLeaveGroupDialog: () -> Unit,
     onInviteParticipantsDialog: () -> Unit,
-    onSnackbarShown: () -> Unit,
+    onResetStateSnackbarMessage: () -> Unit = {},
     onCloseWarningClicked: () -> Unit,
+    onAdmitUsersInWaitingRoomClicked: () -> Unit,
+    onSeeWaitingRoomClicked: () -> Unit,
+    onDismissWaitingRoomDialog: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
@@ -158,6 +161,12 @@ fun ScheduledMeetingInfoView(
             state = state,
             onDismiss = { onDismiss() },
             onInvite = { onInviteParticipantsDialog() })
+
+        UsersInWaitingRoomDialog(
+            state = waitingRoomManagementState,
+            onAdmitClick = { onAdmitUsersInWaitingRoomClicked() },
+            onSeeWaitingRoomClick = { onSeeWaitingRoomClicked() },
+            onDismiss = { onDismissWaitingRoomDialog() })
 
         Column {
             if (shouldShowWarningDialog) {
@@ -225,29 +234,10 @@ fun ScheduledMeetingInfoView(
             }
         }
 
-
-        if (state.snackBar != null) {
-            val msg =
-                if (state.snackBar == R.string.context_contact_request_sent && state.selected != null) {
-                    stringResource(id = state.snackBar, state.selected.email)
-                } else if (state.snackBar == R.string.invite_not_sent_already_sent && state.selected != null) {
-                    stringResource(id = state.snackBar, state.selected.email)
-                } else if (state.snackBar == R.string.context_contact_already_exists && state.selected != null) {
-                    stringResource(id = state.snackBar, state.selected.email)
-                } else {
-                    stringResource(id = state.snackBar)
-                }
-
-            LaunchedEffect(scaffoldState.snackbarHostState) {
-                val s = scaffoldState.snackbarHostState.showSnackbar(
-                    message = msg,
-                    duration = SnackbarDuration.Short
-                )
-
-                if (s == SnackbarResult.Dismissed) {
-                    onSnackbarShown()
-                }
-            }
+        EventEffect(
+            event = state.snackbarMsg, onConsumed = onResetStateSnackbarMessage
+        ) {
+            scaffoldState.snackbarHostState.showSnackbar(it)
         }
     }
 
@@ -1366,6 +1356,7 @@ fun PreviewScheduledMeetingInfoView() {
                 )
             ),
             managementState = ScheduledMeetingManagementState(),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onButtonClicked = {},
             onEditClicked = {},
             onAddParticipantsClicked = {},
@@ -1377,8 +1368,11 @@ fun PreviewScheduledMeetingInfoView() {
             onDismiss = {},
             onLeaveGroupDialog = {},
             onInviteParticipantsDialog = {},
-            onSnackbarShown = {},
+            onResetStateSnackbarMessage = {},
             onCloseWarningClicked = {},
+            onAdmitUsersInWaitingRoomClicked = {},
+            onSeeWaitingRoomClicked = {},
+            onDismissWaitingRoomDialog = {},
         )
     }
 }

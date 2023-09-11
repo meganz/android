@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingData
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import java.time.Instant
 import javax.inject.Inject
 

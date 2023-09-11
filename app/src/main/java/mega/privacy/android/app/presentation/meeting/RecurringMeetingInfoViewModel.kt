@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.usecase.GetChatParticipants
-import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates

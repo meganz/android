@@ -20,7 +20,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
@@ -221,7 +221,8 @@ class WaitingRoomViewModel @Inject constructor(
             it.copy(
                 callStarted = this.hasStarted(),
                 joinCall = this.shouldJoin(),
-                finish = changes?.contains(ChatCallChanges.WaitingRoomDeny) ?: false // TODO Show Dialog
+                finish = changes?.contains(ChatCallChanges.WaitingRoomDeny)
+                    ?: false // TODO Show Dialog
             )
         }
     }
