@@ -12,6 +12,7 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
@@ -51,6 +52,7 @@ internal class AppEventFacade @Inject constructor(
     private val updateUpgradeSecurityState = MutableStateFlow(false)
     private val _monitorCompletedTransfer = MutableSharedFlow<CompletedTransfer>()
     private val _monitorRefreshSession = MutableSharedFlow<Unit>()
+    private val _monitorBackupInfoType = MutableSharedFlow<BackupInfoType>()
 
     private val _monitorCameraUploadsSettingsActions =
         MutableSharedFlow<CameraUploadsSettingsAction>()
@@ -188,6 +190,12 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadCastCameraUploadSettingsActions(action: CameraUploadsSettingsAction) {
         _monitorCameraUploadsSettingsActions.emit(action)
+    }
+
+    override fun monitorBackupInfoType() = _monitorBackupInfoType.asSharedFlow()
+
+    override suspend fun broadCastBackupInfoType(backupInfoType: BackupInfoType) {
+        _monitorBackupInfoType.emit(backupInfoType)
     }
 }
 

@@ -666,6 +666,10 @@ object CameraUploadSyncManager {
      *
      * @param which Re-enable which preference, CU or MU.
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("mega.privacy.android.domain.usecase.backup.BroadcastBackupInfoTypeUseCase")
+    )
     private fun reEnableCameraUploadsPreference(which: Int) = MegaApplication.getInstance()
         .sendBroadcast(
             Intent(BROADCAST_ACTION_REENABLE_CU_PREFERENCE).putExtra(

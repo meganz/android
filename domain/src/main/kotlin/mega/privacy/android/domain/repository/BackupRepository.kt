@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfo
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 
 /**
  * Repository class that provides several functions for Backup-related operations
@@ -59,4 +61,18 @@ interface BackupRepository {
         backupType: Int, targetNode: Long, localFolder: String, backupName: String,
         state: Int, subState: Int,
     ): Backup
+
+    /**
+     * Monitor BackupInfoType.
+     *
+     * @return Flow [BackupInfoType]
+     */
+    fun monitorBackupInfoType(): Flow<BackupInfoType>
+
+    /**
+     * Broadcast BackupInfoType.
+     *
+     * @param backupInfoType [BackupInfoType]
+     */
+    suspend fun broadCastBackupInfoType(backupInfoType: BackupInfoType)
 }

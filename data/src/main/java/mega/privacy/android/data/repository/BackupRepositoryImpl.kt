@@ -4,10 +4,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.backup.BackupDeviceNamesMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoListMapper
 import mega.privacy.android.data.mapper.backup.BackupMapper
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.BackupRepository
 import nz.mega.sdk.MegaApiJava
@@ -21,6 +23,7 @@ import javax.inject.Inject
  * @property backupMapper [BackupMapper]
  * @property ioDispatcher [CoroutineDispatcher]
  * @property megaApiGateway [MegaApiGateway]
+ * @property appEventGateway [AppEventGateway]
  */
 internal class BackupRepositoryImpl @Inject constructor(
     private val backupDeviceNamesMapper: BackupDeviceNamesMapper,
@@ -28,6 +31,7 @@ internal class BackupRepositoryImpl @Inject constructor(
     private val backupMapper: BackupMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaApiGateway: MegaApiGateway,
+    private val appEventGateway: AppEventGateway,
 ) : BackupRepository {
     override suspend fun getDeviceId() = withContext(ioDispatcher) {
         megaApiGateway.getDeviceId()
@@ -118,4 +122,9 @@ internal class BackupRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun monitorBackupInfoType() = appEventGateway.monitorBackupInfoType()
+
+    override suspend fun broadCastBackupInfoType(backupInfoType: BackupInfoType) =
+        appEventGateway.broadCastBackupInfoType(backupInfoType)
 }

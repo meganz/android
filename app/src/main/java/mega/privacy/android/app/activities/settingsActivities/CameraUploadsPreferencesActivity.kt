@@ -69,6 +69,10 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
         settingsFragment?.setCUDestinationFolder(isSecondaryFolder, handleInUserAttr)
     }
 
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase")
+    )
     private val reEnableCameraUploadsPreferenceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent != null && intent.action.equals(BROADCAST_ACTION_REENABLE_CU_PREFERENCE) &&
