@@ -275,8 +275,7 @@ internal class DownloadService : LifecycleService() {
 
         lifecycleScope.launch {
             monitorStopTransfersWorkUseCase().conflate().collect {
-                @Suppress("DEPRECATION")
-                if (megaApi.numPendingDownloads == 0) stopForeground()
+                if (getNumPendingDownloadsNonBackgroundUseCase() == 0) stopForeground()
             }
         }
 
