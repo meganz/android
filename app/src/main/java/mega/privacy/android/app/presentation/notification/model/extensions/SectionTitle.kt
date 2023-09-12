@@ -15,17 +15,16 @@ import java.util.Locale
  */
 internal fun UserAlert.sectionTitle(): (Context) -> String = when (this) {
     is ContactAlert -> { context ->
-        context.getString(R.string.section_contacts).uppercase(Locale.getDefault())
+        context.getString(R.string.section_contacts)
     }
     is IncomingShareAlert -> { context ->
         context.getString(R.string.title_incoming_shares_explorer)
-            .uppercase(Locale.getDefault())
     }
     is ScheduledMeetingAlert -> { context ->
         context.getString(R.string.chat_tab_meetings_title)
     }
     is CustomAlert -> { _ ->
-        heading?.uppercase(Locale.getDefault()) ?: ""
+        heading ?: ""
     }
     else -> { _ -> "" }
 }
