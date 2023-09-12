@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.camerauploads
+package mega.privacy.android.domain.usecase.file
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi

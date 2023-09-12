@@ -135,7 +135,7 @@ import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinksUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesUseCase
 import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetVideosBySearchTypeUseCase

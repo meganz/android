@@ -112,7 +112,7 @@ import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase

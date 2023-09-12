@@ -73,7 +73,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.file.EscapeFsIncompatibleUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.login.CompleteFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
@@ -196,7 +196,7 @@ internal class DownloadService : LifecycleService() {
     lateinit var deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase
 
     @Inject
-    lateinit var escapeFsIncompatibleUseCase: EscapeFsIncompatibleUseCase
+    lateinit var getFingerprintUseCase: GetFingerprintUseCase
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -473,7 +473,7 @@ internal class DownloadService : LifecycleService() {
         currentFile = if (currentDir?.isDirectory == true) {
             File(
                 currentDir,
-                escapeFsIncompatibleUseCase(
+                megaApi.escapeFsIncompatible(
                     node.name,
                     currentDir?.absolutePath + Constants.SEPARATOR
                 )
@@ -502,12 +502,9 @@ internal class DownloadService : LifecycleService() {
                 storeToAdvancedDevices[node.handle] = contentUri
             } else if (currentFile?.exists() == true) {
                 //Check the fingerprint
-                val localFingerprint = megaApi.getFingerprint(currentFile?.absolutePath)
-                val megaFingerprint = node.fingerprint
-                if (!TextUtil.isTextEmpty(localFingerprint)
-                    && !TextUtil.isTextEmpty(megaFingerprint)
-                    && localFingerprint == megaFingerprint
-                ) {
+                val localFingerprint = currentFile?.absolutePath?.let { getFingerprintUseCase(it) }
+
+                if (!localFingerprint.isNullOrEmpty() && localFingerprint == node.fingerprint) {
                     Timber.d("Delete the old version")
                     currentFile?.delete()
                 }

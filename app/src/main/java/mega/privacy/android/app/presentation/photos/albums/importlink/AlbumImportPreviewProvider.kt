@@ -22,7 +22,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetAlbumPhotoFileUrlByNodeIdUseCase
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
