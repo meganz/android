@@ -35,8 +35,6 @@ import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES
 import mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
-import mega.privacy.android.app.data.extensions.isBackgroundTransfer
-import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
@@ -82,6 +80,7 @@ import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUse
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -197,6 +196,9 @@ internal class DownloadService : LifecycleService() {
 
     @Inject
     lateinit var getFingerprintUseCase: GetFingerprintUseCase
+
+    @Inject
+    lateinit var getTransferByTagUseCase: GetTransferByTagUseCase
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -429,10 +431,10 @@ internal class DownloadService : LifecycleService() {
                 val uploadsInProgress = transferData.numDownloads
                 for (i in 0 until uploadsInProgress) {
                     coroutineContext.ensureActive()
-                    val transfer =
-                        megaApi.getTransferByTag(transferData.downloadTags[i]) ?: continue
-                    if (!transfer.isVoiceClipTransfer() && !transfer.isBackgroundTransfer()) {
-                        transfersCount++
+                    getTransferByTagUseCase(transferData.downloadTags[i])?.let { transfer ->
+                        if (!transfer.isVoiceClip() && !transfer.isBackgroundTransfer()) {
+                            transfersCount++
+                        }
                     }
                 }
                 if (transfersCount > 0) {
