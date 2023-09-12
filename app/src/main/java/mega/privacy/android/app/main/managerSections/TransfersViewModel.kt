@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -432,11 +433,13 @@ class TransfersViewModel @Inject constructor(
     fun cancelTransfersByTag(tags: List<Int>) {
         viewModelScope.launch {
             val result = runCatching {
-                tags.map {
-                    async {
-                        cancelTransferByTagUseCase(it)
-                    }
-                }.awaitAll()
+                coroutineScope {
+                    tags.map {
+                        async {
+                            cancelTransferByTagUseCase(it)
+                        }
+                    }.awaitAll()
+                }
                 Unit
             }
             _uiState.update { it.copy(cancelTransfersResult = result) }
