@@ -1802,7 +1802,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Password accettata</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Password errata.\nEffettua una copia della tua Chiave di recupero il prima possibile!</string>
+    <string name="test_pwd_wrong">Password errata.\nEffettua una copia della tua Chiave di recupero il prima possibile.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copia negli appunti</string>
     <!-- Option that permits user logout -->
@@ -2858,7 +2858,7 @@
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Not approved</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Approved</string>
+    <string name="label_verified">Approvato</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenziali di autenticità</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -4841,8 +4841,6 @@
         <item quantity="many">Impossibile aggiornare i permessi di %1$d di contatti</item>
         <item quantity="other">Impossibile aggiornare i permessi di %1$d contatti</item>
     </plurals>
-    <!--This is the label of the button of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, capito</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
         <item quantity="one">%1$d oggetto rimosso permanentemente</item>
@@ -4937,8 +4935,6 @@
     <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Ogni mese</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Personalizzato</string>
-    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
-    <string name="meetings_schedule_meeting_recurrence_daily_label">Giornalmente</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
     <string name="meetings_schedule_meeting_recurrence_weekly_label">Settimanalmente</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
@@ -4961,16 +4957,12 @@
     <string name="general_pro_only">Solo Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_title_link_access">Link di accesso</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access">Chiunque con questo link può vedere e scaricare i tuoi dati.</string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">Data di scadenza</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">Imposta una password</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">Link aggiornato. Copialo di nuovo.</string>
-    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Link creato e copiato negli appunti</string>
     <!-- Album import link label -->
     <string name="album_import_link">Link dell\’album</string>
     <!-- Album import error access title -->
@@ -5315,7 +5307,7 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Allow access to audio files</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Approved</string>
+    <string name="contact_approve_credentials_approved_text">Approvato</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
     <string name="contact_approve_credentials_not_approved_text">Not approved</string>
     <!-- Photos action menu zoom in -->
@@ -5325,17 +5317,17 @@
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">Item couldn’t be added</string>
     <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Wait for host to start the meeting</string>
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Attendi che l\’host dia inizio al meeting</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wait for host to let you in</string>
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Attendi che l\’host ti faccia entrare</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t approved. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
-    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Don’t leave</string>
+    <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Non lasciare</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
-    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">Admit</string>
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_admit_button">Ammetti</string>
     <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
-    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">Admit all</string>
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">Ammetti tutti</string>
     <!-- Deny button in admit users to waiting room dialog in a meeting -->
     <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Nega</string>
     <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
@@ -5344,22 +5336,45 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">See waiting room</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$d participant is waiting to join the call</item>
+        <item quantity="other">%1$d participants are waiting to join the call</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
     <!-- Dialog button to deny entry to a participant in the call -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Deny entry</string>
     <!-- Dialog title when a participant has been denied entry to the call -->
-    <string name="meetings_waiting_room_deny_user_dialog_title">Host didn’t let you in</string>
+    <string name="meetings_waiting_room_deny_user_dialog_title">L\’host non ti ha fatto entrare</string>
     <!-- Dialog description when a participant has been denied entry to the call -->
     <string name="meetings_waiting_room_deny_user_dialog_description">You’ll be removed from the waiting room.</string>
     <!-- Dialog title when waiting room has been inactive for a while -->
-    <string name="meetings_waiting_room_inactive_host_dialog_title">Host didn’t respond</string>
+    <string name="meetings_waiting_room_inactive_host_dialog_title">L\’host non ha risposto</string>
     <!-- Dialog description when waiting room has been inactive for a while -->
-    <string name="meetings_waiting_room_inactive_host_dialog_description">There was no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
+    <string name="meetings_waiting_room_inactive_host_dialog_description">Non c\’è stata risposta alla tua richiesta di unirti al meeting. Non farai più parte della sala d\’attesa. Prova ad unirti nuovamente più tardi.</string>
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">“%s” eliminato</string>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s is waiting to join “%2$s”.</string>
+    <!-- Success message when participants was added to the call from waiting room -->
+    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
+        <item quantity="one">%1$d participant joined the call</item>
+        <item quantity="other">%1$d participants joined the call</item>
+    </plurals>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
+        <item quantity="one">%1$d participant is waiting to join “%2$s”.</item>
+        <item quantity="other">%1$d participants are waiting to join “%2$s”.</item>
+    </plurals>
+    <!-- Title of video option of snapshot-->
+    <string name="media_player_video_option_snapshot_title">Snapshot</string>
+    <!-- Title of video option of lock-->
+    <string name="media_player_video_option_lock_title">Lock</string>
+    <!-- Title of video option of zoom to fill-->
+    <string name="media_player_video_option_zoom_to_fill_title">Zoom to fill</string>
+    <!-- Title of video option of original-->
+    <string name="media_player_video_option_original_title">Originale</string>
+    <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
+    <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
 </resources>

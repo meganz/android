@@ -1720,7 +1720,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">パスワードが受け入れられました</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">パスワードが間違っています。\nできるだけ早く回復キーをバックアップしてください！</string>
+    <string name="test_pwd_wrong">パスワードが間違っています。\nできるだけ早く回復キーをバックアップしてください。</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">クリップボードにコピー</string>
     <!-- Option that permits user logout -->
@@ -4437,8 +4437,6 @@
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
         <item quantity="other">%1$d件の連絡先のアクセス権限を更新できませんでした</item>
     </plurals>
-    <!--This is the label of the button of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">はい、わかりました。</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
         <item quantity="other">%1$d個の項目を恒久的に削除しました</item>
@@ -4515,8 +4513,6 @@
     <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">毎月</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">カスタム</string>
-    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
-    <string name="meetings_schedule_meeting_recurrence_daily_label">毎日</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
     <string name="meetings_schedule_meeting_recurrence_weekly_label">毎週</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
@@ -4537,16 +4533,12 @@
     <string name="general_pro_only">Proのみ</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_title_link_access">リンクアクセス</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access">このリンクを知っている人は誰でも、あなたのデータを表示およびダウンロードできます</string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">有効期限</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">パスワードを設定</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">リンクが更新されました。もう一度コピーしてください。</string>
-    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">リンクが作成され、クリップボードにコピーされました</string>
     <!-- Album import link label -->
     <string name="album_import_link">アルバムリンク</string>
     <!-- Album import error access title -->
@@ -4891,7 +4883,7 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">待合室を見る</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="other">%1$dが通話への参加を待っています。</item>
+        <item quantity="other">%1$d人の参加者が通話への参加を待っています</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">%1$sさんの入室を拒否しますか？</string>
@@ -4907,4 +4899,26 @@
     <string name="meetings_waiting_room_inactive_host_dialog_description">ミーティングへの参加リクエストに対する応答がありませんでした。そのため、待合室から退出させられます。後でもう一度参加してみてください。</string>
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">「%s」が削除されました</string>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$sさんが「%2$s」への参加を待っています</string>
+    <!-- Success message when participants was added to the call from waiting room -->
+    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
+        <item quantity="other">%1$d人の参加者が通話に参加しました</item>
+    </plurals>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
+        <item quantity="other">%1$d人の参加者が「%2$s」への参加を待っています。</item>
+    </plurals>
+    <!-- Title of video option of snapshot-->
+    <string name="media_player_video_option_snapshot_title">スナップショット</string>
+    <!-- Title of video option of lock-->
+    <string name="media_player_video_option_lock_title">ロック</string>
+    <!-- Title of video option of zoom to fill-->
+    <string name="media_player_video_option_zoom_to_fill_title">ズームして埋める</string>
+    <!-- Title of video option of original-->
+    <string name="media_player_video_option_original_title">オリジナル</string>
+    <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_title">サブフォルダメディアディスカバリー</string>
+    <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
 </resources>

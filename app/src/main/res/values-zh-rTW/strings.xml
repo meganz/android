@@ -1720,7 +1720,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">密碼正確</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">密碼錯誤。\n請盡快備份您的還原金鑰！</string>
+    <string name="test_pwd_wrong">密碼錯誤。\n請盡快備份您的還原金鑰。</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">複製到剪貼簿</string>
     <!-- Option that permits user logout -->
@@ -4437,8 +4437,6 @@
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
         <item quantity="other">無法更新%1$d個聯絡人的權限</item>
     </plurals>
-    <!--This is the label of the button of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">好的，明白了</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
         <item quantity="other">已永久移除%1$d個項目</item>
@@ -4515,8 +4513,6 @@
     <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">每月</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">自訂</string>
-    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
-    <string name="meetings_schedule_meeting_recurrence_daily_label">每日</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
     <string name="meetings_schedule_meeting_recurrence_weekly_label">每週</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
@@ -4537,16 +4533,12 @@
     <string name="general_pro_only">僅限Pro會員</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_title_link_access">連結存取</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access">任何有此連結的人都可以查看和下載您的資料</string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">有效期限</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">設定密碼</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">連結已更新。請再複製一次。</string>
-    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">連結已建立並且複製到您的剪貼簿</string>
     <!-- Album import link label -->
     <string name="album_import_link">相簿連結</string>
     <!-- Album import error access title -->
@@ -4848,7 +4840,7 @@
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">只有主持人允許的使用者才可以加入會議。</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">通話期間由非主持人加入的與會者不會被傳送到等候室。</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">非主持人在通話期間新增的與會者將不會被送到等候室。</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
     <string name="contact_share_file_to_unverified_contact_warning_message">您與之共享資訊的某些聯絡人尚未獲得您的批准。為了確保額外的安全性，我們建議您在聯絡人中批准他們的憑證。點選您要批准的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
@@ -4891,7 +4883,7 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">查看等候室</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="other">%1$d正在等待加入通話。</item>
+        <item quantity="other">%1$d個與會者正在等待加入通話</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">是否拒絕%1$s進入？</string>
@@ -4906,5 +4898,27 @@
     <!-- Dialog description when waiting room has been inactive for a while -->
     <string name="meetings_waiting_room_inactive_host_dialog_description">你加入會議的請求沒有得到回應。你將從等候室被移除。請稍後再次嘗試加入。</string>
     <!-- Message after selected albums are deleted (singular) -->
-    <string name="photos_album_deleted_message_singular">“%s” deleted</string>
+    <string name="photos_album_deleted_message_singular">「%s」已刪除</string>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s正在等待加入「%2$s」</string>
+    <!-- Success message when participants was added to the call from waiting room -->
+    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
+        <item quantity="other">%1$d個與會者加入了通話</item>
+    </plurals>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
+        <item quantity="other">%1$d個與會者正在等待加入「%2$s」。</item>
+    </plurals>
+    <!-- Title of video option of snapshot-->
+    <string name="media_player_video_option_snapshot_title">Snapshot</string>
+    <!-- Title of video option of lock-->
+    <string name="media_player_video_option_lock_title">Lock</string>
+    <!-- Title of video option of zoom to fill-->
+    <string name="media_player_video_option_zoom_to_fill_title">Zoom to fill</string>
+    <!-- Title of video option of original-->
+    <string name="media_player_video_option_original_title">原始檔</string>
+    <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
+    <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
 </resources>

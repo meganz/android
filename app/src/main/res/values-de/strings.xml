@@ -1761,7 +1761,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Passwort akzeptiert</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Passwort nicht korrekt.\nErstellen Sie baldmöglichst eine Sicherheitskopie Ihres Rettungsschlüssels!</string>
+    <string name="test_pwd_wrong">Passwort nicht korrekt.\nErstellen Sie baldmöglichst eine Sicherheitskopie Ihres Rettungsschlüssels.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">In die Zwischenablage kopieren</string>
     <!-- Option that permits user logout -->
@@ -4640,8 +4640,6 @@
         <item quantity="one">Berechtigungen von %1$d Kontakt konnten nicht aktualisiert werden</item>
         <item quantity="other">Berechtigungen von %1$d Kontakten konnten nicht aktualisiert werden</item>
     </plurals>
-    <!--This is the label of the button of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">Alles klar</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
         <item quantity="one">%1$d Element unwiderruflich gelöscht</item>
@@ -4727,8 +4725,6 @@
     <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Monatlich</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Benutzerdefiniert</string>
-    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
-    <string name="meetings_schedule_meeting_recurrence_daily_label">Täglich</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
     <string name="meetings_schedule_meeting_recurrence_weekly_label">Wöchentlich</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
@@ -4750,16 +4746,12 @@
     <string name="general_pro_only">Erfordert Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_title_link_access">Linkzugriff</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access">Jeder, der über diesen Link verfügt, kann Ihre Daten einsehen und herunterladen</string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">Gültig bis</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">Passwort setzen</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">Link aktualisiert. Kopieren Sie ihn erneut.</string>
-    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Link erstellt und in die Zwischenablage kopiert</string>
     <!-- Album import link label -->
     <string name="album_import_link">Albumlink</string>
     <!-- Album import error access title -->
@@ -5119,8 +5111,8 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Warteraum anzeigen</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$d participant is waiting to join the call</item>
+        <item quantity="other">%1$d participants are waiting to join the call</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
@@ -5136,4 +5128,28 @@
     <string name="meetings_waiting_room_inactive_host_dialog_description">There was no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">„%s“ wurde gelöscht</string>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s is waiting to join “%2$s”.</string>
+    <!-- Success message when participants was added to the call from waiting room -->
+    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
+        <item quantity="one">%1$d participant joined the call</item>
+        <item quantity="other">%1$d participants joined the call</item>
+    </plurals>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
+        <item quantity="one">%1$d participant is waiting to join “%2$s”.</item>
+        <item quantity="other">%1$d participants are waiting to join “%2$s”.</item>
+    </plurals>
+    <!-- Title of video option of snapshot-->
+    <string name="media_player_video_option_snapshot_title">Snapshot</string>
+    <!-- Title of video option of lock-->
+    <string name="media_player_video_option_lock_title">Lock</string>
+    <!-- Title of video option of zoom to fill-->
+    <string name="media_player_video_option_zoom_to_fill_title">Zoom to fill</string>
+    <!-- Title of video option of original-->
+    <string name="media_player_video_option_original_title">Original</string>
+    <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
+    <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
 </resources>

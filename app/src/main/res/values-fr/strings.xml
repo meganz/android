@@ -1437,7 +1437,7 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Primes d’invitation</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Installer une appli&#160;MEGA mobile</string>
+    <string name="title_install_app">Installer une Appli&#160;MEGA Mobile</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Prime d’inscription</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1453,7 +1453,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Fonctionnement</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invitez vos amies et amis à créer un compte&#160;MEGA gratuit et à installer une appli&#160;MEGA mobile. Vous recevrez de l’espace de stockage gratuit en prime pour chaque inscription et installation d’appli.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitez vos amies et amis à créer un compte&#160;MEGA gratuit et à installer une Appli&#160;MEGA Mobile. Vous recevrez de l’espace de stockage gratuit en prime pour chaque inscription et installation d’appli.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">La prime d’espace de stockage gratuit n’est applicable que pour les nouvelles invitations et si l’Appli&#160;MEGA mobile ou l’Appli&#160;MEGA pour ordinateur est installée.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1463,11 +1463,11 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">En installant l’Appli&#160;MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valable pendant 365&#160;jours. L’Appli&#160;MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">En installant l’appli&#160;MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valable pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS et Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">En installant l’Appli&#160;MEGA Mobile, vous obtenez %1$s d’espace de stockage gratuit valable pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS et Android.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre Appli&#160;MEGA pour ordinateur.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé l’appli&#160;MEGA mobile.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé l’Appli&#160;MEGA Mobile.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Vous avez reçu %1$s d’espace de stockage comme prime gratuite d’inscription.</string>
     <!-- menu items -->
@@ -1539,7 +1539,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Une erreur est survenue et l’appel ne peut pas être connecté.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Aimez-vous l’appli&#160;MEGA mobile ?</string>
+    <string name="title_evaluate_the_app_panel">Aimez-vous l’Appli&#160;MEGA Mobile ?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Oui, évaluer l’appli</string>
     <!-- Label to show send feedback -->
@@ -3436,7 +3436,7 @@
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">Choisir votre écran de démarrage</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">Changez les paramètres pour choisir quel écran s’ouvrira lors du démarrage de l’appli&#160;mobile&#160;MEGA.</string>
+    <string name="choose_start_screen_text">Changez les paramètres pour choisir quel écran s’ouvrira lors du démarrage de l’appli MEGA.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">Changer le paramètre</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
@@ -4843,8 +4843,6 @@
         <item quantity="many">Impossible de mettre à jour les droits de %1$d de contacts</item>
         <item quantity="other">Impossible de mettre à jour les droits de %1$d&#160;contacts</item>
     </plurals>
-    <!--This is the label of the button of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">J’ai compris</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
         <item quantity="one">%1$d&#160;élément a été supprimé définitivement</item>
@@ -4939,8 +4937,6 @@
     <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Mensuelle</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Personnalisée</string>
-    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
-    <string name="meetings_schedule_meeting_recurrence_daily_label">Quotidienne</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
     <string name="meetings_schedule_meeting_recurrence_weekly_label">Hebdomadaire</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
@@ -4963,16 +4959,12 @@
     <string name="general_pro_only">Pro seulement</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_title_link_access">Accès au lien</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access">Quiconque disposant de ce lien peut consulter et télécharger vos données</string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">Date d’expiration</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">Définir un mot de passe</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">Le lien a été mis à jour. Copiez-le de nouveau.</string>
-    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Le lien a été créé et copié dans votre presse-papiers</string>
     <!-- Album import link label -->
     <string name="album_import_link">Lien de l’album</string>
     <!-- Album import error access title -->
@@ -5347,9 +5339,9 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Afficher la salle d’attente</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d attend de se joindre à l’appel.</item>
-        <item quantity="many">%1$d attendent de se joindre à l’appel.</item>
-        <item quantity="other">%1$d attendent de se joindre à l’appel.</item>
+        <item quantity="one">%1$d&#160;participant attend de se joindre à l’appel</item>
+        <item quantity="many">%1$d de participants attendent de se joindre à l’appel</item>
+        <item quantity="other">%1$d&#160;participants attendent de se joindre à l’appel</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Refuser l’entrée à %1$s&#64; ?</string>
@@ -5365,4 +5357,30 @@
     <string name="meetings_waiting_room_inactive_host_dialog_description">Votre demande de participation à la réunion n’a pas reçu réponse. Vous quitterez la salle d’attente. Réessayez plus tard.</string>
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">«&#160;%s&#160;» a été supprimé</string>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s attend de se joindre à «&#160;%2$s&#160;»</string>
+    <!-- Success message when participants was added to the call from waiting room -->
+    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
+        <item quantity="one">%1$d&#160;participant s’est joint à l’appel</item>
+        <item quantity="many">%1$d de participants se sont joints à l’appel</item>
+        <item quantity="other">%1$d&#160;participants se sont joints à l’appel</item>
+    </plurals>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
+        <item quantity="one">%1$d&#160;participant attend de se joindre à «&#160;%2$s&#160;»</item>
+        <item quantity="many">%1$d de participants attendent de se joindre à «&#160;%2$s&#160;»</item>
+        <item quantity="other">%1$d&#160;participants attendent de se joindre à «&#160;%2$s&#160;»</item>
+    </plurals>
+    <!-- Title of video option of snapshot-->
+    <string name="media_player_video_option_snapshot_title">Snapshot</string>
+    <!-- Title of video option of lock-->
+    <string name="media_player_video_option_lock_title">Lock</string>
+    <!-- Title of video option of zoom to fill-->
+    <string name="media_player_video_option_zoom_to_fill_title">Zoom to fill</string>
+    <!-- Title of video option of original-->
+    <string name="media_player_video_option_original_title">Originale</string>
+    <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_title">Découverte des médias des sous-dossiers</string>
+    <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
 </resources>

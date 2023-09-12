@@ -145,11 +145,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Creează un cont</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Te rugăm să introduci adresa de e-mail</string>
+    <string name="error_enter_email">Vă rugăm să introduceți adresa dvs. de e-mail</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Adresă de e-mail nevalidă</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Te rugăm să introduci parola</string>
+    <string name="error_enter_password">Vă rugăm să introduceţi parola</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Nicio conexiune la rețea</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -183,9 +183,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Trebuie să fii de acord cu faptul că înțelegi pericolul pierderii parolei</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Te rugăm să îți introduci prenumele</string>
+    <string name="error_enter_username">Vă rugăm să introduceți prenumele</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Te rugăm să introduci numele.</string>
+    <string name="error_enter_userlastname">Vă rugăm să introduceți numele de familie.</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Parolele nu coincid</string>
     <!-- when creating the account -->
@@ -457,7 +457,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Cheie de decriptare</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Te rugăm să introduci cheia de decriptare pentru link</string>
+    <string name="message_decryption_key">Vă rugăm să introduceți cheia de decriptare pentru link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Cheie de decriptare nevalidă</string>
     <!-- upload to. Then choose an Audio file -->
@@ -569,7 +569,7 @@
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">Te rugăm să furnizezi un număr de telefon valid.</string>
     <!-- Label tell user to enter received txt to below input boxes -->
-    <string name="verify_account_enter_txt_label">Te rugăm să introduci codul de verificare trimis către</string>
+    <string name="verify_account_enter_txt_label">Vă rugăm să introduceți codul de verificare trimis către</string>
     <!-- enter verification code page title -->
     <string name="verify_account_enter_code_title">Verifică-ți contul</string>
     <!-- error message that will show to user when user entered invalid verification code -->
@@ -654,7 +654,7 @@
     <!-- Option available to choose in some context to make an action immediately. -->
     <string name="action_immediately">Imediat</string>
     <!-- Button after the Passcode code input field -->
-    <string name="pin_lock_enter">Introdu</string>
+    <string name="pin_lock_enter">Intră</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="one">%1$d încercare eșuată pentru codul de acces</item>
@@ -666,13 +666,13 @@
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Codurile de acces nu coincid. Încearcă din nou.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="unlock_pin_title">Introdu codul de acces</string>
+    <string name="unlock_pin_title">Introduceți codul de acces</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="unlock_pin_title_2">Reintrodu codul de acces</string>
+    <string name="unlock_pin_title_2">Reintroduceți codul de acces</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="reset_pin_title">Introdu noul cod de acces</string>
+    <string name="reset_pin_title">Introduceți noul cod de acces</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="reset_pin_title_2">Reintrodu noul cod de acces</string>
+    <string name="reset_pin_title_2">Reintroduceți noul cod de acces</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">Despre</string>
     <!-- Preference screen item action button -->
@@ -766,7 +766,7 @@
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">parola se introduce aici</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
-    <string name="delete_account_text_last_step">Acesta este ultimul pas pentru a-ți șterge contul. Vei pierde definitiv toate datele stocate în unitatea cloud. Te rugăm să introduci parola mai jos.</string>
+    <string name="delete_account_text_last_step">Acesta este ultimul pas pentru a vă șterge contul. Veți pierde definitiv toate datele stocate în cloud. Vă rugăm să introduceți parola mai jos.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">Verificarea e-mailului</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
@@ -786,7 +786,7 @@
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Resetarea parolei</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="text_dialog_insert_MK">Te rugăm să introduci cheia ta de recuperare mai jos</string>
+    <string name="text_dialog_insert_MK">Vă rugăm să introduceți cheia de recuperare mai jos</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Parola ți-a fost modificată.</string>
     <!-- Title of the dialog to park an account -->
@@ -794,13 +794,13 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Parchează</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">Acesta este ultimul pas pentru a-ți parca contul, te rugăm să introduci noua parolă. Datele tale vor fi păstrate pentru cel puțin 60 de zile. Dacă îți aduci aminte parola contului parcat, te rugăm să contactezi support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">Acesta este ultimul pas pentru a vă parca contul, vă rugăm să introduceți noua parolă. Datele dvs. vor fi păstrate timp de cel puțin 60 de zile. Dacă vă amintiți parola contului dvs. parcat, vă rugăm să contactați support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
-    <string name="title_enter_new_password">Introdu noua parolă</string>
+    <string name="title_enter_new_password">Introduceți o parolă nouă</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Acest link de recuperare a expirat, te rugăm să încerci din nou.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">Cheia de recuperare va fi folosită pentru a-ți reseta parola. Te rugăm să introduci noua parolă.</string>
+    <string name="text_reset_pass_logged_in">Cheia de recuperare va fi utilizată pentru a vă reseta parola. Vă rugăm să introduceți noua parolă.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">Upgradează</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
@@ -814,7 +814,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">Aceasta este adresa ta de e-mail existentă.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">Acesta este ultimul pas pentru a-ți modifica e-mailul. Te rugăm să introduci parola mai jos.</string>
+    <string name="change_mail_text_last_step">Acesta este ultimul pas pentru a vă schimba e-mailul. Vă rugăm să introduceți parola mai jos.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Modifică e-mailul</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -838,7 +838,7 @@
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Setează o parolă</string>
     <!-- Hint of the dialog to get link with password -->
-    <string name="hint_set_password_protection_dialog">Introdu parola</string>
+    <string name="hint_set_password_protection_dialog">Introduceți parola</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">Confirmă parola</string>
     <!-- Status text at the beginning of getting a link -->
@@ -1802,7 +1802,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Parolă acceptată</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Parolă greșită.\nFă backup cheii de recuperare cât mai curând posibil!</string>
+    <string name="test_pwd_wrong">Parolă greșită.\nFă backup cheii de recuperare cât mai curând posibil.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copiază în clipboard</string>
     <!-- Option that permits user logout -->
@@ -1858,7 +1858,7 @@
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">Îmbunătățește experiența MEGA Chat. Conținutul URL-urilor va fi preluat fără criptare tip zero cunoștințe.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
-    <string name="error_password">Te rugăm să introduci o parolă mai puternică</string>
+    <string name="error_password">Vă rugăm să introduceți o parolă mai puternică</string>
     <!-- title of the notification for an acceptance of a contact request -->
     <string name="title_acceptance_contact_request_notification">Contact nou</string>
     <!-- Notification title to show the number of incoming contact request, contact requests -->
@@ -1894,7 +1894,7 @@
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Asigură-te că faci backupul acestei sămânțe într-un loc sigur în cazul în care îți pierzi aparatul.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Te rugăm să introduci codul din 6 cifre generat de aplicația de autentificare.</string>
+    <string name="explain_confirm_2fa">Vă rugăm să introduceți codul de 6 cifre generat de aplicația dvs. de autentificare.</string>
     <!-- Text button -->
     <string name="general_next">Înainte</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -1902,7 +1902,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Autentificarea cu doi factori activată</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Data viitoare când te autentifici în cont ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
+    <string name="description_2fa_enabled">Data viitoare când vă conectați la contul dvs., vi se va cere să introduceți un cod de 6 cifre furnizat de aplicația dvs. de autentificare.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Te rugăm să salvezi <b>cheia de recuperare</b> într-o locație sigură, pentru a evita problemele în cazul în care pierzi accesul la aplicație sau vrei să dezactivezi autentificarea cu doi factori.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2058,7 +2058,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Activează sau dezactivează versionarea fișierelor pentru întregul cont.\nDezactivarea versionării fișierelor nu împiedică contactele tale să creeze noi versiuni în folderele partajate.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Atinge, introdu numele sau e-mailul</string>
+    <string name="type_mail">Atingeți, introduceți numele sau adresa de e-mail</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Adaugi pe %s la contacte?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2562,11 +2562,11 @@
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Încărcări cameră este o caracteristică esențială pentru orice dispozitiv mobil și te-am ocupat de tine. Creează-ți contul acum.</string>
     <!-- Title of the dialog shown when a pdf required password -->
-    <string name="title_pdf_password">Introdu parola</string>
+    <string name="title_pdf_password">Introduceți parola dvs.</string>
     <!-- Text of the dialog shown when a pdf required password -->
-    <string name="text_pdf_password">%s este un document PDF protejat prin parolă. Te rugăm să introduci parola pentru a deschide fișierul PDF.</string>
+    <string name="text_pdf_password">%s este un document PDF protejat prin parolă. Vă rugăm să introduceți parola pentru a deschide PDF-ul.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
-    <string name="error_max_pdf_password">Parola pe care ai introdus-o nu este validă.</string>
+    <string name="error_max_pdf_password">Parola pe care ați introdus-o nu este validă.</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Nu este posibilă redarea fișierelor media în timp ce există un apel în desfășurare.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -2618,7 +2618,7 @@
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Oamenii se pot alătura grupului folosind acest link.</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
-    <string name="enter_group_name">Introdu numele grupului</string>
+    <string name="enter_group_name">Introduceți numele grupului</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
     <string name="alert_enter_group_name">Pentru a creat un link de chat trebuie să denumești grupul.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
@@ -3402,7 +3402,7 @@
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Întâlnire video criptată cu zero cunoștințe</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
-    <string name="invalid_meeting_link_empty">Te rugăm să introduci un link valid al întâlnirii</string>
+    <string name="invalid_meeting_link_empty">Vă rugăm să introduceți un link valid de întâlnire</string>
     <!-- Guest leave call-->
     <string name="more_than_meeting">Mai mult decât simple întâlniri</string>
     <!-- the title of join without account on left meeting page-->
@@ -3484,15 +3484,15 @@
     <!-- Menu option to open a chat link. -->
     <string name="action_open_chat_link">Deschide un link de chat</string>
     <!-- Hint shown in the open chat link alert dialog. -->
-    <string name="hint_enter_chat_link">Introdu linkul chatului</string>
+    <string name="hint_enter_chat_link">Introduceți linkul de chat</string>
     <!-- Hint shown in the open link alert dialog. -->
     <string name="hint_paste_link">Lipește linkul</string>
     <!-- Error shown when it tries to open an invalid file or folder link .-->
     <string name="invalid_file_folder_link">Link nevalid al folderului sau fișierului</string>
     <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
-    <string name="invalid_file_folder_link_empty">Te rugăm să introduci un link valid al unui fișier sau folder</string>
+    <string name="invalid_file_folder_link_empty">Vă rugăm să introduceți un fișier valid sau un link de folder</string>
     <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
-    <string name="invalid_chat_link_empty">Te rugăm să introduci un link valid al unui chat</string>
+    <string name="invalid_chat_link_empty">Vă rugăm să introduceți un link de chat valid</string>
     <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
     <string name="valid_chat_link">Ai lipit un link de chat.</string>
     <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
@@ -3586,7 +3586,7 @@
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">Folderul selectat este gol. Niciun fișier spre încărcare.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
-    <string name="error_same_password">Ai introdus parola actuală</string>
+    <string name="error_same_password">Ați introdus parola curentă</string>
     <!-- Title of pop-up error message for taken down file -->
     <string name="error_file_not_available">Fișiererul nu mai este disponibil</string>
     <!-- Body of pop-up error message for taken down file. -->
@@ -3656,7 +3656,7 @@
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_forgot_passcode_button">Ți-ai uitat codul de acces?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
-    <string name="settings_passcode_enter_password_title">Introdu parola</string>
+    <string name="settings_passcode_enter_password_title">Introduceți parola dvs.</string>
     <!-- Resume to paused transfers snack bar description text -->
     <string name="resume_paused_transfers_text">Transferurile au fost puse pe pauză. Reia-le pentru a continua descărcarea.</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
@@ -3968,7 +3968,7 @@
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Imagine salvată în galeria dispozitivului</string>
     <!-- Album creation dialog title -->
-    <string name="photos_album_creation_dialog_title">Introdu numele albumului</string>
+    <string name="photos_album_creation_dialog_title">Introduceți numele albumului</string>
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">Album nou</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
@@ -3978,9 +3978,9 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">Părăsește întâlnirea</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album">Acest nume de album nu este permis. Introdu un alt nume.</string>
+    <string name="photos_create_album_error_message_systems_album">Acest nume de album nu este permis. Introduceți un alt nume.</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">Un album cu acest nume există deja. Introdu un alt nume.</string>
+    <string name="photos_create_album_error_message_duplicate">Un album cu acest nume există deja. Introduceți un alt nume.</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">Adaugă elemente în „%s”</string>
     <!-- Message after photos are successfully added in album -->
@@ -4804,9 +4804,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Este necesar numele întâlnirii</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Introdu până la 30&#160;de caractere</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Introduceți până la 30&#160;de caractere</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Introdu până la 3.000&#160;de caractere</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Introduceți până la 3.000&#160;de caractere</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Întâlnirea a fost programată</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4843,8 +4843,6 @@
         <item quantity="few">Nu se poate actualiza permisiunile pentru %1$d contacte</item>
         <item quantity="other">Nu se poate actualiza permisiunile pentru %1$d contacte</item>
     </plurals>
-    <!--This is the label of the button of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, am înțeles</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
         <item quantity="one">%1$d element a fost eliminat definitiv</item>
@@ -4870,7 +4868,7 @@
         <item quantity="other">nu se poate elimina definitiv %1$d elemente</item>
     </plurals>
     <!-- The select time dialog in schedule meeting -->
-    <string name="meetings_schedule_meeting_enter_time_title_dialog">Introducere ora</string>
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Introduceți ora</string>
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations"></string>
     <!-- Text for the meeting invitations option on calls settings -->
@@ -4922,7 +4920,7 @@
         <item quantity="other">Elimină linkurile</item>
     </plurals>
     <!-- Input decryption key dialog title for album import -->
-    <string name="album_import_input_decryption_key_title">Introdu cheia de decriptare</string>
+    <string name="album_import_input_decryption_key_title">Introduceți cheia de decriptare</string>
     <!-- Input decryption key dialog description for album import -->
     <string name="album_import_input_decryption_key_description">Pentru a accesa albumul, introduceți cheia de decriptare. Dacă nu îl aveți, contactați persoana care a partajat linkul cu dvs.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
@@ -4939,8 +4937,6 @@
     <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">În fiecare lună</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Personalizat</string>
-    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
-    <string name="meetings_schedule_meeting_recurrence_daily_label">Zilnică</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
     <string name="meetings_schedule_meeting_recurrence_weekly_label">Săptămânală</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
@@ -4963,16 +4959,12 @@
     <string name="general_pro_only">Numai Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_title_link_access">Acces la ink-uri</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access"></string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">Data de expirare</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">Setează o parolă</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">Linkul a fost actualizat. Copiați din nou.</string>
-    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Linkul a fost creat și copiat în clipboard</string>
     <!-- Album import link label -->
     <string name="album_import_link">Link pentru album</string>
     <!-- Album import error access title -->
@@ -5347,9 +5339,9 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Vezi sala de așteptare</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$d participant așteaptă să se alăture apelului</item>
+        <item quantity="few">%1$d participanții așteaptă să se alăture apelului</item>
+        <item quantity="other">%1$d de participanții așteaptă să se alăture apelului</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Să-i refuzi intrarea %1$s?</string>
@@ -5365,4 +5357,30 @@
     <string name="meetings_waiting_room_inactive_host_dialog_description">Nu a existat niciun răspuns la solicitarea dvs. de a vă alătura întâlnirii. Veți părăsi sala de așteptare. Încercați să vă alăturați din nou mai târziu.</string>
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">„%s” a fost ștearsă</string>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s așteaptă să se alăture la „%2$s”</string>
+    <!-- Success message when participants was added to the call from waiting room -->
+    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
+        <item quantity="one">%1$d participant s-a alăturat apelului</item>
+        <item quantity="few">%1$d de participanți s-au alăturat apelului</item>
+        <item quantity="other">%1$d de participanți s-au alăturat apelului</item>
+    </plurals>
+    <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
+    <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
+        <item quantity="one">%1$d participant așteaptă să se alăture „%2$s1”</item>
+        <item quantity="few">%1$d participanții așteaptă să se alăture „%2$s1”</item>
+        <item quantity="other">%1$d de participanții așteaptă să se alăture „%2$s1”</item>
+    </plurals>
+    <!-- Title of video option of snapshot-->
+    <string name="media_player_video_option_snapshot_title">Instantaneu</string>
+    <!-- Title of video option of lock-->
+    <string name="media_player_video_option_lock_title">Blocare</string>
+    <!-- Title of video option of zoom to fill-->
+    <string name="media_player_video_option_zoom_to_fill_title">Zoom pentru umplere</string>
+    <!-- Title of video option of original-->
+    <string name="media_player_video_option_original_title">Originală</string>
+    <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_title">Descoperirea media în subfoldere</string>
+    <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
 </resources>
