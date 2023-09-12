@@ -97,7 +97,7 @@ class DownloadsWorker @AssistedInject constructor(
             monitorTransferEventsUseCase()
                 .filter { it.transfer.transferType == TransferType.TYPE_DOWNLOAD }
                 .collect {
-                    addOrUpdateActiveTransferUseCase(it.transfer)
+                    addOrUpdateActiveTransferUseCase(it)
                 }
         }
 

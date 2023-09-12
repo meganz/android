@@ -17,8 +17,8 @@ internal class PausedTransferEventMapper @Inject constructor() {
         getTransferFromTag: suspend (Int) -> Transfer?,
     ): TransferEvent? = event.takeIf {
         it is RequestEvent.OnRequestFinish
-                && it.error.errorCode == MegaError.API_OK
                 && it.request.type == TYPE_PAUSE_TRANSFER
+                && it.error.errorCode == MegaError.API_OK
     }?.let {
         getTransferFromTag(event.request.transferTag)?.let { transfer ->
             TransferEvent.TransferPaused(transfer, event.request.flag)

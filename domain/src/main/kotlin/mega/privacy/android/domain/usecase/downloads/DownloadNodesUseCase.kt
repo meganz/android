@@ -73,7 +73,7 @@ class DownloadNodesUseCase @Inject constructor(
 
             if (event is DownloadNodesEvent.SingleTransferEvent) {
                 //update active transfers db
-                addOrUpdateActiveTransferUseCase(event.transferEvent.transfer)
+                addOrUpdateActiveTransferUseCase(event.transferEvent)
 
                 //check if single node processing is finished
                 if (event.isFinishProcessingEvent()) {
