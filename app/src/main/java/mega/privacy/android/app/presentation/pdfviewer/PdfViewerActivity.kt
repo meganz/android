@@ -1393,17 +1393,25 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     val localPath = FileUtil.getLocalFile(file)
                     if (localPath != null) {
                         val mediaFile = File(localPath)
-                        uri = FileUtil.getUriForFile(this, mediaFile)
-                    } else {
-                        megaApi.initStreaming()
-                        val url = megaApi.httpServerGetLocalLink(file)
-                        if (url != null) {
-                            uri = Uri.parse(url)
+                        uri = runCatching { FileUtil.getUriForFile(this, mediaFile) }.getOrNull()
+
+                        if (uri == null) {
+                            initStreaming(file)
                         }
+                    } else {
+                        initStreaming(file)
                     }
                     renamed = true
                 }
             }
+        }
+    }
+
+    private fun initStreaming(node: MegaNode) {
+        megaApi.initStreaming()
+        val url = megaApi.httpServerGetLocalLink(node)
+        if (url != null) {
+            uri = Uri.parse(url)
         }
     }
 
