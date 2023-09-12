@@ -39,7 +39,9 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -78,6 +80,10 @@ class SettingsViewModelTest {
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
+    private val setSubFolderMediaDiscoveryEnabledUseCase =
+        mock<SetSubFolderMediaDiscoveryEnabledUseCase>()
+    private val monitorSubFolderMediaDiscoverySettingsUseCase =
+        mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
 
     @BeforeAll
     fun initialise() {
@@ -110,6 +116,12 @@ class SettingsViewModelTest {
             )
         }
         monitorMediaDiscoveryView.stub {
+            on { invoke() }.thenReturn(
+                emptyFlow()
+            )
+        }
+
+        monitorSubFolderMediaDiscoverySettingsUseCase.stub {
             on { invoke() }.thenReturn(
                 emptyFlow()
             )
@@ -160,6 +172,8 @@ class SettingsViewModelTest {
             setChatLoggingEnabled = mock(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
+            setSubFolderMediaDiscoveryEnabledUseCase = setSubFolderMediaDiscoveryEnabledUseCase,
+            monitorSubFolderMediaDiscoverySettingsUseCase = monitorSubFolderMediaDiscoverySettingsUseCase,
         )
     }
 
@@ -169,7 +183,8 @@ class SettingsViewModelTest {
             monitorAutoAcceptQRLinks,
             getFeatureFlagValueUseCase,
             monitorHideRecentActivityUseCase,
-            getAccountDetailsUseCase
+            getAccountDetailsUseCase,
+            monitorSubFolderMediaDiscoverySettingsUseCase
         )
     }
 
@@ -338,6 +353,37 @@ class SettingsViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that subFolderMediaDiscoveryChecked is triggered with return value of monitorSubFolderMediaDiscoverySettingsUseCase`() =
+        runTest {
+            val subFolderMediaDiscoveryFlow = flow {
+                emit(true)
+                emit(true)
+                emit(false)
+                emit(true)
+                awaitCancellation()
+            }
+
+            monitorHideRecentActivityUseCase.stub {
+                on { invoke() }.thenReturn(false.asHotFlow())
+            }
+            fetchMultiFactorAuthSettingUseCase.stub {
+                onBlocking { invoke() }.thenReturn(false)
+            }
+
+            monitorSubFolderMediaDiscoverySettingsUseCase.stub {
+                on { invoke() }.thenReturn(subFolderMediaDiscoveryFlow)
+            }
+
+            underTest.uiState
+                .map { it.subFolderMediaDiscoveryChecked }
+                .distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isTrue()
+                    assertThat(awaitItem()).isFalse()
+                    assertThat(awaitItem()).isTrue()
+                }
+        }
 
     @Test
     fun `test that mediaDiscoveryViewChecked is set with return value of monitorMediaDiscoveryView`() =

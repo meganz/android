@@ -66,6 +66,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_RECOVERY_KEY
 import mega.privacy.android.app.constants.SettingsConstants.KEY_START_SCREEN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
+import mega.privacy.android.app.constants.SettingsConstants.KEY_SUB_FOLDER_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.di.settings.ViewModelPreferenceDataStoreFactory
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -206,8 +207,18 @@ class SettingsFragment :
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
                     updatePasscodeLockSummary(state.passcodeLock)
+                    updateSubFolderMediaDiscovery(state.subFolderMediaDiscoveryChecked)
                 }
             }
+        }
+    }
+
+    private suspend fun updateSubFolderMediaDiscovery(checked: Boolean) {
+        val isDiscoverySettingEnable =
+            getFeatureFlagUseCase(AppFeatures.SubFolderMediaDiscoverySetting)
+        findPreference<SwitchPreferenceCompat>(KEY_SUB_FOLDER_MEDIA_DISCOVERY)?.apply {
+            isVisible = isDiscoverySettingEnable
+            isChecked = checked
         }
     }
 
@@ -448,6 +459,14 @@ class SettingsFragment :
                         else
                             MediaDiscoveryViewSettings.DISABLED.ordinal
                     )
+                }
+            }
+
+            KEY_SUB_FOLDER_MEDIA_DISCOVERY -> {
+                val checked =
+                    findPreference<SwitchPreferenceCompat>(KEY_SUB_FOLDER_MEDIA_DISCOVERY)?.isChecked
+                checked?.let {
+                    viewModel.setSubFolderMediaDiscoveryEnabled(checked)
                 }
             }
         }

@@ -24,6 +24,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * Enables subfolder media discovery setting
+     */
+    SubFolderMediaDiscoverySetting(
+        "Enables subfolder media discovery  setting",
+        false,
+    ),
+
+    /**
      * Enables new media discovery fab
      */
     NewMediaDiscoveryFab(

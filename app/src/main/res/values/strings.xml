@@ -5150,4 +5150,8 @@
     <string name="media_player_video_option_zoom_to_fill_title">Zoom to fill</string>
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Original</string>
+    <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
+    <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
 </resources>

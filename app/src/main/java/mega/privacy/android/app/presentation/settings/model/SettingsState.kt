@@ -20,6 +20,7 @@ package mega.privacy.android.app.presentation.settings.model
  * @property email
  * @property accountType
  * @property passcodeLock
+ * @property subFolderMediaDiscoveryChecked
  */
 data class SettingsState(
     val autoAcceptEnabled: Boolean,
@@ -39,4 +40,5 @@ data class SettingsState(
     val email: String,
     val accountType: String,
     val passcodeLock: Boolean,
+    val subFolderMediaDiscoveryChecked: Boolean,
 )

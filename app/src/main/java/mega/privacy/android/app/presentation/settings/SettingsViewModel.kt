@@ -41,7 +41,9 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -70,6 +72,8 @@ class SettingsViewModel @Inject constructor(
     private val setChatLoggingEnabled: SetChatLogsEnabled,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
+    private val setSubFolderMediaDiscoveryEnabledUseCase: SetSubFolderMediaDiscoveryEnabledUseCase,
+    private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -99,6 +103,7 @@ class SettingsViewModel @Inject constructor(
             email = "",
             accountType = "",
             passcodeLock = false,
+            subFolderMediaDiscoveryChecked = true,
         )
     }
 
@@ -152,6 +157,14 @@ class SettingsViewModel @Inject constructor(
                             state.copy(
                                 mediaDiscoveryViewState = viewState
                                     ?: MediaDiscoveryViewSettings.INITIAL.ordinal
+                            )
+                        }
+                    },
+                monitorSubFolderMediaDiscoverySettingsUseCase()
+                    .map { viewState ->
+                        { state: SettingsState ->
+                            state.copy(
+                                subFolderMediaDiscoveryChecked = viewState
                             )
                         }
                     },
@@ -273,6 +286,15 @@ class SettingsViewModel @Inject constructor(
      */
     fun mediaDiscoveryView(state: Int) = viewModelScope.launch {
         setMediaDiscoveryView(state)
+    }
+
+    /**
+     * Set sub folder sub folder media discovery  setting enabled
+     *
+     * @param enabled true if enabled sub folder media discovery
+     */
+    fun setSubFolderMediaDiscoveryEnabled(enabled: Boolean) = viewModelScope.launch {
+        setSubFolderMediaDiscoveryEnabledUseCase(enabled)
     }
 
     suspend fun fetchPasscodeEnabled() = refreshPasscodeLockPreference()
