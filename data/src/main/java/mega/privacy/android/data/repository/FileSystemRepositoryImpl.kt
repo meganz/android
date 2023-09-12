@@ -329,4 +329,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             fileAttributeGateway.getPhotoGPSCoordinates(filePath)
         }
+
+    override suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String? =
+        withContext(ioDispatcher) { megaApiGateway.escapeFsIncompatible(fileName, dstPath) }
 }

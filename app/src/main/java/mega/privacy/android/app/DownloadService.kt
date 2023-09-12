@@ -73,6 +73,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.file.EscapeFsIncompatibleUseCase
 import mega.privacy.android.domain.usecase.login.CompleteFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
@@ -193,6 +194,9 @@ internal class DownloadService : LifecycleService() {
 
     @Inject
     lateinit var deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase
+
+    @Inject
+    lateinit var escapeFsIncompatibleUseCase: EscapeFsIncompatibleUseCase
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -469,7 +473,7 @@ internal class DownloadService : LifecycleService() {
         currentFile = if (currentDir?.isDirectory == true) {
             File(
                 currentDir,
-                megaApi.escapeFsIncompatible(
+                escapeFsIncompatibleUseCase(
                     node.name,
                     currentDir?.absolutePath + Constants.SEPARATOR
                 )

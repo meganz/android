@@ -2974,4 +2974,24 @@ interface MegaApiGateway {
         lastName: String,
         listener: MegaRequestListenerInterface
     )
+
+    /**
+     * Make a name suitable for a file name in the local filesystem
+     *
+     * This function escapes (%xx) forbidden characters in the local filesystem if needed.
+     * You can revert this operation using MegaApi::unescapeFsIncompatible
+     *
+     * If no dstPath is provided or filesystem type it's not supported this method will
+     * escape characters contained in the following list: \/:?\"<>|*
+     * Otherwise it will check forbidden characters for local filesystem type
+     *
+     * The input string must be UTF8 encoded. The returned value will be UTF8 too.
+     *
+     * You take the ownership of the returned value
+     *
+     * @param fileName Name to convert (UTF8)
+     * @param dstPath  Destination path
+     * @return Converted name (UTF8)
+     */
+    suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String?
 }

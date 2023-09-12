@@ -1396,4 +1396,7 @@ internal class MegaApiFacade @Inject constructor(
         lastName: String,
         listener: MegaRequestListenerInterface,
     ) = megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
+
+    override suspend fun escapeFsIncompatible(fileName: String, dstPath: String) =
+        megaApi.escapeFsIncompatible(fileName, dstPath)
 }

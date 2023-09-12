@@ -41,6 +41,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -356,6 +357,16 @@ internal class FileSystemRepositoryImplTest {
             verify(megaApiGateway, times(1)).getFileVersionsOption(any())
             assertThat(expectedFileVersionsOption).isEqualTo(actual)
         }
+
+    @ParameterizedTest(name = " megaApi call returns {0}")
+    @NullAndEmptySource
+    @ValueSource(strings = ["testName"])
+    fun `test that escapeFsIncompatible returns correctly if`(
+        fileName: String?,
+    ) = runTest {
+        whenever(megaApiGateway.escapeFsIncompatible(any(), any())).thenReturn(fileName)
+        assertThat(underTest.escapeFsIncompatible("file name", "dest/path")).isEqualTo(fileName)
+    }
 
 
     @Nested
