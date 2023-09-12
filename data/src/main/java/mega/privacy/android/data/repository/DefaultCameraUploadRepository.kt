@@ -14,7 +14,7 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
-import mega.privacy.android.data.gateway.CameraUploadMediaGateway
+import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -37,7 +37,7 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -67,7 +67,7 @@ import kotlin.coroutines.Continuation
  * @property localStorageGateway [MegaLocalStorageGateway]
  * @property megaApiGateway [MegaApiGateway]
  * @property fileGateway [FileGateway]
- * @property cameraUploadMediaGateway [CameraUploadMediaGateway]
+ * @property cameraUploadsMediaGateway [CameraUploadsMediaGateway]
  * @property cacheGateway [CacheGateway]
  * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
  * @property heartbeatStatusIntMapper [HeartbeatStatusIntMapper]
@@ -86,7 +86,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileGateway: FileGateway,
-    private val cameraUploadMediaGateway: CameraUploadMediaGateway,
+    private val cameraUploadsMediaGateway: CameraUploadsMediaGateway,
     private val cacheGateway: CacheGateway,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     private val heartbeatStatusIntMapper: HeartbeatStatusIntMapper,
@@ -366,7 +366,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     )
     override suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean) =
         withContext(ioDispatcher) {
-            cameraUploadMediaGateway.sendUpdateFolderIconBroadcast(nodeHandle, isSecondary)
+            cameraUploadsMediaGateway.sendUpdateFolderIconBroadcast(nodeHandle, isSecondary)
             appEventGateway.broadcastCameraUploadFolderIconUpdate(
                 CameraUploadFolderIconUpdate(
                     nodeHandle = nodeHandle,
@@ -383,7 +383,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         nodeHandle: Long,
         isSecondary: Boolean,
     ) = withContext(ioDispatcher) {
-        cameraUploadMediaGateway.sendUpdateFolderDestinationBroadcast(nodeHandle, isSecondary)
+        cameraUploadsMediaGateway.sendUpdateFolderDestinationBroadcast(nodeHandle, isSecondary)
     }
 
     override suspend fun getMediaQueue(
@@ -391,8 +391,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         parentPath: String?,
         isVideo: Boolean,
         selectionQuery: String?,
-    ): Queue<CameraUploadMedia> = withContext(ioDispatcher) {
-        val queue = cameraUploadMediaGateway.getMediaQueue(
+    ): Queue<CameraUploadsMedia> = withContext(ioDispatcher) {
+        val queue = cameraUploadsMediaGateway.getMediaQueue(
             mediaStoreFileTypeUriMapper(mediaStoreFileType),
             parentPath,
             isVideo,

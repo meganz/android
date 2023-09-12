@@ -9,8 +9,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.data.gateway.CameraUploadMediaGateway
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.util.LinkedList
@@ -45,11 +45,11 @@ const val INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY = "SECONDARY_FOLDER"
 const val INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE = "PRIMARY_HANDLE"
 
 /**
- * Camera Upload Media Facade implements [CameraUploadMediaGateway]
+ * Camera Upload Media Facade implements [CameraUploadsMediaGateway]
  */
-internal class CameraUploadMediaFacade @Inject constructor(
+internal class CameraUploadsMediaFacade @Inject constructor(
     @ApplicationContext private val context: Context,
-) : CameraUploadMediaGateway {
+) : CameraUploadsMediaGateway {
     companion object {
         /**
          * Debug flag if need to set a limit of files retrieved from media cursor
@@ -62,11 +62,11 @@ internal class CameraUploadMediaFacade @Inject constructor(
         parentPath: String?,
         isVideo: Boolean,
         selectionQuery: String?,
-    ): Queue<CameraUploadMedia> =
+    ): Queue<CameraUploadsMedia> =
         createMediaCursor(parentPath, selectionQuery, getPageSize(isVideo), uri)?.let {
             Timber.d("Extract ${it.count} Media from Cursor")
             extractMedia(it, parentPath)
-        } ?: LinkedList<CameraUploadMedia>().also {
+        } ?: LinkedList<CameraUploadsMedia>().also {
             Timber.d("Extract 0 Media - Cursor is NULL")
         }
 
@@ -162,8 +162,8 @@ internal class CameraUploadMediaFacade @Inject constructor(
         }
     }
 
-    private fun extractMedia(cursor: Cursor, parentPath: String?): Queue<CameraUploadMedia> {
-        return LinkedList<CameraUploadMedia>().apply {
+    private fun extractMedia(cursor: Cursor, parentPath: String?): Queue<CameraUploadsMedia> {
+        return LinkedList<CameraUploadsMedia>().apply {
             try {
                 @Suppress("DEPRECATION")
                 val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
@@ -194,17 +194,17 @@ internal class CameraUploadMediaFacade @Inject constructor(
         dataColumn: Int,
         addedColumn: Int,
         modifiedColumn: Int,
-    ): CameraUploadMedia {
+    ): CameraUploadsMedia {
         val filePath = cursor.getString(dataColumn)
         val addedTime = cursor.getLong(addedColumn) * 1000
         val modifiedTime = cursor.getLong(modifiedColumn) * 1000
         val timestamp = max(addedTime, modifiedTime)
-        val media = CameraUploadMedia(filePath = filePath, timestamp = timestamp)
+        val media = CameraUploadsMedia(filePath = filePath, timestamp = timestamp)
         Timber.d("Extract from cursor, add time: $addedTime, modify time: $modifiedTime, chosen time: $timestamp")
         return media
     }
 
-    private fun isFilePathValid(media: CameraUploadMedia, parentPath: String?) =
+    private fun isFilePathValid(media: CameraUploadsMedia, parentPath: String?) =
         media.filePath != null && !parentPath.isNullOrBlank()
                 && media.filePath!!.startsWith(parentPath)
 

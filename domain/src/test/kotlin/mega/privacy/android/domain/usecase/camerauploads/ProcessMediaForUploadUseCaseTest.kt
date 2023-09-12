@@ -10,7 +10,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.node.NodeId
@@ -58,7 +58,7 @@ class ProcessMediaForUploadUseCaseTest {
             saveSyncRecordsToDBUseCase = saveSyncRecordsToDBUseCase,
         )
         runBlocking {
-            val queue: Queue<CameraUploadMedia> = LinkedList(
+            val queue: Queue<CameraUploadsMedia> = LinkedList(
                 listOf(
                     mock(),
                     mock()

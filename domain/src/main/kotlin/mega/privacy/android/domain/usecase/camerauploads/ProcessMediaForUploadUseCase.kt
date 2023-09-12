@@ -5,7 +5,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.node.NodeId
@@ -101,7 +101,7 @@ class ProcessMediaForUploadUseCase @Inject constructor(
         uploadNodeId: NodeId,
         tempRoot: String,
     ) = launch {
-        val primaryPhotos = arrayListOf<CameraUploadMedia>()
+        val primaryPhotos = arrayListOf<CameraUploadsMedia>()
         for (type in types) {
             if (type == MediaStoreFileType.IMAGES_INTERNAL || type == MediaStoreFileType.IMAGES_EXTERNAL) {
                 primaryPhotos.addAll(
@@ -132,7 +132,7 @@ class ProcessMediaForUploadUseCase @Inject constructor(
         uploadNodeId: NodeId,
         tempRoot: String,
     ) = launch {
-        val primaryVideos = arrayListOf<CameraUploadMedia>()
+        val primaryVideos = arrayListOf<CameraUploadsMedia>()
         for (type in types) {
             if (type == MediaStoreFileType.VIDEO_INTERNAL || type == MediaStoreFileType.VIDEO_EXTERNAL) {
                 primaryVideos.addAll(
@@ -163,7 +163,7 @@ class ProcessMediaForUploadUseCase @Inject constructor(
         uploadNodeId: NodeId,
         tempRoot: String,
     ) = launch {
-        val secondaryPhotos = arrayListOf<CameraUploadMedia>()
+        val secondaryPhotos = arrayListOf<CameraUploadsMedia>()
         for (type in types) {
             if (type == MediaStoreFileType.IMAGES_INTERNAL || type == MediaStoreFileType.IMAGES_EXTERNAL) {
                 secondaryPhotos.addAll(
@@ -194,7 +194,7 @@ class ProcessMediaForUploadUseCase @Inject constructor(
         uploadNodeId: NodeId,
         tempRoot: String,
     ) = launch {
-        val secondaryVideos = arrayListOf<CameraUploadMedia>()
+        val secondaryVideos = arrayListOf<CameraUploadsMedia>()
         for (type in types) {
             if (type == MediaStoreFileType.VIDEO_INTERNAL || type == MediaStoreFileType.VIDEO_EXTERNAL) {
 

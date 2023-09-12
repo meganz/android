@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -469,7 +469,7 @@ interface CameraUploadRepository {
         parentPath: String?,
         isVideo: Boolean,
         selectionQuery: String?,
-    ): Queue<CameraUploadMedia>
+    ): Queue<CameraUploadsMedia>
 
     /**
      * Update sync record status by local path

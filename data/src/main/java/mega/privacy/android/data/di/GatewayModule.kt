@@ -8,7 +8,7 @@ import mega.privacy.android.data.facade.AppEventFacade
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.BillingFacade
 import mega.privacy.android.data.facade.CacheFolderFacade
-import mega.privacy.android.data.facade.CameraUploadMediaFacade
+import mega.privacy.android.data.facade.CameraUploadsMediaFacade
 import mega.privacy.android.data.facade.ClipboardFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
@@ -32,7 +32,7 @@ import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CacheGatewayImpl
-import mega.privacy.android.data.gateway.CameraUploadMediaGateway
+import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DefaultStreamingGateway
@@ -112,7 +112,7 @@ internal abstract class GatewayModule {
     abstract fun bindFileAttributeGateway(implementation: FileAttributeFacade): FileAttributeGateway
 
     @Binds
-    abstract fun bindCameraUploadMediaGateway(implementation: CameraUploadMediaFacade): CameraUploadMediaGateway
+    abstract fun bindCameraUploadMediaGateway(implementation: CameraUploadsMediaFacade): CameraUploadsMediaGateway
 
     @Binds
     abstract fun bindFileCompressionGateway(implementation: ZipFileCompressionGateway): FileCompressionGateway

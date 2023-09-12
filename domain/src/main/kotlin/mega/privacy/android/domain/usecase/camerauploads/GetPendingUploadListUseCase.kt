@@ -5,7 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.yield
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -41,15 +41,15 @@ class GetPendingUploadListUseCase @Inject constructor(
     private val semaphore = Semaphore(16)
 
     /**
-     *  Format the [CameraUploadMedia] queue to a [SyncRecord] list
+     *  Format the [CameraUploadsMedia] queue to a [SyncRecord] list
      *
-     * @param mediaList a queue of [CameraUploadMedia] retrieved from the MediaStore
+     * @param mediaList a queue of [CameraUploadsMedia] retrieved from the MediaStore
      * @param isSecondary true if the media comes from the secondary media folder
      * @param isVideo true if the media are videos
      * @return a list of [SyncRecord]
      */
     suspend operator fun invoke(
-        mediaList: List<CameraUploadMedia>,
+        mediaList: List<CameraUploadsMedia>,
         isSecondary: Boolean,
         isVideo: Boolean,
     ): List<SyncRecord> = coroutineScope {

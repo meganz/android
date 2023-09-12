@@ -1,13 +1,13 @@
 package mega.privacy.android.data.gateway
 
 import android.net.Uri
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import java.util.Queue
 
 /**
  * Camera Upload Media Files Gateway
  */
-interface CameraUploadMediaGateway {
+interface CameraUploadsMediaGateway {
 
     /**
      * Get the media queue for a given media type
@@ -24,7 +24,7 @@ interface CameraUploadMediaGateway {
         parentPath: String?,
         isVideo: Boolean,
         selectionQuery: String?,
-    ): Queue<CameraUploadMedia>
+    ): Queue<CameraUploadsMedia>
 
     /**
      * Update camera upload folder (node list) icon

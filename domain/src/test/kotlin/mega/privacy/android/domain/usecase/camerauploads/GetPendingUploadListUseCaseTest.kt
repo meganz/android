@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -39,7 +39,7 @@ class GetPendingUploadListUseCaseTest {
     private val isNodeInRubbishBin: IsNodeInRubbish = mock()
     private val getNodeGPSCoordinatesUseCase: GetNodeGPSCoordinatesUseCase = mock()
 
-    private val uploadMedia = CameraUploadMedia("", 0)
+    private val uploadMedia = CameraUploadsMedia("", 0)
 
     private val primaryPhoto = SyncRecord(
         0,
@@ -136,7 +136,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
-            val queue = LinkedList<CameraUploadMedia>()
+            val queue = LinkedList<CameraUploadsMedia>()
             queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = false, isVideo = false)).isEqualTo(
                 listOf(
@@ -161,7 +161,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
-            val queue = LinkedList<CameraUploadMedia>()
+            val queue = LinkedList<CameraUploadsMedia>()
             queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = true, isVideo = false)).isEqualTo(
                 listOf(
@@ -186,7 +186,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
-            val queue = LinkedList<CameraUploadMedia>()
+            val queue = LinkedList<CameraUploadsMedia>()
             queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = false, isVideo = true)).isEqualTo(
                 listOf(
@@ -206,7 +206,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
-            val queue = LinkedList<CameraUploadMedia>()
+            val queue = LinkedList<CameraUploadsMedia>()
             queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = true, isVideo = true)).isEqualTo(
                 listOf(
@@ -232,7 +232,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(isNodeInRubbishBin(any())).thenReturn(false)
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
-            val queue = LinkedList<CameraUploadMedia>()
+            val queue = LinkedList<CameraUploadsMedia>()
             assertThat(underTest(queue, isSecondary = false, isVideo = false)).isEqualTo(
                 emptyList<SyncRecord>()
             )
@@ -255,7 +255,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
             whenever(isNodeInRubbishBin(any())).thenReturn(true)
-            val queue = LinkedList<CameraUploadMedia>()
+            val queue = LinkedList<CameraUploadsMedia>()
             assertThat(underTest(queue, isSecondary = false, isVideo = false)).isEqualTo(
                 emptyList<SyncRecord>()
             )

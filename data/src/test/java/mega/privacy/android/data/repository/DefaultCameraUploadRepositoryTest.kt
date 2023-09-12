@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.CameraUploadMediaGateway
+import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -30,7 +30,7 @@ import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.data.mapper.videoQualityToInt
-import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -76,7 +76,7 @@ class DefaultCameraUploadRepositoryTest {
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val fileGateway = mock<FileGateway>()
-    private val cameraUploadMediaGateway = mock<CameraUploadMediaGateway>()
+    private val cameraUploadsMediaGateway = mock<CameraUploadsMediaGateway>()
     private val workerGateway = mock<WorkerGateway>()
     private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
     private val heartbeatStatusIntMapper = mock<HeartbeatStatusIntMapper>()
@@ -115,7 +115,7 @@ class DefaultCameraUploadRepositoryTest {
             megaApiGateway = megaApiGateway,
             cacheGateway = mock(),
             fileGateway = fileGateway,
-            cameraUploadMediaGateway = cameraUploadMediaGateway,
+            cameraUploadsMediaGateway = cameraUploadsMediaGateway,
             workerGateway = workerGateway,
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             heartbeatStatusIntMapper = heartbeatStatusIntMapper,
@@ -144,7 +144,7 @@ class DefaultCameraUploadRepositoryTest {
             localStorageGateway,
             megaApiGateway,
             fileGateway,
-            cameraUploadMediaGateway,
+            cameraUploadsMediaGateway,
             workerGateway,
             syncRecordTypeIntMapper,
             heartbeatStatusIntMapper,
@@ -216,10 +216,10 @@ class DefaultCameraUploadRepositoryTest {
         @Test
         fun `test that the correct media queues are retrieved by media store file type`() =
             runTest {
-                val result = LinkedList(listOf(CameraUploadMedia("", 1)))
+                val result = LinkedList(listOf(CameraUploadsMedia("", 1)))
 
                 whenever(
-                    cameraUploadMediaGateway.getMediaQueue(
+                    cameraUploadsMediaGateway.getMediaQueue(
                         uri = anyOrNull(),
                         parentPath = any(),
                         isVideo = any(),
