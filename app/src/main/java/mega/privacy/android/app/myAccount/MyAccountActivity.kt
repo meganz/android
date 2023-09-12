@@ -34,7 +34,6 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.ACTION_OPEN_
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_MASTER_KEY
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
-import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
@@ -679,7 +678,7 @@ class MyAccountActivity : PasscodeActivity(),
     }
 
     private fun showConfirmChangeEmailDialog() {
-        val errorInputBinding = DialogErrorInputEditTextBinding.inflate(layoutInflater)
+        val errorInputBinding = DialogErrorPasswordInputEditTextBinding.inflate(layoutInflater)
         confirmChangeEmailDialog = MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.change_mail_title_last_step))
             .setMessage(getString(R.string.change_mail_text_last_step))
