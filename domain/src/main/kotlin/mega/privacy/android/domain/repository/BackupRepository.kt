@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoType
@@ -55,11 +56,10 @@ interface BackupRepository {
      * @param localFolder [String]
      * @param backupName [String]
      * @param state [Int]
-     * @param subState [Int]
      */
     suspend fun setBackup(
-        backupType: Int, targetNode: Long, localFolder: String, backupName: String,
-        state: Int, subState: Int,
+        backupType: BackupInfoType, targetNode: Long, localFolder: String, backupName: String,
+        state: BackupState,
     ): Backup
 
     /**

@@ -9,12 +9,16 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.backup.BackupDeviceNamesMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoListMapper
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupMapper
+import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.BackupRepository
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
 import javax.inject.Inject
 
 /**
@@ -35,6 +39,8 @@ internal class BackupRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val appEventGateway: AppEventGateway,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
+    private val backupStateIntMapper: BackupStateIntMapper,
 ) : BackupRepository {
     override suspend fun getDeviceId() = withContext(ioDispatcher) {
         megaApiGateway.getDeviceId()
@@ -100,24 +106,23 @@ internal class BackupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun setBackup(
-        backupType: Int,
+        backupType: BackupInfoType,
         targetNode: Long,
         localFolder: String,
         backupName: String,
-        state: Int,
-        subState: Int,
+        state: BackupState,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("setBackup") {
                 backupMapper(it)
             }
             megaApiGateway.setBackup(
-                backupType = backupType,
+                backupType = backupInfoTypeIntMapper(backupType),
                 targetNode = targetNode,
                 localFolder = localFolder,
                 backupName = backupName,
-                state = state,
-                subState = subState,
+                state = backupStateIntMapper(state),
+                subState = MegaError.API_OK,
                 listener = listener
             )
             continuation.invokeOnCancellation {

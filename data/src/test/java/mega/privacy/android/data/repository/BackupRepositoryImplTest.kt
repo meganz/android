@@ -9,9 +9,13 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.backup.BackupDeviceNamesMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoListMapper
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupMapper
+import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfo
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBackupInfoList
@@ -49,6 +53,8 @@ internal class BackupRepositoryImplTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val appEventGateway = mock<AppEventGateway>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
+    private val backupInfoTypeIntMapper = mock<BackupInfoTypeIntMapper>()
+    private val backupStateIntMapper = mock<BackupStateIntMapper>()
 
     private val deviceId = "12345-6789"
     private val deviceName = "New Device Name"
@@ -63,6 +69,8 @@ internal class BackupRepositoryImplTest {
             megaApiGateway = megaApiGateway,
             appEventGateway = appEventGateway,
             megaLocalStorageGateway = megaLocalStorageGateway,
+            backupInfoTypeIntMapper = backupInfoTypeIntMapper,
+            backupStateIntMapper = backupStateIntMapper
         )
     }
 
@@ -79,17 +87,18 @@ internal class BackupRepositoryImplTest {
     fun `test that set backup info returns backup when the sdk returns success`() =
         runTest {
             val backup = mock<Backup>()
-            val backupType = 1
+            val backupType = BackupInfoType.CAMERA_UPLOADS
             val targetNode = 1L
             val localFolder = "folderName"
             val backupName = "backupName"
-            val state = 2
-            val subState = 3
+            val state = BackupState.ACTIVE
             val megaRequest = mock<MegaRequest>()
             val megaResponse = mock<MegaError> {
                 on { errorCode }.thenReturn(MegaError.API_OK)
                 on { errorString }.thenReturn("")
             }
+            whenever(backupInfoTypeIntMapper(backupType)).thenReturn(1)
+            whenever(backupStateIntMapper(state)).thenReturn(2)
             whenever(
                 megaApiGateway.setBackup(
                     any(),
@@ -116,7 +125,6 @@ internal class BackupRepositoryImplTest {
                     localFolder,
                     backupName,
                     state,
-                    subState,
                 )
             ).isEqualTo(backup)
         }

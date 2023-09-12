@@ -3,7 +3,9 @@ package mega.privacy.android.domain.usecase.backup
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.repository.BackupRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -36,12 +38,11 @@ internal class SetBackupUseCaseTest {
 
     @Test
     fun `test that when invoked it returns a backup`() = runTest {
-        val backupType = 1
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val targetNode = 1L
         val localFolder = "folderName"
         val backupName = "backupName"
-        val state = 2
-        val subState = 3
+        val state = BackupState.ACTIVE
         val backup = mock<Backup>()
 
         whenever(
@@ -51,7 +52,6 @@ internal class SetBackupUseCaseTest {
                 localFolder = localFolder,
                 backupName = backupName,
                 state = state,
-                subState = subState,
             )
         ).thenReturn(backup)
 
@@ -61,7 +61,6 @@ internal class SetBackupUseCaseTest {
             localFolder = localFolder,
             backupName = backupName,
             state = state,
-            subState = subState,
         )
         Truth.assertThat(actual).isEqualTo(backup)
     }
