@@ -11,12 +11,17 @@ import javax.inject.Inject
 /**
  * Default implementation of [MonitorTransfersSize]
  */
-class DefaultMonitorTransfersSize @Inject constructor(
+class MonitorTransfersSizeUseCase @Inject constructor(
     private val repository: TransferRepository,
-) : MonitorTransfersSize {
+) {
     private val transferMap: MutableMap<Int, Transfer> = hashMapOf()
 
-    override fun invoke(): Flow<TransfersSizeInfo> = repository.monitorTransferEvents()
+    /**
+     * Invoke.
+     *
+     * @return Flow of [TransfersSizeInfo]
+     */
+    operator fun invoke(): Flow<TransfersSizeInfo> = repository.monitorTransferEvents()
         .map {
             val transfer = it.transfer
             transferMap[transfer.tag] = transfer

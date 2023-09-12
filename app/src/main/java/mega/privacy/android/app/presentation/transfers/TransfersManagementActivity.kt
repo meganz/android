@@ -121,7 +121,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
             }
         }
 
-        collectFlow(monitorTransferOverQuota(), Lifecycle.State.CREATED) {
+        collectFlow(monitorTransferOverQuotaUseCase(), Lifecycle.State.CREATED) {
             updateTransfersWidget(TransferType.NONE)
         }
 

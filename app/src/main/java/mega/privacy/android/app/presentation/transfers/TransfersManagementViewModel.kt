@@ -22,11 +22,11 @@ import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfers
+import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSizeUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ import javax.inject.Inject
  *
  * @property getNumPendingDownloadsNonBackgroundUseCase    [GetNumPendingDownloadsNonBackgroundUseCase]
  * @property getNumPendingUploadsUseCase                   [GetNumPendingUploadsUseCase]
- * @property getNumPendingTransfers                 [GetNumPendingTransfers]
+ * @property getNumPendingTransfersUseCase                 [GetNumPendingTransfersUseCase]
  * @property isCompletedTransfersEmptyUseCase       [IsCompletedTransfersEmptyUseCase]
  * @property areAllTransfersPausedUseCase                  [AreAllTransfersPausedUseCase]
  */
@@ -44,14 +44,14 @@ import javax.inject.Inject
 class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
     private val getNumPendingUploadsUseCase: GetNumPendingUploadsUseCase,
-    private val getNumPendingTransfers: GetNumPendingTransfers,
+    private val getNumPendingTransfersUseCase: GetNumPendingTransfersUseCase,
     private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
     private val areAllTransfersPausedUseCase: AreAllTransfersPausedUseCase,
     private val transfersInfoMapper: TransfersInfoMapper,
     private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    monitorTransfersSize: MonitorTransfersSize,
+    monitorTransfersSize: MonitorTransfersSizeUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
@@ -135,7 +135,7 @@ class TransfersManagementViewModel @Inject constructor(
     fun checkIfShouldShowCompletedTab() {
         viewModelScope.launch {
             shouldShowCompletedTab.value =
-                !isCompletedTransfersEmptyUseCase() && getNumPendingTransfers() <= 0
+                !isCompletedTransfersEmptyUseCase() && getNumPendingTransfersUseCase() <= 0
         }
     }
 

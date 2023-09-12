@@ -1,7 +1,6 @@
 package test.mega.privacy.android.app.presentation.imageviewer
 
 import android.content.Context
-import android.content.res.Resources
 import com.google.common.truth.Truth
 import com.jraska.livedata.test
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
@@ -28,7 +27,6 @@ import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
-import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
@@ -92,7 +90,7 @@ internal class ImageViewerViewModelTest {
             getImageByOfflineNodeHandleUseCase = mock(),
             getImageFromFileUseCase = mock(),
             getNumPendingDownloadsNonBackgroundUseCase = mock(),
-            resetTotalDownloads = mock(),
+            resetTotalDownloadsUseCase = mock(),
             getImageHandlesUseCase = mock(),
             getGlobalChangesUseCase = getGlobalChangesUseCase,
             getNodeUseCase = mock(),

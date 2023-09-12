@@ -24,17 +24,17 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorFailedTransfer
+import mega.privacy.android.domain.usecase.transfers.MonitorFailedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -49,7 +49,7 @@ import javax.inject.Inject
 class TransfersViewModel @Inject constructor(
     private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    monitorFailedTransfer: MonitorFailedTransfer,
+    monitorFailedTransferUseCase: MonitorFailedTransferUseCase,
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
@@ -80,7 +80,7 @@ class TransfersViewModel @Inject constructor(
     /**
      * Failed transfer
      */
-    val failedTransfer = monitorFailedTransfer()
+    val failedTransfer = monitorFailedTransferUseCase()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     private val _activeTransfers = MutableStateFlow(emptyList<Transfer>())

@@ -46,10 +46,10 @@ import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.transfers.BroadcastFailedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.BroadcastStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.BroadcastFailedTransfer
-import mega.privacy.android.domain.usecase.transfers.BroadcastStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetAllSdTransfersUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -73,7 +73,7 @@ class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val broadcastFailedTransfer: BroadcastFailedTransfer,
+    private val broadcastFailedTransferUseCase: BroadcastFailedTransferUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val broadcastStopTransfersWorkUseCase: BroadcastStopTransfersWorkUseCase,
@@ -637,7 +637,7 @@ class TransfersManagement @Inject constructor(
     fun setAreFailedTransfers(failed: Boolean) {
         areFailedTransfers = failed
         applicationScope.launch {
-            broadcastFailedTransfer(failed)
+            broadcastFailedTransferUseCase(failed)
         }
     }
 

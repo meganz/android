@@ -22,8 +22,8 @@ import java.math.BigInteger
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class DefaultMonitorTransfersSizeTest {
-    private lateinit var underTest: MonitorTransfersSize
+internal class MonitorTransfersSizeUseCaseTest {
+    private lateinit var underTest: MonitorTransfersSizeUseCase
     private val globalTransferFlow = MutableSharedFlow<TransferEvent>()
     private val transferRepository = mock<TransferRepository>()
     private val transfer = Transfer(
@@ -59,7 +59,7 @@ internal class DefaultMonitorTransfersSizeTest {
         runTest {
             val event =
                 TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.TYPE_UPLOAD))
-            underTest = DefaultMonitorTransfersSize(
+            underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
             val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
@@ -80,7 +80,7 @@ internal class DefaultMonitorTransfersSizeTest {
         runTest {
             val event =
                 TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.TYPE_DOWNLOAD))
-            underTest = DefaultMonitorTransfersSize(
+            underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
             val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
@@ -100,7 +100,7 @@ internal class DefaultMonitorTransfersSizeTest {
     fun `when monitorTransferEvents emit TransferStartEvent then the transfer size info equal to transfer size`() =
         runTest {
             val event = TransferEvent.TransferStartEvent(transfer)
-            underTest = DefaultMonitorTransfersSize(
+            underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
             val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
@@ -120,7 +120,7 @@ internal class DefaultMonitorTransfersSizeTest {
     fun `when monitorTransferEvents emit TransferDataEvent then the transfer size info equal to transfer size`() =
         runTest {
             val event = TransferEvent.TransferDataEvent(transfer, ByteArray(0))
-            underTest = DefaultMonitorTransfersSize(
+            underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
             val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
@@ -140,7 +140,7 @@ internal class DefaultMonitorTransfersSizeTest {
     fun `when monitorTransferEvents emit TransferFinishEvent then the transfer size info equal to transfer size`() =
         runTest {
             val event = TransferEvent.TransferFinishEvent(transfer, MegaException(-1, null))
-            underTest = DefaultMonitorTransfersSize(
+            underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
             val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
@@ -161,7 +161,7 @@ internal class DefaultMonitorTransfersSizeTest {
         runTest {
             val event =
                 TransferEvent.TransferUpdateEvent(transfer)
-            underTest = DefaultMonitorTransfersSize(
+            underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
             val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
@@ -188,7 +188,7 @@ internal class DefaultMonitorTransfersSizeTest {
                 TransferEvent.TransferUpdateEvent(transfer.copy(tag = 2))
             val eventThree =
                 TransferEvent.TransferUpdateEvent(transfer.copy(tag = 3))
-            underTest = DefaultMonitorTransfersSize(
+            underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
             val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())

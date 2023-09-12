@@ -70,10 +70,10 @@ import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloads
+import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -90,7 +90,7 @@ import javax.inject.Inject
  * @property getImageByOfflineNodeHandleUseCase     Needed to retrieve each individual image based on offline node handle
  * @property getImageFromFileUseCase                Needed to retrieve each individual image based on file Uri
  * @property getNumPendingDownloadsNonBackgroundUseCase    UseCase to get number of pending downloads that are not background transfers
- * @property resetTotalDownloads                    UseCase to reset total downloads
+ * @property resetTotalDownloadsUseCase                    UseCase to reset total downloads
  * @property getImageHandlesUseCase     Needed to retrieve node handles given sent params
  * @property getGlobalChangesUseCase    Use case required to get node changes
  * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
@@ -116,7 +116,7 @@ class ImageViewerViewModel @Inject constructor(
     private val getImageByOfflineNodeHandleUseCase: GetImageByOfflineNodeHandleUseCase,
     private val getImageFromFileUseCase: GetImageFromFileUseCase,
     private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
-    private val resetTotalDownloads: ResetTotalDownloads,
+    private val resetTotalDownloadsUseCase: ResetTotalDownloadsUseCase,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
@@ -446,7 +446,7 @@ class ImageViewerViewModel @Inject constructor(
             val currentTransfers = getNumPendingDownloadsNonBackgroundUseCase()
             val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
             if (currentTransfers == 0 && !isServiceRunning) {
-                resetTotalDownloads()
+                resetTotalDownloadsUseCase()
             }
         }
     }

@@ -78,13 +78,13 @@ import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
-import mega.privacy.android.domain.usecase.transfers.BroadcastTransferOverQuota
+import mega.privacy.android.domain.usecase.transfers.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.CancelAllDownloadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
@@ -141,7 +141,7 @@ internal class DownloadService : LifecycleService() {
     lateinit var rootNodeExistsUseCase: RootNodeExistsUseCase
 
     @Inject
-    lateinit var broadcastTransferOverQuota: BroadcastTransferOverQuota
+    lateinit var broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase
 
     @Inject
     lateinit var monitorDownloadPausedTransfersUseCase: MonitorDownloadTransfersPausedUseCase
@@ -1592,7 +1592,7 @@ internal class DownloadService : LifecycleService() {
             if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
                 transfersManagement.isCurrentTransferOverQuota = isCurrentOverQuota
                 transfersManagement.setTransferOverQuotaTimestamp()
-                broadcastTransferOverQuota()
+                broadcastTransferOverQuotaUseCase()
             }
         } else if (!transfersManagement.isTransferOverQuotaNotificationShown) {
             transfersManagement.isTransferOverQuotaNotificationShown = true

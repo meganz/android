@@ -18,17 +18,17 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorFailedTransfer
+import mega.privacy.android.domain.usecase.transfers.MonitorFailedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import org.junit.After
 import org.junit.Before
@@ -45,7 +45,7 @@ internal class TransfersViewModelTest {
     private lateinit var underTest: TransfersViewModel
     private val transfersManagement: TransfersManagement = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    private val monitorFailedTransfer: MonitorFailedTransfer = mock()
+    private val monitorFailedTransferUseCase: MonitorFailedTransferUseCase = mock()
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase = mock()
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase = mock()
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase = mock()
@@ -69,7 +69,7 @@ internal class TransfersViewModelTest {
         underTest = TransfersViewModel(
             transfersManagement = transfersManagement,
             ioDispatcher = ioDispatcher,
-            monitorFailedTransfer = monitorFailedTransfer,
+            monitorFailedTransferUseCase = monitorFailedTransferUseCase,
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,

@@ -122,7 +122,7 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferOverQuota
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferOverQuotaUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -150,7 +150,7 @@ import javax.inject.Inject
  * @property resumeTransfersWarning         [AlertDialog] for paused transfers.
  * @property getAccountDetailsUseCase
  * @property billingViewModel
- * @property monitorTransferOverQuota
+ * @property monitorTransferOverQuotaUseCase
  */
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
@@ -186,7 +186,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     lateinit var getAccountDetailsUseCase: GetAccountDetailsUseCase
 
     @Inject
-    lateinit var monitorTransferOverQuota: MonitorTransferOverQuota
+    lateinit var monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase
 
     /**
      * Monitor Chat Signal Presence Use Case
@@ -443,7 +443,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
         )
 
-        collectFlow(monitorTransferOverQuota()) {
+        collectFlow(monitorTransferOverQuotaUseCase()) {
             showGeneralTransferOverQuotaWarning()
         }
 
