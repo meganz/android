@@ -27,15 +27,24 @@ class GetPhotosByFolderIdUseCase @Inject constructor(
      *
      * @return photo
      */
-    operator fun invoke(folderId: NodeId, recursive: Boolean): Flow<List<Photo>> {
+    operator fun invoke(
+        folderId: NodeId,
+        recursive: Boolean,
+    ): Flow<List<Photo>> {
         return flow {
             emit(getFolderPhotos(folderId, recursive))
             emitAll(getMonitoredList(folderId, recursive))
         }
     }
 
-    private suspend fun getFolderPhotos(folderId: NodeId, recursive: Boolean): List<Photo> =
-        photosRepository.getPhotosByFolderId(folderId, recursive)
+    private suspend fun getFolderPhotos(
+        folderId: NodeId,
+        recursive: Boolean,
+    ): List<Photo> =
+        photosRepository.getPhotosByFolderId(
+            folderId = folderId,
+            recursive = recursive
+        )
 
 
     @OptIn(ExperimentalCoroutinesApi::class)

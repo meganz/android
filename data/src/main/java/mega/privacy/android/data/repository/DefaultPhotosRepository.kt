@@ -219,7 +219,11 @@ internal class DefaultPhotosRepository @Inject constructor(
         }?.also { photosCache[nodeId] = it }
     }
 
-    override suspend fun getPhotosByFolderId(folderId: NodeId, recursive: Boolean): List<Photo> =
+    override suspend fun getPhotosByFolderId(
+        folderId: NodeId,
+        searchString: String,
+        recursive: Boolean,
+    ): List<Photo> =
         withContext(ioDispatcher) {
             val parent = megaApiFacade.getMegaNodeByHandle(folderId.longValue)
             parent?.let { parentNode ->
@@ -227,7 +231,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 val images = async {
                     val imageNodes = megaApiFacade.searchByType(
                         parentNode = parentNode,
-                        searchString = "",
+                        searchString = searchString,
                         cancelToken = token,
                         recursive = recursive,
                         order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
@@ -238,7 +242,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 val videos = async {
                     val videoNodes = megaApiFacade.searchByType(
                         parentNode = parentNode,
-                        searchString = "",
+                        searchString = searchString,
                         cancelToken = token,
                         recursive = recursive,
                         order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
@@ -260,6 +264,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun getPhotosByFolderIdInFolderLink(
         folderId: NodeId,
+        searchString: String,
         recursive: Boolean,
     ): List<Photo> =
         withContext(ioDispatcher) {
@@ -269,7 +274,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 val images = async {
                     val imageNodes = megaApiFolder.searchByType(
                         parentNode = parentNode,
-                        searchString = "",
+                        searchString = searchString,
                         cancelToken = token,
                         recursive = recursive,
                         order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
@@ -280,7 +285,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 val videos = async {
                     val videoNodes = megaApiFolder.searchByType(
                         parentNode = parentNode,
-                        searchString = "",
+                        searchString = searchString,
                         cancelToken = token,
                         recursive = recursive,
                         order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
@@ -309,7 +314,8 @@ internal class DefaultPhotosRepository @Inject constructor(
                 } else {
                     var photo: Photo? = null
 
-                    (megaApiFacade.getMegaNodeByHandle(id.longValue) ?: megaApiFolder.getMegaNodeByHandle(id.longValue))
+                    (megaApiFacade.getMegaNodeByHandle(id.longValue)
+                        ?: megaApiFolder.getMegaNodeByHandle(id.longValue))
                         ?.also { node ->
                             photo = mapMegaNodeToPhoto(node, filterSvg = false)
                             photo?.let {

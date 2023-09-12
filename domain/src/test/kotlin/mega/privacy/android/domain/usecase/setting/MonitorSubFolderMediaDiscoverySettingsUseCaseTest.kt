@@ -36,13 +36,13 @@ class MonitorSubFolderMediaDiscoverySettingsUseCaseTest {
     }
 
     @Test
-    fun `test that null values return a default of false`() = runTest {
+    fun `test that null values return a default of true`() = runTest {
         settingsRepository.stub {
             on { monitorSubfolderMediaDiscoveryEnabled() }.thenReturn(flowOf(null))
         }
 
         underTest().test {
-            Truth.assertThat(awaitItem()).isFalse()
+            Truth.assertThat(awaitItem()).isTrue()
             awaitComplete()
         }
     }

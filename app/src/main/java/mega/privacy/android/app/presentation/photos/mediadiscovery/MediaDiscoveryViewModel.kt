@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -51,15 +53,18 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -88,6 +93,8 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val hasCredentials: HasCredentials,
     private val getPublicNodeListByIds: GetPublicNodeListByIds,
     private val setViewType: SetViewType,
+    private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
+    private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -118,6 +125,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private fun checkConnectivity() {
         viewModelScope.launch {
             monitorConnectivityUseCase()
+                .catch { Timber.e(it) }
                 .collectLatest { isConnected ->
                     _state.update {
                         it.copy(isConnectedToNetwork = isConnected)
@@ -128,14 +136,16 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     private fun checkMDSetting() {
         viewModelScope.launch {
-            monitorMediaDiscoveryView().collectLatest { mediaDiscoveryViewSettings ->
-                _state.update {
-                    it.copy(
-                        mediaDiscoveryViewSettings = mediaDiscoveryViewSettings
-                            ?: MediaDiscoveryViewSettings.INITIAL.ordinal
-                    )
+            monitorMediaDiscoveryView()
+                .catch { Timber.e(it) }
+                .collectLatest { mediaDiscoveryViewSettings ->
+                    _state.update {
+                        it.copy(
+                            mediaDiscoveryViewSettings = mediaDiscoveryViewSettings
+                                ?: MediaDiscoveryViewSettings.INITIAL.ordinal
+                        )
+                    }
                 }
-            }
         }
     }
 
@@ -162,32 +172,57 @@ class MediaDiscoveryViewModel @Inject constructor(
 
         val currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID)
 
-        fetchPhotosJob = currentFolderId?.let {
+        fetchPhotosJob = currentFolderId?.let { folderId ->
             viewModelScope.launch {
-                if (fromFolderLink == true) {
-                    getPhotosByFolderIdInFolderLinkUseCase(
-                        folderId = NodeId(it),
-                        recursive = true
-                    ).collectLatest { sourcePhotos ->
-                        handlePhotoItems(
-                            sortedPhotos = sortAndFilterPhotos(sourcePhotos),
-                            sourcePhotos = sourcePhotos
-                        )
-                    }
+                if (getFeatureFlagUseCase(AppFeatures.NewMediaDiscoveryFab)) {
+                    monitorSubFolderMediaDiscoverySettingsUseCase()
+                        .catch { Timber.e(it) }
+                        .collectLatest { isRecursive ->
+                            getPhotos(folderId, isRecursive)
+                        }
                 } else {
-                    getPhotosByFolderIdUseCase(
-                        folderId = NodeId(it),
-                        recursive = true
-                    ).collectLatest { sourcePhotos ->
-                        handlePhotoItems(
-                            sortedPhotos = sortAndFilterPhotos(sourcePhotos),
-                            sourcePhotos = sourcePhotos
-                        )
-                    }
+                    getPhotos(folderId, true)
                 }
-
             }
         }
+    }
+
+    private suspend fun getPhotos(
+        folderId: Long,
+        isRecursive: Boolean,
+    ) {
+        if (fromFolderLink == true) {
+            getPhotosByFolderIdInFolderLink(folderId, isRecursive)
+        } else {
+            getPhotosByFolderId(folderId, isRecursive)
+        }
+    }
+
+    private suspend fun getPhotosByFolderId(folderId: Long, isRecursive: Boolean) {
+        getPhotosByFolderIdUseCase(
+            folderId = NodeId(folderId),
+            recursive = isRecursive
+        )
+            .catch { Timber.e(it) }
+            .collectLatest { sourcePhotos ->
+                handlePhotoItems(
+                    sortedPhotos = sortAndFilterPhotos(sourcePhotos),
+                    sourcePhotos = sourcePhotos
+                )
+            }
+    }
+
+    private suspend fun getPhotosByFolderIdInFolderLink(folderId: Long, isRecursive: Boolean) {
+        getPhotosByFolderIdInFolderLinkUseCase(
+            folderId = NodeId(folderId),
+            recursive = isRecursive
+        ).catch { Timber.e(it) }
+            .collectLatest { sourcePhotos ->
+                handlePhotoItems(
+                    sortedPhotos = sortAndFilterPhotos(sourcePhotos),
+                    sourcePhotos = sourcePhotos
+                )
+            }
     }
 
     internal fun sortAndFilterPhotos(sourcePhotos: List<Photo>): List<Photo> {

@@ -15,5 +15,5 @@ class MonitorSubFolderMediaDiscoverySettingsUseCase @Inject constructor(
      * Invoke
      */
     operator fun invoke() =
-        settingsRepository.monitorSubfolderMediaDiscoveryEnabled().map { it ?: false }
+        settingsRepository.monitorSubfolderMediaDiscoveryEnabled().map { it ?: true }
 }

@@ -53,10 +53,12 @@ interface PhotosRepository {
      * Get Photos from a folder
      *
      * @param folderId
+     * @param searchString "*" search All
      * @param recursive True search Photo from sub folders, false only search current folder
      */
     suspend fun getPhotosByFolderId(
         folderId: NodeId,
+        searchString: String = "*",
         recursive: Boolean,
     ): List<Photo>
 
@@ -64,10 +66,12 @@ interface PhotosRepository {
      * Get Photos from a folder
      *
      * @param folderId
+     * @param searchString "*" search All
      * @param recursive True search Photo from sub folders, false only search current folder
      */
     suspend fun getPhotosByFolderIdInFolderLink(
         folderId: NodeId,
+        searchString: String = "*",
         recursive: Boolean,
     ): List<Photo>
 

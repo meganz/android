@@ -2,8 +2,6 @@ package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.node.NodeId
@@ -46,8 +44,10 @@ class GetPhotosByFolderIdInFolderLinkUseCase @Inject constructor(
         folderId: NodeId,
         recursive: Boolean,
     ): List<Photo> =
-        photosRepository.getPhotosByFolderIdInFolderLink(folderId, recursive)
-
+        photosRepository.getPhotosByFolderIdInFolderLink(
+            folderId = folderId,
+            recursive = recursive,
+        )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getMonitoredList(folderId: NodeId, recursive: Boolean) =
