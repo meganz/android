@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.DeleteAllCompletedTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.DeleteFailedOrCanceledTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.DeleteFailedOrCanceledTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
 import javax.inject.Inject

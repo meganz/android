@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.domain.usecase.DownloadBackgroundFile
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadBackgroundFile
 
 /**
  * File management module.

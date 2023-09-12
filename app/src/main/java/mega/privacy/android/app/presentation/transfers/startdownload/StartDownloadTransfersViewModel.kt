@@ -23,14 +23,13 @@ import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
-import mega.privacy.android.domain.usecase.transfer.StartDownloadUseCase
-import mega.privacy.android.domain.usecase.transfer.activetransfers.ClearActiveTransfersIfFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetDefaultDownloadPathForNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
 import timber.log.Timber
 import javax.inject.Inject
 

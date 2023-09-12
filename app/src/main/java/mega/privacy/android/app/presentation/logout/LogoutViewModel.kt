@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.logout.model.LogoutState
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
-import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -4,10 +4,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfer.BroadcastFailedTransfer
-import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
-import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
-import mega.privacy.android.domain.usecase.transfer.MonitorTransferOverQuota
+import mega.privacy.android.domain.usecase.transfers.BroadcastFailedTransfer
+import mega.privacy.android.domain.usecase.transfers.BroadcastTransferOverQuota
+import mega.privacy.android.domain.usecase.transfers.MonitorFailedTransfer
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferOverQuota
 
 @Module
 @DisableInstallInCheck

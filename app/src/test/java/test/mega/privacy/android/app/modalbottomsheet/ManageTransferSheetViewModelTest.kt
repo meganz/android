@@ -12,8 +12,8 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ManageTransferSheetViewModel
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.usecase.transfer.DeleteCompletedTransferUseCase
-import mega.privacy.android.domain.usecase.transfer.GetCompletedTransferByIdUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.GetCompletedTransferByIdUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

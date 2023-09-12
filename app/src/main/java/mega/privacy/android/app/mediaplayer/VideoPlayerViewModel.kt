@@ -152,7 +152,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayer
 import mega.privacy.android.domain.usecase.mediaplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import timber.log.Timber

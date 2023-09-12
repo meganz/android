@@ -32,11 +32,11 @@ import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfers
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfer.activetransfers.AddOrUpdateActiveTransferUseCase
-import mega.privacy.android.domain.usecase.transfer.activetransfers.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfer.activetransfers.MonitorOngoingActiveDownloadTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.monitorpaused.MonitorDownloadTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveDownloadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

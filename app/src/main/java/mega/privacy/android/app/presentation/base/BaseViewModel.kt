@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.base.model.BaseState
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
-import mega.privacy.android.domain.usecase.transfer.MonitorTransfersFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import javax.inject.Inject
 
 /**

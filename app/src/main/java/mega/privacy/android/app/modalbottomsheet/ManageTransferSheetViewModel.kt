@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.usecase.transfer.DeleteCompletedTransferUseCase
-import mega.privacy.android.domain.usecase.transfer.GetCompletedTransferByIdUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.GetCompletedTransferByIdUseCase
 import javax.inject.Inject
 
 @HiltViewModel

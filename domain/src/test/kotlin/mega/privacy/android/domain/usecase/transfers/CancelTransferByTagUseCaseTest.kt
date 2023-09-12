@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase.transfers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

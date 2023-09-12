@@ -6,8 +6,8 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 

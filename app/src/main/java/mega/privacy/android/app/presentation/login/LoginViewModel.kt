@@ -73,8 +73,8 @@ import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
-import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber

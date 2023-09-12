@@ -10,10 +10,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.DeleteAllCompletedTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.DeleteFailedOrCanceledTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.DeleteFailedOrCanceledTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll

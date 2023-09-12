@@ -21,13 +21,13 @@ import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetNumPendingTransfers
-import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.transfer.AreAllTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
-import mega.privacy.android.domain.usecase.transfer.IsCompletedTransfersEmptyUseCase
-import mega.privacy.android.domain.usecase.transfer.uploads.GetNumPendingUploadsUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfers
+import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSize
+import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import javax.inject.Inject
 
 /**

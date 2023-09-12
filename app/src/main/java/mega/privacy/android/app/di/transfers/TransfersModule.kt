@@ -11,10 +11,10 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.presentation.transfers.notification.DefaultDownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.DefaultMonitorTransfersSize
-import mega.privacy.android.domain.usecase.GetNumPendingTransfers
-import mega.privacy.android.domain.usecase.MonitorTransfersSize
-import mega.privacy.android.domain.usecase.ResetTotalDownloads
+import mega.privacy.android.domain.usecase.transfers.DefaultMonitorTransfersSize
+import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfers
+import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSize
+import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloads
 
 /**
  * Use cases to check on transfer status

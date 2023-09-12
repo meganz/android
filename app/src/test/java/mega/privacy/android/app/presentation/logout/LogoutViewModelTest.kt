@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.logout.model.LogoutState
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
-import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
