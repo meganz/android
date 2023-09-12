@@ -356,7 +356,7 @@ interface TransferRepository {
     /**
      * Delete an active transfer by its tag
      */
-    suspend fun deleteActiveTransferByTag(tags: List<Int>)
+    suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
 
     /**
      * Get active transfer totals by type

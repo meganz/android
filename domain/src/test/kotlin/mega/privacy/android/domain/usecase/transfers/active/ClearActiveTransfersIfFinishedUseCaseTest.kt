@@ -24,14 +24,14 @@ internal class ClearActiveTransfersIfFinishedUseCaseTest {
     private lateinit var underTest: ClearActiveTransfersIfFinishedUseCase
 
     private val transferRepository = mock<TransferRepository>()
-    private val cleanActiveTransfersUseCase = mock<CleanActiveTransfersUseCase>()
+    private val correctActiveTransfersUseCase = mock<CorrectActiveTransfersUseCase>()
     private val mockedActiveTransfers = (0..10).map { mock<ActiveTransfer>() }
 
     @BeforeAll
     fun setUp() {
         underTest = ClearActiveTransfersIfFinishedUseCase(
             transferRepository = transferRepository,
-            cleanActiveTransfersUseCase = cleanActiveTransfersUseCase,
+            correctActiveTransfersUseCase = correctActiveTransfersUseCase,
         )
     }
 
@@ -39,7 +39,7 @@ internal class ClearActiveTransfersIfFinishedUseCaseTest {
     fun resetMocks() {
         reset(
             transferRepository,
-            cleanActiveTransfersUseCase,
+            correctActiveTransfersUseCase,
             *mockedActiveTransfers.toTypedArray()
         )
     }
@@ -61,12 +61,12 @@ internal class ClearActiveTransfersIfFinishedUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that cleanActiveTransfersUseCase is invoked when this is invoked`(
+    fun `test that correctActiveTransfersUseCase is invoked when this is invoked`(
         transferType: TransferType,
     ) = runTest {
         stubEmptyActiveTransfers()
         underTest(transferType)
-        verify(cleanActiveTransfersUseCase).invoke(transferType)
+        verify(correctActiveTransfersUseCase).invoke(transferType)
     }
 
     @ParameterizedTest

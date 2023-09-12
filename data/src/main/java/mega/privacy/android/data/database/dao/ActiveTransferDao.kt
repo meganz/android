@@ -27,8 +27,8 @@ internal interface ActiveTransferDao {
     @Query("DELETE FROM active_transfers WHERE transfer_type = :transferType")
     suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
 
-    @Query("DELETE FROM active_transfers WHERE tag IN (:tags)")
-    suspend fun deleteActiveTransferByTag(tags: List<Int>)
+    @Query("UPDATE active_transfers SET is_finished = 1 WHERE tag IN (:tags)")
+    suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
 
     @Query(TOTALS_QUERY)
     fun getTotalsByType(transferType: TransferType): Flow<ActiveTransferTotalsEntity>

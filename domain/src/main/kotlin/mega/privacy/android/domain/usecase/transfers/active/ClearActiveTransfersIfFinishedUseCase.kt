@@ -9,7 +9,7 @@ import javax.inject.Inject
  */
 class ClearActiveTransfersIfFinishedUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
-    private val cleanActiveTransfersUseCase: CleanActiveTransfersUseCase,
+    private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
 ) {
 
     /**
@@ -18,7 +18,7 @@ class ClearActiveTransfersIfFinishedUseCase @Inject constructor(
      */
     suspend operator fun invoke(transferType: TransferType) {
         // first make sure we don't have any corrupted entity
-        cleanActiveTransfersUseCase(transferType)
+        correctActiveTransfersUseCase(transferType)
         // clear all active transfers of this type if all transfers have finished
         val activeTransfers = transferRepository.getCurrentActiveTransfersByType(transferType)
         if (activeTransfers.isNotEmpty() && activeTransfers.all { it.isFinished }) {

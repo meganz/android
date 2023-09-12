@@ -158,13 +158,13 @@ class ActiveTransferDaoTest {
     fun test_deleteActiveTransferByTag_deletes_all_transfers_with_given_tags() = runTest {
         TransferType.values().forEach { type ->
             val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
+            val toFinish = initial.take(initial.size / 2).filter { !it.isFinished }
             assertThat(initial).isNotEmpty()
-            val toDelete = initial.take(initial.size / 2)
-            activeTransferDao.deleteActiveTransferByTag(toDelete.map { it.tag })
+            assertThat(toFinish).isNotEmpty()
+            activeTransferDao.setActiveTransferAsFinishedByTag(toFinish.map { it.tag })
             val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
-            assertThat(initial).isNotEmpty()
-            toDelete.forEach {
-                assertThat(actual).doesNotContain(it)
+            toFinish.forEach { finished ->
+                assertThat(actual.first { it.tag == finished.tag }.isFinished).isTrue()
             }
         }
     }
