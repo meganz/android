@@ -53,6 +53,10 @@ object CameraUploadSyncManager {
     /**
      * Create CU (Camera Uploads) backup. Should be called only when CU is enabled.
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SetupCameraUploadBackupUseCase")
+    )
     fun setPrimaryBackup() = setBackup(
         backupType = BACKUP_TYPE_CAMERA_UPLOADS,
         targetNode = databaseHandler.preferences?.camSyncHandle?.toLong(),
@@ -62,6 +66,10 @@ object CameraUploadSyncManager {
     /**
      * Create MU (Media Uploads) backup. Should be called only when MU is enabled.
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SetupMediaUploadBackupUseCase")
+    )
     fun setSecondaryBackup() = setBackup(
         backupType = BACKUP_TYPE_MEDIA_UPLOADS,
         targetNode = databaseHandler.preferences?.megaHandleSecondaryFolder?.toLong(),
@@ -79,6 +87,10 @@ object CameraUploadSyncManager {
      * @param localFolder The local folder path where the Backup uploads from.
      * @see MegaError
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SetBackupUseCase")
+    )
     private fun setBackup(
         backupType: Int,
         targetNode: Long?,
