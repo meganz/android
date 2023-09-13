@@ -22,7 +22,8 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieTy
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.ANALYTICS
 
 @AndroidEntryPoint
-class CookieSettingsFragment : SettingsBaseFragment() {
+class CookieSettingsFragment : SettingsBaseFragment(),
+    Preference.OnPreferenceChangeListener {
 
     private val viewModel by activityViewModels<CookieSettingsViewModel>()
 

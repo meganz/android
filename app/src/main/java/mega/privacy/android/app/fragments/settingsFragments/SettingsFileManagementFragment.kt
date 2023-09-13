@@ -41,7 +41,8 @@ import javax.inject.Inject
  * The fragment for file management of settings
  */
 @AndroidEntryPoint
-class SettingsFileManagementFragment : SettingsBaseFragment() {
+class SettingsFileManagementFragment : SettingsBaseFragment(),
+    Preference.OnPreferenceClickListener {
 
     /**
      * [MyAccountInfo] injection
@@ -82,10 +83,10 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
         enableRbSchedulerSwitch?.onPreferenceClickListener = this
         clearVersionsFileManagement?.onPreferenceClickListener = this
         autoPlaySwitch?.onPreferenceClickListener = this
-        autoPlaySwitch?.isChecked = prefs.isAutoPlayEnabled()
+        autoPlaySwitch?.isChecked = prefs?.isAutoPlayEnabled() == true
         mobileDataHighResolution?.onPreferenceClickListener = this
         if (megaApi.serverSideRubbishBinAutopurgeEnabled()) {
-            megaApi.getRubbishBinAutopurgePeriod(GetAttrUserListener(context))
+            megaApi.getRubbishBinAutopurgePeriod(GetAttrUserListener(requireContext()))
             enableRbSchedulerSwitch?.let {
                 preferenceScreen.addPreference(it)
             }
@@ -168,6 +169,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
         dismissAlertDialogIfExists(disableVersionsWarning)
     }
 
+
     override fun onPreferenceClick(preference: Preference): Boolean {
         when (preference.key) {
             KEY_OFFLINE -> (context as FileManagementPreferencesActivity).showClearOfflineDialog()
@@ -175,6 +177,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
                 val clearCacheTask = ManageCacheTask(true)
                 clearCacheTask.execute()
             }
+
             KEY_RUBBISH -> (context as FileManagementPreferencesActivity).showClearRubbishBinDialog()
             KEY_ENABLE_RB_SCHEDULER -> {
                 enableRbSchedulerSwitch?.let {
@@ -314,7 +317,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
                 preferenceScreen.addPreference(it)
                 it.onPreferenceClickListener = this
                 it.summary =
-                    context.resources.getQuantityString(
+                    context?.resources?.getQuantityString(
                         R.plurals.settings_file_management_remove_files_older_than_days,
                         daysCount.toInt(),
                         daysCount.toInt()

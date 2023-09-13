@@ -92,7 +92,9 @@ import java.io.File
  * [SettingsBaseFragment] that enables or disables Camera Uploads in Settings
  */
 @AndroidEntryPoint
-class SettingsCameraUploadsFragment : SettingsBaseFragment() {
+class SettingsCameraUploadsFragment : SettingsBaseFragment(),
+    Preference.OnPreferenceClickListener,
+    Preference.OnPreferenceChangeListener{
     private var cameraUploadOnOff: SwitchPreferenceCompat? = null
     private var optionHowToUpload: ListPreference? = null
     private var optionFileUpload: ListPreference? = null
@@ -260,7 +262,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         megaSecondaryFolder = findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER)
         megaSecondaryFolder?.onPreferenceClickListener = this
 
-        val tempHandle = prefs.camSyncHandle
+        val tempHandle = prefs?.camSyncHandle
         if (tempHandle != null) {
             camSyncHandle = tempHandle.toLongOrNull()
             if (camSyncHandle != MegaApiJava.INVALID_HANDLE) {
@@ -278,11 +280,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         }
 
         // Setting up the Secondary Folder path
-        if (prefs.secondaryMediaFolderEnabled == null) {
+        if (prefs?.secondaryMediaFolderEnabled == null) {
             dbH.setSecondaryUploadEnabled(false)
             secondaryUpload = false
         } else {
-            secondaryUpload = prefs.secondaryMediaFolderEnabled.toBoolean()
+            secondaryUpload = prefs?.secondaryMediaFolderEnabled.toBoolean()
             Timber.d("Secondary is: %s", secondaryUpload)
         }
 
@@ -415,7 +417,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * @param newValue Arbitrary value depending on what [Preference] is enabled
      */
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
-        prefs = dbH.preferences
         val value: Int = (newValue as String).toInt()
         when (preference.key) {
             KEY_CAMERA_UPLOAD_HOW_TO -> {
@@ -463,7 +464,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         if (resultCode != Activity.RESULT_OK || intent == null) return
-        prefs = dbH.preferences
         Timber.d("REQUEST CODE: %d___RESULT CODE: %d", requestCode, resultCode)
         when (requestCode) {
             REQUEST_CAMERA_FOLDER -> {
@@ -487,10 +487,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 // Primary Folder to Sync
                 val handle = intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!isNewSettingValid(
-                        primaryPath = prefs.camSyncLocalPath,
-                        secondaryPath = prefs.localPathSecondaryFolder,
+                        primaryPath = prefs?.camSyncLocalPath,
+                        secondaryPath = prefs?.localPathSecondaryFolder,
                         primaryHandle = handle.toString(),
-                        secondaryHandle = prefs.megaHandleSecondaryFolder,
+                        secondaryHandle = prefs?.megaHandleSecondaryFolder,
                     )
                 ) {
                     Toast.makeText(
@@ -515,10 +515,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 val isFolderInSDCard =
                     intent.getBooleanExtra(FileStorageActivity.EXTRA_IS_FOLDER_IN_SD_CARD, false)
                 if (!isNewSettingValid(
-                        primaryPath = prefs.camSyncLocalPath,
+                        primaryPath = prefs?.camSyncLocalPath,
                         secondaryPath = secondaryPath,
-                        primaryHandle = prefs.camSyncHandle,
-                        secondaryHandle = prefs.megaHandleSecondaryFolder,
+                        primaryHandle = prefs?.camSyncHandle,
+                        secondaryHandle = prefs?.megaHandleSecondaryFolder,
                     )
                 ) {
                     Toast.makeText(
@@ -548,9 +548,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 val secondaryHandle =
                     intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!isNewSettingValid(
-                        primaryPath = prefs.camSyncLocalPath,
-                        secondaryPath = prefs.localPathSecondaryFolder,
-                        primaryHandle = prefs.camSyncHandle,
+                        primaryPath = prefs?.camSyncLocalPath,
+                        secondaryPath = prefs?.localPathSecondaryFolder,
+                        primaryHandle = prefs?.camSyncHandle,
                         secondaryHandle = secondaryHandle.toString(),
                     )
                 ) {
@@ -1104,12 +1104,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Checks the Secondary Folder
      */
     private fun checkSecondaryMediaFolder() {
-        prefs = dbH.preferences
         if (secondaryUpload) {
             secondaryMediaFolderOn?.title = getString(R.string.settings_secondary_upload_off)
             with(prefs) {
                 // Check if the node exists in MEGA
-                val node = megaHandleSecondaryFolder?.toLongOrNull()?.let { handle ->
+                val node = this?.megaHandleSecondaryFolder?.toLongOrNull()?.let { handle ->
                     megaApi.getNodeByHandle(handle)
                 }
 
@@ -1119,7 +1118,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 }
 
                 // Check if the local secondary folder exists
-                val path = localPathSecondaryFolder?.let {
+                val path = this?.localPathSecondaryFolder?.let {
                     if (!FileUtil.isFileAvailable(File(it))) {
                         Timber.w("Secondary ON: invalid localSecondaryFolderPath")
                         snackbarCallBack?.showSnackbar(getString(R.string.secondary_media_service_error_local_folder))
@@ -1184,9 +1183,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun refreshCameraUploadsSettings() {
         var cuEnabled = false
-        prefs = dbH.preferences
         if (prefs != null) {
-            cuEnabled = prefs.camSyncEnabled.toBoolean()
+            cuEnabled = prefs?.camSyncEnabled.toBoolean()
         }
         if (cuEnabled) {
             Timber.d("Disable CU.")
@@ -1305,7 +1303,12 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             editText.inputType = InputType.TYPE_CLASS_NUMBER
             layout.addView(editText, params)
             editText.setSingleLine()
-            editText.setTextColor(getThemeColor(context, android.R.attr.textColorSecondary))
+            editText.setTextColor(
+                getThemeColor(
+                    requireContext(),
+                    android.R.attr.textColorSecondary
+                )
+            )
             editText.hint = getString(R.string.label_mega_byte)
             editText.imeOptions = EditorInfo.IME_ACTION_DONE
             editText.setOnEditorActionListener { textView, actionId, _ ->
@@ -1350,7 +1353,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         )
         layout.addView(textView, params)
 
-        val builder = AlertDialog.Builder(context)
+        val builder = AlertDialog.Builder(requireContext())
         with(builder) {
             setTitle(getString(R.string.settings_video_compression_queue_size_popup_title))
             setPositiveButton(getString(R.string.general_ok), null)
@@ -1384,8 +1387,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun enableCameraUploads() {
         Timber.d("Camera Uploads Enabled")
-
-        prefs = dbH.preferences
 
         viewModel.setCameraUploadsEnabled(true)
 
@@ -1442,11 +1443,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Setup Secondary Uploads
      */
     private fun setupSecondaryUpload() {
-        secondaryUpload = if (prefs.secondaryMediaFolderEnabled == null) {
+        secondaryUpload = if (prefs?.secondaryMediaFolderEnabled == null) {
             dbH.setSecondaryUploadEnabled(false)
             false
         } else {
-            prefs.secondaryMediaFolderEnabled.toBoolean()
+            prefs?.secondaryMediaFolderEnabled.toBoolean()
         }
     }
 

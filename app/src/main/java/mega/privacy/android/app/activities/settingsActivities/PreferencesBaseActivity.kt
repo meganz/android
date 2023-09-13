@@ -7,11 +7,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_SCROLL
 import mega.privacy.android.app.databinding.ActivitySettingsBinding
 import mega.privacy.android.app.interfaces.SimpleSnackbarCallBack
 import mega.privacy.android.app.utils.ColorUtils
@@ -43,9 +41,6 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
-
-        LiveEventBus.get(EVENT_UPDATE_SCROLL, Boolean::class.java)
-            .observe(this) { withElevation -> updateElevation(withElevation) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -76,7 +71,7 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
      *
      * @param withElevation True if should show elevation, false if should hide it.
      */
-    private fun updateElevation(withElevation: Boolean) {
+    fun updateElevation(withElevation: Boolean) {
         if (this.withElevation == withElevation) {
             return
         }

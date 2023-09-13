@@ -24,7 +24,8 @@ import timber.log.Timber
 /**
  * The fragment for chat notifications of settings
  */
-class SettingsChatNotificationsFragment : SettingsBaseFragment() {
+class SettingsChatNotificationsFragment : SettingsBaseFragment(),
+    Preference.OnPreferenceClickListener {
     private var chatSettings: ChatSettings?
     private var chatNotificationsSwitch: SwitchPreferenceCompat? = null
     private var chatSoundPreference: Preference? = null
