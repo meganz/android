@@ -774,4 +774,14 @@ interface CameraUploadRepository {
      */
     suspend fun broadCastCameraUploadSettingsActions(action: CameraUploadsSettingsAction)
 
+    /**
+     * Get Camera Uploads Name
+     */
+    fun getCameraUploadsName(): String
+
+    /**
+     * Get Media Uploads Name
+     */
+    fun getMediaUploadsName(): String
+
 }

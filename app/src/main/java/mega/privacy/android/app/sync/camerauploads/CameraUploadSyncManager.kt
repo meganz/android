@@ -245,6 +245,10 @@ object CameraUploadSyncManager {
      *
      * @param newTargetNode The new target node
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SetupOrUpdateCameraUploadsBackupUseCase")
+    )
     fun updatePrimaryFolderTargetNode(newTargetNode: Long) {
         if (!isPrimaryFolderEnabled()) {
             Timber.d("Primary Folder is disabled. Unable to update Primary Folder node")
@@ -284,6 +288,10 @@ object CameraUploadSyncManager {
      *
      * @param newTargetNode The new target node
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SetupOrUpdateCameraUploadsBackupUseCase")
+    )
     fun updateSecondaryFolderTargetNode(newTargetNode: Long) {
         if (!isSecondaryFolderEnabled()) {
             Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder node")
@@ -317,6 +325,10 @@ object CameraUploadSyncManager {
      *
      * @param newLocalFolder The path of the new Primary local folder
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SetupOrUpdateCameraUploadsBackupUseCase")
+    )
     fun updatePrimaryLocalFolder(newLocalFolder: String?) {
         if (!isPrimaryFolderEnabled()) {
             Timber.d("Primary Folder is disabled. Unable to update primary local folder")
@@ -350,6 +362,10 @@ object CameraUploadSyncManager {
      *
      * @param newLocalFolder The path of the new Secondary local folder
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SetupOrUpdateCameraUploadsBackupUseCase")
+    )
     fun updateSecondaryLocalFolder(newLocalFolder: String?) {
         if (!isSecondaryFolderEnabled()) {
             Timber.d("Secondary Folder is disabled. Unable to update secondary local folder")

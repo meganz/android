@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.R
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
@@ -797,6 +798,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun broadCastCameraUploadSettingsActions(action: CameraUploadsSettingsAction) =
         appEventGateway.broadCastCameraUploadSettingsActions(action)
+
+    override fun getCameraUploadsName() = context.getString(R.string.section_photo_sync)
+
+    override fun getMediaUploadsName() = context.getString(R.string.section_secondary_media_uploads)
 
     private companion object {
         private const val STATE_NO_CHANGE = -1
