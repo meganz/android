@@ -48,6 +48,6 @@ class SearchFilterMapperTest {
     @Test
     fun `test that when search category is document all then filter has the name docs`() {
         val actual = underTest(SearchCategory.DOCUMENTS)
-        Truth.assertThat(actual.name).isEqualTo(context.getString(R.string.category_documents))
+        Truth.assertThat(actual.name).isEqualTo(context.getString(R.string.section_documents))
     }
 }

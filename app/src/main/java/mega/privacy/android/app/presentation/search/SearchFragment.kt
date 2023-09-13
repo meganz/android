@@ -26,6 +26,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
 import androidx.core.content.FileProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -62,6 +63,7 @@ import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
+import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.presentation.search.view.SearchFilterChipsView
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
@@ -79,6 +81,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDow
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.displayMetrics
+import mega.privacy.android.core.ui.controls.MegaEmptyView
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ThemeMode
@@ -118,6 +121,12 @@ class SearchFragment : RotatableFragment() {
     lateinit var megaApi: MegaApiAndroid
 
     /**
+     * Empty search view mapper
+     */
+    @Inject
+    lateinit var emptySearchViewMapper: EmptySearchViewMapper
+
+    /**
      * Get system's default theme mode
      */
     @Inject
@@ -143,6 +152,7 @@ class SearchFragment : RotatableFragment() {
     private lateinit var contentLayout: RelativeLayout
     private lateinit var searchProgressBar: ProgressBar
     private lateinit var searchFilterChipsView: ComposeView
+    private lateinit var emptyLoadingView: ComposeView
 
     //Bindings
     private var _binding: FragmentSearchBinding? = null
@@ -212,6 +222,7 @@ class SearchFragment : RotatableFragment() {
             adapter.isMultipleSelect = false
         }
         updateChipsView()
+        updateEmptyOrProgressView()
         recyclerView?.adapter = adapter
         return binding.root
     }
@@ -272,13 +283,34 @@ class SearchFragment : RotatableFragment() {
         }
     }
 
+    private fun updateEmptyOrProgressView() {
+        emptyLoadingView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode()
+                    .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val uiState by searchViewModel.state.collectAsStateWithLifecycle()
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    if (uiState.nodes.isNullOrEmpty() && uiState.showChips) {
+                        val emptyState = emptySearchViewMapper.invoke(
+                            category = uiState.selectedFilter?.filter,
+                            searchQuery = uiState.searchQuery
+                        )
+                        MegaEmptyView(
+                            imagePainter = painterResource(id = emptyState.first),
+                            text = emptyState.second
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * init views
      */
     private fun initViews() {
         recyclerView = binding.fileGridViewBrowser
-        emptyImageView = binding.fileGridEmptyImage
-        emptyTextView = binding.fileGridEmptyText
         fastScroller = binding.fastscroll
         fastScroller.setRecyclerView(binding.fileGridViewBrowser)
         contentLayout = binding.contentLayout
@@ -287,6 +319,7 @@ class SearchFragment : RotatableFragment() {
         emptyTextView = binding.fileGridEmptyText
         emptyTextViewFirst = binding.fileGridEmptyTextFirst
         searchFilterChipsView = binding.filterChipsHorizontalView
+        emptyLoadingView = binding.searchEmptyLoadingView
     }
 
     /**
@@ -733,68 +766,15 @@ class SearchFragment : RotatableFragment() {
         visibilityFastScroller()
         if (adapter.itemCount == 0) {
             recyclerView?.visibility = View.GONE
-            emptyImageView.visibility = View.VISIBLE
-            emptyTextView.visibility = View.VISIBLE
-
-            if (state().searchParentHandle == -1L) {
-                if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.empty_folder_landscape)
-                } else {
-                    emptyImageView.setImageResource(R.drawable.empty_folder_portrait)
-                }
-                emptyTextViewFirst.setText(R.string.no_results_found)
-            } else if (megaApi.rootNode?.handle == state().searchParentHandle) {
-                if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.cloud_empty_landscape)
-                } else {
-                    emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive)
-                }
-                var textToShow = String.format(getString(R.string.context_empty_cloud_drive))
-                runCatching {
-                    textToShow = textToShow.replace(
-                        "[A]", "<font color=\'"
-                                + ColorUtils.getColorHexString(
-                            requireContext(),
-                            R.color.grey_900_grey_100
-                        )
-                                + "\'>"
-                    ).replace("[/A]", "</font>").replace(
-                        "[B]", "<font color=\'"
-                                + ColorUtils.getColorHexString(
-                            requireContext(),
-                            R.color.grey_300_grey_600
-                        )
-                                + "\'>"
-                    ).replace("[/B]", "</font>")
-                }.getOrElse { }
-                val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                emptyTextViewFirst.text = result
+            if (!state().showChips) {
+                emptyImageView.visibility = View.VISIBLE
+                emptyTextView.visibility = View.VISIBLE
+                emptyLoadingView.visibility = View.GONE
+                showEmptyScreenLegacy()
             } else {
-                if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder)
-                } else {
-                    emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder)
-                }
-                var textToShow = String.format(getString(R.string.file_browser_empty_folder_new))
-                runCatching {
-                    textToShow = textToShow.replace(
-                        "[A]", "<font color=\'"
-                                + ColorUtils.getColorHexString(
-                            requireContext(),
-                            R.color.grey_900_grey_100
-                        )
-                                + "\'>"
-                    ).replace("[/A]", "</font>").replace(
-                        "[B]", "<font color=\'"
-                                + ColorUtils.getColorHexString(
-                            requireContext(),
-                            R.color.grey_300_grey_600
-                        )
-                                + "\'>"
-                    ).replace("[/B]", "</font>")
-                }.getOrElse { }
-                val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                emptyTextViewFirst.text = result
+                emptyLoadingView.visibility = View.VISIBLE
+                emptyImageView.visibility = View.GONE
+                emptyTextView.visibility = View.GONE
             }
         } else {
             recyclerView?.visibility = View.VISIBLE
@@ -805,6 +785,77 @@ class SearchFragment : RotatableFragment() {
         if (isWaitingForSearchedNodes) {
             reDoTheSelectionAfterRotation()
             reSelectUnhandledItem()
+        }
+    }
+
+    /**
+     * Method will be removed when SearchWithChipsMVP flag is removed
+     */
+    private fun showEmptyScreenLegacy() {
+        if (state().searchParentHandle == -1L) {
+            if (context?.resources?.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                emptyImageView.setImageResource(R.drawable.empty_folder_landscape)
+            } else {
+                emptyImageView.setImageResource(R.drawable.empty_folder_portrait)
+            }
+            emptyTextViewFirst.setText(R.string.no_results_found)
+        } else if (megaApi.rootNode?.handle == state().searchParentHandle) {
+            if (context?.resources?.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                emptyImageView.setImageResource(R.drawable.cloud_empty_landscape)
+            } else {
+                emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive)
+            }
+            var textToShow = String.format(getString(R.string.context_empty_cloud_drive))
+            runCatching {
+                context?.let {
+                    textToShow = textToShow.replace(
+                        "[A]", "<font color=\'"
+                                +
+                                ColorUtils.getColorHexString(
+                                    it,
+                                    R.color.grey_900_grey_100
+                                )
+                                + "\'>"
+                    ).replace("[/A]", "</font>").replace(
+                        "[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(
+                            it,
+                            R.color.grey_300_grey_600
+                        )
+                                + "\'>"
+                    ).replace("[/B]", "</font>")
+                }
+            }.getOrElse { }
+            val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
+            emptyTextViewFirst.text = result
+        } else {
+            if (context?.resources?.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder)
+            } else {
+                emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder)
+            }
+            var textToShow = String.format(getString(R.string.file_browser_empty_folder_new))
+            runCatching {
+                context?.let {
+                    textToShow = textToShow.replace(
+                        "[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(
+                            it,
+                            R.color.grey_900_grey_100
+                        )
+                                + "\'>"
+                    ).replace("[/A]", "</font>").replace(
+                        "[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(
+                            it,
+                            R.color.grey_300_grey_600
+                        )
+                                + "\'>"
+                    ).replace("[/B]", "</font>")
+                }
+            }.getOrElse { }
+            val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
+            emptyTextViewFirst.text = result
         }
     }
 

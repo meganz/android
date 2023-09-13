@@ -70,6 +70,11 @@
         </LinearLayout>
     </RelativeLayout>
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/search_empty_loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <include
         android:id="@+id/layout_general_progress_bar"
         layout="@layout/general_progress_bar" />

@@ -34,7 +34,7 @@ class SearchFilterMapper @Inject constructor(
 
         SearchCategory.DOCUMENTS -> SearchFilter(
             SearchCategory.DOCUMENTS,
-            context.getString(R.string.category_documents)
+            context.getString(R.string.section_documents)
         )
 
         SearchCategory.AUDIO -> SearchFilter(
