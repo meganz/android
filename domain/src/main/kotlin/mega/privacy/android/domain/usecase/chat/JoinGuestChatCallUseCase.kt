@@ -31,7 +31,7 @@ class JoinGuestChatCallUseCase @Inject constructor(
         firstName: String,
         lastName: String,
     ) {
-        initGuestChatSessionUseCase(false)
+        initGuestChatSessionUseCase(anonymousMode = false)
 
         createEphemeralAccountUseCase(firstName, lastName)
 

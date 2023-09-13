@@ -214,6 +214,11 @@ interface AccountRepository {
     suspend fun isUserLoggedIn(): Boolean
 
     /**
+     * Check if is ephemeral plus plus account
+     */
+    suspend fun isEphemeralPlusPlus(): Boolean
+
+    /**
      * Saves the UserCredentials of the current logged in account and clears ephemeral.
      *
      * @return [AccountSession]

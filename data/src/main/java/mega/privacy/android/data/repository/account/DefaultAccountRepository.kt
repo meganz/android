@@ -541,6 +541,11 @@ internal class DefaultAccountRepository @Inject constructor(
             megaApiGateway.isUserLoggedIn() > 0
         }
 
+    override suspend fun isEphemeralPlusPlus(): Boolean =
+        withContext(ioDispatcher) {
+            megaApiGateway.isEphemeralPlusPlus
+        }
+
     override suspend fun saveAccountCredentials() = withContext(ioDispatcher) {
         var myUserHandle: Long? = null
         var email: String? = null

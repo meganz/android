@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.chat
 
 import mega.privacy.android.domain.entity.chat.ChatInitState
-import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import javax.inject.Inject
@@ -12,25 +11,20 @@ import javax.inject.Inject
 class InitGuestChatSessionUseCase @Inject constructor(
     private val loginRepository: LoginRepository,
     private val chatRepository: ChatRepository,
-    private val accountRepository: AccountRepository,
 ) {
 
     /**
      * Invoke
      *
-     * @param initAnonymous     True to init Chat in anonymous mode, false otherwise.
+     * @param anonymousMode     True to init Chat in anonymous mode, false otherwise.
      */
-    suspend operator fun invoke(initAnonymous: Boolean = true) {
-        if (!accountRepository.isUserLoggedIn()
-            && chatRepository.getChatInitState() != ChatInitState.ANONYMOUS
-        ) {
+    suspend operator fun invoke(anonymousMode: Boolean = true) {
+        if (!anonymousMode) {
             logout()
-
-            if (initAnonymous) {
-                chatRepository.initAnonymousChat()
-            } else {
-                loginRepository.initMegaChat()
-            }
+            loginRepository.initMegaChat()
+        } else if (chatRepository.getChatInitState() != ChatInitState.ANONYMOUS) {
+            logout()
+            chatRepository.initAnonymousChat()
         }
     }
 
