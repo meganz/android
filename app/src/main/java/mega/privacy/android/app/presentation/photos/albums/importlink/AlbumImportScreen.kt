@@ -445,54 +445,48 @@ private fun AlbumImportBottomBar(
 ) {
     val isLight = MaterialTheme.colors.isLight
 
-    BottomAppBar(
+    Column(
         modifier = modifier,
-        backgroundColor = Color.Transparent,
-        elevation = 0.dp,
-        contentPadding = PaddingValues(0.dp),
         content = {
-            Column(
+            Divider(
+                color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
+                thickness = 1.dp,
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(grey_020.takeIf { isLight } ?: dark_grey)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
                 content = {
-                    Divider(
-                        color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
-                        thickness = 1.dp,
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(grey_020.takeIf { isLight } ?: dark_grey)
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.End,
-                        content = {
-                            if (isLogin) {
-                                TextButton(
-                                    onClick = onImport,
-                                    content = {
-                                        Text(
-                                            text = stringResource(id = R.string.general_save_to_cloud_drive),
-                                            color = teal_300,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.W500,
-                                            style = MaterialTheme.typography.button,
-                                        )
-                                    },
+                    if (isLogin) {
+                        TextButton(
+                            onClick = onImport,
+                            content = {
+                                Text(
+                                    text = stringResource(id = R.string.general_save_to_cloud_drive),
+                                    color = teal_300,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.W500,
+                                    style = MaterialTheme.typography.button,
                                 )
-                            }
+                            },
+                        )
+                    }
 
-                            Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
-                            TextButton(
-                                onClick = onSaveToDevice,
-                                content = {
-                                    Text(
-                                        text = stringResource(id = R.string.general_save_to_device),
-                                        color = teal_300,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.W500,
-                                        style = MaterialTheme.typography.button,
-                                    )
-                                },
+                    TextButton(
+                        onClick = onSaveToDevice,
+                        content = {
+                            Text(
+                                text = stringResource(id = R.string.general_save_to_device),
+                                color = teal_300,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.W500,
+                                style = MaterialTheme.typography.button,
                             )
                         },
                     )
