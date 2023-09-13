@@ -56,17 +56,17 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.IsThereAnyChatUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
@@ -74,9 +74,6 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -85,8 +82,7 @@ import javax.inject.Inject
  * Service which should be only used for chat uploads.
  */
 @AndroidEntryPoint
-class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
-    MegaChatRequestListenerInterface {
+class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
 
     @MegaApi
     @Inject
@@ -133,6 +129,9 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase
+
+    @Inject
+    lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -275,7 +274,6 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
     override fun onDestroy() {
         Timber.d("onDestroy")
         releaseLocks()
-        megaApi.removeRequestListener(this)
         monitorPausedTransfersJob?.cancel()
         monitorTransferEventsJob?.cancel()
         super.onDestroy()
@@ -299,7 +297,7 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
             if (intent.action == ACTION_CANCEL) {
                 Timber.d("Cancel intent")
                 canceled = true
-                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this)
+                lifecycleScope.launch { cancelAllUploadTransfersUseCase() }
                 return START_NOT_STICKY
             }
         }
@@ -1252,111 +1250,6 @@ class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
             //Message not found, try to attach from DB
             attachMessageFromDB(id, transfer)
         }
-    }
-
-    fun updatePdfAttachStatus(transfer: Transfer) = with(transfer) {
-        Timber.d("updatePdfAttachStatus")
-        //Find the pending message
-        for (i in pendingMessages!!.indices) {
-            val pendMsg = pendingMessages!![i]
-
-            if (pendMsg.filePath == localPath) {
-                if (pendMsg.nodeHandle == -1L) {
-                    Timber.d("Set node handle to the pdf file: $nodeHandle")
-                    pendMsg.nodeHandle = nodeHandle
-                } else {
-                    Timber.e("Set node handle error")
-                }
-            }
-        }
-
-        transfer.pendingMessageId()?.let { id ->
-            //Update status and nodeHandle on db
-            dbH.updatePendingMessageOnTransferFinish(
-                id,
-                nodeHandle.toString() + "",
-                PendingMessageState.ATTACHING.value
-            )
-
-            pendingMessages?.forEach { if (it.chatId == id) return@with }
-
-            //Message not found, try to get it from DB.
-            dbH.findPendingMessageById(id)?.let { pendingMessages?.add(it) }
-                ?: Timber.e("Message not found, not added")
-        }
-    }
-
-    private fun attachPdfNode(nodeHandle: Long) {
-        Timber.d("Node Handle: $nodeHandle")
-        //Find the pending message
-        pendingMessages?.forEach { pendMsg ->
-            if (pendMsg.nodeHandle == nodeHandle) {
-                Timber.d("Send node: $nodeHandle to chat: ${pendMsg.chatId}")
-                requestSent++
-                val nodePdf = megaApi.getNodeByHandle(nodeHandle)
-
-                if (nodePdf?.hasPreview() == true) {
-                    Timber.d("The pdf node has preview")
-                }
-
-                megaChatApi.attachNode(pendMsg.chatId, nodeHandle, this)
-            } else {
-                Timber.e("PDF attach error")
-            }
-        }
-    }
-
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestStart: ${request.name}")
-
-        if (request.type == MegaRequest.TYPE_COPY) {
-            lifecycleScope.launch { updateProgressNotification() }
-        } else if (request.type == MegaRequest.TYPE_SET_ATTR_FILE) {
-            Timber.d("TYPE_SET_ATTR_FILE")
-        }
-    }
-
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("UPLOAD: onRequestFinish ${request.requestString}")
-
-        //Send the file without preview if the set attribute fails
-        if (request.type == MegaRequest.TYPE_SET_ATTR_FILE && request.paramType == MegaApiJava.ATTR_TYPE_PREVIEW) {
-            requestSent--
-            val handle = request.nodeHandle
-            val node = megaApi.getNodeByHandle(handle)
-
-            if (node != null) {
-                val nodeName = node.name
-
-                if (MimeTypeList.typeForName(nodeName).isPdf) {
-                    attachPdfNode(handle)
-                }
-            }
-        }
-        if (e.errorCode == MegaError.API_OK) {
-            Timber.d("onRequestFinish OK")
-        } else {
-            Timber.e("onRequestFinish:ERROR: ${e.errorCode}")
-            if (e.errorCode == MegaError.API_EOVERQUOTA) {
-                Timber.w("OVERQUOTA ERROR: ${e.errorCode}")
-                isOverQuota = Constants.OVERQUOTA_STORAGE_STATE
-            } else if (e.errorCode == MegaError.API_EGOINGOVERQUOTA) {
-                Timber.w("PRE-OVERQUOTA ERROR: ${e.errorCode}")
-                isOverQuota = Constants.PRE_OVERQUOTA_STORAGE_STATE
-            }
-            onQueueComplete()
-        }
-    }
-
-    override fun onRequestTemporaryError(
-        api: MegaApiJava, request: MegaRequest,
-        e: MegaError,
-    ) {
-        Timber.w("onRequestTemporaryError: ${request.name}")
-    }
-
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestUpdate: ${request.name}")
     }
 
     override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {}
