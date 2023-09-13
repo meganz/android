@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository.thumbnailpreview
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheGateway
@@ -24,7 +25,9 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -260,4 +263,48 @@ class ThumbnailPreviewRepositoryImplTest {
             whenever(megaApi.createPreview(sourcePath, destinationPath)).thenReturn(expected)
             assertThat(underTest.createPreview(testString, file)).isEqualTo(expected)
         }
+
+    @Test
+    fun `test that setThumbnail invokes megaApi setThumbnail if node is not null`() = runTest {
+        whenever(megaApi.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
+        whenever(megaApi.setThumbnail(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mock()
+            )
+        }
+        underTest.setThumbnail(nodeHandle, thumbnailPath)
+        advanceUntilIdle()
+        verify(megaApi).setThumbnail(any(), any(), any())
+    }
+
+    @Test
+    fun `test that setThumbnail does not invoke megaApi setThumbnail if node is null`() = runTest {
+        whenever(megaApi.getMegaNodeByHandle(nodeHandle)).thenReturn(null)
+        underTest.setThumbnail(nodeHandle, any())
+        verify(megaApi, never()).setThumbnail(any(), any(), any())
+    }
+
+    @Test
+    fun `test that setPreview invokes megaApi setPreview if node is not null`() = runTest {
+        whenever(megaApi.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
+        whenever(megaApi.setPreview(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mock()
+            )
+        }
+        underTest.setPreview(nodeHandle, thumbnailPath)
+        advanceUntilIdle()
+        verify(megaApi).setPreview(any(), any(), any())
+    }
+
+    @Test
+    fun `test that setPreview does not invoke megaApi setPreview if node is null`() = runTest {
+        whenever(megaApi.getMegaNodeByHandle(nodeHandle)).thenReturn(null)
+        underTest.setPreview(nodeHandle, any())
+        verify(megaApi, never()).setPreview(any(), any(), any())
+    }
 }

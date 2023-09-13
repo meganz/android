@@ -298,7 +298,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             megaApi.getMegaNodeByHandle(nodeHandle)?.let {
                 suspendCancellableCoroutine { continuation ->
                     val listener = continuation.getRequestListener("setPreview") {}
-                    megaApi.setThumbnail(it, srcFilePath, listener)
+                    megaApi.setPreview(it, srcFilePath, listener)
                     continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
                 }
             } ?: Unit
