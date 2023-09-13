@@ -357,8 +357,15 @@ interface MediaPlayerRepository {
      * Get videos by searchType api
      *
      * @param handle handle
+     * @param searchString containing a search string in their name
+     * @param recursive is search recursively
      * @param order SortOrder
      * @return List<UnTypedNode>
      */
-    suspend fun getVideosBySearchType(handle: Long, order: SortOrder): List<UnTypedNode>?
+    suspend fun getVideosBySearchType(
+        handle: Long,
+        searchString: String,
+        recursive: Boolean,
+        order: SortOrder,
+    ): List<UnTypedNode>?
 }

@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -152,6 +153,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayer
 import mega.privacy.android.domain.usecase.mediaplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -216,6 +218,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val setVideoRepeatModeUseCase: SetVideoRepeatModeUseCase,
     private val getVideosBySearchTypeUseCase: GetVideosBySearchTypeUseCase,
+    private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), SearchCallback.Data {
@@ -854,7 +857,11 @@ class VideoPlayerViewModel @Inject constructor(
                             }
 
                             if (type == FROM_MEDIA_DISCOVERY) {
-                                getVideosBySearchTypeUseCase(parentHandle, order)
+                                getVideosBySearchTypeUseCase(
+                                    handle = parentHandle,
+                                    recursive = monitorSubFolderMediaDiscoverySettingsUseCase().first(),
+                                    order = order
+                                )
                             } else {
                                 getVideoNodesByParentHandleUseCase(
                                     parentHandle = parent.id.longValue,

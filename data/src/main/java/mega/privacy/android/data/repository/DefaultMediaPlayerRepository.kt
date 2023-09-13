@@ -529,14 +529,16 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun getVideosBySearchType(
         handle: Long,
-        order: SortOrder,
+        searchString: String,
+        recursive: Boolean,
+        order: SortOrder
     ): List<UnTypedNode>? =
         megaApi.getMegaNodeByHandle(nodeHandle = handle)?.let { parent ->
             megaApi.searchByType(
                 parent,
-                "",
+                searchString,
                 MegaCancelToken.createInstance(),
-                true,
+                recursive,
                 sortOrderIntMapper(order),
                 FILE_TYPE_VIDEO,
             ).map { node ->

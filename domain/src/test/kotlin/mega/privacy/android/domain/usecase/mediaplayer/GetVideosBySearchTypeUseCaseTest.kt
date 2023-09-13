@@ -49,12 +49,14 @@ class GetVideosBySearchTypeUseCaseTest {
 
             whenever(
                 mediaPlayerRepository.getVideosBySearchType(
-                    handle,
-                    sortOrder
+                    handle = handle,
+                    searchString = "*",
+                    recursive = true,
+                    order = sortOrder
                 )
             ).thenReturn(listOf(unTypeNodeOne, unTypeNodeTwo))
 
-            underTest(handle, sortOrder)
+            underTest(handle = handle, searchString = "*", recursive = true, order = sortOrder)
 
             verify(addNodeType).invoke(unTypeNodeOne)
             verify(addNodeType).invoke(unTypeNodeTwo)

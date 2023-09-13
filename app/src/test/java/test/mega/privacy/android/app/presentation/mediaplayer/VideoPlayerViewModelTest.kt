@@ -100,7 +100,8 @@ internal class VideoPlayerViewModelTest {
             setVideoRepeatModeUseCase = mock(),
             getVideosBySearchTypeUseCase = mock(),
             savedStateHandle = savedStateHandle,
-            monitorVideoRepeatModeUseCase = mock()
+            monitorVideoRepeatModeUseCase = mock(),
+            monitorSubFolderMediaDiscoverySettingsUseCase = mock()
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false
