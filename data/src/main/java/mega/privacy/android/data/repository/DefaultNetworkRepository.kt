@@ -7,6 +7,10 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +23,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.ConnectivityState
@@ -73,6 +78,13 @@ internal class DefaultNetworkRepository @Inject constructor(
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
 
+        // emit current network state every time app resumes from background
+        val job = ProcessLifecycleOwner.get().lifecycleScope.launch {
+            ProcessLifecycleOwner.get().lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                trySend(getCurrentConnectivityState())
+            }
+        }
+
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onLost(network: Network) {
                 super.onLost(network)
@@ -102,7 +114,10 @@ internal class DefaultNetworkRepository @Inject constructor(
             registerDefaultNetworkCallback(callback)
         }
 
-        awaitClose { connectivityManager?.unregisterNetworkCallback(callback) }
+        awaitClose {
+            connectivityManager?.unregisterNetworkCallback(callback)
+            job.cancel()
+        }
     }.flowOn(ioDispatcher)
         .debounce(150L)
         .catch { Timber.e(it, "MonitorConnectivity Exception") }
