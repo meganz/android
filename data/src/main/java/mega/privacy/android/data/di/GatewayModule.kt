@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.data.facade.AdsFacade
 import mega.privacy.android.data.facade.AppEventFacade
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.BillingFacade
@@ -24,6 +25,7 @@ import mega.privacy.android.data.facade.TelephonyFacade
 import mega.privacy.android.data.facade.VerifyPurchaseFacade
 import mega.privacy.android.data.facade.VideoCompressionFacade
 import mega.privacy.android.data.facade.WorkManagerFacade
+import mega.privacy.android.data.gateway.AdsGateway
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
@@ -258,5 +260,8 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindInAppUpdatePreferencesGateway(implementation: InAppUpdatePreferencesDatastore): InAppUpdatePreferencesGateway
+
+    @Binds
+    abstract fun bindAdsGateway(implementation: AdsFacade): AdsGateway
 
 }
