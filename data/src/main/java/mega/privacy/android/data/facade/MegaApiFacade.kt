@@ -1399,4 +1399,21 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun escapeFsIncompatible(fileName: String, dstPath: String) =
         megaApi.escapeFsIncompatible(fileName, dstPath)
+
+    override val currentDownloadSpeed: Int
+        get() = megaApi.currentDownloadSpeed
+
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
+    override val totalDownloadedBytes: Long
+        get() = megaApi.totalDownloadedBytes
+
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
+    override val totalDownloadBytes: Long
+        get() = megaApi.totalDownloadBytes
 }

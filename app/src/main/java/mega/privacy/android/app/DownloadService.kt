@@ -71,6 +71,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.file.EscapeFsIncompatibleUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.login.CompleteFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
@@ -86,7 +87,12 @@ import mega.privacy.android.domain.usecase.transfers.MonitorStopTransfersWorkUse
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.CancelAllDownloadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadBytesUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadedBytesUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadsNonBackgroundUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.InsertSdTransferUseCase
@@ -199,6 +205,24 @@ internal class DownloadService : LifecycleService() {
 
     @Inject
     lateinit var getTransferByTagUseCase: GetTransferByTagUseCase
+
+    @Inject
+    lateinit var escapeFsIncompatibleUseCase: EscapeFsIncompatibleUseCase
+
+    @Inject
+    lateinit var resetTotalDownloadsUseCase: ResetTotalDownloadsUseCase
+
+    @Inject
+    lateinit var getTotalDownloadsNonBackgroundUseCase: GetTotalDownloadsNonBackgroundUseCase
+
+    @Inject
+    lateinit var getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase
+
+    @Inject
+    lateinit var getTotalDownloadedBytesUseCase: GetTotalDownloadedBytesUseCase
+
+    @Inject
+    lateinit var getTotalDownloadBytesUseCase: GetTotalDownloadBytesUseCase
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -473,13 +497,10 @@ internal class DownloadService : LifecycleService() {
         currentDir = getDir(intent)
         currentDir?.mkdirs()
         currentFile = if (currentDir?.isDirectory == true) {
-            File(
-                currentDir,
-                megaApi.escapeFsIncompatible(
-                    node.name,
-                    currentDir?.absolutePath + Constants.SEPARATOR
-                )
-            )
+            escapeFsIncompatibleUseCase(
+                node.name,
+                currentDir?.absolutePath + Constants.SEPARATOR
+            )?.let { File(currentDir, it) }
         } else {
             currentDir
         }
@@ -668,7 +689,7 @@ internal class DownloadService : LifecycleService() {
         if (pendingDownloads <= 0) {
             Timber.d("onQueueComplete: reset total downloads")
             // When download a single file by tapping it, and auto play is enabled.
-            val totalDownloads = megaApi.totalDownloads - backgroundTransfers.size
+            val totalDownloads = getTotalDownloadsNonBackgroundUseCase()
             if (totalDownloads == 1 && autoPlayInfo != null && downloadForPreview) {
                 // If the file is Microsoft file, send the corresponding broadcast
                 TransfersFinishedState(
@@ -701,7 +722,7 @@ internal class DownloadService : LifecycleService() {
                 broadcastTransfersFinishedUseCase(transfersFinishState)
             }
 
-            megaApi.resetTotalDownloads()
+            resetTotalDownloadsUseCase()
             backgroundTransfers.clear()
             errorEBlocked = 0
             errorCount = 0
@@ -769,11 +790,11 @@ internal class DownloadService : LifecycleService() {
     /*
      * Show download success notification
      */
-    private fun showCompleteNotification(handle: Long) {
+    private suspend fun showCompleteNotification(handle: Long) {
         Timber.d("showCompleteNotification")
         val notificationTitle: String
         val size: String
-        val totalDownloads = megaApi.totalDownloads - backgroundTransfers.size
+        val totalDownloads = getTotalDownloadsNonBackgroundUseCase()
         if (alreadyDownloaded > 0 && errorCount > 0) {
             val totalNumber = totalDownloads + errorCount + alreadyDownloaded
             notificationTitle =
@@ -827,9 +848,7 @@ internal class DownloadService : LifecycleService() {
                     totalDownloads,
                     totalDownloads
                 )
-            val totalBytes = Util.getSizeString(
-                megaApi.totalDownloadedBytes, this
-            )
+            val totalBytes = Util.getSizeString(getTotalDownloadedBytesUseCase(), this)
             size = getString(R.string.general_total_size, totalBytes)
         }
         val intent = Intent(applicationContext, ManagerActivity::class.java)
@@ -1171,9 +1190,9 @@ internal class DownloadService : LifecycleService() {
         // make sure app running to avoid DeadSystemException when show notification
         coroutineContext.ensureActive()
         val pendingTransfers = getNumPendingDownloadsNonBackgroundUseCase()
-        val totalTransfers = megaApi.totalDownloads - backgroundTransfers.size
-        val totalSizePendingTransfer = megaApi.totalDownloadBytes
-        val totalSizeTransferred = megaApi.totalDownloadedBytes
+        val totalTransfers = getTotalDownloadsNonBackgroundUseCase()
+        val totalSizePendingTransfer = getTotalDownloadBytesUseCase()
+        val totalSizeTransferred = getTotalDownloadedBytesUseCase()
         val update: Boolean
         if (isOverQuota) {
             Timber.d("Overquota flag! is TRUE")
@@ -1203,7 +1222,7 @@ internal class DownloadService : LifecycleService() {
             val progressPercent =
                 Math.round(totalSizeTransferred.toDouble() / totalSizePendingTransfer * 100).toInt()
             Timber.d("Progress: $progressPercent%")
-            showRating(totalSizePendingTransfer, megaApi.currentDownloadSpeed)
+            showRating(totalSizePendingTransfer, getCurrentDownloadSpeedUseCase())
             var message: String? = ""
             message = if (totalTransfers == 0) {
                 getString(R.string.download_preparing_files)
@@ -1322,11 +1341,7 @@ internal class DownloadService : LifecycleService() {
     }
 
     private suspend fun doOnTransferStart(transfer: Transfer) = withContext(ioDispatcher) {
-        Timber.d(
-            "Download start: %d, totalDownloads: %d",
-            transfer.nodeHandle,
-            megaApi.totalDownloads
-        )
+        Timber.d("Download start: ${transfer.nodeHandle}")
         if (transfer.isStreamingTransfer || transfer.isVoiceClip()) return@withContext
         if (transfer.isBackgroundTransfer()) {
             backgroundTransfers.add(transfer.tag)
@@ -1578,7 +1593,7 @@ internal class DownloadService : LifecycleService() {
             if (e.value != 0L) {
                 Timber.w("TRANSFER OVERQUOTA ERROR: %s", e.errorCode)
                 checkTransferOverQuota(true)
-                downloadedBytesToOverQuota = megaApi.totalDownloadedBytes
+                downloadedBytesToOverQuota = getTotalDownloadedBytesUseCase()
                 isOverQuota = true
             }
         }

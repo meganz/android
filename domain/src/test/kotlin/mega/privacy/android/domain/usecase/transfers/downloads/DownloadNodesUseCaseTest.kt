@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.downloads
+package mega.privacy.android.domain.usecase.transfers.downloads
 
 import app.cash.turbine.Event
 import app.cash.turbine.test
@@ -27,7 +27,6 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll

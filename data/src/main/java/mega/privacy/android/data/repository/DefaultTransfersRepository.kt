@@ -569,6 +569,22 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getCompletedTransferById(id: Int) = withContext(ioDispatcher) {
         megaLocalRoomGateway.getCompletedTransferById(id)
     }
+
+    override suspend fun getTotalDownloadsNonBackground() = withContext(ioDispatcher) {
+        getDownloadTransfers().count { transfer -> !transfer.isBackgroundTransfer() }
+    }
+
+    override suspend fun getCurrentDownloadSpeed() = withContext(ioDispatcher) {
+        megaApiGateway.currentDownloadSpeed
+    }
+
+    override suspend fun getTotalDownloadedBytes() = withContext(ioDispatcher) {
+        megaApiGateway.totalDownloadedBytes
+    }
+
+    override suspend fun getTotalDownloadBytes() = withContext(ioDispatcher) {
+        megaApiGateway.totalDownloadBytes
+    }
 }
 
 private fun MegaTransfer.isCUUpload() =

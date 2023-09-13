@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -57,6 +58,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 /**
  * Test class for [DefaultTransfersRepository]
@@ -983,6 +985,65 @@ class DefaultTransfersRepositoryTest {
             underTest.startDownloadWorker()
             verify(workerManagerGateway).enqueueDownloadsWorkerRequest()
         }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class DownloadCountersTest {
+
+        @ParameterizedTest(name = " total downloads is {0} and background downloads is {1}")
+        @MethodSource("provideTotalDownloadsParameters")
+        fun `test that getTotalDownloadsNonBackground returns correctly if`(
+            downloads: Int,
+            downloadsNonBackground: Int,
+        ) = runTest {
+            val list = mutableListOf<MegaTransfer>()
+            for (i in 1..downloads) {
+                list.add(if (i <= downloadsNonBackground) {
+                    mock {
+                        on { appData }.thenReturn(APP_DATA_BACKGROUND_TRANSFER)
+                    }
+                } else {
+                    mock()
+                })
+            }
+            whenever(megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD)).thenReturn(list)
+            assertThat(underTest.getTotalDownloadsNonBackground())
+                .isEqualTo(downloads - downloadsNonBackground)
+        }
+
+        @ParameterizedTest(name = " megaApi call returns {0}")
+        @ValueSource(ints = [0, 7, 200])
+        fun `test that getCurrentDownloadSpeed returns correctly if`(
+            speed: Int,
+        ) = runTest {
+            whenever(megaApiGateway.currentDownloadSpeed).thenReturn(speed)
+            assertThat(underTest.getCurrentDownloadSpeed()).isEqualTo(speed)
+        }
+
+        @ParameterizedTest(name = " megaApi call returns {0}")
+        @ValueSource(longs = [0, 7, 200])
+        fun `test that getTotalDownloadedBytes returns correctly if`(
+            bytes: Long,
+        ) = runTest {
+            whenever(megaApiGateway.totalDownloadedBytes).thenReturn(bytes)
+            assertThat(underTest.getTotalDownloadedBytes()).isEqualTo(bytes)
+        }
+
+        @ParameterizedTest(name = " megaApi call returns {0}")
+        @ValueSource(longs = [0, 7, 200])
+        fun `test that getTotalDownloadBytes returns correctly if`(
+            bytes: Long,
+        ) = runTest {
+            whenever(megaApiGateway.totalDownloadBytes).thenReturn(bytes)
+            assertThat(underTest.getTotalDownloadBytes()).isEqualTo(bytes)
+        }
+
+        private fun provideTotalDownloadsParameters(): Stream<Arguments> = Stream.of(
+            Arguments.of(0, 0),
+            Arguments.of(7, 0),
+            Arguments.of(7, 3),
+        )
     }
 
     private fun stubPauseTransfers(isPause: Boolean) {

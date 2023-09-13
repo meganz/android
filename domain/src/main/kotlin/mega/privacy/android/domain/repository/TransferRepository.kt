@@ -446,4 +446,32 @@ interface TransferRepository {
      * @param id id of completed transfer
      */
     suspend fun getCompletedTransferById(id: Int): CompletedTransfer?
+
+    /**
+     * Get total downloads non background
+     *
+     * @return The number of total downloads without the background ones.
+     */
+    suspend fun getTotalDownloadsNonBackground(): Int
+
+    /**
+     * Get current download speed.
+     *
+     * @return Current download speed.
+     */
+    suspend fun getCurrentDownloadSpeed(): Int
+
+    /**
+     * Get current downloaded bytes.
+     *
+     * @return Current downloaded bytes.
+     */
+    suspend fun getTotalDownloadedBytes(): Long
+
+    /**
+     * Get current download bytes.
+     *
+     * @return Current download bytes.
+     */
+    suspend fun getTotalDownloadBytes(): Long
 }

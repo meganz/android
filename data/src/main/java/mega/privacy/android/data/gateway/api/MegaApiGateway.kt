@@ -2994,4 +2994,27 @@ interface MegaApiGateway {
      * @return Converted name (UTF8)
      */
     suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String?
+
+    /**
+     * Current download speed
+     */
+    val currentDownloadSpeed: Int
+
+    /**
+     * Total downloaded bytes
+     */
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
+    val totalDownloadedBytes: Long
+
+    /**
+     * Total download bytes
+     */
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
+    val totalDownloadBytes: Long
 }
