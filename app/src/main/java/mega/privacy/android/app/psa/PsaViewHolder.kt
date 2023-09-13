@@ -7,10 +7,11 @@ import android.text.TextUtils
 import android.view.View
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.PsaLayoutBinding
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.databinding.PsaLayoutBinding
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.psa.Psa
 
 /**
  * The view holder for normal PSA view, implementing the display logic of PSA.

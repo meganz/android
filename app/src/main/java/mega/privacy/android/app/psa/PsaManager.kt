@@ -9,6 +9,7 @@ import mega.privacy.android.app.di.CoroutineScopesModule
 import mega.privacy.android.app.di.CoroutinesDispatchersModule
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.EVENT_PSA
+import mega.privacy.android.domain.entity.psa.Psa
 import nz.mega.sdk.MegaError
 
 /**

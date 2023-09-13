@@ -1,4 +1,4 @@
-package mega.privacy.android.app.psa
+package mega.privacy.android.domain.entity.psa
 
 /**
  * The PSA view model class.
