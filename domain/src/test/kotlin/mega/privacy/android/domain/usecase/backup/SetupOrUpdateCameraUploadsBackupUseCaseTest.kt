@@ -21,7 +21,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 /**
- * Test class for [SetBackupUseCase]
+ * Test class for [SetupOrUpdateCameraUploadsBackupUseCase]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -70,7 +70,7 @@ internal class SetupOrUpdateCameraUploadsBackupUseCaseTest {
             )
         }
 
-    @ParameterizedTest(name = "backID is {0}")
+    @ParameterizedTest(name = "backupID is {0}")
     @NullSource
     @ValueSource(longs = [-1L])
     fun `test that camera uploads backup is setup when local back up is not set`(backupId: Long?) =

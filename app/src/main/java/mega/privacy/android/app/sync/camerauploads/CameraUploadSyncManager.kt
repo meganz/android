@@ -290,7 +290,7 @@ object CameraUploadSyncManager {
      */
     @Deprecated(
         message = "Replace all usages with use case",
-        replaceWith = ReplaceWith("SetupOrUpdateCameraUploadsBackupUseCase")
+        replaceWith = ReplaceWith("SetupOrUpdateMediaUploadsBackupUseCase")
     )
     fun updateSecondaryFolderTargetNode(newTargetNode: Long) {
         if (!isSecondaryFolderEnabled()) {
@@ -364,7 +364,7 @@ object CameraUploadSyncManager {
      */
     @Deprecated(
         message = "Replace all usages with use case",
-        replaceWith = ReplaceWith("SetupOrUpdateCameraUploadsBackupUseCase")
+        replaceWith = ReplaceWith("SetupOrUpdateMediaUploadsBackupUseCase")
     )
     fun updateSecondaryLocalFolder(newLocalFolder: String?) {
         if (!isSecondaryFolderEnabled()) {
