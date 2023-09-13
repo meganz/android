@@ -63,8 +63,10 @@ class InAppUpdateHandlerImpl @Inject constructor(
     private val noOfDaysBeforePrompt = 7 //x
     private val incrementalFrequencyInDays = 10 //n
     private val incrementalPromptStopCount = 4 // This will stop prompts after x + 3n
+    private val initialMessageDuration = 5000
+    private val reminderMessageDuration = 1500
 
-    private var availableVersionCode: Int = 0
+    private var availableVersionCode = 0
 
     private val updateFlowResultLauncher: ActivityResultLauncher<IntentSenderRequest>? =
         (context as? ComponentActivity)?.registerForActivityResult(
@@ -126,7 +128,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
         val appUpdateInfo = appUpdateManager.requestAppUpdateInfo()
         // If the update is downloaded but not installed, notify the user to complete the update.
         if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-            popupSnackBarForCompleteUpdate()
+            popupSnackBarForCompleteUpdate(reminderMessageDuration)
         }
     }
 
@@ -142,7 +144,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
                 InstallStatus.DOWNLOADED -> {
                     continuation.resumeWith(Result.success(Unit))
                     Timber.d("InAppUpdate: The user has downloaded the update")
-                    popupSnackBarForCompleteUpdate()
+                    popupSnackBarForCompleteUpdate(initialMessageDuration)
                 }
 
                 InstallStatus.FAILED -> {
@@ -159,12 +161,12 @@ class InAppUpdateHandlerImpl @Inject constructor(
             }
         }
 
-    private fun popupSnackBarForCompleteUpdate() {
+    private fun popupSnackBarForCompleteUpdate(duration: Int) {
         (context as? Activity)?.contentView?.let { view ->
             Snackbar.make(
                 view,
                 context.getString(R.string.general_app_update_message_download_success),
-                Snackbar.LENGTH_INDEFINITE
+                duration
             ).apply {
                 setAction(context.getString(R.string.general_app_update_action_restart)) {
                     Analytics.tracker.trackEvent(InAppUpdateRestartButtonPressedEvent)
