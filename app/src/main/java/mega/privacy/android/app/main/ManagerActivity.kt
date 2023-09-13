@@ -174,6 +174,8 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.app.presentation.backups.BackupsFragment
+import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
@@ -189,8 +191,6 @@ import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
-import mega.privacy.android.app.presentation.backups.BackupsFragment
-import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
@@ -7053,19 +7053,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Check the storage state provided as first parameter.
      *
      * @param newStorageState Storage state to check.
-     * @param onCreate        Flag to indicate if the method was called from "onCreate" or not.
      */
     private fun checkStorageStatus(newStorageState: StorageState?) {
-        val uploadServiceIntent = Intent(this, UploadService::class.java)
         when (newStorageState) {
             StorageState.Green -> {
                 Timber.d("STORAGE STATE GREEN")
-                uploadServiceIntent.action = Constants.ACTION_STORAGE_STATE_CHANGED
-                try {
-                    ContextCompat.startForegroundService(this, uploadServiceIntent)
-                } catch (e: Exception) {
-                    Timber.e(e, "Exception starting UploadService")
-                }
+                notifyUploadServiceStorageStateChange(newStorageState, storageState)
                 if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
                     Timber.d("ACCOUNT TYPE FREE")
                     if (Util.showMessageRandom()) {
@@ -7079,13 +7072,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             StorageState.Orange -> {
                 Timber.w("STORAGE STATE ORANGE")
-                uploadServiceIntent.action = Constants.ACTION_STORAGE_STATE_CHANGED
-                try {
-                    ContextCompat.startForegroundService(this, uploadServiceIntent)
-                } catch (e: Exception) {
-                    Timber.e(e, "Exception starting UploadService")
-                    e.printStackTrace()
-                }
+                notifyUploadServiceStorageStateChange(newStorageState, storageState)
                 if (newStorageState.ordinal > storageState.ordinal) {
                     showStorageAlmostFullDialog()
                 }
@@ -7105,6 +7092,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             else -> return
         }
         storageState = newStorageState
+    }
+
+    private fun notifyUploadServiceStorageStateChange(
+        newStorageState: StorageState,
+        oldStorageState: StorageState,
+    ) {
+        if (newStorageState != oldStorageState) {
+            val uploadServiceIntent = Intent(this, UploadService::class.java)
+            uploadServiceIntent.action = Constants.ACTION_STORAGE_STATE_CHANGED
+            runCatching { ContextCompat.startForegroundService(this, uploadServiceIntent) }
+                .onFailure {
+                    Timber.e(it, "Exception starting UploadService")
+                }
+        }
     }
 
     /**
