@@ -314,8 +314,8 @@ class FileBrowserComposeFragment : Fragment() {
      */
     fun onBackPressed(): Int {
         return with(requireActivity() as ManagerActivity) {
-            if (comesFromNotifications && comesFromNotificationHandle == rubbishBinViewModel.state.value.rubbishBinHandle) {
-                restoreRubbishAfterComingFromNotification()
+            if (comesFromNotifications && comesFromNotificationHandle == fileBrowserViewModel.getSafeBrowserParentHandle()) {
+                restoreFileBrowserAfterComingFromNotification()
                 2
             } else {
                 fileBrowserViewModel.state.value.parentHandle?.let {
