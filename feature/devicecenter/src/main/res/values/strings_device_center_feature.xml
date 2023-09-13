@@ -42,4 +42,18 @@
     <string name="device_center_list_view_item_status_blocked">Blocked</string>
     <!-- The title of the Device Center feature -->
     <string name="device_center_top_app_bar_title">Device centre</string>
+    <!-- The name of one of the Device Center Bottom Sheet items which takes the User to the Camera uploads feature when clicked -->
+    <string name="device_center_bottom_sheet_item_camera_uploads">Camera uploads</string>
+    <!-- The enabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
+    <string name="device_center_bottom_sheet_item_camera_uploads_enabled_status">Enabled</string>
+    <!-- The disabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
+    <string name="device_center_bottom_sheet_item_camera_uploads_disabled_status">Disabled</string>
+    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, opens the "Rename device" Dialog to let the User rename the selected Device -->
+    <string name="device_center_bottom_sheet_item_rename">Rename</string>
+    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
+    <string name="device_center_bottom_sheet_item_info">Info</string>
+    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
+    <string name="device_center_bottom_sheet_item_show_in_backups">Show in Backups</string>
+    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
+    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Show in Cloud drive</string>
 </resources>

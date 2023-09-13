@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">驗證憑證</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">未批准</string>
+    <string name="label_not_verified">未驗證</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">已批准</string>
+    <string name="label_verified">已驗證</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">授權認證</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3834,9 +3834,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未解密資料夾]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">要存取共享資料夾，與您共享資料夾的人也應該批准您。</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">若要存取共享資料夾，與您共享資料夾的人也會對您進行驗證。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">批准%s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">驗證：%s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4284,9 +4284,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">您一次最多只能在一個相簿中新增150個項目。</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">無法批准聯絡人</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">無法驗證聯絡人</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法批准%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀請。</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法驗證%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀啨。</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4828,9 +4828,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">會議事件已更新</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密技術來保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您批准您與之共享資訊，或從之接收資料的聯絡人。</string>
+    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密技術來保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您驗證您與之共享資訊，或從之接收資料的聯絡人。</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">若要批准您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相匹配。您可以要求對方分享他們的憑證給您。</string>
+    <string name="contact_approve_credentials_contact_verify_description">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相符。您可以要求對方分享他們的憑證給您。</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">驗證</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4842,7 +4842,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">非主持人在通話期間新增的與會者將不會被送到等候室。</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">您與之共享資訊的某些聯絡人尚未獲得您的批准。為了確保額外的安全性，我們建議您在聯絡人中批准他們的憑證。點選您要批准的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">某些您與之共享資訊的聯絡人尚未經過您的驗證。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。點選您欲驗證的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">已移除%1$d個與會者</item>
@@ -4854,9 +4854,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">允許存取音訊檔案</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">已批准</string>
+    <string name="contact_approve_credentials_approved_text">已驗證</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">未批准</string>
+    <string name="contact_approve_credentials_not_approved_text">未驗證</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">放大</string>
     <!-- Photos action menu zoom out -->
@@ -4868,7 +4868,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">等待主持人讓你進入</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未批准的聯絡人共享。為了確保額外的安全性，我們建議您在聯絡人中批准他們的憑證。點選您要批准的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">不要離開</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -4920,5 +4920,17 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
+    <!-- Description text in empty search screen when no search results found -->
+    <string name="search_empty_screen_no_results">沒有符合搜尋的項目</string>
+    <!-- Description text in empty search screen when images filter selected -->
+    <string name="search_empty_screen_no_images">No images</string>
+    <!-- Description text in empty search screen when audio filter selected -->
+    <string name="search_empty_screen_no_audio">No audio files</string>
+    <!-- Description text in empty search screen when video filter selected -->
+    <string name="search_empty_screen_no_video">No video files</string>
+    <!-- Description text in empty search screen when documents filter selected -->
+    <string name="search_empty_screen_no_documents">No documents</string>
+    <!-- Description text cloud drive screen when no items are available in cloud drive -->
+    <string name="cloud_drive_empty_screen_message">雲端硬碟是空的</string>
 </resources>

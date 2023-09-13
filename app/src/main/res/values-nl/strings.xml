@@ -2785,9 +2785,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Verifieer aanmeldgegevens</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Niet goedgekeurd</string>
+    <string name="label_not_verified">Niet geverifieerd</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Goedgekeurd</string>
+    <string name="label_verified">Geverifieerd</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticiteit Inloggegevens</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3937,9 +3937,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Ongecodeerde map]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">Om toegang te krijgen tot de gedeelde map, moet de persoon die deze met u heeft gedeeld, u ook goedkeuren.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Om toegang te krijgen tot de gedeelde map, moet de persoon die deze met u heeft gedeeld, u ook verifiëren.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">%s goedkeuren</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">%sverifiëren</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Bestand voorbereiden als voorbeeld</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4468,9 +4468,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">U kunt maximaal 150 items tegelijk aan een album toevoegen.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kan contact niet goedkeuren</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kan contact niet verifiëren</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">U kunt %s niet goedkeuren omdat ze niet in uw contactenlijst staan. Wacht tot ze eerst uw uitnodiging accepteren.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">U kunt %s niet verifiëren omdat ze niet in u contactenlijst staan. Wacht tot ze eerst uw uitnodiging accepteren.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Starten</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5055,13 +5055,13 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Vergadering gebeurtenis bijgwerkt</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">We beschermen uw gegevens met zero-knowledge codering, zodat alle informatie die u op MEGA opslaat, deelt en ontvangt, veilig is. Om extra veiligheid te garanderen, vragen we u om de contacten met wie u informatie deelt of van wie u gegevens ontvangt, goed te keuren.</string>
+    <string name="contact_approve_credentials_secure_share_description">We beschermen uw gegevens met zero-knowledge codering, zodat alle informatie die u op MEGA opslaat, deelt en ontvangt, veilig is. Om extra veiligheid te garanderen, vragen we u om de contacten waarmee u informatie deelt of gegevens van ontvangt verifieert.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Om uw contactpersoon te verifiëren, moet u ervoor zorgen dat de inloggegevens die u hierboven ziet, overeenkomen met de inloggegevens van hun account. U kunt hen vragen om hun inloggegevens met u te delen.</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Goedkeuren</string>
+    <string name="contact_approve_credentials_button_text">Bevestigen</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">Gegevens goedkeuren</string>
+    <string name="contact_approve_credentials_toolbar_title">Verifieer aanmeldgegevens</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Wachtkamer</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -5082,9 +5082,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Toegang tot audio bestanden toestaan</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Goedgekeurd</string>
+    <string name="contact_approve_credentials_approved_text">Geverifieerd</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Niet goedgekeurd</string>
+    <string name="contact_approve_credentials_not_approved_text">Niet geverifieerd</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Inzoomen</string>
     <!-- Photos action menu zoom out -->
@@ -5096,7 +5096,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wacht tot de host u binnenlaat</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s wordt gedeeld door een contactpersoon die u niet heeft goedgekeurd. Om extra veiligheid te garanderen, raden we aan dat u hun inloggegevens goedkeurt in Contacten. Tik op de drie punten naast het contact dat u wilt goedkeuren en tik informatie.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Niet verlaten</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -5143,13 +5143,25 @@
     <!-- Title of video option of snapshot-->
     <string name="media_player_video_option_snapshot_title">Snapshot</string>
     <!-- Title of video option of lock-->
-    <string name="media_player_video_option_lock_title">Lock</string>
+    <string name="media_player_video_option_lock_title">Op slot zetten</string>
     <!-- Title of video option of zoom to fill-->
-    <string name="media_player_video_option_zoom_to_fill_title">Zoom to fill</string>
+    <string name="media_player_video_option_zoom_to_fill_title">Zoom om te vullen</string>
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Orgineel</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Mediadetectie in submap</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
+    <!-- Description text in empty search screen when no search results found -->
+    <string name="search_empty_screen_no_results">Geen resultaten</string>
+    <!-- Description text in empty search screen when images filter selected -->
+    <string name="search_empty_screen_no_images">No images</string>
+    <!-- Description text in empty search screen when audio filter selected -->
+    <string name="search_empty_screen_no_audio">No audio files</string>
+    <!-- Description text in empty search screen when video filter selected -->
+    <string name="search_empty_screen_no_video">No video files</string>
+    <!-- Description text in empty search screen when documents filter selected -->
+    <string name="search_empty_screen_no_documents">No documents</string>
+    <!-- Description text cloud drive screen when no items are available in cloud drive -->
+    <string name="cloud_drive_empty_screen_message">Cloud schijf is leeg</string>
 </resources>

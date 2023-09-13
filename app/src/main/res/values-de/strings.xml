@@ -226,7 +226,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Mein Account</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Kamera Uploads</string>
+    <string name="section_photo_sync">Kamera-Uploads</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Von anderen</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -517,7 +517,7 @@
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">Speicher</string>
     <!-- Settings of the Passcode -->
-    <string name="settings_passcode_lock">Passcodesperre</string>
+    <string name="settings_passcode_lock">Passcode-Sperre</string>
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Passcode-Optionen</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
@@ -636,7 +636,7 @@
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_photos_and_videos">Fotos und Videos</string>
     <!-- Settings of the Passcode -->
-    <string name="settings_passcode_lock_switch">Passcode-Lock</string>
+    <string name="settings_passcode_lock_switch">Passcode-Sperre</string>
     <!-- Settings option to change Passcode. -->
     <string name="settings_change_passcode">Passcode ändern</string>
     <!-- Settings option screen to change Passcode. -->
@@ -671,11 +671,11 @@
     <!--  -->
     <string name="settings_about_terms_of_service">Allgemeine Geschäftsbedingungen</string>
     <!-- App means “Application” -->
-    <string name="settings_about_app_version">App Version</string>
+    <string name="settings_about_app_version">App-Version</string>
     <!-- Title of the label where the SDK version is shown -->
-    <string name="settings_about_sdk_version">MEGA SDK Version</string>
+    <string name="settings_about_sdk_version">MEGA-SDK-Version</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGA chat-SDK-Version</string>
+    <string name="settings_about_karere_version">MEGA-Chat-SDK-Version</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Quellcode ansehen</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -735,7 +735,7 @@
     <!-- First paragraph of the screen to backup the master key -->
     <string name="backup_first_paragraph">Ihre Daten werden bereits auf dem Endgerät verschlüsselt. Alle Dateischlüssel hängen von einem Hauptschlüssel ab, den wir mit Ihrem Passwort verschlüsseln und dann auf unseren Servern speichern. Sollten Sie Ihr Passwort verlieren, so kann der Hauptschlüssel und als Folge die Dateischlüssel und die Dateien selbst nicht mehr entschlüsselt werden.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="backup_second_paragraph">Der Export Ihres Rettungsschlüssels und das Verwahren an einem sicheren Ort ermöglicht es Ihnen, Ihr Passwort ohne Datenverlust zurückzusetzen.</string>
+    <string name="backup_second_paragraph">Wenn Sie Ihren Rettungsschlüssel exportieren und an einem sicheren Ort verwahren, können Sie Ihr Passwort ohne Datenverlust zurücksetzen.</string>
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Ein Angreifer, der sich eine Kopie Ihres Rettungsschlüssels verschafft hat, kann damit trotzdem noch nicht auf Ihre Daten zugreifen, da ein Passwort-Reset zusätzlich den Zugang zu Ihrer E-Mail voraussetzt.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
@@ -1122,7 +1122,7 @@
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_unrecognizable">Nachricht unverständlich</string>
     <!-- Title of the settings section to configure the autoaway of chat presence -->
-    <string name="settings_autoaway_title">Auto-Abwesend</string>
+    <string name="settings_autoaway_title">Autom. Abwesenheitsschaltung</string>
     <!-- Subtitle of the settings section to configure the autoaway of chat presence -->
     <string name="settings_autoaway_subtitle">Als abwesend anzeigen nach</string>
     <!-- Value in the settings section of the autoaway chat presence -->
@@ -1533,7 +1533,7 @@
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">Code scannen</string>
     <!-- Subtitle of QR code settings auto-accept -->
-    <string name="setting_subtitle_qrcode_autoccept">Benutzer, die Ihre QR-Code scannen, werden Ihrer Kontaktliste automatisch hinzugefügt.</string>
+    <string name="setting_subtitle_qrcode_autoccept">MEGA-Benutzer, die Ihren QR-Code scannen, werden Ihrer Kontaktliste automatisch hinzugefügt.</string>
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">Link in Zwischenablage kopiert</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
@@ -1784,7 +1784,7 @@
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_title">Rettungsschlüssel sichern</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_summary">Der Export Ihres Rettungsschlüssels und das Verwahren an einem sicheren Ort ermöglicht es Ihnen, Ihr Passwort ohne Datenverlust zurückzusetzen.</string>
+    <string name="settings_recovery_key_summary">Wenn Sie Ihren Rettungsschlüssel exportieren und an einem sicheren Ort verwahren, können Sie Ihr Passwort ohne Datenverlust zurücksetzen.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
     <string name="login_connectivity_issues">MEGA ist derzeit nicht erreichbar. Bitte prüfen Sie Ihre Verbindung oder versuchen Sie es später noch einmal.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
@@ -2785,7 +2785,7 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Identität verifizieren</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Nicht bestätigt</string>
+    <string name="label_not_verified">Not verified</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Bestätigt</string>
     <!-- ”Verify user” dialog title -->
@@ -3701,7 +3701,7 @@
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filtern</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
-    <string name="photos_filter_camera_uploads">Kamera Uploads</string>
+    <string name="photos_filter_camera_uploads">Kamera-Uploads</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">Datei kann nicht geöffnet werden</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -3937,9 +3937,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Nicht entschlüsselter Ordner]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">Damit Sie auf den freigegebenen Ordner zugreifen können, muss die freigebende Person Sie ebenfalls bestätigen.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Damit Sie auf den freigegebenen Ordner zugreifen können, muss die freigebende Person Sie ebenfalls verifizieren.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">%s bestätigen</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">%s verifizieren</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Datei wird für Vorschau vorbereitet</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4468,9 +4468,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">Sie können maximal 150 Elemente gleichzeitig zu einem Album hinzufügen.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kontakt kann nicht bestätigt werden</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kontakt kann nicht verifiziert werden</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">Sie können %s nicht bestätigen, da diese Person nicht in Ihrer Kontaktliste steht. Warten Sie, bis Ihre Einladung angenommen wird.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Sie können %s nicht verifizieren, da diese Person nicht in Ihrer Kontaktliste steht. Warten Sie, bis Ihre Einladung angenommen wird.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Starten</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5055,13 +5055,13 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Meetingtermin aktualisiert</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">Wir schützen Ihre Daten mit einer Zero-Knowledge-Verschlüsselung, um die Sicherheit aller Informationen zu gewährleisten, die Sie auf MEGA speichern, freigeben oder empfangen. Um eine besonders hohe Sicherheit zu gewährleisten, bitten wir Sie, die Kontakte, für die Sie Informationen freigeben oder von denen Sie Daten erhalten, zu bestätigen.</string>
+    <string name="contact_approve_credentials_secure_share_description">Wir schützen Ihre Daten mit einer Zero-Knowledge-Verschlüsselung, um die Sicherheit aller Informationen zu gewährleisten, die Sie auf MEGA speichern, freigeben oder empfangen. Um eine besonders hohe Sicherheit zu gewährleisten, bitten wir Sie, die Kontakte, für die Sie Informationen freigeben oder von denen Sie Daten erhalten, zu verifizieren.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">Um Ihren Kontakt zu bestätigen, stellen Sie sicher, dass die oben angezeigten Identitätsdaten mit den Account-Identitätsdaten übereinstimmen. Sie können Ihren Kontakt bitten, Ihnen seine Identitätsdaten mitzuteilen.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Um Ihren Kontakt zu verifizieren, stellen Sie sicher, dass die oben angezeigten Identitätsdaten mit den Account-Identitätsdaten übereinstimmen. Sie können Ihren Kontakt bitten, Ihnen seine Identitätsdaten mitzuteilen.</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Bestätigen</string>
+    <string name="contact_approve_credentials_button_text">Verifizieren</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">Identitätsdaten bestätigen</string>
+    <string name="contact_approve_credentials_toolbar_title">Identität verifizieren</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Warteraum</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -5069,7 +5069,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Teilnehmer, die während einer Konferenz von Teilnehmern ohne Gastgeberrechte hinzugefügt werden, werden nicht in den Warteraum weitergeleitet.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Sie haben einige Kontakte, mit denen Sie Informationen teilen, noch nicht bestätigt. Um eine besonders hohe Sicherheit zu gewährleisten, empfehlen wir Ihnen, ihre Identitätsdaten in Ihren Kontakten zu bestätigen. Tippen Sie dazu auf die drei Punkte neben dem Kontakt, den Sie bestätigen möchten, und tippen Sie auf Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Sie haben einige Kontakte, mit denen Sie Informationen teilen, noch nicht verifiziert. Um eine besonders hohe Sicherheit zu gewährleisten, empfehlen wir Ihnen, ihre Anmeldedaten in Ihren Kontakten zu verifizieren. Tippen Sie dazu auf die drei Punkte neben dem Kontakt, den Sie verifizieren möchten, und tippen Sie auf Info.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">%1$d Teilnehmer entfernt</item>
@@ -5084,7 +5084,7 @@
     <!-- Approved text under Approve credentials from contact info screen-->
     <string name="contact_approve_credentials_approved_text">Bestätigt</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Nicht bestätigt</string>
+    <string name="contact_approve_credentials_not_approved_text">Not verified</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Vergrößern</string>
     <!-- Photos action menu zoom out -->
@@ -5096,7 +5096,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Bitte warten Sie, bis der Gastgeber Sie hereinlässt</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s wurde von einem Kontakt freigegeben, den Sie noch nicht bestätigt haben. Um eine besonders hohe Sicherheit zu gewährleisten, empfehlen wir Ihnen, ihre Identitätsdaten in Ihren Kontakten zu bestätigen. Tippen Sie dazu auf die drei Punkte neben dem Kontakt, den Sie bestätigen möchten, und tippen Sie auf Info.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Nicht verlassen</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -5151,5 +5151,17 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
+    <!-- Description text in empty search screen when no search results found -->
+    <string name="search_empty_screen_no_results">Keine Treffer</string>
+    <!-- Description text in empty search screen when images filter selected -->
+    <string name="search_empty_screen_no_images">No images</string>
+    <!-- Description text in empty search screen when audio filter selected -->
+    <string name="search_empty_screen_no_audio">No audio files</string>
+    <!-- Description text in empty search screen when video filter selected -->
+    <string name="search_empty_screen_no_video">No video files</string>
+    <!-- Description text in empty search screen when documents filter selected -->
+    <string name="search_empty_screen_no_documents">No documents</string>
+    <!-- Description text cloud drive screen when no items are available in cloud drive -->
+    <string name="cloud_drive_empty_screen_message">Ihr Cloud Drive ist leer</string>
 </resources>

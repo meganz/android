@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">验证凭证</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">未允许</string>
+    <string name="label_not_verified">未验证</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">已允许</string>
+    <string name="label_verified">已验证</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">真实凭证</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3834,7 +3834,7 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未解密的文件夹]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">要访问共享文件夹，与您共享该文件夹的人也应验证您。</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">为了访问此共享文件夹，与您分享它的人应该也对您进行验证。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">验证%s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
@@ -4828,11 +4828,11 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">会议事件已更新</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">我们使用零知识加密来保护您的数据，因此您在MEGA上存储、共享和接收的所有信息都是安全的。为了确保额外的安全性，我们要求您验证与您共享信息，或从中接收数据的联系人。</string>
+    <string name="contact_approve_credentials_secure_share_description">我们采用零知识加密技术来保护您的数据，因此您在MEGA上存储、共享和接收的所有信息都是安全的。为了确保额外的安全，我们要求您验证与您共享信息或接收数据的联系人。</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">要验证您的联系人，请确保您在上面看到的凭证与他们的帐户凭证相符。您可以要求他们与您共享他们的凭据。</string>
+    <string name="contact_approve_credentials_contact_verify_description">为了验证您的联系人，请确保您在上面看到的凭证与他们的账户凭证相符。您可以要求他们与您分享他们的凭证。</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">同意</string>
+    <string name="contact_approve_credentials_button_text">验证</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">验证凭证</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -4842,7 +4842,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">在通话期间，非主持人添加的参与者将不会被添加到等候室。</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">您与之共享信息的某些联系人尚未获得您的验证。为确保额外的安全性，我们建议您在联系人中验证他们的凭证。点击您要验证的联系人旁边的三点，然后点击信息。</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">某些您与之共享信息的联系人尚未经过您的验证。为确保额外的安全性，我们建议您在联系人中验证他们的凭据。点按您要验证的联系人旁边的三个点，然后点按信息。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">已移除%1$d位参与者</item>
@@ -4854,9 +4854,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">允许访问音频文件</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">已允许</string>
+    <string name="contact_approve_credentials_approved_text">已验证</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">未允许</string>
+    <string name="contact_approve_credentials_not_approved_text">未验证</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">放大</string>
     <!-- Photos action menu zoom out -->
@@ -4868,7 +4868,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">等着主持人让您进入</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未验证的联系人共享。为确保额外的安全性，我们建议您在联系人中验证他们的凭证。点击您要验证的联系人旁边的三点，然后点击信息。</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">不要离开</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -4878,28 +4878,27 @@
     <!-- Deny button in admit users to waiting room dialog in a meeting -->
     <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">拒绝</string>
     <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
-    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s is waiting to join the call.</string>
+    <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s正在等待加入通话。</string>
     <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">查看等候室</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d participant is waiting to join the call</item>
-        <item quantity="other">%1$d participants are waiting to join the call</item>
+        <item quantity="other">%1$d位参与者正在等待加入通话</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
-    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">是否拒绝%1$s加入？</string>
     <!-- Dialog button to deny entry to a participant in the call -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_button">拒绝加入</string>
     <!-- Dialog title when a participant has been denied entry to the call -->
     <string name="meetings_waiting_room_deny_user_dialog_title">主持人尚未请您进入</string>
     <!-- Dialog description when a participant has been denied entry to the call -->
-    <string name="meetings_waiting_room_deny_user_dialog_description">You’ll be removed from the waiting room.</string>
+    <string name="meetings_waiting_room_deny_user_dialog_description">您将被从等候室中移除。</string>
     <!-- Dialog title when waiting room has been inactive for a while -->
     <string name="meetings_waiting_room_inactive_host_dialog_title">主持人无响应</string>
     <!-- Dialog description when waiting room has been inactive for a while -->
-    <string name="meetings_waiting_room_inactive_host_dialog_description">There was no response to your request to join the meeting. You’ll be removed from the waiting room. Try joining again later.</string>
+    <string name="meetings_waiting_room_inactive_host_dialog_description">您加入会议的请求未得到响应。您将被从等候室移除。请稍后再试加入。</string>
     <!-- Message after selected albums are deleted (singular) -->
-    <string name="photos_album_deleted_message_singular">“%s” deleted</string>
+    <string name="photos_album_deleted_message_singular">“%s”已删除</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s is waiting to join “%2$s”.</string>
     <!-- Success message when participants was added to the call from waiting room -->
@@ -4923,5 +4922,17 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
+    <!-- Description text in empty search screen when no search results found -->
+    <string name="search_empty_screen_no_results">没有符合搜索的项目</string>
+    <!-- Description text in empty search screen when images filter selected -->
+    <string name="search_empty_screen_no_images">无图片</string>
+    <!-- Description text in empty search screen when audio filter selected -->
+    <string name="search_empty_screen_no_audio">No audio files</string>
+    <!-- Description text in empty search screen when video filter selected -->
+    <string name="search_empty_screen_no_video">No video files</string>
+    <!-- Description text in empty search screen when documents filter selected -->
+    <string name="search_empty_screen_no_documents">No documents</string>
+    <!-- Description text cloud drive screen when no items are available in cloud drive -->
+    <string name="cloud_drive_empty_screen_message">云盘为空</string>
 </resources>
