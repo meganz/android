@@ -30,7 +30,6 @@ import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.data.mapper.videoQualityToInt
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -38,6 +37,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -216,13 +216,12 @@ class DefaultCameraUploadRepositoryTest {
         @Test
         fun `test that the correct media queues are retrieved by media store file type`() =
             runTest {
-                val result = LinkedList(listOf(CameraUploadsMedia("", 1)))
+                val result =
+                    LinkedList(listOf(CameraUploadsMedia(1234L, "displayName", "filePath", 1)))
 
                 whenever(
-                    cameraUploadsMediaGateway.getMediaQueue(
+                    cameraUploadsMediaGateway.getMediaList(
                         uri = anyOrNull(),
-                        parentPath = any(),
-                        isVideo = any(),
                         selectionQuery = any(),
                     )
                 ).thenReturn(
@@ -230,10 +229,8 @@ class DefaultCameraUploadRepositoryTest {
                 )
                 whenever(mediaStoreFileTypeUriWrapper(any())).thenReturn(Uri.EMPTY)
 
-                val actual = underTest.getMediaQueue(
+                val actual = underTest.getMediaList(
                     mediaStoreFileType = MediaStoreFileType.IMAGES_INTERNAL,
-                    parentPath = "",
-                    isVideo = false,
                     selectionQuery = "",
                 )
                 assertThat(actual).isEqualTo(result)

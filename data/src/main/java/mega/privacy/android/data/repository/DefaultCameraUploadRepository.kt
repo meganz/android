@@ -58,7 +58,6 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
-import java.util.Queue
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 
@@ -387,16 +386,12 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         cameraUploadsMediaGateway.sendUpdateFolderDestinationBroadcast(nodeHandle, isSecondary)
     }
 
-    override suspend fun getMediaQueue(
+    override suspend fun getMediaList(
         mediaStoreFileType: MediaStoreFileType,
-        parentPath: String?,
-        isVideo: Boolean,
         selectionQuery: String?,
-    ): Queue<CameraUploadsMedia> = withContext(ioDispatcher) {
-        val queue = cameraUploadsMediaGateway.getMediaQueue(
+    ): List<CameraUploadsMedia> = withContext(ioDispatcher) {
+        val queue = cameraUploadsMediaGateway.getMediaList(
             mediaStoreFileTypeUriMapper(mediaStoreFileType),
-            parentPath,
-            isVideo,
             selectionQuery
         )
         Timber.d("$mediaStoreFileType count from media store database: ${queue.size}")

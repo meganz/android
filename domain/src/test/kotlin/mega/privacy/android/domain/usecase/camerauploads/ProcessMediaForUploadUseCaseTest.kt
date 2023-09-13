@@ -10,9 +10,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
@@ -27,8 +27,6 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.util.LinkedList
-import java.util.Queue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProcessMediaForUploadUseCaseTest {
@@ -48,8 +46,6 @@ class ProcessMediaForUploadUseCaseTest {
     fun setUp() {
         underTest = ProcessMediaForUploadUseCase(
             cameraUploadRepository = cameraUploadRepository,
-            getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
-            getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             getMediaStoreFileTypesUseCase = getMediaStoreFileTypesUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             getCameraUploadSelectionQueryUseCase = getCameraUploadSelectionQueryUseCase,
@@ -58,11 +54,9 @@ class ProcessMediaForUploadUseCaseTest {
             saveSyncRecordsToDBUseCase = saveSyncRecordsToDBUseCase,
         )
         runBlocking {
-            val queue: Queue<CameraUploadsMedia> = LinkedList(
-                listOf(
-                    mock(),
-                    mock()
-                )
+            val queue: List<CameraUploadsMedia> = listOf(
+                mock(),
+                mock()
             )
             SyncTimeStamp.values().forEach {
                 whenever(getCameraUploadSelectionQueryUseCase(it)).thenReturn("")
@@ -74,10 +68,8 @@ class ProcessMediaForUploadUseCaseTest {
                 MediaStoreFileType.IMAGES_EXTERNAL,
             ).forEach {
                 whenever(
-                    cameraUploadRepository.getMediaQueue(
+                    cameraUploadRepository.getMediaList(
                         mediaStoreFileType = eq(it),
-                        parentPath = eq(""),
-                        isVideo = eq(false),
                         selectionQuery = eq("")
                     )
                 ).thenReturn(
@@ -89,10 +81,8 @@ class ProcessMediaForUploadUseCaseTest {
                 MediaStoreFileType.VIDEO_EXTERNAL
             ).forEach {
                 whenever(
-                    cameraUploadRepository.getMediaQueue(
+                    cameraUploadRepository.getMediaList(
                         mediaStoreFileType = eq(it),
-                        parentPath = eq(""),
-                        isVideo = eq(true),
                         selectionQuery = eq("")
                     )
                 ).thenReturn(

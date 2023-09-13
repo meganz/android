@@ -458,18 +458,14 @@ interface CameraUploadRepository {
      * Get the media queue for a given media type
      *
      * @param mediaStoreFileType different media store file type
-     * @param parentPath local path of camera upload
-     * @param isVideo if media is video
      * @param selectionQuery db query
      *
-     * @return queue of camera upload media
+     * @return list of camera upload media
      */
-    suspend fun getMediaQueue(
+    suspend fun getMediaList(
         mediaStoreFileType: MediaStoreFileType,
-        parentPath: String?,
-        isVideo: Boolean,
         selectionQuery: String?,
-    ): Queue<CameraUploadsMedia>
+    ): List<CameraUploadsMedia>
 
     /**
      * Update sync record status by local path

@@ -13,8 +13,6 @@ import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
-import java.util.LinkedList
-import java.util.Queue
 import javax.inject.Inject
 import kotlin.math.max
 
@@ -50,25 +48,28 @@ const val INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE = "PRIMARY_HANDLE"
 internal class CameraUploadsMediaFacade @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : CameraUploadsMediaGateway {
-    companion object {
-        /**
-         * Debug flag if need to set a limit of files retrieved from media cursor
-         */
-        private const val SET_LIMITATION = false
-    }
 
-    override suspend fun getMediaQueue(
+    /**
+     * Debug size limitation, applied if not null
+     */
+    private val debugSizeLimitation: Int? = null
+
+    override suspend fun getMediaList(
         uri: Uri,
-        parentPath: String?,
-        isVideo: Boolean,
         selectionQuery: String?,
-    ): Queue<CameraUploadsMedia> =
-        createMediaCursor(parentPath, selectionQuery, getPageSize(isVideo), uri)?.let {
-            Timber.d("Extract ${it.count} Media from Cursor")
-            extractMedia(it, parentPath)
-        } ?: LinkedList<CameraUploadsMedia>().also {
+    ): List<CameraUploadsMedia> = runCatching {
+        val isVideo = uri.isVideoUri()
+        createMediaCursor(uri, selectionQuery, isVideo)?.use { cursor ->
+            Timber.d("Extract ${cursor.count} Media from Cursor")
+            cursor.extractMedia(isVideo)
+        } ?: run {
             Timber.d("Extract 0 Media - Cursor is NULL")
+            emptyList()
         }
+    }.getOrElse {
+        Timber.e(it)
+        emptyList()
+    }
 
     override suspend fun sendUpdateFolderIconBroadcast(
         nodeHandle: Long,
@@ -81,9 +82,6 @@ internal class CameraUploadsMediaFacade @Inject constructor(
         }
         context.sendBroadcast(intent)
     }
-
-
-    private fun getPageSize(isVideo: Boolean): Int = if (isVideo) 50 else 1000
 
     override suspend fun sendUpdateFolderDestinationBroadcast(
         nodeHandle: Long,
@@ -100,138 +98,105 @@ internal class CameraUploadsMediaFacade @Inject constructor(
         context.sendBroadcast(destinationIntent)
     }
 
-
-    private fun createMediaCursor(
-        parentPath: String?,
-        selectionQuery: String?,
-        pageSize: Int,
-        uri: Uri,
-    ): Cursor? {
-        val projection = getProjection()
-        val mediaOrder = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
-        return if (shouldPageCursor(parentPath)) {
-            mediaOrder.getPagedMediaCursor(selectionQuery, pageSize, uri, projection)
-        } else {
-            context.contentResolver?.query(
-                uri,
-                projection,
-                selectionQuery,
-                null,
-                mediaOrder
-            )
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun getProjection() = arrayOf(
-        MediaStore.MediaColumns.DATA,
+    /**
+     *  Return the column of the media store to retrieve data from
+     *
+     *  @return an array of strings representing a column of the media store
+     */
+    private fun getProjection(isVideo: Boolean) = arrayOf(
+        if (isVideo) MediaStore.Video.Media._ID else MediaStore.Images.Media._ID,
+        MediaStore.MediaColumns.DISPLAY_NAME,
         MediaStore.MediaColumns.DATE_ADDED,
-        MediaStore.MediaColumns.DATE_MODIFIED
+        MediaStore.MediaColumns.DATE_MODIFIED,
+        MediaStore.MediaColumns.DATA,
     )
 
     /**
-     *  Only paging for files in internal storage
-     *  Files on SD card usually have the same timestamp (the time when the SD is loaded)
+     * Create the cursor to use for querying the media store
+     *
+     * @param uri the uri to query
+     * @param selectionQuery a String representation to the conditions applied to the query
+     * @param isVideo true if the query relates to the video media store
+     * @return a [Cursor] of the query result
      */
-    private fun shouldPageCursor(parentPath: String?) =
-        !isLocalFolderOnSDCard(context, parentPath)
-
-    private fun String.getPagedMediaCursor(
-        selectionQuery: String?,
-        pageSize: Int,
+    private fun createMediaCursor(
         uri: Uri,
-        projection: Array<String>,
+        selectionQuery: String?,
+        isVideo: Boolean
     ): Cursor? {
+        val projection = getProjection(isVideo)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val args = Bundle()
-            args.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, this)
-            args.putString(ContentResolver.QUERY_ARG_OFFSET, "0")
-            args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selectionQuery)
-            if (SET_LIMITATION)
-                args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, pageSize.toString())
+            val args = Bundle().apply {
+                val sortOrder = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
+                putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, sortOrder)
+                putString(ContentResolver.QUERY_ARG_OFFSET, "0")
+                putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selectionQuery)
+                debugSizeLimitation?.let {
+                    putString(ContentResolver.QUERY_ARG_SQL_LIMIT, it.toString())
+                }
+            }
             context.contentResolver?.query(uri, projection, args, null)
         } else {
-            val mediaOrderPreR = if (SET_LIMITATION) "$this LIMIT 0,$pageSize" else null
-            context.contentResolver?.query(
-                uri,
-                projection,
-                selectionQuery,
-                null,
-                mediaOrderPreR
-            )
+            val sortOrder = debugSizeLimitation?.let { "$this LIMIT 0,$it" }
+            context.contentResolver?.query(uri, projection, selectionQuery, null, sortOrder)
         }
     }
 
-    private fun extractMedia(cursor: Cursor, parentPath: String?): Queue<CameraUploadsMedia> {
-        return LinkedList<CameraUploadsMedia>().apply {
-            try {
-                @Suppress("DEPRECATION")
-                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
-                val addedColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED)
-                val modifiedColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED)
-                while (cursor.moveToNext()) {
-                    getUploadMediaFromCursor(
-                        cursor,
-                        dataColumn,
-                        addedColumn,
-                        modifiedColumn
-                    ).takeIf {
-                        isFilePathValid(it, parentPath)
-                    }?.let(this::add)
-                }
-            } catch (exception: Exception) {
-                Timber.e(exception)
-            } finally {
-                cursor.close()
+    /**
+     * Extract the media list using the cursor
+     *
+     * @param isVideo true if the type of media retrieved is
+     * @return a Queue of [CameraUploadsMedia]
+     */
+    private fun Cursor.extractMedia(isVideo: Boolean): List<CameraUploadsMedia> =
+        ArrayList<CameraUploadsMedia>().apply {
+            if (moveToFirst()) {
+                do {
+                    val mediaId =
+                        getLongValue(if (isVideo) MediaStore.Video.Media._ID else MediaStore.Images.Media._ID)
+                    val displayName = getStringValue(MediaStore.MediaColumns.DISPLAY_NAME)
+                    val filePath = getStringValue(MediaStore.MediaColumns.DATA)
+                    val addedDate = getLongValue(MediaStore.MediaColumns.DATE_ADDED) * 1000
+                    val modifiedDate = getLongValue(MediaStore.MediaColumns.DATE_MODIFIED) * 1000
+                    val timestamp = max(addedDate, modifiedDate)
+
+                    val cameraUploadsMedia = CameraUploadsMedia(
+                        mediaId = mediaId,
+                        displayName = displayName,
+                        filePath = filePath,
+                        timestamp = timestamp
+                    )
+                    add(cameraUploadsMedia)
+                } while (moveToNext())
             }
-        }
-    }
+            close()
+        }.toList()
 
-    private fun getUploadMediaFromCursor(
-        cursor: Cursor,
-        dataColumn: Int,
-        addedColumn: Int,
-        modifiedColumn: Int,
-    ): CameraUploadsMedia {
-        val filePath = cursor.getString(dataColumn)
-        val addedTime = cursor.getLong(addedColumn) * 1000
-        val modifiedTime = cursor.getLong(modifiedColumn) * 1000
-        val timestamp = max(addedTime, modifiedTime)
-        val media = CameraUploadsMedia(filePath = filePath, timestamp = timestamp)
-        Timber.d("Extract from cursor, add time: $addedTime, modify time: $modifiedTime, chosen time: $timestamp")
-        return media
-    }
+    /**
+     *  Get the string value of a cursor column index
+     */
+    private fun Cursor.getStringValue(key: String) = getString(getColumnIndexOrThrow(key))
 
-    private fun isFilePathValid(media: CameraUploadsMedia, parentPath: String?) =
-        media.filePath != null && !parentPath.isNullOrBlank()
-                && media.filePath!!.startsWith(parentPath)
+    /**
+     *  Get the long value of a cursor column index
+     */
+    private fun Cursor.getLongValue(key: String) = getLong(getColumnIndexOrThrow(key))
 
 
-    private fun getSDCardRoot(path: String): String {
-        var i = 0
-        var x = 0
-        val chars = path.toCharArray()
-        while (x < chars.size) {
-            val c = chars[x]
-            if (c == '/') {
-                i++
-            }
-            if (i == 3) {
-                break
-            }
-            x++
-        }
-        return path.substring(0, x)
-    }
+    /**
+     * Check if the uri corresponds to an uri of type video or not
+     *
+     * @return true if the uri corresponds to an uri of type video, false otherwise
+     */
+    private fun Uri.isVideoUri() = when (this) {
+        MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        -> false
 
-    private fun isLocalFolderOnSDCard(context: Context, localPath: String?): Boolean {
-        val fs = context.getExternalFilesDirs(null)
-        if (fs.size > 1 && fs[1] != null) {
-            val sdRoot = getSDCardRoot(fs[1].absolutePath)
-            return localPath?.startsWith(sdRoot) ?: false
-        }
-        return false
+        MediaStore.Video.Media.INTERNAL_CONTENT_URI,
+        MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+        -> true
+
+        else -> false
     }
 }

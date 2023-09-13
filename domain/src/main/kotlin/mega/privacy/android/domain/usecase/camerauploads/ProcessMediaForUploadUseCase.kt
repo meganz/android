@@ -5,9 +5,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
@@ -20,8 +20,6 @@ import javax.inject.Inject
 /**
  *
  * @property cameraUploadRepository [CameraUploadRepository]
- * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase]
- * @property getSecondaryFolderPathUseCase [GetSecondaryFolderPathUseCase]
  * @property getMediaStoreFileTypesUseCase [GetMediaStoreFileTypesUseCase]
  * @property isSecondaryFolderEnabled [IsSecondaryFolderEnabled]
  * @property getCameraUploadSelectionQueryUseCase [GetCameraUploadSelectionQueryUseCase]
@@ -31,8 +29,6 @@ import javax.inject.Inject
  */
 class ProcessMediaForUploadUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
-    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val getMediaStoreFileTypesUseCase: GetMediaStoreFileTypesUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val getCameraUploadSelectionQueryUseCase: GetCameraUploadSelectionQueryUseCase,
@@ -105,10 +101,8 @@ class ProcessMediaForUploadUseCase @Inject constructor(
         for (type in types) {
             if (type == MediaStoreFileType.IMAGES_INTERNAL || type == MediaStoreFileType.IMAGES_EXTERNAL) {
                 primaryPhotos.addAll(
-                    cameraUploadRepository.getMediaQueue(
+                    cameraUploadRepository.getMediaList(
                         mediaStoreFileType = type,
-                        parentPath = getPrimaryFolderPathUseCase(),
-                        isVideo = false,
                         selectionQuery = getCameraUploadSelectionQueryUseCase(SyncTimeStamp.PRIMARY_PHOTO),
                     )
                 )
@@ -136,10 +130,8 @@ class ProcessMediaForUploadUseCase @Inject constructor(
         for (type in types) {
             if (type == MediaStoreFileType.VIDEO_INTERNAL || type == MediaStoreFileType.VIDEO_EXTERNAL) {
                 primaryVideos.addAll(
-                    cameraUploadRepository.getMediaQueue(
+                    cameraUploadRepository.getMediaList(
                         mediaStoreFileType = type,
-                        parentPath = getPrimaryFolderPathUseCase(),
-                        isVideo = true,
                         selectionQuery = getCameraUploadSelectionQueryUseCase(SyncTimeStamp.PRIMARY_VIDEO),
                     )
                 )
@@ -167,10 +159,8 @@ class ProcessMediaForUploadUseCase @Inject constructor(
         for (type in types) {
             if (type == MediaStoreFileType.IMAGES_INTERNAL || type == MediaStoreFileType.IMAGES_EXTERNAL) {
                 secondaryPhotos.addAll(
-                    cameraUploadRepository.getMediaQueue(
+                    cameraUploadRepository.getMediaList(
                         mediaStoreFileType = type,
-                        parentPath = getSecondaryFolderPathUseCase(),
-                        isVideo = false,
                         selectionQuery = getCameraUploadSelectionQueryUseCase(SyncTimeStamp.SECONDARY_PHOTO),
                     )
                 )
@@ -199,10 +189,8 @@ class ProcessMediaForUploadUseCase @Inject constructor(
             if (type == MediaStoreFileType.VIDEO_INTERNAL || type == MediaStoreFileType.VIDEO_EXTERNAL) {
 
                 secondaryVideos.addAll(
-                    cameraUploadRepository.getMediaQueue(
+                    cameraUploadRepository.getMediaList(
                         mediaStoreFileType = type,
-                        parentPath = getSecondaryFolderPathUseCase(),
-                        isVideo = true,
                         selectionQuery = getCameraUploadSelectionQueryUseCase(SyncTimeStamp.SECONDARY_VIDEO),
                     )
                 )

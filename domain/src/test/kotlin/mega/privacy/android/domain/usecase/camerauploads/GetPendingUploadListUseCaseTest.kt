@@ -40,7 +40,7 @@ class GetPendingUploadListUseCaseTest {
     private val isNodeInRubbishBin: IsNodeInRubbish = mock()
     private val getNodeGPSCoordinatesUseCase: GetNodeGPSCoordinatesUseCase = mock()
 
-    private val uploadMedia = CameraUploadsMedia("", 0)
+    private val uploadMedia = CameraUploadsMedia(1234L, "", "", 0)
 
     private val primaryPhoto = SyncRecord(
         0,
