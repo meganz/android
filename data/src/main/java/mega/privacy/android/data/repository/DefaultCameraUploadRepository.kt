@@ -37,7 +37,6 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -47,6 +46,7 @@ import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -731,29 +731,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             }
         }
     }
-
-    override suspend fun updateRemoteBackupName(backupId: Long, backupName: String) =
-        withContext(ioDispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("updateRemoteBackupName") {
-                    return@getRequestListener
-                }
-                // Any values that should not be changed should be marked as null, -1 or -1L
-                megaApiGateway.updateBackup(
-                    backupId = backupId,
-                    backupType = getInvalidBackupType(),
-                    targetNode = TARGET_NODE_NO_CHANGE,
-                    localFolder = null,
-                    backupName = backupName,
-                    state = STATE_NO_CHANGE,
-                    subState = SUB_STATE_NO_CHANGE,
-                    listener = listener,
-                )
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
 
     override suspend fun updateLocalBackup(backup: Backup) = withContext(ioDispatcher) {
         localStorageGateway.updateBackup(backup)

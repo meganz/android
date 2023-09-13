@@ -55,12 +55,28 @@ interface BackupRepository {
      * @param targetNode [Long]
      * @param localFolder [String]
      * @param backupName [String]
-     * @param state [Int]
+     * @param state [BackupState]
      */
     suspend fun setBackup(
         backupType: BackupInfoType, targetNode: Long, localFolder: String, backupName: String,
         state: BackupState,
     ): Backup
+
+
+    /**
+     * Updates a backup to display in Device Centre
+     * Any values that should not be changed should be marked as null, -1 or -1L
+     * @param backupId [Long]
+     * @param backupType [BackupInfoType]
+     * @param backupName [String]
+     * @param targetNode [Long]
+     * @param localFolder [String]
+     * @param state [BackupState]
+     */
+    suspend fun updateRemoteBackup(
+        backupId: Long, backupType: BackupInfoType, backupName: String, targetNode: Long,
+        localFolder: String?, state: BackupState,
+    )
 
     /**
      * Monitor BackupInfoType.

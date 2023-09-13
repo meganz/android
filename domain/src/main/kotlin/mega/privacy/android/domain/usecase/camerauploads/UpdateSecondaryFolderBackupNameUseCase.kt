@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import javax.inject.Inject
@@ -9,12 +10,12 @@ import javax.inject.Inject
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property isSecondaryFolderEnabled [IsSecondaryFolderEnabled]
- * @property updateBackupNameUseCase [UpdateBackupNameUseCase]
+ * @property updateBackupUseCase [UpdateBackupUseCase]
  */
 class UpdateSecondaryFolderBackupNameUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
-    private val updateBackupNameUseCase: UpdateBackupNameUseCase,
+    private val updateBackupUseCase: UpdateBackupUseCase,
 ) {
     /**
      * Invocation function
@@ -24,9 +25,10 @@ class UpdateSecondaryFolderBackupNameUseCase @Inject constructor(
     suspend operator fun invoke(backupName: String) {
         if (isSecondaryFolderEnabled() && backupName.isNotBlank()) {
             cameraUploadRepository.getMuBackUp()?.let { backup ->
-                updateBackupNameUseCase(
+                updateBackupUseCase(
                     backupId = backup.backupId,
                     backupName = backupName,
+                    backupType = BackupInfoType.MEDIA_UPLOADS
                 )
             }
         }

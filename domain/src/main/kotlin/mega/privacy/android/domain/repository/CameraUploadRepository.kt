@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -14,6 +13,7 @@ import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
@@ -698,17 +698,6 @@ interface CameraUploadRepository {
         backupId: Long,
         backupState: BackupState,
     ): BackupState
-
-    /**
-     * Updates the Backup Name of a specific [Backup] remotely
-     *
-     * @param backupId The Backup ID that identifies the Backup to be updated
-     * @param backupName The new Backup Name to be updated
-     */
-    suspend fun updateRemoteBackupName(
-        backupId: Long,
-        backupName: String,
-    )
 
     /**
      * Set the GPS coordinates of image files as a node attribute.

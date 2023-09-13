@@ -131,6 +131,35 @@ internal class BackupRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateRemoteBackup(
+        backupId: Long,
+        backupType: BackupInfoType,
+        backupName: String,
+        targetNode: Long,
+        localFolder: String?,
+        state: BackupState,
+    ) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("updateRemoteBackupName") {
+                return@getRequestListener
+            }
+            // Any values that should not be changed should be marked as null, -1 or -1L
+            megaApiGateway.updateBackup(
+                backupId = backupId,
+                backupType = backupInfoTypeIntMapper(backupType),
+                targetNode = targetNode,
+                localFolder = null,
+                backupName = backupName,
+                state = backupStateIntMapper(state),
+                subState = MegaError.API_OK,
+                listener = listener,
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
     override fun monitorBackupInfoType() = appEventGateway.monitorBackupInfoType()
 
     override suspend fun broadCastBackupInfoType(backupInfoType: BackupInfoType) =

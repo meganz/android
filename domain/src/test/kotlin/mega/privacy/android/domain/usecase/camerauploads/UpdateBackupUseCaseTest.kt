@@ -4,6 +4,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.repository.BackupRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -17,26 +19,28 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
- * Test class for [UpdateBackupNameUseCase]
+ * Test class for [UpdateBackupUseCase]
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExperimentalCoroutinesApi
-internal class UpdateBackupNameUseCaseTest {
+internal class UpdateBackupUseCaseTest {
 
-    private lateinit var underTest: UpdateBackupNameUseCase
+    private lateinit var underTest: UpdateBackupUseCase
 
+    private val backupRepository = mock<BackupRepository>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = UpdateBackupNameUseCase(
+        underTest = UpdateBackupUseCase(
+            backupRepository = backupRepository,
             cameraUploadRepository = cameraUploadRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(backupRepository, cameraUploadRepository)
     }
 
     @Test
@@ -59,11 +63,16 @@ internal class UpdateBackupNameUseCaseTest {
         underTest(
             backupId = backupId,
             backupName = newBackupName,
+            backupType = BackupInfoType.CAMERA_UPLOADS
         )
 
-        verify(cameraUploadRepository).updateRemoteBackupName(
+        verify(backupRepository).updateRemoteBackup(
             backupId = backupId,
             backupName = newBackupName,
+            backupType = BackupInfoType.CAMERA_UPLOADS,
+            targetNode = -1L,
+            localFolder = null,
+            state = BackupState.INVALID
         )
         verify(cameraUploadRepository).updateLocalBackup(backup.copy(backupName = newBackupName))
     }
@@ -77,11 +86,16 @@ internal class UpdateBackupNameUseCaseTest {
         underTest(
             backupId = backupId,
             backupName = newBackupName,
+            backupType = BackupInfoType.CAMERA_UPLOADS
         )
 
-        verify(cameraUploadRepository).updateRemoteBackupName(
+        verify(backupRepository).updateRemoteBackup(
             backupId = backupId,
             backupName = newBackupName,
+            backupType = BackupInfoType.CAMERA_UPLOADS,
+            targetNode = -1L,
+            localFolder = null,
+            state = BackupState.INVALID
         )
         verify(cameraUploadRepository, never()).updateLocalBackup(any())
     }

@@ -4,6 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +31,7 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
-    private val updateBackupNameUseCase = mock<UpdateBackupNameUseCase>()
+    private val updateBackupUseCase = mock<UpdateBackupUseCase>()
 
     private val testBackup = Backup(
         backupId = 123L,
@@ -49,13 +50,13 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
         underTest = UpdatePrimaryFolderBackupNameUseCase(
             cameraUploadRepository = cameraUploadRepository,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            updateBackupNameUseCase = updateBackupNameUseCase,
+            updateBackupUseCase = updateBackupUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() =
-        reset(cameraUploadRepository, isCameraUploadsEnabledUseCase, updateBackupNameUseCase)
+        reset(cameraUploadRepository, isCameraUploadsEnabledUseCase, updateBackupUseCase)
 
     @Test
     fun `test that the primary folder backup name is updated`() = runTest {
@@ -66,9 +67,10 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
 
         underTest(testBackupName)
 
-        verify(updateBackupNameUseCase).invoke(
+        verify(updateBackupUseCase).invoke(
             backupId = testBackup.backupId,
             backupName = testBackupName,
+            backupType = BackupInfoType.CAMERA_UPLOADS
         )
     }
 
@@ -84,7 +86,7 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
 
         underTest(backupName)
 
-        verifyNoInteractions(updateBackupNameUseCase)
+        verifyNoInteractions(updateBackupUseCase)
     }
 
     private fun provideErrorParams() = Stream.of(
