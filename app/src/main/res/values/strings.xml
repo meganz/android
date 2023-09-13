@@ -2785,9 +2785,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Verify credentials</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Not approved</string>
+    <string name="label_not_verified">Not verified</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Approved</string>
+    <string name="label_verified">Verified</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticity Credentials</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3937,9 +3937,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should approve you, too.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Approve %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4468,9 +4468,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot approve contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t approve %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Start</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5055,13 +5055,13 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Meeting occurrence updated</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to approve the contacts you share information with or receive data from.</string>
+    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to verify the contacts you share information with or receive data from.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">To approve your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <string name="contact_approve_credentials_contact_verify_description">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Approve</string>
+    <string name="contact_approve_credentials_button_text">Verify</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">Approve credentials</string>
+    <string name="contact_approve_credentials_toolbar_title">Verify credentials</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Waiting room</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -5069,7 +5069,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Participants added by non-hosts during calls won’t be sent to the waiting room.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been approved by you. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">Removed %1$d participant</item>
@@ -5082,9 +5082,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Allow access to audio files</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Approved</string>
+    <string name="contact_approve_credentials_approved_text">Verified</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Not approved</string>
+    <string name="contact_approve_credentials_not_approved_text">Not verified</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Zoom in</string>
     <!-- Photos action menu zoom out -->
@@ -5096,7 +5096,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Wait for host to let you in</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t approved. To ensure extra security, we recommend that you approve their credentials in Contacts. Tap on the three dots next to the contact you want to approve and tap Info.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Don’t leave</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -5151,7 +5151,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">No results</string>
     <!-- Description text in empty search screen when images filter selected -->

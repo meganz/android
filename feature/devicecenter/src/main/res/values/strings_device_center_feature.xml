@@ -55,5 +55,5 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_backups">Show in Backups</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Show in Cloud Drive</string>
+    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Show in Cloud drive</string>
 </resources>

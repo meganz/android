@@ -2856,9 +2856,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Verifică acreditările</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Nu sunt aprobate</string>
+    <string name="label_not_verified">Neverificate</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Aprobate</string>
+    <string name="label_verified">Verificat</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Acreditări de autenticitate</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -4040,9 +4040,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[folder nedecriptat]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">Pentru a accesa folderul partajat, persoana care l-a partajat cu tine ar trebui să te aprobe și pe tine.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Pentru a accesa folderul partajat, persoana care l-a partajat cu tine ar trebui să te verifice și pe tine.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Aprobați %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verifică pe %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Se pregătește fișierul pentru previzualizare</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4652,9 +4652,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">Poți adăuga doar până la 150 de elemente o dată într-un album</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Nu se poate aproba contactul</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Nu se poate verifica contactul</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">Nu poți aproba pe %s deoarece nu se află în lista de contacte. Așteaptă ca această persoană să îți accepte mai întâi invitația.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Nu poți confirma pe %s deoarece nu se află în lista de contacte. Așteaptă ca această persoană să îți accepte mai întâi invitația.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Pornește</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5282,13 +5282,13 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Întâlnirea a fost actualizată</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare tip zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să aprobați contactele cu care partajați informații sau de la care primiți date.</string>
+    <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare tip zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații sau de la care primiți date.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">Pentru a vă aproba contactul, asigurați-vă că acreditările pe care le vedeți mai sus corespund cu acreditările contului lor. Le puteți cere să vă împărtășească acreditările.</string>
+    <string name="contact_approve_credentials_contact_verify_description">Pentru a vă confirma contactul, asigurați-vă că acreditările pe care le vedeți mai sus corespund cu acreditările contului lor. Le puteți cere să vă împărtășească acreditările.</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Aprobă</string>
+    <string name="contact_approve_credentials_button_text">Verifică</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">Aprobă acreditările</string>
+    <string name="contact_approve_credentials_toolbar_title">Verifică acreditările</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Sală de așteptare</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -5296,7 +5296,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Participanții adăugați de non-gazde în timpul apelurilor nu vor fi trimiși în sala de așteptare.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Unele contacte cu care partajați informații nu au fost aprobate de dvs. Pentru a asigura un plus de securitate, vă recomandăm să aprobați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl aprobați și atingeți Informații.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Unele dintre contactele cu care partajați informații nu au fost confirmate de dvs. Pentru a asigura o securitate suplimentară, vă recomandăm să confirmați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl confirmați și atingeți Informații.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">%1$d participant a fost eliminat</item>
@@ -5310,9 +5310,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permite accesul la fișierele audio</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Aprobate</string>
+    <string name="contact_approve_credentials_approved_text">Verificat</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Nu sunt aprobate</string>
+    <string name="contact_approve_credentials_not_approved_text">Neverificate</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Zoom in</string>
     <!-- Photos action menu zoom out -->
@@ -5324,7 +5324,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Așteptați ca gazda să vă lase să intrați</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s este partajat de un contact pe care nu l-ați aprobat. Pentru a asigura un plus de securitate, vă recomandăm să aprobați acreditările acestora în Contacte. Atingeți cele trei puncte de lângă contactul pe care doriți să îl aprobați și atingeți Informații.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Nu părăsiți</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -5382,5 +5382,17 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Descoperirea media în subfoldere</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">Imaginile și videoclipurile din subfoldere vor fi, de asemenea, incluse în vizualizarea de descoperire media atunci când folderul principal se află în această vizualizare</string>
+    <!-- Description text in empty search screen when no search results found -->
+    <string name="search_empty_screen_no_results">Niciun rezultat</string>
+    <!-- Description text in empty search screen when images filter selected -->
+    <string name="search_empty_screen_no_images">No images</string>
+    <!-- Description text in empty search screen when audio filter selected -->
+    <string name="search_empty_screen_no_audio">No audio files</string>
+    <!-- Description text in empty search screen when video filter selected -->
+    <string name="search_empty_screen_no_video">No video files</string>
+    <!-- Description text in empty search screen when documents filter selected -->
+    <string name="search_empty_screen_no_documents">No documents</string>
+    <!-- Description text cloud drive screen when no items are available in cloud drive -->
+    <string name="cloud_drive_empty_screen_message">Unitatea cloud este goală</string>
 </resources>

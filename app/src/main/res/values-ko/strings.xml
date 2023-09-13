@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">자격 증명 인증 중</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">승인되지 않음</string>
+    <string name="label_not_verified">인증되지 않음</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">승인됨</string>
+    <string name="label_verified">확인됨</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">진위 증명</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3834,9 +3834,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[복호화 되지 않은 폴더]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">공유된 폴더에 접근하려면, 당신에게 공유해준 사람도 당신을 확인해야 합니다.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">공유된 폴더에 접근하려면, 당신에게 공유해준 사람도 당신을 인증해야 합니다.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">%s 님 확인</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">%s님 인증</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">파일 미리보기 준비 중</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4284,9 +4284,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">사진첩에 한번에 최대 150개의 항목만 추가할 수 있습니다.</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">연락처를 확인할 수 없습니다</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">연락처를 인증할 수 없습니다</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">당신의 연락처 목록에 %s 님이 없기 때문에 확인할 수 없습니다. 그들이 초대를 수락할 때까지 기다리세요.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">당신의 연락처 목록에 %s님이 없기 때문에 인증할 수 없습니다. 그들이 초대를 수락할 때까지 기다리세요.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">시작</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4828,13 +4828,13 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">회의 되풀이 항목 수정됨</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">우리는 당신이 MEGA에 저장, 공유, 수신하는 모든 정보가 안전하도록 영지식 암호화로 당신의 데이터를 보호합니다. 추가적인 보안을 적용하려면, 우리는 당신이 정보를 공유하거나 데이터를 받는 연락처를 확인할 것을 요청합니다.</string>
+    <string name="contact_approve_credentials_secure_share_description">우리는 당신이 MEGA에 저장, 공유, 수신하는 모든 정보가 안전하도록 영지식 암호화로 당신의 데이터를 보호합니다. 추가적인 보안을 적용하려면, 우리는 당신이 정보를 공유하거나 데이터를 받는 연락처를 인증할 것을 요청합니다.</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">연락처를 확인하려면, 위에 보이는 자격 증명이 연락처의 계정 자격 증명과 일치하는지 확인하세요. 연락처에게 자격 증명을 공유해달라고 요청하세요.</string>
+    <string name="contact_approve_credentials_contact_verify_description">연락처를 인증하려면, 위에 보이는 자격 증명이 연락처의 계정 자격 증명과 일치하는지 확인하세요. 연락처에게 자격 증명을 공유해달라고 요청하세요.</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">확인</string>
+    <string name="contact_approve_credentials_button_text">인증</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">자격 증명 확인</string>
+    <string name="contact_approve_credentials_toolbar_title">자격 증명 인증 중</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">대기실</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -4842,7 +4842,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">통화 중에 호스트가 아닌 사람으로부터 추가된 참여자들은 대기실에 보내질 수 없습니다.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">정보를 공유하는 연락처 중 일부가 당신에 의해 확인되지 않았습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 확인할 것을 권장합니다. 확인하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">정보를 공유하는 연락처 중 일부가 당신에 의해 인증되지 않았습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 인증할 것을 권장합니다. 인증하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">%1$d명의 참여자를 제거하였습니다</item>
@@ -4854,9 +4854,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">오디오 파일에 접근 허용</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">승인됨</string>
+    <string name="contact_approve_credentials_approved_text">확인됨</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">승인되지 않음</string>
+    <string name="contact_approve_credentials_not_approved_text">인증되지 않음</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">확대</string>
     <!-- Photos action menu zoom out -->
@@ -4868,7 +4868,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">주최자가 당신을 들어오게 하기를 기다립니다</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s은/는 당신이 확인하지 않은 연락처에 의해 공유되었습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 확인할 것을 권장합니다. 확인하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">떠나지 않기</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -4923,5 +4923,17 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
+    <!-- Description text in empty search screen when no search results found -->
+    <string name="search_empty_screen_no_results">결과 없음</string>
+    <!-- Description text in empty search screen when images filter selected -->
+    <string name="search_empty_screen_no_images">No images</string>
+    <!-- Description text in empty search screen when audio filter selected -->
+    <string name="search_empty_screen_no_audio">No audio files</string>
+    <!-- Description text in empty search screen when video filter selected -->
+    <string name="search_empty_screen_no_video">No video files</string>
+    <!-- Description text in empty search screen when documents filter selected -->
+    <string name="search_empty_screen_no_documents">No documents</string>
+    <!-- Description text cloud drive screen when no items are available in cloud drive -->
+    <string name="cloud_drive_empty_screen_message">클라우드 드라이브가 비어 있습니다</string>
 </resources>

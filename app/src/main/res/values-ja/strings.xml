@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">本人確認証明</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">未承認</string>
+    <string name="label_not_verified">検証されていません</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">承認済み</string>
+    <string name="label_verified">検証済み</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">認証資格情報</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3836,7 +3836,7 @@
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">共有フォルダにアクセスするには、あなたと共有した人もあなたを承認する必要があります。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを承認する</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを承認</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">プレビュー用にファイルを準備しています</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4284,9 +4284,9 @@
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">一度に最大150個のアイテムのみをアルバムに追加できます。</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">連絡先を承認できません</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">連絡先を認証できません</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">連絡先リストにないため、%sを承認できません。相手側が最初にあなたの招待を受け入れるのを待ちます。</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">連絡先リストにないため、%sを認証できません。相手側が最初にあなたの招待を受け入れるのを待ちます。</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4828,13 +4828,13 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">ミーティングの開催状況が更新されました</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">当社はゼロ知識暗号化でデータを保護するため、MEGAで保存、共有、受信する情報はすべて安全です。さらなるセキュリティを確保するために、情報を共有する連絡先、またはデータを受信する連絡先を承認するようお願いいたします。</string>
+    <string name="contact_approve_credentials_secure_share_description">当社はゼロ知識暗号化でデータを保護するため、MEGAで保存、共有、受信する情報はすべて安全です。さらなるセキュリティを確保するために、情報を共有する連絡先、またはデータを受信する連絡先を認証するようお願いいたします。</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">連絡先を承認するには、上記の認証情報がアカウントの認証情報と一致していることを確認してください。連絡先に認証情報を共有するように依頼できます。</string>
+    <string name="contact_approve_credentials_contact_verify_description">連絡先を認証するには、上記の認証情報がアカウントの認証情報と一致していることを確認してください。連絡先に認証情報を共有するように依頼できます。</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">承認</string>
+    <string name="contact_approve_credentials_button_text">確認する</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">認証情報を承認</string>
+    <string name="contact_approve_credentials_toolbar_title">認証情報の検証</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">待合室</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -4842,7 +4842,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">通話中に主催者以外によって追加された参加者は待合室に送られません。</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">情報を共有している連絡先の一部は、あなたによって承認されていません。さらなるセキュリティを確保するために、連絡先で認証情報を承認することをお勧めします。承認したい連絡先の横にある3つの点をタップし、「情報」をタップします。</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">情報を共有している連絡先の一部は、あなたによって認証されていません。さらなるセキュリティを確保するために、連絡先で認証情報を確認することをお勧めします。認証したい連絡先の横にある3つの点をタップし、「情報」をタップします。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">%1$d人の参加者を削除しました</item>
@@ -4854,9 +4854,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">音声ファイルへのアクセスを許可する</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">承認済み</string>
+    <string name="contact_approve_credentials_approved_text">検証済み</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">未承認</string>
+    <string name="contact_approve_credentials_not_approved_text">検証されていません</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">ズームイン</string>
     <!-- Photos action menu zoom out -->
@@ -4868,7 +4868,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">主催者が参加を許可するまでお待ちください</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%sは、あなたが承認していない連絡先によって共有されています。セキュリティをさらに強化するために、連絡先で認証情報を承認することをお勧めします。承認したい連絡先の横にある三点をタップして、「情報」をタップします。</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">退室しない</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -4920,5 +4920,17 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">サブフォルダメディアディスカバリー</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders        will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">メインフォルダがメディアディスカバリービューにある場合、サブフォルダの画像と動画もメディアディスカバリービューに含まれます。</string>
+    <!-- Description text in empty search screen when no search results found -->
+    <string name="search_empty_screen_no_results">結果なし</string>
+    <!-- Description text in empty search screen when images filter selected -->
+    <string name="search_empty_screen_no_images">画像がありません</string>
+    <!-- Description text in empty search screen when audio filter selected -->
+    <string name="search_empty_screen_no_audio">音声ファイルがありません</string>
+    <!-- Description text in empty search screen when video filter selected -->
+    <string name="search_empty_screen_no_video">動画ファイルがありません</string>
+    <!-- Description text in empty search screen when documents filter selected -->
+    <string name="search_empty_screen_no_documents">ドキュメントがありません</string>
+    <!-- Description text cloud drive screen when no items are available in cloud drive -->
+    <string name="cloud_drive_empty_screen_message">クラウドドライブが空です</string>
 </resources>
