@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
+import mega.privacy.android.app.presentation.qrcode.CREATE_TAG
 import mega.privacy.android.app.presentation.qrcode.LINK_TAG
 import mega.privacy.android.app.presentation.qrcode.QRCODE_TAG
 import mega.privacy.android.app.presentation.qrcode.QRCodeView
@@ -38,6 +39,7 @@ class QRCodeViewTest {
         composeTestRule.setContent {
             QRCodeView(
                 viewState = viewState,
+                onCreateQRCode = { },
                 onBackPressed = { },
                 onDeleteQRCode = { },
                 onResetQRCode = { },
@@ -105,5 +107,17 @@ class QRCodeViewTest {
     fun `test that snackbar message is shown when myQRCodeState is QRCodeDeleted`() {
         setComposeContent(QRCodeUIState(myQRCodeState = MyCodeUIState.QRCodeDeleted))
         composeTestRule.onNodeWithTag(SNACKBAR_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that create button is shown when myQRCodeState is QRCodeDeleted`() {
+        setComposeContent(QRCodeUIState(myQRCodeState = MyCodeUIState.QRCodeDeleted))
+        composeTestRule.onNodeWithTag(CREATE_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that create button is shown when myQRCodeState is Idle`() {
+        setComposeContent(QRCodeUIState(myQRCodeState = MyCodeUIState.Idle))
+        composeTestRule.onNodeWithTag(CREATE_TAG).assertIsDisplayed()
     }
 }

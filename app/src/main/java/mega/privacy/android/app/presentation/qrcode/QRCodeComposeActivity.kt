@@ -79,6 +79,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
                 QRCodeView(
                     viewState = viewState,
                     onBackPressed = onBackPressedDispatcher::onBackPressed,
+                    onCreateQRCode = viewModel::createQRCode,
                     onDeleteQRCode = viewModel::deleteQRCode,
                     onResetQRCode = viewModel::resetQRCode,
                     onScanQrCodeClicked = { viewModel.scanCode(this) },
