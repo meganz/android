@@ -57,12 +57,18 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FILE_VERSION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_NEARBY_FILES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_URI
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIEWER_FROM
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.VIEWER_FROM_ZIP_BROWSER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
@@ -732,10 +738,29 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun launchVideoScreen(imageItem: ImageItem) {
-        val nodeHandle = imageItem.getNodeHandle() ?: return
-        val nodeName = imageItem.nodeItem?.name ?: return
+        val viewerFrom = intent.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE)
+
+        val nodeHandle = if (viewerFrom == VIEWER_FROM_ZIP_BROWSER) {
+            imageItem.name.hashCode().toLong()
+        } else {
+            imageItem.getNodeHandle()
+        } ?: return
+
+        val nodeName = if (viewerFrom == VIEWER_FROM_ZIP_BROWSER) {
+            imageItem.name
+        } else {
+            imageItem.nodeItem?.name
+        } ?: return
 
         val intent = Util.getMediaIntent(this, nodeName).apply {
+            if (viewerFrom == VIEWER_FROM_ZIP_BROWSER && imageItem is ImageItem.File) {
+                putExtra(INTENT_EXTRA_KEY_PATH, imageItem.fileUri.toString())
+                putExtra(
+                    INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY,
+                    imageItem.fileUri.toFile().absolutePath
+                )
+            }
+
             putExtra(INTENT_EXTRA_KEY_POSITION, 0)
             putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
@@ -743,6 +768,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 INTENT_EXTRA_KEY_ADAPTER_TYPE,
                 if (isAlbumSharing) {
                     FROM_ALBUM_SHARING
+                } else if (viewerFrom == VIEWER_FROM_ZIP_BROWSER) {
+                    ZIP_ADAPTER
                 } else {
                     adapterType
                 }
