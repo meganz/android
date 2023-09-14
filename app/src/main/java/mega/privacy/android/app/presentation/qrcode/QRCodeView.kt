@@ -13,6 +13,7 @@ import android.os.Looper
 import android.view.PixelCopy
 import android.view.View
 import android.view.Window
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -25,14 +26,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -65,6 +69,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.R
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
@@ -98,6 +103,7 @@ import kotlin.coroutines.resumeWithException
 /**
  * View to render the QR code Screen, including toolbar, content, etc.
  */
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun QRCodeView(
@@ -105,7 +111,6 @@ internal fun QRCodeView(
     onBackPressed: () -> Unit,
     onDeleteQRCode: () -> Unit,
     onResetQRCode: () -> Unit,
-    onSaveQRCode: () -> Unit,
     onScanQrCodeClicked: () -> Unit,
     onCopyLinkClicked: () -> Unit,
     onViewContactClicked: (String) -> Unit,
@@ -115,6 +120,12 @@ internal fun QRCodeView(
     onInviteContactResultConsumed: () -> Unit,
     onInviteResultDialogDismiss: () -> Unit,
     onInviteContactDialogDismiss: () -> Unit,
+    onCloudDriveClicked: () -> Unit,
+    onFileSystemClicked: () -> Unit,
+    onShowCollision: (NameCollision) -> Unit,
+    onShowCollisionConsumed: () -> Unit,
+    onUploadFile: (Pair<File, Long>) -> Unit,
+    onUploadFileConsumed: () -> Unit,
     qrCodeMapper: QRCodeMapper,
 ) {
     val view: View = LocalView.current
@@ -127,11 +138,21 @@ internal fun QRCodeView(
     var showInviteContactResult by remember { mutableStateOf<InviteContactRequest?>(null) }
     var qrCodeComposableBounds by remember { mutableStateOf<Rect?>(null) }
 
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
+        skipHalfExpanded = true,
+    )
+
+    BackHandler(enabled = modalSheetState.isVisible) {
+        coroutineScope.launch { modalSheetState.hide() }
+    }
+
     EventEffect(
         event = viewState.resultMessage,
         onConsumed = onResultMessageConsumed
     ) {
-        snackBarHostState.showSnackbar(context.resources.getString(it))
+        snackBarHostState.showSnackbar(context.resources.getString(it.first, *it.second))
     }
 
     EventEffect(
@@ -148,6 +169,18 @@ internal fun QRCodeView(
         showInviteContactResult = it
     }
 
+    EventEffect(
+        event = viewState.showCollision,
+        onConsumed = onShowCollisionConsumed,
+        action = onShowCollision
+    )
+
+    EventEffect(
+        event = viewState.uploadFile,
+        onConsumed = onUploadFileConsumed,
+        action = onUploadFile
+    )
+
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost = {
@@ -162,7 +195,22 @@ internal fun QRCodeView(
                 showMoreMenu = showMoreMenu,
                 onShowMoreClicked = { showMoreMenu = !showMoreMenu },
                 onMenuDismissed = { showMoreMenu = false },
-                onSave = onSaveQRCode,
+                onSave = {
+                    context.findActivity()?.let { activity ->
+                        qrCodeComposableBounds?.let { viewBounds ->
+                            handleSave(
+                                activity,
+                                view,
+                                viewBounds,
+                                viewState.myQRCodeState,
+                                coroutineScope,
+                                snackBarHostState,
+                            ) {
+                                coroutineScope.launch { modalSheetState.show() }
+                            }
+                        }
+                    }
+                },
                 onResetQRCode = onResetQRCode,
                 onDeleteQRCode = onDeleteQRCode,
                 onBackPressed = onBackPressed,
@@ -336,6 +384,13 @@ internal fun QRCodeView(
                 }
             }
         }
+
+        QRCodeSaveBottomSheetView(
+            modalSheetState = modalSheetState,
+            coroutineScope = coroutineScope,
+            onCloudDriveClicked = onCloudDriveClicked,
+            onFileSystemClicked = onFileSystemClicked
+        )
     }
 }
 
@@ -437,6 +492,28 @@ private fun InviteContactDialog(
                     )
                 }
             }
+        }
+    }
+}
+
+private fun handleSave(
+    activity: Activity,
+    view: View,
+    viewBounds: Rect,
+    myQRCodeState: MyCodeUIState,
+    coroutineScope: CoroutineScope,
+    snackBarHostState: SnackbarHostState,
+    onSaveQRCode: () -> Unit,
+) {
+    coroutineScope.launch {
+        (myQRCodeState as? MyCodeUIState.QRCodeAvailable)?.qrCodeFilePath?.let { qrFilePath ->
+            runCatching {
+                val bitmap = captureViewToBitmap(view, activity.window, viewBounds)
+                bitmap?.let {
+                    saveBitmap(bitmap, qrFilePath)
+                    onSaveQRCode()
+                } ?: snackBarHostState.showSnackbar(activity.getString(R.string.general_text_error))
+            }.onFailure { snackBarHostState.showSnackbar(activity.getString(R.string.general_text_error)) }
         }
     }
 }
@@ -572,7 +649,6 @@ private fun PreviewQRCodeView() {
             onBackPressed = { },
             onDeleteQRCode = { },
             onResetQRCode = { },
-            onSaveQRCode = { },
             onScanQrCodeClicked = { },
             onCopyLinkClicked = { },
             onViewContactClicked = { },
@@ -581,7 +657,13 @@ private fun PreviewQRCodeView() {
             onScannedContactLinkResultConsumed = { },
             onInviteContactResultConsumed = { },
             onInviteResultDialogDismiss = { },
-            onInviteContactDialogDismiss = { }
+            onInviteContactDialogDismiss = { },
+            onCloudDriveClicked = { },
+            onFileSystemClicked = { },
+            onShowCollision = { },
+            onShowCollisionConsumed = { },
+            onUploadFile = { },
+            onUploadFileConsumed = { }
         ) { _, _, _, _, _ ->
             Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
         }

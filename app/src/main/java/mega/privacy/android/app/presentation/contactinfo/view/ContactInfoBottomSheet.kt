@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.core.ui.controls.sheets.MenuActionBottomSheet
+import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 
 /**
  * Contact info bottom sheet
@@ -28,7 +28,7 @@ internal fun ContactInfoBottomSheet(
     updateNickName: (String?) -> Unit,
     updateNickNameDialogVisibility: (Boolean) -> Unit
 ) {
-    MenuActionBottomSheet(
+    BottomSheet(
         modalSheetState = modalSheetState,
         sheetHeader = { MenuActionHeader(text = stringResource(id = R.string.nickname_title)) },
         sheetBody = {

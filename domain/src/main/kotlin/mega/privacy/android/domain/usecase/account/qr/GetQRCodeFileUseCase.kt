@@ -24,7 +24,7 @@ class GetQRCodeFileUseCase @Inject constructor(
      */
     suspend operator fun invoke(): File? = withContext(ioDispatcher) {
         accountRepository.getAccountEmail()?.let { email ->
-            qrCodeRepository.getQRFile(email + QR_IMAGE_FILE_NAME)?.takeIf { it.exists() }
+            qrCodeRepository.getQRFile(email + QR_IMAGE_FILE_NAME)
         }
     }
 

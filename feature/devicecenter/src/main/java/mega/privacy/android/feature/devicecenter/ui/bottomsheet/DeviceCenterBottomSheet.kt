@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.lists.MenuActionNodeHeaderWithBody
-import mega.privacy.android.core.ui.controls.sheets.MenuActionBottomSheet
+import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -68,7 +68,7 @@ internal fun DeviceCenterBottomSheet(
     onShowInCloudDriveClicked: () -> Unit,
     onInfoClicked: () -> Unit,
 ) {
-    MenuActionBottomSheet(
+    BottomSheet(
         modifier = Modifier.testTag(BOTTOM_SHEET_CONTAINER),
         modalSheetState = modalSheetState,
         sheetHeader = {

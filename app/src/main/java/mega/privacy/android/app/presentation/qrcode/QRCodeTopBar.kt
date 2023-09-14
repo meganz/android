@@ -90,16 +90,28 @@ internal fun QRCodeTopBar(
                     expanded = showMoreMenu,
                     onDismissRequest = onMenuDismissed,
                 ) {
-                    DropdownMenuItem(onClick = onSave) {
+                    DropdownMenuItem(onClick = {
+                        onMenuDismissed()
+                        onSave()
+                    }) {
                         Text(text = stringResource(id = R.string.save_action))
                     }
-                    DropdownMenuItem(onClick = { onGotoSettings(context) }) {
+                    DropdownMenuItem(onClick = {
+                        onMenuDismissed()
+                        onGotoSettings(context)
+                    }) {
                         Text(text = stringResource(id = R.string.action_settings))
                     }
-                    DropdownMenuItem(onClick = onResetQRCode) {
+                    DropdownMenuItem(onClick = {
+                        onMenuDismissed()
+                        onResetQRCode()
+                    }) {
                         Text(text = stringResource(id = R.string.action_reset_qr))
                     }
-                    DropdownMenuItem(onClick = onDeleteQRCode) {
+                    DropdownMenuItem(onClick = {
+                        onMenuDismissed()
+                        onDeleteQRCode()
+                    }) {
                         Text(text = stringResource(id = R.string.action_delete_qr))
                     }
                 }

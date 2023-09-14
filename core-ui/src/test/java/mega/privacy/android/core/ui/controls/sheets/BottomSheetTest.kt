@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 
 @OptIn(ExperimentalMaterialApi::class)
 @RunWith(AndroidJUnit4::class)
-class MenuActionBottomSheetTest {
+class BottomSheetTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -41,7 +41,7 @@ class MenuActionBottomSheetTest {
         )
         composeTestRule.setContent {
             val coroutineScope = rememberCoroutineScope()
-            MenuActionBottomSheet(
+            BottomSheet(
                 modalSheetState = sheetState,
                 sheetHeader = { Text(text = "sample") },
                 sheetBody = {
@@ -81,7 +81,7 @@ class MenuActionBottomSheetTest {
         )
         composeTestRule.setContent {
             val coroutineScope = rememberCoroutineScope()
-            MenuActionBottomSheet(
+            BottomSheet(
                 modalSheetState = sheetState,
                 sheetHeader = { Text(text = "sample") },
                 sheetBody = {

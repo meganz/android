@@ -41,7 +41,6 @@ class QRCodeViewTest {
                 onBackPressed = { },
                 onDeleteQRCode = { },
                 onResetQRCode = { },
-                onSaveQRCode = { },
                 onScanQrCodeClicked = { },
                 onCopyLinkClicked = { },
                 onViewContactClicked = { },
@@ -51,6 +50,12 @@ class QRCodeViewTest {
                 onInviteContactResultConsumed = { },
                 onInviteResultDialogDismiss = { },
                 onInviteContactDialogDismiss = { },
+                onCloudDriveClicked = { },
+                onFileSystemClicked = { },
+                onShowCollision = { },
+                onShowCollisionConsumed = { },
+                onUploadFile = { },
+                onUploadFileConsumed = { },
                 qrCodeMapper = qrCodeMapper
             )
         }

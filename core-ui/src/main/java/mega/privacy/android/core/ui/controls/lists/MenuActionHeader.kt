@@ -30,7 +30,7 @@ fun MenuActionHeader(
 ) {
     Box(
         modifier = modifier
-            .height(56.dp)
+            .height(48.dp)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart
     ) {

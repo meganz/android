@@ -15,25 +15,31 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
+import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.QRCodeViewModel
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
+import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -65,12 +71,17 @@ class QRCodeViewModelTest {
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
-    private val saveBitmapToFileMapper: SaveBitmapToFileMapper = mock()
     private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
     private val inviteContactUseCase = mock<InviteContactUseCase>()
     private val avatarContentMapper = mock<AvatarContentMapper>()
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
     private val scannerHandler = mock<ScannerHandler>()
+    private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
+    private val doesPathHaveSufficientSpaceUseCase = mock<DoesPathHaveSufficientSpaceUseCase>()
+    private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
+    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
+    private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -88,14 +99,19 @@ class QRCodeViewModelTest {
             deleteQRCodeUseCase = deleteQRCodeUseCase,
             resetContactLinkUseCase = resetContactLinkUseCase,
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
-            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             getUserFullNameUseCase = getUserFullNameUseCase,
-            saveBitmapToFile = saveBitmapToFileMapper,
-            inviteContactUseCase = inviteContactUseCase,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             queryScannedContactLinkUseCase = queryScannedContactLinkUseCase,
+            inviteContactUseCase = inviteContactUseCase,
             avatarContentMapper = avatarContentMapper,
             myQRCodeTextErrorMapper = myQRCodeTextErrorMapper,
-            scannerHandler = scannerHandler
+            scannerHandler = scannerHandler,
+            getCurrentUserEmail = getCurrentUserEmail,
+            doesPathHaveSufficientSpaceUseCase = doesPathHaveSufficientSpaceUseCase,
+            scanMediaFileUseCase = scanMediaFileUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            checkNameCollisionUseCase = checkNameCollisionUseCase
         )
     }
 
@@ -110,14 +126,13 @@ class QRCodeViewModelTest {
             val initialState = awaitItem()
             with(initialState) {
                 assertThat(myQRCodeState).isEqualTo(MyCodeUIState.Idle)
-                assertThat(contactLink).isNull()
-                assertThat(qrCodeBitmap).isNull()
-                assertThat(isInProgress).isFalse()
-                assertThat(localQRCodeFile).isNull()
-                assertThat(hasQRCodeBeenDeleted).isFalse()
-                assertThat(resultMessage).isInstanceOf(consumed<Int>().javaClass)
+                assertThat(resultMessage).isInstanceOf(consumed<Pair<Int, Array<Any>>>().javaClass)
                 assertThat(inviteContactResult).isInstanceOf(consumed<InviteContactRequest>().javaClass)
                 assertThat(scannedContactLinkResult).isInstanceOf(consumed<ScannedContactLinkResult>().javaClass)
+                assertThat(uploadFile).isInstanceOf(consumed<Pair<File, Long>>().javaClass)
+                assertThat(showCollision).isInstanceOf(consumed<NameCollision>().javaClass)
+                assertThat(scannedContactEmail).isNull()
+                assertThat(scannedContactAvatarContent).isNull()
             }
         }
     }

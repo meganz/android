@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -38,7 +39,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 
 /**
- * ActionMenuBottomSheet
+ * BottomSheet
  *
  * @param modalSheetState state of [ModalBottomSheetLayout]
  * @param sheetHeader header composable for the bottom sheet
@@ -49,13 +50,43 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MenuActionBottomSheet(
+fun BottomSheet(
     modalSheetState: ModalBottomSheetState,
+    sheetHeader: @Composable () -> Unit,
+    sheetBody: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     headerDividerPadding: Dp = 16.dp,
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
-    sheetHeader: @Composable () -> Unit,
+    content: (@Composable () -> Unit)? = null,
+) {
+    BottomSheet(
+        modalSheetState = modalSheetState,
+        sheetBody = {
+            sheetHeader()
+            Divider(Modifier.padding(start = headerDividerPadding))
+            sheetBody()
+        },
+        modifier = modifier,
+        scrimColor = scrimColor,
+        content = content
+    )
+}
+
+/**
+ * BottomSheet
+ *
+ * @param modalSheetState state of [ModalBottomSheetLayout]
+ * @param content scaffold/layout in which bottom sheet is shown
+ * @param sheetBody list of composable which will be included in sheet content below sheet header
+ * @param scrimColor when bottom sheet displayed this color will overlay on background content
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun BottomSheet(
+    modalSheetState: ModalBottomSheetState,
     sheetBody: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    scrimColor: Color = Color.Black.copy(alpha = 0.5f),
     content: (@Composable () -> Unit)? = null,
 ) {
     val roundedCornerRadius = remember {
@@ -66,14 +97,10 @@ fun MenuActionBottomSheet(
     val navigationBarHeight = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
     ModalBottomSheetLayout(
         modifier = modifier.padding(bottom = navigationBarHeight),
-        sheetShape = MaterialTheme.shapes.medium,
+        sheetShape = RoundedCornerShape(roundedCornerRadius.value),
         sheetState = modalSheetState,
         scrimColor = scrimColor,
-        sheetContent = {
-            sheetHeader()
-            Divider(Modifier.padding(start = headerDividerPadding))
-            sheetBody()
-        },
+        sheetContent = { sheetBody() },
     ) {
         content?.invoke()
     }
@@ -82,14 +109,14 @@ fun MenuActionBottomSheet(
 @OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
-private fun MenuActionBottomSheetPreview() {
+private fun BottomSheetPreview() {
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.HalfExpanded,
         skipHalfExpanded = false,
     )
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MenuActionBottomSheet(
+        BottomSheet(
             modalSheetState = modalSheetState,
             sheetHeader = {
                 MenuActionHeader(text = "Header")
