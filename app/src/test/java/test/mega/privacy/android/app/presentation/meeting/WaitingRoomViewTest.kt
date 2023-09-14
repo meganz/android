@@ -49,26 +49,6 @@ class WaitingRoomViewTest {
     }
 
     @Test
-    fun `test that leave dialog is shown when close button is clicked`() {
-        composeTestRule.setContent {
-            WaitingRoomView(
-                state = WaitingRoomState(),
-                onInfoClicked = {},
-                onCloseClicked = {},
-                onMicToggleChange = {},
-                onCameraToggleChange = {},
-                onSpeakerToggleChange = {},
-                onGuestNameChange = { _, _ -> },
-                videoStream = emptyFlow()
-            )
-        }
-
-        composeTestRule.onNodeWithTag("waiting_room:button_close").performClick()
-
-        composeTestRule.onNodeWithTag("waiting_room:dialog_leave").assertIsDisplayed()
-    }
-
-    @Test
     fun `test that onMicToggleChange is called when mic button is toggled`() {
         val onMicToggleChange: (Boolean) -> Unit = mock()
 
@@ -164,28 +144,6 @@ class WaitingRoomViewTest {
         }
 
         composeTestRule.onNodeWithTag("waiting_room:dialog_inactive_host").assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that guest name input fields are visible when isGuestMode is true`() {
-        composeTestRule.setContent {
-            WaitingRoomView(
-                state = WaitingRoomState(
-                    chatLink = "chatLink",
-                    guestFirstName = null,
-                    guestLastName = null
-                ),
-                onInfoClicked = {},
-                onCloseClicked = {},
-                onMicToggleChange = {},
-                onCameraToggleChange = {},
-                onSpeakerToggleChange = {},
-                onGuestNameChange = { _, _ -> },
-                videoStream = emptyFlow()
-            )
-        }
-
-        composeTestRule.onNodeWithTag("waiting_room:guest_name_inputs").assertIsDisplayed()
     }
 
     @Test

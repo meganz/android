@@ -7,8 +7,9 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
  * Data class defining the state of [RecurringMeetingInfoViewModel]
  *
  * @property chatId                     Chat id.
- * @property chatLink                   Chat link.
  * @property schedId                    Scheduled meeting id.
+ * @property chatLink                   Chat link.
+ * @property guestMode                  Flag to check if it's guest mode.
  * @property callStarted                Flag to check if the meeting call has started.
  * @property title                      Scheduled meeting title.
  * @property formattedTimestamp         Scheduled meeting timestamp formatted.
@@ -21,12 +22,13 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
  * @property denyAccessDialog           Flag to show Guest Leave Dialog
  * @property inactiveHostDialog         Flag to show Inactive Host Dialog
  * @property joinCall                   Flag to open the screen and join the call.
- * @property finish                     True, if the activity is to be terminated.
+ * @property finish                     Flag to finish current screen.
  **/
 data class WaitingRoomState(
     val chatId: Long = -1L,
     val schedId: Long = -1L,
     val chatLink: String? = null,
+    val guestMode: Boolean = false,
     val callStarted: Boolean = false,
     val title: String? = null,
     val formattedTimestamp: String? = null,
@@ -40,13 +42,4 @@ data class WaitingRoomState(
     val inactiveHostDialog: Boolean = false,
     val joinCall: Boolean = false,
     val finish: Boolean = false,
-) {
-
-    /**
-     * Check if Waiting Room is in guest mode
-     *
-     * @return  true if it's guest mode, false otherwise
-     */
-    fun isGuestMode(): Boolean =
-        !chatLink.isNullOrBlank() && guestFirstName.isNullOrBlank() && guestLastName.isNullOrBlank()
-}
+)

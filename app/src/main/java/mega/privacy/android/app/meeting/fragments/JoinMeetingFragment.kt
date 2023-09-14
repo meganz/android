@@ -36,11 +36,13 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
                 findNavController().navigate(
                     JoinMeetingFragmentDirections
                         .actionGlobalInMeeting(
-                            MEETING_ACTION_REJOIN,
-                            chatId,
+                            action = MEETING_ACTION_REJOIN,
+                            chatId = chatId,
                             publicChatHandle = publicChatHandle,
-                            meetingName,
-                            meetingLink
+                            meetingName = meetingName,
+                            meetingLink = meetingLink,
+                            firstName = guestFisrtName,
+                            lastName = guestLastName,
                         )
                 )
             } else {
@@ -48,11 +50,13 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
                 findNavController().navigate(
                     JoinMeetingFragmentDirections
                         .actionGlobalInMeeting(
-                            MEETING_ACTION_JOIN,
-                            chatId,
+                            action = MEETING_ACTION_JOIN,
+                            chatId = chatId,
                             publicChatHandle = publicChatHandle,
-                            meetingName,
-                            meetingLink
+                            meetingName = meetingName,
+                            meetingLink = meetingLink,
+                            firstName = guestFisrtName,
+                            lastName = guestLastName,
                         )
                 )
             }

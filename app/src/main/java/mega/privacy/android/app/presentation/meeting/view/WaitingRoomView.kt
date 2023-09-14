@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
 import android.util.Size
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -29,18 +29,22 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
@@ -50,8 +54,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
-import androidx.constraintlayout.compose.Visibility
+import androidx.constraintlayout.compose.layoutId
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
@@ -89,8 +96,8 @@ internal fun WaitingRoomView(
     videoStream: Flow<Pair<Size, ByteArray>>,
 ) {
     val isLandscape = LocalConfiguration.current.landscape
+    val focusRequester = remember { FocusRequester() }
     var showLeaveDialog by rememberSaveable { mutableStateOf(false) }
-    var showGuestUi by rememberSaveable { mutableStateOf(state.isGuestMode()) }
     var firstName by rememberSaveable { mutableStateOf(state.guestFirstName ?: "") }
     var lastName by rememberSaveable { mutableStateOf(state.guestLastName ?: "") }
 
@@ -106,30 +113,19 @@ internal fun WaitingRoomView(
         }
     ) { paddingValues ->
         ConstraintLayout(
+            constraintSet = createWaitingRoomConstraintSet(isLandscape, state.guestMode),
+            animateChanges = true,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState(), false)
         ) {
-            val (closeButton, infoButton, titleText, timestampText, alertText, videoPreview, guestBackground, guestInputs, controls, joinButton) = createRefs()
-            val topGuideline = createGuidelineFromTop(if (isLandscape) 0.06f else 0.08f)
-            val videoStartGuideline = createGuidelineFromStart(if (isLandscape) 0.29f else 0.16f)
-            val videoEndGuideline = createGuidelineFromEnd(if (isLandscape) 0.29f else 0.16f)
-            val guestGuideline = if (isLandscape) {
-                timestampText.bottom
-            } else {
-                createGuidelineFromBottom(0.4f)
-            }
-
             IconButton(
                 onClick = { showLeaveDialog = true },
                 modifier = Modifier
+                    .layoutId("closeButton")
                     .testTag("waiting_room:button_close")
-                    .constrainAs(closeButton) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                    }
             ) {
                 Icon(
                     modifier = Modifier.size(24.dp),
@@ -142,11 +138,8 @@ internal fun WaitingRoomView(
             IconButton(
                 onClick = onInfoClicked,
                 modifier = Modifier
+                    .layoutId("infoButton")
                     .testTag("waiting_room:button_info")
-                    .constrainAs(infoButton) {
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.end)
-                    }
             ) {
                 Icon(
                     modifier = Modifier.size(24.dp),
@@ -164,11 +157,8 @@ internal fun WaitingRoomView(
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
+                    .layoutId("titleText")
                     .testTag("waiting_room:text_title")
-                    .constrainAs(titleText) {
-                        top.linkTo(topGuideline)
-                        linkTo(parent.start, parent.end)
-                    }
                     .placeholder(
                         color = MaterialTheme.colors.grey_020_grey_900,
                         shape = RoundedCornerShape(4.dp),
@@ -185,11 +175,8 @@ internal fun WaitingRoomView(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
+                    .layoutId("timestampText")
                     .testTag("waiting_room:text_timestamp")
-                    .constrainAs(timestampText) {
-                        top.linkTo(titleText.bottom, 2.dp)
-                        linkTo(parent.start, parent.end)
-                    }
                     .placeholder(
                         color = MaterialTheme.colors.grey_020_grey_900,
                         shape = RoundedCornerShape(4.dp),
@@ -206,14 +193,7 @@ internal fun WaitingRoomView(
                 ),
                 modifier = Modifier
                     .testTag("waiting_room:text_alert")
-                    .constrainAs(alertText) {
-                        top.linkTo(timestampText.bottom, 24.dp)
-                        linkTo(parent.start, parent.end)
-                        visibility = if (showGuestUi)
-                            Visibility.Invisible
-                        else
-                            Visibility.Visible
-                    }
+                    .layoutId("alertText")
             ) {
                 Text(
                     text = stringResource(
@@ -227,20 +207,11 @@ internal fun WaitingRoomView(
                 )
             }
 
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(color = grey_900)
-                .constrainAs(videoPreview) {
-                    top.linkTo(alertText.bottom, 24.dp)
-                    linkTo(videoStartGuideline, videoEndGuideline)
-                    width = Dimension.fillToConstraints
-                    if (isLandscape) {
-                        height = Dimension.fillToConstraints
-                        bottom.linkTo(parent.bottom)
-                    } else {
-                        height = Dimension.ratio("55:83")
-                    }
-                }
+            Box(
+                modifier = Modifier
+                    .layoutId("videoPreview")
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(color = grey_900)
             ) {
                 if (state.cameraEnabled) {
                     MegaVideoTextureView(
@@ -250,27 +221,34 @@ internal fun WaitingRoomView(
                         videoStream = videoStream,
                     )
                 } else {
-                    ChatAvatarView(
+                    Box(
                         modifier = Modifier
                             .size(88.dp)
                             .align(Alignment.Center)
-                            .testTag("waiting_room:image_avatar"),
-                        avatars = state.avatar?.let(::listOf)
-                    )
+                            .testTag("waiting_room:image_avatar")
+                    ) {
+                        if (state.avatar != null) {
+                            ChatAvatarView(
+                                modifier = Modifier.fillMaxSize(),
+                                avatars = listOf(state.avatar)
+                            )
+                        } else {
+                            Image(
+                                modifier = Modifier.fillMaxSize(),
+                                contentDescription = "Guest avatar",
+                                painter = painterResource(R.drawable.ic_guest_avatar),
+                            )
+                        }
+                    }
                 }
             }
 
-            if (showGuestUi) {
-                Box(modifier = Modifier
-                    .background(MaterialTheme.colors.surface)
-                    .testTag("waiting_room:guest_background")
-                    .constrainAs(guestBackground) {
-                        top.linkTo(guestGuideline)
-                        bottom.linkTo(parent.bottom)
-                        linkTo(parent.start, parent.end)
-                        width = Dimension.fillToConstraints
-                        height = Dimension.fillToConstraints
-                    }
+            if (state.guestMode) {
+                Box(
+                    modifier = Modifier
+                        .layoutId("guestBackground")
+                        .background(MaterialTheme.colors.surface)
+                        .testTag("waiting_room:guest_background")
                 )
 
                 GuestNameInputText(
@@ -279,12 +257,9 @@ internal fun WaitingRoomView(
                     onFirstNameChange = { firstName = it },
                     onLastNameChange = { lastName = it },
                     modifier = Modifier
+                        .layoutId("guestInputs")
                         .testTag("waiting_room:guest_name_inputs")
-                        .constrainAs(guestInputs) {
-                            top.linkTo(guestBackground.top, 8.dp)
-                            linkTo(videoStartGuideline, videoEndGuideline)
-                            width = Dimension.fillToConstraints
-                        },
+                        .focusRequester(focusRequester)
                 )
             }
 
@@ -296,76 +271,74 @@ internal fun WaitingRoomView(
                 onCameraToggleChange = onCameraToggleChange,
                 onSpeakerToggleChange = onSpeakerToggleChange,
                 modifier = Modifier
+                    .layoutId("controls")
                     .testTag("waiting_room:toggle_controls")
-                    .constrainAs(controls) {
-                        if (showGuestUi) {
-                            top.linkTo(guestInputs.bottom, 25.dp)
-                        } else if (isLandscape) {
-                            bottom.linkTo(parent.bottom, 12.dp)
-                        } else {
-                            top.linkTo(videoPreview.bottom, 65.dp)
-                        }
-                        linkTo(videoStartGuideline, videoEndGuideline)
-                        width = Dimension.fillToConstraints
-                    }
             )
 
-            if (showGuestUi) {
+            if (state.guestMode) {
                 RaisedDefaultMegaButton(
                     textId = R.string.action_join,
                     enabled = firstName.isNotBlank() && lastName.isNotBlank(),
-                    onClick = {
-                        onGuestNameChange(firstName, lastName)
-                        showGuestUi = false
-                    },
+                    onClick = { onGuestNameChange(firstName, lastName) },
                     modifier = Modifier
+                        .layoutId("joinButton")
                         .testTag("waiting_room:button_join")
-                        .constrainAs(joinButton) {
-                            top.linkTo(controls.bottom, if (isLandscape) 30.dp else 40.dp)
-                            linkTo(videoStartGuideline, videoEndGuideline)
-                            width = Dimension.fillToConstraints
-                        }
                 )
             }
         }
     }
 
+    LaunchedEffect(state.guestMode) {
+        if (state.guestMode) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    BackHandler { onCloseClicked() }
+
     when {
-        showLeaveDialog -> MegaAlertDialog(
-            modifier = Modifier.testTag("waiting_room:dialog_leave"),
-            text = stringResource(R.string.meetings_leave_meeting_confirmation_dialog_title),
-            confirmButtonText = stringResource(R.string.general_leave),
-            cancelButtonText = stringResource(R.string.meetings__waiting_room_leave_meeting_dialog_cancel_button),
-            onConfirm = onCloseClicked,
-            onDismiss = { showLeaveDialog = false },
-        )
+        showLeaveDialog -> AndroidTheme(true) {
+            MegaAlertDialog(
+                modifier = Modifier.testTag("waiting_room:dialog_leave"),
+                text = stringResource(R.string.meetings_leave_meeting_confirmation_dialog_title),
+                confirmButtonText = stringResource(R.string.general_leave),
+                cancelButtonText = stringResource(R.string.meetings__waiting_room_leave_meeting_dialog_cancel_button),
+                onConfirm = onCloseClicked,
+                onDismiss = { showLeaveDialog = false },
+            )
+        }
 
-        state.denyAccessDialog -> MegaAlertDialog(
-            modifier = Modifier.testTag("waiting_room:dialog_deny_access"),
-            title = stringResource(R.string.meetings_waiting_room_deny_user_dialog_title),
-            text = stringResource(R.string.meetings_waiting_room_deny_user_dialog_description),
-            confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
-            cancelButtonText = null,
-            onConfirm = onCloseClicked,
-            onDismiss = {},
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false,
-        )
+        state.denyAccessDialog -> AndroidTheme(true) {
+            MegaAlertDialog(
+                modifier = Modifier.testTag("waiting_room:dialog_deny_access"),
+                title = stringResource(R.string.meetings_waiting_room_deny_user_dialog_title),
+                text = stringResource(R.string.meetings_waiting_room_deny_user_dialog_description),
+                confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
+                cancelButtonText = null,
+                onConfirm = onCloseClicked,
+                onDismiss = {},
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+            )
+        }
 
-        state.inactiveHostDialog -> MegaAlertDialog(
-            modifier = Modifier.testTag("waiting_room:dialog_inactive_host"),
-            title = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_title),
-            text = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_description),
-            confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
-            cancelButtonText = null,
-            onConfirm = onCloseClicked,
-            onDismiss = {},
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false,
-        )
+        state.inactiveHostDialog -> AndroidTheme(true) {
+            MegaAlertDialog(
+                modifier = Modifier.testTag("waiting_room:dialog_inactive_host"),
+                title = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_title),
+                text = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_description),
+                confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
+                cancelButtonText = null,
+                onConfirm = onCloseClicked,
+                onDismiss = {},
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun ToggleControlsRow(
     micEnabled: Boolean,
@@ -376,18 +349,26 @@ private fun ToggleControlsRow(
     onSpeakerToggleChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
+    val micPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+
     Row(modifier = modifier.fillMaxWidth()) {
         ToggleMegaButton(
             modifier = Modifier
                 .weight(1f)
                 .testTag("waiting_room:button_mic"),
             checked = micEnabled,
-            enabled = context.hasMicrophonePermissions(),
+            enabled = !micPermissionState.status.shouldShowRationale,
             title = stringResource(R.string.general_mic),
             enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_mic_on,
             disabledIcon = mega.privacy.android.core.R.drawable.ic_universal_mic_off,
-            onCheckedChange = onMicToggleChange,
+            onCheckedChange = { enabled ->
+                if (micPermissionState.status.isGranted) {
+                    onMicToggleChange(enabled)
+                } else {
+                    micPermissionState.launchPermissionRequest()
+                }
+            },
         )
 
         ToggleMegaButton(
@@ -395,11 +376,17 @@ private fun ToggleControlsRow(
                 .weight(1f)
                 .testTag("waiting_room:button_camera"),
             checked = cameraEnabled,
-            enabled = context.hasCameraPermissions(),
+            enabled = !cameraPermissionState.status.shouldShowRationale,
             title = stringResource(R.string.general_camera),
             enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_video_on,
             disabledIcon = mega.privacy.android.core.R.drawable.ic_universal_video_off,
-            onCheckedChange = onCameraToggleChange,
+            onCheckedChange = { enabled ->
+                if (cameraPermissionState.status.isGranted) {
+                    onCameraToggleChange(enabled)
+                } else {
+                    cameraPermissionState.launchPermissionRequest()
+                }
+            },
         )
 
         ToggleMegaButton(
@@ -451,12 +438,6 @@ private fun GuestNameInputText(
         )
     }
 }
-
-private fun Context.hasCameraPermissions(): Boolean =
-    checkSelfPermission(Manifest.permission.CAMERA) == PERMISSION_GRANTED
-
-private fun Context.hasMicrophonePermissions(): Boolean =
-    checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(

@@ -8309,6 +8309,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val isFromOpenChatPreview: Boolean = request.flag
         val type: Int = request.paramType
         val link: String = request.link
+        val waitingRoom = MegaChatApi.hasChatOptionEnabled(MegaChatApi.CHAT_OPTION_WAITING_ROOM, request.privilege)
         if (joiningToChatLink && TextUtil.isTextEmpty(link) && chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
@@ -8326,7 +8327,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.e("Invalid link")
                 return
             }
-            if (CallUtil.isMeetingEnded(request.megaHandleList)) {
+            if (CallUtil.isMeetingEnded(request)) {
                 Timber.d("It's a meeting, open dialog: Meeting has ended")
                 MeetingHasEndedDialogFragment(object : MeetingHasEndedDialogFragment.ClickCallback {
                     override fun onViewMeetingChat() {
@@ -8349,7 +8350,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     request.text,
                     alreadyExist,
                     request.userHandle,
-                    passcodeManagement
+                    passcodeManagement,
+                    waitingRoom
                 )
             }
         } else {

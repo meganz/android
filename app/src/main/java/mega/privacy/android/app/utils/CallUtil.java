@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.view.View.GONE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_GUEST;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
@@ -44,6 +43,7 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermi
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_WAITING_ROOM;
 
 import android.Manifest;
 import android.app.Activity;
@@ -73,6 +73,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
 import mega.privacy.android.app.presentation.openlink.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
@@ -95,6 +96,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
@@ -112,21 +114,29 @@ public class CallUtil {
      * @param link               Meeting's link
      * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link, long publicChatHandle, boolean isRejoin, PasscodeManagement passcodeManagement) {
+    public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link, long publicChatHandle, boolean isRejoin, PasscodeManagement passcodeManagement, boolean isWaitingRoom) {
         Timber.d("Open join a meeting screen:: chatId = %s", chatId);
         passcodeManagement.setShowPasscodeScreen(true);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
-        Intent meetingIntent = new Intent(context, MeetingActivity.class);
-        if (isRejoin) {
-            meetingIntent.setAction(MEETING_ACTION_JOIN);
-            meetingIntent.putExtra(MEETING_PUBLIC_CHAT_HANDLE, publicChatHandle);
+        Intent intent;
+        if (isWaitingRoom) {
+            intent = new Intent(context, WaitingRoomActivity.class);
+            intent.putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, chatId);
+            intent.putExtra(WaitingRoomActivity.EXTRA_CHAT_LINK, link);
         } else {
-            meetingIntent.setAction(MEETING_ACTION_JOIN);
+            intent = new Intent(context, MeetingActivity.class);
+            if (isRejoin) {
+                intent.setAction(MEETING_ACTION_JOIN);
+                intent.putExtra(MEETING_PUBLIC_CHAT_HANDLE, publicChatHandle);
+            } else {
+                intent.setAction(MEETING_ACTION_JOIN);
+            }
+            intent.putExtra(MEETING_CHAT_ID, chatId);
+            intent.putExtra(MEETING_NAME, meetingName);
+            intent.setData(Uri.parse(link));
         }
-        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
-        meetingIntent.putExtra(MEETING_NAME, meetingName);
-        meetingIntent.setData(Uri.parse(link));
-        context.startActivity(meetingIntent);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     /**
@@ -222,19 +232,27 @@ public class CallUtil {
      * @param link               Meeting's link
      * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link, PasscodeManagement passcodeManagement, MegaChatRequestHandler chatRequestHandler) {
+    public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link, PasscodeManagement passcodeManagement, MegaChatRequestHandler chatRequestHandler, boolean isWaitingRoom) {
         Timber.d("Open meeting in guest mode. Chat id is %s", chatId);
         passcodeManagement.setShowPasscodeScreen(true);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         chatRequestHandler.setIsLoggingRunning(true);
-        Intent intent = new Intent(context, MeetingActivity.class);
-        intent.setAction(MEETING_ACTION_GUEST);
-        if (!isTextEmpty(meetingName)) {
-            intent.putExtra(MEETING_NAME, meetingName);
+        Intent intent;
+        if (isWaitingRoom) {
+            intent = new Intent(context, WaitingRoomActivity.class);
+            intent.putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, chatId);
+            intent.putExtra(WaitingRoomActivity.EXTRA_CHAT_LINK, link);
+        } else {
+            intent = new Intent(context, MeetingActivity.class);
+            intent.setAction(MEETING_ACTION_GUEST);
+            if (!isTextEmpty(meetingName)) {
+                intent.putExtra(MEETING_NAME, meetingName);
+            }
+            intent.putExtra(MEETING_CHAT_ID, chatId);
+            intent.putExtra(MEETING_IS_GUEST, true);
+            intent.setData(Uri.parse(link));
         }
-        intent.putExtra(MEETING_CHAT_ID, chatId);
-        intent.putExtra(MEETING_IS_GUEST, true);
-        intent.setData(Uri.parse(link));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
@@ -1243,11 +1261,15 @@ public class CallUtil {
     /**
      * Method to know if a meeting has ended
      *
-     * @param list MegaHandleList with the call ID
+     * @param chatRequest [MegaChatRequest]
      * @return True, if the meeting is finished. False, if not.
      */
-    public static boolean isMeetingEnded(MegaHandleList list) {
-        return list == null || list.get(0) == MEGACHAT_INVALID_HANDLE;
+    public static boolean isMeetingEnded(MegaChatRequest chatRequest) {
+        return !MegaChatApi.hasChatOptionEnabled(
+                MegaChatApi.CHAT_OPTION_WAITING_ROOM,
+                chatRequest.getPrivilege()
+        ) && (chatRequest.getMegaHandleList() == null
+                || chatRequest.getMegaHandleList().get(0) == MEGACHAT_INVALID_HANDLE);
     }
 
     /**
@@ -1285,7 +1307,7 @@ public class CallUtil {
      * @param titleChat             The title of the chat
      * @param passcodeManagement    To disable passcode.
      */
-    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat, boolean alreadyExist, long publicChatHandle, PasscodeManagement passcodeManagement) {
+    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat, boolean alreadyExist, long publicChatHandle, PasscodeManagement passcodeManagement, boolean isWaitingRoom) {
         if (amIParticipatingInThisMeeting(chatId)) {
             Timber.d("I am participating in the meeting of this meeting link");
             returnCall(context, chatId, passcodeManagement);
@@ -1300,9 +1322,9 @@ public class CallUtil {
 
         if (isFromOpenChatPreview) {
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-            if (call == null || call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
+            if (call == null || call.getStatus() == CALL_STATUS_USER_NO_PRESENT || call.getStatus() == CALL_STATUS_WAITING_ROOM) {
                 Timber.d("Call id: %d. It's a meeting, open to join", list.get(0));
-                CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist, passcodeManagement);
+                CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist, passcodeManagement, isWaitingRoom);
             } else {
                 Timber.d("Call id: %d. Return to call", list.get(0));
                 returnCall(context, chatId, passcodeManagement);

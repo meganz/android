@@ -78,6 +78,7 @@ dependencies {
     implementation(androidx.appcompat)
     implementation(google.material)
     implementation(google.accompanist.systemui)
+    implementation(google.accompanist.permissions)
     implementation(androidx.compose.activity)
     implementation(androidx.lifecycle.runtime)
     implementation(androidx.lifecycle.runtime.compose)

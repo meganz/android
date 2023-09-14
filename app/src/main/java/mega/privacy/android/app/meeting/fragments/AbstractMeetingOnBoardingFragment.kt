@@ -55,6 +55,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     protected var publicChatHandle: Long = MEGACHAT_INVALID_HANDLE
 
     protected var meetingLink = ""
+    protected var guestFisrtName = ""
+    protected var guestLastName = ""
 
     var mRootViewHeight: Int = 0
     protected var toast: Toast? = null
@@ -137,6 +139,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
             args.getLong(MeetingActivity.MEETING_PUBLIC_CHAT_HANDLE).let {
                 publicChatHandle = it
+            }
+            args.getString(MeetingActivity.MEETING_GUEST_FIRST_NAME)?.let {
+                guestFisrtName = it
+            }
+            args.getString(MeetingActivity.MEETING_GUEST_LAST_NAME)?.let {
+                guestLastName = it
             }
         }
     }

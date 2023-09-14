@@ -722,7 +722,7 @@
         <activity
             android:name="mega.privacy.android.app.presentation.meeting.WaitingRoomActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="stateHidden|adjustResize"/>
+            android:windowSoftInputMode="adjustResize"/>
 
         <activity android:name=".presentation.contactinfo.ComposeContactInfoActivity" />
 

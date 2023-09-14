@@ -76,6 +76,8 @@ class MeetingActivity : BaseActivity() {
         const val MEETING_AUDIO_ENABLE = "audio_enable"
         const val MEETING_VIDEO_ENABLE = "video_enable"
         const val MEETING_IS_GUEST = "is_guest"
+        const val MEETING_GUEST_FIRST_NAME = "guest_first_name"
+        const val MEETING_GUEST_LAST_NAME = "guest_last_name"
         const val CALL_ACTION = "call_action"
 
         fun getIntentOngoingCall(context: Context, chatId: Long): Intent {
@@ -415,6 +417,14 @@ class MeetingActivity : BaseActivity() {
         if (meetingAction == MEETING_ACTION_GUEST || meetingAction == MEETING_ACTION_JOIN) {
             bundle.putString(MEETING_LINK, intent.dataString)
             bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
+            bundle.putString(
+                MEETING_GUEST_FIRST_NAME,
+                intent.getStringExtra(MEETING_GUEST_FIRST_NAME)
+            )
+            bundle.putString(
+                MEETING_GUEST_LAST_NAME,
+                intent.getStringExtra(MEETING_GUEST_LAST_NAME)
+            )
         }
 
         if (meetingAction == MEETING_ACTION_IN) {

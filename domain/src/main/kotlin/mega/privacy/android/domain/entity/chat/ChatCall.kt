@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.meeting.ChatWaitingRoom
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.TermCodeType
+import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
 import java.time.Instant
 
 /**
@@ -42,6 +43,7 @@ import java.time.Instant
  * @property hasLocalVideo
  * @property hasRequestSpeak
  * @property waitingRoom
+ * @property waitingRoomStatus
  */
 data class ChatCall(
     val callId: Long,
@@ -74,6 +76,7 @@ data class ChatCall(
     val hasLocalVideo: Boolean = false,
     val hasRequestSpeak: Boolean = false,
     val waitingRoom: ChatWaitingRoom? = null,
+    val waitingRoomStatus: WaitingRoomStatus? = null,
 ) {
 
     /**

@@ -543,16 +543,20 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      *
      * @param chatId chat ID
      * @param meetingName Meeting Name
+     * @param isWaitingRoom Flag to check if it's a Waiting Room
      */
-    private fun goToMeetingActivity(chatId: Long, meetingName: String) =
+    private fun goToMeetingActivity(chatId: Long, meetingName: String, isWaitingRoom: Boolean) {
         CallUtil.openMeetingGuestMode(
             this,
             meetingName,
             chatId,
             url,
             passcodeManagement,
-            chatRequestHandler
+            chatRequestHandler,
+            isWaitingRoom
         )
+        finish()
+    }
 
     /**
      * Check the url if requires transfer session, if yes open web link.
@@ -678,6 +682,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val isFromOpenChatPreview = request.flag
         val type = request.paramType
         val linkInvalid = TextUtil.isTextEmpty(request.link) && chatId == MEGACHAT_INVALID_HANDLE
+        val waitingRoom = MegaChatApi.hasChatOptionEnabled(MegaChatApi.CHAT_OPTION_WAITING_ROOM, request.privilege)
         Timber.d("Chat id: $chatId, type: $type, flag: $isFromOpenChatPreview")
 
         if (linkInvalid) {
@@ -694,7 +699,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 )
             } else {
                 when {
-                    CallUtil.isMeetingEnded(request.megaHandleList) -> {
+                    CallUtil.isMeetingEnded(request) -> {
                         Timber.d("Meeting has ended, open dialog")
                         MeetingHasEndedDialogFragment(
                             object : MeetingHasEndedDialogFragment.ClickCallback {
@@ -712,7 +717,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                     isFromOpenChatPreview -> {
                         Timber.d("Meeting is in progress, open join meeting")
-                        goToMeetingActivity(chatId, request.text)
+                        goToMeetingActivity(chatId, request.text, waitingRoom)
                     }
 
                     else -> {

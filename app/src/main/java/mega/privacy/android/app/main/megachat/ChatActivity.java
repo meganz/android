@@ -993,6 +993,7 @@ public class ChatActivity extends PasscodeActivity
         boolean isFromOpenChatPreview = request.getFlag();
         int type = request.getParamType();
         String link = request.getLink();
+        boolean waitingRoom = MegaChatApi.hasChatOptionEnabled(MegaChatApi.CHAT_OPTION_WAITING_ROOM, request.getPrivilege());
 
         if (type == LINK_IS_FOR_MEETING) {
             Timber.d("It's a meeting link");
@@ -1002,7 +1003,7 @@ public class ChatActivity extends PasscodeActivity
                 return;
             }
 
-            if (isMeetingEnded(request.getMegaHandleList())) {
+            if (isMeetingEnded(request)) {
                 Timber.d("It's a meeting, open dialog: Meeting has ended");
                 new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
                     @Override
@@ -1017,7 +1018,7 @@ public class ChatActivity extends PasscodeActivity
                 }, false).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else {
-                CallUtil.checkMeetingInProgress(ChatActivity.this, ChatActivity.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
+                CallUtil.checkMeetingInProgress(ChatActivity.this, ChatActivity.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement, waitingRoom);
             }
         } else {
             Timber.d("It's a chat link");

@@ -34,7 +34,8 @@ class ChatRequestMapperTest {
                 CallTermCodeMapper(),
                 CallCompositionChangesMapper(),
                 NetworkQualityMapper(),
-                ChatWaitingRoomMapper(WaitingRoomStatusMapper(), HandleListMapper())
+                ChatWaitingRoomMapper(WaitingRoomStatusMapper(), HandleListMapper()),
+                WaitingRoomStatusMapper()
             )
     }
 
@@ -247,6 +248,7 @@ class ChatRequestMapperTest {
         hasLocalAudio: Boolean = false,
         hasLocalVideo: Boolean = false,
         hasRequestSpeak: Boolean = false,
+        waitingRoomStatus: Int = 0,
 
         ): MegaChatCall {
         val call = mock<MegaChatCall> {
@@ -279,6 +281,7 @@ class ChatRequestMapperTest {
             on { this.hasLocalAudio() }.thenReturn(hasLocalAudio)
             on { this.hasLocalVideo() }.thenReturn(hasLocalVideo)
             on { this.hasRequestSpeak() }.thenReturn(hasRequestSpeak)
+            on { this.wrJoiningState }.thenReturn(waitingRoomStatus)
         }
 
         return call

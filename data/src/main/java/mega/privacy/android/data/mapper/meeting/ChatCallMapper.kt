@@ -16,7 +16,8 @@ internal class ChatCallMapper @Inject constructor(
     private val callTermCodeMapper: CallTermCodeMapper,
     private val callCompositionChangesMapper: CallCompositionChangesMapper,
     private val networkQualityMapper: NetworkQualityMapper,
-    private val chatWaitingRoomMapper: ChatWaitingRoomMapper
+    private val chatWaitingRoomMapper: ChatWaitingRoomMapper,
+    private val waitingRoomStatusMapper: WaitingRoomStatusMapper,
 ) {
     operator fun invoke(megaChatCall: MegaChatCall): ChatCall = ChatCall(
         callId = megaChatCall.callId,
@@ -48,6 +49,7 @@ internal class ChatCallMapper @Inject constructor(
         hasLocalAudio = megaChatCall.hasLocalAudio(),
         hasLocalVideo = megaChatCall.hasLocalVideo(),
         hasRequestSpeak = megaChatCall.hasRequestSpeak(),
-        waitingRoom = chatWaitingRoomMapper(megaChatCall.waitingRoom)
+        waitingRoom = chatWaitingRoomMapper(megaChatCall.waitingRoom),
+        waitingRoomStatus = waitingRoomStatusMapper(megaChatCall.wrJoiningState)
     )
 }
