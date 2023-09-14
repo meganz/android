@@ -18,21 +18,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.fade
-import com.google.accompanist.placeholder.placeholder
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
-import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_900
+import mega.privacy.android.core.ui.controls.modifier.skeletonEffect
 
 @Composable
 internal fun PhotosSkeletonView() {
@@ -263,13 +256,4 @@ private fun AlbumSmall2BigSkeletonView(
                 .skeletonEffect(),
         )
     }
-}
-
-private fun Modifier.skeletonEffect() = composed {
-    Modifier.placeholder(
-        color = MaterialTheme.colors.grey_020_grey_800,
-        shape = RoundedCornerShape(4.dp),
-        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.grey_050_grey_900),
-        visible = true,
-    )
 }

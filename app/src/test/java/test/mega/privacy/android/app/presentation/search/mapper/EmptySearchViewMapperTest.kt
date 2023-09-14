@@ -23,42 +23,62 @@ class EmptySearchViewMapperTest {
 
     @Test
     fun `test that when search query is not null no results description is shown to the user`() {
-        val actual = underTest(SearchCategory.ALL, searchQuery = "query")
+        val actual =
+            underTest(
+                isSearchChipEnabled = true,
+                category = SearchCategory.ALL,
+                searchQuery = "query"
+            )
         Truth.assertThat(actual.second)
             .isEqualTo(context.getString(R.string.search_empty_screen_no_results))
     }
 
     @Test
     fun `test that when search query is null and user has not any chips then Cloud drive is empty message is shown to the user`() {
-        val actual = underTest(SearchCategory.ALL)
+        val actual = underTest(
+            isSearchChipEnabled = true,
+            category = SearchCategory.ALL
+        )
         Truth.assertThat(actual.second)
             .isEqualTo(context.getString(R.string.cloud_drive_empty_screen_message))
     }
 
     @Test
     fun `test that when search query is null and user has selected images then No images message is shown to the user`() {
-        val actual = underTest(SearchCategory.IMAGES)
+        val actual = underTest(
+            isSearchChipEnabled = true,
+            category = SearchCategory.IMAGES
+        )
         Truth.assertThat(actual.second)
             .isEqualTo(context.getString(R.string.search_empty_screen_no_images))
     }
 
     @Test
     fun `test that when search query is null and user has selected documents then No documents message is shown to the user`() {
-        val actual = underTest(SearchCategory.DOCUMENTS)
+        val actual = underTest(
+            isSearchChipEnabled = true,
+            category = SearchCategory.DOCUMENTS
+        )
         Truth.assertThat(actual.second)
             .isEqualTo(context.getString(R.string.search_empty_screen_no_documents))
     }
 
     @Test
     fun `test that when search query is null and user has selected audio then No images message is shown to the user`() {
-        val actual = underTest(SearchCategory.AUDIO)
+        val actual = underTest(
+            isSearchChipEnabled = true,
+            category = SearchCategory.AUDIO
+        )
         Truth.assertThat(actual.second)
             .isEqualTo(context.getString(R.string.search_empty_screen_no_audio))
     }
 
     @Test
     fun `test that when search query is null and user has selected video then No images message is shown to the user`() {
-        val actual = underTest(SearchCategory.VIDEO)
+        val actual = underTest(
+            isSearchChipEnabled = true,
+            category = SearchCategory.VIDEO
+        )
         Truth.assertThat(actual.second)
             .isEqualTo(context.getString(R.string.search_empty_screen_no_video))
     }

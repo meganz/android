@@ -85,6 +85,7 @@ dependencies {
     implementation(lib.compose.state.events)
     implementation(lib.coil.compose)
     implementation(lib.balloon)
+    implementation(google.accompanist.placeholder)
     kapt(lib.showkase.processor)
 
     testImplementation(testlib.bundles.ui.test)

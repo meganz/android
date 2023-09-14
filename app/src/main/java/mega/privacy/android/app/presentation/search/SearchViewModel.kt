@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -49,7 +50,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
-    monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
+    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getRootFolder: GetRootFolder,
     private val searchNodesUseCase: SearchNodesUseCase,
@@ -86,6 +87,21 @@ class SearchViewModel @Inject constructor(
     private var firstNavigationLevel = false
 
     init {
+        monitorTransferEvent()
+        getRootNode()
+    }
+
+    private fun getRootNode() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    rootNodeHandle = getRootFolder()?.handle ?: INVALID_HANDLE
+                )
+            }
+        }
+    }
+
+    private fun monitorTransferEvent() {
         viewModelScope.launch {
             monitorTransferEventsUseCase().collect { event ->
                 if (event is TransferEvent.TransferFinishEvent && !event.transfer.isFolderTransfer) {
@@ -246,8 +262,6 @@ class SearchViewModel @Inject constructor(
             it.copy(searchHandle = parentHandle)
         }
 
-        cancelSearch()
-        setIsInSearchProgress(true)
         startSearch()
     }
 
@@ -255,6 +269,8 @@ class SearchViewModel @Inject constructor(
      * Start search by calling search api
      */
     private suspend fun startSearch() {
+        cancelSearch()
+        setIsInSearchProgress(true)
         with(state.value) {
             val nodes = searchNodesUseCase(
                 query = searchQuery,
@@ -265,6 +281,7 @@ class SearchViewModel @Inject constructor(
                 isFirstLevel = firstNavigationLevel,
                 searchFilter = selectedFilter
             )
+            delay(5000L)
             finishSearch(nodes ?: emptyList())
         }
     }
@@ -379,7 +396,7 @@ class SearchViewModel @Inject constructor(
             textSubmitted = false,
             searchQuery = "",
             searchDepth = -1,
-            isInProgress = false
+            isInProgress = false,
         )
 
     /**

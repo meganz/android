@@ -3,30 +3,26 @@ package mega.privacy.android.app.presentation.search
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.text.Html
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.view.ActionMode
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -65,12 +61,12 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.model.SearchState
+import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.search.view.SearchFilterChipsView
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
 import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
-import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.FileUtil
@@ -145,12 +141,7 @@ class SearchFragment : RotatableFragment() {
     private val searchViewModel: SearchViewModel by activityViewModels()
 
     private var recyclerView: NewGridRecyclerView? = null
-    private lateinit var emptyImageView: ImageView
-    private lateinit var emptyTextView: LinearLayout
-    private lateinit var emptyTextViewFirst: TextView
     private lateinit var fastScroller: FastScroller
-    private lateinit var contentLayout: RelativeLayout
-    private lateinit var searchProgressBar: ProgressBar
     private lateinit var searchFilterChipsView: ComposeView
     private lateinit var emptyLoadingView: ComposeView
 
@@ -249,11 +240,8 @@ class SearchFragment : RotatableFragment() {
         searchViewModel.stateLiveData.observe(
             viewLifecycleOwner,
             EventObserver { state ->
-                updateSearchProgressView(state.isInProgress)
-                state.nodes?.let {
-                    setNodes(it)
-                    switchViewType()
-                }
+                setNodes(state.nodes)
+                switchViewType()
             }
         )
 
@@ -291,15 +279,27 @@ class SearchFragment : RotatableFragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by searchViewModel.state.collectAsStateWithLifecycle()
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
-                    if (uiState.nodes.isNullOrEmpty() && uiState.showChips) {
-                        val emptyState = emptySearchViewMapper.invoke(
+                    if (uiState.isInProgress) {
+                        isVisible = true
+                        LoadingStateView(
+                            modifier = if (state().showChips) Modifier.padding(top = 48.dp) else Modifier,
+                            isList = state().currentViewType == ViewType.LIST
+                        )
+                    } else if (uiState.nodes.isNullOrEmpty()) {
+                        isVisible = true
+                        val emptyState = emptySearchViewMapper(
+                            isSearchChipEnabled = uiState.showChips,
                             category = uiState.selectedFilter?.filter,
-                            searchQuery = uiState.searchQuery
+                            searchQuery = uiState.searchQuery,
+                            searchParentHandle = uiState.searchParentHandle,
+                            rootNodeHandle = uiState.rootNodeHandle
                         )
                         MegaEmptyView(
                             imagePainter = painterResource(id = emptyState.first),
                             text = emptyState.second
                         )
+                    } else {
+                        isVisible = false
                     }
                 }
             }
@@ -313,11 +313,6 @@ class SearchFragment : RotatableFragment() {
         recyclerView = binding.fileGridViewBrowser
         fastScroller = binding.fastscroll
         fastScroller.setRecyclerView(binding.fileGridViewBrowser)
-        contentLayout = binding.contentLayout
-        searchProgressBar = binding.layoutGeneralProgressBar.progressbar
-        emptyImageView = binding.fileGridEmptyImage
-        emptyTextView = binding.fileGridEmptyText
-        emptyTextViewFirst = binding.fileGridEmptyTextFirst
         searchFilterChipsView = binding.filterChipsHorizontalView
         emptyLoadingView = binding.searchEmptyLoadingView
     }
@@ -348,19 +343,6 @@ class SearchFragment : RotatableFragment() {
                 newSearchNodesTask()
                 managerActivity.showFabButton()
             }
-        }
-    }
-
-    /**
-     * This will update progress of search
-     * @param inProgress if search is in progress
-     */
-    private fun updateSearchProgressView(inProgress: Boolean) {
-        recyclerView?.let {
-            contentLayout.isEnabled = !inProgress
-            contentLayout.alpha = if (inProgress) 0.4f else 1f
-            searchProgressBar.isVisible = inProgress
-            it.isGone = inProgress
         }
     }
 
@@ -760,102 +742,24 @@ class SearchFragment : RotatableFragment() {
      * This method set nodes and updates the adapter
      * @param nodes List of Mega Nodes
      */
-    private fun setNodes(nodes: List<MegaNode>) {
-        val mutableListNodes = ArrayList(nodes)
-        adapter.setNodes(mutableListNodes)
-        visibilityFastScroller()
-        if (adapter.itemCount == 0) {
+    private fun setNodes(nodes: List<MegaNode>?) {
+        nodes?.let {
+            val mutableListNodes = ArrayList(nodes)
+            adapter.setNodes(mutableListNodes)
+            visibilityFastScroller()
+            if (adapter.itemCount == 0) {
+                recyclerView?.visibility = View.GONE
+            } else {
+                recyclerView?.visibility = View.VISIBLE
+            }
+
+            if (isWaitingForSearchedNodes) {
+                reDoTheSelectionAfterRotation()
+                reSelectUnhandledItem()
+            }
+        } ?: run {
             recyclerView?.visibility = View.GONE
-            if (!state().showChips) {
-                emptyImageView.visibility = View.VISIBLE
-                emptyTextView.visibility = View.VISIBLE
-                emptyLoadingView.visibility = View.GONE
-                showEmptyScreenLegacy()
-            } else {
-                emptyLoadingView.visibility = View.VISIBLE
-                emptyImageView.visibility = View.GONE
-                emptyTextView.visibility = View.GONE
-            }
-        } else {
-            recyclerView?.visibility = View.VISIBLE
-            emptyImageView.visibility = View.GONE
-            emptyTextView.visibility = View.GONE
-        }
-
-        if (isWaitingForSearchedNodes) {
-            reDoTheSelectionAfterRotation()
-            reSelectUnhandledItem()
-        }
-    }
-
-    /**
-     * Method will be removed when SearchWithChipsMVP flag is removed
-     */
-    private fun showEmptyScreenLegacy() {
-        if (state().searchParentHandle == -1L) {
-            if (context?.resources?.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                emptyImageView.setImageResource(R.drawable.empty_folder_landscape)
-            } else {
-                emptyImageView.setImageResource(R.drawable.empty_folder_portrait)
-            }
-            emptyTextViewFirst.setText(R.string.no_results_found)
-        } else if (megaApi.rootNode?.handle == state().searchParentHandle) {
-            if (context?.resources?.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                emptyImageView.setImageResource(R.drawable.cloud_empty_landscape)
-            } else {
-                emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive)
-            }
-            var textToShow = String.format(getString(R.string.context_empty_cloud_drive))
-            runCatching {
-                context?.let {
-                    textToShow = textToShow.replace(
-                        "[A]", "<font color=\'"
-                                +
-                                ColorUtils.getColorHexString(
-                                    it,
-                                    R.color.grey_900_grey_100
-                                )
-                                + "\'>"
-                    ).replace("[/A]", "</font>").replace(
-                        "[B]", "<font color=\'"
-                                + ColorUtils.getColorHexString(
-                            it,
-                            R.color.grey_300_grey_600
-                        )
-                                + "\'>"
-                    ).replace("[/B]", "</font>")
-                }
-            }.getOrElse { }
-            val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-            emptyTextViewFirst.text = result
-        } else {
-            if (context?.resources?.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder)
-            } else {
-                emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder)
-            }
-            var textToShow = String.format(getString(R.string.file_browser_empty_folder_new))
-            runCatching {
-                context?.let {
-                    textToShow = textToShow.replace(
-                        "[A]", "<font color=\'"
-                                + ColorUtils.getColorHexString(
-                            it,
-                            R.color.grey_900_grey_100
-                        )
-                                + "\'>"
-                    ).replace("[/A]", "</font>").replace(
-                        "[B]", "<font color=\'"
-                                + ColorUtils.getColorHexString(
-                            it,
-                            R.color.grey_300_grey_600
-                        )
-                                + "\'>"
-                    ).replace("[/B]", "</font>")
-                }
-            }.getOrElse { }
-            val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-            emptyTextViewFirst.text = result
+            fastScroller.visibility = View.GONE
         }
     }
 

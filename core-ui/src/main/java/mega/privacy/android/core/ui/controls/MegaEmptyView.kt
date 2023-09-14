@@ -128,15 +128,15 @@ private fun getIconTint(): Color {
 /**
  * Reusable EmptyView with Icon & Text
  * Pass imageVector using ImageVector.vectorResource(id = R.drawable.ic_xyz)
- * @param modifier
- * @param imagePainter
+ * @param modifier [Modifier]
  * @param text with string
+ * @param imagePainter
  */
 @Composable
 fun MegaEmptyView(
-    modifier: Modifier = Modifier,
     text: String,
-    imagePainter: Painter
+    imagePainter: Painter,
+    modifier: Modifier = Modifier,
 ) {
     MegaEmptyView(modifier, text) {
         Icon(
@@ -165,7 +165,8 @@ private fun MegaEmptyView(modifier: Modifier, text: String, Icon: @Composable ()
             styles = mapOf(
                 SpanIndicator('A') to SpanStyle(color = MaterialTheme.colors.grey_900_grey_100),
                 SpanIndicator('B') to SpanStyle(color = MaterialTheme.colors.grey_300_grey_600)
-            )
+            ),
+            color = MaterialTheme.colors.grey_300_grey_600
         )
     }
 }
