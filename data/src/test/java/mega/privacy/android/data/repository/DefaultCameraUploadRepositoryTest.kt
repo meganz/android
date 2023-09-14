@@ -903,5 +903,16 @@ class DefaultCameraUploadRepositoryTest {
                 assertThat(underTest.monitorCameraUploadProgress()).isEqualTo(expected)
             }
         }
+
+        @Test
+        fun `test that getMediaSelectionQuery returns the result of cameraUploadsMediaGateway getMediaSelectionQuery`() =
+            runTest {
+                val expected = "selectionQuery"
+                val parentPath = "parentPath"
+                whenever(cameraUploadsMediaGateway.getMediaSelectionQuery(parentPath)).thenReturn(
+                    expected
+                )
+                assertThat(underTest.getMediaSelectionQuery(parentPath)).isEqualTo(expected)
+            }
     }
 }

@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import java.util.Queue
 
 /**
  * Camera Upload Repository
@@ -780,4 +779,10 @@ interface CameraUploadRepository {
      */
     fun getMediaUploadsName(): String
 
+    /**
+     * Get the selection query to filter the media based on the parent path
+     *
+     * @param parentPath path that contains the media
+     */
+    fun getMediaSelectionQuery(parentPath: String): String
 }

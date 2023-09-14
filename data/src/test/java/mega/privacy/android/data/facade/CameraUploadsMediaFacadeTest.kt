@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import android.provider.MediaStore
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -110,6 +111,15 @@ class CameraUploadsMediaFacadeTest {
                 )
             )
             assertThat(underTest.getMediaList(uri, selectionQuery)).isEqualTo(expected)
+        }
+
+    @Test
+    fun test_that_getMediaSelectionQuery_returns_the_correct_selection_query() =
+        runTest {
+            val parentPath = "parentPath"
+            val expected = "${MediaStore.MediaColumns.DATA} LIKE '$parentPath%'"
+
+            assertThat(underTest.getMediaSelectionQuery(parentPath)).isEqualTo(expected)
         }
 
 

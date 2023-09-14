@@ -798,6 +798,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override fun getMediaUploadsName() = context.getString(R.string.section_secondary_media_uploads)
 
+    override fun getMediaSelectionQuery(parentPath: String): String =
+        cameraUploadsMediaGateway.getMediaSelectionQuery(parentPath)
+
     private companion object {
         private const val STATE_NO_CHANGE = -1
         private const val SUB_STATE_NO_CHANGE = -1

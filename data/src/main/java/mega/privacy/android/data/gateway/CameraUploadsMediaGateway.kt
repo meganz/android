@@ -36,4 +36,11 @@ interface CameraUploadsMediaGateway {
      * @param isSecondary   if updated node handle is secondary media
      */
     suspend fun sendUpdateFolderDestinationBroadcast(nodeHandle: Long, isSecondary: Boolean)
+
+    /**
+     * Get the selection query to filter the media based on the parent path
+     *
+     * @param parentPath path that contains the media
+     */
+    fun getMediaSelectionQuery(parentPath: String): String
 }

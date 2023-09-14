@@ -98,6 +98,9 @@ internal class CameraUploadsMediaFacade @Inject constructor(
         context.sendBroadcast(destinationIntent)
     }
 
+    override fun getMediaSelectionQuery(parentPath: String): String =
+        "${MediaStore.MediaColumns.DATA} LIKE '${parentPath}%'"
+
     /**
      *  Return the column of the media store to retrieve data from
      *
