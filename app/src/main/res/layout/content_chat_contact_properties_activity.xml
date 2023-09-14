@@ -411,7 +411,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@+id/verify_credentials_info_icon"
-                        android:text="@string/contact_approve_credentials_not_approved_text"
+                        android:text="@string/contact_verify_credentials_not_verified_text"
                         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
                 </RelativeLayout>

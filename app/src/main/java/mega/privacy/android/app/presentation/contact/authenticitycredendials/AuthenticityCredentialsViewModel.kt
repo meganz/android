@@ -81,12 +81,15 @@ class AuthenticityCredentialsViewModel @Inject constructor(
             !isConnected.value -> {
                 _state.update { it.copy(error = R.string.check_internet_connection_error) }
             }
+
             state.value.isVerifyingCredentials -> {
                 _state.update { it.copy(error = R.string.already_verifying_credentials) }
             }
+
             state.value.areCredentialsVerified -> {
                 resetContactCredentials()
             }
+
             else -> {
                 verifyContactCredentials()
             }
@@ -107,7 +110,8 @@ class AuthenticityCredentialsViewModel @Inject constructor(
                     it.copy(
                         areCredentialsVerified = true,
                         isVerifyingCredentials = false,
-                        error = R.string.label_verified)
+                        error = R.string.contact_verify_credentials_verified_text
+                    )
                 }
             }.onFailure { showError(it) }
         }
@@ -126,7 +130,8 @@ class AuthenticityCredentialsViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isVerifyingCredentials = false,
-                        areCredentialsVerified = false)
+                        areCredentialsVerified = false
+                    )
                 }
             }.onFailure { showError(it) }
         }
@@ -140,7 +145,8 @@ class AuthenticityCredentialsViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     isVerifyingCredentials = false,
-                    error = error.getErrorStringId())
+                    error = error.getErrorStringId()
+                )
             }
         }
     }

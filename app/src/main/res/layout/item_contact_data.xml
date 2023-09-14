@@ -20,7 +20,7 @@
         android:id="@+id/verified_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/label_verified"
+        android:contentDescription="@string/contact_verify_credentials_verified_text"
         android:layout_marginStart="40dp"
         android:layout_marginTop="8dp"
         android:src="@drawable/ic_verified"

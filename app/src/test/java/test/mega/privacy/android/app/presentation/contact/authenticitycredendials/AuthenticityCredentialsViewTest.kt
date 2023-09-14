@@ -86,7 +86,7 @@ class AuthenticityCredentialsViewTest {
     @Test
     fun test_that_verify_button_is_show() {
         initComposeRuleContent()
-        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_button_text)
+        composeTestRule.onNodeWithText(R.string.contact_verify_credentials_mark_as_verified_text)
             .assertExists()
         composeTestRule.onNodeWithText(R.string.action_reset).assertDoesNotExist()
     }
@@ -95,7 +95,7 @@ class AuthenticityCredentialsViewTest {
     fun test_that_verify_button_performs_action() {
         val onButtonClicked = mock<() -> Unit>()
         initComposeRuleContent(onButtonClicked = onButtonClicked)
-        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_button_text)
+        composeTestRule.onNodeWithText(R.string.contact_verify_credentials_mark_as_verified_text)
             .performClick()
 
         verify(onButtonClicked).invoke()
@@ -110,7 +110,7 @@ class AuthenticityCredentialsViewTest {
                 myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
             )
         )
-        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_button_text)
+        composeTestRule.onNodeWithText(R.string.contact_verify_credentials_mark_as_verified_text)
             .assertDoesNotExist()
         composeTestRule.onNodeWithText(R.string.action_reset).assertExists()
     }

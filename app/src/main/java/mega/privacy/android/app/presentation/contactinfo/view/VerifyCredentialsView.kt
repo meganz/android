@@ -47,7 +47,7 @@ internal fun VerifyCredentialsView(isVerified: Boolean) = Column {
         Spacer(modifier = Modifier.padding(start = 20.dp))
         Column(modifier = Modifier.padding(vertical = 12.dp)) {
             Text(
-                text = stringResource(id = R.string.label_verify_credentials),
+                text = stringResource(id = R.string.contact_approve_credentials_toolbar_title),
                 style = MaterialTheme.typography.subtitle1.copy(
                     color = MaterialTheme.colors.textColorPrimary,
                     lineHeight = 24.sp
@@ -63,7 +63,7 @@ internal fun VerifyCredentialsView(isVerified: Boolean) = Column {
                         contentDescription = "Verified user",
                     )
                     Text(
-                        text = stringResource(id = R.string.label_verified),
+                        text = stringResource(id = R.string.contact_verify_credentials_verified_text),
                         style = MaterialTheme.typography.body2.copy(
                             color = MaterialTheme.colors.textColorSecondary,
                         ),
@@ -72,7 +72,7 @@ internal fun VerifyCredentialsView(isVerified: Boolean) = Column {
 
             } else {
                 Text(
-                    text = stringResource(id = R.string.label_not_verified),
+                    text = stringResource(id = R.string.contact_verify_credentials_not_verified_text),
                     style = MaterialTheme.typography.body2.copy(
                         color = MaterialTheme.colors.textColorSecondary,
                     ),

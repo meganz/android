@@ -203,7 +203,7 @@ fun ContactCredentials(
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)
             ) {
                 val actionTextId =
-                    if (state.areCredentialsVerified) R.string.action_reset else R.string.contact_approve_credentials_button_text
+                    if (state.areCredentialsVerified) R.string.action_reset else R.string.contact_verify_credentials_mark_as_verified_text
 
                 Text(
                     modifier = Modifier,

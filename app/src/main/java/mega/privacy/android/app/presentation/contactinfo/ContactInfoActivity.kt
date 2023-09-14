@@ -1447,10 +1447,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             if (!state.email.isNullOrEmpty()) {
                 verifyCredentialsLayout.isVisible = true
                 if (state.areCredentialsVerified) {
-                    verifyCredentialsInfo.setText(R.string.contact_approve_credentials_approved_text)
+                    verifyCredentialsInfo.setText(R.string.contact_verify_credentials_verified_text)
                     verifyCredentialsInfoIcon.isVisible = true
                 } else {
-                    verifyCredentialsInfo.setText(R.string.contact_approve_credentials_not_approved_text)
+                    verifyCredentialsInfo.setText(R.string.contact_verify_credentials_not_verified_text)
                     verifyCredentialsInfoIcon.isVisible = false
                 }
             } else {
