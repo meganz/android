@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.triggered
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -83,7 +84,11 @@ internal fun MegaPickerRoute(
     EventEffect(event = state.value.navigateNextEvent, onConsumed = {
         viewModel.handleAction(MegaPickerAction.NextScreenOpened)
     }) {
-        folderSelected()
+        // temporary navigation fix, state.value and viewmodel.state.value are out of sync
+        // to avoid this workaround, we need to rearchitect the screen navigation logic
+        if (viewModel.state.value.navigateNextEvent == triggered) {
+            folderSelected()
+        }
     }
 
     BackHandler(onBack = onBack)

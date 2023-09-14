@@ -15,11 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
  */
 internal class SyncPermissionsManager {
 
-    fun isDisableBatteryOptimizationGranted(context: Context): Boolean {
-        val powerManager =
-            context.getSystemService(AppCompatActivity.POWER_SERVICE) as PowerManager
-        return powerManager.isIgnoringBatteryOptimizations(context.packageName)
-    }
+    // We temporary don't ask this permission
+    fun isDisableBatteryOptimizationGranted(context: Context): Boolean = true
 
     fun isManageExternalStoragePermissionGranted(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.R || Environment.isExternalStorageManager()

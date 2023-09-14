@@ -70,25 +70,24 @@ internal class SyncGatewayImpl @Inject constructor(
                     }
                 }
             )
-//            megaApi.syncFolder(
-//                MegaSync.SyncType.TYPE_TWOWAY,
-//                localPath,
-//                name,
-//                remoteFolderId,
-//                null,
-//                requestListener
-//            )
+            megaApi.syncFolder(
+                MegaSync.SyncType.TYPE_TWOWAY,
+                localPath,
+                name,
+                remoteFolderId,
+                null,
+                requestListener
+            )
             continuation.invokeOnCancellation {
                 megaApi.removeRequestListener(requestListener)
             }
         }
 
     override suspend fun getFolderPairs(): MegaSyncList =
-        TODO()
-//        megaApi.syncs
+        megaApi.syncs
 
     override suspend fun removeFolderPair(folderPairId: Long) {
-//        megaApi.removeSync(folderPairId)
+        megaApi.removeSync(folderPairId)
     }
 
     override fun monitorOnSyncDeleted(): Flow<MegaSync> =
@@ -108,10 +107,10 @@ internal class SyncGatewayImpl @Inject constructor(
 
 
     override fun resumeSync(folderPairId: Long) {
-//        megaApi.resumeSync(folderPairId)
+        megaApi.resumeSync(folderPairId)
     }
 
     override fun pauseSync(folderPairId: Long) {
-//        megaApi.pauseSync(folderPairId)
+        megaApi.pauseSync(folderPairId)
     }
 }
