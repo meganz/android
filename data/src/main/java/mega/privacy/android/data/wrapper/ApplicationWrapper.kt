@@ -13,4 +13,10 @@ interface ApplicationWrapper {
      * Gets the isLoggingIn variable in MegaApplication
      */
     fun isLoggingIn(): Boolean
+
+    /**
+     * Sets the isIsHeartBeatAlive variable in MegaApplication
+     * @param isAlive
+     */
+    fun setHeartBeatAlive(isAlive: Boolean)
 }

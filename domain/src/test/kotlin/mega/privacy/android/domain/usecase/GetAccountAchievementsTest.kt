@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.domain.entity.achievement.DefaultMegaAchievement
+import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.Before
 import org.junit.Test
@@ -16,15 +16,15 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetAccountAchievementsTest {
+class GetAccountAchievementsTest {
 
     private lateinit var underTest: GetAccountAchievements
     private val accountRepository = mock<AccountRepository>()
-    private val achievement = mock<DefaultMegaAchievement>()
+    private val achievement = mock<MegaAchievement>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAccountAchievements(accountRepository)
+        underTest = GetAccountAchievements(accountRepository)
     }
 
     @Test
@@ -37,8 +37,12 @@ class DefaultGetAccountAchievementsTest {
     @Test
     fun `test that data is not null and mega achievement is returned`() = runTest {
         whenever(accountRepository.areAccountAchievementsEnabled()).thenReturn(true)
-        whenever(accountRepository.getAccountAchievements(AchievementType.MEGA_ACHIEVEMENT_WELCOME,
-            5L)).thenReturn(achievement)
+        whenever(
+            accountRepository.getAccountAchievements(
+                AchievementType.MEGA_ACHIEVEMENT_WELCOME,
+                5L
+            )
+        ).thenReturn(achievement)
         val actual = underTest(AchievementType.MEGA_ACHIEVEMENT_WELCOME, 5L)
         assertThat(actual).isSameInstanceAs(achievement)
     }

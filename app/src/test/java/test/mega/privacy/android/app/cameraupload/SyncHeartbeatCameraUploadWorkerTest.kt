@@ -23,8 +23,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit.MINUTES
 import javax.inject.Inject
-import kotlin.Exception
-import kotlin.jvm.Throws
 
 /**
  * Test class of [SyncHeartbeatCameraUploadWorker]
@@ -76,7 +74,7 @@ class SyncHeartbeatCameraUploadWorkerTest {
         val workInfo = underTest.getWorkInfoById(request.id).get()
 
         // Perform Assertion
-        assertThat(workInfo.state).isEqualTo(WorkInfo.State.SUCCEEDED)
+        assertThat(workInfo.state).isEqualTo(WorkInfo.State.RUNNING)
     }
 
     @Test
@@ -103,6 +101,6 @@ class SyncHeartbeatCameraUploadWorkerTest {
         val workInfo = underTest.getWorkInfoById(request.id).get()
 
         // Perform Assertion
-        assertThat(workInfo.state).isEqualTo(WorkInfo.State.ENQUEUED)
+        assertThat(workInfo.state).isEqualTo(WorkInfo.State.RUNNING)
     }
 }

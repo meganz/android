@@ -216,6 +216,10 @@ abstract class UtilWrapperModule {
                 }
 
                 override fun isLoggingIn() = MegaApplication.isLoggingIn
+
+                override fun setHeartBeatAlive(isAlive: Boolean) {
+                    MegaApplication.setHeartBeatAlive(isAlive)
+                }
             }
 
         /**

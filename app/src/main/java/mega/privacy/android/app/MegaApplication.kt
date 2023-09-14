@@ -534,6 +534,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
          * Is is heart beat alive
          */
         @JvmStatic
+        @Volatile
         var isIsHeartBeatAlive = false
             private set
 

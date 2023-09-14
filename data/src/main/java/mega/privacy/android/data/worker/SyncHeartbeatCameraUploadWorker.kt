@@ -2,11 +2,16 @@ package mega.privacy.android.data.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
+import kotlinx.coroutines.delay
+import mega.privacy.android.data.wrapper.ApplicationWrapper
+import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
+import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SendMediaUploadsBackupHeartBeatUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import timber.log.Timber
 
 /**
@@ -16,17 +21,43 @@ import timber.log.Timber
 class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val cameraUploadSyncManagerWrapper: CameraUploadSyncManagerWrapper,
-) : Worker(context, workerParams) {
+    private val applicationWrapper: ApplicationWrapper,
+    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
+    private val sendCameraUploadsBackupHeartBeatUseCase: SendCameraUploadsBackupHeartBeatUseCase,
+    private val sendMediaUploadsBackupHeartBeatUseCase: SendMediaUploadsBackupHeartBeatUseCase,
+) : CoroutineWorker(context, workerParams) {
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         if (isStopped) return Result.failure()
         Timber.d("SyncHeartbeatCameraUploadWorker: doWork()")
         return try {
-            cameraUploadSyncManagerWrapper.doRegularHeartbeat()
+            // arbitrary retry value
+            var retry = 3
+            while (applicationWrapper.isLoggingIn() && retry > 0) {
+                Timber.d("Wait for the isLoggingIn lock to be available")
+                delay(1000)
+                retry--
+            }
+            if (!applicationWrapper.isLoggingIn()) {
+                applicationWrapper.setLoggingIn(true)
+                backgroundFastLoginUseCase()
+                Timber.d("backgroundFastLogin successful")
+                applicationWrapper.setLoggingIn(false)
+                applicationWrapper.setHeartBeatAlive(true)
+                sendCameraUploadsBackupHeartBeatUseCase(
+                    heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+                    lastNodeHandle = -1L
+                )
+                Timber.d("Camera Uploads up to date heartbeat sent")
+                sendMediaUploadsBackupHeartBeatUseCase(
+                    heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+                    lastNodeHandle = -1L
+                )
+                Timber.d("Media Uploads up to date heartbeat sent")
+            }
             Result.success()
         } catch (throwable: Throwable) {
-            Timber.d("SyncHeartbeatCameraUploadWorker: doWork() fail")
+            Timber.e(throwable, "SyncHeartbeatCameraUploadWorker: doWork() fail")
             Result.failure()
         }
     }

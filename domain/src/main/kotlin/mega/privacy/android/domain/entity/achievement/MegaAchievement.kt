@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.achievement
 
+
 /**
  * MegaAchievement to include all the  common values for an achievement
  *
@@ -14,33 +15,15 @@ package mega.privacy.android.domain.entity.achievement
  * @property rewardStorageByAwardId: Long : Storage rewarded by specific award Id
  * @property rewardTransferByAwardId: Long : Transfer rewarded by specific award Id
  */
-sealed interface MegaAchievement {
-    val invitedEmails: List<String>
-    val grantedStorage: Long
-    val grantedTransferQuota: Long
-    val unlockedAwardsCount: Long
-    val achievementType: AchievementType
-    val awardId: Int
-    val awardExpirationTimeStamp: Long
-    val rewardAwardId: Int
-    val rewardStorageByAwardId: Long
-    val rewardTransferByAwardId: Long
-}
-
-/**
- * DefaultMegaAchievement
- *
- */
-data class DefaultMegaAchievement(
-    override val invitedEmails: List<String> = emptyList(),
-    override val awardId: Int = 0,
-    override val grantedStorage: Long = 0L,
-    override val grantedTransferQuota: Long = 0L,
-    override val unlockedAwardsCount: Long = 0L,
-    override val achievementType: AchievementType = AchievementType.INVALID_ACHIEVEMENT,
-    override val awardExpirationTimeStamp: Long = 0L,
-    override val rewardAwardId: Int = 0,
-    override val rewardStorageByAwardId: Long = 0L,
-    override val rewardTransferByAwardId: Long = 0L,
-) : MegaAchievement
-
+data class MegaAchievement(
+    val invitedEmails: List<String> = emptyList(),
+    val awardId: Int = 0,
+    val grantedStorage: Long = 0L,
+    val grantedTransferQuota: Long = 0L,
+    val unlockedAwardsCount: Long = 0L,
+    val achievementType: AchievementType = AchievementType.INVALID_ACHIEVEMENT,
+    val awardExpirationTimeStamp: Long = 0L,
+    val rewardAwardId: Int = 0,
+    val rewardStorageByAwardId: Long = 0L,
+    val rewardTransferByAwardId: Long = 0L,
+)

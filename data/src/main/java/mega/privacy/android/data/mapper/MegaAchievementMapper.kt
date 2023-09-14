@@ -1,7 +1,6 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.domain.entity.achievement.DefaultMegaAchievement
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaStringList
@@ -20,7 +19,7 @@ internal fun toMegaAchievement(
     achievementType: AchievementType,
     awardIndex: Long,
 ): MegaAchievement = with(megaAchievementsDetails) {
-    DefaultMegaAchievement(
+    MegaAchievement(
         invitedEmails = getInviteEmailList(getAwardEmails(awardIndex)),
         grantedStorage = getClassStorage(achievementType.classValue),
         grantedTransferQuota = getClassTransfer(achievementType.classValue),
@@ -41,7 +40,3 @@ private fun getInviteEmailList(megaStringList: MegaStringList): List<String> {
     }
     return emailList.toList()
 }
-
-
-
-

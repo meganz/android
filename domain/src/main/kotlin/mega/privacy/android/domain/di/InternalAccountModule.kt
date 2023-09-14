@@ -6,10 +6,8 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BusinessRepository
-import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultIsUserLoggedIn
 import mega.privacy.android.domain.usecase.DeleteContactLink
-import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
@@ -28,13 +26,6 @@ import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 @Module
 @DisableInstallInCheck
 internal abstract class InternalAccountModule {
-
-    /**
-     * Binds the Use Case [GetAccountAchievements] to its implementation [DefaultGetAccountAchievements]
-     */
-    @Binds
-    abstract fun provideGetAccountAchievements(implementation: DefaultGetAccountAchievements): GetAccountAchievements
-
     /**
      * Binds the Use Case [IsUserLoggedIn] to its implementation [DefaultIsUserLoggedIn]
      */

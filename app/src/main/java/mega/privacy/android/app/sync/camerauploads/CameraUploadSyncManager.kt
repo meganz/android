@@ -615,6 +615,10 @@ object CameraUploadSyncManager {
      * Before sending, check the account state and login again when the rootNode is null.
      * Only call in Worker class.
      */
+    @Deprecated(
+        message = "Replace all usages with use case and pass in camera upload type",
+        replaceWith = ReplaceWith("SyncHeartbeatCameraUploadWorker")
+    )
     fun doRegularHeartbeat() {
         val isLoggingIn = MegaApplication.isLoggingIn
         if (megaApi.rootNode == null && !isLoggingIn) {
