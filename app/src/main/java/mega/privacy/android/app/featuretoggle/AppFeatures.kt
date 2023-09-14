@@ -143,7 +143,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     AndroidSync(
         "Enable a synchronization between folders on local storage and folders on MEGA cloud",
-        false
+        true
     ),
 
     /**
