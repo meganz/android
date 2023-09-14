@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.CreateShareKey
@@ -31,15 +30,12 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.entity.verification.UnVerified
-import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.usecase.*
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
@@ -74,7 +70,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotification
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import nz.mega.sdk.MegaNode
@@ -103,7 +98,6 @@ import javax.inject.Inject
  * @property getFeatureFlagValueUseCase
  * @property getUnverifiedIncomingShares
  * @property getUnverifiedOutgoingShares
- * @property monitorVerificationStatus
  * @property monitorUserUpdates
  * @property startCameraUploadUseCase
  * @property stopCameraUploadsUseCase
@@ -143,7 +137,6 @@ class ManagerViewModel @Inject constructor(
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
     monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
-    private val monitorVerificationStatus: MonitorVerificationStatus,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
@@ -179,11 +172,6 @@ class ManagerViewModel @Inject constructor(
      * public UI State
      */
     val state: StateFlow<ManagerState> = _state
-
-    /**
-     * private Backups Node
-     */
-    private var backupsNode: MegaNode? = null
 
     /**
      * Monitor connectivity event
@@ -233,18 +221,13 @@ class ManagerViewModel @Inject constructor(
             val order = getCloudSortOrder()
             combine(
                 isFirstLogin,
-                monitorVerificationStatus()
-                    .onEach {
-                        Timber.d("Verification status returned: $it")
-                    },
                 flowOf(getUnverifiedIncomingShares(order) + getUnverifiedOutgoingShares(order))
                     .map { it.size },
                 flowOf(getEnabledFeatures()),
-            ) { firstLogin: Boolean, verificationStatus: VerificationStatus, pendingShares: Int, features: Set<Feature> ->
+            ) { firstLogin: Boolean, pendingShares: Int, features: Set<Feature> ->
                 { state: ManagerState ->
                     state.copy(
                         isFirstLogin = firstLogin,
-                        canVerifyPhoneNumber = verificationStatus is UnVerified && verificationStatus.canRequestOptInVerification,
                         pendingActionsCount = state.pendingActionsCount + pendingShares,
                         enabledFlags = features
                     )
@@ -257,7 +240,6 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             monitorNodeUpdates().collect {
                 val nodeList = it.changes.keys.toList()
-                checkItemForBackups(nodeList)
                 onReceiveNodeUpdate(true)
                 checkCameraUploadFolder(nodeList)
                 checkUnverifiedSharesCount()
@@ -346,8 +328,6 @@ class ManagerViewModel @Inject constructor(
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
-            AppFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
-            AppFeatures.DeviceCenter.takeIf { getFeatureFlagValueUseCase(it) },
             AppFeatures.FileLinkCompose.takeIf { getFeatureFlagValueUseCase(it) }
         )
     }
@@ -362,14 +342,6 @@ class ManagerViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it)
             }
-    }
-
-    private fun checkItemForBackups(updatedNodes: List<Node>) {
-        // Verify if it is a new item to Backups
-        backupsNode?.let { node ->
-            updatedNodes.find { node.handle == it.parentId.longValue }
-                ?.run { updateBackupsSectionVisibility() }
-        }
     }
 
     /**
@@ -436,17 +408,6 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Checks the Backups section visibility.
-     */
-    fun updateBackupsSectionVisibility() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(hasBackupsChildren = hasBackupsChildren())
-            }
-        }
-    }
-
-    /**
      * Fire a Media Discovery stats event
      */
     fun onMediaDiscoveryOpened(mediaHandle: Long) {
@@ -460,15 +421,6 @@ class ManagerViewModel @Inject constructor(
      */
     fun setIsFirstLogin(newIsFirstLogin: Boolean) {
         savedStateHandle[isFirstLoginKey] = newIsFirstLogin
-    }
-
-    /**
-     * Set Backups Node State in ViewModel initially
-     */
-    fun setBackupsNode() {
-        viewModelScope.launch {
-            backupsNode = getBackupsNode()
-        }
     }
 
     /**
@@ -560,11 +512,6 @@ class ManagerViewModel @Inject constructor(
     fun markHandleShow2FADialog() {
         _state.update { state -> state.copy(show2FADialog = false) }
     }
-
-    /**
-     * Active subscription in local cache
-     */
-    val activeSubscription: MegaPurchase? get() = getActiveSubscriptionUseCase()
 
     /**
      * Set last used path of copy as target path for next copy

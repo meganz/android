@@ -89,7 +89,8 @@
                         android:layout_marginTop="7dp"
                         android:text="@string/business_label"
                         android:textColor="@color/dark_blue_500_200"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/pro_flexi_label"
@@ -413,6 +414,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/navigation_drawer_add_phone_number_button"
                 android:layout_marginTop="8dp"
+                android:text="@string/sms_add_phone_number_dialog_msg_non_achievement_user"
                 android:layout_toEndOf="@+id/navigation_drawer_add_phone_number_icon"
                 android:textColor="@color/grey_alpha_054"
                 android:textSize="11sp" />

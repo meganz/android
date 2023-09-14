@@ -179,7 +179,11 @@
         android:layout_height="match_parent"
         android:layout_gravity="start">
 
-        <include layout="@layout/navigation_view_layout" />
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/manager_drawer_container"
+            android:name="mega.privacy.android.app.main.drawer.ManagerDrawerFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </com.google.android.material.navigation.NavigationView>
 

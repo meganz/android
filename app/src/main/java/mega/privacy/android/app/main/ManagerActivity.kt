@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.main
 
-import com.google.android.material.R as MaterialR
 import mega.privacy.android.core.R as CoreUiR
 import android.Manifest
 import android.annotation.SuppressLint
@@ -37,32 +36,24 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.Chronometer
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.dp
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
@@ -111,11 +102,9 @@ import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME
@@ -175,8 +164,6 @@ import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetD
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -188,7 +175,6 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
-import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
@@ -202,7 +188,6 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
@@ -246,11 +231,9 @@ import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
-import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
-import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.psa.Psa
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.psa.PsaViewHolder
@@ -278,7 +261,6 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
@@ -300,7 +282,6 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -327,7 +308,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
-import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
@@ -433,9 +413,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
-    lateinit var syncNavigator: SyncNavigator
-
-    @Inject
     lateinit var monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase
 
     @Inject
@@ -459,8 +436,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var getProText: TextView
     private lateinit var leftCancelButton: TextView
     private lateinit var rightUpgradeButton: TextView
-    private lateinit var addPhoneNumberButton: Button
-    private lateinit var addPhoneNumberLabel: TextView
     private lateinit var fabButton: FloatingActionButton
     private var pendingActionsBadge: View? = null
 
@@ -506,7 +481,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private var reconnectDialog: AlertDialog? = null
 
-    private lateinit var navigationDrawerAddPhoneContainer: RelativeLayout
     private var orientationSaved = 0
 
     // Determine if in Media discovery page, if it is true, it must in CD drawerItem tab
@@ -523,14 +497,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var waitingRoomComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
-    private lateinit var usedSpaceLayout: RelativeLayout
-    private lateinit var nVDisplayName: EmojiTextView
-    private lateinit var nVEmail: TextView
-    private lateinit var businessLabel: TextView
-    private lateinit var proFlexiLabel: TextView
-    private lateinit var profileImageView: ComposeView
-    private lateinit var spaceTextView: TextView
-    private lateinit var usedSpaceProgressBar: ProgressBar
 
     private var miniAudioPlayerController: MiniAudioPlayerController? = null
     private lateinit var cameraUploadViewTypes: LinearLayout
@@ -601,21 +567,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var comesFromNotificationDeepBrowserTreeIncoming = Constants.INVALID_VALUE
     private var comesFromNotificationChildNodeHandleList: LongArray? = null
     private var comesFromNotificationSharedIndex: SharesTab = SharesTab.NONE
-
-    private lateinit var myAccountHeader: RelativeLayout
-    private lateinit var contactStatus: ImageView
-    private lateinit var myAccountSection: RelativeLayout
-    private lateinit var backupsSection: RelativeLayout
-    private lateinit var contactsSection: RelativeLayout
-    private lateinit var notificationsSection: RelativeLayout
-    private lateinit var syncSection: RelativeLayout
-    private lateinit var deviceCenterSection: RelativeLayout
-    private lateinit var rubbishBinSection: RelativeLayout
-    private lateinit var settingsSection: RelativeLayout
-    private lateinit var upgradeAccount: Button
-    private lateinit var contactsSectionText: TextView
-    private lateinit var notificationsSectionText: TextView
-
     private var bottomNavigationCurrentItem = -1
 
     private lateinit var chatBadge: View
@@ -717,7 +668,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
 
     private val fileBackupManager: FileBackupManager = initFileBackupManager()
-    private var canVerifyPhoneNumber = false
 
     /**
      * Method for updating the visible elements related to a call.
@@ -1008,8 +958,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
         if (handleRootNodeAndHeartbeatState(savedInstanceState)) return
         userInfoViewModel.checkPasswordReminderStatus()
-        updateAccountDetailsVisibleInfo()
-        setContactStatus()
         checkInitialScreens()
         lifecycleScope.launch {
             PsaManager.checkPsa()
@@ -1079,39 +1027,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             findViewById(R.id.bottom_navigation_view)
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.navigation_view)
-        myAccountHeader = findViewById(R.id.navigation_drawer_account_section)
-        contactStatus = findViewById(R.id.contact_state)
-        myAccountSection = findViewById(R.id.my_account_section)
-        backupsSection = findViewById(R.id.backups_section)
-        contactsSection = findViewById(R.id.contacts_section)
-        notificationsSection = findViewById(R.id.notifications_section)
-        notificationsSectionText = findViewById(R.id.notification_section_text)
-        contactsSectionText = findViewById(R.id.contacts_section_text)
-        syncSection = findViewById(R.id.sync_section)
-        deviceCenterSection = findViewById(R.id.device_center_section)
-        rubbishBinSection = findViewById(R.id.rubbish_bin_section)
-        settingsSection = findViewById(R.id.settings_section)
-        upgradeAccount = findViewById(R.id.upgrade_navigation_view)
-        navigationDrawerAddPhoneContainer =
-            findViewById(R.id.navigation_drawer_add_phone_number_container)
-        addPhoneNumberButton = findViewById(R.id.navigation_drawer_add_phone_number_button)
-        addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label)
-        usedSpaceLayout = findViewById(R.id.nv_used_space_layout)
         fabButton = findViewById(R.id.floating_button)
         getProLayout = findViewById(R.id.get_pro_account)
         getProText = findViewById(R.id.get_pro_account_text)
         rightUpgradeButton = findViewById(R.id.btnRight_upgrade)
         leftCancelButton = findViewById(R.id.btnLeft_cancel)
-        nVDisplayName =
-            findViewById(R.id.navigation_drawer_account_information_display_name)
-        nVEmail = findViewById(R.id.navigation_drawer_account_information_email)
-        profileImageView =
-            findViewById(R.id.navigation_drawer_user_account_picture_profile)
-        businessLabel = findViewById(R.id.business_label)
-        proFlexiLabel = findViewById(R.id.pro_flexi_label)
         fragmentContainer = findViewById(R.id.fragment_container)
-        spaceTextView = findViewById(R.id.navigation_drawer_space)
-        usedSpaceProgressBar = findViewById(R.id.manager_used_space_bar)
         cameraUploadViewTypes = findViewById(R.id.cu_view_type)
         tabLayoutShares = findViewById(R.id.sliding_tabs_shares)
         viewPagerShares = findViewById(R.id.shares_tabs_pager)
@@ -1123,13 +1044,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
 
     private fun setInitialViewProperties() {
-        nVDisplayName.setMaxWidthEmojis(
-            Util.dp2px(
-                Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT.toFloat(),
-                outMetrics
-            )
-        )
-        businessLabel.visibility = View.GONE
         viewPagerShares.offscreenPageLimit = 3
         getProLayout.setBackgroundColor(
             if (Util.isDarkMode(this)) ColorUtils.getColorForElevation(
@@ -1162,14 +1076,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun setViewListeners() {
         bottomNavigationView.setOnNavigationItemSelectedListener(this)
-        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+        addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
 
             override fun onDrawerOpened(drawerView: View) {
                 refreshDrawerInfo(storageState === StorageState.Unknown)
-
-                // Sync the account info after changing account information settings to keep the data the same
-                updateAccountDetailsVisibleInfo()
 
                 LiveEventBus.get(EventConstants.EVENT_DRAWER_OPEN, Boolean::class.java).post(true)
             }
@@ -1186,45 +1097,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
              * @param refreshStorageInfo Parameter to indicate if refresh the storage info.
              */
             private fun refreshDrawerInfo(refreshStorageInfo: Boolean) {
-                if (!viewModel.isConnected || megaApi.rootNode == null) {
-                    disableNavigationViewLayout()
-                } else {
-                    resetNavigationViewLayout()
-                }
-                setContactStatus()
                 if (!refreshStorageInfo) return
-                showAddPhoneNumberInMenu()
+                viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
                 refreshAccountInfo()
             }
         })
-        myAccountHeader.setOnClickListener(this)
-        myAccountSection.setOnClickListener(this)
-        backupsSection.setOnClickListener(this)
-        contactsSection.setOnClickListener(this)
-        notificationsSection.setOnClickListener(this)
-        findViewById<View>(R.id.offline_section).setOnClickListener(this)
-        findViewById<View>(R.id.transfers_section).setOnClickListener(this)
-        syncSection.setOnClickListener(this)
-        deviceCenterSection.setOnClickListener(this)
-        rubbishBinSection.setOnClickListener(this)
-        settingsSection.setOnClickListener(this)
-        upgradeAccount.setOnClickListener(this)
-        addPhoneNumberButton.viewTreeObserver?.addOnPreDrawListener(
-            object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    val buttonLayout = addPhoneNumberButton.layout
-                    if (buttonLayout != null) {
-                        if (buttonLayout.lineCount > 1) {
-                            findViewById<View>(R.id.navigation_drawer_add_phone_number_icon).visibility =
-                                View.GONE
-                        }
-                        addPhoneNumberButton.viewTreeObserver?.removeOnPreDrawListener(this)
-                    }
-                    return true
-                }
-            }
-        )
-        addPhoneNumberButton.setOnClickListener(this)
         fabButton.setOnClickListener(FabButtonListener(this))
         viewPagerShares.setPageTransformer { _: View?, _: Float -> }
         viewPagerShares.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -1296,6 +1173,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment)?.let {
             setupNavDestListener(it)
         }
+    }
+
+    override fun addDrawerListener(listener: DrawerLayout.DrawerListener) {
+        drawerLayout.addDrawerListener(listener)
     }
 
     private fun initialiseChatBadgeView() {
@@ -1404,7 +1285,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             return true
         } else {
-            viewModel.setBackupsNode()
             attr = dbH.attributes
             if (attr?.invalidateSdkCache.toBoolean()) {
                 Timber.d("megaApi.invalidateCache();")
@@ -1990,18 +1870,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (managerState.isPushNotificationSettingsUpdatedEvent) {
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
             }
-            canVerifyPhoneNumber = managerState.canVerifyPhoneNumber
-            if (!canVerifyPhoneNumber) {
-                hideAddPhoneNumberButton()
-            }
-            updateBackupsSectionVisibility(managerState.hasBackupsChildren)
-            if (managerState.enabledFlags.contains(AppFeatures.AndroidSync)) {
-                syncSection.visibility = View.VISIBLE
-                syncNavigator.startSyncService(this)
-            }
-            if (managerState.enabledFlags.contains(AppFeatures.DeviceCenter)) {
-                deviceCenterSection.visibility = View.VISIBLE
-            }
             if (managerState.nodeUpdateReceived) {
                 // Invalidate the menu will collapse/expand the search view and set the query text to ""
                 // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -2042,19 +1910,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
         this.collectFlow(
-            userInfoViewModel.state,
-            Lifecycle.State.STARTED
-        ) { state: UserInfoUiState ->
-            updateUserNameNavigationView(state.fullName)
-            setProfileAvatar(state.avatarContent)
-            nVEmail.visibility = View.VISIBLE
-            nVEmail.text = state.email
-            if (state.isTestPasswordRequired) {
-                startActivity(Intent(this, TestPasswordActivity::class.java))
-                userInfoViewModel.onTestPasswordHandled()
-            }
-        }
-        this.collectFlow(
             incomingSharesViewModel.state,
             Lifecycle.State.STARTED
         ) { incomingSharesState: IncomingSharesState ->
@@ -2091,9 +1946,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         collectFlow(targetFlow = viewModel.monitorOfflineNodeAvailabilityEvent) {
             refreshCloudOrder()
-        }
-        collectFlow(viewModel.incomingContactRequests) { pendingRequest ->
-            setContactTitleSection(pendingRequest.size)
         }
 
         collectFlow(waitingRoomManagementViewModel.state) { state ->
@@ -2342,14 +2194,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             DrawerItem.PHOTOS
         }
         selectDrawerItem(drawerItem)
-    }
-
-    fun setContactStatus() {
-        ChatUtil.setContactStatus(
-            megaChatApi.onlineStatus,
-            contactStatus,
-            ChatUtil.StatusIconLocation.DRAWER
-        )
     }
 
     override fun onResume() {
@@ -2777,16 +2621,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         } else {
             Timber.e("Error, chat id is -1")
-        }
-    }
-
-    private fun setProfileAvatar(avatar: AvatarContent?) {
-        avatar?.let {
-            profileImageView.apply {
-                setContent {
-                    Avatar(modifier = Modifier.size(48.dp), content = avatar)
-                }
-            }
         }
     }
 
@@ -3291,7 +3125,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 resetNavigationViewMenu(bottomNavigationView.menu)
                 clickDrawerItem(drawerItem)
                 supportInvalidateOptionsMenu()
-                updateAccountDetailsVisibleInfo()
                 checkCurrentStorageStatus()
             } else {
                 Timber.w("showOnlineMode - Root is NULL")
@@ -3310,9 +3143,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun showOfflineMode() {
         Timber.d("showOfflineMode")
         try {
-            usedSpaceLayout.visibility = View.GONE
-            nVEmail.text = megaChatApi.myEmail
-            nVDisplayName.text = megaChatApi.myFullname
             Timber.d("DrawerItem on start offline: %s", drawerItem)
             if (drawerItem == null) {
                 Timber.w("drawerItem == null --> On start OFFLINE MODE")
@@ -3643,6 +3473,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         cameraUploadViewTypes.visibility = View.GONE
         if (getPhotosFragment() != null) {
             showBottomView()
+        }
+    }
+
+    override fun drawerItemClicked(item: DrawerItem) {
+        val oldDrawerItem = drawerItem
+        isFirstTimeCam
+        checkIfShouldCloseSearchView(oldDrawerItem)
+        if (item == DrawerItem.OFFLINE) {
+            bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
+            openFullscreenOfflineFragment(pathNavigationOffline)
+        } else {
+            drawerItem = item
+            selectDrawerItem(item)
         }
     }
 
@@ -6044,91 +5887,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             PermissionUtils.getReadExternalStoragePermission()
         )
 
-    fun updateAccountDetailsVisibleInfo() {
-        Timber.d("updateAccountDetailsVisibleInfo")
-        if (isFinishing) {
-            return
-        }
-        val settingsSeparator = navigationView.findViewById<View>(R.id.settings_separator)
-
-        if (isBusinessAccount) {
-            usedSpaceLayout.visibility = View.GONE
-            upgradeAccount.visibility = View.GONE
-            settingsSeparator?.visibility = View.GONE
-            if (isBusinessAccount) {
-                businessLabel.visibility = View.VISIBLE
-            }
-        } else {
-            businessLabel.visibility = View.GONE
-            if (myAccountInfo.accountType == Constants.PRO_FLEXI) {
-                upgradeAccount.visibility = View.GONE
-                proFlexiLabel.visibility = View.VISIBLE
-            } else {
-                upgradeAccount.visibility = View.VISIBLE
-                proFlexiLabel.visibility = View.GONE
-            }
-            settingsSeparator?.visibility = View.GONE
-            var textToShow: String = String.format(
-                resources.getString(R.string.used_space),
-                myAccountInfo.usedFormatted,
-                myAccountInfo.totalFormatted
-            )
-            var colorString = ColorUtils.getThemeColorHexString(this, MaterialR.attr.colorSecondary)
-            when (viewModel.getStorageState()) {
-                StorageState.Green -> {}
-                StorageState.Orange -> colorString =
-                    ColorUtils.getColorHexString(this, R.color.amber_600_amber_300)
-
-                StorageState.Red, StorageState.PayWall -> colorString =
-                    ColorUtils.getColorHexString(this, R.color.red_600_red_300)
-
-                else -> {}
-            }
-            try {
-                textToShow = textToShow.replace(
-                    "[A]", "<font color=\'"
-                            + colorString
-                            + "\'>"
-                )
-                textToShow = textToShow.replace("[/A]", "</font>")
-                textToShow = textToShow.replace(
-                    "[B]", "<font color=\'"
-                            + ColorUtils.getThemeColorHexString(
-                        this,
-                        android.R.attr.textColorPrimary
-                    )
-                            + "\'>"
-                )
-                textToShow = textToShow.replace("[/B]", "</font>")
-            } catch (e: Exception) {
-                Timber.w(e, "Exception formatting string")
-            }
-            spaceTextView.text =
-                HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY)
-            val progress: Int = myAccountInfo.usedPercentage
-            val usedSpace: Long = myAccountInfo.usedStorage
-            Timber.d("Progress: %d, Used space: %d", progress, usedSpace)
-            usedSpaceProgressBar.progress = progress
-            if (myAccountInfo.accountType != Constants.PRO_FLEXI && progress >= 0 && usedSpace >= 0) {
-                usedSpaceLayout.visibility = View.VISIBLE
-            } else {
-                usedSpaceLayout.visibility = View.GONE
-            }
-        }
-        updateSubscriptionLevel(myAccountInfo, viewModel.activeSubscription, dbH, megaApi)
-        var resId = R.drawable.custom_progress_bar_horizontal_ok
-        when (storageState) {
-            StorageState.Green -> {}
-            StorageState.Orange -> resId = R.drawable.custom_progress_bar_horizontal_warning
-            StorageState.Red, StorageState.PayWall -> resId =
-                R.drawable.custom_progress_bar_horizontal_exceed
-
-            else -> {}
-        }
-        val drawable = ResourcesCompat.getDrawable(resources, resId, null)
-        usedSpaceProgressBar.progressDrawable = drawable
-    }
-
     private fun refreshCloudDrive() {
         if (rootNode == null) {
             rootNode = megaApi.rootNode
@@ -6226,11 +5984,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.MANAGER
     }
 
-    private fun navigateToContacts() {
-        closeDrawer()
-        startActivity(ContactsActivity.getListIntent(this))
-    }
-
     override fun navigateToContactRequests() {
         closeDrawer()
         startActivity(ContactsActivity.getReceivedRequestsIntent(this))
@@ -6252,101 +6005,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     override fun onClick(v: View) {
         Timber.d("onClick")
-        val oldDrawerItem = drawerItem
-        var sectionClicked = false
         when (v.id) {
-            R.id.navigation_drawer_add_phone_number_button -> {
-                val intent = Intent(this, SMSVerificationActivity::class.java)
-                startActivity(intent)
-            }
-
             R.id.btnLeft_cancel -> {
                 getProLayout.visibility = View.GONE
             }
 
             R.id.btnRight_upgrade -> {
-
                 //Add navigation to Upgrade Account
                 Timber.d("Click on Upgrade in pro panel!")
                 navigateToUpgradeAccount()
             }
 
-            R.id.navigation_drawer_account_section, R.id.my_account_section -> {
-                if (viewModel.isConnected && megaApi.rootNode != null) {
-                    showMyAccount()
-                }
-            }
-
-            R.id.backups_section -> {
-                sectionClicked = true
-                drawerItem = DrawerItem.BACKUPS
-            }
-
-            R.id.contacts_section -> {
-                navigateToContacts()
-            }
-
-            R.id.notifications_section -> {
-                sectionClicked = true
-                drawerItem = DrawerItem.NOTIFICATIONS
-            }
-
-            R.id.offline_section -> {
-                sectionClicked = true
-                bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
-                openFullscreenOfflineFragment(pathNavigationOffline)
-            }
-
-            R.id.device_center_section -> {
-                sectionClicked = true
-                drawerItem = DrawerItem.DEVICE_CENTER
-            }
-
-            R.id.transfers_section -> {
-                sectionClicked = true
-                drawerItem = DrawerItem.TRANSFERS
-            }
-
-            R.id.sync_section -> {
-                sectionClicked = true
-                drawerItem = DrawerItem.SYNC
-            }
-
-            R.id.rubbish_bin_section -> {
-                sectionClicked = true
-                drawerItem = DrawerItem.RUBBISH_BIN
-            }
-
-            R.id.settings_section -> {
-                sectionClicked = true
-                navigateToSettingsActivity(null)
-            }
-
-            R.id.upgrade_navigation_view -> {
-                navigateToUpgradeAccount()
-            }
-
-            R.id.lost_authentication_device -> {
-                try {
-                    val openTermsIntent = Intent(this, WebViewActivity::class.java)
-                    openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    openTermsIntent.data = Uri.parse(RECOVERY_URL)
-                    startActivity(openTermsIntent)
-                } catch (e: Exception) {
-                    val viewIntent = Intent(Intent.ACTION_VIEW)
-                    viewIntent.data = Uri.parse(RECOVERY_URL)
-                    startActivity(viewIntent)
-                }
-            }
-
             R.id.call_in_progress_layout -> {
                 returnCall()
             }
-        }
-        if (sectionClicked) {
-            isFirstTimeCam
-            checkIfShouldCloseSearchView(oldDrawerItem)
-            selectDrawerItem(drawerItem)
         }
     }
 
@@ -6872,26 +6544,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (mi != null) {
             mi.isChecked = false
         }
-        disableNavigationViewLayout()
-    }
-
-    fun disableNavigationViewLayout() {
-        myAccountSection.isEnabled = false
-        myAccountSection.findViewById<TextView>(R.id.my_account_section_text).setTextColor(
-            ContextCompat.getColor(this, R.color.grey_038_white_038)
-        )
-        viewModel.updateBackupsSectionVisibility()
-        contactsSection.isEnabled = false
-        contactsSectionText.alpha = 0.38f
-        notificationsSection.isEnabled = false
-        notificationsSectionText.alpha = 0.38f
-        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
-        rubbishBinSection.isEnabled = false
-        syncSection.isEnabled = false
-        syncSection.findViewById<TextView>(R.id.sync_section_text).alpha = 0.38f
-        rubbishBinSection.findViewById<TextView>(R.id.rubbish_bin_section_text).alpha =
-            0.38f
-        upgradeAccount.isEnabled = false
     }
 
     private fun resetNavigationViewMenu(menu: Menu) {
@@ -6920,26 +6572,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             mi.isChecked = false
             mi.isEnabled = true
         }
-        resetNavigationViewLayout()
-    }
-
-    fun resetNavigationViewLayout() {
-        myAccountSection.isEnabled = true
-        myAccountSection.findViewById<TextView>(R.id.my_account_section_text).setTextColor(
-            ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary)
-        )
-        viewModel.updateBackupsSectionVisibility()
-        contactsSection.isEnabled = true
-        contactsSectionText.alpha = 1f
-        notificationsSection.isEnabled = true
-        notificationsSectionText.alpha = 1f
-        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
-        rubbishBinSection.isEnabled = true
-        rubbishBinSection.findViewById<TextView>(R.id.rubbish_bin_section_text).alpha =
-            1f
-        syncSection.isEnabled = true
-        syncSection.findViewById<TextView>(R.id.sync_section_text).alpha = 1f
-        upgradeAccount.isEnabled = true
     }
 
     private fun showProPanel() {
@@ -7914,11 +7546,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             viewPagerShares.currentItem = index.position
         }
 
-    private fun updateUserNameNavigationView(fullName: String?) {
-        Timber.d("updateUserNameNavigationView")
-        nVDisplayName.text = fullName
-    }
-
     fun hideFabButton() {
         initFabButtonShow = false
         fabButton.hide()
@@ -8041,16 +7668,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun onChatOnlineStatusUpdate(userHandle: Long, status: Int, inProgress: Boolean) {
         Timber.d("Status: %d, In Progress: %s", status, inProgress)
-        val currentStatus = if (inProgress) -1 else status
         if (chatsFragment == null) {
             chatTabsFragment =
                 supportFragmentManager.findFragmentByTag(FragmentTag.RECENT_CHAT.tag) as? ChatTabsFragment
-        }
-        if (userHandle == megaChatApi.myUserHandle) {
-            Timber.d("My own status update")
-            setContactStatus()
-        } else {
-            Timber.d("Status update for the user: %s", userHandle)
         }
     }
 
@@ -8072,19 +7692,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         } else {
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-        }
-    }
-
-    private fun setContactTitleSection(pendingRequestCount: Int) {
-        if (pendingRequestCount == 0) {
-            contactsSectionText.text = getString(R.string.section_contacts)
-        } else {
-            contactsSectionText.text =
-                getString(R.string.section_contacts_with_notification, pendingRequestCount)
-                    .spanABTextFontColour(
-                        this,
-                        ColorUtils.getColorHexString(this, R.color.red_600_red_300)
-                    )
         }
     }
 
@@ -8130,20 +7737,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             this,
             mElevationCause > 0 && !isInMainHomePage
         )
-    }
-
-    private fun setNotificationsTitleSection(unread: Int) {
-        if (unread == 0) {
-            notificationsSectionText.text =
-                getString(R.string.title_properties_chat_contact_notifications)
-        } else {
-            notificationsSectionText.text =
-                getString(R.string.section_notification_with_unread, unread)
-                    .spanABTextFontColour(
-                        this,
-                        ColorUtils.getColorHexString(this, R.color.red_600_red_300)
-                    )
-        }
     }
 
     private fun setChatBadge() {
@@ -8311,19 +7904,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     val isSearchOpen: Boolean
         get() = searchViewModel.state.value.searchQuery != null && searchExpand
-
-    private fun hideAddPhoneNumberButton() {
-        navigationDrawerAddPhoneContainer.visibility = View.GONE
-    }
-
-    fun showAddPhoneNumberInMenu() {
-        if (canVerifyPhoneNumber) {
-            addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user)
-            navigationDrawerAddPhoneContainer.visibility = View.VISIBLE
-        } else {
-            navigationDrawerAddPhoneContainer.visibility = View.GONE
-        }
-    }
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
@@ -8866,11 +8446,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val numUnreadUserAlerts = result.second
         if (type === UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON) {
             updateNavigationToolbarIcon(numUnreadUserAlerts)
-        } else if (type === UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE) {
-            setNotificationsTitleSection(numUnreadUserAlerts)
-        } else {
+        } else if (type === UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON) {
             updateNavigationToolbarIcon(numUnreadUserAlerts)
-            setNotificationsTitleSection(numUnreadUserAlerts)
         }
     }
 
@@ -8930,31 +8507,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         refreshCloudDrive()
     }
 
-    /**
-     * Updates Backups section visibility depending on if it has children.
-     *
-     * @param hasChildren True if the Backups node has children, false otherwise.
-     */
-    private fun updateBackupsSectionVisibility(hasChildren: Boolean) {
-        Timber.d("updateBackupsSectionVisibility")
-        if (hasChildren) {
-            backupsSection.isEnabled = true
-            backupsSection.visibility = View.VISIBLE
-            backupsSection.findViewById<TextView>(R.id.backups_section_text).setTextColor(
-                ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary)
-            )
-        } else {
-            backupsSection.visibility = View.GONE
-        }
-    }
-
     private fun handleSuperBackPressed() {
         onBackPressedCallback.isEnabled = false
         onBackPressedDispatcher.onBackPressed()
         onBackPressedCallback.isEnabled = true
     }
 
-    private fun closeDrawer() {
+    override fun closeDrawer() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         }
@@ -9008,7 +8567,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         if (storageStateFromBroadcast !== StorageState.Unknown) storageStateFromBroadcast else viewModel.getStorageState()
                     )
                 }
-                updateAccountDetailsVisibleInfo()
                 return
             }
 
@@ -9017,7 +8575,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 if (isFinishing) {
                     return
                 }
-                updateAccountDetailsVisibleInfo()
                 checkInitialScreens()
                 if (isBusinessAccount) {
                     invalidateOptionsMenu()

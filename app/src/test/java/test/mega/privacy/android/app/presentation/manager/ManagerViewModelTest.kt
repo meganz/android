@@ -44,10 +44,6 @@ import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
-import mega.privacy.android.domain.entity.verification.UnVerified
-import mega.privacy.android.domain.entity.verification.VerificationStatus
-import mega.privacy.android.domain.entity.verification.Verified
-import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -198,12 +194,6 @@ class ManagerViewModelTest {
             )
         )
     }
-    private val monitorVerificationStatus = MutableStateFlow<VerificationStatus>(
-        UnVerified(
-            canRequestUnblockSms = false,
-            canRequestOptInVerification = false,
-        )
-    )
 
     private val monitorPushNotificationSettingsUpdate =
         mock<MonitorUpdatePushNotificationSettingsUseCase> {
@@ -279,7 +269,6 @@ class ManagerViewModelTest {
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
             monitorFinishActivityUseCase = monitorFinishActivity,
-            monitorVerificationStatus = { monitorVerificationStatus },
             requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
@@ -455,41 +444,6 @@ class ManagerViewModelTest {
             assertThat(awaitItem().show2FADialog).isTrue()
         }
     }
-
-    @Test
-    fun `test that canVerifyPhoneNumber matches canRequestOptInVerification if unverified`() {
-        val expectedCanVerify = true
-        runTest {
-            monitorVerificationStatus.emit(
-                UnVerified(
-                    canRequestUnblockSms = false,
-                    canRequestOptInVerification = expectedCanVerify,
-                )
-            )
-            testScheduler.advanceUntilIdle()
-
-            underTest.state.test {
-                assertThat(awaitItem().canVerifyPhoneNumber).isEqualTo(expectedCanVerify)
-            }
-        }
-    }
-
-    @Test
-    fun `test that canVerifyPhoneNumber is false if a phone number has already been verified`() =
-        runTest {
-            monitorVerificationStatus.emit(
-                Verified(
-                    phoneNumber = VerifiedPhoneNumber.PhoneNumber("766543"),
-                    canRequestUnblockSms = false,
-                    canRequestOptInVerification = true
-                )
-            )
-            testScheduler.advanceUntilIdle()
-
-            underTest.state.test {
-                assertThat(awaitItem().canVerifyPhoneNumber).isFalse()
-            }
-        }
 
     @Test
     fun `test that the camera uploads sync handles are established when receiving an update to change the camera uploads folders`() =

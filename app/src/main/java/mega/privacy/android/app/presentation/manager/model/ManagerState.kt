@@ -12,13 +12,11 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property isFirstNavigationLevel
  * @property sharesTab
  * @property isFirstLogin
- * @property hasBackupsChildren
  * @property nodeUpdateReceived
  * @property pendingActionsCount
  * @property shouldAlertUserAboutSecurityUpgrade
  * @property showSyncSection
  * @property show2FADialog
- * @property canVerifyPhoneNumber
  * @property enabledFlags
  * @property isPushNotificationSettingsUpdatedEvent
  * @property titleChatArchivedEvent
@@ -30,13 +28,11 @@ data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
     val sharesTab: SharesTab = SharesTab.INCOMING_TAB,
     val isFirstLogin: Boolean = false,
-    val hasBackupsChildren: Boolean = false,
     val nodeUpdateReceived: Boolean = false,
     val pendingActionsCount: Int = 0,
     val shouldAlertUserAboutSecurityUpgrade: Boolean = false,
     val showSyncSection: Boolean = false,
     val show2FADialog: Boolean = false,
-    val canVerifyPhoneNumber: Boolean = false,
     val enabledFlags: Set<Feature> = emptySet(),
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
     val titleChatArchivedEvent: String? = null,

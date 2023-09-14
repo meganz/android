@@ -67,5 +67,10 @@ enum class DrawerItem {
     /**
      * Device Center
      */
-    DEVICE_CENTER;
+    DEVICE_CENTER,
+
+    /**
+     * Offline
+     */
+    OFFLINE;
 }
