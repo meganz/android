@@ -5,8 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.app.presentation.offline.offlinev2.OfflineViewModelV2
-import mega.privacy.android.app.presentation.offline.offlinev2.model.OfflineUIState
+import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeViewModel
+import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUIState
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 
 internal object OfflineViewTestTags {
@@ -14,7 +14,7 @@ internal object OfflineViewTestTags {
 }
 
 @Composable
-internal fun OfflineRoute(viewModel: OfflineViewModelV2 = hiltViewModel()) {
+internal fun OfflineRoute(viewModel: OfflineComposeViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     OfflineScreen(uiState = uiState)
 }

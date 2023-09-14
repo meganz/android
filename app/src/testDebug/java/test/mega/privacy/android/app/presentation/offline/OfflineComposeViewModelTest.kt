@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.offline.offlinev2.OfflineViewModelV2
+import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeViewModel
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.LoadOfflineNodesUseCase
 import org.junit.After
@@ -22,14 +22,14 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-internal class OfflineViewModelV2Test {
-    private lateinit var underTest: OfflineViewModelV2
+internal class OfflineComposeViewModelTest {
+    private lateinit var underTest: OfflineComposeViewModel
     private val loadOfflineNodesUseCase = mock<LoadOfflineNodesUseCase>()
 
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = OfflineViewModelV2(
+        underTest = OfflineComposeViewModel(
             loadOfflineNodesUseCase,
         )
     }

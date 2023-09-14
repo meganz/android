@@ -172,6 +172,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
     PlansPageUpdate("Enable new design for Upgrade account view", false),
 
     /**
+     * To switch into new Offline Screen Compose UI
+     */
+    OfflineCompose("Enable compose for Offline Screen", false),
+
+    /**
      * Meeting notification settings
      */
     MeetingNotificationSettings("Enable Meeting notification settings", false),

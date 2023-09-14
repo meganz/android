@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.offline.offlinev2
+package mega.privacy.android.app.presentation.offline.offlinecompose
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,18 +7,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.offline.offlinev2.model.OfflineNodeUIItem
-import mega.privacy.android.app.presentation.offline.offlinev2.model.OfflineUIState
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUIState
+import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.domain.usecase.LoadOfflineNodesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * OfflineViewModelV2 of [OfflineFragmentV2]
+ * OfflineViewModelV2 of [OfflineFragmentCompose]
  */
 @HiltViewModel
-class OfflineViewModelV2 @Inject constructor(
+class OfflineComposeViewModel @Inject constructor(
     private val loadOfflineNodesUseCase: LoadOfflineNodesUseCase,
 ) : ViewModel() {
 

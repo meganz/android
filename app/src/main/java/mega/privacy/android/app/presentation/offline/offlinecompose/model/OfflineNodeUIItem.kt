@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.offline.offlinev2.model
+package mega.privacy.android.app.presentation.offline.offlinecompose.model
 
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 

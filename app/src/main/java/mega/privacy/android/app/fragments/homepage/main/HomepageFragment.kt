@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -34,12 +35,14 @@ import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.main.ManagerActivity
@@ -58,6 +61,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.HomeScreenAudioTilePressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenDocsTilePressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenEvent
@@ -68,6 +72,7 @@ import mega.privacy.mobile.analytics.event.RecentsTabEvent
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -88,6 +93,9 @@ class HomepageFragment : Fragment() {
         private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
         private const val START_SCREEN_DIALOG_SHOWN = "START_SCREEN_DIALOG_SHOWN"
     }
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel: HomePageViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
@@ -132,6 +140,11 @@ class HomepageFragment : Fragment() {
     }
 
     var isFabExpanded = false
+
+    /**
+     * Feature Flag for OfflineCompose
+     */
+    private var enableOfflineCompose: Boolean = false
 
     /** The click listener for clicking on the file category buttons.
      *  Clicking to navigate to corresponding fragments */
@@ -210,33 +223,37 @@ class HomepageFragment : Fragment() {
         }
 
         (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
-
         return rootView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        lifecycleScope.launch {
+            runCatching {
+                enableOfflineCompose = getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
+            }
+            setupMask()
+            setupSearchView()
+            setupBannerView()
+            setupCategories()
+            setupBottomSheetUI()
+            setupBottomSheetBehavior()
+            setupFabs()
 
-        setupMask()
-        setupSearchView()
-        setupBannerView()
-        setupCategories()
-        setupBottomSheetUI()
-        setupBottomSheetBehavior()
-        setupFabs()
+            (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
 
-        (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
-
-        if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
-            showChooseStartScreenDialog()
-        }
-        viewLifecycleOwner.collectFlow(viewModel.monitorConnectivity) { isConnected ->
-            if (isConnected) {
-                showOnlineMode()
-            } else {
-                showOfflineMode()
+            if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
+                showChooseStartScreenDialog()
+            }
+            viewLifecycleOwner.collectFlow(viewModel.monitorConnectivity) { isConnected ->
+                if (isConnected) {
+                    showOnlineMode()
+                } else {
+                    showOfflineMode()
+                }
             }
         }
+
     }
 
     override fun onResume() {
@@ -418,7 +435,8 @@ class HomepageFragment : Fragment() {
      */
     private fun setupBottomSheetUI() {
         viewPager = viewDataBinding.homepageBottomSheet.viewPager
-        val adapter = BottomSheetPagerAdapter(this)
+        val adapter =
+            BottomSheetPagerAdapter(fragment = this, enableOfflineCompose = enableOfflineCompose)
         // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
         viewPager.offscreenPageLimit = adapter.itemCount
         viewPager.adapter = adapter

@@ -12,13 +12,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import mega.privacy.android.app.presentation.offline.offlinev2.OfflineViewModelV2
+import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeViewModel
 
 /**
  * Scaffold for the Offline Flow Screen
  */
 @Composable
-fun OfflineFeatureScreen(viewModel: OfflineViewModelV2 = hiltViewModel()) {
+fun OfflineFeatureScreen(viewModel: OfflineComposeViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navHostController = rememberNavController()
     Scaffold(

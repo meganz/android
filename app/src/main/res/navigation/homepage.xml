@@ -10,11 +10,11 @@
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage">
         <action
-            android:id="@+id/action_homepageFragment_to_photosFragment"
-            app:destination="@id/photosFragment" />
-        <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
+            app:destination="@id/offlineFragmentCompose" />
         <action
             android:id="@+id/action_homepage_to_offline_file_info"
             app:destination="@id/offline_file_info" />
@@ -32,19 +32,14 @@
             app:destination="@id/videoFragment" />
         <action
             android:id="@+id/action_homepageFragment_to_favourites"
-            app:destination="@id/favouritesFragment"/>
+            app:destination="@id/favouritesFragment" />
         <action
             android:id="@+id/action_homepageFragment_to_favouritesFolderFragment"
             app:destination="@id/favouritesFolderFragment"
-            app:popUpTo="@id/homepageFragment"/>
-    </fragment>
-    <fragment
-        android:id="@+id/photosFragment"
-        android:name="mega.privacy.android.app.fragments.homepage.photos.ImagesFragment"
-        android:label="@string/section_images">
+            app:popUpTo="@id/homepageFragment" />
         <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
+            android:id="@+id/action_homepageFragment_to_offlineFragmentCompose"
+            app:destination="@id/offlineFragmentCompose" />
     </fragment>
     <fragment
         android:id="@+id/recentBucketFragment"
@@ -52,6 +47,9 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
+            app:destination="@id/offlineFragmentCompose" />
     </fragment>
     <fragment
         android:id="@+id/fullscreen_offline"
@@ -90,6 +88,9 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
+            app:destination="@id/offlineFragmentCompose" />
     </fragment>
     <fragment
         android:id="@+id/audioFragment"
@@ -98,6 +99,9 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
+            app:destination="@id/offlineFragmentCompose" />
     </fragment>
     <fragment
         android:id="@+id/videoFragment"
@@ -106,14 +110,18 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
+            app:destination="@id/offlineFragmentCompose" />
     </fragment>
 
-    <fragment android:id="@+id/favouritesFragment"
+    <fragment
+        android:id="@+id/favouritesFragment"
         android:name="mega.privacy.android.app.presentation.favourites.FavouritesFragment"
         android:label="FavouritesFragment">
         <action
             android:id="@+id/action_homepageFragment_to_favouritesFolderFragment"
-            app:destination="@id/favouritesFolderFragment"/>
+            app:destination="@id/favouritesFolderFragment" />
     </fragment>
     <fragment
         android:id="@+id/favouritesFolderFragment"
@@ -122,5 +130,24 @@
         <argument
             android:name="parentHandle"
             app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/offlineFragmentCompose"
+        android:name="mega.privacy.android.app.presentation.offline.offlinecompose.OfflineFragmentCompose"
+        android:label="OfflineFragmentCompose">
+        <argument
+            android:name="path"
+            android:defaultValue="/"
+            app:argType="string" />
+        <argument
+            android:name="rootFolderOnly"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
+            app:destination="@id/offlineFragmentCompose" />
+        <action
+            android:id="@+id/action_homepage_to_offline_file_info"
+            app:destination="@id/offline_file_info" />
     </fragment>
 </navigation>

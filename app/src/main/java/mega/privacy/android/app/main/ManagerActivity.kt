@@ -196,6 +196,7 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
 import mega.privacy.android.app.presentation.offline.OfflineFragment
+import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineFragmentCompose
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
@@ -543,6 +544,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var mediaDiscoveryFragment: Fragment? = null
     private var mStopped = true
     private var bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
+    private var fullscreenOfflineFragmentCompose: OfflineFragmentCompose? = null
+    private var pagerOfflineFragmentCompose: OfflineFragmentCompose? = null
     private var fullscreenOfflineFragment: OfflineFragment? = null
     private var pagerOfflineFragment: OfflineFragment? = null
 
@@ -668,6 +671,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
 
     private val fileBackupManager: FileBackupManager = initFileBackupManager()
+
+    /**
+     * Feature Flag for OfflineCompose
+     */
+    private var enableOfflineCompose: Boolean = false
+
 
     /**
      * Method for updating the visible elements related to a call.
@@ -896,6 +905,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch {
+            enableOfflineCompose =
+                getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
+        }
+
         Timber.d("onCreate after call super")
         registerViewModelObservers()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
@@ -3763,7 +3778,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         drawerItem = DrawerItem.HOMEPAGE
         path?.let {
             navController?.navigate(
-                HomepageFragmentDirections.actionHomepageToFullscreenOffline(it, false),
+                if (enableOfflineCompose) {
+                    HomepageFragmentDirections.actionHomepageFragmentToOfflineFragmentCompose(
+                        it, false
+                    )
+                } else {
+                    HomepageFragmentDirections.actionHomepageToFullscreenOffline(it, false)
+                },
                 NavOptions.Builder().setLaunchSingleTop(true).build()
             )
         }
@@ -3792,6 +3813,42 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (isInMainHomePage) {
                 appBarLayout.visibility = View.GONE
             }
+        }
+    }
+
+    fun fullscreenOfflineFragmentComposeOpened(fragment: OfflineFragmentCompose?) {
+        fullscreenOfflineFragmentCompose = fragment
+        showFabButton()
+        setBottomNavigationMenuItemChecked(HOME_BNV)
+        appBarLayout.visibility = View.VISIBLE
+        setToolbarTitle()
+        supportInvalidateOptionsMenu()
+    }
+
+    fun fullscreenOfflineFragmentComposeClosed(fragment: OfflineFragmentCompose) {
+        if (fragment === fullscreenOfflineFragmentCompose) {
+            fullscreenOfflineFragmentCompose = null
+            if (bottomItemBeforeOpenFullscreenOffline != Constants.INVALID_VALUE && !mStopped) {
+                backToDrawerItem(bottomItemBeforeOpenFullscreenOffline)
+                bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
+            }
+            pathNavigationOffline = "/"
+            // workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
+            // offline, and hide AppBarLayout when immediately on go back, we will see the flicker
+            // of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
+            if (isInMainHomePage) {
+                appBarLayout.visibility = View.GONE
+            }
+        }
+    }
+
+    fun pagerOfflineFragmentComposeOpened(fragment: OfflineFragmentCompose?) {
+        pagerOfflineFragmentCompose = fragment
+    }
+
+    fun pagerOfflineFragmentComposeClosed(fragment: OfflineFragmentCompose) {
+        if (fragment === pagerOfflineFragmentCompose) {
+            pagerOfflineFragment = null
         }
     }
 
@@ -3896,7 +3953,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         when (drawerItem) {
             DrawerItem.HOMEPAGE -> {
-                if (fullscreenOfflineFragment != null) {
+                if (enableOfflineCompose) {
+                    fullscreenOfflineFragmentCompose?.checkScroll()
+                } else {
                     fullscreenOfflineFragment?.checkScroll()
                 }
             }
@@ -5445,11 +5504,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 SharesTab.OUTGOING_TAB -> parentHandle =
                                     outgoingSharesViewModel.state().outgoingHandle
 
-                                SharesTab.LINKS_TAB -> parentHandle = legacyLinksViewModel.state().linksHandle
+                                SharesTab.LINKS_TAB -> parentHandle =
+                                    legacyLinksViewModel.state().linksHandle
+
                                 else -> {}
                             }
 
-                            DrawerItem.BACKUPS -> parentHandle = backupsViewModel.state().backupsHandle
+                            DrawerItem.BACKUPS -> parentHandle =
+                                backupsViewModel.state().backupsHandle
+
                             else -> {}
                         }
                     }
