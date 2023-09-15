@@ -465,4 +465,41 @@ class ChatRepositoryImplTest {
         val actual = underTest.getChatConnectionState(chatId = chatId)
         assertThat(actual).isEqualTo(ChatConnectionStatus.Online)
     }
+
+    @Test
+    fun `test that attachNode invokes megaApi and returns the temp id`() = runTest {
+        val handle = 2L
+        val expectedTempId = 3L
+        val message = mock<MegaChatMessage> { on { tempId }.thenReturn(expectedTempId) }
+        val megaChatRequest = mock<MegaChatRequest> { on { megaChatMessage }.thenReturn(message) }
+        whenever(megaChatApiGateway.attachNode(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaChatRequest,
+                megaChatErrorSuccess,
+            )
+        }
+        val actual = underTest.attachNode(chatId, handle)
+        assertThat(actual).isEqualTo(expectedTempId)
+        verify(megaChatApiGateway).attachNode(any(), any(), any())
+    }
+
+    @Test
+    fun `test that attachVoiceMessage invokes megaApi returns the temp id`() = runTest {
+
+        val handle = 2L
+        val expectedTempId = 3L
+        val message = mock<MegaChatMessage> { on { tempId }.thenReturn(expectedTempId) }
+        val megaChatRequest = mock<MegaChatRequest> { on { megaChatMessage }.thenReturn(message) }
+        whenever(megaChatApiGateway.attachVoiceMessage(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaChatRequest,
+                megaChatErrorSuccess,
+            )
+        }
+        val actual = underTest.attachVoiceMessage(chatId, handle)
+        assertThat(actual).isEqualTo(expectedTempId)
+        verify(megaChatApiGateway).attachVoiceMessage(any(), any(), any())
+    }
 }

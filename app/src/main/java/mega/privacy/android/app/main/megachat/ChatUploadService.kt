@@ -56,6 +56,8 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.chat.AttachNodeUseCase
+import mega.privacy.android.domain.usecase.chat.AttachVoiceMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
@@ -67,11 +69,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfe
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -82,14 +80,11 @@ import javax.inject.Inject
  * Service which should be only used for chat uploads.
  */
 @AndroidEntryPoint
-class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
+class ChatUploadService : LifecycleService() {
 
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var megaChatApi: MegaChatApiAndroid
 
     @Inject
     lateinit var dbH: LegacyDatabaseHandler
@@ -132,6 +127,12 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
 
     @Inject
     lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
+
+    @Inject
+    lateinit var attachNodeUseCase: AttachNodeUseCase
+
+    @Inject
+    lateinit var attachVoiceMessageUseCase: AttachVoiceMessageUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -374,7 +375,11 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
                 for (attachFile in attachFiles) {
                     for (idChat in idChats!!) {
                         requestSent++
-                        megaChatApi.attachNode(idChat, attachFile, this)
+                        lifecycleScope.launch {
+                            runCatching { attachNodeUseCase(idChat, attachFile) }
+                                .onSuccess { handleSuccessAttachment(attachFile, it) }
+                                .onFailure { handleFailureAttachment(it, attachFile) }
+                        }
                     }
                 }
             }
@@ -572,7 +577,11 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
                     if (dbH.transferQueueStatus
                         && !transfersManagement.hasResumeTransfersWarningAlreadyBeenShown
                     ) {
-                        sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS).setPackage(applicationContext.packageName))
+                        sendBroadcast(
+                            Intent(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS).setPackage(
+                                applicationContext.packageName
+                            )
+                        )
                     }
 
                     this.cancel()
@@ -942,7 +951,8 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
         transfer.pendingMessageId()?.let { id ->
             sendBroadcast(
                 Intent(BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START)
-                    .putExtra(BroadcastConstants.PENDING_MESSAGE_ID, id).setPackage(applicationContext.packageName)
+                    .putExtra(BroadcastConstants.PENDING_MESSAGE_ID, id)
+                    .setPackage(applicationContext.packageName)
             )
 
             //Update status and tag on db
@@ -1030,7 +1040,11 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
         error: MegaException?,
     ) = with(transfer) {
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(applicationContext.packageName))
+            sendBroadcast(
+                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
+                    applicationContext.packageName
+                )
+            )
         }
 
         Timber.d("onTransferFinish: $nodeHandle")
@@ -1203,7 +1217,11 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
         requestSent++
         pendMsg.nodeHandle = nodeHandle
         pendMsg.state = PendingMessageState.ATTACHING.value
-        megaChatApi.attachNode(pendMsg.chatId, nodeHandle, this@ChatUploadService)
+        lifecycleScope.launch {
+            runCatching { attachNodeUseCase(pendMsg.chatId, nodeHandle) }
+                .onSuccess { handleSuccessAttachment(nodeHandle, it) }
+                .onFailure { handleFailureAttachment(it, nodeHandle) }
+        }
 
         if (FileUtil.isVideoFile(localPath)) {
             val pathDownsampled = pendMsg.videoDownSampled
@@ -1238,11 +1256,11 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
                 if (pendMsg.id == id) {
                     pendMsg.nodeHandle = nodeHandle
                     pendMsg.state = PendingMessageState.ATTACHING.value
-                    megaChatApi.attachVoiceMessage(
-                        pendMsg.chatId,
-                        nodeHandle,
-                        this@ChatUploadService
-                    )
+                    lifecycleScope.launch {
+                        runCatching { attachVoiceMessageUseCase(pendMsg.chatId, nodeHandle) }
+                            .onSuccess { handleSuccessAttachment(nodeHandle, it) }
+                            .onFailure { handleFailureAttachment(it, nodeHandle) }
+                    }
                     return@with
                 }
             }
@@ -1252,65 +1270,44 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
         }
     }
 
-    override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {}
+    private fun handleSuccessAttachment(nodeHandle: Long, tempId: Long) {
+        Timber.d("The tempId of the message is: $tempId")
 
-    override fun onRequestUpdate(api: MegaChatApiJava, request: MegaChatRequest) {}
+        requestSent--
 
-    override fun onRequestFinish(api: MegaChatApiJava, request: MegaChatRequest, e: MegaChatError) {
-        if (request.type == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE) {
-            requestSent--
-
-            if (e.errorCode == MegaChatError.ERROR_OK) {
-                Timber.d("Attachment sent correctly")
-                val nodeList = request.megaNodeList
-
-                //Find the pending message
-                for (i in pendingMessages!!.indices) {
-                    val pendMsg = pendingMessages!![i]
-
-                    //Check node handles - if match add to DB the karere temp id of the message
-                    val nodeHandle = pendMsg.nodeHandle
-                    val node = nodeList[0]
-
-                    if (node.handle == nodeHandle) {
-                        Timber.d("The message MATCH!!")
-                        val tempId = request.megaChatMessage.tempId
-                        Timber.d("The tempId of the message is: $tempId")
-                        dbH.updatePendingMessageOnAttach(
-                            pendMsg.id,
-                            tempId.toString() + "",
-                            PendingMessageState.SENT.value
-                        )
-                        pendingMessages!!.removeAt(i)
-                        break
-                    }
-                }
-            } else {
-                Timber.w("Attachment not correctly sent: ${e.errorCode} ${e.errorString}")
-                val nodeList = request.megaNodeList
-
-                //Find the pending message
-                for (i in pendingMessages!!.indices) {
-                    val pendMsg = pendingMessages!![i]
-                    //Check node handles - if match add to DB the karere temp id of the message
-                    val nodeHandle = pendMsg.nodeHandle
-                    val node = nodeList[0]
-
-                    if (node.handle == nodeHandle) {
-                        MegaApplication.getChatManagement().removeMsgToDelete(pendMsg.id)
-                        Timber.d("The message MATCH!!")
-                        dbH.updatePendingMessageOnAttach(
-                            pendMsg.id,
-                            (-1).toString(),
-                            PendingMessageState.ERROR_ATTACHING.value
-                        )
-                        launchErrorToChat(pendMsg.id)
-                        break
-                    }
-                }
-            }
+        pendingMessages?.first { pendMsg -> pendMsg.nodeHandle == nodeHandle }?.let {
+            dbH.updatePendingMessageOnAttach(
+                it.id,
+                tempId.toString(),
+                PendingMessageState.SENT.value
+            )
+            pendingMessages?.remove(it)
         }
 
+        checkTotals()
+    }
+
+    private fun handleFailureAttachment(exception: Throwable, nodeHandle: Long) {
+        Timber.e("Exception attaching voice message", exception)
+
+        requestSent--
+
+        pendingMessages?.first { pendMsg -> pendMsg.nodeHandle == nodeHandle }?.let {
+            MegaApplication.getChatManagement().removeMsgToDelete(it.id)
+            Timber.d("The message MATCH!!")
+
+            dbH.updatePendingMessageOnAttach(
+                it.id,
+                (-1).toString(),
+                PendingMessageState.ERROR_ATTACHING.value
+            )
+            launchErrorToChat(it.id)
+        }
+
+        checkTotals()
+    }
+
+    private fun checkTotals() {
         if (totalUploadsCompleted == totalUploads && transfersCount == 0 && numberVideosPending <= 0 && requestSent <= 0) {
             onQueueComplete()
         }
@@ -1337,13 +1334,6 @@ class ChatUploadService : LifecycleService(), MegaChatRequestListenerInterface {
                 }
             }
         }
-    }
-
-    override fun onRequestTemporaryError(
-        api: MegaChatApiJava,
-        request: MegaChatRequest,
-        e: MegaChatError,
-    ) {
     }
 
     private fun showStorageOverquotaNotification() {

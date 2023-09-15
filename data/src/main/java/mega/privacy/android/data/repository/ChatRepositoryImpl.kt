@@ -848,4 +848,41 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun attachNode(chatId: Long, nodeHandle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("attachNode") {
+                it.megaChatMessage.tempId
+            }
+
+            megaChatApiGateway.attachNode(
+                chatId = chatId,
+                nodeHandle = nodeHandle,
+                listener = listener,
+            )
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun attachVoiceMessage(chatId: Long, nodeHandle: Long) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener("attachVoiceMessage") {
+                    it.megaChatMessage.tempId
+                }
+
+                megaChatApiGateway.attachVoiceMessage(
+                    chatId = chatId,
+                    nodeHandle = nodeHandle,
+                    listener = listener,
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }

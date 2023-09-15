@@ -663,4 +663,16 @@ internal class MegaChatApiFacade @Inject constructor(
     ) {
         chatApi.allowUsersJoinCall(chatId, userList, all, listener)
     }
+
+    override fun attachNode(
+        chatId: Long,
+        nodeHandle: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.attachNode(chatId, nodeHandle, listener)
+
+    override fun attachVoiceMessage(
+        chatId: Long,
+        nodeHandle: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.attachVoiceMessage(chatId, nodeHandle, listener)
 }
