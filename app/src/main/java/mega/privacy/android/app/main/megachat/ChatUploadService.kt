@@ -17,11 +17,11 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
@@ -58,6 +58,7 @@ import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.chat.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.AttachVoiceMessageUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
@@ -67,6 +68,7 @@ import mega.privacy.android.domain.usecase.transfers.chatuploads.IsThereAnyChatU
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -133,6 +135,12 @@ class ChatUploadService : LifecycleService() {
 
     @Inject
     lateinit var attachVoiceMessageUseCase: AttachVoiceMessageUseCase
+
+    @Inject
+    lateinit var getFingerprintUseCase: GetFingerprintUseCase
+
+    @Inject
+    lateinit var resetTotalUploadsUseCase: ResetTotalUploadsUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -231,9 +239,6 @@ class ChatUploadService : LifecycleService() {
     }
 
     private fun startForeground() {
-        @Suppress("DEPRECATION")
-        if (megaApi.numPendingUploads <= 0) return
-
         isForeground = try {
             startForeground(
                 Constants.NOTIFICATION_CHAT_UPLOAD,
@@ -304,38 +309,36 @@ class ChatUploadService : LifecycleService() {
         }
 
         isOverQuota = Constants.NOT_OVERQUOTA_STATE
-        onHandleIntent(intent)
+        lifecycleScope.launch { onHandleIntent(intent) }
         return START_NOT_STICKY
     }
 
-    private fun onHandleIntent(intent: Intent?) {
+    private suspend fun onHandleIntent(intent: Intent?) {
         if (intent == null) return
 
         if (intent.action != null && intent.action == Constants.ACTION_RESTART_SERVICE) {
-            lifecycleScope.launch {
-                getTransferDataUseCase()?.let { transferData ->
-                    var voiceClipsInProgress = 0
+            getTransferDataUseCase()?.let { transferData ->
+                var voiceClipsInProgress = 0
 
-                    for (i in 0 until transferData.numUploads) {
-                        getTransferByTagUseCase(transferData.uploadTags[i])?.takeIf { transfer ->
-                            transfer.isChatUpload()
-                        }?.let { transfer ->
-                            mapProgressTransfers[transfer.tag] = transfer
+                for (i in 0 until transferData.numUploads) {
+                    getTransferByTagUseCase(transferData.uploadTags[i])?.takeIf { transfer ->
+                        transfer.isChatUpload()
+                    }?.let { transfer ->
+                        mapProgressTransfers[transfer.tag] = transfer
 
-                            if (transfer.isVoiceClip()) voiceClipsInProgress++
-                        }
+                        if (transfer.isVoiceClip()) voiceClipsInProgress++
                     }
+                }
 
-                    totalUploads = mapProgressTransfers.size - voiceClipsInProgress
-                    transfersCount = totalUploads
+                totalUploads = mapProgressTransfers.size - voiceClipsInProgress
+                transfersCount = totalUploads
 
-                    if (totalUploads > 0) {
-                        updateProgressNotification()
-                    } else {
-                        stopForeground()
-                    }
-                } ?: startForeground()
-            }
+                if (totalUploads > 0) {
+                    updateProgressNotification()
+                } else {
+                    stopForeground()
+                }
+            } ?: startForeground()
             return
         } else if (Constants.ACTION_CHECK_COMPRESSING_MESSAGE == intent.action) {
             checkCompressingMessage(intent)
@@ -375,11 +378,9 @@ class ChatUploadService : LifecycleService() {
                 for (attachFile in attachFiles) {
                     for (idChat in idChats!!) {
                         requestSent++
-                        lifecycleScope.launch {
-                            runCatching { attachNodeUseCase(idChat, attachFile) }
-                                .onSuccess { handleSuccessAttachment(attachFile, it) }
-                                .onFailure { handleFailureAttachment(it, attachFile) }
-                        }
+                        runCatching { attachNodeUseCase(idChat, attachFile) }
+                            .onSuccess { handleSuccessAttachment(attachFile, it) }
+                            .onFailure { handleFailureAttachment(it, attachFile) }
                     }
                 }
             }
@@ -459,133 +460,128 @@ class ChatUploadService : LifecycleService() {
         }
     }
 
-    private fun initUpload(pendingMsgs: ArrayList<PendingMessage>, type: String?) {
+    private suspend fun initUpload(pendingMsgs: ArrayList<PendingMessage>, type: String?) {
         Timber.d("initUpload")
         val pendingMsg = pendingMsgs[0]
         val file = File(pendingMsg.filePath)
 
-        lifecycleScope.launch {
-            chatPreferencesGateway
-                .getChatImageQualityPreference().collectLatest { imageQuality ->
-                    val shouldCompressImage = MimeTypeList.typeForName(file.name).isImage
-                            && !MimeTypeList.typeForName(file.name).isGIF
-                            && (imageQuality == ChatImageQuality.Optimised
-                            || (imageQuality == ChatImageQuality.Automatic
-                            && Util.isOnMobileData(this@ChatUploadService)))
+        val imageQuality = chatPreferencesGateway.getChatImageQualityPreference().first()
+        Timber.d("Image quality is $imageQuality")
+        val shouldCompressImage = MimeTypeList.typeForName(file.name).isImage
+                && !MimeTypeList.typeForName(file.name).isGIF
+                && (imageQuality == ChatImageQuality.Optimised
+                || (imageQuality == ChatImageQuality.Automatic
+                && Util.isOnMobileData(this@ChatUploadService)))
 
-                    if (shouldCompressImage) {
-                        val compressedFile = ChatUtil.checkImageBeforeUpload(file)
-                        val uploadPath = if (FileUtil.isFileAvailable(compressedFile)) {
-                            val fingerprint = megaApi.getFingerprint(compressedFile.absolutePath)
-                            for (pendMsg in pendingMsgs) {
-                                if (fingerprint != null) {
-                                    pendMsg.fingerprint = fingerprint
-                                }
-                                pendingMessages!!.add(pendMsg)
-                            }
-                            compressedFile.absolutePath
-                        } else {
-                            pendingMessages!!.addAll(pendingMsgs)
-                            pendingMsg.filePath
+        if (shouldCompressImage) {
+            val compressedFile = ChatUtil.checkImageBeforeUpload(file)
+            val uploadPath = if (FileUtil.isFileAvailable(compressedFile)) {
+                val fingerprint = getFingerprintUseCase(compressedFile.absolutePath)
+                for (pendMsg in pendingMsgs) {
+                    if (fingerprint != null) {
+                        pendMsg.fingerprint = fingerprint
+                    }
+                    pendingMessages!!.add(pendMsg)
+                }
+                compressedFile.absolutePath
+            } else {
+                pendingMessages!!.addAll(pendingMsgs)
+                pendingMsg.filePath
+            }
+
+            startUpload(pendingMsg.id, type, fileNames!![pendingMsg.name], uploadPath)
+        } else if (MimeTypeList.typeForName(file.name).isMp4Video && !sendOriginalAttachments) {
+            Timber.d("DATA connection is Mp4Video")
+            try {
+                val chatTempFolder = getCacheFolder(
+                    CacheFolderManager.CHAT_TEMPORARY_FOLDER
+                )
+                var outFile = buildChatTempFile(file.name)
+                var index = 0
+
+                if (outFile != null) {
+                    while (outFile!!.exists()) {
+                        if (index > 0) {
+                            outFile = File(chatTempFolder!!.absolutePath, file.name)
                         }
 
-                        startUpload(pendingMsg.id, type, fileNames!![pendingMsg.name], uploadPath)
-                    } else if (MimeTypeList.typeForName(file.name).isMp4Video && !sendOriginalAttachments) {
-                        Timber.d("DATA connection is Mp4Video")
-                        try {
-                            val chatTempFolder = getCacheFolder(
-                                CacheFolderManager.CHAT_TEMPORARY_FOLDER
-                            )
-                            var outFile = buildChatTempFile(file.name)
-                            var index = 0
+                        index++
+                        val outFilePath = outFile.absolutePath
+                        val splitByDot = outFilePath.split("\\.").toTypedArray()
+                        var ext = ""
 
-                            if (outFile != null) {
-                                while (outFile!!.exists()) {
-                                    if (index > 0) {
-                                        outFile = File(chatTempFolder!!.absolutePath, file.name)
-                                    }
+                        if (splitByDot.size > 1) {
+                            ext = splitByDot[splitByDot.size - 1]
+                        }
 
-                                    index++
-                                    val outFilePath = outFile.absolutePath
-                                    val splitByDot = outFilePath.split("\\.").toTypedArray()
-                                    var ext = ""
+                        var fileName = outFilePath
+                            .substring(outFilePath.lastIndexOf(File.separator) + 1)
 
-                                    if (splitByDot.size > 1) {
-                                        ext = splitByDot[splitByDot.size - 1]
-                                    }
-
-                                    var fileName = outFilePath
-                                        .substring(outFilePath.lastIndexOf(File.separator) + 1)
-
-                                    fileName =
-                                        if (ext.isNotEmpty()) {
-                                            fileName.replace(
-                                                ".$ext",
-                                                "_" + index + FileUtil.MP4_EXTENSION
-                                            )
-                                        } else {
-                                            fileName + "_" + index + FileUtil.MP4_EXTENSION
-                                        }
-
-                                    outFile = File(chatTempFolder!!.absolutePath, fileName)
-                                }
-
-                                outFile.createNewFile()
-                            }
-
-                            if (outFile == null) {
-                                addPendingMessagesAndStartUpload(
-                                    pendingMsg.id,
-                                    type,
-                                    fileNames!![pendingMsg.name],
-                                    pendingMsg.filePath,
-                                    pendingMsgs
+                        fileName =
+                            if (ext.isNotEmpty()) {
+                                fileName.replace(
+                                    ".$ext",
+                                    "_" + index + FileUtil.MP4_EXTENSION
                                 )
                             } else {
-                                totalVideos++
-                                numberVideosPending++
-                                for (pendMsg in pendingMsgs) {
-                                    pendMsg.videoDownSampled = outFile.absolutePath
-                                    pendingMessages!!.add(pendMsg)
-                                }
-                                mapVideoDownsampling!![outFile.absolutePath] = 0
-                                if (videoDownsampling == null) {
-                                    videoDownsampling = VideoDownSampling(this@ChatUploadService)
-                                }
-                                videoDownsampling!!.changeResolution(
-                                    file, outFile.absolutePath,
-                                    pendingMsg.id, dbH.chatVideoQuality
-                                )
+                                fileName + "_" + index + FileUtil.MP4_EXTENSION
                             }
-                        } catch (throwable: Throwable) {
-                            Timber.e("EXCEPTION: Video cannot be downsampled", throwable)
-                            addPendingMessagesAndStartUpload(
-                                pendingMsg.id,
-                                type,
-                                fileNames!![pendingMsg.name],
-                                pendingMsg.filePath,
-                                pendingMsgs
-                            )
-                        }
-                    } else {
-                        addPendingMessagesAndStartUpload(
-                            pendingMsg.id, type,
-                            fileNames!![pendingMsg.name], pendingMsg.filePath, pendingMsgs
-                        )
+
+                        outFile = File(chatTempFolder!!.absolutePath, fileName)
                     }
 
-                    if (dbH.transferQueueStatus
-                        && !transfersManagement.hasResumeTransfersWarningAlreadyBeenShown
-                    ) {
-                        sendBroadcast(
-                            Intent(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS).setPackage(
-                                applicationContext.packageName
-                            )
-                        )
-                    }
-
-                    this.cancel()
+                    outFile.createNewFile()
                 }
+
+                if (outFile == null) {
+                    addPendingMessagesAndStartUpload(
+                        pendingMsg.id,
+                        type,
+                        fileNames!![pendingMsg.name],
+                        pendingMsg.filePath,
+                        pendingMsgs
+                    )
+                } else {
+                    totalVideos++
+                    numberVideosPending++
+                    for (pendMsg in pendingMsgs) {
+                        pendMsg.videoDownSampled = outFile.absolutePath
+                        pendingMessages!!.add(pendMsg)
+                    }
+                    mapVideoDownsampling!![outFile.absolutePath] = 0
+                    if (videoDownsampling == null) {
+                        videoDownsampling = VideoDownSampling(this@ChatUploadService)
+                    }
+                    videoDownsampling!!.changeResolution(
+                        file, outFile.absolutePath,
+                        pendingMsg.id, dbH.chatVideoQuality
+                    )
+                }
+            } catch (throwable: Throwable) {
+                Timber.e("EXCEPTION: Video cannot be downsampled", throwable)
+                addPendingMessagesAndStartUpload(
+                    pendingMsg.id,
+                    type,
+                    fileNames!![pendingMsg.name],
+                    pendingMsg.filePath,
+                    pendingMsgs
+                )
+            }
+        } else {
+            addPendingMessagesAndStartUpload(
+                pendingMsg.id, type,
+                fileNames!![pendingMsg.name], pendingMsg.filePath, pendingMsgs
+            )
+        }
+
+        if (dbH.transferQueueStatus
+            && !transfersManagement.hasResumeTransfersWarningAlreadyBeenShown
+        ) {
+            sendBroadcast(
+                Intent(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS).setPackage(
+                    applicationContext.packageName
+                )
+            )
         }
     }
 
@@ -645,7 +641,7 @@ class ChatUploadService : LifecycleService() {
     /**
      * No more intents in the queue
      */
-    private fun onQueueComplete() {
+    private suspend fun onQueueComplete() {
         Timber.d("onQueueComplete")
         //Review when is called
         releaseLocks()
@@ -660,21 +656,16 @@ class ChatUploadService : LifecycleService() {
         totalUploads = 0
         totalUploadsCompleted = 0
 
-        @Suppress("DEPRECATION")
-        if (megaApi.numPendingUploads <= 0) {
-            megaApi.resetTotalUploads()
-        }
+        resetTotalUploadsUseCase()
 
         if (fileExplorerUpload) {
             fileExplorerUpload = false
-            lifecycleScope.launch {
-                broadcastTransfersFinishedUseCase(
-                    TransfersFinishedState(
-                        type = TransferFinishType.FILE_EXPLORER_CHAT_UPLOAD,
-                        chatId = snackbarChatHandle
-                    )
+            broadcastTransfersFinishedUseCase(
+                TransfersFinishedState(
+                    type = TransferFinishType.FILE_EXPLORER_CHAT_UPLOAD,
+                    chatId = snackbarChatHandle
                 )
-            }
+            )
 
             snackbarChatHandle = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
         }
@@ -714,10 +705,8 @@ class ChatUploadService : LifecycleService() {
                 }
 
                 if (pendMsg.videoDownSampled != null && pendMsg.videoDownSampled == returnedFile) {
-                    val fingerPrint = megaApi.getFingerprint(returnedFile)
-
-                    if (fingerPrint != null) {
-                        pendMsg.fingerprint = fingerPrint
+                    lifecycleScope.launch {
+                        getFingerprintUseCase(returnedFile)?.let { pendMsg.fingerprint = it }
                     }
                 }
             }
@@ -972,10 +961,8 @@ class ChatUploadService : LifecycleService() {
         if (canceled) {
             Timber.w("Transfer cancel: $nodeHandle")
             releaseLocks()
-            lifecycleScope.launch {
-                runCatching { cancelTransferByTagUseCase(tag) }
-                    .onFailure { Timber.w("Exception canceling transfer: $it") }
-            }
+            runCatching { cancelTransferByTagUseCase(tag) }
+                .onFailure { Timber.w("Exception canceling transfer: $it") }
             cancel()
             Timber.d("After cancel")
             return
@@ -1156,7 +1143,7 @@ class ChatUploadService : LifecycleService() {
      * @param transfer Current MegaTransfer.
      * @return True if the list is empty, false otherwise.
      */
-    private fun arePendingMessagesEmpty(id: Long, transfer: Transfer): Boolean {
+    private suspend fun arePendingMessagesEmpty(id: Long, transfer: Transfer): Boolean {
         if (pendingMessages != null && pendingMessages!!.isNotEmpty()) {
             return false
         }
@@ -1170,7 +1157,7 @@ class ChatUploadService : LifecycleService() {
      * @param id       Identifier of PendingMessage.
      * @param transfer Current MegaTransfer.
      */
-    private fun attachMessageFromDB(id: Long, transfer: Transfer) {
+    private suspend fun attachMessageFromDB(id: Long, transfer: Transfer) {
         val pendingMessage = dbH.findPendingMessageById(id)
         if (pendingMessage != null) {
             pendingMessages!!.add(pendingMessage)
@@ -1180,7 +1167,7 @@ class ChatUploadService : LifecycleService() {
         }
     }
 
-    fun attachNodes(transfer: Transfer) = with(transfer) {
+    private suspend fun attachNodes(transfer: Transfer) = with(transfer) {
         Timber.d("attachNodes()")
 
         transfer.pendingMessageId()?.let { id ->
@@ -1195,7 +1182,7 @@ class ChatUploadService : LifecycleService() {
                 return@with
             }
 
-            val fingerprint = megaApi.getFingerprint(localPath)
+            val fingerprint = getFingerprintUseCase(localPath)
             var msgNotFound = true
 
             for (pendMsg in pendingMessages!!) {
@@ -1212,16 +1199,14 @@ class ChatUploadService : LifecycleService() {
         }
     }
 
-    fun attach(pendMsg: PendingMessage, transfer: Transfer) = with(transfer) {
+    private suspend fun attach(pendMsg: PendingMessage, transfer: Transfer) = with(transfer) {
         Timber.d("attach")
         requestSent++
         pendMsg.nodeHandle = nodeHandle
         pendMsg.state = PendingMessageState.ATTACHING.value
-        lifecycleScope.launch {
-            runCatching { attachNodeUseCase(pendMsg.chatId, nodeHandle) }
-                .onSuccess { handleSuccessAttachment(nodeHandle, it) }
-                .onFailure { handleFailureAttachment(it, nodeHandle) }
-        }
+        runCatching { attachNodeUseCase(pendMsg.chatId, nodeHandle) }
+            .onSuccess { handleSuccessAttachment(nodeHandle, it) }
+            .onFailure { handleFailureAttachment(it, nodeHandle) }
 
         if (FileUtil.isVideoFile(localPath)) {
             val pathDownsampled = pendMsg.videoDownSampled
@@ -1238,7 +1223,7 @@ class ChatUploadService : LifecycleService() {
         }
     }
 
-    fun attachVoiceClips(transfer: Transfer) = with(transfer) {
+    private suspend fun attachVoiceClips(transfer: Transfer) = with(transfer) {
         Timber.d("attachVoiceClips()")
         transfer.pendingMessageId()?.let { id ->
             //Update status and nodeHandle on db
@@ -1256,11 +1241,9 @@ class ChatUploadService : LifecycleService() {
                 if (pendMsg.id == id) {
                     pendMsg.nodeHandle = nodeHandle
                     pendMsg.state = PendingMessageState.ATTACHING.value
-                    lifecycleScope.launch {
-                        runCatching { attachVoiceMessageUseCase(pendMsg.chatId, nodeHandle) }
-                            .onSuccess { handleSuccessAttachment(nodeHandle, it) }
-                            .onFailure { handleFailureAttachment(it, nodeHandle) }
-                    }
+                    runCatching { attachVoiceMessageUseCase(pendMsg.chatId, nodeHandle) }
+                        .onSuccess { handleSuccessAttachment(nodeHandle, it) }
+                        .onFailure { handleFailureAttachment(it, nodeHandle) }
                     return@with
                 }
             }
@@ -1270,7 +1253,7 @@ class ChatUploadService : LifecycleService() {
         }
     }
 
-    private fun handleSuccessAttachment(nodeHandle: Long, tempId: Long) {
+    private suspend fun handleSuccessAttachment(nodeHandle: Long, tempId: Long) {
         Timber.d("The tempId of the message is: $tempId")
 
         requestSent--
@@ -1287,7 +1270,7 @@ class ChatUploadService : LifecycleService() {
         checkTotals()
     }
 
-    private fun handleFailureAttachment(exception: Throwable, nodeHandle: Long) {
+    private suspend fun handleFailureAttachment(exception: Throwable, nodeHandle: Long) {
         Timber.e("Exception attaching voice message", exception)
 
         requestSent--
@@ -1307,7 +1290,7 @@ class ChatUploadService : LifecycleService() {
         checkTotals()
     }
 
-    private fun checkTotals() {
+    private suspend fun checkTotals() {
         if (totalUploadsCompleted == totalUploads && transfersCount == 0 && numberVideosPending <= 0 && requestSent <= 0) {
             onQueueComplete()
         }

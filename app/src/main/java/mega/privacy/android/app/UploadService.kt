@@ -60,17 +60,17 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.account.qr.CheckUploadedQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.GetNumberOfPendingUploadsUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -136,7 +136,7 @@ internal class UploadService : LifecycleService() {
     lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
-    lateinit var getNumberOfPendingUploadsUseCase: GetNumberOfPendingUploadsUseCase
+    lateinit var getNumPendingUploadsUseCase: GetNumPendingUploadsUseCase
 
     @Inject
     lateinit var resetTotalUploadsUseCase: ResetTotalUploadsUseCase
@@ -230,7 +230,7 @@ internal class UploadService : LifecycleService() {
         monitorStopTransfersWorkJob = applicationScope.launch {
             monitorStopTransfersWorkUseCase().conflate().collect {
                 applicationScope.launch {
-                    if (getNumberOfPendingUploadsUseCase() == 0) stopForeground()
+                    if (getNumPendingUploadsUseCase() == 0) stopForeground()
                 }
             }
         }
@@ -401,7 +401,7 @@ internal class UploadService : LifecycleService() {
     }
 
     private suspend fun checkUploads() {
-        if (getNumberOfPendingUploadsUseCase() == 0) {
+        if (getNumPendingUploadsUseCase() == 0) {
             stopForeground()
         } else {
             updateProgressNotification()
@@ -835,7 +835,7 @@ internal class UploadService : LifecycleService() {
             }
         }
         if (appData.isNotEmpty()) {
-            if (getNumberOfPendingUploadsUseCase() == 0) {
+            if (getNumPendingUploadsUseCase() == 0) {
                 onQueueComplete(false)
             }
             return
