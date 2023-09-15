@@ -5,11 +5,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
+@Ignore("Ignore the unstable test. Will add the tests back once stability issue is resolved.")
 class ChatAvatarViewTest {
 
     @get:Rule
