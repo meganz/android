@@ -28,7 +28,10 @@ internal object RoomDatabaseModule {
             applicationContext,
             MegaDatabase::class.java, MegaDatabaseConstant.DATABASE_NAME
         ).addMigrations(*MegaDatabase.MIGRATIONS)
-            .build()
+            .build().apply {
+                // this is workaround to make sure room migration run before sqlite database migration
+                openHelper.writableDatabase
+            }
 
     @Provides
     @Singleton

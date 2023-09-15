@@ -30,6 +30,7 @@ import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
+import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.MegaDatabaseConstant.DATABASE_NAME
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_CONTACTS
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_SD_TRANSFERS
@@ -72,7 +73,7 @@ class SqliteDatabaseHandler @Inject constructor(
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), LegacyDatabaseHandler {
+) : SQLiteOpenHelper(context, DATABASE_NAME, null, MegaDatabaseConstant.DATABASE_VERSION), LegacyDatabaseHandler {
     private var db: SQLiteDatabase
     override fun onCreate(db: SQLiteDatabase) {
         Timber.d("onCreate")
@@ -4331,7 +4332,6 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     companion object {
-        private const val DATABASE_VERSION = 68
         private const val TABLE_PREFERENCES = "preferences"
         private const val TABLE_CREDENTIALS = "credentials"
         private const val TABLE_ATTRIBUTES = "attributes"
