@@ -8,10 +8,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
@@ -48,7 +46,6 @@ import nz.mega.sdk.MegaUserAlert
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.resume
 
 /**
  * Mega api facade
@@ -523,21 +520,11 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(userHandle: Long): String? =
         megaApi.getUserAvatarColor(userHandleToBase64(userHandle))
 
-    override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {
-        return suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, e ->
-                    continuation.resume(e.errorCode == MegaError.API_OK)
-                })
-
-            continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
-            megaApi.getUserAvatar(
-                user,
-                destinationPath,
-                listener
-            )
-        }
-    }
+    override fun getUserAvatar(
+        user: MegaUser,
+        destinationPath: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getUserAvatar(user, destinationPath, listener)
 
     override suspend fun acknowledgeUserAlerts() {
         megaApi.acknowledgeUserAlerts()

@@ -760,10 +760,13 @@ interface MegaApiGateway {
      *
      * @param user
      * @param destinationPath destination path file
-     *
-     * @return true if success
+     * @param listener
      */
-    suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean
+    fun getUserAvatar(
+        user: MegaUser,
+        destinationPath: String,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Allow to search nodes with the specific options, [order] & [type] & [target]

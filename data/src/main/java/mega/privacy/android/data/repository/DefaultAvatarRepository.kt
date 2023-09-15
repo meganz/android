@@ -89,12 +89,22 @@ internal class DefaultAvatarRepository @Inject constructor(
         }
     }
 
-    private suspend fun loadAvatarFile(user: MegaUser): File? {
+    private suspend fun loadAvatarFile(user: MegaUser): File? = withContext(ioDispatcher) {
         val avatarFile =
             cacheGateway.buildAvatarFile(user.email + FileConstant.JPG_EXTENSION)
-                ?: return null
-        megaApiGateway.getUserAvatar(user, avatarFile.absolutePath)
-        return avatarFile
+                ?: return@withContext null
+        return@withContext suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("getUserAvatar") {
+                avatarFile
+            }
+
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            megaApiGateway.getUserAvatar(
+                user,
+                avatarFile.absolutePath,
+                listener
+            )
+        }
     }
 
     override suspend fun getMyAvatarColor(): Int = withContext(ioDispatcher) {

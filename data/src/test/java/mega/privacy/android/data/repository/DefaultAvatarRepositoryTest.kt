@@ -103,7 +103,16 @@ internal class DefaultAvatarRepositoryTest {
             testScheduler.advanceUntilIdle()
             whenever(cacheGateway.buildAvatarFile(any())).thenReturn(File(""))
             whenever(megaApiGateway.myUser).thenReturn(currentUser)
-            whenever(megaApiGateway.getUserAvatar(any(), any())).thenReturn(true)
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(megaApiGateway.getUserAvatar(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    error,
+                )
+            }
             underTest.monitorMyAvatarFile().test {
                 sharedFlow.emit(GlobalUpdate.OnUsersUpdate(users = arrayListOf(currentUser)))
                 val value = awaitItem()
@@ -126,7 +135,16 @@ internal class DefaultAvatarRepositoryTest {
                 on { it.email }.thenReturn("anotherUser")
             }
             sharedFlow.emit(GlobalUpdate.OnUsersUpdate(users = arrayListOf(anotherUser)))
-            whenever(megaApiGateway.getUserAvatar(any(), any())).thenReturn(true)
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(megaApiGateway.getUserAvatar(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    error,
+                )
+            }
             delay(300L)
             collectJob.cancel()
         }
@@ -142,7 +160,16 @@ internal class DefaultAvatarRepositoryTest {
             }
             whenever(currentUser.isOwnChange).thenReturn(1)
             sharedFlow.emit(GlobalUpdate.OnUsersUpdate(users = arrayListOf(currentUser)))
-            whenever(megaApiGateway.getUserAvatar(any(), any())).thenReturn(true)
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(megaApiGateway.getUserAvatar(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    error,
+                )
+            }
             delay(300L)
             collectJob.cancel()
         }
@@ -217,7 +244,16 @@ internal class DefaultAvatarRepositoryTest {
         whenever(databaseHandler.myEmail).thenReturn(email)
         underTest.getMyAvatarFile(isForceRefresh = false)
         verify(megaApiGateway, times(0)).myUser
-        verify(megaApiGateway, times(0)).getUserAvatar(any(), any())
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(megaApiGateway.getUserAvatar(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                error,
+            )
+        }
         verify(
             cacheGateway,
             times(1)
@@ -232,6 +268,16 @@ internal class DefaultAvatarRepositoryTest {
         whenever(megaApiGateway.myUser).thenReturn(currentUser)
         whenever(megaApiGateway.accountEmail).thenReturn(CURRENT_USER_EMAIL)
         whenever(cacheGateway.buildAvatarFile(CURRENT_USER_EMAIL + FileConstant.JPG_EXTENSION)).thenReturn(expectedFile)
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(megaApiGateway.getUserAvatar(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                error,
+            )
+        }
         Truth.assertThat(underTest.getMyAvatarFile(true)).isEqualTo(expectedFile)
     }
 }
