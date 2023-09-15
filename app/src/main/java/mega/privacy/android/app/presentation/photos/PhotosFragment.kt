@@ -154,6 +154,7 @@ class PhotosFragment : Fragment() {
         albumsActionModeCallback = AlbumsActionModeCallback(this)
         lifecycleScope.launch {
             isNewCUEnabled = getFeatureFlagUseCase(AppFeatures.NewCU)
+            if (isNewCUEnabled) activity?.invalidateMenu()
         }
     }
 
