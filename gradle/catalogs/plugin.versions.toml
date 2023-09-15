@@ -1,5 +1,5 @@
 [versions]
-firebase-crashlytics = "2.9.7"
+firebase-crashlytics = "2.9.9"
 firebase-performance = "1.4.2"
 firebase-app-distribution = "4.0.0"
 gradle = "8.1.1"
