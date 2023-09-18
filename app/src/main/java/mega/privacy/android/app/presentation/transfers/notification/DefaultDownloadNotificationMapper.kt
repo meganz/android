@@ -38,11 +38,11 @@ class DefaultDownloadNotificationMapper @Inject constructor(
         )
         val content = context.getString(R.string.download_touch_to_show)
         val title =
-            if (activeTransferTotals == null || activeTransferTotals.transferredBytes == 0L) {
+            if (activeTransferTotals == null || activeTransferTotals.totalBytes == 0L) {
                 context.getString(R.string.download_preparing_files)
             } else {
-                val inProgress = activeTransferTotals.totalFinishedTransfers
-                val totalTransfers = activeTransferTotals.totalTransfers
+                val inProgress = activeTransferTotals.totalFinishedFileTransfers + 1
+                val totalTransfers = activeTransferTotals.totalFileTransfers
                 if (paused) {
                     context.getString(
                         R.string.download_service_notification_paused,

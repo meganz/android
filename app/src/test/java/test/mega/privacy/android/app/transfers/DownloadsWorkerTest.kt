@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveDownloadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
@@ -42,6 +43,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -68,6 +70,7 @@ class DownloadsWorkerTest {
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val downloadNotificationMapper = mock<DownloadNotificationMapper>()
     private val areNotificationsEnabledUseCase = mock<AreNotificationsEnabledUseCase>()
+    private val correctActiveTransfersUseCase = mock<CorrectActiveTransfersUseCase>()
 
     @Before
     fun setup() {
@@ -109,7 +112,8 @@ class DownloadsWorkerTest {
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             downloadNotificationMapper = downloadNotificationMapper,
             areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
-            notificationManager = mock()
+            notificationManager = mock(),
+            correctActiveTransfersUseCase = correctActiveTransfersUseCase,
         )
     }
 
@@ -128,12 +132,36 @@ class DownloadsWorkerTest {
         }
 
     @Test
+    fun `test that correctActiveTransfersUseCase is invoked when the worker starts doing work`() =
+        runTest {
+            commonStub()
+            underTest.doWork()
+            verify(correctActiveTransfersUseCase).invoke(TransferType.TYPE_DOWNLOAD)
+        }
+
+    @Test
     fun `test that monitorActiveTransferTotalsUseCase is invoked when the worker starts doing work`() =
         runTest {
             commonStub()
             underTest.doWork()
             verify(monitorOngoingActiveDownloadTransfersUseCase).invoke()
         }
+
+    @Test
+    fun `test that correctActiveTransfersUseCase is called before start monitoring ongoing transfers`() =
+        runTest {
+            commonStub()
+            val inOrder =
+                inOrder(
+                    monitorTransferEventsUseCase,
+                    correctActiveTransfersUseCase,
+                    monitorOngoingActiveDownloadTransfersUseCase
+                )
+            underTest.doWork()
+            inOrder.verify(correctActiveTransfersUseCase).invoke(TransferType.TYPE_DOWNLOAD)
+            inOrder.verify(monitorOngoingActiveDownloadTransfersUseCase).invoke()
+        }
+
 
     @Test
     fun `test that worker finishes with success if last transfer is completed`() = runTest {

@@ -1,25 +1,27 @@
 package mega.privacy.android.data.mapper.transfer.active
 
-import mega.privacy.android.data.database.entity.ActiveTransferTotalsEntity
+import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
 /**
- * Mapper for converting [ActiveTransferTotalsEntity] into [ActiveTransferTotals].
+ * Mapper for converting a list of [ActiveTransferEntity] into [ActiveTransferTotals].
  */
 internal class ActiveTransferTotalsMapper @Inject constructor() {
-    suspend operator fun invoke(
+    operator fun invoke(
         type: TransferType,
-        activeTransferTotals: ActiveTransferTotalsEntity?,
-    ) =
-        with(activeTransferTotals) {
-            ActiveTransferTotals(
-                transfersType = type,
-                totalTransfers = this?.totalTransfers ?: 0,
-                totalFinishedTransfers = this?.totalFinishedTransfers ?: 0,
-                totalBytes = this?.totalBytes ?: 0L,
-                transferredBytes = this?.transferredBytes ?: 0L,
-            )
-        }
+        list: List<ActiveTransferEntity>,
+    ): ActiveTransferTotals {
+        val onlyFiles = list.filter { !it.isFolderTransfer }
+        return ActiveTransferTotals(
+            transfersType = type,
+            totalTransfers = list.size,
+            totalFileTransfers = onlyFiles.size,
+            totalFinishedTransfers = list.count { it.isFinished },
+            totalFinishedFileTransfers = onlyFiles.count { it.isFinished },
+            totalBytes = onlyFiles.sumOf { it.totalBytes },
+            transferredBytes = 0 // this will be recovered in TRAN-230
+        )
+    }
 }

@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveDownloadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
@@ -50,6 +51,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val downloadNotificationMapper: DownloadNotificationMapper,
     private val notificationManager: NotificationManagerCompat,
     private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
+    private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork() = coroutineScope {
@@ -59,6 +61,7 @@ class DownloadsWorker @AssistedInject constructor(
 
         withContext(ioDispatcher) {
             val monitorJob = monitorTransferEvents(this)
+            correctActiveTransfersUseCase(TransferType.TYPE_DOWNLOAD) //to be sure we haven't missed any event before monitoring them
             monitorOngoingActiveDownloadTransfersUseCase()
                 .catch { Timber.e("DownloadsWorker error: $it") }
                 .onEach { (transferTotals, paused) ->

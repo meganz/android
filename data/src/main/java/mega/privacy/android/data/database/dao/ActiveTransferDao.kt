@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
-import mega.privacy.android.data.database.entity.ActiveTransferTotalsEntity
 import mega.privacy.android.domain.entity.transfer.TransferType
 
 @Dao
@@ -29,16 +28,4 @@ internal interface ActiveTransferDao {
 
     @Query("UPDATE active_transfers SET is_finished = 1 WHERE tag IN (:tags)")
     suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
-
-    @Query(TOTALS_QUERY)
-    fun getTotalsByType(transferType: TransferType): Flow<ActiveTransferTotalsEntity>
-
-    @Query(TOTALS_QUERY)
-    fun getCurrentTotalsByType(transferType: TransferType): ActiveTransferTotalsEntity
-
-    companion object {
-        // TRAN-230: total transferredBytes will be recovered in task TRAN-230
-        private const val TOTALS_QUERY =
-            "SELECT transfer_type as transfersType, SUM(total_bytes) as totalBytes, 0 as transferredBytes, COUNT(*) as totalTransfers, SUM(is_finished) as totalFinishedTransfers FROM active_transfers WHERE transfer_type = :transferType GROUP by transfer_type"
-    }
 }

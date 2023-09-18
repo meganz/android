@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -24,26 +25,40 @@ class ActiveTransferEntityMapperTest {
     }
 
     @ParameterizedTest(name = "Transfer Type {0}")
-    @EnumSource(TransferType::class)
-    fun `test that mapper returns model correctly when invoke function`(transferType: TransferType) =
-        runTest {
-            val model = ActiveTransferImpl(
-                tag = TAG,
-                transferType = transferType,
-                totalBytes = TOTAL,
-                isFinished = true,
-                isFolderTransfer = false,
-                isPaused = false
-            )
-            val expected = ActiveTransferEntity(
-                tag = TAG,
-                transferType = transferType,
-                totalBytes = TOTAL,
-                isFinished = true,
-                isFolderTransfer = false,
-                isPaused = false
-            )
-            Truth.assertThat(underTest(model)).isEqualTo(expected)
+    @MethodSource("provideParameters")
+    internal fun `test that mapper returns model correctly when invoke function`(
+        model: ActiveTransfer,
+        expected: ActiveTransferEntity,
+    ) = runTest {
+        Truth.assertThat(underTest(model)).isEqualTo(expected)
+    }
+
+    private fun provideParameters(): List<Arguments> =
+        TransferType.values().flatMap { transferType ->
+            listOf(true, false).flatMap { isFinished ->
+                listOf(true, false).flatMap { isFolder ->
+                    listOf(true, false).map { isPaused ->
+                        Arguments.of(
+                            ActiveTransferTestImpl(
+                                tag = TAG,
+                                transferType = transferType,
+                                totalBytes = TOTAL,
+                                isFinished = isFinished,
+                                isFolderTransfer = isFolder,
+                                isPaused = isPaused,
+                            ),
+                            ActiveTransferEntity(
+                                tag = TAG,
+                                transferType = transferType,
+                                totalBytes = TOTAL,
+                                isFinished = isFinished,
+                                isFolderTransfer = isFolder,
+                                isPaused = isPaused,
+                            )
+                        )
+                    }
+                }
+            }
         }
 
     companion object {
@@ -57,7 +72,7 @@ class ActiveTransferEntityMapperTest {
      *
      * @constructor Create empty Active transfer impl
      */
-    private data class ActiveTransferImpl(
+    private data class ActiveTransferTestImpl(
         override val tag: Int,
         override val transferType: TransferType,
         override val totalBytes: Long,

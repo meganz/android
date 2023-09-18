@@ -100,42 +100,6 @@ class ActiveTransferDaoTest {
     }
 
     @Test
-    fun test_that_getTotals_returns_correct_totalBytes() = runTest {
-        TransferType.values().forEach { type ->
-            val expectedTotal = entities.filter { it.transferType == type }.sumOf { it.totalBytes }
-            val actual = activeTransferDao.getTotalsByType(type).first()
-            assertThat(actual.totalBytes).isEqualTo(expectedTotal)
-        }
-    }
-
-    @Test
-    fun test_that_getTotals_returns_correct_totalTransfers() = runTest {
-        TransferType.values().forEach { type ->
-            val expected = entities.count { it.transferType == type }
-            val actual = activeTransferDao.getTotalsByType(type).first()
-            assertThat(actual.totalTransfers).isEqualTo(expected)
-        }
-    }
-
-    @Test
-    fun test_that_getTotals_returns_correct_totalFinishedTransfers() = runTest {
-        TransferType.values().forEach { type ->
-            val expected = entities.count { it.transferType == type && it.isFinished }
-            val actual = activeTransferDao.getTotalsByType(type).first()
-            assertThat(actual.totalFinishedTransfers).isEqualTo(expected)
-        }
-    }
-
-    @Test
-    fun test_that_getCurrentTotals_returns_correct_totalFinishedTransfers() = runTest {
-        TransferType.values().forEach { type ->
-            val expected = entities.count { it.transferType == type && it.isFinished }
-            val actual = activeTransferDao.getCurrentTotalsByType(type)
-            assertThat(actual.totalFinishedTransfers).isEqualTo(expected)
-        }
-    }
-
-    @Test
     fun test_deleteAllActiveTransfersByType_deletes_all_transfers_of_that_type() = runTest {
         TransferType.values().forEach { type ->
             val initial = activeTransferDao.getCurrentActiveTransfersByType(type)

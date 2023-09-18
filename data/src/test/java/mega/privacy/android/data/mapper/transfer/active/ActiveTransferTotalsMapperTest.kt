@@ -1,9 +1,7 @@
 package mega.privacy.android.data.mapper.transfer.active
 
-import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.database.entity.ActiveTransferTotalsEntity
+import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.jupiter.api.BeforeAll
@@ -11,12 +9,10 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ActiveTransferTotalsMapperTest {
 
     private lateinit var underTest: ActiveTransferTotalsMapper
-
 
     @BeforeAll
     fun setUp() {
@@ -25,37 +21,77 @@ class ActiveTransferTotalsMapperTest {
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
-    fun `test that mapper returns entity correctly when invoke function`(transferType: TransferType) =
-        runTest {
-            val entity = ActiveTransferTotalsEntity(
-                transferType,
-                TOTAL_TRANSFERS,
-                TOTAL_FINISHED_TRANSFERS,
-                TOTAL_BYTES,
-                TRANSFERRED_BYTES
-            )
-            val expected = ActiveTransferTotals(
-                transferType,
-                TOTAL_TRANSFERS,
-                TOTAL_FINISHED_TRANSFERS,
-                TOTAL_BYTES,
-                TRANSFERRED_BYTES
-            )
-            Truth.assertThat(underTest(transferType, entity)).isEqualTo(expected)
-        }
+    fun `test that mapper returns totalBytes excluding folder transfers`(transferType: TransferType) {
+        val entities = createEntities(transferType)
+        val expectedTotal = entities.filter { !it.isFolderTransfer }.sumOf { it.totalBytes }
+        val actual = underTest(transferType, entities)
+        assertThat(actual.totalBytes).isEqualTo(expectedTotal)
+    }
+
+    /* this will be recovered in TRAN-230
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
-    fun `test that mapper returns empty entity when null entity is mapped`(transferType: TransferType) =
-        runTest {
-            val expected = ActiveTransferTotals(transferType, 0, 0, 0, 0)
-            Truth.assertThat(underTest(transferType, null)).isEqualTo(expected)
-        }
+    fun `test that mapper returns transferredBytes excluding folder transfers`(transferType: TransferType) {
+        val entities = createEntities(transferType)
+        val expectedTransferredBytes =
+            entities.filter { !it.isFolderTransfer }.sumOf { it.transferredBytes }
+        val actual = underTest(transferType, entities)
+        assertThat(actual.transferredBytes).isEqualTo(expectedTransferredBytes)
+    }
+    */
 
-    companion object {
-        private const val TOTAL_TRANSFERS = 20
-        private const val TOTAL_FINISHED_TRANSFERS = 10
-        private const val TOTAL_BYTES = 2048L
-        private const val TRANSFERRED_BYTES = 1024L
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that mapper returns correct totalTransfers`(transferType: TransferType) {
+        val entities = createEntities(transferType)
+        val expected = entities.size
+        val actual = underTest(transferType, entities)
+        assertThat(actual.totalTransfers).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that mapper returns correct totalFinishedTransfers`(transferType: TransferType) {
+        val entities = createEntities(transferType)
+        val expected = entities.count { it.isFinished }
+        val actual = underTest(transferType, entities)
+        assertThat(actual.totalFinishedTransfers).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that mapper excludes folder transfers in totalFileTransfers`(transferType: TransferType) {
+        val entities = createEntities(transferType)
+        val expected = entities.filter { !it.isFolderTransfer }.size
+        val actual = underTest(transferType, entities)
+        assertThat(actual.totalFileTransfers).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that mapper excludes folder transfers in totalFinishedFileTransfers`(transferType: TransferType) {
+        val entities = createEntities(transferType)
+        val expected = entities.filter { !it.isFolderTransfer }.count { it.isFinished }
+        val actual = underTest(transferType, entities)
+        assertThat(actual.totalFinishedFileTransfers).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that mapper returns empty entity when empty list is mapped`(transferType: TransferType) {
+        val expected = ActiveTransferTotals(transferType, 0, 0, 0, 0, 0, 0)
+        assertThat(underTest(transferType, emptyList())).isEqualTo(expected)
+    }
+
+    private fun createEntities(transferType: TransferType) = (0..20).map { tag ->
+        ActiveTransferEntity(
+            tag = tag,
+            transferType = transferType,
+            totalBytes = 1024 * (tag.toLong() % 5 + 1),
+            isFinished = tag.rem(5) == 0,
+            isFolderTransfer = tag.rem(8) == 0,
+            isPaused = false,
+        )
     }
 }
