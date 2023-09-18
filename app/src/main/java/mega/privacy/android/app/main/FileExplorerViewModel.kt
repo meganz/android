@@ -143,7 +143,6 @@ class FileExplorerViewModel @Inject constructor(
         )
         val messageContent = buildMessageContent(
             text = sharedText,
-            subject = sharedSubject,
             email = sharedEmail,
             context = context,
         )
@@ -207,7 +206,7 @@ class FileExplorerViewModel @Inject constructor(
         return if (isUrl && text != null) {
             buildUrlContent(text, subject, email, context)
         } else {
-            buildMessageContent(text, subject, email, context)
+            buildMessageContent(text, email, context)
         }
     }
 
@@ -241,21 +240,15 @@ class FileExplorerViewModel @Inject constructor(
      * Builds message content from the shared text.
      *
      * @param text    Shared text.
-     * @param subject Shared subject.
      * @param email   Shared email.
      * @return The message content.
      */
     private fun buildMessageContent(
         text: String?,
-        subject: String?,
         email: String?,
         context: Context,
     ): String {
         val builder = StringBuilder()
-        subject?.let {
-            builder.append(context.getString(R.string.new_file_subject_when_uploading))
-                .append(": ").append(it).append("\n\n")
-        }
         email?.let {
             builder.append(context.getString(R.string.new_file_email_when_uploading))
                 .append(": ").append(it).append("\n\n")
