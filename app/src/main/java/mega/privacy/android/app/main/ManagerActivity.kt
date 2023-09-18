@@ -1080,10 +1080,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         state = waitingRoomState,
                         onAdmitClick = {
                             waitingRoomManagementViewModel.admitUsersClick()
+                        },
+                        onDenyClick = {
+                            waitingRoomManagementViewModel.denyUsersClick()
+                        },
+                        onDenyEntryClick = {
+                            waitingRoomManagementViewModel.denyEntryClick()
+                        },
+                        onSeeWaitingRoomClick = {
+                            waitingRoomManagementViewModel.seeWaitingRoomClick()
+                        },
+                        onDismiss = {
                             waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
                         },
-                        onSeeWaitingRoomClick = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
-                        onDismiss = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() })
+                        onCancelDenyEntryClick = {
+                            waitingRoomManagementViewModel.cancelDenyEntryClick()
+                        },
+                    )
                 }
             }
         }

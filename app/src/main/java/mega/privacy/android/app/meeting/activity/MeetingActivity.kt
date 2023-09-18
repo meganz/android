@@ -40,6 +40,7 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
@@ -216,17 +217,15 @@ class MeetingActivity : BaseActivity() {
                         },
                         onDenyEntryClick = {
                             waitingRoomManagementViewModel.denyEntryClick()
-                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
                         },
                         onSeeWaitingRoomClick = {
-                            waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
-                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
+                            waitingRoomManagementViewModel.seeWaitingRoomClick()
                         },
                         onDismiss = {
                             waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
                         },
-                        onDismissDenyParticipantDialog = {
-                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
+                        onCancelDenyEntryClick = {
+                            waitingRoomManagementViewModel.cancelDenyEntryClick()
                         },
                     )
                 }
@@ -267,6 +266,13 @@ class MeetingActivity : BaseActivity() {
 
             if (state.chatId != -1L) {
                 waitingRoomManagementViewModel.setChatIdCallOpened(state.chatId)
+            }
+        }
+
+        collectFlow(waitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
+            state.snackbarString?.let {
+                showSnackbar(it)
+                waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
             }
         }
     }

@@ -53,13 +53,23 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
                         onAdmitClick = {
                             viewModel.admitUsersClick()
                         },
+                        onDenyClick = {
+                            viewModel.denyUsersClick()
+                        },
+                        onDenyEntryClick = {
+                            viewModel.denyEntryClick()
+                            dismissAllowingStateLoss()
+                        },
                         onSeeWaitingRoomClick = {
-                            viewModel.setShowParticipantsInWaitingRoomDialogConsumed()
-                            viewModel.setShowDenyParticipantDialogConsumed()
+                            viewModel.seeWaitingRoomClick()
                             dismissAllowingStateLoss()
                         },
                         onDismiss = {
                             viewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                            dismissAllowingStateLoss()
+                        },
+                        onCancelDenyEntryClick = {
+                            viewModel.cancelDenyEntryClick()
                             dismissAllowingStateLoss()
                         },
                     )

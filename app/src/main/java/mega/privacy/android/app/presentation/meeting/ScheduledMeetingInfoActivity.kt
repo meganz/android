@@ -470,10 +470,14 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 onResetStateSnackbarMessage = viewModel::onSnackbarMessageConsumed,
                 onAdmitUsersInWaitingRoomClicked = {
                     waitingRoomManagementViewModel.admitUsersClick()
-                    waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
                 },
-                onSeeWaitingRoomClicked = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
+                onSeeWaitingRoomClicked = { waitingRoomManagementViewModel.seeWaitingRoomClick() },
+                onDenyUsersInWaitingRoomClicked = { waitingRoomManagementViewModel.denyUsersClick() },
+                onDenyEntryInWaitingRoomClicked = { waitingRoomManagementViewModel.denyEntryClick() },
                 onDismissWaitingRoomDialog = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
+                onCancelDenyEntryClick = {
+
+                    waitingRoomManagementViewModel.cancelDenyEntryClick() }
             )
         }
     }

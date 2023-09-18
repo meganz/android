@@ -13,12 +13,12 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 /**
  * Show there are participants waiting in the waiting room dialog
  *
- * @param onAdmitClick                           To be triggered when positive button is pressed
- * @param onSeeWaitingRoomClick                  To be triggered when negative button is pressed
- * @param onDenyClick                            To be triggered when negative button is pressed
- * @param onDenyEntryClick                       To be triggered when positive button is pressed
- * @param onDismiss                         To be triggered when admit participants dialog is hidden
- * @param onDismissDenyParticipantDialog    To be triggered when deny participant dialog is hidden
+ * @param onAdmitClick                              To be triggered when positive button is pressed
+ * @param onSeeWaitingRoomClick                     To be triggered when negative button is pressed
+ * @param onDenyClick                               To be triggered when negative button is pressed
+ * @param onDenyEntryClick                          To be triggered when positive button is pressed
+ * @param onDismiss                                 To be triggered when admit participants dialog is hidden
+ * @param onCancelDenyEntryClick                    To be triggered when deny participant dialog is hidden
  */
 @Composable
 fun UsersInWaitingRoomDialog(
@@ -28,7 +28,7 @@ fun UsersInWaitingRoomDialog(
     onDismiss: () -> Unit,
     onDenyClick: () -> Unit = {},
     onDenyEntryClick: () -> Unit = {},
-    onDismissDenyParticipantDialog: () -> Unit = {},
+    onCancelDenyEntryClick: () -> Unit = {},
 ) {
     if (state.usersInWaitingRoom.isNotEmpty() && (state.showParticipantsInWaitingRoomDialog || state.showDenyParticipantDialog)) {
         val isOneParticipantInWaitingRoom = state.usersInWaitingRoom.size == 1
@@ -38,9 +38,9 @@ fun UsersInWaitingRoomDialog(
         val message =
             when {
                 state.showParticipantsInWaitingRoomDialog -> when {
-                    isDialogRelativeToTheOpenCall && isOneParticipantInWaitingRoom -> stringResource(
+                    isDialogRelativeToTheOpenCall && isOneParticipantInWaitingRoom && state.nameOfTheFirstUserInTheWaitingRoom.isNotEmpty() -> stringResource(
                         R.string.meetings_waiting_room_admit_user_to_call_dialog_message,
-                        state.nameOfTheOnlyUserInTheWaitingRoom
+                        state.nameOfTheFirstUserInTheWaitingRoom
                     )
 
                     isDialogRelativeToTheOpenCall && !isOneParticipantInWaitingRoom -> pluralStringResource(
@@ -49,9 +49,9 @@ fun UsersInWaitingRoomDialog(
                         usersSize
                     )
 
-                    !isDialogRelativeToTheOpenCall && isOneParticipantInWaitingRoom -> stringResource(
+                    !isDialogRelativeToTheOpenCall && isOneParticipantInWaitingRoom && state.nameOfTheFirstUserInTheWaitingRoom.isNotEmpty() -> stringResource(
                         R.string.meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message,
-                        state.nameOfTheOnlyUserInTheWaitingRoom, state.scheduledMeetingTitle
+                        state.nameOfTheFirstUserInTheWaitingRoom, state.scheduledMeetingTitle
                     )
 
                     else -> pluralStringResource(
@@ -64,46 +64,51 @@ fun UsersInWaitingRoomDialog(
 
                 else -> stringResource(
                     R.string.meetings_waiting_room_deny_user_to_call_dialog_message,
-                    state.nameOfTheOnlyUserInTheWaitingRoom
+                    state.nameOfTheFirstUserInTheWaitingRoom
                 )
             }
 
         MegaAlertDialog(
             title = null,
             text = message,
+            dismissOnClickOutside = false,
+            dismissOnBackPress = false,
             confirmButtonText = stringResource(
                 id =
                 when (state.showDenyParticipantDialog) {
                     true -> R.string.meetings_waiting_room_deny_user_to_call_dialog_button
                     false -> when {
                         isOneParticipantInWaitingRoom -> R.string.meetings_waiting_room_admit_user_to_call_dialog_admit_button
-                        else -> R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button
-                    }
-                }
-            ),
-            cancelButtonText = stringResource(
-                id =
-                when (state.showDenyParticipantDialog) {
-                    true -> R.string.general_cancel
-                    false -> when {
-                        isDialogRelativeToTheOpenCall && isOneParticipantInWaitingRoom -> R.string.meetings_waiting_room_admit_users_to_call_dialog_deny_button
                         else -> R.string.meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button
                     }
                 }
             ),
             onConfirm = when (state.showDenyParticipantDialog) {
                 true -> onDenyEntryClick
-                false -> onAdmitClick
-            },
-            onCancel =
-            when (state.showDenyParticipantDialog) {
-                true -> onDismissDenyParticipantDialog
                 false -> when {
-                    isDialogRelativeToTheOpenCall && isOneParticipantInWaitingRoom -> onDenyClick
+                    isOneParticipantInWaitingRoom -> onAdmitClick
                     else -> onSeeWaitingRoomClick
                 }
             },
-            onDismiss = if (state.showDenyParticipantDialog) onDismissDenyParticipantDialog else onDismiss,
+            cancelButtonText = stringResource(
+                id =
+                when (state.showDenyParticipantDialog) {
+                    true -> R.string.general_cancel
+                    false -> when {
+                        isOneParticipantInWaitingRoom -> R.string.meetings_waiting_room_admit_users_to_call_dialog_deny_button
+                        else -> R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button
+                    }
+                }
+            ),
+            onCancel =
+            when (state.showDenyParticipantDialog) {
+                true -> onCancelDenyEntryClick
+                false -> when {
+                    isOneParticipantInWaitingRoom -> onDenyClick
+                    else -> onAdmitClick
+                }
+            },
+            onDismiss = if (state.showDenyParticipantDialog) onCancelDenyEntryClick else onDismiss,
         )
     }
 }
@@ -118,12 +123,13 @@ fun PreviewUsersInWaitingRoomDialog() {
         UsersInWaitingRoomDialog(
             WaitingRoomManagementState(
                 scheduledMeetingTitle = "Title",
-                nameOfTheOnlyUserInTheWaitingRoom = "Name",
+                nameOfTheFirstUserInTheWaitingRoom = "Name",
                 showParticipantsInWaitingRoomDialog = true
             ),
             onAdmitClick = {},
             onSeeWaitingRoomClick = {},
             onDismiss = {},
+            onCancelDenyEntryClick = {}
         )
     }
 }
@@ -138,14 +144,15 @@ fun PreviewDenyUserInWaitingRoomDialog() {
         UsersInWaitingRoomDialog(
             WaitingRoomManagementState(
                 scheduledMeetingTitle = "Title",
-                nameOfTheOnlyUserInTheWaitingRoom = "Name",
+                nameOfTheFirstUserInTheWaitingRoom = "User1",
+                nameOfTheSecondUserInTheWaitingRoom = "User2",
                 showParticipantsInWaitingRoomDialog = false,
                 showDenyParticipantDialog = true
             ),
             onAdmitClick = {},
             onSeeWaitingRoomClick = {},
             onDenyClick = {},
-            onDismissDenyParticipantDialog = {},
+            onCancelDenyEntryClick = {},
             onDismiss = {},
         )
     }

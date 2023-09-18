@@ -119,8 +119,11 @@ fun ScheduledMeetingInfoView(
     onResetStateSnackbarMessage: () -> Unit = {},
     onCloseWarningClicked: () -> Unit,
     onAdmitUsersInWaitingRoomClicked: () -> Unit,
+    onDenyUsersInWaitingRoomClicked: () -> Unit,
+    onDenyEntryInWaitingRoomClicked: () -> Unit,
     onSeeWaitingRoomClicked: () -> Unit,
     onDismissWaitingRoomDialog: () -> Unit,
+    onCancelDenyEntryClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
@@ -165,8 +168,11 @@ fun ScheduledMeetingInfoView(
         UsersInWaitingRoomDialog(
             state = waitingRoomManagementState,
             onAdmitClick = { onAdmitUsersInWaitingRoomClicked() },
+            onDenyClick = { onDenyUsersInWaitingRoomClicked() },
+            onDenyEntryClick = { onDenyEntryInWaitingRoomClicked() },
             onSeeWaitingRoomClick = { onSeeWaitingRoomClicked() },
-            onDismiss = { onDismissWaitingRoomDialog() })
+            onDismiss = { onDismissWaitingRoomDialog() },
+            onCancelDenyEntryClick = { onCancelDenyEntryClick() })
 
         Column {
             if (shouldShowWarningDialog) {
@@ -1371,8 +1377,11 @@ fun PreviewScheduledMeetingInfoView() {
             onResetStateSnackbarMessage = {},
             onCloseWarningClicked = {},
             onAdmitUsersInWaitingRoomClicked = {},
+            onDenyUsersInWaitingRoomClicked = {},
+            onDenyEntryInWaitingRoomClicked = {},
             onSeeWaitingRoomClicked = {},
             onDismissWaitingRoomDialog = {},
+            onCancelDenyEntryClick = {}
         )
     }
 }

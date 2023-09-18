@@ -11,7 +11,9 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewM
  * @property scheduledMeetingTitle                   Scheduled meeting title
  * @property chatId                                  Chat id of call with waiting room
  * @property usersInWaitingRoom                      User list in the waiting room
- * @property nameOfTheOnlyUserInTheWaitingRoom       User name
+ * @property temporaryUsersInWaitingRoomList         Temporary list of users in waiting room
+ * @property nameOfTheFirstUserInTheWaitingRoom      Name of the first user in the waiting room
+ * @property nameOfTheSecondUserInTheWaitingRoom     Name of the second user in the waiting room
  * @property chatIdOfCallOpened                      Chat id of call opened
  */
 data class WaitingRoomManagementState constructor(
@@ -19,9 +21,11 @@ data class WaitingRoomManagementState constructor(
     val showParticipantsInWaitingRoomDialog: Boolean = false,
     val showDenyParticipantDialog: Boolean = false,
     val usersInWaitingRoom: List<Long> = emptyList(),
+    val temporaryUsersInWaitingRoomList: List<Long> = emptyList(),
     val chatId: Long = -1L,
     val scheduledMeetingTitle: String = "",
-    val nameOfTheOnlyUserInTheWaitingRoom: String = "",
+    val nameOfTheFirstUserInTheWaitingRoom: String = "",
+    val nameOfTheSecondUserInTheWaitingRoom: String = "",
     val chatIdOfCallOpened: Long = -1L,
 ) {
     /**

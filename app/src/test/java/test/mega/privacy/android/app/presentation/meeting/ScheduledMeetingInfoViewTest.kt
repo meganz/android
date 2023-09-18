@@ -378,8 +378,11 @@ class ScheduledMeetingInfoViewTest {
                 onResetStateSnackbarMessage = {},
                 onCloseWarningClicked = {},
                 onAdmitUsersInWaitingRoomClicked = {},
+                onDenyEntryInWaitingRoomClicked = {},
+                onDenyUsersInWaitingRoomClicked = {},
                 onSeeWaitingRoomClicked = {},
                 onDismissWaitingRoomDialog = {},
+                onCancelDenyEntryClick = {}
             )
         }
     }
@@ -408,8 +411,11 @@ class ScheduledMeetingInfoViewTest {
                 onResetStateSnackbarMessage = {},
                 onCloseWarningClicked = {},
                 onAdmitUsersInWaitingRoomClicked = {},
+                onDenyEntryInWaitingRoomClicked = {},
+                onDenyUsersInWaitingRoomClicked = {},
                 onSeeWaitingRoomClicked = {},
                 onDismissWaitingRoomDialog = {},
+                onCancelDenyEntryClick = {}
             )
         }
     }
