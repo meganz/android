@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.feature.devicecenter.ui.bottomsheet.BOTTOM_SHEET_CONTAINER
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
@@ -11,6 +12,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.feature.devicecenter.ui.renamedevice.RENAME_DEVICE_DIALOG_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +40,10 @@ internal class DeviceCenterScreenTest {
             DeviceCenterScreen(
                 uiState = uiState,
                 onDeviceClicked = {},
-                onBackPressed = {},
+                onNodeMenuIconClicked = {},
+                onRenameDeviceClicked = {},
+                onRenameDeviceCancelled = {},
+                onBackPressHandled = {},
                 onFeatureExited = {},
             )
         }
@@ -51,12 +56,44 @@ internal class DeviceCenterScreenTest {
             DeviceCenterScreen(
                 uiState = DeviceCenterState(),
                 onDeviceClicked = {},
-                onBackPressed = {},
+                onNodeMenuIconClicked = {},
+                onRenameDeviceClicked = {},
+                onRenameDeviceCancelled = {},
+                onBackPressHandled = {},
                 onFeatureExited = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertDoesNotExist()
         composeTestRule.onNodeWithTag(DEVICE_CENTER_OTHER_DEVICES_HEADER).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(RENAME_DEVICE_DIALOG_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the bottom dialog is shown when the menu icon of a node is selected`() {
+        val ownDeviceUINode = OwnDeviceUINode(
+            id = "1234-5678",
+            name = "Own Device",
+            icon = DeviceIconType.Android,
+            status = DeviceCenterUINodeStatus.UpToDate,
+            folders = emptyList(),
+        )
+        val uiState = DeviceCenterState(
+            devices = listOf(ownDeviceUINode),
+            menuIconClickedNode = ownDeviceUINode,
+        )
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = uiState,
+                onDeviceClicked = {},
+                onNodeMenuIconClicked = {},
+                onRenameDeviceClicked = {},
+                onRenameDeviceCancelled = {},
+                onBackPressHandled = {},
+                onFeatureExited = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER).assertIsDisplayed()
     }
 
     @Test
@@ -73,7 +110,10 @@ internal class DeviceCenterScreenTest {
             DeviceCenterScreen(
                 uiState = uiState,
                 onDeviceClicked = {},
-                onBackPressed = {},
+                onNodeMenuIconClicked = {},
+                onRenameDeviceClicked = {},
+                onRenameDeviceCancelled = {},
+                onBackPressHandled = {},
                 onFeatureExited = {},
             )
         }
@@ -95,7 +135,10 @@ internal class DeviceCenterScreenTest {
             DeviceCenterScreen(
                 uiState = uiState,
                 onDeviceClicked = {},
-                onBackPressed = {},
+                onNodeMenuIconClicked = {},
+                onRenameDeviceClicked = {},
+                onRenameDeviceCancelled = {},
+                onBackPressHandled = {},
                 onFeatureExited = {},
             )
         }
@@ -124,7 +167,10 @@ internal class DeviceCenterScreenTest {
             DeviceCenterScreen(
                 uiState = uiState,
                 onDeviceClicked = {},
-                onBackPressed = {},
+                onNodeMenuIconClicked = {},
+                onRenameDeviceClicked = {},
+                onRenameDeviceCancelled = {},
+                onBackPressHandled = {},
                 onFeatureExited = {},
             )
         }
@@ -155,7 +201,10 @@ internal class DeviceCenterScreenTest {
             DeviceCenterScreen(
                 uiState = uiState,
                 onDeviceClicked = {},
-                onBackPressed = {},
+                onNodeMenuIconClicked = {},
+                onRenameDeviceClicked = {},
+                onRenameDeviceCancelled = {},
+                onBackPressHandled = {},
                 onFeatureExited = {},
             )
         }

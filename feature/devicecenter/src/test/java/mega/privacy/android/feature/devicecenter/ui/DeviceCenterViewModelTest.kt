@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
@@ -37,8 +38,10 @@ internal class DeviceCenterViewModelTest {
     private lateinit var underTest: DeviceCenterViewModel
 
     private val getDevicesUseCase = mock<GetDevicesUseCase>()
+    private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val deviceUINodeListMapper = mock<DeviceUINodeListMapper>()
 
+    private val isCameraUploadsEnabled = true
     private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
         id = "ABCD-EFGH",
         name = "Camera uploads",
@@ -58,13 +61,14 @@ internal class DeviceCenterViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = DeviceCenterViewModel(
             getDevicesUseCase = getDevicesUseCase,
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             deviceUINodeListMapper = deviceUINodeListMapper,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getDevicesUseCase, deviceUINodeListMapper)
+        reset(getDevicesUseCase, isCameraUploadsEnabledUseCase, deviceUINodeListMapper)
     }
 
     @AfterAll
@@ -75,12 +79,14 @@ internal class DeviceCenterViewModelTest {
     private fun setUnderTest() {
         underTest = DeviceCenterViewModel(
             getDevicesUseCase = getDevicesUseCase,
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             deviceUINodeListMapper = deviceUINodeListMapper,
         )
     }
 
     private suspend fun setupMocks() {
-        whenever(getDevicesUseCase()).thenReturn(listOf(mock<OwnDeviceNode>()))
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
+        whenever(getDevicesUseCase(any())).thenReturn(listOf(mock<OwnDeviceNode>()))
         whenever(deviceUINodeListMapper(any())).thenReturn(listOf(ownDeviceUINode))
     }
 
@@ -91,20 +97,24 @@ internal class DeviceCenterViewModelTest {
         underTest.state.test {
             val initialState = awaitItem()
             assertThat(initialState.devices).isEmpty()
+            assertThat(initialState.isCameraUploadsEnabled).isFalse()
             assertThat(initialState.selectedDevice).isNull()
+            assertThat(initialState.menuIconClickedNode).isNull()
+            assertThat(initialState.deviceToRename).isNull()
             assertThat(initialState.itemsToDisplay).isEmpty()
             assertThat(initialState.exitFeature).isEqualTo(consumed)
         }
     }
 
     @Test
-    fun `test that the backup information is retrieved`() = runTest {
+    fun `test that the backup information is shown when accessing the device center`() = runTest {
         setupMocks()
         setUnderTest()
 
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.devices).isEqualTo(listOf(ownDeviceUINode))
+            assertThat(state.isCameraUploadsEnabled).isEqualTo(isCameraUploadsEnabled)
             assertThat(state.itemsToDisplay).isEqualTo(listOf(ownDeviceUINode))
         }
     }
@@ -124,29 +134,97 @@ internal class DeviceCenterViewModelTest {
     }
 
     @Test
-    fun `test that the user goes back to device view when going back from folder view`() = runTest {
+    fun `test that the bottom dialog is shown when the menu icon of a node is selected`() =
+        runTest {
+            setupMocks()
+            setUnderTest()
+            underTest.setMenuClickedNode(ownDeviceUINode)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.menuIconClickedNode).isEqualTo(ownDeviceUINode)
+            }
+        }
+
+    @Test
+    fun `test that the bottom dialog is hidden when a back press event occurs`() = runTest {
         setupMocks()
         setUnderTest()
-        underTest.showDeviceFolders(ownDeviceUINode)
+        underTest.setMenuClickedNode(ownDeviceUINode)
         underTest.handleBackPress()
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.devices).isEqualTo(listOf(ownDeviceUINode))
-            assertThat(state.selectedDevice).isNull()
-            assertThat(state.itemsToDisplay).isEqualTo(listOf(ownDeviceUINode))
+            assertThat(state.menuIconClickedNode).isNull()
         }
     }
 
     @Test
-    fun `test that the user exits the device center when going back from device view`() = runTest {
+    fun `test that the rename device dialog is shown`() =
+        runTest {
+            setupMocks()
+            setUnderTest()
+            underTest.setDeviceToRename(ownDeviceUINode)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.deviceToRename).isEqualTo(ownDeviceUINode)
+            }
+        }
+
+    @Test
+    fun `test that the rename device dialog is hidden when dismissed by the user`() = runTest {
         setupMocks()
         setUnderTest()
-        underTest.handleBackPress()
+        underTest.setDeviceToRename(ownDeviceUINode)
+        underTest.resetDeviceToRename()
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.exitFeature).isEqualTo(triggered)
+            assertThat(state.deviceToRename).isNull()
         }
     }
+
+    @Test
+    fun `test that the rename device dialog is hidden when a back press event occurs`() =
+        runTest {
+            setupMocks()
+            setUnderTest()
+            underTest.setDeviceToRename(ownDeviceUINode)
+            underTest.handleBackPress()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.deviceToRename).isNull()
+            }
+        }
+
+    @Test
+    fun `test that the user goes back to device view when going back from folder view`() =
+        runTest {
+            setupMocks()
+            setUnderTest()
+            underTest.showDeviceFolders(ownDeviceUINode)
+            underTest.handleBackPress()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.devices).isEqualTo(listOf(ownDeviceUINode))
+                assertThat(state.selectedDevice).isNull()
+                assertThat(state.itemsToDisplay).isEqualTo(listOf(ownDeviceUINode))
+            }
+        }
+
+    @Test
+    fun `test that the user exits the device center when going back from device view`() =
+        runTest {
+            setupMocks()
+            setUnderTest()
+            underTest.handleBackPress()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.exitFeature).isEqualTo(triggered)
+            }
+        }
 }

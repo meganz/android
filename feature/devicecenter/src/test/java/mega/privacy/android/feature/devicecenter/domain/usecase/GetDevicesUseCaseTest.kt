@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.usecase.backup.GetBackupInfoUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdAndNameMapUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
@@ -33,7 +32,6 @@ internal class GetDevicesUseCaseTest {
     private val getBackupInfoUseCase = mock<GetBackupInfoUseCase>()
     private val getDeviceIdAndNameMapUseCase = mock<GetDeviceIdAndNameMapUseCase>()
     private val getDeviceIdUseCase = mock<GetDeviceIdUseCase>()
-    private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -42,7 +40,6 @@ internal class GetDevicesUseCaseTest {
             getBackupInfoUseCase = getBackupInfoUseCase,
             getDeviceIdAndNameMapUseCase = getDeviceIdAndNameMapUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
-            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
         )
     }
 
@@ -53,7 +50,6 @@ internal class GetDevicesUseCaseTest {
             getBackupInfoUseCase,
             getDeviceIdAndNameMapUseCase,
             getDeviceIdUseCase,
-            isCameraUploadsEnabledUseCase,
         )
     }
 
@@ -61,17 +57,11 @@ internal class GetDevicesUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that get devices returns the list of backup devices`(isCameraUploadsEnabled: Boolean) =
         runTest {
-            val backupInfoList = listOf<BackupInfo>(
-                mock()
-            )
+            val backupInfoList = listOf(mock<BackupInfo>())
             val currentDeviceId = "12345-6789"
             val deviceIdAndNameMap = mapOf(currentDeviceId to "Device Name One")
-            val deviceNodes = listOf(
-                mock<OwnDeviceNode>(),
-                mock<OtherDeviceNode>()
-            )
+            val deviceNodes = listOf(mock<OwnDeviceNode>(), mock<OtherDeviceNode>())
 
-            whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
             whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
             whenever(getBackupInfoUseCase()).thenReturn(backupInfoList)
             whenever(getDeviceIdAndNameMapUseCase()).thenReturn(deviceIdAndNameMap)
@@ -84,6 +74,8 @@ internal class GetDevicesUseCaseTest {
                 )
             ).thenReturn(deviceNodes)
 
-            assertThat(underTest()).isEqualTo(deviceNodes)
+            assertThat(underTest(isCameraUploadsEnabled = isCameraUploadsEnabled)).isEqualTo(
+                deviceNodes
+            )
         }
 }

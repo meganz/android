@@ -55,7 +55,10 @@ class DeviceCenterFragment : Fragment() {
                     DeviceCenterScreen(
                         uiState = uiState,
                         onDeviceClicked = viewModel::showDeviceFolders,
-                        onBackPressed = viewModel::handleBackPress,
+                        onNodeMenuIconClicked = viewModel::setMenuClickedNode,
+                        onRenameDeviceClicked = viewModel::setDeviceToRename,
+                        onRenameDeviceCancelled = viewModel::resetDeviceToRename,
+                        onBackPressHandled = viewModel::handleBackPress,
                         onFeatureExited = viewModel::resetExitFeature,
                     )
                 }

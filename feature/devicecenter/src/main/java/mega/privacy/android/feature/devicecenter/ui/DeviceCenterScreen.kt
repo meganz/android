@@ -6,17 +6,23 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.appbar.TopAppBar
 import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceCenterBottomSheet
 import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
@@ -28,6 +34,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDialog
 
 /**
  * Test tags for the Device Center Screen
@@ -43,25 +50,49 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
  *
  * @param uiState The UI State
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
- * @param onBackPressed Lambda that performs a specific action when the User performs a Back Press
+ * @param onNodeMenuIconClicked Lambda that performs a specific action when the Node Menu Icon is
+ * clicked
+ * @param onRenameDeviceClicked Lambda that performs a specific action when the Rename Device feature
+ * is clicked
+ * @param onRenameDeviceCancelled Lambda that performs a specific action when the Rename Device
+ * feature is cancelled
+ * @param onBackPressHandled Lambda that performs a specific action when the Composable handles the
+ * Back Press
  * @param onFeatureExited Lambda that performs a specific action when the Device Center is exited
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun DeviceCenterScreen(
     uiState: DeviceCenterState,
     onDeviceClicked: (DeviceUINode) -> Unit,
-    onBackPressed: () -> Unit,
+    onNodeMenuIconClicked: (DeviceCenterUINode) -> Unit,
+    onRenameDeviceClicked: (DeviceUINode) -> Unit,
+    onRenameDeviceCancelled: () -> Unit,
+    onBackPressHandled: () -> Unit,
     onFeatureExited: () -> Unit,
 ) {
     val selectedDevice = uiState.selectedDevice
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = false,
+    )
 
     EventEffect(
         event = uiState.exitFeature,
         onConsumed = onFeatureExited,
         action = { onBackPressedDispatcher?.onBackPressed() },
     )
-
+    // Handle the Back Press if the Bottom Dialog is visible and the User is in Folder View
+    BackHandler(enabled = modalSheetState.isVisible || selectedDevice != null) {
+        if (modalSheetState.isVisible) {
+            coroutineScope.launch { modalSheetState.hide() }
+        } else {
+            onBackPressHandled()
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -69,20 +100,46 @@ internal fun DeviceCenterScreen(
                 title = selectedDevice?.name
                     ?: stringResource(R.string.device_center_top_app_bar_title),
                 elevation = false,
-                onBackPressed = onBackPressed,
+                onBackPressed = {
+                    if (modalSheetState.isVisible) {
+                        coroutineScope.launch { modalSheetState.hide() }
+                    } else {
+                        onBackPressHandled()
+                    }
+                },
             )
         },
         content = { paddingValues ->
             DeviceCenterContent(
                 itemsToDisplay = uiState.itemsToDisplay,
                 onDeviceClicked = onDeviceClicked,
+                onNodeMenuIconClicked = { menuClickedNode ->
+                    onNodeMenuIconClicked(menuClickedNode)
+                    if (!modalSheetState.isVisible) {
+                        coroutineScope.launch { modalSheetState.show() }
+                    }
+                },
                 modifier = Modifier.padding(paddingValues),
             )
-            // Handles the System Back Press
-            BackHandler(
-                enabled = uiState.selectedDevice != null,
-                onBack = onBackPressed,
+            DeviceCenterBottomSheet(
+                coroutineScope = coroutineScope,
+                modalSheetState = modalSheetState,
+                selectedNode = uiState.menuIconClickedNode ?: return@Scaffold,
+                isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
+                onCameraUploadsClicked = {},
+                onRenameDeviceClicked = onRenameDeviceClicked,
+                onShowInBackupsClicked = {},
+                onShowInCloudDriveClicked = {},
+                onInfoClicked = {},
             )
+            uiState.deviceToRename?.let { nonNullDevice ->
+                RenameDeviceDialog(
+                    deviceId = nonNullDevice.id,
+                    oldDeviceName = nonNullDevice.name,
+                    onRenameSuccessful = {},
+                    onRenameCancelled = { onRenameDeviceCancelled.invoke() },
+                )
+            }
         },
     )
 }
@@ -92,12 +149,14 @@ internal fun DeviceCenterScreen(
  *
  * @param itemsToDisplay The list of Backup Devices / Device Folders to be displayed
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
+ * @param onNodeMenuIconClicked Lambda that performs a specific action when the Node Menu Icon is clicked
  * @param modifier The Modifier object
  */
 @Composable
 private fun DeviceCenterContent(
     itemsToDisplay: List<DeviceCenterUINode>,
     onDeviceClicked: (DeviceUINode) -> Unit,
+    onNodeMenuIconClicked: (DeviceCenterUINode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (itemsToDisplay.isNotEmpty()) {
@@ -116,7 +175,7 @@ private fun DeviceCenterContent(
                 }) { itemIndex ->
                     DeviceCenterListViewItem(
                         uiNode = deviceFolders[itemIndex],
-                        onMenuClicked = {},
+                        onMenuClicked = { node -> onNodeMenuIconClicked(node) },
                     )
                 }
                 // User is in Device View
@@ -134,7 +193,7 @@ private fun DeviceCenterContent(
                         DeviceCenterListViewItem(
                             uiNode = currentlyUsedDevices[itemIndex],
                             onDeviceClicked = onDeviceClicked,
-                            onMenuClicked = {},
+                            onMenuClicked = { node -> onNodeMenuIconClicked(node) },
                         )
                     }
                 }
@@ -151,7 +210,7 @@ private fun DeviceCenterContent(
                         DeviceCenterListViewItem(
                             uiNode = otherDevices[itemIndex],
                             onDeviceClicked = onDeviceClicked,
-                            onMenuClicked = {},
+                            onMenuClicked = { node -> onNodeMenuIconClicked(node) },
                         )
                     }
                 }
@@ -173,13 +232,15 @@ private fun PreviewDeviceCenterInDeviceView() {
             otherDeviceUINodeTwo,
             otherDeviceUINodeThree,
         ),
-        selectedDevice = null,
     )
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             onDeviceClicked = {},
-            onBackPressed = {},
+            onNodeMenuIconClicked = {},
+            onRenameDeviceClicked = {},
+            onRenameDeviceCancelled = {},
+            onBackPressHandled = {},
             onFeatureExited = {},
         )
     }
@@ -199,7 +260,10 @@ private fun PreviewDeviceCenterInFolderView() {
         DeviceCenterScreen(
             uiState = uiState,
             onDeviceClicked = {},
-            onBackPressed = {},
+            onNodeMenuIconClicked = {},
+            onRenameDeviceClicked = {},
+            onRenameDeviceCancelled = {},
+            onBackPressHandled = {},
             onFeatureExited = {},
         )
     }
@@ -215,6 +279,7 @@ private fun PreviewDeviceCenterContentWithOwnDeviceSectionOnly() {
         DeviceCenterContent(
             itemsToDisplay = listOf(ownDeviceUINode),
             onDeviceClicked = {},
+            onNodeMenuIconClicked = {},
         )
     }
 }
@@ -229,6 +294,7 @@ private fun PreviewDeviceCenterContentWithOtherDevicesSectionOnly() {
         DeviceCenterContent(
             itemsToDisplay = listOf(otherDeviceUINodeOne),
             onDeviceClicked = {},
+            onNodeMenuIconClicked = {},
         )
     }
 }
@@ -248,6 +314,7 @@ private fun PreviewDeviceCenterContentWithBothDeviceSections() {
                 otherDeviceUINodeThree,
             ),
             onDeviceClicked = {},
+            onNodeMenuIconClicked = {},
         )
     }
 }

@@ -46,7 +46,7 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
 internal fun DeviceCenterListViewItem(
     uiNode: DeviceCenterUINode,
     onDeviceClicked: (DeviceUINode) -> Unit = {},
-    onMenuClicked: () -> Unit,
+    onMenuClicked: (DeviceCenterUINode) -> Unit,
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -82,7 +82,7 @@ internal fun DeviceCenterListViewItem(
             isSharedWithPublicLink = false,
             imageState = remember { mutableStateOf(null as File?) },
             onClick = { if (uiNode is DeviceUINode) onDeviceClicked(uiNode) },
-            onMenuClick = onMenuClicked,
+            onMenuClick = { onMenuClicked(uiNode) },
         )
         CustomDivider(
             modifier = Modifier

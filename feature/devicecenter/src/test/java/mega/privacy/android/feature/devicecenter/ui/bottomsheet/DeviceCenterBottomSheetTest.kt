@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 /**
  * Test class for [DeviceCenterBottomSheet]
  */
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @RunWith(AndroidJUnit4::class)
 internal class DeviceCenterBottomSheetTest {
 

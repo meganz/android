@@ -25,6 +25,7 @@ import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OtherDevice
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OwnDeviceBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
@@ -55,7 +56,7 @@ internal const val BOTTOM_SHEET_HEADER =
  * selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  */
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun DeviceCenterBottomSheet(
     coroutineScope: CoroutineScope,
@@ -63,7 +64,7 @@ internal fun DeviceCenterBottomSheet(
     selectedNode: DeviceCenterUINode,
     isCameraUploadsEnabled: Boolean,
     onCameraUploadsClicked: () -> Unit,
-    onRenameDeviceClicked: () -> Unit,
+    onRenameDeviceClicked: (DeviceUINode) -> Unit,
     onShowInBackupsClicked: () -> Unit,
     onShowInCloudDriveClicked: () -> Unit,
     onInfoClicked: () -> Unit,
@@ -99,7 +100,7 @@ internal fun DeviceCenterBottomSheet(
                         },
                         onRenameDeviceClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
-                            onRenameDeviceClicked.invoke()
+                            onRenameDeviceClicked(selectedNode)
                         },
                         onInfoClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
@@ -112,7 +113,7 @@ internal fun DeviceCenterBottomSheet(
                     OtherDeviceBottomSheetBody(
                         onRenameDeviceClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
-                            onRenameDeviceClicked.invoke()
+                            onRenameDeviceClicked(selectedNode)
                         },
                         onInfoClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
@@ -154,7 +155,7 @@ internal fun DeviceCenterBottomSheet(
 /**
  * A Preview Composable that displays the Bottom Sheet and its options
  */
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterBottomSheet() {
