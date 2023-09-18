@@ -134,6 +134,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             intent?.let { setContentIntent(intent) }
             progress?.let { setProgress(100, progress, false) }
             subText?.let { setSubText(subText) }
+            foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
         }
         return builder.build()
     }
