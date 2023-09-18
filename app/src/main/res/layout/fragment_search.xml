@@ -1,36 +1,46 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_container_file_browser_grid"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <include
-        android:id="@+id/layout_transfer_over_quota_banner"
-        layout="@layout/transfer_over_quota_banner" />
-
-    <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/filter_chips_horizontal_view"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+        android:id="@+id/fragment_container_file_browser_grid"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical">
 
+        <include
+            android:id="@+id/layout_transfer_over_quota_banner"
+            layout="@layout/transfer_over_quota_banner" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/filter_chips_horizontal_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
     <mega.privacy.android.app.components.NewGridRecyclerView
         android:id="@+id/file_grid_view_browser"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:choiceMode="multipleChoice"
         android:columnWidth="172dp"
         android:paddingLeft="4dp"
-        android:paddingRight="4dp" />
+        android:paddingRight="4dp"
+        app:layout_constraintTop_toBottomOf="@id/fragment_container_file_browser_grid"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <mega.privacy.android.app.components.scrollBar.FastScroller
         android:id="@+id/fastscroll"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="end"
-        android:orientation="vertical" />
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/file_grid_view_browser"
+        app:layout_constraintBottom_toBottomOf="@id/file_grid_view_browser"/>
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/search_empty_loading_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/fragment_container_file_browser_grid"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
