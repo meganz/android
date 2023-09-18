@@ -39,8 +39,8 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  * @param modifier          [Modifier]
  * @param checked           Whether or not the Button is currently checked
  * @param title             String title to show under the Button
- * @param enabledIcon       Icon to show when the button is not checked
- * @param disabledIcon      Icon to show when the button is checked
+ * @param uncheckedIcon     Icon to show when the button is not checked
+ * @param checkedIcon       Icon to show when the button is checked
  * @param enabled           Whether or not the Button will handle input events and appear enabled
  * @param onCheckedChange   Callback to be invoked when this button is selected
  */
@@ -49,8 +49,8 @@ fun ToggleMegaButton(
     modifier: Modifier,
     checked: Boolean,
     title: String,
-    @DrawableRes enabledIcon: Int,
-    @DrawableRes disabledIcon: Int,
+    @DrawableRes uncheckedIcon: Int,
+    @DrawableRes checkedIcon: Int,
     enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
@@ -59,11 +59,11 @@ fun ToggleMegaButton(
     val tintColor: Color
     val backgroundColor: Color
     if (checked) {
-        iconRes = disabledIcon
+        iconRes = checkedIcon
         tintColor = MaterialTheme.colors.surface
         backgroundColor = MaterialTheme.colors.onSurface
     } else {
-        iconRes = enabledIcon
+        iconRes = uncheckedIcon
         tintColor = MaterialTheme.colors.onSurface
         backgroundColor = Color.Transparent
     }
@@ -123,8 +123,8 @@ fun PreviewEnabledToggleMegaButton(
             modifier = Modifier,
             checked = isEnabled,
             title = "Camera",
-            enabledIcon = R.drawable.ic_universal_video_on,
-            disabledIcon = R.drawable.ic_universal_video_off,
+            uncheckedIcon = R.drawable.ic_universal_video_on,
+            checkedIcon = R.drawable.ic_universal_video_off,
         ) {}
     }
 }

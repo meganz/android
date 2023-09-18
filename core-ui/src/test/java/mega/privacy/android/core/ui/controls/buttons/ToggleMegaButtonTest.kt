@@ -30,8 +30,8 @@ class ToggleMegaButtonTest {
                 checked = true,
                 enabled = true,
                 title = "Mic",
-                enabledIcon = R.drawable.ic_universal_mic_on,
-                disabledIcon = R.drawable.ic_universal_mic_off,
+                uncheckedIcon = R.drawable.ic_universal_mic_on,
+                checkedIcon = R.drawable.ic_universal_mic_off,
                 onCheckedChange = {},
             )
         }
@@ -48,8 +48,8 @@ class ToggleMegaButtonTest {
                 checked = true,
                 enabled = true,
                 title = "Mic",
-                enabledIcon = R.drawable.ic_universal_mic_on,
-                disabledIcon = R.drawable.ic_universal_mic_off,
+                uncheckedIcon = R.drawable.ic_universal_mic_on,
+                checkedIcon = R.drawable.ic_universal_mic_off,
                 onCheckedChange = {},
             )
         }
@@ -67,8 +67,8 @@ class ToggleMegaButtonTest {
                 checked = false,
                 enabled = true,
                 title = "Mic",
-                enabledIcon = R.drawable.ic_universal_mic_on,
-                disabledIcon = R.drawable.ic_universal_mic_off,
+                uncheckedIcon = R.drawable.ic_universal_mic_on,
+                checkedIcon = R.drawable.ic_universal_mic_off,
                 onCheckedChange = mock
             )
         }
@@ -85,8 +85,8 @@ class ToggleMegaButtonTest {
                 checked = true,
                 enabled = false,
                 title = "Mic",
-                enabledIcon = R.drawable.ic_universal_mic_on,
-                disabledIcon = R.drawable.ic_universal_mic_off,
+                uncheckedIcon = R.drawable.ic_universal_mic_on,
+                checkedIcon = R.drawable.ic_universal_mic_off,
                 onCheckedChange = {},
             )
         }
@@ -101,8 +101,8 @@ class ToggleMegaButtonTest {
                 checked = true,
                 enabled = true,
                 title = "Mic",
-                enabledIcon = R.drawable.ic_universal_mic_on,
-                disabledIcon = R.drawable.ic_universal_mic_off,
+                uncheckedIcon = R.drawable.ic_universal_mic_on,
+                checkedIcon = R.drawable.ic_universal_mic_off,
                 onCheckedChange = {},
             )
         }
@@ -119,8 +119,8 @@ class ToggleMegaButtonTest {
                 checked = true,
                 enabled = true,
                 title = title,
-                enabledIcon = R.drawable.ic_universal_mic_on,
-                disabledIcon = R.drawable.ic_universal_mic_off,
+                uncheckedIcon = R.drawable.ic_universal_mic_on,
+                checkedIcon = R.drawable.ic_universal_mic_off,
                 onCheckedChange = {},
             )
         }

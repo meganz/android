@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -53,11 +50,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.layoutId
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
@@ -70,12 +67,14 @@ import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.ToggleMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.text.AutoSizeText
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.core.ui.controls.video.MegaVideoTextureView
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.grey_900
+import mega.privacy.android.core.ui.utils.rememberPermissionState
 import org.jetbrains.anko.landscape
 import kotlin.random.Random
 
@@ -83,7 +82,6 @@ import kotlin.random.Random
 /**
  * Waiting room View
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun WaitingRoomView(
     state: WaitingRoomState,
@@ -185,25 +183,26 @@ internal fun WaitingRoomView(
                     ),
             )
 
-            Chip(
-                onClick = {},
-                colors = ChipDefaults.chipColors(
-                    backgroundColor = MaterialTheme.colors.onSurface,
-                    contentColor = MaterialTheme.colors.surface,
-                ),
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .testTag("waiting_room:text_alert")
                     .layoutId("alertText")
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colors.onSurface)
             ) {
-                Text(
+                AutoSizeText(
                     text = stringResource(
                         if (state.callStarted)
                             R.string.meetings_waiting_room_wait_for_host_to_let_you_in_label
                         else
                             R.string.meetings_waiting_room_wait_for_host_to_start_meeting_label
                     ),
+                    maxLines = 1,
+                    maxTextSize = 14.sp,
                     style = MaterialTheme.typography.subtitle2medium,
-                    modifier = Modifier.padding(vertical = 9.dp, horizontal = 4.dp)
+                    color = MaterialTheme.colors.surface,
+                    modifier = Modifier.padding(vertical = 9.dp, horizontal = 16.dp)
                 )
             }
 
@@ -297,44 +296,38 @@ internal fun WaitingRoomView(
     BackHandler { onCloseClicked() }
 
     when {
-        showLeaveDialog -> AndroidTheme(true) {
-            MegaAlertDialog(
-                modifier = Modifier.testTag("waiting_room:dialog_leave"),
-                text = stringResource(R.string.meetings_leave_meeting_confirmation_dialog_title),
-                confirmButtonText = stringResource(R.string.general_leave),
-                cancelButtonText = stringResource(R.string.meetings__waiting_room_leave_meeting_dialog_cancel_button),
-                onConfirm = onCloseClicked,
-                onDismiss = { showLeaveDialog = false },
-            )
-        }
+        showLeaveDialog -> MegaAlertDialog(
+            modifier = Modifier.testTag("waiting_room:dialog_leave"),
+            text = stringResource(R.string.meetings_leave_meeting_confirmation_dialog_title),
+            confirmButtonText = stringResource(R.string.general_leave),
+            cancelButtonText = stringResource(R.string.meetings__waiting_room_leave_meeting_dialog_cancel_button),
+            onConfirm = onCloseClicked,
+            onDismiss = { showLeaveDialog = false },
+        )
 
-        state.denyAccessDialog -> AndroidTheme(true) {
-            MegaAlertDialog(
-                modifier = Modifier.testTag("waiting_room:dialog_deny_access"),
-                title = stringResource(R.string.meetings_waiting_room_deny_user_dialog_title),
-                text = stringResource(R.string.meetings_waiting_room_deny_user_dialog_description),
-                confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
-                cancelButtonText = null,
-                onConfirm = onCloseClicked,
-                onDismiss = {},
-                dismissOnBackPress = false,
-                dismissOnClickOutside = false,
-            )
-        }
+        state.denyAccessDialog -> MegaAlertDialog(
+            modifier = Modifier.testTag("waiting_room:dialog_deny_access"),
+            title = stringResource(R.string.meetings_waiting_room_deny_user_dialog_title),
+            text = stringResource(R.string.meetings_waiting_room_deny_user_dialog_description),
+            confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
+            cancelButtonText = null,
+            onConfirm = onCloseClicked,
+            onDismiss = {},
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+        )
 
-        state.inactiveHostDialog -> AndroidTheme(true) {
-            MegaAlertDialog(
-                modifier = Modifier.testTag("waiting_room:dialog_inactive_host"),
-                title = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_title),
-                text = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_description),
-                confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
-                cancelButtonText = null,
-                onConfirm = onCloseClicked,
-                onDismiss = {},
-                dismissOnBackPress = false,
-                dismissOnClickOutside = false,
-            )
-        }
+        state.inactiveHostDialog -> MegaAlertDialog(
+            modifier = Modifier.testTag("waiting_room:dialog_inactive_host"),
+            title = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_title),
+            text = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_description),
+            confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
+            cancelButtonText = null,
+            onConfirm = onCloseClicked,
+            onDismiss = {},
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+        )
     }
 }
 
@@ -357,14 +350,14 @@ private fun ToggleControlsRow(
             modifier = Modifier
                 .weight(1f)
                 .testTag("waiting_room:button_mic"),
-            checked = micEnabled,
+            checked = !micEnabled,
             enabled = !micPermissionState.status.shouldShowRationale,
             title = stringResource(R.string.general_mic),
-            enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_mic_on,
-            disabledIcon = mega.privacy.android.core.R.drawable.ic_universal_mic_off,
-            onCheckedChange = { enabled ->
+            uncheckedIcon = mega.privacy.android.core.R.drawable.ic_universal_mic_on,
+            checkedIcon = mega.privacy.android.core.R.drawable.ic_universal_mic_off,
+            onCheckedChange = { checked ->
                 if (micPermissionState.status.isGranted) {
-                    onMicToggleChange(enabled)
+                    onMicToggleChange(!checked)
                 } else {
                     micPermissionState.launchPermissionRequest()
                 }
@@ -375,19 +368,20 @@ private fun ToggleControlsRow(
             modifier = Modifier
                 .weight(1f)
                 .testTag("waiting_room:button_camera"),
-            checked = cameraEnabled,
+            checked = !cameraEnabled,
             enabled = !cameraPermissionState.status.shouldShowRationale,
             title = stringResource(R.string.general_camera),
-            enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_video_on,
-            disabledIcon = mega.privacy.android.core.R.drawable.ic_universal_video_off,
-            onCheckedChange = { enabled ->
+            uncheckedIcon = mega.privacy.android.core.R.drawable.ic_universal_video_on,
+            checkedIcon = mega.privacy.android.core.R.drawable.ic_universal_video_off,
+            onCheckedChange = { checked ->
                 if (cameraPermissionState.status.isGranted) {
-                    onCameraToggleChange(enabled)
+                    onCameraToggleChange(!checked)
                 } else {
                     cameraPermissionState.launchPermissionRequest()
                 }
             },
         )
+
 
         ToggleMegaButton(
             modifier = Modifier
@@ -395,8 +389,8 @@ private fun ToggleControlsRow(
                 .testTag("waiting_room:button_speaker"),
             checked = speakerEnabled,
             title = stringResource(R.string.general_speaker),
-            enabledIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_max,
-            disabledIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_off,
+            uncheckedIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_max,
+            checkedIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_off,
             onCheckedChange = onSpeakerToggleChange,
         )
     }
@@ -453,6 +447,7 @@ internal fun PreviewWaitingRoomView() {
             state = WaitingRoomState(
                 chatId = -1,
                 schedId = -1,
+                guestMode = false,
                 callStarted = Random.nextBoolean(),
                 title = "Book Club",
                 formattedTimestamp = "Monday, 30 May · 10:25 - 11:25",
@@ -482,11 +477,10 @@ internal fun PreviewGuestWaitingRoomView() {
             state = WaitingRoomState(
                 chatId = -1,
                 schedId = -1,
+                guestMode = true,
                 callStarted = false,
                 title = "Book Club",
                 formattedTimestamp = "Monday, 30 May · 10:25 - 11:25",
-                guestFirstName = "Bell",
-                guestLastName = "Hooks",
             ),
             onInfoClicked = {},
             onCloseClicked = {},

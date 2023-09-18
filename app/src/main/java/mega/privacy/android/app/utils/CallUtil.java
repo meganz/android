@@ -1323,10 +1323,10 @@ public class CallUtil {
         if (isFromOpenChatPreview) {
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
             if (call == null || call.getStatus() == CALL_STATUS_USER_NO_PRESENT || call.getStatus() == CALL_STATUS_WAITING_ROOM) {
-                Timber.d("Call id: %d. It's a meeting, open to join", list.get(0));
+                Timber.d("Call id: %d. It's a meeting, open to join", chatId);
                 CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist, passcodeManagement, isWaitingRoom);
             } else {
-                Timber.d("Call id: %d. Return to call", list.get(0));
+                Timber.d("Call id: %d. Return to call", chatId);
                 returnCall(context, chatId, passcodeManagement);
             }
             return;

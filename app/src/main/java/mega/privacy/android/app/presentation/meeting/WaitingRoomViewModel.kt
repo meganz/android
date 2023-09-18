@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
@@ -112,9 +113,9 @@ class WaitingRoomViewModel @Inject constructor(
             initChatGuestSessionIfNeeded()
             monitorCallUpdates()
             monitorMeetingUpdates()
+            monitorCallStartedCountdown()
             setChatVideoDevice()
             retrieveUserAvatar()
-            startCountdownTimer()
         }
     }
 
@@ -273,6 +274,21 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     /**
+     * Start countdown timer observer to show inactive dialog after [WAITING_ROOM_TIMEOUT] minutes.
+     */
+    private fun monitorCallStartedCountdown() {
+        viewModelScope.launch {
+            _state.distinctUntilChangedBy { it.callStarted }
+                .collectLatest { state ->
+                    if (state.callStarted) {
+                        delay(WAITING_ROOM_TIMEOUT.minutes)
+                        _state.update { it.copy(inactiveHostDialog = true) }
+                    }
+                }
+        }
+    }
+
+    /**
      * Set chat video In Device
      */
     private fun setChatVideoDevice() =
@@ -353,16 +369,6 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     /**
-     * Start countdown timer to show inactive dialog after [WAITING_ROOM_TIMEOUT] minutes.
-     */
-    private fun startCountdownTimer() {
-        viewModelScope.launch {
-            delay(WAITING_ROOM_TIMEOUT.minutes)
-            _state.update { it.copy(inactiveHostDialog = true) }
-        }
-    }
-
-    /**
      * Check if [ChatCall] access has been granted
      */
     private fun ChatCall.hasAccessBeenGranted(): Boolean =
@@ -408,10 +414,17 @@ class WaitingRoomViewModel @Inject constructor(
             }.onSuccess { call ->
                 call?.updateUiState()
             }.onFailure { error ->
-                if (error is MegaException && error.errorCode == MegaChatError.ERROR_EXIST) {
-                    // Already requested, do nothing.
-                } else {
-                    Timber.e(error)
+                when {
+                    error is MegaException && error.errorCode == MegaChatError.ERROR_EXIST -> {
+                        // Already requested, do nothing.
+                    }
+
+                    error is MegaException && error.errorCode == MegaChatError.ERROR_ACCESS -> {
+                        // Retry request access
+                        answerChatCall()
+                    }
+
+                    else -> Timber.e(error)
                 }
             }
         }

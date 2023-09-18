@@ -1,6 +1,10 @@
 package mega.privacy.android.core.ui.utils
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalInspectionMode
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
 
 /**
  * A scope function similar to "let" to be used with compose blocks.
@@ -11,3 +15,22 @@ inline fun <T> T.composeLet(crossinline block: @Composable (T) -> Unit): @Compos
         block(this)
     }
 }
+
+/**
+ * Wrapper for [com.google.accompanist.permissions.rememberPermissionState] to grant permissions when in Preview mode
+ */
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun rememberPermissionState(
+    permission: String,
+    onPermissionResult: (Boolean) -> Unit = {},
+): PermissionState =
+    if (LocalInspectionMode.current) {
+        object : PermissionState {
+            override val permission: String = permission
+            override val status: PermissionStatus = PermissionStatus.Granted
+            override fun launchPermissionRequest() {}
+        }
+    } else {
+        com.google.accompanist.permissions.rememberPermissionState(permission, onPermissionResult)
+    }
