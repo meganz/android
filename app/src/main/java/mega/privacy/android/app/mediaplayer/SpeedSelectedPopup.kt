@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,9 +23,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.mobile.analytics.event.SpeedOption0_5XPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedOption1_5XPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedOption2XPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedSelectedDialogEvent
 
 /**
  * The popup for selecting the playback speed in the video player
@@ -43,6 +49,12 @@ fun SpeedSelectedPopup(
     onDismissRequest: () -> Unit,
     onItemClick: (item: SpeedPlaybackItem) -> Unit,
 ) {
+    LaunchedEffect(isShown) {
+        if (isShown) {
+            Analytics.tracker.trackEvent(SpeedSelectedDialogEvent)
+        }
+    }
+
     if (isShown) {
         Popup(
             onDismissRequest = onDismissRequest,
@@ -59,6 +71,14 @@ fun SpeedSelectedPopup(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
+                                when (item) {
+                                    SpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> SpeedOption0_5XPressedEvent
+                                    SpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> SpeedOption1_5XPressedEvent
+                                    SpeedPlaybackItem.PLAYBACK_SPEED_2_X -> SpeedOption2XPressedEvent
+                                    else -> null
+                                }?.let { eventIdentifier ->
+                                    Analytics.tracker.trackEvent(eventIdentifier)
+                                }
                                 onItemClick(item)
                             }
                     ) {

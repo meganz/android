@@ -39,6 +39,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
@@ -57,6 +58,8 @@ import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.utils.getScreenWidth
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import org.jetbrains.anko.configuration
 import timber.log.Timber
 import java.io.File
@@ -371,6 +374,13 @@ class VideoPlayerFragment : Fragment() {
     }
 
     private fun fullScreenButtonClicked(isFullScreen: Boolean) {
+        Analytics.tracker.trackEvent(
+            if (isFullScreen) {
+                VideoPlayerFullScreenPressedEvent
+            } else {
+                VideoPlayerOriginalPressedEvent
+            }
+        )
         viewModel.updateIsFullScreen(isFullScreen)
     }
 
