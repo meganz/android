@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -81,6 +82,7 @@ internal fun SyncCard(
                 SyncStatus.SYNCING,
                 SyncStatus.SYNCED
             ),
+            isError = status == SyncStatus.ERROR,
             pauseRunClicked,
             removeFolderClicked
         )
@@ -132,7 +134,11 @@ private fun SyncCardHeader(
                             .padding(end = 8.dp)
                             .align(Alignment.CenterVertically)
                             .size(16.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorPrimary),
+                        colorFilter = if (status == SyncStatus.ERROR) {
+                            ColorFilter.tint(MaterialTheme.colors.error)
+                        } else {
+                            ColorFilter.tint(MaterialTheme.colors.textColorPrimary)
+                        },
                     )
                     Text(
                         text = when (status) {
@@ -142,7 +148,13 @@ private fun SyncCardHeader(
                             else -> "Synced"
                         },
                         Modifier.align(Alignment.CenterVertically),
-                        style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary),
+                        style = MaterialTheme.typography.body2.copy(
+                            color = if (status == SyncStatus.ERROR) {
+                                MaterialTheme.colors.error
+                            } else {
+                                MaterialTheme.colors.textColorPrimary
+                            },
+                        )
                     )
                 }
             }
@@ -216,6 +228,7 @@ private fun SyncCardDetailedInfo(
 @Composable
 private fun SyncCardFooter(
     isSyncRunning: Boolean,
+    isError: Boolean,
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
 ) {
@@ -223,11 +236,20 @@ private fun SyncCardFooter(
         Row(
             Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = 16.dp, top = 16.dp)
+                .padding(end = 16.dp, top = 16.dp, bottom = 16.dp)
         ) {
+            if (isError) {
+                IconButtonWithText(
+                    modifier = Modifier.padding(end = 8.dp),
+                    onClick = removeFolderClicked,
+                    icon = R.drawable.ic_info,
+                    color = MaterialTheme.colors.error,
+                    text = "Issues info"
+                )
+            }
             IconButtonWithText(
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
+                    .padding(end = 8.dp)
                     .defaultMinSize(minWidth = 48.dp, minHeight = 36.dp),
                 onClick = pauseRunClicked,
                 icon = if (isSyncRunning) {
@@ -242,10 +264,9 @@ private fun SyncCardFooter(
                 }
             )
             IconButtonWithText(
-                modifier = Modifier.padding(start = 8.dp, bottom = 16.dp),
                 onClick = removeFolderClicked,
                 icon = R.drawable.ic_minus_circle,
-                text = "Remove synced folder"
+                text = "Remove"
             )
         }
     }
@@ -256,6 +277,7 @@ private fun IconButtonWithText(
     modifier: Modifier = Modifier,
     @DrawableRes icon: Int,
     text: String,
+    color: Color = MaterialTheme.colors.textColorPrimary,
     onClick: () -> Unit,
 ) {
     Column(modifier.clickable { onClick() }) {
@@ -267,12 +289,12 @@ private fun IconButtonWithText(
                 .height(16.dp)
                 .width(16.dp)
                 .align(Alignment.CenterHorizontally),
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorPrimary)
+            colorFilter = ColorFilter.tint(color)
         )
         Text(
             text = text,
             Modifier.align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.textColorPrimary),
+            style = MaterialTheme.typography.caption.copy(color = color),
         )
     }
 }
