@@ -14,7 +14,7 @@
         android:icon="@drawable/info_ic_white"
         android:orderInCategory="105"
         android:title="@string/general_file_info"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/chat_import"
