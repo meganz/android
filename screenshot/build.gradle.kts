@@ -59,7 +59,7 @@ dependencies {
 
     implementation(lib.showkase)
     implementation(lib.compose.state.events)
-    kapt(lib.showkase.processor)
+//    kapt(lib.showkase.processor)
 
     testImplementation(testlib.junit)
     testImplementation(lib.showkase.screenshot.test)

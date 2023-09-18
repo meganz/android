@@ -65,13 +65,13 @@ object ColorUtils {
         return tintIcon(context, drawableId, getThemeColor(context, MaterialR.attr.colorControlNormal))
     }
 
+    @SuppressLint("RestrictedApi")
     private fun doSetEditTextUnderlineColor(
         editText: EditText,
         reset: Boolean,
         color: Int,
     ) {
         var editTextBackground = editText.background ?: return
-        @SuppressLint("RestrictedApi")
         if (DrawableUtils.canSafelyMutateDrawable(editTextBackground)) {
             editTextBackground = editTextBackground.mutate()
         }

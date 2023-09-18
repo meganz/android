@@ -526,7 +526,8 @@ class FolderLinkViewModel @Inject constructor(
                         Timber.w("parentNode == NULL")
                         _state.update { it.copy(finishActivity = true) }
                     }
-            } ?: {
+                ""
+            } ?: run {
                 Timber.w("parentNode == NULL")
                 _state.update { it.copy(finishActivity = true) }
             }
