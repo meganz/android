@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.waitingroom.IsValidWaitingRoomUseCase
@@ -55,26 +56,27 @@ import kotlin.time.Duration.Companion.minutes
 /**
  * Waiting room view model
  *
- * @property monitorConnectivityUseCase
- * @property getScheduleMeetingDataUseCase
- * @property timestampMapper
- * @property getMyAvatarFileUseCase
- * @property getMyAvatarColorUseCase
- * @property getUserFullNameUseCase
- * @property isValidWaitingRoomUseCase
- * @property monitorChatCallUpdates
- * @property monitorScheduledMeetingUpdates
- * @property getChatCall
- * @property getChatLocalVideoUpdatesUseCase
- * @property setChatVideoInDeviceUseCase
- * @property startVideoDeviceUseCase
- * @property answerChatCallUseCase
- * @property initGuestChatSessionUseCase
- * @property joinGuestChatCallUseCase
- * @property checkChatLinkUseCase
- * @property isUserLoggedIn
- * @property isEphemeralPlusPlusUseCase
- * @property logoutUseCase
+ * @property monitorConnectivityUseCase         [MonitorConnectivityUseCase]
+ * @property getScheduleMeetingDataUseCase      [GetScheduleMeetingDataUseCase]
+ * @property timestampMapper                    [ChatRoomTimestampMapper]
+ * @property getMyAvatarFileUseCase             [GetMyAvatarFileUseCase]
+ * @property getMyAvatarColorUseCase            [GetMyAvatarColorUseCase]
+ * @property getUserFullNameUseCase             [GetUserFullNameUseCase]
+ * @property isValidWaitingRoomUseCase          [IsValidWaitingRoomUseCase]
+ * @property monitorChatCallUpdates             [MonitorChatCallUpdates]
+ * @property monitorScheduledMeetingUpdates     [MonitorScheduledMeetingUpdates]
+ * @property getChatCall                        [GetChatCall]
+ * @property getChatLocalVideoUpdatesUseCase    [GetChatLocalVideoUpdatesUseCase]
+ * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
+ * @property startVideoDeviceUseCase            [StartVideoDeviceUseCase]
+ * @property answerChatCallUseCase              [AnswerChatCallUseCase]
+ * @property initGuestChatSessionUseCase        [InitGuestChatSessionUseCase]
+ * @property joinGuestChatCallUseCase           [JoinGuestChatCallUseCase]
+ * @property checkChatLinkUseCase               [CheckChatLinkUseCase]
+ * @property isUserLoggedIn                     [IsUserLoggedIn]
+ * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
+ * @property logoutUseCase                      [LogoutUseCase]
+ * @property hangChatCallUseCase                [HangChatCallUseCase]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -99,6 +101,7 @@ class WaitingRoomViewModel @Inject constructor(
     private val isUserLoggedIn: IsUserLoggedIn,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val logoutUseCase: LogoutUseCase,
+    private val hangChatCallUseCase: HangChatCallUseCase
 ) : ViewModel() {
 
     companion object {
@@ -106,6 +109,10 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     private val _state = MutableStateFlow(WaitingRoomState())
+
+    /**
+     * Waiting room state
+     */
     val state: StateFlow<WaitingRoomState> = _state
 
     init {
@@ -282,7 +289,8 @@ class WaitingRoomViewModel @Inject constructor(
                 .collectLatest { state ->
                     if (state.callStarted) {
                         delay(WAITING_ROOM_TIMEOUT.minutes)
-                        _state.update { it.copy(inactiveHostDialog = true) }
+                        hangChatCall()
+                        _state.update { it.copy(inactiveHostDialog = true, canAnswer = false) }
                     }
                 }
         }
@@ -295,6 +303,23 @@ class WaitingRoomViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 setChatVideoInDeviceUseCase()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    /**
+     * Hang current chat call
+     */
+    private fun hangChatCall() =
+        viewModelScope.launch {
+            runCatching {
+                val callId = _state.value.callId
+                if (callId != -1L) {
+                    hangChatCallUseCase(callId = callId)
+                }
+            }.onSuccess {
+                _state.update { it.copy(callId = -1L) }
             }.onFailure { exception ->
                 Timber.e(exception)
             }
@@ -349,14 +374,19 @@ class WaitingRoomViewModel @Inject constructor(
      */
     private fun ChatCall.updateUiState() {
         when {
-            hasAccessBeenDenied() ->
-                _state.update { it.copy(denyAccessDialog = true) }
+            hasAccessBeenDenied() -> _state.update {
+                it.copy(
+                    callId = callId,
+                    denyAccessDialog = true,
+                    canAnswer = false
+                )
+            }
 
             hasAccessBeenGranted() ->
-                _state.update { it.copy(joinCall = true) }
+                _state.update { it.copy(callId = callId, joinCall = true) }
 
             hasStarted() -> {
-                _state.update { it.copy(callStarted = true) }
+                _state.update { it.copy(callId = callId, callStarted = true) }
 
                 if (shouldBeAnswered()) {
                     answerChatCall()
@@ -364,7 +394,7 @@ class WaitingRoomViewModel @Inject constructor(
             }
 
             else ->
-                _state.update { it.copy(callStarted = false) }
+                _state.update { it.copy(callId = callId, callStarted = false) }
         }
     }
 
@@ -380,7 +410,7 @@ class WaitingRoomViewModel @Inject constructor(
      * Check if [ChatCall] access has been denied
      */
     private fun ChatCall.hasAccessBeenDenied(): Boolean =
-        changes?.contains(ChatCallChanges.WaitingRoomDeny) == true
+        !_state.value.canAnswer || changes?.contains(ChatCallChanges.WaitingRoomDeny) == true
                 || (waitingRoomStatus == WaitingRoomStatus.NotAllowed
                 && termCode == TermCodeType.Kicked)
 
@@ -388,7 +418,7 @@ class WaitingRoomViewModel @Inject constructor(
      * Check if [ChatCall] should be answered
      */
     private fun ChatCall.shouldBeAnswered(): Boolean =
-        (status == ChatCallStatus.WaitingRoom || status == ChatCallStatus.UserNoPresent)
+        _state.value.canAnswer && (status == ChatCallStatus.WaitingRoom || status == ChatCallStatus.UserNoPresent)
                 && !_state.value.guestMode
 
     /**
@@ -517,6 +547,9 @@ class WaitingRoomViewModel @Inject constructor(
     fun finishWaitingRoom() {
         viewModelScope.launch {
             runCatching {
+                _state.update { it.copy(canAnswer = false) }
+                hangChatCall().join()
+
                 if (isEphemeralPlusPlusUseCase()) {
                     logoutUseCase()
                 }

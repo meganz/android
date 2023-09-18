@@ -15,7 +15,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.view.WaitingRoomView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,8 +22,6 @@ import javax.inject.Inject
 
 /**
  * Activity which shows waiting room.
- *
- * @property getThemeMode               [GetThemeMode]
  */
 @AndroidEntryPoint
 class WaitingRoomActivity : AppCompatActivity() {

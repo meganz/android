@@ -305,10 +305,10 @@ internal fun WaitingRoomView(
             onDismiss = { showLeaveDialog = false },
         )
 
-        state.denyAccessDialog -> MegaAlertDialog(
-            modifier = Modifier.testTag("waiting_room:dialog_deny_access"),
-            title = stringResource(R.string.meetings_waiting_room_deny_user_dialog_title),
-            text = stringResource(R.string.meetings_waiting_room_deny_user_dialog_description),
+        state.inactiveHostDialog -> MegaAlertDialog(
+            modifier = Modifier.testTag("waiting_room:dialog_inactive_host"),
+            title = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_title),
+            text = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_description),
             confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
             cancelButtonText = null,
             onConfirm = onCloseClicked,
@@ -317,10 +317,10 @@ internal fun WaitingRoomView(
             dismissOnClickOutside = false,
         )
 
-        state.inactiveHostDialog -> MegaAlertDialog(
-            modifier = Modifier.testTag("waiting_room:dialog_inactive_host"),
-            title = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_title),
-            text = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_description),
+        state.denyAccessDialog -> MegaAlertDialog(
+            modifier = Modifier.testTag("waiting_room:dialog_deny_access"),
+            title = stringResource(R.string.meetings_waiting_room_deny_user_dialog_title),
+            text = stringResource(R.string.meetings_waiting_room_deny_user_dialog_description),
             confirmButtonText = stringResource(R.string.cloud_drive_media_discovery_banner_ok),
             cancelButtonText = null,
             onConfirm = onCloseClicked,

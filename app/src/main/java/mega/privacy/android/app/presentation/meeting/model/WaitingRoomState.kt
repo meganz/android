@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
  *
  * @property chatId                     Chat id.
  * @property schedId                    Scheduled meeting id.
+ * @property callId                     Chat call id.
  * @property chatLink                   Chat link.
  * @property guestMode                  Flag to check if it's guest mode.
  * @property callStarted                Flag to check if the meeting call has started.
@@ -21,12 +22,14 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
  * @property guestLastName              Guest user last name
  * @property denyAccessDialog           Flag to show Guest Leave Dialog
  * @property inactiveHostDialog         Flag to show Inactive Host Dialog
+ * @property canAnswer                  Flag to store if call can be answered depending on leave or deny actions
  * @property joinCall                   Flag to open the screen and join the call.
  * @property finish                     Flag to finish current screen.
  **/
 data class WaitingRoomState(
     val chatId: Long = -1L,
     val schedId: Long = -1L,
+    val callId: Long = -1L,
     val chatLink: String? = null,
     val guestMode: Boolean = false,
     val callStarted: Boolean = false,
@@ -40,6 +43,7 @@ data class WaitingRoomState(
     val guestLastName: String? = null,
     val denyAccessDialog: Boolean = false,
     val inactiveHostDialog: Boolean = false,
+    val canAnswer: Boolean = true,
     val joinCall: Boolean = false,
     val finish: Boolean = false,
 )
