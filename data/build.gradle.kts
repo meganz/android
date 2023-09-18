@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("de.mannodermaus.android-junit5")
+    id("com.google.devtools.ksp")
 }
 
 apply(plugin = "jacoco")
@@ -70,10 +71,8 @@ android {
         }
     }
 
-    kapt {
-        arguments {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
     namespace = "mega.privacy.android.data"
 }
@@ -99,7 +98,7 @@ dependencies {
     implementation(google.hilt.android)
     kapt(google.hilt.android.compiler)
     kapt(androidx.hilt.compiler)
-    kapt(androidx.room.compiler)
+    ksp(androidx.room.compiler)
 
     "gmsImplementation"(lib.billing.client.ktx)
 
