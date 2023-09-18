@@ -235,6 +235,7 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
+import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
