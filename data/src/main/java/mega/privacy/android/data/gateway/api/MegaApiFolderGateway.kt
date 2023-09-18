@@ -13,7 +13,7 @@ interface MegaApiFolderGateway {
     /**
      * Authentication token that can be used to identify the user account.
      */
-    var accountAuth: String?
+    suspend fun setAccountAuth(authentication: String?)
 
     /**
      * Authorize and return a MegaNode can be downloaded with any instance of MegaApi

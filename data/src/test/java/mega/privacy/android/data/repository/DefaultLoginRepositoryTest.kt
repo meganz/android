@@ -195,8 +195,8 @@ class DefaultLoginRepositoryTest {
             verify(megaApiGateway).login(any(), any(), listenerCaptor.capture())
             val listener = listenerCaptor.firstValue
             listener.onRequestFinish(mock(), mock(), error)
-            val value = verify(megaApiGateway).accountAuth
-            verify(megaApiFolderGateway).accountAuth = value
+            val value = verify(megaApiGateway).getAccountAuth()
+            verify(megaApiFolderGateway).setAccountAuth(value)
             assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
             cancelAndIgnoreRemainingEvents()
         }
@@ -338,8 +338,8 @@ class DefaultLoginRepositoryTest {
                     .multiFactorAuthLogin(any(), any(), any(), listenerCaptor.capture())
                 val listener = listenerCaptor.firstValue
                 listener.onRequestFinish(mock(), mock(), error)
-                val value = verify(megaApiGateway).accountAuth
-                verify(megaApiFolderGateway).accountAuth = value
+                val value = verify(megaApiGateway).getAccountAuth()
+                verify(megaApiFolderGateway).setAccountAuth(value)
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -479,8 +479,8 @@ class DefaultLoginRepositoryTest {
                 verify(megaApiGateway).fastLogin(any(), listenerCaptor.capture())
                 val listener = listenerCaptor.firstValue
                 listener.onRequestFinish(mock(), mock(), error)
-                val value = verify(megaApiGateway).accountAuth
-                verify(megaApiFolderGateway).accountAuth = value
+                val value = verify(megaApiGateway).getAccountAuth()
+                verify(megaApiFolderGateway).setAccountAuth(value)
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 cancelAndIgnoreRemainingEvents()
             }

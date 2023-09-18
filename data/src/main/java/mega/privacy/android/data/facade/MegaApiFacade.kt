@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
@@ -129,8 +130,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override val isEphemeralPlusPlus: Boolean
         get() = megaApi.isEphemeralPlusPlus
-    override val accountAuth: String?
-        get() = megaApi.accountAuth
+
+    override suspend fun getAccountAuth(): String? = megaApi.accountAuth
     override val myCredentials: String?
         get() = megaApi.myCredentials
     override val dumpSession: String?
@@ -855,8 +856,11 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getPreviewElementNode(eid, listener)
     }
 
-    override fun removeRequestListener(listener: MegaRequestListenerInterface) =
-        megaApi.removeRequestListener(listener)
+    override fun removeRequestListener(listener: MegaRequestListenerInterface) {
+        sharingScope.launch {
+            megaApi.removeRequestListener(listener)
+        }
+    }
 
     override fun getUserCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
         megaApi.getUserCredentials(user, listener)

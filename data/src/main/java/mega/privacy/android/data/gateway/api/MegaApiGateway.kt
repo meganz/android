@@ -178,7 +178,7 @@ interface MegaApiGateway {
     /**
      * Authentication token that can be used to identify the user account.
      */
-    val accountAuth: String?
+    suspend fun getAccountAuth(): String?
 
     /**
      * Fingerprint of the signing key of the current account

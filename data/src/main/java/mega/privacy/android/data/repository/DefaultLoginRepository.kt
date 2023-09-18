@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -109,7 +110,7 @@ internal class DefaultLoginRepository @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 Timber.d("Fast login allowed.")
                 val listener =
-                    continuation.getRequestListener("fastLogin") { onFastLoginFinish(continuation) }
+                    continuation.getRequestListener("fastLogin") { }
                 megaApiGateway.fastLogin(
                     session,
                     listener
@@ -118,20 +119,9 @@ internal class DefaultLoginRepository @Inject constructor(
                     megaApiGateway.removeRequestListener(listener)
                 }
             }
+            megaApiFolderGateway.setAccountAuth(megaApiGateway.getAccountAuth())
         }
     }
-
-    private fun onFastLoginFinish(continuation: Continuation<Unit>) =
-        { _: MegaRequest, error: MegaError ->
-            if (error.errorCode == MegaError.API_OK) {
-                Timber.d("Fast login success")
-                megaApiFolderGateway.accountAuth = megaApiGateway.accountAuth
-                continuation.resumeWith(Result.success(Unit))
-            } else {
-                Timber.e("Fast login error: ${error.errorString}")
-                continuation.failWithError(error, "onFastLoginFinish")
-            }
-        }
 
     override suspend fun fetchNodes() {
         withContext(ioDispatcher) {
@@ -244,7 +234,6 @@ internal class DefaultLoginRepository @Inject constructor(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
                         MegaError.API_OK -> {
-                            megaApiFolderGateway.accountAuth = megaApiGateway.accountAuth
                             trySend(LoginStatus.LoginSucceed)
                             close()
                         }
@@ -294,6 +283,10 @@ internal class DefaultLoginRepository @Inject constructor(
 
             loginRequest.invoke(listener)
             awaitClose { megaApiGateway.removeRequestListener(listener) }
+        }.onEach {
+            if (it == LoginStatus.LoginSucceed) {
+                megaApiFolderGateway.setAccountAuth(megaApiGateway.getAccountAuth())
+            }
         }.flowOn(ioDispatcher)
 
     override fun login(email: String, password: String) =
@@ -359,7 +352,7 @@ internal class DefaultLoginRepository @Inject constructor(
 
         megaApiGateway.fetchNodes(listener)
         awaitClose { megaApiGateway.removeRequestListener(listener) }
-    }
+    }.flowOn(ioDispatcher)
 
     override fun monitorFetchNodesFinish() = appEventGateway.monitorFetchNodesFinish()
 

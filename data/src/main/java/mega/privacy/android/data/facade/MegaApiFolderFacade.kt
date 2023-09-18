@@ -19,11 +19,9 @@ internal class MegaApiFolderFacade @Inject constructor(
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
 ) : MegaApiFolderGateway {
 
-    override var accountAuth: String?
-        get() = megaApiFolder.accountAuth
-        set(value) {
-            megaApiFolder.accountAuth = value
-        }
+    override suspend fun setAccountAuth(authentication: String?) {
+        megaApiFolder.accountAuth = authentication
+    }
 
     override suspend fun authorizeNode(handle: Long): MegaNode? =
         megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle))

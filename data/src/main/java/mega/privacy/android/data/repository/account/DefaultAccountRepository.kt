@@ -629,7 +629,7 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun resetAccountAuth() = withContext(ioDispatcher) {
-        megaApiFolderGateway.accountAuth = null
+        megaApiFolderGateway.setAccountAuth(null)
     }
 
     override suspend fun clearAccountPreferences() = withContext(ioDispatcher) {

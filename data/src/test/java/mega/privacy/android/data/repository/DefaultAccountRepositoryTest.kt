@@ -873,7 +873,7 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test that MegaApiFolderGateway is invoked when resetting accountAuth`() = runTest {
         underTest.resetAccountAuth()
-        verify(megaApiFolderGateway).accountAuth = null
+        verify(megaApiFolderGateway).setAccountAuth(null)
     }
 
     @Test
