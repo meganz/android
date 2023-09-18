@@ -27,8 +27,9 @@ class ActiveTransferDaoTest {
             tag = tag,
             transferType = TransferType.values()[tag.rem(TransferType.values().size)],
             totalBytes = 1024 * (tag.toLong() % 5 + 1),
-            transferredBytes = 512 * (tag.toLong() % 5 + 1),
-            isFinished = tag.rem(5) == 0
+            isFinished = tag.rem(5) == 0,
+            isPaused = false,
+            isFolderTransfer = false,
         )
     }
 
@@ -54,8 +55,9 @@ class ActiveTransferDaoTest {
             tag = 100,
             transferType = TransferType.TYPE_UPLOAD,
             totalBytes = 1024,
-            transferredBytes = 512,
             isFinished = true,
+            isFolderTransfer = false,
+            isPaused = false,
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)
@@ -103,16 +105,6 @@ class ActiveTransferDaoTest {
             val expectedTotal = entities.filter { it.transferType == type }.sumOf { it.totalBytes }
             val actual = activeTransferDao.getTotalsByType(type).first()
             assertThat(actual.totalBytes).isEqualTo(expectedTotal)
-        }
-    }
-
-    @Test
-    fun test_that_getTotals_returns_correct_transferredBytes() = runTest {
-        TransferType.values().forEach { type ->
-            val expectedTransferredBytes =
-                entities.filter { it.transferType == type }.sumOf { it.transferredBytes }
-            val actual = activeTransferDao.getTotalsByType(type).first()
-            assertThat(actual.transferredBytes).isEqualTo(expectedTransferredBytes)
         }
     }
 

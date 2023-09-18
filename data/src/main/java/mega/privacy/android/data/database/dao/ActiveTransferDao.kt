@@ -37,7 +37,8 @@ internal interface ActiveTransferDao {
     fun getCurrentTotalsByType(transferType: TransferType): ActiveTransferTotalsEntity
 
     companion object {
+        // TRAN-230: total transferredBytes will be recovered in task TRAN-230
         private const val TOTALS_QUERY =
-            "SELECT transfer_type as transfersType, SUM(total_bytes) as totalBytes, SUM(transferred_bytes) as transferredBytes, COUNT(*) as totalTransfers, SUM(is_finished) as totalFinishedTransfers FROM active_transfers WHERE transfer_type = :transferType GROUP by transfer_type"
+            "SELECT transfer_type as transfersType, SUM(total_bytes) as totalBytes, 0 as transferredBytes, COUNT(*) as totalTransfers, SUM(is_finished) as totalFinishedTransfers FROM active_transfers WHERE transfer_type = :transferType GROUP by transfer_type"
     }
 }

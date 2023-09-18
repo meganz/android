@@ -27,15 +27,28 @@ class ActiveTransferEntityMapperTest {
     @EnumSource(TransferType::class)
     fun `test that mapper returns model correctly when invoke function`(transferType: TransferType) =
         runTest {
-            val model = ActiveTransferImpl(TAG, transferType, TOTAL, TRANSFERRED, true)
-            val expected = ActiveTransferEntity(TAG, transferType, TOTAL, TRANSFERRED, true)
+            val model = ActiveTransferImpl(
+                tag = TAG,
+                transferType = transferType,
+                totalBytes = TOTAL,
+                isFinished = true,
+                isFolderTransfer = false,
+                isPaused = false
+            )
+            val expected = ActiveTransferEntity(
+                tag = TAG,
+                transferType = transferType,
+                totalBytes = TOTAL,
+                isFinished = true,
+                isFolderTransfer = false,
+                isPaused = false
+            )
             Truth.assertThat(underTest(model)).isEqualTo(expected)
         }
 
     companion object {
         private const val TAG = 2
         private const val TOTAL = 1024L
-        private const val TRANSFERRED = 1024L
     }
 
 
@@ -48,7 +61,8 @@ class ActiveTransferEntityMapperTest {
         override val tag: Int,
         override val transferType: TransferType,
         override val totalBytes: Long,
-        override val transferredBytes: Long,
         override val isFinished: Boolean,
+        override val isFolderTransfer: Boolean,
+        override val isPaused: Boolean,
     ) : ActiveTransfer
 }

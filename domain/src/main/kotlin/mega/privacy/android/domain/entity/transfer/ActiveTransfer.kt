@@ -21,12 +21,17 @@ interface ActiveTransfer {
     val totalBytes: Long
 
     /**
-     * The current amount of bytes already transferred
-     */
-    val transferredBytes: Long
-
-    /**
      * True if the transfer has already finished but it's still part of the current
      */
     val isFinished: Boolean
+
+    /**
+     * True if it's a folder transfer, false otherwise (file transfer).
+     */
+    val isFolderTransfer: Boolean
+
+    /**
+     * True if the transfer is paused, false otherwise
+     */
+    val isPaused: Boolean
 }

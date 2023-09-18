@@ -41,7 +41,7 @@ import java.math.BigInteger
  */
 data class Transfer(
     override val transferType: TransferType,
-    override val transferredBytes: Long,
+    val transferredBytes: Long,
     override val totalBytes: Long,
     val localPath: String,
     val parentPath: String,
@@ -54,7 +54,7 @@ data class Transfer(
     val isForeignOverQuota: Boolean,
     val isStreamingTransfer: Boolean,
     override val isFinished: Boolean,
-    val isFolderTransfer: Boolean,
+    override val isFolderTransfer: Boolean,
     @Deprecated(message = "use transferAppData")
     val appData: String,
     val transferAppData: List<TransferAppData>,
@@ -62,6 +62,12 @@ data class Transfer(
     val priority: BigInteger,
     val notificationNumber: Long,
 ) : ActiveTransfer {
+
+    /**
+     * Gets paused state from [state]
+     */
+    override val isPaused get() = state == TransferState.STATE_PAUSED
+
     /**
      * Is voice clip.
      *

@@ -15,6 +15,7 @@ import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
+import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 
 @Database(
     entities = [
@@ -29,6 +30,7 @@ import mega.privacy.android.data.database.entity.SyncRecordEntity
     autoMigrations = [
         AutoMigration(69, 70),
         AutoMigration(72, 73),
+        AutoMigration(73, 74, spec = AutoMigrationSpec73to74::class),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
