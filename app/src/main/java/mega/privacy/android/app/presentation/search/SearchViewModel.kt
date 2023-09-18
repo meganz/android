@@ -281,7 +281,6 @@ class SearchViewModel @Inject constructor(
                 isFirstLevel = firstNavigationLevel,
                 searchFilter = selectedFilter
             )
-            delay(5000L)
             finishSearch(nodes ?: emptyList())
         }
     }

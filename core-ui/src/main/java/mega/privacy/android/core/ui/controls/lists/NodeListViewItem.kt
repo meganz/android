@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -47,6 +48,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.utils.isScreenOrientationLandscape
 import java.io.File
 
 /**
@@ -267,6 +269,7 @@ fun NodeListViewItem(
 
                     MiddleEllipsisText(
                         text = name,
+                        modifier = Modifier.widthIn(max = if (isScreenOrientationLandscape()) 275.dp else 190.dp),
                         style = MaterialTheme.typography.subtitle1,
                         color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
                     )
