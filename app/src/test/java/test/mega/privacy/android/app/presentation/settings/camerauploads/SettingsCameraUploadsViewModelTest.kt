@@ -599,18 +599,6 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that setupDefaultSecondaryFolder is invoked when calling setupDefaultSecondaryCameraUploadFolder`() =
-        runTest {
-            setupUnderTest()
-
-            val testName = "Media Uploads"
-
-            underTest.setupDefaultSecondaryCameraUploadFolder(testName)
-
-            verify(setupDefaultSecondaryFolderUseCase).invoke(testName)
-        }
-
-    @Test
     fun `test that setupPrimaryFolder is invoked when calling setupPrimaryCameraUploadFolder`() =
         runTest {
             setupUnderTest()
@@ -734,17 +722,31 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.state.map { it.shouldShowError }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isFalse()
-                underTest.setupDefaultSecondaryCameraUploadFolder(anyString())
+                underTest.onMediaUploadsEnabled(anyString())
                 assertThat(awaitItem()).isTrue()
             }
         }
 
     @Test
-    fun `test that camera uploads is enabled when onEnableCameraUploads is invoked`() =
+    fun `test that camera uploads is enabled when onCameraUploadsEnabled is invoked`() =
         runTest {
             setupUnderTest()
-            underTest.onEnableCameraUploads()
+            val shouldDisableMediaUploads = true
+            underTest.onCameraUploadsEnabled(shouldDisableMediaUploads)
             verify(restorePrimaryTimestamps).invoke()
             verify(dbh).setCamSyncEnabled(true)
+            verify(resetMediaUploadTimeStamps).invoke()
+            verify(disableMediaUploadSettings).invoke()
+        }
+
+    @Test
+    fun `test that media uploads is enabled when onMediaUploadsEnabled is invoked`() =
+        runTest {
+            setupUnderTest()
+            val mediaUploadsName = "Media Uploads"
+            underTest.onMediaUploadsEnabled(mediaUploadsName)
+            verify(setupDefaultSecondaryFolderUseCase).invoke(mediaUploadsName)
+            verify(restoreSecondaryTimestamps).invoke()
+            verify(dbh).setSecondaryUploadEnabled(true)
         }
 }

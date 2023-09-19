@@ -256,6 +256,26 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * on Enable MediaUpload
+     * @param mediaUploadsName
+     */
+    fun onMediaUploadsEnabled(mediaUploadsName: String) {
+        viewModelScope.launch {
+            runCatching {
+                // Sets up a Secondary Folder with a Media Uploads folder name
+                setupDefaultSecondaryFolderUseCase(mediaUploadsName)
+                //If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
+                //if not clean the sync record from previous primary folder
+                restoreSecondaryTimestamps()
+                dbh.setSecondaryUploadEnabled(true)
+            }.onFailure {
+                Timber.e(it)
+                setErrorState(shouldShow = true)
+            }
+        }
+    }
+
+    /**
      * If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
      * if not clean the sync record from previous primary folder
      */
@@ -268,19 +288,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             }
         }
     }
-
-    /**
-     * Sets up a Secondary Folder with a Media Uploads folder name
-     */
-    fun setupDefaultSecondaryCameraUploadFolder(secondaryFolderName: String) =
-        viewModelScope.launch {
-            runCatching {
-                setupDefaultSecondaryFolderUseCase(secondaryFolderName)
-            }.onFailure {
-                Timber.w(it)
-                setErrorState(shouldShow = true)
-            }
-        }
 
     /**
      * Sets up the Primary Folder with a given folder handle
@@ -361,23 +368,36 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun disableMediaUploads() {
         runCatching {
             viewModelScope.launch {
-                resetMediaUploadTimeStamps()
-                disableMediaUploadSettings()
+                resetAndDisableMediaUploads()
             }
         }.onFailure {
             Timber.e(it)
         }
     }
 
+    private suspend fun resetAndDisableMediaUploads() {
+        resetMediaUploadTimeStamps()
+        disableMediaUploadSettings()
+    }
+
     /**
-     * onEnableCameraUploads
+     * onCameraUploadsEnabled
+     * @param shouldDisableMediaUploads
      */
-    fun onEnableCameraUploads() {
+    fun onCameraUploadsEnabled(shouldDisableMediaUploads: Boolean) {
         viewModelScope.launch {
-            setCameraUploadsEnabled(true)
-            restorePrimaryTimestamps()
-            // this will be replaced with [SetupCameraUploadSettingUseCase]
-            dbh.setCamSyncEnabled(true)
+            runCatching {
+                setCameraUploadsEnabled(true)
+                restorePrimaryTimestamps()
+                // this will be replaced with [SetupCameraUploadSettingUseCase]
+                dbh.setCamSyncEnabled(true)
+                if (shouldDisableMediaUploads) {
+                    resetAndDisableMediaUploads()
+                }
+            }.onFailure {
+                Timber.e(it)
+                setErrorState(shouldShow = true)
+            }
         }
     }
 

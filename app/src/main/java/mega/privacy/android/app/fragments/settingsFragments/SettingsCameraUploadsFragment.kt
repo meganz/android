@@ -94,7 +94,7 @@ import java.io.File
 @AndroidEntryPoint
 class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     Preference.OnPreferenceClickListener,
-    Preference.OnPreferenceChangeListener{
+    Preference.OnPreferenceChangeListener {
     private var cameraUploadOnOff: SwitchPreferenceCompat? = null
     private var optionHowToUpload: ListPreference? = null
     private var optionFileUpload: ListPreference? = null
@@ -281,7 +281,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
 
         // Setting up the Secondary Folder path
         if (prefs?.secondaryMediaFolderEnabled == null) {
-            dbH.setSecondaryUploadEnabled(false)
+            viewModel.disableMediaUploads()
             secondaryUpload = false
         } else {
             secondaryUpload = prefs?.secondaryMediaFolderEnabled.toBoolean()
@@ -370,9 +370,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 if (secondaryUpload) {
                     Timber.d("Enable Media Uploads.")
                     // If there is any possible secondary folder, set it as the default one
-                    viewModel.setupDefaultSecondaryCameraUploadFolder(getString(R.string.section_secondary_media_uploads))
-                    viewModel.restoreSecondaryTimestampsAndSyncRecordProcess()
-                    dbH.setSecondaryUploadEnabled(true)
+                    viewModel.onMediaUploadsEnabled(getString(R.string.section_secondary_media_uploads))
 
                     // To prevent user switch on/off rapidly. After set backup, will be re-enabled.
                     secondaryMediaFolderOn?.isEnabled = false
@@ -1388,7 +1386,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private fun enableCameraUploads() {
         Timber.d("Camera Uploads Enabled")
 
-        viewModel.onEnableCameraUploads()
+        viewModel.onCameraUploadsEnabled(prefs?.secondaryMediaFolderEnabled == null)
 
         // Cloud Primary Folder
         setupPrimaryCloudFolder()
@@ -1438,7 +1436,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      */
     private fun setupSecondaryUpload() {
         secondaryUpload = if (prefs?.secondaryMediaFolderEnabled == null) {
-            dbH.setSecondaryUploadEnabled(false)
             false
         } else {
             prefs?.secondaryMediaFolderEnabled.toBoolean()
