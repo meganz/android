@@ -7,13 +7,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.SqliteDatabaseHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -143,6 +142,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val dbh: SqliteDatabaseHandler,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -366,6 +366,18 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             }
         }.onFailure {
             Timber.e(it)
+        }
+    }
+
+    /**
+     * onEnableCameraUploads
+     */
+    fun onEnableCameraUploads() {
+        viewModelScope.launch {
+            setCameraUploadsEnabled(true)
+            restorePrimaryTimestamps()
+            // this will be replaced with [SetupCameraUploadSettingUseCase]
+            dbh.setCamSyncEnabled(true)
         }
     }
 

@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
+import mega.privacy.android.app.SqliteDatabaseHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -113,6 +114,7 @@ class SettingsCameraUploadsViewModelTest {
     private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
     private val monitorCameraUploadsSettingsActionsUseCase =
         mock<MonitorCameraUploadsSettingsActionsUseCase>()
+    private val dbh: SqliteDatabaseHandler = mock()
 
     @Before
     fun setUp() {
@@ -169,7 +171,8 @@ class SettingsCameraUploadsViewModelTest {
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
-            isConnectedToInternetUseCase = mock()
+            isConnectedToInternetUseCase = mock(),
+            dbh = dbh,
         )
     }
 
@@ -734,5 +737,14 @@ class SettingsCameraUploadsViewModelTest {
                 underTest.setupDefaultSecondaryCameraUploadFolder(anyString())
                 assertThat(awaitItem()).isTrue()
             }
+        }
+
+    @Test
+    fun `test that camera uploads is enabled when onEnableCameraUploads is invoked`() =
+        runTest {
+            setupUnderTest()
+            underTest.onEnableCameraUploads()
+            verify(restorePrimaryTimestamps).invoke()
+            verify(dbh).setCamSyncEnabled(true)
         }
 }

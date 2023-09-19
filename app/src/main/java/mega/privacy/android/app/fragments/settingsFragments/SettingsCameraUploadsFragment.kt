@@ -1388,19 +1388,13 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private fun enableCameraUploads() {
         Timber.d("Camera Uploads Enabled")
 
-        viewModel.setCameraUploadsEnabled(true)
-
-        // Local Primary Folder
-        viewModel.restorePrimaryTimestampsAndSyncRecordProcess()
+        viewModel.onEnableCameraUploads()
 
         // Cloud Primary Folder
         setupPrimaryCloudFolder()
 
         // Secondary Uploads
         setupSecondaryUpload()
-
-        // Set Camera Uploads as Enabled
-        dbH.setCamSyncEnabled(true)
 
         cameraUploadOnOff?.isChecked = true
 
@@ -1483,17 +1477,26 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     fun reEnableCameraUploadsPreference(which: Int) {
         when (which) {
             MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS -> {
+                Timber.d("${cameraUploadOnOff?.isEnabled}")
                 cameraUploadOnOff?.isEnabled = true
+                Timber.d("${optionLocalCameraFolder?.isEnabled}")
                 optionLocalCameraFolder?.isEnabled = true
+                Timber.d("${megaCameraFolder?.isEnabled}")
                 megaCameraFolder?.isEnabled = true
+                Timber.d("${secondaryMediaFolderOn?.isEnabled}")
                 secondaryMediaFolderOn?.isEnabled = true
+                Timber.d("${localSecondaryFolder?.isEnabled}")
                 localSecondaryFolder?.isEnabled = true
+                Timber.d("${megaSecondaryFolder?.isEnabled}")
                 megaSecondaryFolder?.isEnabled = true
             }
 
             MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS -> {
+                Timber.d("${secondaryMediaFolderOn?.isEnabled}")
                 secondaryMediaFolderOn?.isEnabled = true
+                Timber.d("${localSecondaryFolder?.isEnabled}")
                 localSecondaryFolder?.isEnabled = true
+                Timber.d("${megaSecondaryFolder?.isEnabled}")
                 megaSecondaryFolder?.isEnabled = true
             }
         }
