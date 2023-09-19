@@ -453,4 +453,18 @@ interface SettingsRepository {
      * Get the secret code of the account to enable multi-factor authentication
      */
     suspend fun getMultiFactorAuthCode(): String
+
+    /**
+     * Set offline warning message visibility
+     * @param isVisible the visibility of the view to set
+     */
+    suspend fun setOfflineWarningMessageVisibility(isVisible: Boolean)
+
+    /**
+     * Monitor the offline warning message visibility
+     *
+     * @return the message visibility state
+     */
+    fun monitorOfflineWarningMessageVisibility(): Flow<Boolean?>
+
 }

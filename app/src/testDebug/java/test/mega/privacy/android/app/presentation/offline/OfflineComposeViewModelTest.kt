@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -11,36 +12,76 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeViewModel
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.LoadOfflineNodesUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
+import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.robolectric.RobolectricTestRunner
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class OfflineComposeViewModelTest {
     private lateinit var underTest: OfflineComposeViewModel
     private val loadOfflineNodesUseCase = mock<LoadOfflineNodesUseCase>()
+    private val setOfflineWarningMessageVisibilityUseCase =
+        mock<SetOfflineWarningMessageVisibilityUseCase>()
+    private val monitorOfflineWarningMessageVisibilityUseCase =
+        mock<MonitorOfflineWarningMessageVisibilityUseCase>()
 
-    @Before
+    @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = OfflineComposeViewModel(
             loadOfflineNodesUseCase,
+            setOfflineWarningMessageVisibilityUseCase,
+            monitorOfflineWarningMessageVisibilityUseCase
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
 
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            loadOfflineNodesUseCase,
+            setOfflineWarningMessageVisibilityUseCase,
+            monitorOfflineWarningMessageVisibilityUseCase
+        )
+    }
+
     @Test
-    fun `test that isLoading should be false when get fetching the offline nodes is successful `() =
+    fun `test that dismissOfflineWarning will invoke setOfflineWarningMessageVisibilityUseCase`() {
+        runTest {
+            val expectedResult = false
+            underTest.dismissOfflineWarning()
+            verify(setOfflineWarningMessageVisibilityUseCase).invoke(expectedResult)
+        }
+    }
+
+    @Test
+    fun `test that showOfflineWarning equals to the same value that monitorOfflineWarningMessageVisibilityUseCase returns`() =
+        runTest {
+            val expected = false
+            whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(flowOf(expected))
+            underTest.monitorOfflineWarningMessage()
+            underTest.uiState.test {
+                val state = awaitItem()
+                Truth.assertThat(state.showOfflineWarning).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that isLoading should be false when get fetching the offline nodes is successful`() =
         runTest {
             val path = ""
             val searchQuery = ""

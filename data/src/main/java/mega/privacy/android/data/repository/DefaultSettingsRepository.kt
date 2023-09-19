@@ -195,6 +195,12 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean) =
         uiPreferencesGateway.setSubfolderMediaDiscoveryEnabled(enabled)
 
+    override suspend fun setOfflineWarningMessageVisibility(isVisible: Boolean) =
+        uiPreferencesGateway.setOfflineWarningMessageVisibility(isVisible)
+
+    override fun monitorOfflineWarningMessageVisibility(): Flow<Boolean?> =
+        uiPreferencesGateway.monitorOfflineWarningMessageVisibility()
+
     override suspend fun getStorageDownloadAskAlways(): Boolean {
         return megaLocalStorageGateway.getStorageAskAlways()
     }

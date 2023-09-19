@@ -7,19 +7,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
-import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUIState
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
+import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUIState
+import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.LoadOfflineNodesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
+import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * OfflineViewModelV2 of [OfflineFragmentCompose]
+ * OfflineComposeViewModel of [OfflineFragmentCompose]
  */
 @HiltViewModel
 class OfflineComposeViewModel @Inject constructor(
     private val loadOfflineNodesUseCase: LoadOfflineNodesUseCase,
+    private val setOfflineWarningMessageVisibilityUseCase: SetOfflineWarningMessageVisibilityUseCase,
+    private val monitorOfflineWarningMessageVisibilityUseCase: MonitorOfflineWarningMessageVisibilityUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OfflineUIState())
@@ -30,9 +34,29 @@ class OfflineComposeViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        monitorOfflineWarningMessage()
         loadOfflineNodes()
     }
 
+    /**
+     * Monitor the visibility of the offline warning message
+     */
+     fun monitorOfflineWarningMessage() {
+        viewModelScope.launch {
+            monitorOfflineWarningMessageVisibilityUseCase().collect {
+                _uiState.update { state -> state.copy(showOfflineWarning = it) }
+            }
+        }
+    }
+
+    /**
+     * Dismiss showing the Offline warning message
+     */
+    fun dismissOfflineWarning() {
+        viewModelScope.launch {
+            setOfflineWarningMessageVisibilityUseCase(isVisible = false)
+        }
+    }
 
     /**
      * map a list of [OfflineNodeInformation] to [OfflineNodeUIItem] to be used in the presentation layer

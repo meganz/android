@@ -76,4 +76,19 @@ interface UIPreferencesGateway {
      * @param enabled
      */
     suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
+
+
+    /**
+     * Set offline warning message visibility
+     * @param isVisible the visibility of the view to set
+     */
+    suspend fun setOfflineWarningMessageVisibility(isVisible: Boolean)
+
+    /**
+     * Monitor the offline warning message visibility
+     *
+     * @return the view visibility state
+     */
+    fun monitorOfflineWarningMessageVisibility(): Flow<Boolean?>
+
 }
