@@ -11,9 +11,15 @@ import androidx.compose.ui.graphics.Color
 @Immutable
 internal data class MegaColors(
     val buttonPrimary: Color,
+    val buttonOutline: Color,
+    val buttonDisabled: Color,
+    val borderDisabled: Color,
     val textPrimary: Color,
     val textInverse: Color,
     val textWarning: Color,
+    val textAccent: Color,
+    val textDisabled: Color,
+    val iconPrimary: Color,
     val notificationWarning: Color,
     val isLight: Boolean,
 ) {
@@ -22,16 +28,16 @@ internal data class MegaColors(
         @Composable
         get() = ButtonDefaults.buttonColors(
             backgroundColor = Color.Transparent,
-            contentColor = buttonPrimary,
+            contentColor = textAccent,
             disabledBackgroundColor = Color.Transparent,
-            disabledContentColor = buttonPrimary.copy(alpha = .38f),
+            disabledContentColor = textDisabled,
         )
     val raisedButtonColors
         @Composable
         get() = ButtonDefaults.buttonColors(
             backgroundColor = buttonPrimary,
             contentColor = textInverse,
-            disabledBackgroundColor = buttonPrimary.copy(alpha = .25f),
-            disabledContentColor = textInverse,
+            disabledBackgroundColor = buttonDisabled,
+            disabledContentColor = textDisabled,
         )
 }

@@ -56,18 +56,19 @@ fun WarningBanner(
     onCloseClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val foregroundColor = MegaTheme.colors.textWarning
+    val textColour = MegaTheme.colors.textPrimary
+    val buttonColor = MegaTheme.colors.iconPrimary
     ProvideTextStyle(
-        MaterialTheme.typography.caption.copy(color = foregroundColor)
+        MaterialTheme.typography.caption.copy(color = textColour)
     ) {
         if (onCloseClick == null) {
-            BannerContent(null, foregroundColor, textComponent, modifier)
+            BannerContent(null, buttonColor, textComponent, modifier)
         } else {
             //close button vertical position depends on banner size
             SubComposeBannerContent(
-                onCloseClick = onCloseClick,
-                foregroundColor = foregroundColor,
                 textComponent = textComponent,
+                onCloseButtonColor = buttonColor,
+                onCloseClick = onCloseClick,
                 modifier = modifier
             )
         }
@@ -76,16 +77,16 @@ fun WarningBanner(
 
 @Composable
 private fun SubComposeBannerContent(
-    onCloseClick: () -> Unit,
-    foregroundColor: Color,
     textComponent: @Composable () -> Unit,
+    onCloseButtonColor: Color,
+    onCloseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SubcomposeLayout(modifier) { constraints ->
         var placeable = subcompose("align-top") {
             BannerContent(
                 onCloseClick = onCloseClick,
-                tintColor = foregroundColor,
+                tintColor = onCloseButtonColor,
                 textComponent = textComponent,
                 verticalAlignment = Alignment.Top
             )
@@ -93,7 +94,7 @@ private fun SubComposeBannerContent(
         if (placeable.height < 48.dp.toPx()) {
             // if the banner is small enough (typically one line) the close button should be vertically centered
             placeable = subcompose("align-center") {
-                BannerContent(onCloseClick, foregroundColor, textComponent)
+                BannerContent(onCloseClick, onCloseButtonColor, textComponent)
             }.first().measure(constraints)
         }
         layout(placeable.width, placeable.height) {

@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
@@ -56,15 +57,21 @@ fun OutlinedMegaButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val colors = MegaTheme.colors.buttonsColors
     TextButton(
         modifier = modifier
             .widthIn(min = 100.dp),
         enabled = enabled,
-        colors = colors,
+        colors = MegaTheme.colors.buttonsColors,
         onClick = onClick,
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(1.dp, colors.contentColor(enabled = enabled).value)
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+        border = BorderStroke(
+            1.dp, if (enabled) {
+                MegaTheme.colors.buttonOutline
+            } else {
+                MegaTheme.colors.borderDisabled
+            }
+        )
     ) {
         Text(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
