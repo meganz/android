@@ -32,6 +32,13 @@ interface PsaRepository {
      * Clear cache
      *
      */
-    fun clearCache()
+    suspend fun clearCache()
+
+    /**
+     * Dismiss psa
+     *
+     * @param psaId
+     */
+    suspend fun dismissPsa(psaId: Int)
 
 }
