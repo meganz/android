@@ -28,4 +28,10 @@ interface PsaRepository {
      */
     suspend fun setLastFetchedTime(time: Long?)
 
+    /**
+     * Clear cache
+     *
+     */
+    fun clearCache()
+
 }
