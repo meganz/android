@@ -6,14 +6,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
@@ -49,8 +47,8 @@ import mega.privacy.android.domain.usecase.meeting.waitingroom.IsValidWaitingRoo
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
 
 
 /**
@@ -104,11 +102,8 @@ class WaitingRoomViewModel @Inject constructor(
     private val hangChatCallUseCase: HangChatCallUseCase
 ) : ViewModel() {
 
-    companion object {
-        private const val WAITING_ROOM_TIMEOUT = 10
-    }
-
     private val _state = MutableStateFlow(WaitingRoomState())
+    private var shouldAnswerCall = AtomicBoolean(true)
 
     /**
      * Waiting room state
@@ -120,7 +115,6 @@ class WaitingRoomViewModel @Inject constructor(
             initChatGuestSessionIfNeeded()
             monitorCallUpdates()
             monitorMeetingUpdates()
-            monitorCallStartedCountdown()
             setChatVideoDevice()
             retrieveUserAvatar()
         }
@@ -281,22 +275,6 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     /**
-     * Start countdown timer observer to show inactive dialog after [WAITING_ROOM_TIMEOUT] minutes.
-     */
-    private fun monitorCallStartedCountdown() {
-        viewModelScope.launch {
-            _state.distinctUntilChangedBy { it.callStarted }
-                .collectLatest { state ->
-                    if (state.callStarted) {
-                        delay(WAITING_ROOM_TIMEOUT.minutes)
-                        hangChatCall()
-                        _state.update { it.copy(inactiveHostDialog = true, canAnswer = false) }
-                    }
-                }
-        }
-    }
-
-    /**
      * Set chat video In Device
      */
     private fun setChatVideoDevice() =
@@ -374,16 +352,19 @@ class WaitingRoomViewModel @Inject constructor(
      */
     private fun ChatCall.updateUiState() {
         when {
-            hasAccessBeenDenied() -> _state.update {
-                it.copy(
-                    callId = callId,
-                    denyAccessDialog = true,
-                    canAnswer = false
-                )
+            hasTimeoutExpired() -> {
+                shouldAnswerCall.set(false)
+                _state.update { it.copy(callId = callId, inactiveHostDialog = true) }
             }
 
-            hasAccessBeenGranted() ->
+            hasAccessBeenDenied() -> {
+                shouldAnswerCall.set(false)
+                _state.update { it.copy(callId = callId, denyAccessDialog = true) }
+            }
+
+            hasAccessBeenGranted() -> {
                 _state.update { it.copy(callId = callId, joinCall = true) }
+            }
 
             hasStarted() -> {
                 _state.update { it.copy(callId = callId, callStarted = true) }
@@ -393,8 +374,9 @@ class WaitingRoomViewModel @Inject constructor(
                 }
             }
 
-            else ->
+            else -> {
                 _state.update { it.copy(callId = callId, callStarted = false) }
+            }
         }
     }
 
@@ -410,16 +392,20 @@ class WaitingRoomViewModel @Inject constructor(
      * Check if [ChatCall] access has been denied
      */
     private fun ChatCall.hasAccessBeenDenied(): Boolean =
-        !_state.value.canAnswer || changes?.contains(ChatCallChanges.WaitingRoomDeny) == true
-                || (waitingRoomStatus == WaitingRoomStatus.NotAllowed
-                && termCode == TermCodeType.Kicked)
+        termCode == TermCodeType.Kicked
+
+    /**
+     * Check if [ChatCall] timeout has expired
+     */
+    private fun ChatCall.hasTimeoutExpired(): Boolean =
+        termCode == TermCodeType.WaitingRoomTimeout
 
     /**
      * Check if [ChatCall] should be answered
      */
     private fun ChatCall.shouldBeAnswered(): Boolean =
-        _state.value.canAnswer && (status == ChatCallStatus.WaitingRoom || status == ChatCallStatus.UserNoPresent)
-                && !_state.value.guestMode
+        shouldAnswerCall.get() && !_state.value.guestMode
+                && (status == ChatCallStatus.WaitingRoom || status == ChatCallStatus.UserNoPresent)
 
     /**
      * Check if [ChatCall] has started
@@ -547,7 +533,7 @@ class WaitingRoomViewModel @Inject constructor(
     fun finishWaitingRoom() {
         viewModelScope.launch {
             runCatching {
-                _state.update { it.copy(canAnswer = false) }
+                shouldAnswerCall.set(false)
                 hangChatCall().join()
 
                 if (isEphemeralPlusPlusUseCase()) {

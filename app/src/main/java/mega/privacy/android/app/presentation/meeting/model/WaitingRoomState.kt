@@ -1,10 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.model
 
-import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoViewModel
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 
 /**
- * Data class defining the state of [RecurringMeetingInfoViewModel]
+ * Data class defining the state of [WaitingRoomViewModel]
  *
  * @property chatId                     Chat id.
  * @property schedId                    Scheduled meeting id.
@@ -22,7 +21,6 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
  * @property guestLastName              Guest user last name
  * @property denyAccessDialog           Flag to show Guest Leave Dialog
  * @property inactiveHostDialog         Flag to show Inactive Host Dialog
- * @property canAnswer                  Flag to store if call can be answered depending on leave or deny actions
  * @property joinCall                   Flag to open the screen and join the call.
  * @property finish                     Flag to finish current screen.
  **/
@@ -43,7 +41,6 @@ data class WaitingRoomState(
     val guestLastName: String? = null,
     val denyAccessDialog: Boolean = false,
     val inactiveHostDialog: Boolean = false,
-    val canAnswer: Boolean = true,
     val joinCall: Boolean = false,
     val finish: Boolean = false,
 )

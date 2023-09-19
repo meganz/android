@@ -18,6 +18,7 @@ internal class CallTermCodeMapper @Inject constructor() {
         MegaChatCall.TERM_CODE_TOO_MANY_CLIENTS -> TermCodeType.TooManyClients
         MegaChatCall.TERM_CODE_PROTOCOL_VERSION -> TermCodeType.ProtocolVersion
         MegaChatCall.TERM_CODE_KICKED -> TermCodeType.Kicked
+        MegaChatCall.TERM_CODE_WR_TIMEOUT -> TermCodeType.WaitingRoomTimeout
         else -> TermCodeType.Unknown
     }
 }

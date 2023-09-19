@@ -50,6 +50,11 @@ enum class TermCodeType {
     Kicked,
 
     /**
+     *  Term code Waiting Room timeout
+     */
+    WaitingRoomTimeout,
+
+    /**
      *  Term code Unknown
      */
     Unknown,
