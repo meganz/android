@@ -5,10 +5,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.FloatingActionButton
@@ -46,6 +51,7 @@ import mega.privacy.android.core.ui.controls.tooltips.MegaTooltip
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.white_black
+import mega.privacy.android.core.ui.theme.red_600
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 
@@ -128,7 +134,14 @@ fun ChatTabsView(
                 contentColor = MaterialTheme.colors.red_600_red_300
             ) {
                 ChatTab.values().forEachIndexed { index, item ->
-                    Tab(text = { Text(text = stringResource(item.titleStringRes)) },
+                    Tab(
+                        text = {
+                            TabText(
+                                titleStringRes = item.titleStringRes,
+                                hasUnreadMessages = state.currentUnreadStatus
+                                    ?.toList()?.getOrNull(index) ?: false
+                            )
+                        },
                         selected = pagerState.currentPage == index,
                         unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
                         onClick = {
@@ -221,6 +234,20 @@ fun ChatTabsView(
                     onConfirm = onCancelScheduledMeeting,
                     onDismiss = onDismissDialog,
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TabText(titleStringRes: Int, hasUnreadMessages: Boolean) {
+    Row {
+        Text(stringResource(titleStringRes))
+
+        if (hasUnreadMessages) {
+            Spacer(modifier = Modifier.width(6.dp))
+            Canvas(modifier = Modifier.size(6.dp)) {
+                drawCircle(color = red_600)
             }
         }
     }

@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatsUnreadStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
@@ -97,6 +98,7 @@ class ChatTabsViewModel @Inject constructor(
     private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase,
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase,
     private val monitorScheduledMeetingCanceledUseCase: MonitorScheduledMeetingCanceledUseCase,
+    private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -112,6 +114,7 @@ class ChatTabsViewModel @Inject constructor(
         requestChats()
         retrieveChatStatus()
         retrieveTooltips()
+        retrieveChatsUnreadStatus()
 
         viewModelScope.launch {
             monitorScheduledMeetingCanceledUseCase().conflate()
@@ -397,6 +400,19 @@ class ChatTabsViewModel @Inject constructor(
             }.onSuccess { tooltips ->
                 state.update { it.copy(tooltip = tooltips) }
             }.onFailure(Timber.Forest::e)
+        }
+    }
+
+    /**
+     * Retrieve unread status for Chat and Meeting tabs
+     */
+    private fun retrieveChatsUnreadStatus() {
+        viewModelScope.launch {
+            getChatsUnreadStatusUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { result ->
+                    state.update { it.copy(currentUnreadStatus = result) }
+                }
         }
     }
 

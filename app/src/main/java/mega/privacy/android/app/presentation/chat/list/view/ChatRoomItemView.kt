@@ -43,6 +43,7 @@ import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.controls.text.ChatUnreadCountText
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
@@ -70,13 +71,13 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ChatRoomItemView(
-    modifier: Modifier = Modifier,
     item: ChatRoomItem,
     isSelected: Boolean,
     isSelectionEnabled: Boolean,
     onItemClick: (Long) -> Unit,
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
     val hasOngoingCall = item.hasOngoingCall()
@@ -359,7 +360,7 @@ internal fun ChatRoomItemView(
             )
         }
 
-        ChatUnreadCountView(
+        ChatUnreadCountText(
             count = item.unreadCount,
             modifier = Modifier
                 .testTag("chat_room_item:unread_count_icon")

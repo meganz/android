@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatsUnreadStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
@@ -69,6 +70,8 @@ internal class ChatTabsViewModelTest {
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase = mock()
     private val monitorScheduledMeetingCanceledUseCase: MonitorScheduledMeetingCanceledUseCase =
         mock()
+    private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase = mock()
+
 
     @BeforeAll
     fun setup() {
@@ -104,6 +107,7 @@ internal class ChatTabsViewModelTest {
             isParticipatingInChatCallUseCase,
             getMeetingTooltipsUseCase,
             setNextMeetingTooltipUseCase,
+            getChatsUnreadStatusUseCase,
         )
     }
 
@@ -128,6 +132,7 @@ internal class ChatTabsViewModelTest {
             getMeetingTooltipsUseCase,
             setNextMeetingTooltipUseCase,
             monitorScheduledMeetingCanceledUseCase,
+            getChatsUnreadStatusUseCase,
         )
     }
 

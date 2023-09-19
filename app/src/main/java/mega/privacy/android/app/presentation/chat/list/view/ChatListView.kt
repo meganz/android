@@ -61,11 +61,11 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  */
 @Composable
 fun ChatListView(
-    modifier: Modifier = Modifier,
     items: List<ChatRoomItem>,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     isMeetingView: Boolean,
+    modifier: Modifier = Modifier,
     tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
     onItemClick: (Long) -> Unit = {},
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
@@ -104,7 +104,6 @@ fun ChatListView(
 
 @Composable
 private fun ListView(
-    modifier: Modifier = Modifier,
     items: List<ChatRoomItem>,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
@@ -114,6 +113,7 @@ private fun ListView(
     onItemSelected: (Long) -> Unit,
     onFirstItemVisible: (Boolean) -> Unit,
     onScrollInProgress: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
@@ -239,8 +239,8 @@ private fun TooltipView(
 
 @Composable
 private fun EmptyView(
-    modifier: Modifier = Modifier,
     isMeetingView: Boolean,
+    modifier: Modifier = Modifier,
     onEmptyButtonClick: () -> Unit = {},
 ) {
     val imageResource: Int

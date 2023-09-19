@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.chat.list.view
+package mega.privacy.android.core.ui.controls.text
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -17,13 +18,16 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import kotlin.random.Random
 
 /**
- * Chat unread count icon view
+ * Chat unread count icon text view
  *
  * @param modifier
- * @param count     Number of unread messages
+ * @param count     Number of unread items
  */
 @Composable
-fun ChatUnreadCountView(modifier: Modifier, count: Int) {
+fun ChatUnreadCountText(
+    modifier: Modifier,
+    count: Int,
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -31,9 +35,9 @@ fun ChatUnreadCountView(modifier: Modifier, count: Int) {
             .clip(CircleShape)
             .background(MaterialTheme.colors.secondary),
     ) {
-        val countText = if (count > 99) "99" else count.toString()
         Text(
-            text = countText,
+            modifier = Modifier.testTag("chat_unread_count:text"),
+            text = (count.takeIf { it < MAX_COUNT } ?: MAX_COUNT).toString(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.body2,
             color = MaterialTheme.colors.surface,
@@ -43,10 +47,12 @@ fun ChatUnreadCountView(modifier: Modifier, count: Int) {
     }
 }
 
+private const val MAX_COUNT = 99
+
 @CombinedThemePreviews
 @Composable
 private fun PreviewChatUnreadCountView() {
-    ChatUnreadCountView(
+    ChatUnreadCountText(
         Modifier,
         Random.nextInt(110)
     )
