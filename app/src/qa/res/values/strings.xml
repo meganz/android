@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources translatable="false">
     <string name="settings_qa">QA Settings</string>
-    <string name="settings_qa_compose_ui_browser_summary">A collection of the current application theme and design components as well as complete screens implemented in Compose</string>
-    <string name="settings_qa_compose_ui_browser_title">Compose UI browser</string>
     <string name="settings_qa_compose_check_for_updates">Check for updates</string>
     <string name="qa_feature_flag_title">Feature Flags</string>
     <string name="settings_qa_export_logs">Send logs</string>

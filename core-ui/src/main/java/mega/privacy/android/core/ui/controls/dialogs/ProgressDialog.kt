@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -103,10 +102,6 @@ fun ProgressDialog(
 internal const val PROGRESS_TITLE_TAG = "progress_dialog:text_title"
 internal const val PROGRESS_SUBTITLE_TAG = "progress_dialog:text_subtitle"
 internal const val PROGRESS_CANCEL_TAG = "progress_dialog:button_cancel"
-
-@ShowkaseComposable("Progress Dialog", "Dialogs")
-@Composable
-fun ShowkasePreviewProgressDialog() = PreviewProgressDialog(false)
 
 @CombinedThemePreviews
 @Composable
