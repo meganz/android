@@ -21,12 +21,8 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
      */
     suspend operator fun invoke(event: TransferEvent) {
         when (event) {
-            is TransferEvent.TransferStartEvent, is TransferEvent.TransferUpdateEvent -> {
+            is TransferEvent.TransferStartEvent, is TransferEvent.TransferUpdateEvent, is TransferEvent.TransferPaused -> {
                 transferRepository.insertOrUpdateActiveTransfer(event.transfer)
-            }
-
-            is TransferEvent.TransferPaused -> {
-                // TRAN-229: once we are storing the paused state of each transfer, update it
             }
 
             is TransferEvent.TransferDataEvent -> {

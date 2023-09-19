@@ -7,17 +7,18 @@ import javax.inject.Inject
 
 /**
  * Use case to get a flow that determines whether the transfer queue is paused or if all individual Download transfers in progress are paused.
+ * @Deprecated, this use case is using sdk calls to get counters, once everything is moved to ActiveTransfers MonitorDownloadTransfersPausedUseCase should be used
  */
-class MonitorDownloadTransfersPausedUseCase @Inject constructor(
+class MonitorDownloadTransfersPausedLegacyUseCase @Inject constructor(
     override val transferRepository: TransferRepository,
 ) : MonitorTypeTransfersPausedUseCase() {
 
     override fun isCorrectType(transfer: Transfer) =
-        transfer.transferType == TransferType.TYPE_DOWNLOAD && !transfer.isFolderTransfer
+        transfer.transferType == TransferType.TYPE_DOWNLOAD
 
     override suspend fun totalPendingIndividualTransfers() =
-        transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_DOWNLOAD).pendingFileTransfers
+        transferRepository.getNumPendingDownloadsNonBackground()
 
     override suspend fun totalPausedIndividualTransfers() =
-        transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_DOWNLOAD).pausedFileTransfers
+        transferRepository.getNumPendingNonBackgroundPausedDownloads()
 }

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.paused
 import com.google.common.truth.Truth.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
@@ -36,19 +37,27 @@ class MonitorGeneralUploadTransfersPausedUseCaseTest {
 
     @ParameterizedTest
     @ValueSource(ints = [0, 1, 5, 99])
-    fun `test that totalPendingIndividualTransfers returns getNumPendingGeneralUploads from repository`(
+    fun `test that totalPendingIndividualTransfers returns getCurrentActiveTransferTotalsByType pendingFileTransfers from repository`(
         value: Int,
     ) = runTest {
-        whenever(transferRepository.getNumPendingGeneralUploads()).thenReturn(value)
+        val totals = mock<ActiveTransferTotals> {
+            on { pendingFileTransfers }.thenReturn(value)
+        }
+        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_UPLOAD))
+            .thenReturn(totals)
         assertThat(underTest.totalPendingIndividualTransfers()).isEqualTo(value)
     }
 
     @ParameterizedTest
     @ValueSource(ints = [0, 1, 5, 99])
-    fun `test that totalPausedIndividualTransfers returns getNumPendingNonBackgroundPausedDownloads from repository`(
+    fun `test that totalPausedIndividualTransfers returns getCurrentActiveTransferTotalsByType pausedFileTransfers from repository`(
         value: Int,
     ) = runTest {
-        whenever(transferRepository.getNumPendingPausedGeneralUploads()).thenReturn(value)
+        val totals = mock<ActiveTransferTotals> {
+            on { pausedFileTransfers }.thenReturn(value)
+        }
+        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_UPLOAD))
+            .thenReturn(totals)
         assertThat(underTest.totalPausedIndividualTransfers()).isEqualTo(value)
     }
 

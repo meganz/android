@@ -43,7 +43,7 @@ class DefaultDownloadNotificationMapper @Inject constructor(
             } else {
                 val inProgress = activeTransferTotals.totalFinishedFileTransfers + 1
                 val totalTransfers = activeTransferTotals.totalFileTransfers
-                if (paused) {
+                if (paused || activeTransferTotals.allPaused()) {
                     context.getString(
                         R.string.download_service_notification_paused,
                         inProgress,

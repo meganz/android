@@ -93,7 +93,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadB
 import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadedBytesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedLegacyUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.InsertSdTransferUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -150,7 +150,7 @@ internal class DownloadService : LifecycleService() {
     lateinit var broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase
 
     @Inject
-    lateinit var monitorDownloadPausedTransfersUseCase: MonitorDownloadTransfersPausedUseCase
+    lateinit var monitorDownloadPausedTransfersUseCase: MonitorDownloadTransfersPausedLegacyUseCase
 
     @Inject
     lateinit var monitorStopTransfersWorkUseCase: MonitorStopTransfersWorkUseCase

@@ -13,11 +13,11 @@ class MonitorGeneralUploadTransfersPausedUseCase @Inject constructor(
 ) : MonitorTypeTransfersPausedUseCase() {
 
     override fun isCorrectType(transfer: Transfer) =
-        transfer.transferType == TransferType.TYPE_UPLOAD && !transfer.isChatUpload() && !transfer.isCUUpload()
+        transfer.transferType == TransferType.TYPE_UPLOAD && !transfer.isFolderTransfer && !transfer.isChatUpload() && !transfer.isCUUpload()
 
     override suspend fun totalPendingIndividualTransfers() =
-        transferRepository.getNumPendingGeneralUploads()
+        transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_UPLOAD).pendingFileTransfers
 
     override suspend fun totalPausedIndividualTransfers() =
-        transferRepository.getNumPendingPausedGeneralUploads()
+        transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_UPLOAD).pausedFileTransfers
 }

@@ -70,6 +70,17 @@ class ActiveTransferTotalsMapperTest {
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
+    fun `test that mapper returns correct pausedFileTransfers excluding folder transfers`(
+        transferType: TransferType,
+    ) {
+        val entities = createEntities(transferType)
+        val expected = entities.filter { !it.isFolderTransfer && it.isPaused }.size
+        val actual = underTest(transferType, entities)
+        assertThat(actual.pausedFileTransfers).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
     fun `test that mapper excludes folder transfers in totalFinishedFileTransfers`(transferType: TransferType) {
         val entities = createEntities(transferType)
         val expected = entities.filter { !it.isFolderTransfer }.count { it.isFinished }
@@ -80,7 +91,7 @@ class ActiveTransferTotalsMapperTest {
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
     fun `test that mapper returns empty entity when empty list is mapped`(transferType: TransferType) {
-        val expected = ActiveTransferTotals(transferType, 0, 0, 0, 0, 0, 0)
+        val expected = ActiveTransferTotals(transferType, 0, 0, 0, 0, 0, 0, 0)
         assertThat(underTest(transferType, emptyList())).isEqualTo(expected)
     }
 

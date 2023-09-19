@@ -19,14 +19,14 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorAllTransfersPausedUseCaseTest {
-    private lateinit var underTest: MonitorAllTransfersPausedUseCase
+class MonitorDownloadTransfersPausedLegacyUseCaseTest {
+    private lateinit var underTest: MonitorDownloadTransfersPausedLegacyUseCase
 
     private val transferRepository = mock<TransferRepository>()
 
     @BeforeAll
     fun setup() {
-        underTest = MonitorAllTransfersPausedUseCase(transferRepository)
+        underTest = MonitorDownloadTransfersPausedLegacyUseCase(transferRepository)
     }
 
     @BeforeEach
@@ -36,21 +36,20 @@ class MonitorAllTransfersPausedUseCaseTest {
 
     @ParameterizedTest
     @ValueSource(ints = [0, 1, 5, 99])
-    fun `test that totalPendingIndividualTransfers returns getNumPendingTransfers from repository`(
+    fun `test that totalPendingIndividualTransfers returns getNumPendingDownloadsNonBackground from repository`(
         value: Int,
     ) = runTest {
-        whenever(transferRepository.getNumPendingTransfers()).thenReturn(value)
+        whenever(transferRepository.getNumPendingDownloadsNonBackground()).thenReturn(value)
         assertThat(underTest.totalPendingIndividualTransfers()).isEqualTo(value)
     }
 
     @ParameterizedTest
     @ValueSource(ints = [0, 1, 5, 99])
-    fun `test that totalPausedIndividualTransfers returns getNumPendingNonBackgroundPausedDownloads plus getNumPendingNonBackgroundPausedDownloads from repository`(
+    fun `test that totalPausedIndividualTransfers returns getNumPendingNonBackgroundPausedDownloads from repository`(
         value: Int,
     ) = runTest {
-        whenever(transferRepository.getNumPendingPausedUploads()).thenReturn(value)
         whenever(transferRepository.getNumPendingNonBackgroundPausedDownloads()).thenReturn(value)
-        assertThat(underTest.totalPausedIndividualTransfers()).isEqualTo(value * 2)
+        assertThat(underTest.totalPausedIndividualTransfers()).isEqualTo(value)
     }
 
     @ParameterizedTest
@@ -61,20 +60,12 @@ class MonitorAllTransfersPausedUseCaseTest {
 
     private fun getTransfers() = listOf(
         Arguments.of(mockTransfer(TransferType.TYPE_DOWNLOAD), true),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD), true),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD, isChatUpload = true), true),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD, isCameraUpload = true), true),
-        Arguments.of(mockTransfer(TransferType.NONE), true),
+        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD), false),
+        Arguments.of(mockTransfer(TransferType.NONE), false),
     )
 
-    private fun mockTransfer(
-        type: TransferType,
-        isChatUpload: Boolean = false,
-        isCameraUpload: Boolean = false,
-    ) = mock<Transfer> {
+    private fun mockTransfer(type: TransferType) = mock<Transfer> {
         on { it.transferType }.thenReturn(type)
-        on { it.isChatUpload() }.thenReturn(isChatUpload)
-        on { it.isCUUpload() }.thenReturn(isCameraUpload)
     }
 
 }

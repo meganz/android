@@ -257,7 +257,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
     }
 
-
     override suspend fun getNumPendingPausedGeneralUploads() = withContext(ioDispatcher) {
         getUploadTransfers().count { transfer ->
             !transfer.isFinished && transfer.state == MegaTransfer.STATE_PAUSED

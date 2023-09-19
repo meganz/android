@@ -18,7 +18,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -31,7 +30,7 @@ import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTra
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveDownloadTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
 /**
@@ -46,7 +45,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
     private val monitorOngoingActiveDownloadTransfersUseCase: MonitorOngoingActiveDownloadTransfersUseCase,
-    private val monitorDownloadTransfersPausedUseCase: MonitorDownloadTransfersPausedUseCase,
+    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val downloadNotificationMapper: DownloadNotificationMapper,
     private val notificationManager: NotificationManagerCompat,
@@ -88,7 +87,7 @@ class DownloadsWorker @AssistedInject constructor(
         createForegroundInfo(
             downloadNotificationMapper(
                 getActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD),
-                monitorDownloadTransfersPausedUseCase().first()
+                areTransfersPausedUseCase()
             )
         )
 

@@ -18,6 +18,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor() {
             transfersType = type,
             totalTransfers = list.size,
             totalFileTransfers = onlyFiles.size,
+            pausedFileTransfers = onlyFiles.count { it.isPaused },
             totalFinishedTransfers = list.count { it.isFinished },
             totalFinishedFileTransfers = onlyFiles.count { it.isFinished },
             totalBytes = onlyFiles.sumOf { it.totalBytes },
