@@ -224,7 +224,9 @@ class WorkerFacade @Inject constructor(
         val singleUploadFlow =
             workManager.getWorkInfosByTagLiveData(SINGLE_CAMERA_UPLOAD_TAG).asFlow()
         return merge(uploadFlow, singleUploadFlow).mapNotNull {
-            cameraUploadsStatusInfoMapper(it.first().progress)
+            it.takeUnless { it.isEmpty() }?.let { workInfoList ->
+                cameraUploadsStatusInfoMapper(workInfoList.first().progress)
+            }
         }
     }
 }
