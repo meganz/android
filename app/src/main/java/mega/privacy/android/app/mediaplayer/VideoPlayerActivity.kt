@@ -392,7 +392,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
 
             mediaPlayerGateway.createPlayer(
-                repeatToggleMode = videoRepeatToggleMode(),
+                repeatToggleMode = videoViewModel.uiState.value.videoRepeatToggleMode,
                 nameChangeCallback = nameChangeCallback,
                 mediaPlayerCallback = mediaPlayerCallback
             )

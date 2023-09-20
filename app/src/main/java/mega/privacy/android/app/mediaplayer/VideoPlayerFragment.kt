@@ -275,6 +275,19 @@ class VideoPlayerFragment : Fragment() {
                     playerViewHolder?.updateSpeedPlaybackIcon(item.iconId)
                     mediaPlayerGateway.updatePlaybackSpeed(item.speed)
                 }
+
+                viewLifecycleOwner.collectFlow(
+                    uiState.map { it.videoRepeatToggleMode }.distinctUntilChanged()
+                ) { repeatMode ->
+                    mediaPlayerGateway.setRepeatToggleMode(
+                        if (repeatMode == RepeatToggleMode.REPEAT_NONE) {
+                            RepeatToggleMode.REPEAT_NONE
+                        } else {
+                            RepeatToggleMode.REPEAT_ONE
+                        }
+                    )
+                    playerViewHolder?.updateRepeatToggleButtonUI(requireContext(), repeatMode)
+                }
             }
         }
     }
@@ -333,7 +346,19 @@ class VideoPlayerFragment : Fragment() {
 
             setupPlayerView(binding.playerView)
 
-            initRepeatToggleButtonForVideo(viewHolder)
+            viewHolder.setupRepeatToggleButton(
+                context = requireContext(),
+                defaultRepeatToggleMode = viewModel.uiState.value.videoRepeatToggleMode
+            ) {
+                viewModel.uiState.value.videoRepeatToggleMode.let { repeatToggleMode ->
+                    if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
+                        mediaPlayerGateway.setRepeatToggleMode(RepeatToggleMode.REPEAT_ONE)
+                        viewModel.sendLoopButtonEnabledEvent()
+                    } else {
+                        mediaPlayerGateway.setRepeatToggleMode(RepeatToggleMode.REPEAT_NONE)
+                    }
+                }
+            }
         }
     }
 
@@ -452,33 +477,6 @@ class VideoPlayerFragment : Fragment() {
         anim.fillAfter = true
         anim.duration = ANIMATION_DURATION
         layout.startAnimation(anim)
-    }
-
-    private fun initRepeatToggleButtonForVideo(viewHolder: VideoPlayerViewHolder) {
-        val defaultRepeatMode = viewModel.getVideoRepeatMode()
-
-        mediaPlayerGateway.setRepeatToggleMode(
-            if (defaultRepeatMode == RepeatToggleMode.REPEAT_NONE) {
-                RepeatToggleMode.REPEAT_NONE
-            } else {
-                RepeatToggleMode.REPEAT_ONE
-            }
-        )
-        viewHolder.setupRepeatToggleButton(
-            requireContext(),
-            defaultRepeatMode
-        ) { repeatToggleButton ->
-            viewModel.videoRepeatToggleMode().let { repeatToggleMode ->
-                if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
-                    mediaPlayerGateway.setRepeatToggleMode(RepeatToggleMode.REPEAT_ONE)
-                    repeatToggleButton.setColorFilter(requireContext().getColor(R.color.teal_300))
-                    viewModel.sendLoopButtonEnabledEvent()
-                } else {
-                    mediaPlayerGateway.setRepeatToggleMode(RepeatToggleMode.REPEAT_NONE)
-                    repeatToggleButton.setColorFilter(requireContext().getColor(R.color.white))
-                }
-            }
-        }
     }
 
     private fun setupPlayerView(

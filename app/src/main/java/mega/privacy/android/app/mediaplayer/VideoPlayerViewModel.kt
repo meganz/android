@@ -349,6 +349,7 @@ class VideoPlayerViewModel @Inject constructor(
                 _isSubtitleDialogShown,
                 _addSubtitleState,
                 _currentSubtitleFileInfo,
+                _videoRepeatToggleMode,
                 ::mapToVideoPlayerUIState
             ).collectLatest { newState ->
                 _state.update {
@@ -387,13 +388,6 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun updateCurrentSpeedPlaybackItem(item: SpeedPlaybackItem) =
         _state.update { it.copy(currentSpeedPlayback = item) }
 
-    /**
-     * Get video repeat mode
-     *
-     * @return repeat mode
-     */
-    internal fun getVideoRepeatMode() = _videoRepeatToggleMode.value
-
     internal fun updateShowPlaybackPositionDialogState(newState: PlaybackPositionState) =
         _showPlaybackPositionDialogState.update { newState }
 
@@ -424,13 +418,15 @@ class VideoPlayerViewModel @Inject constructor(
         subtitleDialogShown: Boolean,
         isAddSubtitle: Boolean,
         subtitleFileInfo: SubtitleFileInfo?,
+        videoRepeatToggleMode: RepeatToggleMode,
     ) = VideoPlayerUiState(
         subtitleDisplayState = SubtitleDisplayState(
             isSubtitleShown = subtitleShown,
             isSubtitleDialogShown = subtitleDialogShown,
             isAddSubtitle = isAddSubtitle,
             subtitleFileInfo = subtitleFileInfo
-        )
+        ),
+        videoRepeatToggleMode = videoRepeatToggleMode
     )
 
     /**
@@ -1701,22 +1697,17 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun getPlaylistItems() = _playlistItemsState.value.first
 
     /**
-     * Get video repeat Mode
-     *
-     * @return RepeatToggleMode
-     */
-    internal fun videoRepeatToggleMode() = _videoRepeatToggleMode.value
-
-    /**
      * Set repeat mode for video
      *
      * @param repeatToggleMode RepeatToggleMode
      */
-    internal fun setVideoRepeatMode(repeatToggleMode: RepeatToggleMode) {
+    internal fun setVideoRepeatMode(repeatToggleMode: RepeatToggleMode) =
         viewModelScope.launch {
+            _state.update {
+                it.copy(videoRepeatToggleMode = repeatToggleMode)
+            }
             setVideoRepeatModeUseCase(repeatToggleMode.ordinal)
         }
-    }
 
     /**
      * Clear the state and flying task of this class, should be called in onDestroy.

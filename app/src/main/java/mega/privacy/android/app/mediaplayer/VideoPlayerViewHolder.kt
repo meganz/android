@@ -74,27 +74,37 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
     /**
      * Setup the repeat toggle button
      *
+     * @param context Context
      * @param defaultRepeatToggleMode the default RepeatToggleMode
      * @param clickedCallback the callback of repeat toggle button clicked
      */
     fun setupRepeatToggleButton(
         context: Context,
         defaultRepeatToggleMode: RepeatToggleMode,
-        clickedCallback: (repeatToggleButton: ImageButton) -> Unit,
+        clickedCallback: () -> Unit,
     ) {
-        with(repeatToggleButton) {
-            isVisible = true
-            setColorFilter(
-                if (defaultRepeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
-                    context.getColor(R.color.white)
-                } else {
-                    context.getColor(R.color.teal_300)
-                }
-            )
-            setOnClickListener {
-                clickedCallback(this)
+        repeatToggleButton.isVisible = true
+        updateRepeatToggleButtonUI(context, defaultRepeatToggleMode)
+        repeatToggleButton.setOnClickListener { clickedCallback() }
+    }
+
+    /**
+     * Update repeat toggle button UI
+     *
+     * @param context Context
+     * @param repeatToggleMode the current RepeatToggleMode
+     */
+    fun updateRepeatToggleButtonUI(
+        context: Context,
+        repeatToggleMode: RepeatToggleMode,
+    ) {
+        repeatToggleButton.setColorFilter(
+            if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
+                context.getColor(R.color.white)
+            } else {
+                context.getColor(R.color.teal_300)
             }
-        }
+        )
     }
 
     /**
