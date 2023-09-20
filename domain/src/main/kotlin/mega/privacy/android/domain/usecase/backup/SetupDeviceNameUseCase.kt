@@ -18,7 +18,7 @@ class SetupDeviceNameUseCase @Inject constructor(
      */
     suspend operator fun invoke() {
         getDeviceIdUseCase()?.let { deviceId ->
-            getDeviceNameUseCase(deviceId).let {
+            runCatching { getDeviceNameUseCase(deviceId) }.getOrNull().let {
                 if (it.isNullOrEmpty()) {
                     setDeviceNameUseCase(deviceId, environmentRepository.getDeviceInfo().device)
                 }

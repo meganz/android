@@ -29,7 +29,9 @@ class InitializeBackupsUseCase @Inject constructor(
      * Invocation function
      */
     suspend operator fun invoke() {
-        setupDeviceNameUseCase()
+        runCatching {
+            setupDeviceNameUseCase()
+        }
         val cameraUploadsName = cameraUploadsRepository.getCameraUploadsName()
         val cuBackupID = getCameraUploadBackupIDUseCase()
         if (isCameraUploadsEnabledUseCase() && cuBackupID == null) {
