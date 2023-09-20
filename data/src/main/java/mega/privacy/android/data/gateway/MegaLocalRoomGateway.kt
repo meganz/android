@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -327,4 +328,12 @@ interface MegaLocalRoomGateway {
      * @param id the id of the completed transfer
      */
     suspend fun getCompletedTransferById(id: Int): CompletedTransfer?
+
+    /**
+     * Insert a list of [CameraUploadsRecord] or replace the record if already exists
+     *
+     * @param records the list to save in the database
+     */
+    suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>)
+
 }

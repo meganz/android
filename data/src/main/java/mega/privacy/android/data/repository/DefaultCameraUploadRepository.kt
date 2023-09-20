@@ -48,6 +48,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -800,6 +801,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override fun getMediaSelectionQuery(parentPath: String): String =
         cameraUploadsMediaGateway.getMediaSelectionQuery(parentPath)
+
+    override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.insertOrUpdateCameraUploadsRecords(records)
+        }
 
     private companion object {
         private const val STATE_NO_CHANGE = -1

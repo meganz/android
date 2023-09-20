@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -296,4 +297,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun getCompletedTransferById(id: Int) = completedTransferDao
         .getCompletedTransferById(id)?.let { completedTransferModelMapper(it) }
+
+    override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) {
+        // Implementation to be added with the implementation of the table
+    }
 }

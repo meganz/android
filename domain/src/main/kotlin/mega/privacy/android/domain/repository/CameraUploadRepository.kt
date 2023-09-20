@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
@@ -785,4 +786,11 @@ interface CameraUploadRepository {
      * @param parentPath path that contains the media
      */
     fun getMediaSelectionQuery(parentPath: String): String
+
+    /**
+     * Save a list of [CameraUploadsRecord] in the database
+     *
+     * @param records the list to save in the database
+     */
+    suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>)
 }
