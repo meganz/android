@@ -2,7 +2,7 @@ package mega.privacy.android.core.ui.controls.text
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import kotlin.random.Random
@@ -31,18 +30,18 @@ fun ChatUnreadCountText(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(24.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colors.secondary),
     ) {
         Text(
-            modifier = Modifier.testTag("chat_unread_count:text"),
-            text = (count.takeIf { it < MAX_COUNT } ?: MAX_COUNT).toString(),
+            modifier = Modifier
+                .testTag("chat_unread_count:text")
+                .padding(horizontal = 6.dp, vertical = 2.dp),
+            text = count.takeIf { it <= MAX_COUNT }?.toString() ?: "$MAX_COUNT+",
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.body2,
             color = MaterialTheme.colors.surface,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
     }
 }

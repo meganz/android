@@ -39,6 +39,6 @@ class ChatUnreadCountTextTest {
             )
         }
 
-        composeTestRule.onNodeWithTag("chat_unread_count:text").assertTextEquals("99")
+        composeTestRule.onNodeWithTag("chat_unread_count:text").assertTextEquals("99+")
     }
 }

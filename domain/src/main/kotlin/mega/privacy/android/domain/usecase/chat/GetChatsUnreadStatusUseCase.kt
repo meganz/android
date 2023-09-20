@@ -5,11 +5,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
-import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
@@ -63,6 +62,6 @@ class GetChatsUnreadStatusUseCase @Inject constructor(
      */
     private fun monitorUnreadUpdates(): Flow<Pair<Boolean, Boolean>> =
         chatRepository.monitorChatListItemUpdates()
-            .distinctUntilChangedBy(ChatListItem::unreadCount)
             .mapLatest { hasUnreadChats().await() to hasUnreadMeetings().await() }
+            .distinctUntilChanged()
 }
