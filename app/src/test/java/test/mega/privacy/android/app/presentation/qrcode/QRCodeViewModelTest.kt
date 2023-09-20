@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.QRCodeViewModel
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
+import mega.privacy.android.app.presentation.qrcode.model.ScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
@@ -313,6 +314,26 @@ class QRCodeViewModelTest {
             }
         }
 
+    @Test
+    fun `test that scanCancel is set to triggered when ScanResult Cancel is returned from scanCode`() =
+        runTest {
+            whenever(scannerHandler.scan()).thenReturn(ScanResult.Cancel)
+            underTest.scanCode(mock())
+            underTest.uiState.test {
+                val result = awaitItem()
+                assertThat(result.scanCancel).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that scanCancel is set to consumed when resetScanCancel is invoked`() = runTest {
+        underTest.uiState.test {
+            underTest.resetScanCancel()
+            val result = expectMostRecentItem()
+            assertThat(result.scanCancel).isEqualTo(consumed)
+        }
+    }
+
     private suspend fun prepareQRCode() {
         val localAvatarFile = mock<File> {
             on { exists() }.thenReturn(true)
@@ -333,6 +354,6 @@ class QRCodeViewModelTest {
                 backgroundColor = 0xFFFFF
             )
         ).thenReturn(PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true))
-        underTest.createQRCode()
+        underTest.createQRCode(true)
     }
 }

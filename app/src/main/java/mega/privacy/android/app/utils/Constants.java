@@ -234,6 +234,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_VIEWER_FROM = "viewerFrom";
     public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
+    public static final String INTENT_EXTRA_KEY_MAIL = "mail";
 
     public static final String INTENT_EXTRA_KEY_APP = "APP";
     public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";

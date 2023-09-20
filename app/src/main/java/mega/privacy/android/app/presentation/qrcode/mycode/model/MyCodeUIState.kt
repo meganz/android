@@ -15,8 +15,9 @@ sealed interface MyCodeUIState {
 
     /**
      * In the progress of creating QR code
+     * @property showLoader
      */
-    object CreatingQRCode : MyCodeUIState
+    data class CreatingQRCode(val showLoader: Boolean = true) : MyCodeUIState
 
     /**
      * QR code is created

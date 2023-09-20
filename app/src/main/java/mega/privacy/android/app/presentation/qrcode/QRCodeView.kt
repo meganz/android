@@ -130,6 +130,7 @@ internal fun QRCodeView(
     onShowCollisionConsumed: () -> Unit,
     onUploadFile: (Pair<File, Long>) -> Unit,
     onUploadFileConsumed: () -> Unit,
+    onScanCancelConsumed: () -> Unit,
     qrCodeMapper: QRCodeMapper,
 ) {
     val view: View = LocalView.current
@@ -163,7 +164,11 @@ internal fun QRCodeView(
         event = viewState.scannedContactLinkResult,
         onConsumed = onScannedContactLinkResultConsumed
     ) {
-        showScannedContactLinkResult = it
+        if (viewState.finishActivityOnScanComplete) {
+            finishActivityAndSetResult(context.findActivity(), it)
+        } else {
+            showScannedContactLinkResult = it
+        }
     }
 
     EventEffect(
@@ -184,6 +189,14 @@ internal fun QRCodeView(
         onConsumed = onUploadFileConsumed,
         action = onUploadFile
     )
+
+    EventEffect(
+        event = viewState.scanCancel,
+        onConsumed = onScanCancelConsumed
+    ) {
+        if (viewState.finishActivityOnScanComplete)
+            finishActivity(context.findActivity())
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -236,7 +249,8 @@ internal fun QRCodeView(
         }
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -249,7 +263,8 @@ internal fun QRCodeView(
 
             when (viewState.myQRCodeState) {
                 is MyCodeUIState.CreatingQRCode -> {
-                    LoadingDialog(text = stringResource(id = R.string.generatin_qr))
+                    if (viewState.myQRCodeState.showLoader)
+                        LoadingDialog(text = stringResource(id = R.string.generatin_qr))
                 }
 
                 is MyCodeUIState.QRCodeAvailable -> {
@@ -647,6 +662,20 @@ private fun shareImage(activity: Activity, uri: Uri?) {
     }
 }
 
+private fun finishActivityAndSetResult(
+    activity: Activity?,
+    scannedContactLinkResult: ScannedContactLinkResult
+) {
+    val intent = Intent()
+    intent.putExtra(Constants.INTENT_EXTRA_KEY_MAIL, scannedContactLinkResult.email)
+    activity?.setResult(Activity.RESULT_OK, intent)
+    activity?.finish()
+}
+
+private fun finishActivity(activity: Activity?) {
+    activity?.finish()
+}
+
 @CombinedThemePreviews
 @Composable
 private fun PreviewQRCodeView() {
@@ -684,7 +713,8 @@ private fun PreviewQRCodeView() {
             onShowCollision = { },
             onShowCollisionConsumed = { },
             onUploadFile = { },
-            onUploadFileConsumed = { }
+            onUploadFileConsumed = { },
+            onScanCancelConsumed = { },
         ) { _, _, _, _, _ ->
             Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
         }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.qrcode.model
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -20,6 +21,8 @@ import java.io.File
  * @property scannedContactAvatarContent Avatar of the scanned contact
  * @property showCollision  Collision while saving to cloud drive
  * @property uploadFile     Upload file to the given parent handle
+ * @property finishActivityOnScanComplete Finish the activity and set result
+ * @property scanCancel     Handle scanning cancel event
  */
 data class QRCodeUIState(
     val myQRCodeState: MyCodeUIState = MyCodeUIState.Idle,
@@ -30,4 +33,6 @@ data class QRCodeUIState(
     val scannedContactAvatarContent: AvatarContent? = null,
     val showCollision: StateEventWithContent<NameCollision> = consumed(),
     val uploadFile: StateEventWithContent<Pair<File, Long>> = consumed(),
+    val finishActivityOnScanComplete: Boolean = false,
+    val scanCancel: StateEvent = consumed,
 )

@@ -58,6 +58,7 @@ class QRCodeViewTest {
                 onShowCollisionConsumed = { },
                 onUploadFile = { },
                 onUploadFileConsumed = { },
+                onScanCancelConsumed = { },
                 qrCodeMapper = qrCodeMapper
             )
         }

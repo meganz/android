@@ -87,17 +87,17 @@ class QRCodeViewModel @Inject constructor(
     /**
      * Create QR code.
      */
-    fun createQRCode() {
+    fun createQRCode(showLoader: Boolean) {
         Timber.d("create QR code")
         viewModelScope.launch {
             runCatching {
-                _uiState.update { it.copy(myQRCodeState = MyCodeUIState.CreatingQRCode) }
+                _uiState.update { it.copy(myQRCodeState = MyCodeUIState.CreatingQRCode(showLoader)) }
                 createContactLinkUseCase(renew = false)
             }.fold(
                 onSuccess = { contactLink ->
                     val fullName = getUserFullNameUseCase(forceRefresh = true)
                     val avatarBgColor = getMyAvatarColorUseCase()
-                    val localFile = getMyAvatarFileUseCase(true)
+                    val localFile = runCatching { getMyAvatarFileUseCase(true) }.getOrNull()
 
                     val avatarContent =
                         avatarContentMapper(
@@ -134,7 +134,7 @@ class QRCodeViewModel @Inject constructor(
         viewModelScope.launch {
             val qrCodeBackup = qrCodeBackup()
             runCatching {
-                _uiState.update { it.copy(myQRCodeState = MyCodeUIState.CreatingQRCode) }
+                _uiState.update { it.copy(myQRCodeState = MyCodeUIState.CreatingQRCode()) }
                 resetContactLinkUseCase()
             }.fold(
                 onSuccess = { contactLink ->
@@ -143,7 +143,7 @@ class QRCodeViewModel @Inject constructor(
                     val avatarBgColor = getMyAvatarColorUseCase()
                     val avatarContent = avatarContentMapper(
                         fullName = fullName,
-                        localFile = getMyAvatarFileUseCase(true),
+                        localFile = runCatching { getMyAvatarFileUseCase(true) }.getOrNull(),
                         showBorder = true,
                         textSize = 38.sp,
                         backgroundColor = getMyAvatarColorUseCase(),
@@ -264,10 +264,10 @@ class QRCodeViewModel @Inject constructor(
     fun scanCode(context: Context) {
         viewModelScope.launch {
             runCatching { scannerHandler.scan() }
-                .onSuccess {
-                    when (it) {
+                .onSuccess { scanResult ->
+                    when (scanResult) {
                         is ScanResult.Success -> {
-                            val contactLink = it.rawValue
+                            val contactLink = scanResult.rawValue
                             contactLink?.let {
                                 val s = contactLink.split("C!").toTypedArray()
                                 if (s.size <= 1 || s[0] != Constants.SCANNED_CONTACT_BASE_URL) {
@@ -278,7 +278,9 @@ class QRCodeViewModel @Inject constructor(
                             }
                         }
 
-                        ScanResult.Cancel -> {}
+                        ScanResult.Cancel -> {
+                            _uiState.update { it.copy(scanCancel = triggered) }
+                        }
                     }
                 }
                 .onFailure { error ->
@@ -369,6 +371,13 @@ class QRCodeViewModel @Inject constructor(
     }
 
     /**
+     * Set finish activity on scan complete
+     */
+    fun setFinishActivityOnScanComplete(finish: Boolean) {
+        _uiState.update { it.copy(finishActivityOnScanComplete = finish) }
+    }
+
+    /**
      * Show result message of a operation
      *
      * @param messageId String ID of the message
@@ -412,6 +421,11 @@ class QRCodeViewModel @Inject constructor(
      * Reset and notify uploadFile is consumed
      */
     fun resetUploadFile() = _uiState.update { it.copy(uploadFile = consumed()) }
+
+    /**
+     *Reset and notify scan cancel is consumed
+     */
+    fun resetScanCancel() = _uiState.update { it.copy(scanCancel = consumed) }
 
     companion object {
         private const val QR_IMAGE_FILE_NAME = "QR_code_image.jpg"

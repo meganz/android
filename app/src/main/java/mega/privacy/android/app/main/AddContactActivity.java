@@ -13,6 +13,7 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAIL;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.INVITE_CONTACT;
@@ -2934,7 +2935,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         Timber.d("onActivityResult");
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == SCAN_QR_FOR_ADD_CONTACTS && resultCode == Activity.RESULT_OK && intent != null) {
-            String mail = intent.getStringExtra("mail");
+            String mail = intent.getStringExtra(INTENT_EXTRA_KEY_MAIL);
 
             if (mail != null && !mail.equals("")) {
                 confirmAddMail = mail;

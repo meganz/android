@@ -22,6 +22,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.usecase.UploadUseCase
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -38,6 +39,8 @@ import javax.inject.Inject
 class QRCodeComposeActivity : PasscodeActivity() {
 
     private val viewModel: QRCodeViewModel by viewModels()
+    private var inviteContacts = false
+    private var showScanQrView = false
 
     /**
      * QR code mapper
@@ -72,6 +75,11 @@ class QRCodeComposeActivity : PasscodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        showScanQrView = intent.getBooleanExtra(Constants.OPEN_SCAN_QR, false)
+        inviteContacts = intent.getBooleanExtra(Constants.INVITE_CONTACT, false)
+        var showLoader = true
+
+        viewModel.setFinishActivityOnScanComplete(inviteContacts)
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val viewState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -79,7 +87,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
                 QRCodeView(
                     viewState = viewState,
                     onBackPressed = onBackPressedDispatcher::onBackPressed,
-                    onCreateQRCode = viewModel::createQRCode,
+                    onCreateQRCode = { viewModel.createQRCode(true) },
                     onDeleteQRCode = viewModel::deleteQRCode,
                     onResetQRCode = viewModel::resetQRCode,
                     onScanQrCodeClicked = { viewModel.scanCode(this) },
@@ -97,11 +105,16 @@ class QRCodeComposeActivity : PasscodeActivity() {
                     onUploadFile = { uploadFile(qrFile = it.first, parentHandle = it.second) },
                     onShowCollisionConsumed = viewModel::resetShowCollision,
                     onUploadFileConsumed = viewModel::resetUploadFile,
+                    onScanCancelConsumed = viewModel::resetScanCancel,
                     qrCodeMapper = qrCodeMapper,
                 )
             }
         }
-        viewModel.createQRCode()
+        if (showScanQrView || inviteContacts) {
+            showLoader = false
+            viewModel.scanCode(this)
+        }
+        viewModel.createQRCode(showLoader)
     }
 
     private fun onViewContact(email: String) {
