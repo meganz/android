@@ -9,7 +9,6 @@ import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.CUBackupInitializeChecker
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.data.database.DatabaseHandler
@@ -17,6 +16,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
+import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastPushNotificationSettingsUseCase
@@ -61,6 +61,7 @@ class BackgroundRequestListener @Inject constructor(
     private val broadcastPushNotificationSettingsUseCase: BroadcastPushNotificationSettingsUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
+    private val initializeBackupsUseCase: InitializeBackupsUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -176,13 +177,13 @@ class BackgroundRequestListener @Inject constructor(
             if (dbH.myChatFilesFolderHandle == INVALID_HANDLE) {
                 megaApi.getMyChatFilesFolder(listener)
             }
-
-            // Init CU sync data after login successfully
-            CUBackupInitializeChecker(megaApi).initCuSync()
-
             //Login check resumed pending transfers
             transfersManagement.checkResumedPendingTransfers()
-            applicationScope.launch { scheduleCameraUploadUseCase() }
+            applicationScope.launch {
+                // Init CU sync data after login successfully
+                initializeBackupsUseCase()
+                scheduleCameraUploadUseCase()
+            }
         }
     }
 

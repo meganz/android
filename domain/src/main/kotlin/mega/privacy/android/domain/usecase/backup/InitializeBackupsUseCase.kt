@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.backup
 
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadBackupIDUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadBackupIDUseCase
@@ -21,26 +22,27 @@ class InitializeBackupsUseCase @Inject constructor(
     private val getMediaUploadBackupIDUseCase: GetMediaUploadBackupIDUseCase,
     private val setupMediaUploadsBackupUseCase: SetupMediaUploadsBackupUseCase,
     private val updateSecondaryFolderBackupNameUseCase: UpdateSecondaryFolderBackupNameUseCase,
+    private val cameraUploadsRepository: CameraUploadRepository,
 ) {
 
     /**
      * Invocation function
-     * @param cameraUploadName
-     * @param mediaUploadName
      */
-    suspend operator fun invoke(cameraUploadName: String, mediaUploadName: String) {
+    suspend operator fun invoke() {
         setupDeviceNameUseCase()
+        val cameraUploadsName = cameraUploadsRepository.getCameraUploadsName()
         val cuBackupID = getCameraUploadBackupIDUseCase()
         if (isCameraUploadsEnabledUseCase() && cuBackupID == null) {
-            setupCameraUploadsBackupUseCase(cameraUploadName)
+            setupCameraUploadsBackupUseCase(cameraUploadsName)
         } else if (cuBackupID != null) {
-            updatePrimaryFolderBackupNameUseCase(cameraUploadName)
+            updatePrimaryFolderBackupNameUseCase(cameraUploadsName)
         }
         val muBackupID = getMediaUploadBackupIDUseCase()
+        val mediaUploadsName = cameraUploadsRepository.getMediaUploadsName()
         if (isSecondaryFolderEnabled() && muBackupID == null) {
-            setupMediaUploadsBackupUseCase(mediaUploadName)
+            setupMediaUploadsBackupUseCase(mediaUploadsName)
         } else if (muBackupID != null) {
-            updateSecondaryFolderBackupNameUseCase(mediaUploadName)
+            updateSecondaryFolderBackupNameUseCase(mediaUploadsName)
         }
     }
 }
