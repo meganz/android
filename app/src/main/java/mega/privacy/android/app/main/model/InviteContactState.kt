@@ -3,11 +3,9 @@ package mega.privacy.android.app.main.model
 import mega.privacy.android.domain.entity.Feature
 
 /**
- * State for Add Contact
- * @property isContactVerificationWarningEnabled contact verification flag is enabled or not
+ * State for invite Contact
  * @property enabledFeatureFlags Set of enabled feature flags
  */
-data class AddContactState(
-    val isContactVerificationWarningEnabled: Boolean = false,
+data class InviteContactState(
     val enabledFeatureFlags: Set<Feature> = emptySet(),
 )

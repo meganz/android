@@ -17,12 +17,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountHomeView
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
+import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChangeApiServerUtil
@@ -141,10 +143,13 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
         if (CallUtil.isNecessaryDisableLocalCamera() != Constants.INVALID_VALUE.toLong()) {
             CallUtil.showConfirmationOpenCamera(requireActivity(), Constants.ACTION_OPEN_QR, false)
         } else {
-            startActivity(
+            val intent = if (activityViewModel.isFeatureEnabled(AppFeatures.QRCodeCompose)) {
+                Intent(requireContext(), QRCodeComposeActivity::class.java)
+            } else {
                 Intent(requireContext(), QRCodeActivity::class.java)
-                    .putExtra(Constants.OPEN_SCAN_QR, false)
-            )
+            }
+            intent.putExtra(Constants.OPEN_SCAN_QR, false)
+            startActivity(intent)
         }
     }
 

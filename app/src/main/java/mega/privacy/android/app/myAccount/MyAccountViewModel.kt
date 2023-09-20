@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -48,12 +49,9 @@ import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR
 import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.CHOOSE_PICTURE_PROFILE_CODE
@@ -61,7 +59,6 @@ import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
-import mega.privacy.android.app.utils.Constants.OPEN_SCAN_QR
 import mega.privacy.android.app.utils.Constants.PRO_FLEXI
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_REFRESH
@@ -75,19 +72,20 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -216,6 +214,7 @@ class MyAccountViewModel @Inject constructor(
         refreshNumberOfSubscription(false)
         refreshUserName(false)
         refreshCurrentUserEmail()
+        getEnabledFeatures()
 
         viewModelScope.launch {
             flow {
@@ -242,6 +241,20 @@ class MyAccountViewModel @Inject constructor(
             }
         }
     }
+
+    private fun getEnabledFeatures() {
+        viewModelScope.launch {
+            val enabledFeatures = setOfNotNull(
+                AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) }
+            )
+            _state.update { it.copy(enabledFeatureFlags = enabledFeatures) }
+        }
+    }
+
+    /**
+     * Check if given feature flag is enabled or not
+     */
+    fun isFeatureEnabled(feature: Feature) = state.value.enabledFeatureFlags.contains(feature)
 
     override fun onCleared() {
         super.onCleared()
@@ -820,22 +833,6 @@ class MyAccountViewModel @Inject constructor(
             Intent.createChooser(intent, null),
             CHOOSE_PICTURE_PROFILE_CODE
         )
-    }
-
-    /**
-     * Open q r
-     *
-     * @param activity
-     */
-    fun openQR(activity: Activity) {
-        if (CallUtil.isNecessaryDisableLocalCamera() != INVALID_VALUE.toLong()) {
-            CallUtil.showConfirmationOpenCamera(activity, ACTION_OPEN_QR, false)
-        } else {
-            activity.startActivity(
-                Intent(activity, QRCodeActivity::class.java)
-                    .putExtra(OPEN_SCAN_QR, false)
-            )
-        }
     }
 
     /**

@@ -1,10 +1,13 @@
 package mega.privacy.android.app.myAccount
 
+import mega.privacy.android.domain.entity.Feature
+
 /**
  * My account ui state
  *
  * @property isFileVersioningEnabled
  * @property versionsInfo
+ * @property name
  * @property email
  * @property changeEmailResult
  * @property isLoading
@@ -12,6 +15,7 @@ package mega.privacy.android.app.myAccount
  * @property verifiedPhoneNumber
  * @property canVerifyPhoneNumber
  * @property isBusinessAccount
+ * @property enabledFeatureFlags
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
@@ -23,5 +27,6 @@ data class MyAccountUiState(
     val changeUserNameResult: Result<Unit>? = null,
     val verifiedPhoneNumber: String? = null,
     val canVerifyPhoneNumber: Boolean = false,
-    val isBusinessAccount: Boolean = false
+    val isBusinessAccount: Boolean = false,
+    val enabledFeatureFlags: Set<Feature> = emptySet()
 )

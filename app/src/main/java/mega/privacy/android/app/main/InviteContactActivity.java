@@ -61,6 +61,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,8 +82,10 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ContactInfoListDialog;
 import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
+import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
@@ -120,6 +123,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     public static final String KEY_SENT_NUMBER = "sentNumber";
     private boolean fromAchievement;
 
+    private InviteContactViewModel viewModel;
     private DisplayMetrics outMetrics;
     private ActionBar aB;
     private RelativeLayout containerContacts;
@@ -177,6 +181,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(InviteContactViewModel.class);
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -498,13 +503,23 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     public void initScanQR() {
         Timber.d("initScanQR");
-        Intent intent = new Intent(this, QRCodeActivity.class);
+        Intent intent;
+        if (viewModel.isFeatureEnabled(AppFeatures.QRCodeCompose)) {
+            intent = new Intent(this, QRCodeComposeActivity.class);
+        } else {
+            intent = new Intent(this, QRCodeActivity.class);
+        }
         intent.putExtra(OPEN_SCAN_QR, true);
         startQRActivity(intent);
     }
 
     private void initMyQr() {
-        Intent intent = new Intent(this, QRCodeActivity.class);
+        Intent intent;
+        if (viewModel.isFeatureEnabled(AppFeatures.QRCodeCompose)) {
+            intent = new Intent(this, QRCodeComposeActivity.class);
+        } else {
+            intent = new Intent(this, QRCodeActivity.class);
+        }
         startQRActivity(intent);
     }
 

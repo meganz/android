@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.tasks
+package mega.privacy.android.app.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,29 +7,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.main.model.AddContactState
+import mega.privacy.android.app.main.model.InviteContactState
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
- * AddContactView Model
- * @param getContactVerificationWarningUseCase [GetFeatureFlagValueUseCase]
+ * InviteContact ViewModel
  */
 @HiltViewModel
-class AddContactViewModel @Inject constructor(
-    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+class InviteContactViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AddContactState())
+    private val _state = MutableStateFlow(InviteContactState())
 
     val state = _state.asStateFlow()
 
     init {
-        getContactFeatureEnabled()
         getEnabledFeatures()
     }
 
@@ -43,20 +39,7 @@ class AddContactViewModel @Inject constructor(
     }
 
     /**
-     * Gets contact enabled Value from [GetContactVerificationWarningUseCase]
-     */
-    fun getContactFeatureEnabled() {
-        viewModelScope.launch {
-            val contactVerificationWarningEnabled = getContactVerificationWarningUseCase()
-            _state.update {
-                it.copy(isContactVerificationWarningEnabled = contactVerificationWarningEnabled)
-            }
-        }
-    }
-
-    /**
      * Check if given feature flag is enabled or not
      */
     fun isFeatureEnabled(feature: Feature) = state.value.enabledFeatureFlags.contains(feature)
-
 }

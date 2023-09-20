@@ -215,7 +215,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * In-App Ads toggle
      */
-    InAppAdvertisement("Enable In-App Ads", false)
+    InAppAdvertisement("Enable In-App Ads", false),
+
+    /**
+     * To switch into new QRCode compose screen with Google code scanner
+     */
+    QRCodeCompose("Enable compose for QRCode with google code scanner", false)
     ;
 
     companion object : FeatureFlagValueProvider {
