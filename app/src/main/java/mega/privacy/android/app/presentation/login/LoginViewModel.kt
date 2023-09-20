@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
@@ -115,6 +116,7 @@ class LoginViewModel @Inject constructor(
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
+    private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -732,6 +734,12 @@ class LoginViewModel @Inject constructor(
                             intentState = LoginIntentState.ReadyForFinalSetup,
                             fetchNodesUpdate = update
                         )
+                    }
+
+                    if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                        /*In case the app crash or restarts, we need to restart the worker
+                        in order to monitor current transfers and update the related notification.*/
+                        startDownloadWorkerUseCase()
                     }
                 } else {
                     _state.update { it.copy(fetchNodesUpdate = update) }

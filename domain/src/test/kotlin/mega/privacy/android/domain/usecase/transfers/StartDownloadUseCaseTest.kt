@@ -15,11 +15,11 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,7 +43,7 @@ class StartDownloadUseCaseTest {
     private val downloadNodesUseCase: DownloadNodesUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
-    private val transferRepository: TransferRepository = mock()
+    private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -53,7 +53,7 @@ class StartDownloadUseCaseTest {
                 downloadNodesUseCase = downloadNodesUseCase,
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 fileSystemRepository = fileSystemRepository,
-                transferRepository = transferRepository,
+                startDownloadWorkerUseCase = startDownloadWorkerUseCase,
             )
     }
 
@@ -64,7 +64,7 @@ class StartDownloadUseCaseTest {
             downloadNodesUseCase,
             cancelCancelTokenUseCase,
             fileSystemRepository,
-            transferRepository,
+            startDownloadWorkerUseCase,
         )
     }
 
@@ -124,7 +124,7 @@ class StartDownloadUseCaseTest {
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).collect()
-        verify(transferRepository).startDownloadWorker()
+        verify(startDownloadWorkerUseCase).invoke()
     }
 
     @Test

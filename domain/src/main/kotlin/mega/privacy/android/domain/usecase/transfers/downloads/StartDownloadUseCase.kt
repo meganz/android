@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import javax.inject.Inject
@@ -34,7 +33,7 @@ class StartDownloadUseCase @Inject constructor(
     private val downloadNodesUseCase: DownloadNodesUseCase,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val fileSystemRepository: FileSystemRepository,
-    private val transferRepository: TransferRepository,
+    private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
 ) {
     /**
      * Invoke
@@ -82,7 +81,7 @@ class StartDownloadUseCase @Inject constructor(
                                     throw error
                                 }
                             } else {
-                                transferRepository.startDownloadWorker()
+                                startDownloadWorkerUseCase()
                             }
                         }
                 } else {

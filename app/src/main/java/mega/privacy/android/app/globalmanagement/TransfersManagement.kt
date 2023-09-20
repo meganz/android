@@ -26,6 +26,7 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastFailedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
@@ -80,6 +82,7 @@ class TransfersManagement @Inject constructor(
     private val addCompletedTransferIfNotExistUseCase: AddCompletedTransferIfNotExistUseCase,
     private val deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase,
     private val getAllSdTransfersUseCase: GetAllSdTransfersUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     companion object {
@@ -334,16 +337,21 @@ class TransfersManagement @Inject constructor(
                 val shouldStartForeground =
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
                             (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || active) //starting with Android 12 only active apps can startForegroundService
-                @Suppress("DEPRECATION")
-                if (megaApi.numPendingDownloads > 0) {
-                    val downloadServiceIntent =
-                        Intent(context, DownloadService::class.java)
-                            .setAction(Constants.ACTION_RESTART_SERVICE)
 
-                    if (shouldStartForeground) {
-                        context.startForegroundService(downloadServiceIntent)
-                    } else {
-                        context.startService(downloadServiceIntent)
+                applicationScope.launch {
+                    if (!getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                        @Suppress("DEPRECATION")
+                        if (megaApi.numPendingDownloads > 0) {
+                            val downloadServiceIntent =
+                                Intent(context, DownloadService::class.java)
+                                    .setAction(Constants.ACTION_RESTART_SERVICE)
+
+                            if (shouldStartForeground) {
+                                context.startForegroundService(downloadServiceIntent)
+                            } else {
+                                context.startService(downloadServiceIntent)
+                            }
+                        }
                     }
                 }
 

@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.Rule
@@ -100,6 +101,7 @@ internal class LoginViewModelTest {
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
+    private val startDownloadWorkerUseCase = mock<StartDownloadWorkerUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -134,6 +136,7 @@ internal class LoginViewModelTest {
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
+            startDownloadWorkerUseCase = startDownloadWorkerUseCase,
         )
     }
 
