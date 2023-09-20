@@ -665,4 +665,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun rescheduleCameraUpload() = viewModelScope.launch {
         rescheduleCameraUploadUseCase()
     }
+
+    /**
+     * Set Invalid Camera Uploads Sync Handle
+     */
+    fun setInvalidCameraUploadsHandle() {
+        viewModelScope.launch {
+            dbh.setCamSyncHandle(-1L)
+        }
+    }
 }

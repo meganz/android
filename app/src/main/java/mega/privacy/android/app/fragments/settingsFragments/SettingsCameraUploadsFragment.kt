@@ -1141,7 +1141,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      * Method to control the changes needed when the node for CameraSync doesn't exist.
      */
     private fun nodeForCameraSyncDoesNotExist() {
-        dbH.setCamSyncHandle(Constants.INVALID_NON_NULL_VALUE.toLong())
+        viewModel.setInvalidCameraUploadsHandle()
         camSyncHandle = Constants.INVALID_NON_NULL_VALUE.toLong()
         camSyncMegaPath = getString(R.string.section_photo_sync)
     }
