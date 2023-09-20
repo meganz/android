@@ -262,7 +262,9 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun playerRelease() {
         player?.release()
-        exoPlayer.release()
+        if (::exoPlayer.isInitialized) {
+            exoPlayer.release()
+        }
     }
 
     override fun playerSeekTo(index: Int) {
