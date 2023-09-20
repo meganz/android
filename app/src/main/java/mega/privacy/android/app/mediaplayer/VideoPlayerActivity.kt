@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -73,17 +74,17 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_BACKUPS
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
-import mega.privacy.android.app.utils.Constants.FROM_BACKUPS
 import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
 import mega.privacy.android.app.utils.Constants.HANDLE
-import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
@@ -116,6 +117,13 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerSendToChatMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerShareMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -292,6 +300,10 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 ) {
                     videoViewModel.setCurrentPlayingVideoSize(null)
                     handle?.let {
+                        if (currentPlayingHandle != it.toLong()) {
+                            sendVideoPlayerActivatedEvent()
+                            Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
+                        }
                         setCurrentPlayingHandle(it.toLong())
                         lifecycleScope.launch {
                             monitorPlaybackTimes(it.toLong()) { positionInMs ->
@@ -366,7 +378,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                             // This case is only for video player
                             if (isPaused && mediaPlayerGateway.getPlayWhenReady()) {
                                 updateMediaPlaybackState(false)
-                                sendVideoPlayerActivatedEvent()
                             } else {
                                 // Detect videoPlayType and isPlayingAfterReady after video is ready
                                 // If videoPlayType is VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG, and
@@ -443,6 +454,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             when (menuId) {
                 R.id.save_to_device -> {
                     videoViewModel.sendSaveToDeviceButtonClickedEvent()
+                    Analytics.tracker.trackEvent(VideoPlayerSaveToDeviceMenuToolbarEvent)
                     when (adapterType) {
                         OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(
                             handle = playingHandle,
@@ -511,6 +523,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
                 R.id.properties -> {
                     videoViewModel.sendInfoButtonClickedEvent()
+                    Analytics.tracker.trackEvent(VideoPlayerInfoMenuItemEvent)
                     // Pause the video when the file info page is opened, and allow the video to
                     // revert to playing after back to the video player page.
                     mediaPlayerGateway.setPlayWhenReady(false)
@@ -562,6 +575,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
                 R.id.share -> {
                     videoViewModel.sendShareButtonClickedEvent()
+                    Analytics.tracker.trackEvent(VideoPlayerShareMenuToolbarEvent)
                     when (adapterType) {
                         OFFLINE_ADAPTER, ZIP_ADAPTER -> {
                             val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
@@ -593,11 +607,13 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
                 R.id.send_to_chat -> {
                     videoViewModel.sendSendToChatButtonClickedEvent()
+                    Analytics.tracker.trackEvent(VideoPlayerSendToChatMenuToolbarEvent)
                     nodeAttacher.attachNode(handle = playingHandle)
                 }
 
                 R.id.get_link -> {
                     videoViewModel.sendGetLinkButtonClickedEvent()
+                    Analytics.tracker.trackEvent(VideoPlayerGetLinkMenuToolbarEvent)
                     if (!MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(
                             node = megaApi.getNodeByHandle(playingHandle),
                             context = this
@@ -609,6 +625,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
                 R.id.remove_link -> {
                     videoViewModel.sendRemoveLinkButtonClickedEvent()
+                    Analytics.tracker.trackEvent(VideoPlayerRemoveLinkMenuToolbarEvent)
                     megaApi.getNodeByHandle(playingHandle)?.let { node ->
                         if (!MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, this)) {
                             AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
@@ -825,7 +842,8 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     private fun initMediaData() {
         currentPlayingHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-
+        videoViewModel.sendVideoPlayerActivatedEvent()
+        Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
         videoViewModel.monitorPlaybackTimes(currentPlayingHandle) { positionInMs ->
             // If the first video contains playback history, show dialog before build sources
             if (positionInMs != null && positionInMs > 0) {

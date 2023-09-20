@@ -58,6 +58,13 @@ import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.utils.getScreenWidth
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
+import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
+import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
+import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
+import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import org.jetbrains.anko.configuration
@@ -354,6 +361,7 @@ class VideoPlayerFragment : Fragment() {
                     if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
                         mediaPlayerGateway.setRepeatToggleMode(RepeatToggleMode.REPEAT_ONE)
                         viewModel.sendLoopButtonEnabledEvent()
+                        Analytics.tracker.trackEvent(LoopButtonPressedEvent)
                     } else {
                         mediaPlayerGateway.setRepeatToggleMode(RepeatToggleMode.REPEAT_NONE)
                     }
@@ -367,8 +375,10 @@ class VideoPlayerFragment : Fragment() {
         if (isLock) {
             delayHideWhenLocked()
             viewModel.sendScreenLockedEvent()
+            Analytics.tracker.trackEvent(LockButtonPressedEvent)
         } else {
             viewModel.sendScreenUnlockedEvent()
+            Analytics.tracker.trackEvent(UnlockButtonPressedEvent)
         }
     }
 
@@ -384,6 +394,7 @@ class VideoPlayerFragment : Fragment() {
                 captureView = view
             ) { bitmap ->
                 viewModel.sendSnapshotButtonClickedEvent()
+                Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)
                 viewLifecycleOwner.lifecycleScope.launch {
                     showCaptureScreenshotAnimation(
                         view = binding.screenshotScaleAnimationView,
@@ -683,10 +694,13 @@ class VideoPlayerFragment : Fragment() {
                         if (info.url == null) {
                             showAddingSubtitleFailedMessage()
                         }
+                        viewModel.sendAutoMatchSubtitleClickedEvent()
+                        Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
                         viewModel.onAutoMatchItemClicked(info)
                     },
                     onToSelectSubtitle = {
                         viewModel.sendOpenSelectSubtitlePageEvent()
+                        Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
                         selectSubtitleFileActivityLauncher.launch(
                             Intent(
                                 requireActivity(),

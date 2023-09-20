@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.INTENT_KEY_SUBTITLE_FILE_ID
 import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
+import mega.privacy.mobile.analytics.event.SearchModeEnablePressedEvent
 import javax.inject.Inject
 
 /**
@@ -138,6 +140,7 @@ class SelectSubtitleFileViewModel @Inject constructor(
     fun searchWidgetStateUpdate() {
         searchState = if (searchState == SearchWidgetState.COLLAPSED) {
             sendSearchModeEnabledEvent()
+            Analytics.tracker.trackEvent(SearchModeEnablePressedEvent)
             SearchWidgetState.EXPANDED
         } else {
             SearchWidgetState.COLLAPSED

@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -155,6 +156,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.TrackPlaybackPositionUseC
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import timber.log.Timber
@@ -538,6 +540,7 @@ class VideoPlayerViewModel @Inject constructor(
         // Only when the subtitle file has been loaded and shown, send hide subtitle event if off item is clicked
         if (_currentSubtitleFileInfo.value != null && selectOptionState != SUBTITLE_SELECTED_STATE_OFF) {
             sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.HideSubtitleEvent())
+            Analytics.tracker.trackEvent(OffOptionForHideSubtitlePressedEvent)
         }
         _addSubtitleState.update { false }
         _isSubtitleShown.update { false }
@@ -566,7 +569,6 @@ class VideoPlayerViewModel @Inject constructor(
             updateCurrentSubtitleFileInfo(info)
             _isSubtitleShown.update { true }
             updateSubtitleInfoByAddSubtitles(null)
-            sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.AutoMatchSubtitleClickedEvent())
             selectOptionState = SUBTITLE_SELECTED_STATE_MATCHED_ITEM
         } ?: Timber.d("The subtitle file url is null")
         _isSubtitleDialogShown.update { false }
@@ -1982,6 +1984,12 @@ class VideoPlayerViewModel @Inject constructor(
      */
     fun sendVideoPlayerActivatedEvent() =
         sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.VideoPlayerActivatedEvent())
+
+    /**
+     * Send AutoMatchSubtitleClickedEvent
+     */
+    fun sendAutoMatchSubtitleClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.AutoMatchSubtitleClickedEvent())
 
     /**
      * Send MediaPlayerStatisticsEvent
