@@ -20,6 +20,10 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
      * @param event the [TransferEvent] that has been received.
      */
     suspend operator fun invoke(event: TransferEvent) {
+        if (event.transfer.isVoiceClip() || event.transfer.isBackgroundTransfer()) {
+            return
+        }
+
         when (event) {
             is TransferEvent.TransferStartEvent, is TransferEvent.TransferPaused -> {
                 transferRepository.insertOrUpdateActiveTransfer(event.transfer)
