@@ -84,14 +84,25 @@
                 app:apThumbnail="@{item.thumbnail}"
                 app:roundedCornerRadius="4dp" />
 
-            <View
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="24dp"
-                android:background="@drawable/media_playlist_paused"
-                android:visibility="@{item.type == PlaylistAdapter.TYPE_PLAYING &amp;&amp; paused ? View.VISIBLE : View.GONE}"
-                tools:visibility="visible" />
+                android:background="@drawable/background_playlist_paused"
+                android:visibility="@{item.type == PlaylistAdapter.TYPE_PLAYING &amp;&amp; paused ? View.VISIBLE : View.GONE}">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_pause"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/white"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
                 android:id="@+id/image_selected"
