@@ -281,12 +281,14 @@ class SearchFragment : RotatableFragment() {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
                     if (uiState.isInProgress) {
                         isVisible = true
+                        recyclerView?.isVisible = false
                         LoadingStateView(
                             modifier = if (state().showChips) Modifier.padding(top = 48.dp) else Modifier,
                             isList = state().currentViewType == ViewType.LIST
                         )
-                    } else if (uiState.nodes.isNullOrEmpty()) {
+                    } else if (adapter.itemCount == 0) {
                         isVisible = true
+                        recyclerView?.isVisible = false
                         val emptyState = emptySearchViewMapper(
                             isSearchChipEnabled = uiState.showChips,
                             category = uiState.selectedFilter?.filter,
@@ -300,6 +302,7 @@ class SearchFragment : RotatableFragment() {
                         )
                     } else {
                         isVisible = false
+                        recyclerView?.isVisible = true
                     }
                 }
             }
@@ -747,19 +750,10 @@ class SearchFragment : RotatableFragment() {
             val mutableListNodes = ArrayList(nodes)
             adapter.setNodes(mutableListNodes)
             visibilityFastScroller()
-            if (adapter.itemCount == 0) {
-                recyclerView?.visibility = View.GONE
-            } else {
-                recyclerView?.visibility = View.VISIBLE
-            }
-
             if (isWaitingForSearchedNodes) {
                 reDoTheSelectionAfterRotation()
                 reSelectUnhandledItem()
             }
-        } ?: run {
-            recyclerView?.visibility = View.GONE
-            fastScroller.visibility = View.GONE
         }
     }
 
