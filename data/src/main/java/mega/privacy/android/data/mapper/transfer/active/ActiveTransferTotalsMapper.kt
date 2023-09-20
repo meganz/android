@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.transfer.active
 
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
@@ -11,7 +12,8 @@ import javax.inject.Inject
 internal class ActiveTransferTotalsMapper @Inject constructor() {
     operator fun invoke(
         type: TransferType,
-        list: List<ActiveTransferEntity>,
+        list: List<ActiveTransfer>,
+        transferredBytes: Map<Int, Long>,
     ): ActiveTransferTotals {
         val onlyFiles = list.filter { !it.isFolderTransfer }
         return ActiveTransferTotals(
@@ -22,7 +24,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor() {
             totalFinishedTransfers = list.count { it.isFinished },
             totalFinishedFileTransfers = onlyFiles.count { it.isFinished },
             totalBytes = onlyFiles.sumOf { it.totalBytes },
-            transferredBytes = 0 // this will be recovered in TRAN-230
+            transferredBytes = onlyFiles.sumOf { transferredBytes[it.tag] ?: 0L }
         )
     }
 }

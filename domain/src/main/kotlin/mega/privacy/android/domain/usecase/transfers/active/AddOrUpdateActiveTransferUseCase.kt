@@ -21,8 +21,12 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
      */
     suspend operator fun invoke(event: TransferEvent) {
         when (event) {
-            is TransferEvent.TransferStartEvent, is TransferEvent.TransferUpdateEvent, is TransferEvent.TransferPaused -> {
+            is TransferEvent.TransferStartEvent, is TransferEvent.TransferPaused -> {
                 transferRepository.insertOrUpdateActiveTransfer(event.transfer)
+            }
+
+            is TransferEvent.TransferUpdateEvent -> {
+                transferRepository.updateTransferredBytes(event.transfer)
             }
 
             is TransferEvent.TransferDataEvent -> {
@@ -32,6 +36,7 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
             is TransferEvent.TransferFinishEvent -> {
                 if (event.error == null || event.transfer.state == TransferState.STATE_CANCELLED) {
                     transferRepository.insertOrUpdateActiveTransfer(event.transfer)
+                    transferRepository.updateTransferredBytes(event.transfer)
                 } else {
                     //TRAN-228: handle the error similar to what is done in DownloadService.doOnTransferFinish
                 }

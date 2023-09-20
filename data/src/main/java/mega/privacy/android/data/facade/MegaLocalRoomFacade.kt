@@ -17,7 +17,6 @@ import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
-import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
@@ -41,7 +40,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val completedTransferModelMapper: CompletedTransferModelMapper,
     private val completedTransferEntityMapper: CompletedTransferEntityMapper,
     private val activeTransferEntityMapper: ActiveTransferEntityMapper,
-    private val activeTransferTotalsMapper: ActiveTransferTotalsMapper,
     private val syncRecordDao: SyncRecordDao,
     private val syncRecordModelMapper: SyncRecordModelMapper,
     private val syncRecordEntityMapper: SyncRecordEntityMapper,
@@ -168,16 +166,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>) =
         activeTransferDao.setActiveTransferAsFinishedByTag(tags)
-
-    override fun getActiveTransferTotalsByType(transferType: TransferType) =
-        activeTransferDao.getActiveTransfersByType(transferType)
-            .map { activeTransferTotalsMapper(transferType, it) }
-
-    override suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType) =
-        activeTransferTotalsMapper(
-            transferType,
-            activeTransferDao.getCurrentActiveTransfersByType(transferType)
-        )
 
     override suspend fun saveSyncRecord(record: SyncRecord) =
         syncRecordDao.insertOrUpdateSyncRecord(syncRecordEntityMapper(record))

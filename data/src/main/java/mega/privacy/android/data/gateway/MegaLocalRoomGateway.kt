@@ -5,7 +5,6 @@ import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
-import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 
@@ -183,18 +182,6 @@ interface MegaLocalRoomGateway {
      * Delete an active transfer by its tag
      */
     suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
-
-    /**
-     * Get active transfer totals by type
-     * @return a flow of [ActiveTransferTotals]
-     */
-    fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals>
-
-    /**
-     * Get active transfer totals by type
-     * @return current [ActiveTransferTotals]
-     */
-    suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType): ActiveTransferTotals
 
     /**
      * Save sync record

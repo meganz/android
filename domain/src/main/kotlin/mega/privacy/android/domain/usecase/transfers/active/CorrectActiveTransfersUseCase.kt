@@ -41,5 +41,10 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         inProgressNotInActiveTransfers.forEach {
             transferRepository.insertOrUpdateActiveTransfer(it)
         }
+
+        //update transferred bytes for each transfer
+        inProgressTransfers.forEach {
+            transferRepository.updateTransferredBytes(it)
+        }
     }
 }

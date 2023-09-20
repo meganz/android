@@ -9,13 +9,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
@@ -33,6 +39,7 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
@@ -76,6 +83,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val pausedTransferEventMapper: PausedTransferEventMapper,
     private val transferMapper: TransferMapper,
     private val transferAppDataStringMapper: TransferAppDataStringMapper,
+    private val activeTransferTotalsMapper: ActiveTransferTotalsMapper,
     private val appEventGateway: AppEventGateway,
     private val localStorageGateway: MegaLocalStorageGateway,
     private val workerManagerGateway: WorkManagerGateway,
@@ -85,6 +93,12 @@ internal class DefaultTransfersRepository @Inject constructor(
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
+
+    /**
+     * to store current transferred bytes in memory instead of in database
+     */
+    private val transferredBytesFlows =
+        HashMap<TransferType, MutableStateFlow<Map<Int, Long>>>()
 
     init {
         //update monitorPausedTransfer with current sdk value
@@ -468,8 +482,15 @@ internal class DefaultTransfersRepository @Inject constructor(
             megaLocalRoomGateway.insertOrUpdateActiveTransfer(activeTransfer)
         }
 
+    override suspend fun updateTransferredBytes(transfer: Transfer) {
+        transferredBytesFlow(transfer.transferType).update {
+            it + (transfer.tag to transfer.transferredBytes)
+        }
+    }
+
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
         withContext(ioDispatcher) {
+            transferredBytesFlow(transferType).value = mapOf()
             megaLocalRoomGateway.deleteAllActiveTransfersByType(transferType)
         }
 
@@ -479,14 +500,23 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
 
     override fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
-        megaLocalRoomGateway
-            .getActiveTransferTotalsByType(transferType)
-            .flowOn(ioDispatcher)
-            .cancellable()
+        flow {
+            val transferredBytesFlow = transferredBytesFlow(transferType)
+            emitAll(
+                megaLocalRoomGateway.getActiveTransfersByType(transferType).flowOn(ioDispatcher)
+                    .combine(transferredBytesFlow) { activeTransfers, transferredBytes ->
+                        activeTransferTotalsMapper(transferType, activeTransfers, transferredBytes)
+                    }
+            )
+        }.cancellable()
 
     override suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType): ActiveTransferTotals =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.getCurrentActiveTransferTotalsByType(transferType)
+            activeTransferTotalsMapper(
+                type = transferType,
+                list = megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType),
+                transferredBytes = transferredBytesFlow(transferType).value
+            )
         }
 
     override suspend fun getCurrentUploadSpeed() = withContext(ioDispatcher) {
@@ -583,6 +613,17 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun getTotalDownloadBytes() = withContext(ioDispatcher) {
         megaApiGateway.totalDownloadBytes
+    }
+
+
+    private val transferredBytesFlowMutex = Mutex()
+    private suspend fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Int, Long>> {
+        transferredBytesFlowMutex.withLock {
+            return transferredBytesFlows[transferType]
+                ?: MutableStateFlow<Map<Int, Long>>(mapOf()).also {
+                    transferredBytesFlows[transferType] = it
+                }
+        }
     }
 }
 

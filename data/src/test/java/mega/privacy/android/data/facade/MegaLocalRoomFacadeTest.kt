@@ -22,7 +22,6 @@ import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
-import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
@@ -60,7 +59,6 @@ internal class MegaLocalRoomFacadeTest {
     private val encryptData = mock<EncryptData>()
     private val decryptData = mock<DecryptData>()
     private val activeTransferDao = mock<ActiveTransferDao>()
-    private val activeTransferTotalsMapper = mock<ActiveTransferTotalsMapper>()
     private val activeTransferEntityMapper = mock<ActiveTransferEntityMapper>()
     private val syncRecordDao: SyncRecordDao = mock()
     private val syncRecordModelMapper: SyncRecordModelMapper = mock()
@@ -82,7 +80,6 @@ internal class MegaLocalRoomFacadeTest {
             activeTransferDao = activeTransferDao,
             completedTransferModelMapper = completedTransferModelMapper,
             activeTransferEntityMapper = activeTransferEntityMapper,
-            activeTransferTotalsMapper = activeTransferTotalsMapper,
             syncRecordDao = syncRecordDao,
             syncRecordModelMapper = syncRecordModelMapper,
             syncRecordEntityMapper = syncRecordEntityMapper,

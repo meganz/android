@@ -24,6 +24,7 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.SdTransfer
@@ -79,6 +80,7 @@ class DefaultTransfersRepositoryTest {
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val transferDataMapper = mock<TransferDataMapper>()
     private val cancelTokenProvider = mock<CancelTokenProvider>()
+    private val activeTransferTotalsMapper = mock<ActiveTransferTotalsMapper>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -99,6 +101,7 @@ class DefaultTransfersRepositoryTest {
             transferMapper = transferMapper,
             transferAppDataStringMapper = transferAppDataStringMapper,
             pausedTransferEventMapper = pausedTransferEventMapper,
+            activeTransferTotalsMapper = activeTransferTotalsMapper,
             localStorageGateway = localStorageGateway,
             workerManagerGateway = workerManagerGateway,
             megaLocalRoomGateway = megaLocalRoomGateway,
@@ -961,9 +964,12 @@ class DefaultTransfersRepositoryTest {
             transferType: TransferType,
         ) = runTest {
             val expected = mock<ActiveTransferTotals>()
-            val flow = flowOf(expected)
-            whenever(megaLocalRoomGateway.getActiveTransferTotalsByType(transferType))
+            val list = mock<List<ActiveTransfer>>()
+            val flow = flowOf(list)
+            whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
                 .thenReturn(flow)
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
+                .thenReturn(expected)
             val actual = underTest.getActiveTransferTotalsByType(transferType).first()
             assertThat(actual).isEqualTo(expected)
         }
@@ -973,8 +979,11 @@ class DefaultTransfersRepositoryTest {
         fun `test that getCurrentActiveTransferTotalsByType gateway result is returned when getCurrentActiveTransferTotalsByType is called`(
             transferType: TransferType,
         ) = runTest {
+            val list = mock<List<ActiveTransfer>>()
             val expected = mock<ActiveTransferTotals>()
-            whenever(megaLocalRoomGateway.getCurrentActiveTransferTotalsByType(transferType))
+            whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
+                .thenReturn(list)
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
                 .thenReturn(expected)
             val actual = underTest.getCurrentActiveTransferTotalsByType(transferType)
             assertThat(actual).isEqualTo(expected)
@@ -984,6 +993,36 @@ class DefaultTransfersRepositoryTest {
         fun `test that workerManagerGateway enqueueDownloadsWorkerRequest is called when startDownloadWorker is called`() {
             underTest.startDownloadWorker()
             verify(workerManagerGateway).enqueueDownloadsWorkerRequest()
+        }
+
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that updateTransferredBytes adds currentTransferred bytes and deleteAllActiveTransfersByType clears the values`(
+            transferType: TransferType,
+        ) = runTest {
+            val expected = 1024L
+            val tag = 1
+            val expectedMap = mapOf(tag to expected)
+            val list = mock<List<ActiveTransfer>>()
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(transferType)
+                on { transferredBytes }.thenReturn(expected)
+                on { this.tag }.thenReturn(tag)
+            }
+            whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
+                .thenReturn(list)
+
+            // test updateTransferredBytes
+            underTest.updateTransferredBytes(transfer)
+            underTest.getCurrentActiveTransferTotalsByType(transferType)
+            //here we check that the mapper is called with the proper expectedMap
+            verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(expectedMap))
+
+            // test deleteAllActiveTransfersByType so we also clear the cached values
+            underTest.deleteAllActiveTransfersByType(transferType)
+            underTest.getCurrentActiveTransferTotalsByType(transferType)
+            //here we check that the mapper is called with the proper expectedMap
+            verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(emptyMap()))
         }
     }
 

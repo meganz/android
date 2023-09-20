@@ -24,29 +24,27 @@ class ActiveTransferTotalsMapperTest {
     fun `test that mapper returns totalBytes excluding folder transfers`(transferType: TransferType) {
         val entities = createEntities(transferType)
         val expectedTotal = entities.filter { !it.isFolderTransfer }.sumOf { it.totalBytes }
-        val actual = underTest(transferType, entities)
+        val actual = underTest(transferType, entities, emptyMap())
         assertThat(actual.totalBytes).isEqualTo(expectedTotal)
     }
-
-    /* this will be recovered in TRAN-230
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
     fun `test that mapper returns transferredBytes excluding folder transfers`(transferType: TransferType) {
         val entities = createEntities(transferType)
+        val transferredBytes = entities.associate { it.tag to it.totalBytes / 2 }
         val expectedTransferredBytes =
-            entities.filter { !it.isFolderTransfer }.sumOf { it.transferredBytes }
-        val actual = underTest(transferType, entities)
+            entities.filter { !it.isFolderTransfer }.sumOf { it.totalBytes / 2 }
+        val actual = underTest(transferType, entities, transferredBytes)
         assertThat(actual.transferredBytes).isEqualTo(expectedTransferredBytes)
     }
-    */
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
     fun `test that mapper returns correct totalTransfers`(transferType: TransferType) {
         val entities = createEntities(transferType)
         val expected = entities.size
-        val actual = underTest(transferType, entities)
+        val actual = underTest(transferType, entities, emptyMap())
         assertThat(actual.totalTransfers).isEqualTo(expected)
     }
 
@@ -55,7 +53,7 @@ class ActiveTransferTotalsMapperTest {
     fun `test that mapper returns correct totalFinishedTransfers`(transferType: TransferType) {
         val entities = createEntities(transferType)
         val expected = entities.count { it.isFinished }
-        val actual = underTest(transferType, entities)
+        val actual = underTest(transferType, entities, emptyMap())
         assertThat(actual.totalFinishedTransfers).isEqualTo(expected)
     }
 
@@ -64,7 +62,7 @@ class ActiveTransferTotalsMapperTest {
     fun `test that mapper excludes folder transfers in totalFileTransfers`(transferType: TransferType) {
         val entities = createEntities(transferType)
         val expected = entities.filter { !it.isFolderTransfer }.size
-        val actual = underTest(transferType, entities)
+        val actual = underTest(transferType, entities, emptyMap())
         assertThat(actual.totalFileTransfers).isEqualTo(expected)
     }
 
@@ -75,7 +73,7 @@ class ActiveTransferTotalsMapperTest {
     ) {
         val entities = createEntities(transferType)
         val expected = entities.filter { !it.isFolderTransfer && it.isPaused }.size
-        val actual = underTest(transferType, entities)
+        val actual = underTest(transferType, entities, emptyMap())
         assertThat(actual.pausedFileTransfers).isEqualTo(expected)
     }
 
@@ -84,7 +82,7 @@ class ActiveTransferTotalsMapperTest {
     fun `test that mapper excludes folder transfers in totalFinishedFileTransfers`(transferType: TransferType) {
         val entities = createEntities(transferType)
         val expected = entities.filter { !it.isFolderTransfer }.count { it.isFinished }
-        val actual = underTest(transferType, entities)
+        val actual = underTest(transferType, entities, emptyMap())
         assertThat(actual.totalFinishedFileTransfers).isEqualTo(expected)
     }
 
@@ -92,7 +90,7 @@ class ActiveTransferTotalsMapperTest {
     @EnumSource(TransferType::class)
     fun `test that mapper returns empty entity when empty list is mapped`(transferType: TransferType) {
         val expected = ActiveTransferTotals(transferType, 0, 0, 0, 0, 0, 0, 0)
-        assertThat(underTest(transferType, emptyList())).isEqualTo(expected)
+        assertThat(underTest(transferType, emptyList(), emptyMap())).isEqualTo(expected)
     }
 
     private fun createEntities(transferType: TransferType) = (0..20).map { tag ->
