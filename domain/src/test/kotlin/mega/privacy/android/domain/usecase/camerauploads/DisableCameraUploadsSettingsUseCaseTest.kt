@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,27 +15,31 @@ import org.mockito.kotlin.verify
 class DisableCameraUploadsSettingsUseCaseTest {
     private lateinit var underTest: DisableCameraUploadsSettingsUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val setupMediaUploadsSettingUseCase = mock<SetupMediaUploadsSettingUseCase>()
+    private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase = mock()
 
     @BeforeAll
     fun setUp() {
         underTest = DisableCameraUploadsSettingsUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            setupMediaUploadsSettingUseCase = setupMediaUploadsSettingUseCase,
+            setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            setupMediaUploadsSettingUseCase,
+            setupCameraUploadsSettingUseCase,
         )
     }
 
     @Test
-    fun `test that camera upload settings are updated when the use case is invoked`() = runTest {
-        underTest()
+    fun `test that camera uploads and media uploads settings are updated when the use case is invoked`() =
+        runTest {
+            underTest()
 
-        verify(cameraUploadRepository).setCameraUploadsEnabled(false)
-        verify(cameraUploadRepository).setSecondaryEnabled(false)
-    }
+            verify(setupCameraUploadsSettingUseCase).invoke(false)
+            verify(setupMediaUploadsSettingUseCase).invoke(false)
+        }
 }

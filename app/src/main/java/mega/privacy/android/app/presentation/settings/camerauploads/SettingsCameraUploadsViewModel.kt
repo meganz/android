@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.SqliteDatabaseHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -48,7 +47,10 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -142,7 +144,9 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val dbh: SqliteDatabaseHandler,
+    private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
+    private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase,
+    private val setupCameraUploadsSyncHandleUseCase: SetupCameraUploadsSyncHandleUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -267,7 +271,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 //If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
                 //if not clean the sync record from previous primary folder
                 restoreSecondaryTimestamps()
-                dbh.setSecondaryUploadEnabled(true)
+                setupMediaUploadsSettingUseCase(isEnabled = true)
             }.onFailure {
                 Timber.e(it)
                 setErrorState(shouldShow = true)
@@ -389,8 +393,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setCameraUploadsEnabled(true)
                 restorePrimaryTimestamps()
-                // this will be replaced with [SetupCameraUploadSettingUseCase]
-                dbh.setCamSyncEnabled(true)
+                setupCameraUploadsSettingUseCase(isEnabled = true)
                 if (shouldDisableMediaUploads) {
                     resetAndDisableMediaUploads()
                 }
@@ -671,7 +674,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun setInvalidCameraUploadsHandle() {
         viewModelScope.launch {
-            dbh.setCamSyncHandle(-1L)
+            setupCameraUploadsSyncHandleUseCase(handle = -1L)
         }
     }
 }

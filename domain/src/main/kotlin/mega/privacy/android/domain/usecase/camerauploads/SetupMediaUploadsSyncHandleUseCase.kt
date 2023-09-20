@@ -10,7 +10,7 @@ import javax.inject.Inject
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property setupOrUpdateMediaUploadsBackupUseCase [SetupOrUpdateMediaUploadsBackupUseCase]
  */
-class SetupMediaUploadSyncHandleUseCase @Inject constructor(
+class SetupMediaUploadsSyncHandleUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase,
 ) {

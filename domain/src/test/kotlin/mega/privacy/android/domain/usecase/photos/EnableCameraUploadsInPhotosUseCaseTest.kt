@@ -11,6 +11,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForV
 import mega.privacy.android.domain.usecase.camerauploads.SetDefaultPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,6 +37,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
     private val setDefaultPrimaryFolderPathUseCase = mock<SetDefaultPrimaryFolderPathUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
     private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
+    private val setupCameraUploadsSettingUseCase = mock<SetupCameraUploadsSettingUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -47,6 +49,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
             setDefaultPrimaryFolderPathUseCase = setDefaultPrimaryFolderPathUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
             setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
+            setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase
         )
     }
 
@@ -85,6 +88,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
             setDefaultPrimaryFolderPathUseCase,
             setUploadVideoQualityUseCase,
             setVideoCompressionSizeLimitUseCase,
+            setupCameraUploadsSettingUseCase
         )
 
         inOrder.verify(setDefaultPrimaryFolderPathUseCase).invoke()
@@ -94,7 +98,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
         inOrder.verify(setChargingRequiredForVideoCompressionUseCase).invoke(true)
         inOrder.verify(setVideoCompressionSizeLimitUseCase)
             .invoke(expectedVideoCompressionSizeLimit)
-        inOrder.verify(cameraUploadRepository).setCameraUploadsEnabled(true)
+        inOrder.verify(setupCameraUploadsSettingUseCase).invoke(isEnabled = true)
         inOrder.verify(listenToNewMediaUseCase).invoke()
 
         inOrder.verifyNoMoreInteractions()

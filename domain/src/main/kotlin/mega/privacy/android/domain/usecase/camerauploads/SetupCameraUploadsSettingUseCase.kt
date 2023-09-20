@@ -12,7 +12,7 @@ import javax.inject.Inject
  * @property setupCameraUploadsBackupUseCase [SetupCameraUploadsBackupUseCase]
  * @property removeBackupFolderUseCase [RemoveBackupFolderUseCase]
  */
-class SetupCameraUploadSettingUseCase @Inject constructor(
+class SetupCameraUploadsSettingUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val setupCameraUploadsBackupUseCase: SetupCameraUploadsBackupUseCase,
     private val removeBackupFolderUseCase: RemoveBackupFolderUseCase,
@@ -22,12 +22,11 @@ class SetupCameraUploadSettingUseCase @Inject constructor(
      * Invocation function
      *
      * @param isEnabled [Boolean]
-     * @param cameraUploadName [String]
      */
-    suspend operator fun invoke(isEnabled: Boolean, cameraUploadName: String) {
+    suspend operator fun invoke(isEnabled: Boolean) {
         cameraUploadRepository.setCameraUploadsEnabled(isEnabled)
         if (isEnabled) {
-            setupCameraUploadsBackupUseCase(cameraUploadName)
+            setupCameraUploadsBackupUseCase(cameraUploadRepository.getCameraUploadsName())
         } else {
             removeBackupFolderUseCase(CameraUploadFolderType.Primary)
         }

@@ -5,12 +5,12 @@ import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBack
 import javax.inject.Inject
 
 /**
- * UseCase that  Setup CameraUpload Sync Handle
+ * UseCase that  Setup CameraUploads Sync Handle
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property setupOrUpdateCameraUploadsBackupUseCase [SetupOrUpdateCameraUploadsBackupUseCase]
  */
-class SetupCameraUploadSyncHandleUseCase @Inject constructor(
+class SetupCameraUploadsSyncHandleUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase,
 ) {

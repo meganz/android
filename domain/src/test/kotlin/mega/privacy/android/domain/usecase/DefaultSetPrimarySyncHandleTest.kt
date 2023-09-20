@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSyncHandleUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -12,14 +12,14 @@ import org.mockito.kotlin.verify
 class DefaultSetPrimarySyncHandleTest {
     private lateinit var underTest: SetPrimarySyncHandle
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val setupCameraUploadsSyncHandleUseCase = mock<SetupCameraUploadsSyncHandleUseCase>()
     private val updateFolderIconBroadcast = mock<UpdateFolderIconBroadcast>()
     private val updateFolderDestinationBroadcast = mock<UpdateFolderDestinationBroadcast>()
 
     @Before
     fun setUp() {
         underTest = DefaultSetPrimarySyncHandle(
-            cameraUploadRepository = cameraUploadRepository,
+            setupCameraUploadsSyncHandleUseCase = setupCameraUploadsSyncHandleUseCase,
             updateFolderIconBroadcast = updateFolderIconBroadcast,
             updateFolderDestinationBroadcast = updateFolderDestinationBroadcast
         )
@@ -30,7 +30,7 @@ class DefaultSetPrimarySyncHandleTest {
         runTest {
             val result = 69L
             underTest(result)
-            verify(cameraUploadRepository).setPrimarySyncHandle(result)
+            verify(setupCameraUploadsSyncHandleUseCase).invoke(result)
             verify(updateFolderIconBroadcast).invoke(result, false)
             verify(updateFolderDestinationBroadcast).invoke(result, false)
         }

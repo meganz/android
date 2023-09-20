@@ -13,13 +13,13 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 /**
- * Test class for [SetupCameraUploadSyncHandleUseCase]
+ * Test class for [SetupCameraUploadsSyncHandleUseCase]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SetupCameraUploadSyncHandleUseCaseTest {
+class SetupCameraUploadsSyncHandleUseCaseTest {
 
-    private lateinit var underTest: SetupCameraUploadSyncHandleUseCase
+    private lateinit var underTest: SetupCameraUploadsSyncHandleUseCase
 
     private val cameraUploadRepository: CameraUploadRepository = mock()
     private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase =
@@ -27,7 +27,7 @@ class SetupCameraUploadSyncHandleUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = SetupCameraUploadSyncHandleUseCase(
+        underTest = SetupCameraUploadsSyncHandleUseCase(
             cameraUploadRepository = cameraUploadRepository,
             setupOrUpdateCameraUploadsBackupUseCase = setupOrUpdateCameraUploadsBackupUseCase
         )
@@ -39,7 +39,7 @@ class SetupCameraUploadSyncHandleUseCaseTest {
     }
 
     @Test
-    fun `test that it sets up camera sync handle when invoked`() = runTest {
+    fun `test that it sets up camera uploads sync handle when invoked`() = runTest {
         val handle = 1234L
         underTest(handle)
         verify(cameraUploadRepository).setPrimarySyncHandle(handle)

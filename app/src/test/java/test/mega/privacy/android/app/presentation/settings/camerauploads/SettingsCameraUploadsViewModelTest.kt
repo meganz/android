@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.app.SqliteDatabaseHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -47,7 +46,10 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
@@ -114,7 +116,9 @@ class SettingsCameraUploadsViewModelTest {
     private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
     private val monitorCameraUploadsSettingsActionsUseCase =
         mock<MonitorCameraUploadsSettingsActionsUseCase>()
-    private val dbh: SqliteDatabaseHandler = mock()
+    private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase = mock()
+    private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase = mock()
+    private val setupCameraUploadsSyncHandleUseCase: SetupCameraUploadsSyncHandleUseCase = mock()
 
     @Before
     fun setUp() {
@@ -172,7 +176,9 @@ class SettingsCameraUploadsViewModelTest {
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
             isConnectedToInternetUseCase = mock(),
-            dbh = dbh,
+            setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
+            setupMediaUploadsSettingUseCase = setupMediaUploadsSettingUseCase,
+            setupCameraUploadsSyncHandleUseCase = setupCameraUploadsSyncHandleUseCase,
         )
     }
 
@@ -734,7 +740,7 @@ class SettingsCameraUploadsViewModelTest {
             val shouldDisableMediaUploads = true
             underTest.onCameraUploadsEnabled(shouldDisableMediaUploads)
             verify(restorePrimaryTimestamps).invoke()
-            verify(dbh).setCamSyncEnabled(true)
+            verify(setupCameraUploadsSettingUseCase).invoke(true)
             verify(resetMediaUploadTimeStamps).invoke()
             verify(disableMediaUploadSettings).invoke()
         }
@@ -747,6 +753,6 @@ class SettingsCameraUploadsViewModelTest {
             underTest.onMediaUploadsEnabled(mediaUploadsName)
             verify(setupDefaultSecondaryFolderUseCase).invoke(mediaUploadsName)
             verify(restoreSecondaryTimestamps).invoke()
-            verify(dbh).setSecondaryUploadEnabled(true)
+            verify(setupMediaUploadsSettingUseCase).invoke(true)
         }
 }

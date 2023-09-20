@@ -17,12 +17,6 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.monitoring.CrashReporter
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removeSecondaryBackup
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.setPrimaryBackup
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.setSecondaryBackup
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderTargetNode
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryFolderTargetNode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
@@ -2570,11 +2564,6 @@ class SqliteDatabaseHandler @Inject constructor(
                     values.put(KEY_CAM_SYNC_ENABLED, encrypt(enabled.toString()))
                     db.insert(TABLE_PREFERENCES, null, values)
                 }
-                if (enabled) {
-                    setPrimaryBackup()
-                } else {
-                    removePrimaryBackup()
-                }
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
@@ -2594,12 +2583,6 @@ class SqliteDatabaseHandler @Inject constructor(
                 } else {
                     values.put(KEY_SEC_FOLDER_ENABLED, encrypt(enabled.toString()))
                     db.insert(TABLE_PREFERENCES, null, values)
-                }
-                // Set or remove corresponding MU backup.
-                if (enabled) {
-                    setSecondaryBackup()
-                } else {
-                    removeSecondaryBackup()
                 }
             }
         } catch (e: Exception) {
@@ -2621,8 +2604,6 @@ class SqliteDatabaseHandler @Inject constructor(
                     db.insert(TABLE_PREFERENCES, null, values)
                 }
                 Timber.d("Set new primary handle: %s", handle)
-                // Update CU backup when CU target folder changed.
-                updatePrimaryFolderTargetNode(handle)
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
@@ -2644,8 +2625,6 @@ class SqliteDatabaseHandler @Inject constructor(
                     db.insert(TABLE_PREFERENCES, null, values)
                 }
                 Timber.d("Set new secondary handle: %s", handle)
-                // Update MU backup when MU target folder changed.
-                updateSecondaryFolderTargetNode(handle)
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")

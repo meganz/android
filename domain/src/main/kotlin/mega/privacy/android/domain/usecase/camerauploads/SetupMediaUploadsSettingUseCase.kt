@@ -7,13 +7,13 @@ import mega.privacy.android.domain.usecase.backup.SetupMediaUploadsBackupUseCase
 import javax.inject.Inject
 
 /**
- * UseCase that  Setup CameraUpload Setting and backup
+ * UseCase that  Setup Media Uploads Setting and backup
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property setupMediaUploadsBackupUseCase [SetupCameraUploadsBackupUseCase]
  * @property removeBackupFolderUseCase [RemoveBackupFolderUseCase]
  */
-class SetupMediaUploadSettingUseCase @Inject constructor(
+class SetupMediaUploadsSettingUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val setupMediaUploadsBackupUseCase: SetupMediaUploadsBackupUseCase,
     private val removeBackupFolderUseCase: RemoveBackupFolderUseCase,
@@ -23,12 +23,11 @@ class SetupMediaUploadSettingUseCase @Inject constructor(
      * Invocation function
      *
      * @param isEnabled [Boolean]
-     * @param mediaUploadName [String]
      */
-    suspend operator fun invoke(isEnabled: Boolean, mediaUploadName: String) {
+    suspend operator fun invoke(isEnabled: Boolean) {
         cameraUploadRepository.setSecondaryEnabled(isEnabled)
         if (isEnabled) {
-            setupMediaUploadsBackupUseCase(mediaUploadName)
+            setupMediaUploadsBackupUseCase(cameraUploadRepository.getMediaUploadsName())
         } else {
             removeBackupFolderUseCase(CameraUploadFolderType.Secondary)
         }

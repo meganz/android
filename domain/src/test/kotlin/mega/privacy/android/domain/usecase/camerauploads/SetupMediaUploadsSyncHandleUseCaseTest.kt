@@ -13,13 +13,13 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 /**
- * Test class for [SetupMediaUploadSyncHandleUseCase]
+ * Test class for [SetupMediaUploadsSyncHandleUseCase]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SetupMediaUploadSyncHandleUseCaseTest {
+class SetupMediaUploadsSyncHandleUseCaseTest {
 
-    private lateinit var underTest: SetupMediaUploadSyncHandleUseCase
+    private lateinit var underTest: SetupMediaUploadsSyncHandleUseCase
 
     private val cameraUploadRepository: CameraUploadRepository = mock()
     private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase =
@@ -27,7 +27,7 @@ class SetupMediaUploadSyncHandleUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = SetupMediaUploadSyncHandleUseCase(
+        underTest = SetupMediaUploadsSyncHandleUseCase(
             cameraUploadRepository = cameraUploadRepository,
             setupOrUpdateMediaUploadsBackupUseCase = setupOrUpdateMediaUploadsBackupUseCase
         )

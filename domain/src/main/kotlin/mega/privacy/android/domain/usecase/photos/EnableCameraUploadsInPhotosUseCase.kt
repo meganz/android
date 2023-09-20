@@ -9,6 +9,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForV
 import mega.privacy.android.domain.usecase.camerauploads.SetDefaultPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import javax.inject.Inject
 
 /**
@@ -30,6 +31,7 @@ class EnableCameraUploadsInPhotosUseCase @Inject constructor(
     private val setDefaultPrimaryFolderPathUseCase: SetDefaultPrimaryFolderPathUseCase,
     private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
     private val setVideoCompressionSizeLimitUseCase: SetVideoCompressionSizeLimitUseCase,
+    private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
 ) {
 
     /**
@@ -53,7 +55,7 @@ class EnableCameraUploadsInPhotosUseCase @Inject constructor(
         setUploadVideoQualityUseCase(videoUploadQuality)
         setChargingRequiredForVideoCompressionUseCase(true)
         setVideoCompressionSizeLimitUseCase(videoCompressionSizeLimit)
-        cameraUploadRepository.setCameraUploadsEnabled(true)
+        setupCameraUploadsSettingUseCase(isEnabled = true)
         listenToNewMediaUseCase()
     }
 }

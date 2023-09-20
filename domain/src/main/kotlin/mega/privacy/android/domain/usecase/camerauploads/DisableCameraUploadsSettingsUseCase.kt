@@ -1,21 +1,21 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
 /**
- * Disable the camera uploads settings
+ * Disable the camera uploads and media uploads settings
  *
  */
 class DisableCameraUploadsSettingsUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase,
+    private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
 ) {
 
     /**
      * Disable the camera uploads settings
      */
     suspend operator fun invoke() {
-        cameraUploadRepository.setCameraUploadsEnabled(false)
-        cameraUploadRepository.setSecondaryEnabled(false)
+        setupCameraUploadsSettingUseCase(isEnabled = false)
+        setupMediaUploadsSettingUseCase(isEnabled = false)
     }
 }

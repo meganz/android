@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import javax.inject.Inject
 
 /**
@@ -8,10 +8,10 @@ import javax.inject.Inject
  *
  */
 class DefaultDisableMediaUploadSettings @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase
 ) : DisableMediaUploadSettings {
 
     override suspend fun invoke() {
-        cameraUploadRepository.setSecondaryEnabled(false)
+        setupMediaUploadsSettingUseCase(isEnabled = false)
     }
 }

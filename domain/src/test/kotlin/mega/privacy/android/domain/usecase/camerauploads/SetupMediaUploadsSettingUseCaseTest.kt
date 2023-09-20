@@ -14,15 +14,16 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 /**
- * Test class for [SetupMediaUploadSettingUseCase]
+ * Test class for [SetupMediaUploadsSettingUseCase]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SetupMediaUploadSettingUseCaseTest {
+class SetupMediaUploadsSettingUseCaseTest {
 
-    private lateinit var underTest: SetupMediaUploadSettingUseCase
+    private lateinit var underTest: SetupMediaUploadsSettingUseCase
 
     private val cameraUploadRepository: CameraUploadRepository = mock()
     private val setupMediaUploadsBackupUseCase: SetupMediaUploadsBackupUseCase = mock()
@@ -30,7 +31,7 @@ class SetupMediaUploadSettingUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = SetupMediaUploadSettingUseCase(
+        underTest = SetupMediaUploadsSettingUseCase(
             cameraUploadRepository = cameraUploadRepository,
             setupMediaUploadsBackupUseCase = setupMediaUploadsBackupUseCase,
             removeBackupFolderUseCase = removeBackupFolderUseCase
@@ -48,12 +49,13 @@ class SetupMediaUploadSettingUseCaseTest {
 
     @ParameterizedTest(name = "with {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that media upload setting is set when invoked`(isEnabled: Boolean) = runTest {
-        val mediaUploadName = "Media Uploads"
-        underTest(isEnabled, mediaUploadName)
+    fun `test that media uploads setting is set when invoked`(isEnabled: Boolean) = runTest {
+        val mediaUploadsName = "Media Uploads"
+        whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(mediaUploadsName)
+        underTest(isEnabled)
         verify(cameraUploadRepository).setSecondaryEnabled(isEnabled)
         if (isEnabled) {
-            verify(setupMediaUploadsBackupUseCase).invoke(mediaUploadName)
+            verify(setupMediaUploadsBackupUseCase).invoke(mediaUploadsName)
             verifyNoInteractions(removeBackupFolderUseCase)
         } else {
             verify(removeBackupFolderUseCase).invoke(CameraUploadFolderType.Secondary)
