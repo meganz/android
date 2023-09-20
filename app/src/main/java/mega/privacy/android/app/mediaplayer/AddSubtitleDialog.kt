@@ -65,12 +65,9 @@ fun AddSubtitleDialog(
         mutableStateOf<SubtitleFileInfo?>(null)
     }
 
-    LaunchedEffect(Unit) {
-        subtitleFileInfo = matchedSubtitleFileUpdate()
-    }
-
     LaunchedEffect(isShown) {
         if (isShown) {
+            subtitleFileInfo = matchedSubtitleFileUpdate()
             Analytics.tracker.trackEvent(AddSubtitleDialogEvent)
         }
     }
