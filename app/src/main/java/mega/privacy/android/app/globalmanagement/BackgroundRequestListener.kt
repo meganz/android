@@ -181,7 +181,11 @@ class BackgroundRequestListener @Inject constructor(
             transfersManagement.checkResumedPendingTransfers()
             applicationScope.launch {
                 // Init CU sync data after login successfully
-                initializeBackupsUseCase()
+                runCatching {
+                    initializeBackupsUseCase()
+                }.onFailure {
+                    Timber.e(it)
+                }
                 scheduleCameraUploadUseCase()
             }
         }
