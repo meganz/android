@@ -23,7 +23,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">업데이트 중&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Updating&#8230;</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% 업데이트 중...</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">카메라 업로드 없음</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
@@ -53,7 +53,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">정보</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_backups"></string>
+    <string name="device_center_bottom_sheet_item_show_in_backups">백업에서 보기</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">클라우드 드라이브에서 보기</string>
 </resources>

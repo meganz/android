@@ -247,7 +247,7 @@
     <!-- When the file/folder was last modified -->
     <string name="file_properties_info_last_modified">最後修改</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
-    <string name="file_properties_info_added">上傳時間</string>
+    <string name="file_properties_info_added">新增時間</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">權限</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
@@ -2858,9 +2858,9 @@
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">無法更改傳輸「%1$s」的優先順序</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">各別發送解密金鑰</string>
+    <string name="option_send_decryption_key_separately">單獨發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">各別匯出連結與解密金鑰。</string>
+    <string name="explanation_send_decryption_key_separately">單獨匯出連結與解密金鑰。</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">瞭解更多</string>
     <!-- Label key referring to a link decryption key -->
@@ -4489,7 +4489,7 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="other">您與之共享這些連結的人將失去這些相簿的存取權限。</item>
+        <item quantity="other">與您共享這些連結的人將無法存取相簿。</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -4828,9 +4828,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">會議事件已更新</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密技術來保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您驗證您與之共享資訊，或從之接收資料的聯絡人。</string>
+    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您驗證您與之共享資訊，或從之接收資料的聯絡人。</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相符。您可以要求對方分享他們的憑證給您。</string>
+    <string name="contact_approve_credentials_contact_verify_description">要驗證您的聯絡人，請確認您在上面看到的憑證與他們的帳戶憑證相符。您可以要求他們與您共享他們的憑證。</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">驗證</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4883,7 +4883,8 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">查看等候室</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="other">%1$d個與會者正在等待加入通話</item>
+        <item quantity="one">%1$d participant is waiting to join the call.</item>
+        <item quantity="other">%1$d participants are waiting to join the call.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">是否拒絕%1$s進入？</string>
@@ -4918,7 +4919,7 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">原始檔</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
+    <string name="settings_media_discovery_sub_folder_title">Media discovery in subfolders</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
     <!-- Description text in empty search screen when no search results found -->
@@ -4933,4 +4934,10 @@
     <string name="search_empty_screen_no_documents">No documents</string>
     <!-- Description text cloud drive screen when no items are available in cloud drive -->
     <string name="cloud_drive_empty_screen_message">雲端硬碟是空的</string>
+    <!-- Button text from verify credentials screen when contact is not verified -->
+    <string name="contact_verify_credentials_mark_as_verified_text">標記為已驗證</string>
+    <!-- Description text from contact info screen when contact is verified -->
+    <string name="contact_verify_credentials_verified_text">已驗證</string>
+    <!-- Description text from contact info screen when contact is not verified -->
+    <string name="contact_verify_credentials_not_verified_text">未驗證</string>
 </resources>

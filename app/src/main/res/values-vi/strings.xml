@@ -4883,8 +4883,8 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Xem phòng chờ</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d participant is waiting to join the call</item>
-        <item quantity="other">%1$d participants are waiting to join the call</item>
+        <item quantity="one">%1$d participant is waiting to join the call.</item>
+        <item quantity="other">%1$d participants are waiting to join the call.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Deny %1$s entry?</string>
@@ -4921,7 +4921,7 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Nguyên gốc</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
+    <string name="settings_media_discovery_sub_folder_title">Media discovery in subfolders</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
     <!-- Description text in empty search screen when no search results found -->
@@ -4936,4 +4936,10 @@
     <string name="search_empty_screen_no_documents">No documents</string>
     <!-- Description text cloud drive screen when no items are available in cloud drive -->
     <string name="cloud_drive_empty_screen_message">Ổ&#160;Mây trống</string>
+    <!-- Button text from verify credentials screen when contact is not verified -->
+    <string name="contact_verify_credentials_mark_as_verified_text">Mark as verified</string>
+    <!-- Description text from contact info screen when contact is verified -->
+    <string name="contact_verify_credentials_verified_text">Đã xác thực</string>
+    <!-- Description text from contact info screen when contact is not verified -->
+    <string name="contact_verify_credentials_not_verified_text">Chưa có xác thực</string>
 </resources>

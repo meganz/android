@@ -4842,7 +4842,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">ในระหว่างการโทร ผู้เข้าร่วมที่เพิ่มจากผู้ที่ไม่ใช่ผู้จัดการประชุมจะไม่ถูกจัดให้อยู่ในห้องนั่งรอ</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">ผู้ติดต่อบางรายที่คุณแชร์ข้อมูลด้วยยังไม่ได้รับการตรวจสอบจากคุณ เพื่อความปลอดภัยมากยิ่งขึ้น เราขอแนะนำให้คุณตรวจสอบข้อมูลประจำตัวของพวกเขาในรายชื่อติดต่อ โดยแตะที่จุดสามจุดถัดจากรายชื่อติดต่อที่คุณต้องการตรวจสอบและแตะที่ข้อมูล</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">ลบผู้เข้าร่วม %1$d คนออกแล้ว</item>
@@ -4868,7 +4868,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">รอให้ผู้จัดการประชุมอนุญาตคุณเข้าร่วมก่อน</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s ถูกแชร์โดยผู้ติดต่อที่คุณยังไม่ได้รับการตรวจสอบ เพื่อความปลอดภัยมากยิ่งขึ้น เราขอแนะนำให้คุณตรวจสอบข้อมูลประจำตัวของพวกเขาในรายชื่อติดต่อ โดยแตะที่จุดสามจุดถัดจากรายชื่อติดต่อที่คุณต้องการตรวจสอบและแตะที่ข้อมูล</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">ไม่ต้องออก</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -4883,7 +4883,8 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">ดูห้องนั่งรอ</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="other">มีคนกำลังรอเข้าร่วมสายอยู่ %1$d คน</item>
+        <item quantity="one">%1$d participant is waiting to join the call.</item>
+        <item quantity="other">%1$d participants are waiting to join the call.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">ปฏิเสธไม่ให้ %1$s เข้าร่วมสายหรือไม่</string>
@@ -4918,19 +4919,25 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">ต้นฉบับ</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Subfolder media discovery</string>
+    <string name="settings_media_discovery_sub_folder_title">ให้โฟลเดอร์ย่อยแสดงในการค้นพบสื่อด้วย</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">หากคุณกำลังอยู่ในโฟลเดอร์หลัก คุณจะเห็นรูปภาพและวิดีโอจากโฟลเดอร์ย่อยในมุมมองการค้นพบสื่อด้วย</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">ไม่พบรายการค้นหา</string>
     <!-- Description text in empty search screen when images filter selected -->
-    <string name="search_empty_screen_no_images">No images</string>
+    <string name="search_empty_screen_no_images">ไม่มีรูปภาพ</string>
     <!-- Description text in empty search screen when audio filter selected -->
-    <string name="search_empty_screen_no_audio">No audio files</string>
+    <string name="search_empty_screen_no_audio">ไม่มีไฟล์เสียง</string>
     <!-- Description text in empty search screen when video filter selected -->
-    <string name="search_empty_screen_no_video">No video files</string>
+    <string name="search_empty_screen_no_video">ไม่มีไฟล์วิดีโอ</string>
     <!-- Description text in empty search screen when documents filter selected -->
-    <string name="search_empty_screen_no_documents">No documents</string>
+    <string name="search_empty_screen_no_documents">ไม่มีไฟล์เอกสาร</string>
     <!-- Description text cloud drive screen when no items are available in cloud drive -->
     <string name="cloud_drive_empty_screen_message">คลาวด์ไดร์ฟนี้ว่างเปล่า</string>
+    <!-- Button text from verify credentials screen when contact is not verified -->
+    <string name="contact_verify_credentials_mark_as_verified_text">ทำเครื่องหมายว่าตรวจสอบแล้ว</string>
+    <!-- Description text from contact info screen when contact is verified -->
+    <string name="contact_verify_credentials_verified_text">ตรวจสอบแล้ว</string>
+    <!-- Description text from contact info screen when contact is not verified -->
+    <string name="contact_verify_credentials_not_verified_text">ไม่ผ่านการตรวจสอบ</string>
 </resources>

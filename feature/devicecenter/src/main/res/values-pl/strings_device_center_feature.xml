@@ -53,7 +53,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">Info</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_backups"></string>
+    <string name="device_center_bottom_sheet_item_show_in_backups">Show in BackupsPokaż w kopiach zapasowych</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Pokaż na dysku w chmurze</string>
+    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Pokaż na Dysku w chmurze</string>
 </resources>

@@ -2714,9 +2714,9 @@
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">本人確認証明</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">検証されていません</string>
+    <string name="label_not_verified">認証されていません</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">検証済み</string>
+    <string name="label_verified">認証済み</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">認証資格情報</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3834,9 +3834,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未復号フォルダ]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">共有フォルダにアクセスするには、あなたと共有した人もあなたを承認する必要があります。</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">共有フォルダにアクセスするには、あなたと共有した人もあなたを認証する必要があります。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを承認</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを認証</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">プレビュー用にファイルを準備しています</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4832,9 +4832,9 @@
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">連絡先を認証するには、上記の認証情報がアカウントの認証情報と一致していることを確認してください。連絡先に認証情報を共有するように依頼できます。</string>
     <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">確認する</string>
+    <string name="contact_approve_credentials_button_text">認証する</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">認証情報の検証</string>
+    <string name="contact_approve_credentials_toolbar_title">認証情報の認証</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">待合室</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -4854,9 +4854,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">音声ファイルへのアクセスを許可する</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">検証済み</string>
+    <string name="contact_approve_credentials_approved_text">認証済み</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">検証されていません</string>
+    <string name="contact_approve_credentials_not_approved_text">認証されていません</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">ズームイン</string>
     <!-- Photos action menu zoom out -->
@@ -4868,7 +4868,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">主催者が参加を許可するまでお待ちください</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%sは、あなたが認証していない連絡先によって共有されています。セキュリティをさらに強化するために、連絡先で認証情報を認証することをお勧めします。認証したい連絡先の横にある三点をタップして、「情報」をタップします。</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">退室しない</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -4883,7 +4883,7 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">待合室を見る</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="other">%1$d人の参加者が通話への参加を待っています</item>
+        <item quantity="other">%1$d人の参加者が通話への参加を待っています。</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">%1$sさんの入室を拒否しますか？</string>
@@ -4918,7 +4918,7 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">オリジナル</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">サブフォルダメディアディスカバリー</string>
+    <string name="settings_media_discovery_sub_folder_title">サブフォルダ内のメディアディスカバリー</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_context">メインフォルダがメディアディスカバリービューにある場合、サブフォルダの画像と動画もメディアディスカバリービューに含まれます。</string>
     <!-- Description text in empty search screen when no search results found -->
@@ -4933,4 +4933,10 @@
     <string name="search_empty_screen_no_documents">ドキュメントがありません</string>
     <!-- Description text cloud drive screen when no items are available in cloud drive -->
     <string name="cloud_drive_empty_screen_message">クラウドドライブが空です</string>
+    <!-- Button text from verify credentials screen when contact is not verified -->
+    <string name="contact_verify_credentials_mark_as_verified_text">認証済みとしてマークする</string>
+    <!-- Description text from contact info screen when contact is verified -->
+    <string name="contact_verify_credentials_verified_text">認証済み</string>
+    <!-- Description text from contact info screen when contact is not verified -->
+    <string name="contact_verify_credentials_not_verified_text">認証されていません</string>
 </resources>
