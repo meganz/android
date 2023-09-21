@@ -14,7 +14,6 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
-import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import org.mockito.kotlin.mock
 
@@ -26,7 +25,6 @@ import org.mockito.kotlin.mock
 object TestWrapperModule {
 
     val getFullPathWrapper = mock<GetFullPathFileWrapper>()
-    val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
     val permissionUtilWrapper = mock<PermissionUtilWrapper>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
@@ -34,10 +32,6 @@ object TestWrapperModule {
 
     @Provides
     fun provideGetFullPathFileWrapper(): GetFullPathFileWrapper = getFullPathWrapper
-
-    @Provides
-    fun provideCameraUploadSyncManagerWrapper(): CameraUploadSyncManagerWrapper =
-        cameraUploadSyncManagerWrapper
 
     @Provides
     fun providePermissionUtilWrapper(): PermissionUtilWrapper = permissionUtilWrapper

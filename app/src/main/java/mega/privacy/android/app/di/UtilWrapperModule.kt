@@ -18,7 +18,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
@@ -38,11 +37,9 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
-import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.feature.sync.data.service.ApplicationLoggingInSetter
 import org.webrtc.Camera1Enumerator
@@ -84,18 +81,6 @@ abstract class UtilWrapperModule {
                 }
             }
         }
-
-        @Provides
-        fun provideCameraUploadSyncManagerWrapper(): CameraUploadSyncManagerWrapper =
-            object : CameraUploadSyncManagerWrapper {
-                override fun doRegularHeartbeat() = CameraUploadSyncManager.doRegularHeartbeat()
-
-                override fun updatePrimaryFolderBackupState(backupState: BackupState) =
-                    CameraUploadSyncManager.updatePrimaryFolderBackupState(backupState)
-
-                override fun updateSecondaryFolderBackupState(backupState: BackupState) =
-                    CameraUploadSyncManager.updateSecondaryFolderBackupState(backupState)
-            }
 
         @Provides
         fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =
