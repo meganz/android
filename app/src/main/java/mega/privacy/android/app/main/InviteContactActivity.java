@@ -469,7 +469,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private void showEmptyTextView() {
         Timber.d("showEmptyTextView");
-        String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
+        String textToShow = getString(R.string.context_empty_contacts);
         try {
             textToShow = textToShow.replace(
                     "[A]", "<font color=\'"

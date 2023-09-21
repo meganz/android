@@ -92,7 +92,6 @@ private fun NotificationEmptyView(modifier: Modifier) {
             modifier = modifier,
             imageBitmap = ImageBitmap.imageResource(id = emptyImgResId),
             text = context.getString(R.string.context_empty_notifications)
-                .uppercase(Locale.getDefault())
                 .formatColorTag(context, 'A', R.color.grey_900_grey_100)
                 .formatColorTag(context, 'B', R.color.grey_300_grey_600)
                 .toSpannedHtmlText()

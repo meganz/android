@@ -369,7 +369,7 @@ internal fun SubtitleEmptyView(
                 } else {
                     R.string.media_player_video_select_subtitle_file_empty_message
                 }
-            ).uppercase(),
+            ),
             color = colorResource(id = R.color.grey_300)
         )
     }

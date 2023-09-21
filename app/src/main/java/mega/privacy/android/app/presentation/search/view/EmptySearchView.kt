@@ -25,24 +25,29 @@ import mega.privacy.android.core.ui.theme.grey_600
 
 @Composable
 fun EmptySearchView() {
-    Column(modifier = Modifier
-        .fillMaxWidth(),
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally) {
         val isPortrait =
             LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 
         Spacer(modifier = Modifier.height(if (isPortrait) 200.dp else 100.dp))
 
-        Image(painter = painterResource(id = R.drawable.ic_empty_search),
+        Image(
+            painter = painterResource(id = R.drawable.ic_empty_search),
             contentDescription = "Empty search image",
-            alpha = if (MaterialTheme.colors.isLight) 1f else 0.16f)
+            alpha = if (MaterialTheme.colors.isLight) 1f else 0.16f
+        )
 
         Spacer(modifier = Modifier.height(29.dp))
 
-        Text(modifier = Modifier.padding(11.dp),
-            text = stringResource(id = R.string.no_results_found).uppercase(),
+        Text(
+            modifier = Modifier.padding(11.dp),
+            text = stringResource(id = R.string.no_results_found),
             style = MaterialTheme.typography.subtitle2,
-            color = if (MaterialTheme.colors.isLight) grey_300 else grey_600)
+            color = if (MaterialTheme.colors.isLight) grey_300 else grey_600
+        )
 
         Spacer(modifier = Modifier.height(50.dp))
     }

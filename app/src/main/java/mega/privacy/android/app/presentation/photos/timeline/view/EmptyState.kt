@@ -92,7 +92,7 @@ fun EmptyState(
 
                     FilterMediaType.VIDEOS ->
                         stringResource(id = R.string.timeline_empty_videos)
-                }.uppercase()
+                }
 
                 Text(
                     text = text.substring(0, text.indexOf(placeHolderStart)),

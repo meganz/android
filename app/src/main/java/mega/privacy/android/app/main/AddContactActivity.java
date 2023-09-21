@@ -1073,7 +1073,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (queryPermissions && filteredContactsPhone != null) {
             if (filteredContactsPhone.size() == 0) {
                 showHeader(false);
-                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
+                String textToShow = String.format(getString(R.string.context_empty_contacts));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'"
                             + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
@@ -1156,7 +1156,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             recyclerViewList.setAdapter(adapterMEGA);
 
             if (adapterMEGA.getItemCount() == 0) {
-                String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
+                String textToShow = getString(R.string.context_empty_contacts);
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'"
                             + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
@@ -1199,7 +1199,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
 
         if (adapterShareHeader.getItemCount() == 0) {
-            String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
+            String textToShow = String.format(getString(R.string.context_empty_contacts));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'"
                         + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
@@ -2017,7 +2017,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             if (adapterShareHeader.getItemCount() == 0) {
                 setEmptyStateVisibility(true);
 
-                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
+                String textToShow = String.format(getString(R.string.context_empty_contacts));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'"
                             + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
@@ -2088,7 +2088,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 showHeader(false);
                 setEmptyStateVisibility(true);
 
-                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
+                String textToShow = String.format(getString(R.string.context_empty_contacts));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'"
                             + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
@@ -2147,7 +2147,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 showHeader(false);
                 setEmptyStateVisibility(true);
 
-                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
+                String textToShow = String.format(getString(R.string.context_empty_contacts));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'"
                             + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)

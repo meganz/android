@@ -392,7 +392,7 @@ private fun SelectLocationDialog(
                     Spacer(modifier = Modifier.size(4.dp))
                 }
                 Text(
-                    text = stringResource(id = R.string.button_cancel).uppercase(),
+                    text = stringResource(id = R.string.button_cancel),
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(top = 8.dp, end = 16.dp, bottom = 16.dp)

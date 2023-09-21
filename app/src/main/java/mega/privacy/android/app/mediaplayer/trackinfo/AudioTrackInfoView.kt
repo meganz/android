@@ -292,7 +292,7 @@ fun AudioNodeInfoView(
         )
 
         Text(
-            text = stringResource(id = R.string.file_properties_info_size_file).uppercase(),
+            text = stringResource(id = R.string.file_properties_info_size_file),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.grey_087_white),
@@ -309,7 +309,7 @@ fun AudioNodeInfoView(
         )
 
         Text(
-            text = stringResource(id = R.string.file_properties_info_location).uppercase(),
+            text = stringResource(id = R.string.file_properties_info_location),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.grey_087_white),
@@ -317,7 +317,7 @@ fun AudioNodeInfoView(
         )
 
         Text(
-            text = (locationValue?.location ?: "").uppercase(),
+            text = (locationValue?.location ?: ""),
             fontSize = 14.sp,
             color = colorResource(R.color.teal_300),
             modifier = Modifier
@@ -329,7 +329,7 @@ fun AudioNodeInfoView(
         )
 
         Text(
-            text = stringResource(id = R.string.file_properties_info_added).uppercase(),
+            text = stringResource(id = R.string.file_properties_info_added),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.grey_087_white),
@@ -346,7 +346,7 @@ fun AudioNodeInfoView(
         )
 
         Text(
-            text = stringResource(id = R.string.file_properties_info_last_modified).uppercase(),
+            text = stringResource(id = R.string.file_properties_info_last_modified),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.grey_087_white),

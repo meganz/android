@@ -180,7 +180,7 @@ fun EnableCU(
             )
         ) {
             Text(
-                text = stringResource(id = R.string.general_enable).uppercase(),
+                text = stringResource(id = R.string.general_enable),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp,
