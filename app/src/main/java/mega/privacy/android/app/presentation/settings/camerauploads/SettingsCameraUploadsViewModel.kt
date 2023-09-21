@@ -26,6 +26,8 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase
+import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -149,6 +151,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase,
     private val setupCameraUploadsSyncHandleUseCase: SetupCameraUploadsSyncHandleUseCase,
     monitorBackupInfoTypeUseCase: MonitorBackupInfoTypeUseCase,
+    private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase,
+    private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -682,6 +686,40 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun setInvalidCameraUploadsHandle() {
         viewModelScope.launch {
             setupCameraUploadsSyncHandleUseCase(handle = -1L)
+        }
+    }
+
+    /**
+     * update Media Uploads Backup
+     * @param mediaUploadsFolderPath
+     */
+    fun updateMediaUploadsBackup(mediaUploadsFolderPath: String?) {
+        viewModelScope.launch {
+            runCatching {
+                setupOrUpdateMediaUploadsBackupUseCase(
+                    localFolder = mediaUploadsFolderPath,
+                    targetNode = null
+                )
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * update Camera Uploads Backup
+     * @param cameraUploadsFolderPath
+     */
+    fun updateCameraUploadsBackup(cameraUploadsFolderPath: String?) {
+        viewModelScope.launch {
+            runCatching {
+                setupOrUpdateCameraUploadsBackupUseCase(
+                    localFolder = cameraUploadsFolderPath,
+                    targetNode = null
+                )
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 }

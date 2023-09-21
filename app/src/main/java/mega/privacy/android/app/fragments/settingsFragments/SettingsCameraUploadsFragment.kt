@@ -67,8 +67,6 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryLocalFolder
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryLocalFolder
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -479,7 +477,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     rescheduleCameraUpload()
                 }
                 // Update Sync when the Primary Local Folder has changed
-                updatePrimaryLocalFolder(newPrimaryFolderPath)
+                viewModel.updateCameraUploadsBackup(newPrimaryFolderPath)
             }
 
             REQUEST_MEGA_CAMERA_FOLDER -> {
@@ -539,7 +537,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 viewModel.rescheduleCameraUpload()
 
                 // Update Sync when the Secondary Local Folder has changed
-                updateSecondaryLocalFolder(secondaryPath)
+                viewModel.updateMediaUploadsBackup(secondaryPath)
             }
 
             REQUEST_MEGA_SECONDARY_MEDIA_FOLDER -> {

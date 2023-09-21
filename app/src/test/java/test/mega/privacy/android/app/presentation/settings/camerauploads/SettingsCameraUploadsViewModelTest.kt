@@ -24,6 +24,8 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
+import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -119,6 +121,10 @@ class SettingsCameraUploadsViewModelTest {
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase = mock()
     private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase = mock()
     private val setupCameraUploadsSyncHandleUseCase: SetupCameraUploadsSyncHandleUseCase = mock()
+    private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase =
+        mock()
+    private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase =
+        mock()
 
     @Before
     fun setUp() {
@@ -179,7 +185,9 @@ class SettingsCameraUploadsViewModelTest {
             setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
             setupMediaUploadsSettingUseCase = setupMediaUploadsSettingUseCase,
             setupCameraUploadsSyncHandleUseCase = setupCameraUploadsSyncHandleUseCase,
-            monitorBackupInfoTypeUseCase = mock()
+            monitorBackupInfoTypeUseCase = mock(),
+            setupOrUpdateCameraUploadsBackupUseCase = setupOrUpdateCameraUploadsBackupUseCase,
+            setupOrUpdateMediaUploadsBackupUseCase = setupOrUpdateMediaUploadsBackupUseCase,
         )
     }
 
@@ -755,5 +763,29 @@ class SettingsCameraUploadsViewModelTest {
             verify(setupDefaultSecondaryFolderUseCase).invoke(mediaUploadsName)
             verify(restoreSecondaryTimestamps).invoke()
             verify(setupMediaUploadsSettingUseCase).invoke(true)
+        }
+
+    @Test
+    fun `test that camera uploads backup is updated when updateCameraUploadsLocalFolder is invoked`() =
+        runTest {
+            setupUnderTest()
+            val cameraUploadsFolderPath = "/path/to/camera uploads"
+            underTest.updateCameraUploadsBackup(cameraUploadsFolderPath)
+            verify(setupOrUpdateCameraUploadsBackupUseCase).invoke(
+                localFolder = cameraUploadsFolderPath,
+                targetNode = null
+            )
+        }
+
+    @Test
+    fun `test that media uploads backup is updated when updateMediaUploadsLocalFolder is invoked`() =
+        runTest {
+            setupUnderTest()
+            val mediaUploadsFolderPath = "/path/to/media uploads"
+            underTest.updateMediaUploadsBackup(mediaUploadsFolderPath)
+            verify(setupOrUpdateMediaUploadsBackupUseCase).invoke(
+                localFolder = mediaUploadsFolderPath,
+                targetNode = null
+            )
         }
 }
