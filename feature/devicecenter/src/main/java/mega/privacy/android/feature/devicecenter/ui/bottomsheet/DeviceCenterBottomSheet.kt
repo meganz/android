@@ -9,7 +9,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +28,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 
@@ -76,16 +76,12 @@ internal fun DeviceCenterBottomSheet(
             MenuActionNodeHeaderWithBody(
                 modifier = Modifier.testTag(BOTTOM_SHEET_HEADER),
                 title = selectedNode.name,
-                body = stringResource(selectedNode.status.name),
+                body = getStatusText(selectedNode.status),
                 nodeIcon = selectedNode.icon.iconRes,
                 bodyIcon = selectedNode.status.icon,
-                bodyColor = selectedNode.status.color ?: MaterialTheme.colors.textColorSecondary,
-                bodyIconColor = selectedNode.status.color ?: Color.Unspecified,
-                nodeIconColor = if (selectedNode.icon.applySecondaryColorTint) {
-                    MaterialTheme.colors.textColorSecondary
-                } else {
-                    null
-                },
+                bodyColor = getStatusColor(selectedNode.status),
+                bodyIconColor = getStatusColor(selectedNode.status),
+                nodeIconColor = getNodeIconColor(selectedNode.icon),
             )
         },
         sheetBody = {
@@ -151,6 +147,45 @@ internal fun DeviceCenterBottomSheet(
         },
     )
 }
+
+/**
+ * Retrieves the Status Text to be displayed in [DeviceCenterBottomSheet]
+ *
+ * @param uiNodeStatus The [DeviceCenterUINodeStatus]
+ * @return The corresponding Status Text
+ */
+@Composable
+private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
+    if (uiNodeStatus is DeviceCenterUINodeStatus.SyncingWithPercentage) {
+        // Apply String Formatting for this UI Status
+        stringResource(uiNodeStatus.name, uiNodeStatus.progress)
+    } else {
+        stringResource(uiNodeStatus.name)
+    }
+
+/**
+ * Retrieves the Status Color to be applied in the Status Text and Icon of [DeviceCenterBottomSheet]
+ *
+ * @param uiNodeStatus The [DeviceCenterUINodeStatus]
+ * @return The corresponding Status Color
+ */
+@Composable
+private fun getStatusColor(uiNodeStatus: DeviceCenterUINodeStatus) =
+    uiNodeStatus.color ?: MaterialTheme.colors.textColorSecondary
+
+/**
+ * Retrieves the Color to be applied in the Node Icon of [DeviceCenterBottomSheet]
+ *
+ * @param uiNodeIcon The [DeviceCenterUINodeIcon]
+ * @return The corresponding Node Icon Color
+ */
+@Composable
+private fun getNodeIconColor(uiNodeIcon: DeviceCenterUINodeIcon) =
+    if (uiNodeIcon.applySecondaryColorTint) {
+        MaterialTheme.colors.textColorSecondary
+    } else {
+        null
+    }
 
 /**
  * A Preview Composable that displays the Bottom Sheet and its options
