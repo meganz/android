@@ -9,6 +9,7 @@ constraintlayout-compose = "1.0.1"
 compose-activity = "1.7.2"
 compose-bom = "2023.06.01"
 compose-compiler = "1.5.3"
+compose-material = "1.5.0-alpha01"
 compose-viewmodel = "2.6.1"
 datastore = "1.0.0"
 emoji = "1.1.0"
@@ -40,7 +41,7 @@ camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = 
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
-compose-material = { group = "androidx.compose.material", name = "material" }
+compose-material = { group = "androidx.compose.material", name = "material", version.ref = "compose-material" }
 compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewmodel" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
