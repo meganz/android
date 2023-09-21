@@ -90,6 +90,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.mobile.analytics.event.CreateAlbumDialogButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumConfirmButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumsConfirmationDialogEvent
@@ -389,7 +390,10 @@ fun AlbumsView(
                     setShowCreateAlbumDialog(false)
                     setInputValidity(true)
                 },
-                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
+                onDialogPositiveButtonClicked = {
+                    Analytics.tracker.trackEvent(CreateAlbumDialogButtonPressedEvent)
+                    onDialogPositiveButtonClicked(it)
+                },
                 onDialogInputChange = setInputValidity,
                 inputPlaceHolderText = { albumsViewState.createAlbumPlaceholderTitle },
                 errorMessage = albumsViewState.createDialogErrorMessage,

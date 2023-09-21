@@ -35,6 +35,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumContentViewModel
@@ -60,6 +61,8 @@ import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.mobile.analytics.event.DeleteAlbumsDialogButtonEvent
+import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
 
 @Deprecated(message = "In favor of mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentScreen")
 @OptIn(ExperimentalAnimationApi::class)
@@ -135,7 +138,10 @@ fun AlbumContentScreen(
         DeleteAlbumsConfirmationDialog(
             selectedAlbumIds = listOfNotNull(album?.id),
             onCancelClicked = albumsViewModel::closeDeleteAlbumsConfirmation,
-            onDeleteClicked = { albumContentViewModel.deleteAlbum() },
+            onDeleteClicked = {
+                Analytics.tracker.trackEvent(DeleteAlbumsDialogButtonEvent)
+                albumContentViewModel.deleteAlbum()
+            },
         )
     }
 
@@ -354,6 +360,7 @@ fun AlbumContentScreen(
                     }
                 },
                 onPositiveButtonClick = {
+                    Analytics.tracker.trackEvent(RemoveItemsFromAlbumDialogButtonEvent)
                     with(albumsViewModel) {
                         removePhotosFromAlbum()
                         clearSelectedPhotos()

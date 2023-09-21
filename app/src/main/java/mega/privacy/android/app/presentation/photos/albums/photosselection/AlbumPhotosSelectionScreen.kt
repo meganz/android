@@ -43,6 +43,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel.Companion.MAX_SELECTION_NUM
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
@@ -63,6 +64,8 @@ import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.mobile.analytics.event.AddItemsToExistingAlbumFABEvent
+import mega.privacy.mobile.analytics.event.AddItemsToNewAlbumFABEvent
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -156,6 +159,16 @@ fun AlbumPhotosSelectionScreen(
             if (album != null && photos.isNotEmpty() && (albumFlow == AlbumFlow.Creation || albumFlow == AlbumFlow.Addition && selectedPhotoIds.isNotEmpty())) {
                 FloatingActionButton(
                     onClick = {
+                        when (albumFlow) {
+                            AlbumFlow.Creation -> Analytics.tracker.trackEvent(
+                                AddItemsToNewAlbumFABEvent
+                            )
+
+                            AlbumFlow.Addition -> Analytics.tracker.trackEvent(
+                                AddItemsToExistingAlbumFABEvent
+                            )
+                        }
+
                         viewModel.addPhotos(
                             album = album,
                             selectedPhotoIds = state.selectedPhotoIds,
