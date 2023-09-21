@@ -1185,10 +1185,13 @@ class ChatUploadService : LifecycleService() {
             val fingerprint = getFingerprintUseCase(localPath)
             var msgNotFound = true
 
-            for (pendMsg in pendingMessages!!) {
-                if (pendMsg.id == id || pendMsg.fingerprint == fingerprint) {
-                    attach(pendMsg, transfer)
-                    msgNotFound = false
+            //Use an internal temp list in order to avoid `ConcurrentModificationException`
+            pendingMessages?.toList()?.let { pendingMessagesTempList ->
+                for (pendMsg in pendingMessagesTempList) {
+                    if (pendMsg.id == id || pendMsg.fingerprint == fingerprint) {
+                        attach(pendMsg, transfer)
+                        msgNotFound = false
+                    }
                 }
             }
 
