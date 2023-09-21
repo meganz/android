@@ -91,7 +91,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloa
 import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadBytesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadedBytesUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadsNonBackgroundUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedLegacyUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
@@ -213,7 +213,7 @@ internal class DownloadService : LifecycleService() {
     lateinit var resetTotalDownloadsUseCase: ResetTotalDownloadsUseCase
 
     @Inject
-    lateinit var getTotalDownloadsNonBackgroundUseCase: GetTotalDownloadsNonBackgroundUseCase
+    lateinit var getTotalDownloadsUseCase: GetTotalDownloadsUseCase
 
     @Inject
     lateinit var getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase
@@ -689,7 +689,7 @@ internal class DownloadService : LifecycleService() {
         if (pendingDownloads <= 0) {
             Timber.d("onQueueComplete: reset total downloads")
             // When download a single file by tapping it, and auto play is enabled.
-            val totalDownloads = getTotalDownloadsNonBackgroundUseCase()
+            val totalDownloads = getTotalDownloadsUseCase() - backgroundTransfers.size
             if (totalDownloads == 1 && autoPlayInfo != null && downloadForPreview) {
                 // If the file is Microsoft file, send the corresponding broadcast
                 TransfersFinishedState(
@@ -794,7 +794,7 @@ internal class DownloadService : LifecycleService() {
         Timber.d("showCompleteNotification")
         val notificationTitle: String
         val size: String
-        val totalDownloads = getTotalDownloadsNonBackgroundUseCase()
+        val totalDownloads = getTotalDownloadsUseCase() - backgroundTransfers.size
         if (alreadyDownloaded > 0 && errorCount > 0) {
             val totalNumber = totalDownloads + errorCount + alreadyDownloaded
             notificationTitle =
@@ -1190,7 +1190,7 @@ internal class DownloadService : LifecycleService() {
         // make sure app running to avoid DeadSystemException when show notification
         coroutineContext.ensureActive()
         val pendingTransfers = getNumPendingDownloadsNonBackgroundUseCase()
-        val totalTransfers = getTotalDownloadsNonBackgroundUseCase()
+        val totalTransfers = getTotalDownloadsUseCase() - backgroundTransfers.size
         val totalSizePendingTransfer = getTotalDownloadBytesUseCase()
         val totalSizeTransferred = getTotalDownloadedBytesUseCase()
         val update: Boolean

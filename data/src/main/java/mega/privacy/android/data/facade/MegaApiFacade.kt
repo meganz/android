@@ -1407,4 +1407,11 @@ internal class MegaApiFacade @Inject constructor(
     )
     override val totalDownloadBytes: Long
         get() = megaApi.totalDownloadBytes
+
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
+    override val totalDownloads: Int
+        get() = megaApi.totalDownloads
 }
