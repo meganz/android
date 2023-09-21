@@ -453,13 +453,6 @@ interface TransferRepository {
     suspend fun getCompletedTransferById(id: Int): CompletedTransfer?
 
     /**
-     * Get total downloads non background
-     *
-     * @return The number of total downloads without the background ones.
-     */
-    suspend fun getTotalDownloadsNonBackground(): Int
-
-    /**
      * Get current download speed.
      *
      * @return Current download speed.
@@ -471,6 +464,10 @@ interface TransferRepository {
      *
      * @return Current downloaded bytes.
      */
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
     suspend fun getTotalDownloadedBytes(): Long
 
     /**
@@ -478,5 +475,20 @@ interface TransferRepository {
      *
      * @return Current download bytes.
      */
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
     suspend fun getTotalDownloadBytes(): Long
+
+    /**
+     * Get total downloads
+     *
+     * @return Total downloads.
+     */
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
+    suspend fun getTotalDownloads(): Int
 }

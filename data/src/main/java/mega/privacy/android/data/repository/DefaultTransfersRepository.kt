@@ -599,22 +599,31 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.getCompletedTransferById(id)
     }
 
-    override suspend fun getTotalDownloadsNonBackground() = withContext(ioDispatcher) {
-        getDownloadTransfers().count { transfer -> !transfer.isBackgroundTransfer() }
-    }
-
     override suspend fun getCurrentDownloadSpeed() = withContext(ioDispatcher) {
         megaApiGateway.currentDownloadSpeed
     }
 
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
     override suspend fun getTotalDownloadedBytes() = withContext(ioDispatcher) {
         megaApiGateway.totalDownloadedBytes
     }
 
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
     override suspend fun getTotalDownloadBytes() = withContext(ioDispatcher) {
         megaApiGateway.totalDownloadBytes
     }
 
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
+    override suspend fun getTotalDownloads() = megaApiGateway.totalDownloads
 
     private val transferredBytesFlowMutex = Mutex()
     private suspend fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Int, Long>> {

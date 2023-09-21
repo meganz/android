@@ -16,16 +16,16 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetTotalDownloadsNonBackgroundUseCaseTest {
+class GetTotalDownloadsUseCaseTest {
 
-    private lateinit var underTest: GetTotalDownloadsNonBackgroundUseCase
+    private lateinit var underTest: GetTotalDownloadsUseCase
 
     private lateinit var transferRepository: TransferRepository
 
     @BeforeAll
     fun setup() {
         transferRepository = mock()
-        underTest = GetTotalDownloadsNonBackgroundUseCase(transferRepository)
+        underTest = GetTotalDownloadsUseCase(transferRepository)
     }
 
     @AfterAll
@@ -38,7 +38,7 @@ class GetTotalDownloadsNonBackgroundUseCaseTest {
     fun `test that GetTotalDownloadsNonBackgroundUseCase returns correctly if`(
         total: Int,
     ) = runTest {
-        whenever(transferRepository.getTotalDownloadsNonBackground()).thenReturn(total)
+        whenever(transferRepository.getTotalDownloads()).thenReturn(total)
         Truth.assertThat(underTest()).isEqualTo(total)
     }
 }

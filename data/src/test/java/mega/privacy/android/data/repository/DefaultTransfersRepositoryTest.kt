@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -1030,25 +1029,13 @@ class DefaultTransfersRepositoryTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class DownloadCountersTest {
 
-        @ParameterizedTest(name = " total downloads is {0} and background downloads is {1}")
-        @MethodSource("provideTotalDownloadsParameters")
-        fun `test that getTotalDownloadsNonBackground returns correctly if`(
+        @ParameterizedTest(name = " total downloads is {0}")
+        @ValueSource(ints = [0, 7, 200])
+        fun `test that getTotalDownloads returns correctly if`(
             downloads: Int,
-            downloadsNonBackground: Int,
         ) = runTest {
-            val list = mutableListOf<MegaTransfer>()
-            for (i in 1..downloads) {
-                list.add(if (i <= downloadsNonBackground) {
-                    mock {
-                        on { appData }.thenReturn(APP_DATA_BACKGROUND_TRANSFER)
-                    }
-                } else {
-                    mock()
-                })
-            }
-            whenever(megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD)).thenReturn(list)
-            assertThat(underTest.getTotalDownloadsNonBackground())
-                .isEqualTo(downloads - downloadsNonBackground)
+            whenever(megaApiGateway.totalDownloads).thenReturn(downloads)
+            assertThat(underTest.getTotalDownloads()).isEqualTo(downloads)
         }
 
         @ParameterizedTest(name = " megaApi call returns {0}")

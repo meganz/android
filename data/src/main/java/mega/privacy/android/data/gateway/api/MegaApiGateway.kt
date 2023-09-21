@@ -3020,4 +3020,13 @@ interface MegaApiGateway {
                 "Replace with the corresponding value get from ActiveTransfers when ready"
     )
     val totalDownloadBytes: Long
+
+    /**
+     * Total downloads
+     */
+    @Deprecated(
+        "This value is deprecated in SDK. " +
+                "Replace with the corresponding value get from ActiveTransfers when ready"
+    )
+    val totalDownloads: Int
 }
