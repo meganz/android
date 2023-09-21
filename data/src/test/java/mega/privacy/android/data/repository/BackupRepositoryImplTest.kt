@@ -71,7 +71,6 @@ internal class BackupRepositoryImplTest {
             megaLocalStorageGateway = megaLocalStorageGateway,
             backupInfoTypeIntMapper = backupInfoTypeIntMapper,
             backupStateIntMapper = backupStateIntMapper,
-            context = mock()
         )
     }
 

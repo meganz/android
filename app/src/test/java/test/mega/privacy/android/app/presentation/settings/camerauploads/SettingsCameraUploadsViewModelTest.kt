@@ -179,6 +179,7 @@ class SettingsCameraUploadsViewModelTest {
             setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
             setupMediaUploadsSettingUseCase = setupMediaUploadsSettingUseCase,
             setupCameraUploadsSyncHandleUseCase = setupCameraUploadsSyncHandleUseCase,
+            monitorBackupInfoTypeUseCase = mock()
         )
     }
 

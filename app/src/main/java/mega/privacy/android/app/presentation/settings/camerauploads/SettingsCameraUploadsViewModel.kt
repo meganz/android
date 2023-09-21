@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
+import mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -147,6 +148,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
     private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase,
     private val setupCameraUploadsSyncHandleUseCase: SetupCameraUploadsSyncHandleUseCase,
+    monitorBackupInfoTypeUseCase: MonitorBackupInfoTypeUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -165,6 +167,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Monitor Camera Upload Settings Actions
      */
     val monitorCameraUploadsSettingsActions = monitorCameraUploadsSettingsActionsUseCase()
+
+    /**
+     * Monitor Backup Info Type
+     */
+    val monitorBackupInfoType = monitorBackupInfoTypeUseCase()
 
     /**
      * Is connected

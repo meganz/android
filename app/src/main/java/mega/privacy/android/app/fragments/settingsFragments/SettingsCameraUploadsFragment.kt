@@ -81,6 +81,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasAccessMediaLocationPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import nz.mega.sdk.MegaApiJava
@@ -635,6 +636,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     CameraUploadsSettingsAction.DisableMediaUploads -> disableMediaUploadUIProcess()
                     CameraUploadsSettingsAction.RefreshSettings -> refreshCameraUploadsSettings()
                 }
+            }
+            collectFlow(viewModel.monitorBackupInfoType) {
+                reEnableCameraUploadsPreference(it)
             }
         }
     }
@@ -1471,9 +1475,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      *
      * @param which [MegaApiJava] that specifies which part of Camera Uploads is enabled
      */
-    fun reEnableCameraUploadsPreference(which: Int) {
+    private fun reEnableCameraUploadsPreference(which: BackupInfoType) {
         when (which) {
-            MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS -> {
+            BackupInfoType.CAMERA_UPLOADS -> {
                 Timber.d("${cameraUploadOnOff?.isEnabled}")
                 cameraUploadOnOff?.isEnabled = true
                 Timber.d("${optionLocalCameraFolder?.isEnabled}")
@@ -1488,7 +1492,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 megaSecondaryFolder?.isEnabled = true
             }
 
-            MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS -> {
+            BackupInfoType.MEDIA_UPLOADS -> {
                 Timber.d("${secondaryMediaFolderOn?.isEnabled}")
                 secondaryMediaFolderOn?.isEnabled = true
                 Timber.d("${localSecondaryFolder?.isEnabled}")
@@ -1496,6 +1500,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 Timber.d("${megaSecondaryFolder?.isEnabled}")
                 megaSecondaryFolder?.isEnabled = true
             }
+
+            else -> {}
         }
     }
 }

@@ -6,8 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
-import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment
 import mega.privacy.android.data.facade.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
 import mega.privacy.android.data.facade.BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
@@ -69,25 +67,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
         settingsFragment?.setCUDestinationFolder(isSecondaryFolder, handleInUserAttr)
     }
 
-    @Deprecated(
-        message = "Replace all usages with use case",
-        replaceWith = ReplaceWith("mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase")
-    )
-    private val reEnableCameraUploadsPreferenceReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent != null && intent.action.equals(BROADCAST_ACTION_REENABLE_CU_PREFERENCE) &&
-                settingsFragment != null
-            ) {
-                Timber.d("Re-Enable Camera Uploads Preference Event Received")
-                settingsFragment?.reEnableCameraUploadsPreference(
-                    intent.getIntExtra(
-                        KEY_REENABLE_WHICH_PREFERENCE, 0
-                    )
-                )
-            }
-        }
-    }
-
     /**
      * Set up the [BroadcastReceiver]s on Activity creation
      */
@@ -109,11 +88,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
             receiverCameraUploadsAttrChanged,
             IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE)
         )
-        registerReceiver(
-            reEnableCameraUploadsPreferenceReceiver, IntentFilter(
-                BROADCAST_ACTION_REENABLE_CU_PREFERENCE
-            )
-        )
     }
 
     /**
@@ -123,6 +97,5 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
         super.onDestroy()
         unregisterReceiver(cameraUploadsDestinationReceiver)
         unregisterReceiver(receiverCameraUploadsAttrChanged)
-        unregisterReceiver(reEnableCameraUploadsPreferenceReceiver)
     }
 }

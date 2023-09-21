@@ -1,8 +1,5 @@
 package mega.privacy.android.data.repository
 
-import android.content.Context
-import android.content.Intent
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -44,7 +41,6 @@ internal class BackupRepositoryImpl @Inject constructor(
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
     private val backupStateIntMapper: BackupStateIntMapper,
-    @ApplicationContext private val context: Context,
 ) : BackupRepository {
     override suspend fun getDeviceId() = withContext(ioDispatcher) {
         megaApiGateway.getDeviceId()
@@ -167,21 +163,10 @@ internal class BackupRepositoryImpl @Inject constructor(
     override fun monitorBackupInfoType() = appEventGateway.monitorBackupInfoType()
 
     override suspend fun broadCastBackupInfoType(backupInfoType: BackupInfoType) {
-        context.sendBroadcast(
-            Intent(BROADCAST_ACTION_REENABLE_CU_PREFERENCE).putExtra(
-                KEY_REENABLE_WHICH_PREFERENCE,
-                backupInfoTypeIntMapper(backupInfoType)
-            ).setPackage(context.packageName)
-        )
+        appEventGateway.broadCastBackupInfoType(backupInfoType)
     }
 
     override suspend fun saveBackup(backup: Backup) = withContext(ioDispatcher) {
         megaLocalStorageGateway.saveBackup(backup)
-    }
-
-    private companion object {
-        const val BROADCAST_ACTION_REENABLE_CU_PREFERENCE =
-            "BROADCAST_ACTION_REENABLE_CU_PREFERENCE"
-        const val KEY_REENABLE_WHICH_PREFERENCE = "REENABLE_WHICH_PREFERENCE"
     }
 }
