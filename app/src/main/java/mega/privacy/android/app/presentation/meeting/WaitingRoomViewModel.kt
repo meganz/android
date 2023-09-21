@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatLocalVideoUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.InitGuestChatSessionUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
+import mega.privacy.android.domain.usecase.chat.JoinChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.JoinGuestChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -75,6 +76,7 @@ import javax.inject.Inject
  * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
  * @property logoutUseCase                      [LogoutUseCase]
  * @property hangChatCallUseCase                [HangChatCallUseCase]
+ * @property joinChatCallUseCase                [JoinChatCallUseCase]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -99,7 +101,8 @@ class WaitingRoomViewModel @Inject constructor(
     private val isUserLoggedIn: IsUserLoggedIn,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val hangChatCallUseCase: HangChatCallUseCase
+    private val hangChatCallUseCase: HangChatCallUseCase,
+    private val joinChatCallUseCase: JoinChatCallUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WaitingRoomState())
@@ -149,27 +152,32 @@ class WaitingRoomViewModel @Inject constructor(
      */
     fun loadMeetingDetails(chatId: Long?, chatLink: String?) {
         viewModelScope.launch {
+            val userLoggedIn = isUserLoggedIn()
+
             _state.update {
                 it.copy(
                     chatId = chatId ?: -1L,
                     chatLink = chatLink,
-                    guestMode = !chatLink.isNullOrBlank() && !isUserLoggedIn(),
+                    guestMode = !chatLink.isNullOrBlank() && !userLoggedIn,
                 )
             }
 
             when {
-                chatId != null -> {
-                    if (isValidWaitingRoom(chatId)) {
-                        retrieveMeetingDetails()
-                        retrieveCallDetails()
+                !chatLink.isNullOrBlank() -> {
+                    if (isValidWaitingRoom(chatLink)) {
+                        retrieveChatLinkDetails()
+                        if (userLoggedIn) {
+                            joinCurrentCall()
+                        }
                     } else {
                         _state.update { it.copy(joinCall = true) }
                     }
                 }
 
-                !chatLink.isNullOrBlank() -> {
-                    if (isValidWaitingRoom(chatLink)) {
-                        retrieveChatLinkDetails(chatLink)
+                chatId != null -> {
+                    if (isValidWaitingRoom(chatId)) {
+                        retrieveMeetingDetails()
+                        retrieveCallDetails()
                     } else {
                         _state.update { it.copy(joinCall = true) }
                     }
@@ -231,13 +239,13 @@ class WaitingRoomViewModel @Inject constructor(
 
     /**
      * Retrieve Chat Room link details
-     *
-     * @param chatLink  Chat Room link
      */
-    private fun retrieveChatLinkDetails(chatLink: String) {
+    private fun retrieveChatLinkDetails() {
         viewModelScope.launch {
             runCatching {
-                checkChatLinkUseCase(chatLink).also { requireNotNull(it.chatHandle) }
+                checkChatLinkUseCase(
+                    chatLink = requireNotNull(_state.value.chatLink)
+                ).also { requireNotNull(it.chatHandle) }
             }.onSuccess { chatRequest ->
                 _state.update {
                     it.copy(
@@ -491,29 +499,38 @@ class WaitingRoomViewModel @Inject constructor(
             it.copy(
                 guestFirstName = firstName,
                 guestLastName = lastName,
-                guestMode = false,
             )
         }
 
-        joinCallAsGuest()
+        joinCurrentCall()
     }
 
     /**
-     * Join current call as a guest.
+     * Join current chat call.
      *
      * Also disables camera during guest login process to avoid SDK issues.
      */
-    private fun joinCallAsGuest() {
+    private fun joinCurrentCall() {
         viewModelScope.launch {
-            val cameraEnabled = _state.value.cameraEnabled
+            val currentState = _state.value
+            val cameraEnabled = currentState.cameraEnabled
+            val guestMode = currentState.guestMode
+
             runCatching {
+                if (guestMode) _state.update { it.copy(guestMode = false) }
                 if (cameraEnabled) enableCamera(false).join()
 
-                joinGuestChatCallUseCase(
-                    chatLink = requireNotNull(_state.value.chatLink),
-                    firstName = requireNotNull(_state.value.guestFirstName),
-                    lastName = requireNotNull(_state.value.guestLastName),
-                )
+                if (guestMode) {
+                    joinGuestChatCallUseCase(
+                        chatLink = requireNotNull(currentState.chatLink),
+                        firstName = requireNotNull(currentState.guestFirstName),
+                        lastName = requireNotNull(currentState.guestLastName),
+                    )
+                } else {
+                    joinChatCallUseCase(
+                        chatLink = requireNotNull(currentState.chatLink)
+                    )
+                }
             }.onSuccess {
                 if (cameraEnabled) enableCamera(true)
 
@@ -522,7 +539,7 @@ class WaitingRoomViewModel @Inject constructor(
                 retrieveCallDetails()
             }.onFailure { exception ->
                 Timber.e(exception)
-                _state.update { it.copy(guestMode = true) }
+                if (guestMode) _state.update { it.copy(guestMode = true) }
             }
         }
     }
