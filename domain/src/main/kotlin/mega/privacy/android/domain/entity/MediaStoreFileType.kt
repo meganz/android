@@ -22,5 +22,16 @@ enum class MediaStoreFileType {
     /**
      * type video external
      */
-    VIDEO_EXTERNAL
+    VIDEO_EXTERNAL;
+
+
+    /**
+     * Check if the MediaStoreFileType is of image type
+     *
+     * @return true if the MediaStoreFileType is of image type
+     */
+    fun isImageFileType(): Boolean = when (this) {
+        IMAGES_INTERNAL, IMAGES_EXTERNAL -> true
+        else -> false
+    }
 }
