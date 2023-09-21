@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.dialog.shares
+package mega.privacy.android.app.main.dialog.removelink
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -7,11 +7,10 @@ import mega.privacy.android.domain.entity.node.ResultCount
 import javax.inject.Inject
 
 /**
- * Remove share result mapper
+ * Remove public link result mapper
  *
- * @property context
  */
-class RemoveShareResultMapper @Inject constructor(@ApplicationContext private val context: Context) {
+class RemovePublicLinkResultMapper @Inject constructor(@ApplicationContext private val context: Context) {
     /**
      * Invoke
      *
@@ -19,9 +18,13 @@ class RemoveShareResultMapper @Inject constructor(@ApplicationContext private va
      * @return the string to show in the snackbar
      */
     operator fun invoke(result: ResultCount): String =
-        if (result.errorCount == 0) context.getString(R.string.context_share_correctly_removed)
+        if (result.errorCount == 0) context.resources.getQuantityString(
+            R.plurals.context_link_removal_success,
+            result.successCount,
+            result.successCount
+        )
         else context.resources.getQuantityString(
-            R.plurals.shared_items_outgoing_shares_snackbar_remove_contact_access_failed,
+            R.plurals.context_link_removal_error,
             result.errorCount,
             result.errorCount
         )

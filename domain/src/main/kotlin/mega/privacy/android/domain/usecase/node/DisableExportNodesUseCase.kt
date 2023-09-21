@@ -5,17 +5,14 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ResultCount
-import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
- * Remove share use case
+ * Disable export nodes use case
  *
- * @property nodeRepository Node repository
  */
-class RemoveShareUseCase @Inject constructor(
-    private val nodeRepository: NodeRepository,
+class DisableExportNodesUseCase @Inject constructor(
+    private val disableExportUseCase: DisableExportUseCase
 ) {
     /**
      * Invoke
@@ -23,16 +20,11 @@ class RemoveShareUseCase @Inject constructor(
      * @param nodeIds List of node ids
      */
     suspend operator fun invoke(nodeIds: List<NodeId>): ResultCount {
-        val allShares = nodeIds.map { nodeRepository.getNodeOutgoingShares(it) }.flatten()
         val result = coroutineScope {
-            allShares.map {
+            nodeIds.map {
                 async {
                     runCatching {
-                        nodeRepository.setShareAccess(
-                            nodeId = NodeId(longValue = it.nodeHandle),
-                            accessPermission = AccessPermission.UNKNOWN,
-                            email = it.user.orEmpty()
-                        )
+                        disableExportUseCase(it)
                     }
                 }
             }.awaitAll()
