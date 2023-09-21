@@ -22,6 +22,7 @@ import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -64,6 +65,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -161,6 +163,8 @@ class ManagerViewModel @Inject constructor(
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
     private val renameRecoveryKeyFileUseCase: RenameRecoveryKeyFileUseCase,
+    private val removeShareUseCase: RemoveShareUseCase,
+    private val removeShareResultMapper: RemoveShareResultMapper,
 ) : ViewModel() {
 
     /**
@@ -793,6 +797,36 @@ class ManagerViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+    }
+
+
+    /**
+     * Remove shares
+     *
+     */
+    fun removeShares(nodeIds: List<Long>) {
+        viewModelScope.launch {
+            runCatching {
+                removeShareUseCase(nodeIds.map { NodeId(it) })
+            }.onFailure {
+                Timber.e(it)
+            }.onSuccess { result ->
+                val message = removeShareResultMapper(result)
+                _state.update { state ->
+                    state.copy(
+                        message = message,
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Mark handled message
+     *
+     */
+    fun markHandledMessage() {
+        _state.update { it.copy(message = null) }
     }
 
     internal companion object {

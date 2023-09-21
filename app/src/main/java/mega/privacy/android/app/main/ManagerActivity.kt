@@ -236,7 +236,6 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
-import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
@@ -1927,6 +1926,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     MEGACHAT_INVALID_HANDLE
                 )
                 viewModel.onChatArchivedEventConsumed()
+            }
+
+            if (!managerState.message.isNullOrEmpty()) {
+                showSnackbar(content = managerState.message)
+                viewModel.markHandledMessage()
             }
         }
         this.collectFlow(
@@ -5634,52 +5638,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     override fun onScheduleMeeting() {
         startActivity(Intent(this, CreateScheduledMeetingActivity::class.java))
-    }
-
-    fun showConfirmationRemoveAllSharingContacts(shares: List<MegaNode?>) {
-        if (shares.size == 1) {
-            showConfirmationRemoveAllSharingContacts(megaApi.getOutShares(shares[0]), shares[0])
-            return
-        }
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setMessage(
-            resources.getQuantityString(
-                R.plurals.alert_remove_several_shares,
-                shares.size,
-                shares.size
-            )
-        )
-            .setPositiveButton(
-                R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes
-            ) { _: DialogInterface?, _: Int ->
-                nodeController.removeSeveralFolderShares(shares)
-            }
-            .setNegativeButton(
-                R.string.shared_items_outgoing_unshare_confirm_dialog_button_no
-            ) { _: DialogInterface?, _: Int -> }
-            .show()
-    }
-
-    fun showConfirmationRemoveAllSharingContacts(
-        shareList: ArrayList<MegaShare?>,
-        node: MegaNode?,
-    ) {
-        val builder = MaterialAlertDialogBuilder(this)
-        val size = shareList.size
-        val message: String = resources.getQuantityString(
-            R.plurals.confirmation_remove_outgoing_shares,
-            size,
-            size
-        )
-        builder.setMessage(message)
-            .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int ->
-                nodeController.removeShares(
-                    shareList,
-                    node
-                )
-            }
-            .setNegativeButton(R.string.general_cancel) { _: DialogInterface?, _: Int -> }
-            .show()
     }
 
     /**

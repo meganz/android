@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
+import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.data.model.GlobalUpdate
@@ -76,6 +77,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -235,6 +237,8 @@ class ManagerViewModelTest {
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
     private val copyNodesUseCase = mock<CopyNodesUseCase>()
     private val renameRecoveryKeyFileUseCase = mock<RenameRecoveryKeyFileUseCase>()
+    private val removeShareUseCase: RemoveShareUseCase = mock()
+    private val removeShareResultMapper: RemoveShareResultMapper = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -294,6 +298,8 @@ class ManagerViewModelTest {
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             renameRecoveryKeyFileUseCase = renameRecoveryKeyFileUseCase,
+            removeShareUseCase = removeShareUseCase,
+            removeShareResultMapper = removeShareResultMapper,
         )
     }
 
@@ -988,4 +994,34 @@ class ManagerViewModelTest {
             testScheduler.advanceUntilIdle()
             verifyNoInteractions(stopCameraUploadsUseCase)
         }
+
+    @Test
+    fun `test that message update correctly when call removeShareUseCase success`() = runTest {
+        val message = "message"
+        testScheduler.advanceUntilIdle()
+        whenever(removeShareResultMapper(any())).thenReturn(message)
+        whenever(removeShareUseCase(any())).thenReturn(mock())
+        underTest.state.test {
+            assertThat(awaitItem().message).isNull()
+            underTest.removeShares(listOf(1L))
+            assertThat(awaitItem().message).isEqualTo(message)
+        }
+    }
+
+    @Test
+    fun `test that message update correctly when call markHandledMessage`() = runTest {
+        testScheduler.advanceUntilIdle()
+        val message = "message"
+        whenever(removeShareResultMapper(any())).thenReturn(message)
+        whenever(removeShareUseCase(any())).thenReturn(mock())
+        underTest.state.test {
+            assertThat(awaitItem().message).isNull()
+            underTest.removeShares(listOf(1L))
+            assertThat(awaitItem().message).isEqualTo(message)
+        }
+        underTest.markHandledMessage()
+        underTest.state.test {
+            assertThat(awaitItem().message).isNull()
+        }
+    }
 }

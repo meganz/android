@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property restoreNodeResult
  * @property nodeNameCollisionResult
  * @property moveRequestResult
+ * @property message
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -38,5 +39,6 @@ data class ManagerState(
     val titleChatArchivedEvent: String? = null,
     val restoreNodeResult: Result<RestoreNodeResult>? = null,
     val nodeNameCollisionResult: NodeNameCollisionResult? = null,
-    val moveRequestResult: Result<MoveRequestResult>? = null
+    val moveRequestResult: Result<MoveRequestResult>? = null,
+    val message: String? = null,
 )

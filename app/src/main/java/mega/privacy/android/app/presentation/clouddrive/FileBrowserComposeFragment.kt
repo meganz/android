@@ -43,6 +43,7 @@ import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
+import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -461,9 +462,8 @@ class FileBrowserComposeFragment : Fragment() {
                 }
 
                 OptionItems.REMOVE_SHARE_CLICKED -> {
-                    (requireActivity() as ManagerActivity).showConfirmationRemoveAllSharingContacts(
-                        it.selectedMegaNode
-                    )
+                    RemoveAllSharingContactDialogFragment.newInstance(it.selectedNode.map { node -> node.id.longValue })
+                        .show(childFragmentManager, RemoveAllSharingContactDialogFragment.TAG)
                     disableSelectMode()
                 }
 

@@ -35,6 +35,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.VersionsFileActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
+import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail
@@ -952,11 +953,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onClearShareClicked(node: MegaNode?) {
-        val shareList = megaApi.getOutShares(node)
-        (requireActivity() as ManagerActivity).showConfirmationRemoveAllSharingContacts(
-            shareList,
-            node
-        )
+        node?.let {
+            RemoveAllSharingContactDialogFragment.newInstance(listOf(node.handle))
+                .show(parentFragmentManager, RemoveAllSharingContactDialogFragment.TAG)
+        }
         setStateBottomSheetBehaviorHidden()
     }
 
