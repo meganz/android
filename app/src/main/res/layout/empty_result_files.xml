@@ -23,6 +23,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             app:visibleGone="@{showHint}"
+            app:tint="@color/light_grey"
             tools:src="@drawable/ic_homepage_empty_audio" />
 
         <TextView

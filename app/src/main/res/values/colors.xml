@@ -533,5 +533,5 @@
     <color name="grey_500_grey_300">@color/grey_500</color>
     <color name="grey_900_white">@color/grey_900</color>
     <color name="grey_700_white_alpha_075">@color/grey_700</color>
-
+    <color name="light_grey">#EAEFEF</color>
 </resources>

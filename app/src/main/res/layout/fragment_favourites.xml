@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:src="@drawable/ic_homepage_empty_favourite"
+            app:tint="@color/light_grey"
             tools:ignore="ContentDescription" />
 
         <TextView

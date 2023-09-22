@@ -308,3 +308,7 @@ val purple_200 = Color(0xFFCE91D3)
 val purple_300 = Color(0xFFB965C1)
 
 val transparent = Color(0x00000000)
+
+val lightBlack = Color(0xFF252626)
+
+val lightGrey = Color(0xFFEAEFEF)

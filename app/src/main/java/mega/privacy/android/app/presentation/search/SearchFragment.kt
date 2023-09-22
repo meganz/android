@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -77,7 +76,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDow
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.displayMetrics
-import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.core.ui.controls.MegaEmptyViewForSearch
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ThemeMode
@@ -296,7 +295,7 @@ class SearchFragment : RotatableFragment() {
                             searchParentHandle = uiState.searchParentHandle,
                             rootNodeHandle = uiState.rootNodeHandle
                         )
-                        MegaEmptyView(
+                        MegaEmptyViewForSearch(
                             imagePainter = painterResource(id = emptyState.first),
                             text = emptyState.second
                         )
