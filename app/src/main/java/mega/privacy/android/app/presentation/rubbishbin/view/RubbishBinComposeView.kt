@@ -47,9 +47,7 @@ fun RubbishBinComposeView(
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     if (uiState.nodeList.isNotEmpty()) {
-        NodesView<TypedNode>(
-            modifier = Modifier
-                .padding(horizontal = 8.dp),
+        NodesView(
             nodeUIItems = uiState.nodeList,
             onMenuClick = onMenuClick,
             onItemClicked = onItemClicked,

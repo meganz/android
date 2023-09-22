@@ -61,7 +61,7 @@ fun <T : TypedNode> NodesView(
     val span = if (orientation == Configuration.ORIENTATION_PORTRAIT) spanCount else 4
     if (isListView) {
         NodeListView(
-            modifier = Modifier,
+            modifier = modifier,
             nodeUIItemList = nodeUIItems,
             onMenuClick = onMenuClick,
             onItemClicked = {

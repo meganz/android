@@ -61,8 +61,6 @@ fun FileBrowserComposeView(
             )
 
             NodesView(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp),
                 nodeUIItems = uiState.nodesList,
                 onMenuClick = onMenuClick,
                 onItemClicked = onItemClick,

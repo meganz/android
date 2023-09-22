@@ -25,8 +25,8 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
  */
 @Composable
 fun LoadingStateView(
-    modifier: Modifier = Modifier,
     isList: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier) {
         if (isList) {

@@ -17,6 +17,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinFolderUseCase
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -55,6 +56,9 @@ class RubbishBinViewModelTest {
     private val getRubbishBinFolderUseCase = mock<GetRubbishBinFolderUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
+    private val fileDurationMapper: FileDurationMapper = mock {
+        onBlocking { invoke(any()) }.thenReturn(null)
+    }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -76,7 +80,8 @@ class RubbishBinViewModelTest {
             getCloudSortOrder = getCloudSortOrder,
             getIntentToOpenFileMapper = getIntentToOpenFileMapper,
             getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
-            getNodeByHandle = getNodeByHandle
+            getNodeByHandle = getNodeByHandle,
+            fileDurationMapper = fileDurationMapper
         )
     }
 

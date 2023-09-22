@@ -20,10 +20,13 @@ import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.utils.TimeUtils.getVideoDuration
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -58,6 +61,7 @@ import javax.inject.Inject
  * @param transfersManagement [TransfersManagement]
  * @param containsMediaItemUseCase [ContainsMediaItemUseCase]
  * @param isAvailableOfflineUseCase [IsAvailableOfflineUseCase]
+ * @param fileDurationMapper [FileDurationMapper]
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -76,6 +80,7 @@ class FileBrowserViewModel @Inject constructor(
     private val transfersManagement: TransfersManagement,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val fileDurationMapper: FileDurationMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -285,11 +290,15 @@ class FileBrowserViewModel @Inject constructor(
         val existingNodeList = state.value.nodesList
         return nodeList.mapIndexed { index, node ->
             val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
+            val fileDuration = if (node is FileNode) {
+                fileDurationMapper(node.type)?.let { getVideoDuration(it) } ?: run { null }
+            } else null
             NodeUIItem(
                 node = node,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
-                isAvailableOffline = isAvailableOfflineUseCase(node)
+                isAvailableOffline = isAvailableOfflineUseCase(node),
+                fileDuration = fileDuration
             )
         }
     }

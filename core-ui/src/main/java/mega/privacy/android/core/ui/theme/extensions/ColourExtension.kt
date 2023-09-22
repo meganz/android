@@ -48,6 +48,7 @@ import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.transparent
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.white_alpha_005
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_038
 import mega.privacy.android.core.ui.theme.white_alpha_050
@@ -392,6 +393,12 @@ val Colors.grey_500_grey_400: Color
  */
 val Colors.red_500_red_300: Color
     get() = if (isLight) red_500 else red_300
+
+/**
+ * Color background when light else [white_alpha_005]
+ */
+val Colors.background_white_alpha_005: Color
+    get() = if (isLight) background else white_alpha_005
 
 /**
  * Color [grey_300] when light and [white_alpha_087] when dark

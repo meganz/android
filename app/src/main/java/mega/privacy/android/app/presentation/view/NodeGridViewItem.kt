@@ -3,11 +3,13 @@ package mega.privacy.android.app.presentation.view
 import mega.privacy.android.core.R as CoreUiR
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,12 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -35,9 +40,12 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getPainter
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.core.ui.theme.extensions.background_white_alpha_005
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.core.ui.theme.grey_alpha_040
+import mega.privacy.android.core.ui.theme.transparent
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -101,6 +109,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                     shape = RoundedCornerShape(5.dp)
                 )
+                .background(MaterialTheme.colors.background_white_alpha_005)
                 .combinedClickable(
                     onClick = { onItemClicked(nodeUIItem) },
                     onLongClick = { onLongClick(nodeUIItem) }
@@ -117,7 +126,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                         end.linkTo(parent.end)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                    }
+                    },
             )
             Image(
                 painter = if (nodeUIItem.isSelected) painterResource(id = CoreUiR.drawable.ic_select_folder) else nodeUIItem.node.getPainter(),
@@ -170,6 +179,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                     shape = RoundedCornerShape(5.dp)
                 )
+                .background(MaterialTheme.colors.background_white_alpha_005)
                 .combinedClickable(
                     onClick = { onItemClicked(nodeUIItem) },
                     onLongClick = { onLongClick(nodeUIItem) }
@@ -185,8 +195,35 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     contentDescription = "File",
                     data = thumbnailData,
                     defaultImage = MimeTypeList.typeForName(nodeUIItem.name).iconResourceId,
-                    contentScale = ContentScale.Fit,
+                    contentScale = ContentScale.Crop,
                 )
+                nodeUIItem.fileDuration?.let {
+                    Row(
+                        modifier = Modifier.align(Alignment.BottomStart)
+                            .fillMaxWidth()
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        transparent,
+                                        grey_alpha_040
+                                    )
+                                )
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_play_arrow_white_24dp),
+                            contentDescription = "Video duration",
+                            colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorPrimary)
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 8.dp),
+                            text = it,
+                            style = MaterialTheme.typography.body2,
+                            color = MaterialTheme.colors.textColorPrimary
+                        )
+                    }
+                }
                 if (nodeUIItem.isSelected) {
                     Image(
                         painter = painterResource(id = CoreUiR.drawable.ic_select_folder),

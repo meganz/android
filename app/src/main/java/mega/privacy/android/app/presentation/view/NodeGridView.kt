@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.view
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -53,8 +54,9 @@ fun <T : TypedNode> NodeGridView(
     LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier = modifier.padding(horizontal = 2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         if (showSortOrder || showChangeViewType) {
             item(
@@ -64,7 +66,7 @@ fun <T : TypedNode> NodeGridView(
                 }
             ) {
                 HeaderViewItem(
-                    modifier = modifier,
+                    modifier = modifier.padding(bottom = 4.dp),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
@@ -128,8 +130,9 @@ fun <T : TypedNode> NodeGridView(
     LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier = modifier.padding(horizontal = 2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         if (showSortOrder || showChangeViewType) {
             item(
@@ -139,7 +142,8 @@ fun <T : TypedNode> NodeGridView(
                 }
             ) {
                 HeaderViewItem(
-                    modifier = modifier,
+                    modifier = modifier
+                        .padding(bottom = 8.dp),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,

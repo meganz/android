@@ -21,6 +21,8 @@ import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -48,6 +50,7 @@ import javax.inject.Inject
  * @param monitorViewType [MonitorViewType] check view type
  * @param getIntentToOpenFileMapper [GetIntentToOpenFileMapper]
  * @param getRubbishBinFolderUseCase [GetRubbishBinFolderUseCase]
+ * @param fileDurationMapper [FileDurationMapper]
  */
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
@@ -61,6 +64,7 @@ class RubbishBinViewModel @Inject constructor(
     private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
     private val getNodeByHandle: GetNodeByHandle,
+    private val fileDurationMapper: FileDurationMapper,
 ) : ViewModel() {
 
     /**
@@ -149,10 +153,14 @@ class RubbishBinViewModel @Inject constructor(
         return nodeList.mapIndexed { index, it ->
             val isSelected =
                 state.value.selectedNodeHandles.contains(it.id.longValue)
+            val fileDuration = if (it is FileNode) {
+                fileDurationMapper(it.type)?.let { TimeUtils.getVideoDuration(it) } ?: run { null }
+            } else null
             NodeUIItem(
                 node = it,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
-                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
+                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
+                fileDuration = fileDuration
             )
         }
     }
