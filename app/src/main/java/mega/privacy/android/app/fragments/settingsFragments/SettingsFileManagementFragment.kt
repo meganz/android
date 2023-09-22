@@ -172,37 +172,39 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
 
     override fun onPreferenceClick(preference: Preference): Boolean {
         when (preference.key) {
-            KEY_OFFLINE -> (context as FileManagementPreferencesActivity).showClearOfflineDialog()
+            KEY_OFFLINE -> (activity as? FileManagementPreferencesActivity)?.showClearOfflineDialog()
             KEY_CACHE -> {
                 val clearCacheTask = ManageCacheTask(true)
                 clearCacheTask.execute()
             }
 
-            KEY_RUBBISH -> (context as FileManagementPreferencesActivity).showClearRubbishBinDialog()
+            KEY_RUBBISH -> (activity as? FileManagementPreferencesActivity)?.showClearRubbishBinDialog()
             KEY_ENABLE_RB_SCHEDULER -> {
                 enableRbSchedulerSwitch?.let {
                     if (!viewModel.isConnected) return false
                     if (it.isChecked) {
-                        (context as? FileManagementPreferencesActivity)?.showRbSchedulerValueDialog(
+                        (activity as? FileManagementPreferencesActivity)?.showRbSchedulerValueDialog(
                             true
                         )
                     } else if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                        (context as FileManagementPreferencesActivity).showRBNotDisabledDialog()
+                        (activity as? FileManagementPreferencesActivity)?.showRBNotDisabledDialog()
                         it.onPreferenceClickListener = null
                         it.isChecked = true
                         it.onPreferenceClickListener = this
                     } else {
-                        (context as FileManagementPreferencesActivity).setRBSchedulerValue(
+                        (activity as? FileManagementPreferencesActivity)?.setRBSchedulerValue(
                             INITIAL_VALUE
                         )
                     }
                 }
 
             }
+
             KEY_DAYS_RB_SCHEDULER -> {
                 if (!viewModel.isConnected) return false
-                (context as? FileManagementPreferencesActivity)?.showRbSchedulerValueDialog(false)
+                (activity as? FileManagementPreferencesActivity)?.showRbSchedulerValueDialog(false)
             }
+
             KEY_ENABLE_VERSIONS -> {
                 enableVersionsSwitch?.let {
                     if (!viewModel.isConnected) return false
@@ -213,8 +215,10 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                     viewModel.enableFileVersionOption(it.isChecked)
                 }
             }
+
             KEY_CLEAR_VERSIONS ->
-                (context as? FileManagementPreferencesActivity)?.showConfirmationClearAllVersions()
+                (activity as? FileManagementPreferencesActivity)?.showConfirmationClearAllVersions()
+
             KEY_AUTO_PLAY_SWITCH ->
                 autoPlaySwitch?.let {
                     dbH.setAutoPlayEnabled(it.isChecked.toString())
