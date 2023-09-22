@@ -201,7 +201,7 @@ internal class DefaultAvatarRepository @Inject constructor(
         }
         megaApiGateway.myUser?.let { user ->
             deleteAvatarFile(user)
-            myAvatarFile.emit(loadAvatarFile(user))
+            myAvatarFile.emit(runCatching { loadAvatarFile(user) }.getOrNull())
         }
         Unit
     }
