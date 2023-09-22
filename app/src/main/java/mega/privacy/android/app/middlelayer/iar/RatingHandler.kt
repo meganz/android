@@ -7,7 +7,6 @@ import androidx.preference.PreferenceManager
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.domain.entity.StorageState
-import nz.mega.sdk.MegaApiJava
 
 /**
  * Abstract In-App review handler for determine the base conditions and some special moment
@@ -192,7 +191,7 @@ abstract class RatingHandler(val context: Context) {
         // The speed limitation, 2 Mb
         const val SPEED_LIMIT = 2
 
-        const val FILES_NUM_LIMIT = 20
+        val FILES_NUM_LIMIT = 20.toBigInteger()
         const val SHARED_NUM_LIMIT = 4
 
         const val CONTACTS_NUMBER_LIMIT = 5
