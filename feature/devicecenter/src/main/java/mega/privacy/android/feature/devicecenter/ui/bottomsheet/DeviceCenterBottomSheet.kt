@@ -18,6 +18,7 @@ import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.BackupFolderBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.NonBackupFolderBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OtherDeviceBottomSheetBody
@@ -75,7 +76,7 @@ internal fun DeviceCenterBottomSheet(
         sheetHeader = {
             MenuActionNodeHeaderWithBody(
                 modifier = Modifier.testTag(BOTTOM_SHEET_HEADER),
-                title = selectedNode.name,
+                title = getTitleText(selectedNode.name),
                 body = getStatusText(selectedNode.status),
                 nodeIcon = selectedNode.icon.iconRes,
                 bodyIcon = selectedNode.status.icon,
@@ -146,6 +147,17 @@ internal fun DeviceCenterBottomSheet(
             }
         },
     )
+}
+
+/**
+ * Retrieves the Title Text to be displayed in [DeviceCenterBottomSheet]
+ *
+ * @param uiNodeName The Node name
+ * @return The corresponding Title Text
+ */
+@Composable
+private fun getTitleText(uiNodeName: String) = uiNodeName.ifBlank {
+    stringResource(R.string.device_center_list_view_item_title_unknown_device)
 }
 
 /**
