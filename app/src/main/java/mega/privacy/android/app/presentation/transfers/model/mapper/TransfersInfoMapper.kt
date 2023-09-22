@@ -29,14 +29,15 @@ class TransfersInfoMapper @Inject constructor() {
         val pendingDownloads = numPendingDownloadsNonBackground > 0
         val pendingUploads = numPendingUploads > 0
 
-        val uploading = transferType == TransferType.TYPE_UPLOAD && pendingUploads
-                || (!(transferType == TransferType.TYPE_DOWNLOAD && pendingDownloads)
+        val uploading = transferType.isUploadType() && pendingUploads
+                || (!(transferType == TransferType.DOWNLOAD && pendingDownloads)
                 && numPendingDownloadsNonBackground <= numPendingUploads)
 
         val status = when {
             areTransfersPaused -> TransfersStatus.Paused
             (isTransferOverQuota && (!pendingUploads || isStorageOverQuota))
                     || (isStorageOverQuota && !pendingDownloads) -> TransfersStatus.OverQuota
+
             isTransferError -> TransfersStatus.TransferError
             else -> TransfersStatus.Transferring
         }

@@ -18,28 +18,31 @@ internal class TransferMapper @Inject constructor(
      *
      * @param transfer [MegaTransfer]
      */
-    operator fun invoke(transfer: MegaTransfer) = Transfer(
-        transferType = transferTypeMapper(transfer.type),
-        transferredBytes = transfer.transferredBytes,
-        totalBytes = transfer.totalBytes,
-        localPath = transfer.path.orEmpty(),
-        parentPath = transfer.parentPath.orEmpty(),
-        nodeHandle = transfer.nodeHandle,
-        parentHandle = transfer.parentHandle,
-        fileName = transfer.fileName,
-        stage = transfer.stage.toTransferStage(),
-        tag = transfer.tag,
-        speed = transfer.speed,
-        isForeignOverQuota = transfer.isForeignOverquota,
-        isStreamingTransfer = transfer.isStreamingTransfer,
-        isFinished = transfer.isFinished,
-        isFolderTransfer = transfer.isFolderTransfer,
-        appData = transfer.appData.orEmpty(),
-        transferAppData = transferAppDataMapper(transfer.appData.orEmpty()),
-        state = transferStateMapper(transfer.state),
-        priority = transfer.priority,
-        notificationNumber = transfer.notificationNumber,
-    )
+    operator fun invoke(transfer: MegaTransfer): Transfer {
+        val transferAppData = transferAppDataMapper(transfer.appData.orEmpty())
+        return Transfer(
+            transferType = transferTypeMapper(transfer.type, transferAppData),
+            transferredBytes = transfer.transferredBytes,
+            totalBytes = transfer.totalBytes,
+            localPath = transfer.path.orEmpty(),
+            parentPath = transfer.parentPath.orEmpty(),
+            nodeHandle = transfer.nodeHandle,
+            parentHandle = transfer.parentHandle,
+            fileName = transfer.fileName,
+            stage = transfer.stage.toTransferStage(),
+            tag = transfer.tag,
+            speed = transfer.speed,
+            isForeignOverQuota = transfer.isForeignOverquota,
+            isStreamingTransfer = transfer.isStreamingTransfer,
+            isFinished = transfer.isFinished,
+            isFolderTransfer = transfer.isFolderTransfer,
+            appData = transfer.appData.orEmpty(),
+            transferAppData = transferAppData,
+            state = transferStateMapper(transfer.state),
+            priority = transfer.priority,
+            notificationNumber = transfer.notificationNumber,
+        )
+    }
 
     private fun Long.toTransferStage(): TransferStage = when (this) {
         MegaTransfer.STAGE_SCAN.toLong() -> TransferStage.STAGE_SCANNING

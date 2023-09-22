@@ -43,7 +43,7 @@ class MonitorDownloadTransfersPausedUseCaseTest {
         val totals = mock<ActiveTransferTotals> {
             on { pendingFileTransfers }.thenReturn(value)
         }
-        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_DOWNLOAD))
+        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.DOWNLOAD))
             .thenReturn(totals)
         assertThat(underTest.totalPendingIndividualTransfers()).isEqualTo(value)
     }
@@ -56,7 +56,7 @@ class MonitorDownloadTransfersPausedUseCaseTest {
         val totals = mock<ActiveTransferTotals> {
             on { pausedFileTransfers }.thenReturn(value)
         }
-        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_DOWNLOAD))
+        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.DOWNLOAD))
             .thenReturn(totals)
         assertThat(underTest.totalPausedIndividualTransfers()).isEqualTo(value)
     }
@@ -67,11 +67,9 @@ class MonitorDownloadTransfersPausedUseCaseTest {
         assertThat(underTest.isCorrectType(transfer)).isEqualTo(isCorrect)
     }
 
-    private fun getTransfers() = listOf(
-        Arguments.of(mockTransfer(TransferType.TYPE_DOWNLOAD), true),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD), false),
-        Arguments.of(mockTransfer(TransferType.NONE), false),
-    )
+    private fun getTransfers() = TransferType.values().map {
+        Arguments.of(mockTransfer(it), it == TransferType.DOWNLOAD)
+    }
 
     private fun mockTransfer(type: TransferType) = mock<Transfer> {
         on { it.transferType }.thenReturn(type)

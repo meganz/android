@@ -43,7 +43,7 @@ class MonitorGeneralUploadTransfersPausedUseCaseTest {
         val totals = mock<ActiveTransferTotals> {
             on { pendingFileTransfers }.thenReturn(value)
         }
-        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_UPLOAD))
+        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.GENERAL_UPLOAD))
             .thenReturn(totals)
         assertThat(underTest.totalPendingIndividualTransfers()).isEqualTo(value)
     }
@@ -56,7 +56,7 @@ class MonitorGeneralUploadTransfersPausedUseCaseTest {
         val totals = mock<ActiveTransferTotals> {
             on { pausedFileTransfers }.thenReturn(value)
         }
-        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_UPLOAD))
+        whenever(transferRepository.getCurrentActiveTransferTotalsByType(TransferType.GENERAL_UPLOAD))
             .thenReturn(totals)
         assertThat(underTest.totalPausedIndividualTransfers()).isEqualTo(value)
     }
@@ -67,22 +67,13 @@ class MonitorGeneralUploadTransfersPausedUseCaseTest {
         assertThat(underTest.isCorrectType(transfer)).isEqualTo(isCorrect)
     }
 
-    private fun getTransfers() = listOf(
-        Arguments.of(mockTransfer(TransferType.TYPE_DOWNLOAD), false),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD), true),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD, isChatUpload = true), false),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD, isCameraUpload = true), false),
-        Arguments.of(mockTransfer(TransferType.NONE), false),
-    )
+    private fun getTransfers() = TransferType.values().map {
+        Arguments.of(mockTransfer(it), it == TransferType.GENERAL_UPLOAD)
+    }
 
     private fun mockTransfer(
         type: TransferType,
-        isChatUpload: Boolean = false,
-        isCameraUpload: Boolean = false,
     ) = mock<Transfer> {
         on { it.transferType }.thenReturn(type)
-        on { it.isChatUpload() }.thenReturn(isChatUpload)
-        on { it.isCUUpload() }.thenReturn(isCameraUpload)
     }
-
 }

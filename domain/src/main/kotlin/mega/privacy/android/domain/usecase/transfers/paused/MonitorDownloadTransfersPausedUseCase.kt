@@ -13,11 +13,11 @@ class MonitorDownloadTransfersPausedUseCase @Inject constructor(
 ) : MonitorTypeTransfersPausedUseCase() {
 
     override fun isCorrectType(transfer: Transfer) =
-        transfer.transferType == TransferType.TYPE_DOWNLOAD && !transfer.isFolderTransfer
+        transfer.transferType == TransferType.DOWNLOAD && !transfer.isFolderTransfer
 
     override suspend fun totalPendingIndividualTransfers() =
-        transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_DOWNLOAD).pendingFileTransfers
+        transferRepository.getCurrentActiveTransferTotalsByType(TransferType.DOWNLOAD).pendingFileTransfers
 
     override suspend fun totalPausedIndividualTransfers() =
-        transferRepository.getCurrentActiveTransferTotalsByType(TransferType.TYPE_DOWNLOAD).pausedFileTransfers
+        transferRepository.getCurrentActiveTransferTotalsByType(TransferType.DOWNLOAD).pausedFileTransfers
 }

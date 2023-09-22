@@ -56,6 +56,7 @@ abstract class MonitorTypeTransfersPausedUseCase {
                 (it is TransferEvent.TransferPaused || it is TransferEvent.TransferFinishEvent || it is TransferEvent.TransferStartEvent)
                         && !it.transfer.isBackgroundTransfer()
                         && !it.transfer.isVoiceClip()
+                        && !it.transfer.isFolderTransfer
                         && isCorrectType(it.transfer)
             }
             .map {

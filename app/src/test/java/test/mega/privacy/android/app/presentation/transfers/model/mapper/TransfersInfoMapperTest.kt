@@ -17,7 +17,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when transfer is in progress then correct progress is returned`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
                 totalSizePendingTransfer = 10L,
@@ -33,7 +33,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that if totalSizePendingTransfer is 0 then completed Progress is 0`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 1,
                 totalSizePendingTransfer = 0L,
@@ -55,7 +55,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that if there are no transfers then returns not transferring status`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 0,
                 totalSizePendingTransfer = 10L,
@@ -71,7 +71,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when transfer is paused then paused status is returned regardless of errors or over quota`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
                 totalSizePendingTransfer = 10L,
@@ -87,7 +87,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when transfer has error then transfer error status is returned`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
                 totalSizePendingTransfer = 10L,
@@ -103,7 +103,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when there is storage over quota and pending uploads then transfer over quota status is returned`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
                 totalSizePendingTransfer = 10L,
@@ -119,7 +119,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when there is storage over quota but no pending uploads then Transferring status is returned`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 1,
                 totalSizePendingTransfer = 10L,
@@ -135,7 +135,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when there is transfer over quota and pending downloads then transfer over quota status is returned`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 1,
                 totalSizePendingTransfer = 10L,
@@ -151,7 +151,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when there is transfer over quota but no pending downloads then Transferring status is returned`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
                 totalSizePendingTransfer = 10L,
@@ -172,7 +172,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when upload status is uploading and there are pending uploads then upload flag is true`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
                 totalSizePendingTransfer = 10L,
@@ -188,7 +188,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when upload status is uploading but there are no pending uploads then upload flag is false`() {
             val result = underTest(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 0,
                 totalSizePendingTransfer = 10L,
@@ -204,7 +204,7 @@ class TransfersInfoMapperTest {
         @Test
         fun `test that when upload status is downloading and there are downloads then upload flag is false`() {
             val result = underTest(
-                transferType = TransferType.TYPE_DOWNLOAD,
+                transferType = TransferType.DOWNLOAD,
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 1,
                 totalSizePendingTransfer = 10L,

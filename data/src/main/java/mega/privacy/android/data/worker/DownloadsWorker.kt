@@ -60,7 +60,7 @@ class DownloadsWorker @AssistedInject constructor(
 
         withContext(ioDispatcher) {
             val monitorJob = monitorTransferEvents(this)
-            correctActiveTransfersUseCase(TransferType.TYPE_DOWNLOAD) //to be sure we haven't missed any event before monitoring them
+            correctActiveTransfersUseCase(TransferType.DOWNLOAD) //to be sure we haven't missed any event before monitoring them
             monitorOngoingActiveDownloadTransfersUseCase()
                 .catch { Timber.e("DownloadsWorker error: $it") }
                 .onEach { (transferTotals, paused) ->
@@ -86,7 +86,7 @@ class DownloadsWorker @AssistedInject constructor(
     override suspend fun getForegroundInfo() =
         createForegroundInfo(
             downloadNotificationMapper(
-                getActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD),
+                getActiveTransferTotalsUseCase(TransferType.DOWNLOAD),
                 areTransfersPausedUseCase()
             )
         )
@@ -97,7 +97,7 @@ class DownloadsWorker @AssistedInject constructor(
     private fun monitorTransferEvents(scope: CoroutineScope) =
         scope.launch(ioDispatcher) {
             monitorTransferEventsUseCase()
-                .filter { it.transfer.transferType == TransferType.TYPE_DOWNLOAD }
+                .filter { it.transfer.transferType == TransferType.DOWNLOAD }
                 .collect {
                     addOrUpdateActiveTransferUseCase(it)
                 }

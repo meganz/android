@@ -15,8 +15,8 @@ class TransferTypeIntMapper @Inject constructor() {
      * @param transferType [TransferType]
      */
     operator fun invoke(transferType: TransferType) = when (transferType) {
-        TransferType.TYPE_DOWNLOAD -> MegaTransfer.TYPE_DOWNLOAD
-        TransferType.TYPE_UPLOAD -> MegaTransfer.TYPE_UPLOAD
+        TransferType.DOWNLOAD -> MegaTransfer.TYPE_DOWNLOAD
+        TransferType.GENERAL_UPLOAD, TransferType.CAMERA_UPLOADS_UPLOAD, TransferType.CHAT_UPLOAD -> MegaTransfer.TYPE_UPLOAD
         TransferType.NONE -> -1
     }
 }

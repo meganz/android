@@ -58,25 +58,13 @@ class MonitorCameraUploadTransfersPausedUseCaseTest {
         assertThat(underTest.isCorrectType(transfer)).isEqualTo(isCorrect)
     }
 
-    private fun getTransfers() = listOf(
-        Arguments.of(mockTransfer(TransferType.TYPE_DOWNLOAD), false),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD), true),
-        Arguments.of(
-            mockTransfer(TransferType.TYPE_UPLOAD, isCameraUpload = false, isChatUpload = true),
-            false
-        ),
-        Arguments.of(mockTransfer(TransferType.TYPE_UPLOAD, isCameraUpload = false), false),
-        Arguments.of(mockTransfer(TransferType.NONE), false),
-    )
+    private fun getTransfers() = TransferType.values().map {
+        Arguments.of(mockTransfer(it), it == TransferType.CAMERA_UPLOADS_UPLOAD)
+    }
 
     private fun mockTransfer(
         type: TransferType,
-        isChatUpload: Boolean = false,
-        isCameraUpload: Boolean = true,
     ) = mock<Transfer> {
         on { it.transferType }.thenReturn(type)
-        on { it.isChatUpload() }.thenReturn(isChatUpload)
-        on { it.isCUUpload() }.thenReturn(isCameraUpload)
     }
-
 }

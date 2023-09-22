@@ -30,9 +30,9 @@ class MonitorOngoingActiveDownloadTransfersUseCase @Inject constructor(
      */
     @OptIn(FlowPreview::class)
     operator fun invoke(refreshSample: Long = ON_TRANSFER_UPDATE_REFRESH_MILLIS): Flow<MonitorOngoingActiveTransfersResult> {
-        val transfersFlow = monitorActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD)
+        val transfersFlow = monitorActiveTransferTotalsUseCase(TransferType.DOWNLOAD)
             .sample(refreshSample)
-            .onStart { emit(getActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD)) }
+            .onStart { emit(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD)) }
         val pausedFlow = monitorDownloadTransfersPausedUseCase()
 
         return combine(transfersFlow, pausedFlow) { transferTotals, paused ->

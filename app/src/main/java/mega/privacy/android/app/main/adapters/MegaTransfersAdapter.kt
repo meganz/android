@@ -105,7 +105,7 @@ class MegaTransfersAdapter(
         holder.textViewFileName.text = transfer.fileName
         val isItemChecked = isItemChecked(transfer)
         when (transfer.transferType) {
-            TransferType.TYPE_DOWNLOAD -> {
+            TransferType.DOWNLOAD -> {
                 holder.progressText.setTextColor(
                     ContextCompat.getColor(
                         context,
@@ -132,7 +132,7 @@ class MegaTransfersAdapter(
                 }
             }
 
-            TransferType.TYPE_UPLOAD -> {
+            TransferType.GENERAL_UPLOAD, TransferType.CAMERA_UPLOADS_UPLOAD, TransferType.CHAT_UPLOAD -> {
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers)
                     showDefaultIcon(
@@ -196,8 +196,8 @@ class MegaTransfersAdapter(
                 TransferState.STATE_QUEUED,
                 -> {
                     when {
-                        (transfer.transferType == TransferType.TYPE_DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
-                                || (transfer.transferType == TransferType.TYPE_UPLOAD && getStorageState() == StorageState.Red)
+                        (transfer.transferType == TransferType.DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
+                                || (transfer.transferType.isUploadType() && getStorageState() == StorageState.Red)
                         -> {
                             holder.progressText.setTextColor(
                                 ContextCompat.getColor(
@@ -208,7 +208,7 @@ class MegaTransfersAdapter(
                             holder.progressText.text = String.format(
                                 "%s %s",
                                 getProgress(transfer),
-                                if (transfer.transferType == TransferType.TYPE_DOWNLOAD)
+                                if (transfer.transferType == TransferType.DOWNLOAD)
                                     context.getString(R.string.label_transfer_over_quota)
                                 else
                                     context.getString(R.string.label_storage_over_quota)

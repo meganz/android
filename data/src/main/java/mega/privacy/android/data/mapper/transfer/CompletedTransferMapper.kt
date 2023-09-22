@@ -66,7 +66,7 @@ class CompletedTransferMapper @Inject constructor(
      */
 
     private suspend fun isOffline(transfer: Transfer) = when (transfer.transferType) {
-        TransferType.TYPE_DOWNLOAD ->
+        TransferType.DOWNLOAD ->
             transfer.parentPath.let {
                 it.isNotBlank() && it.startsWith(fileGateway.getOfflineFilesRootPath())
             }
@@ -83,10 +83,10 @@ class CompletedTransferMapper @Inject constructor(
         transfer.getSDCardTransferPath()?.takeUnless { it.isBlank() }
             ?: run {
                 when (transfer.transferType) {
-                    TransferType.TYPE_UPLOAD ->
+                    TransferType.GENERAL_UPLOAD, TransferType.CAMERA_UPLOADS_UPLOAD, TransferType.CHAT_UPLOAD ->
                         formatNodePath(transfer.parentHandle)
 
-                    TransferType.TYPE_DOWNLOAD -> {
+                    TransferType.DOWNLOAD -> {
                         if (isOffline)
                             formatOfflineNodePath(transfer.parentPath, transfer.nodeHandle)
                         else

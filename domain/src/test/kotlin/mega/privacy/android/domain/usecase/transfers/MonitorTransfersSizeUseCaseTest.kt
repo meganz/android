@@ -27,7 +27,7 @@ internal class MonitorTransfersSizeUseCaseTest {
     private val globalTransferFlow = MutableSharedFlow<TransferEvent>()
     private val transferRepository = mock<TransferRepository>()
     private val transfer = Transfer(
-        transferType = TransferType.TYPE_DOWNLOAD,
+        transferType = TransferType.DOWNLOAD,
         transferredBytes = 2000L,
         totalBytes = 1000L,
         localPath = "localPath",
@@ -55,10 +55,10 @@ internal class MonitorTransfersSizeUseCaseTest {
     }
 
     @Test
-    fun `when monitorTransferEvents emit Upload TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_UPLOAD`() =
+    fun `when monitorTransferEvents emit Upload TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_GENERAL_UPLOAD`() =
         runTest {
             val event =
-                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.TYPE_UPLOAD))
+                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.GENERAL_UPLOAD))
             underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
@@ -71,7 +71,7 @@ internal class MonitorTransfersSizeUseCaseTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, TransferType.TYPE_UPLOAD)
+            assertEquals(transfersSizeInfo.value.transferType, TransferType.GENERAL_UPLOAD)
             collectJob.cancel()
         }
 
@@ -79,7 +79,7 @@ internal class MonitorTransfersSizeUseCaseTest {
     fun `when monitorTransferEvents emit Download TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_DOWNLOAD`() =
         runTest {
             val event =
-                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.TYPE_DOWNLOAD))
+                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.DOWNLOAD))
             underTest = MonitorTransfersSizeUseCase(
                 repository = transferRepository
             )
@@ -92,7 +92,7 @@ internal class MonitorTransfersSizeUseCaseTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, TransferType.TYPE_DOWNLOAD)
+            assertEquals(transfersSizeInfo.value.transferType, TransferType.DOWNLOAD)
             collectJob.cancel()
         }
 

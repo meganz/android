@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.transfer
 
 import com.google.common.truth.Truth
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeAll
@@ -19,28 +20,42 @@ class TransferTypeMapperTest {
         underTest = TransferTypeMapper()
     }
 
-    @ParameterizedTest(name = "invoked with {0} and returns {1}")
+    @ParameterizedTest(name = "invoked with {0} and {2}: returns {1}")
     @MethodSource("provideParameters")
     fun `test that transfer type mapper returns correctly`(
         transferInt: Int,
         transferType: TransferType,
+        appData: List<TransferAppData>,
     ) {
-        val actual = underTest(transferInt)
+        val actual = underTest(transferInt, appData)
         Truth.assertThat(actual).isEqualTo(transferType)
     }
 
     private fun provideParameters() = Stream.of(
         Arguments.of(
             MegaTransfer.TYPE_DOWNLOAD,
-            TransferType.TYPE_DOWNLOAD
+            TransferType.DOWNLOAD,
+            emptyList<TransferAppData>(),
         ),
         Arguments.of(
             MegaTransfer.TYPE_UPLOAD,
-            TransferType.TYPE_UPLOAD
+            TransferType.GENERAL_UPLOAD,
+            emptyList<TransferAppData>(),
+        ),
+        Arguments.of(
+            MegaTransfer.TYPE_UPLOAD,
+            TransferType.CAMERA_UPLOADS_UPLOAD,
+            listOf(TransferAppData.CameraUpload),
+        ),
+        Arguments.of(
+            MegaTransfer.TYPE_UPLOAD,
+            TransferType.CHAT_UPLOAD,
+            listOf(TransferAppData.ChatUpload(1L)),
         ),
         Arguments.of(
             -1,
-            TransferType.NONE
+            TransferType.NONE,
+            emptyList<TransferAppData>(),
         ),
     )
 }

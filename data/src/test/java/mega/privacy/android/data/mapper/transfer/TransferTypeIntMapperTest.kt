@@ -31,11 +31,19 @@ class TransferTypeIntMapperTest {
 
     private fun provideParameters() = Stream.of(
         Arguments.of(
-            TransferType.TYPE_DOWNLOAD,
+            TransferType.DOWNLOAD,
             MegaTransfer.TYPE_DOWNLOAD,
         ),
         Arguments.of(
-            TransferType.TYPE_UPLOAD,
+            TransferType.GENERAL_UPLOAD,
+            MegaTransfer.TYPE_UPLOAD,
+        ),
+        Arguments.of(
+            TransferType.CAMERA_UPLOADS_UPLOAD,
+            MegaTransfer.TYPE_UPLOAD,
+        ),
+        Arguments.of(
+            TransferType.CHAT_UPLOAD,
             MegaTransfer.TYPE_UPLOAD,
         ),
         Arguments.of(

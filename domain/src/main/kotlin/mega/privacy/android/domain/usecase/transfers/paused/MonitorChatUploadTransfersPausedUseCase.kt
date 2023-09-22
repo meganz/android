@@ -13,7 +13,7 @@ class MonitorChatUploadTransfersPausedUseCase @Inject constructor(
 ) : MonitorTypeTransfersPausedUseCase() {
 
     override fun isCorrectType(transfer: Transfer) =
-        transfer.transferType == TransferType.TYPE_UPLOAD && transfer.isChatUpload()
+        transfer.transferType == TransferType.CHAT_UPLOAD
 
     override suspend fun totalPendingIndividualTransfers() =
         transferRepository.getNumPendingChatUploads()

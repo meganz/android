@@ -7,17 +7,17 @@ sealed interface TransferAppData {
     /**
      * Identify a camera upload transfer
      */
-    object CameraUpload : TransferAppData
+    data object CameraUpload : TransferAppData
 
     /**
      * Identify a voice clip transfer
      */
-    object VoiceClip : TransferAppData
+    data object VoiceClip : TransferAppData
 
     /**
      * Indicates the transfer should be transparent for the user and should not show any notification
      */
-    object BackgroundTransfer : TransferAppData
+    data object BackgroundTransfer : TransferAppData
 
     /**
      * Identify a chat transfer and its message

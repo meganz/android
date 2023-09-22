@@ -209,7 +209,7 @@ class ChatUploadService : LifecycleService() {
         monitorTransferEventsJob = lifecycleScope.launch {
             monitorTransferEventsUseCase()
                 .filter {
-                    it.transfer.transferType == TransferType.TYPE_UPLOAD && it.transfer.isChatUpload()
+                    it.transfer.transferType == TransferType.CHAT_UPLOAD
                 }
                 .catch { Timber.e(it) }
                 .collect { transferEvent ->

@@ -53,7 +53,7 @@ class ActiveTransferDaoTest {
     fun test_that_insert_a_new_entity_actually_inserts_the_entity() = runTest {
         val newEntity = ActiveTransferEntity(
             tag = 100,
-            transferType = TransferType.TYPE_UPLOAD,
+            transferType = TransferType.GENERAL_UPLOAD,
             totalBytes = 1024,
             isFinished = true,
             isFolderTransfer = false,

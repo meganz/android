@@ -21,7 +21,8 @@ internal class TransferMapperTest {
             on { invoke("appData") }.thenReturn(appDataList)
         }
         val transferTypeMapper = mock<TransferTypeMapper> {
-            on { invoke(MegaTransfer.TYPE_DOWNLOAD) }.thenReturn(TransferType.TYPE_DOWNLOAD)
+            on { invoke(MegaTransfer.TYPE_DOWNLOAD, appDataList) }
+                .thenReturn(TransferType.DOWNLOAD)
         }
 
         val transferStateMapper = mock<TransferStateMapper> {
@@ -49,7 +50,7 @@ internal class TransferMapperTest {
             on { notificationNumber }.thenReturn(Random.nextLong())
         }
         val expected = Transfer(
-            transferType = TransferType.TYPE_DOWNLOAD,
+            transferType = TransferType.DOWNLOAD,
             transferredBytes = megaTransfer.transferredBytes,
             totalBytes = megaTransfer.totalBytes,
             localPath = megaTransfer.path.orEmpty(),

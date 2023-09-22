@@ -312,7 +312,7 @@ internal class DownloadService : LifecycleService() {
         lifecycleScope.launch {
             monitorTransferEventsUseCase()
                 .filter {
-                    it.transfer.transferType == TransferType.TYPE_DOWNLOAD
+                    it.transfer.transferType == TransferType.DOWNLOAD
                 }
                 .catch {
                     Timber.e(it)

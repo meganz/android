@@ -51,11 +51,11 @@ class MonitorOngoingActiveDownloadTransfersUseCaseTest {
     @Test
     fun `test that getActiveTransferTotalsUseCase is emitted as first result`() = runTest {
         val activeTransferTotals = mockActiveTransfersTotals(true)
-        whenever(monitorActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
+        whenever(monitorActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
             .thenReturn(flowOf())
         whenever(monitorDownloadTransfersPausedUseCase())
             .thenReturn(flowOf(false))
-        whenever(getActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
+        whenever(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
             .thenReturn(activeTransferTotals)
         underTest().test {
             assertThat(awaitItem())
@@ -68,11 +68,11 @@ class MonitorOngoingActiveDownloadTransfersUseCaseTest {
     fun `test that flow ends when there are no more ongoing active transfers`() = runTest {
         val first = mockActiveTransfersTotals(true)
         val last = mockActiveTransfersTotals(false)
-        whenever(monitorActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
+        whenever(monitorActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
             .thenReturn(MutableStateFlow(last))
         whenever(monitorDownloadTransfersPausedUseCase())
             .thenReturn(flowOf(false))
-        whenever(getActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
+        whenever(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
             .thenReturn(first)
         val lastReceived = underTest(TEST_SAMPLE).last()
         assertThat(lastReceived).isEqualTo(MonitorOngoingActiveTransfersResult(last, false))
@@ -81,12 +81,12 @@ class MonitorOngoingActiveDownloadTransfersUseCaseTest {
     @Test
     fun `test that monitorDownloadTransfersPausedUseCase values are emitted`() = runTest {
         val activeTransferTotals = mockActiveTransfersTotals(true)
-        whenever(monitorActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
+        whenever(monitorActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
             .thenReturn(flowOf())
         val pausedFlow = MutableStateFlow(false)
         whenever(monitorDownloadTransfersPausedUseCase())
             .thenReturn(pausedFlow)
-        whenever(getActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
+        whenever(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
             .thenReturn(activeTransferTotals)
         underTest().test {
             assertThat(awaitItem())

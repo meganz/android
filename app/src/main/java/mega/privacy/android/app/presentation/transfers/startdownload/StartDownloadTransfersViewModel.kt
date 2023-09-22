@@ -101,7 +101,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
         if (!checkAndHandleIsDeviceConnected()) {
             return
         }
-        clearActiveTransfersIfFinishedUseCase(TransferType.TYPE_DOWNLOAD)
+        clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
         _uiState.update {
             it.copy(jobInProgressState = StartDownloadTransferJobInProgress.ProcessingFiles)
         }

@@ -9,7 +9,7 @@ import nz.mega.sdk.MegaTransfer
  * This will be removed after the usage of [MegaTransfer] is completely removed from code.
  */
 fun TransferType.mapTransferType(): Int =
-    if (this == TransferType.TYPE_DOWNLOAD) MegaTransfer.TYPE_DOWNLOAD
+    if (this == TransferType.DOWNLOAD) MegaTransfer.TYPE_DOWNLOAD
     else MegaTransfer.TYPE_UPLOAD
 
 /**

@@ -112,7 +112,7 @@ class StartDownloadTransfersViewModelTest {
         runTest {
             stubNodeForDownload()
             underTest.startDownloadNode(nodes)
-            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.TYPE_DOWNLOAD)
+            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
         }
 
     @Test
@@ -120,7 +120,7 @@ class StartDownloadTransfersViewModelTest {
         runTest {
             stubNodeForDownload()
             underTest.startDownloadForOffline(node)
-            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.TYPE_DOWNLOAD)
+            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
         }
 
     @Test

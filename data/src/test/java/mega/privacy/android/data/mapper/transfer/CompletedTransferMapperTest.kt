@@ -77,7 +77,7 @@ class CompletedTransferMapperTest {
         val now = 123L
         whenever(deviceGateway.now).thenReturn(now)
         whenever(stringWrapper.getSizeString(any())).thenReturn(size)
-        whenever(transferTypeIntMapper(TransferType.TYPE_UPLOAD)).thenReturn(MegaTransfer.TYPE_UPLOAD)
+        whenever(transferTypeIntMapper(TransferType.GENERAL_UPLOAD)).thenReturn(MegaTransfer.TYPE_UPLOAD)
         whenever(transferStateIntMapper(TransferState.STATE_COMPLETED)).thenReturn(MegaTransfer.STATE_COMPLETED)
         val actual = underTest(transfer, null)
         assertThat(actual.fileName).isEqualTo(transfer.fileName)
@@ -114,7 +114,7 @@ class CompletedTransferMapperTest {
             val directoryPath = "/data/user/0/mega.privacy.android.app/files"
             val offlineDirectory = "MEGA Offline"
             val transfer = mockTransfer(
-                transferType = TransferType.TYPE_DOWNLOAD,
+                transferType = TransferType.DOWNLOAD,
                 parentPath = "$directoryPath/$offlineDirectory/$path/"
             )
             val mock1 = mock<MegaNode> {
@@ -149,7 +149,7 @@ class CompletedTransferMapperTest {
             val offlineDirectoryPath = "/data/user/0/mega.privacy.android.app/files"
             val offlineDirectory = "MEGA Offline"
             val transfer = mockTransfer(
-                transferType = TransferType.TYPE_DOWNLOAD,
+                transferType = TransferType.DOWNLOAD,
                 parentPath = directoryPath
             )
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
@@ -170,7 +170,7 @@ class CompletedTransferMapperTest {
     ) =
         runTest {
             val transfer = mockTransfer(
-                transferType = TransferType.TYPE_UPLOAD,
+                transferType = TransferType.GENERAL_UPLOAD,
             )
             val node1 = mock<MegaNode> {
                 on { handle }.thenReturn(4)
@@ -183,7 +183,8 @@ class CompletedTransferMapperTest {
                 on { handle }.thenReturn(rootNodeHandle)
             }
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
-            whenever(transferTypeIntMapper(TransferType.TYPE_UPLOAD)).thenReturn(MegaTransfer.TYPE_UPLOAD)
+            whenever(transferTypeIntMapper(TransferType.GENERAL_UPLOAD))
+                .thenReturn(MegaTransfer.TYPE_UPLOAD)
 
             whenever(megaApiGateway.getMegaNodeByHandle(transfer.parentHandle)).thenReturn(node1)
             whenever(megaApiGateway.getNodePath(node1)).thenReturn(path)
@@ -241,7 +242,7 @@ class CompletedTransferMapperTest {
         parentPath: String? = null,
     ): Transfer {
         return mock {
-            on { it.transferType }.thenReturn(transferType ?: TransferType.TYPE_UPLOAD)
+            on { it.transferType }.thenReturn(transferType ?: TransferType.GENERAL_UPLOAD)
             on { it.transferredBytes }.thenReturn(Random.nextLong())
             on { it.totalBytes }.thenReturn(Random.nextLong())
             on { it.localPath }.thenReturn("/path/to/local")

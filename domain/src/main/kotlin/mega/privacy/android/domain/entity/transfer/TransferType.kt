@@ -12,10 +12,28 @@ enum class TransferType {
     /**
      * Type Download refer to MegaTransfer.TYPE_DOWNLOAD
      */
-    TYPE_DOWNLOAD,
+    DOWNLOAD,
 
     /**
-     * Type Upload refer to MegaTransfer.TYPE_UPLOAD
+     * Type Upload refer to MegaTransfer.TYPE_UPLOAD for general uploads (no camera upload nor chat upload)
      */
-    TYPE_UPLOAD
+    GENERAL_UPLOAD,
+
+    /**
+     * Type Upload refer to MegaTransfer.TYPE_UPLOAD  for camera upload transfers
+     */
+    CAMERA_UPLOADS_UPLOAD,
+
+    /**
+     * Type Upload refer to MegaTransfer.TYPE_UPLOAD  for camera upload transfers
+     */
+    CHAT_UPLOAD;
+
+    /**
+     * @return true if transfer type is any of the upload types
+     */
+    fun isUploadType() = when (this) {
+        GENERAL_UPLOAD, CAMERA_UPLOADS_UPLOAD, CHAT_UPLOAD -> true
+        else -> false
+    }
 }

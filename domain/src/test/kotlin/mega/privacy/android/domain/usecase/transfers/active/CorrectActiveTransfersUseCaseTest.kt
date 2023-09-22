@@ -78,7 +78,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             val expected =
                 mockedActiveTransfers.map { it.tag } - inProgress.map { it.tag }.toSet()
             Truth.assertThat(expected).isNotEmpty()
-            underTest(TransferType.TYPE_UPLOAD)
+            underTest(TransferType.GENERAL_UPLOAD)
             verify(transferRepository).setActiveTransferAsFinishedByTag(expected)
         }
 
@@ -91,7 +91,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             whenever(transferRepository.getCurrentActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
-            underTest(TransferType.TYPE_UPLOAD)
+            underTest(TransferType.GENERAL_UPLOAD)
             verify(transferRepository, never()).setActiveTransferAsFinishedByTag(anyOrNull())
         }
 
@@ -105,7 +105,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             whenever(transferRepository.getCurrentActiveTransfersByType(any()))
                 .thenReturn(alreadyInDataBase)
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
-            underTest(TransferType.TYPE_UPLOAD)
+            underTest(TransferType.GENERAL_UPLOAD)
             verify(transferRepository, times(notInDataBase.size))
                 .insertOrUpdateActiveTransfer(any())
             notInDataBase.forEach {

@@ -13,7 +13,7 @@ class MonitorCameraUploadTransfersPausedUseCase @Inject constructor(
 ) : MonitorTypeTransfersPausedUseCase() {
 
     override fun isCorrectType(transfer: Transfer) =
-        transfer.transferType == TransferType.TYPE_UPLOAD && transfer.isCUUpload()
+        transfer.transferType == TransferType.CAMERA_UPLOADS_UPLOAD
 
     override suspend fun totalPendingIndividualTransfers() =
         transferRepository.getNumPendingCameraUploads()

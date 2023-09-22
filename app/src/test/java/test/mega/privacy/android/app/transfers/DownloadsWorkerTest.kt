@@ -134,7 +134,7 @@ class DownloadsWorkerTest {
         runTest {
             commonStub()
             underTest.doWork()
-            verify(correctActiveTransfersUseCase).invoke(TransferType.TYPE_DOWNLOAD)
+            verify(correctActiveTransfersUseCase).invoke(TransferType.DOWNLOAD)
         }
 
     @Test
@@ -156,7 +156,7 @@ class DownloadsWorkerTest {
                     monitorOngoingActiveDownloadTransfersUseCase
                 )
             underTest.doWork()
-            inOrder.verify(correctActiveTransfersUseCase).invoke(TransferType.TYPE_DOWNLOAD)
+            inOrder.verify(correctActiveTransfersUseCase).invoke(TransferType.DOWNLOAD)
             inOrder.verify(monitorOngoingActiveDownloadTransfersUseCase).invoke()
         }
 
@@ -210,7 +210,7 @@ class DownloadsWorkerTest {
     ) = runTest {
         val transfer: Transfer = mock()
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-        whenever(getActiveTransferTotalsUseCase(TransferType.TYPE_DOWNLOAD))
+        whenever(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
             .thenReturn(initialTransferTotals)
         whenever(areTransfersPausedUseCase())
             .thenReturn(false)

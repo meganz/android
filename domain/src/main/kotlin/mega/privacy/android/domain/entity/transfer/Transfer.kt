@@ -80,14 +80,22 @@ data class Transfer(
      *
      * @return True if the transfer is a chat upload, false otherwise.
      */
-    fun isChatUpload(): Boolean = transferAppData.any { it is TransferAppData.ChatUpload }
+    @Deprecated(
+        message = "deprecated in favor of transfer type",
+        replaceWith = ReplaceWith("transferType == TransferType.TYPE_CHAT_UPLOAD")
+    )
+    fun isChatUpload(): Boolean = transferType == TransferType.CHAT_UPLOAD
 
     /**
      * Is CU upload
      *
      * @return True if the transfer is a CU upload, false otherwise.
      */
-    fun isCUUpload(): Boolean = transferAppData.contains(TransferAppData.CameraUpload)
+    @Deprecated(
+        message = "deprecated in favor of transfer type",
+        replaceWith = ReplaceWith("transferType == TransferType.TYPE_CU_UPLOAD")
+    )
+    fun isCUUpload(): Boolean = transferType == TransferType.CAMERA_UPLOADS_UPLOAD
 
     /**
      * Is SD card download
