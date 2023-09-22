@@ -24,12 +24,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -39,13 +35,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -63,8 +56,6 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.compose.main.PhotosScreen
-import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavGraph
-import mega.privacy.android.app.presentation.photos.compose.navigation.photosRoute
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -98,7 +89,6 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.PhotoScreenEvent
-import timber.log.Timber
 import javax.inject.Inject
 
 /** A temporary bridge to support compatibility between view and compose architecture. */
@@ -109,7 +99,6 @@ class PhotosViewComposeCoordinator {
 /**
  * PhotosFragment
  */
-@OptIn(ExperimentalAnimationApi::class)
 @AndroidEntryPoint
 class PhotosFragment : Fragment() {
 
@@ -169,38 +158,21 @@ class PhotosFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    val usePhotosCompose by produceState(initialValue = false) {
-                        value = getFeatureFlagUseCase(AppFeatures.PhotosCompose)
-                    }
-                    if (usePhotosCompose) {
-                        val animatedNavController = rememberAnimatedNavController()
-                        AnimatedNavHost(
-                            navController = animatedNavController,
-                            startDestination = photosRoute,
-                            enterTransition = { EnterTransition.None },
-                            exitTransition = { ExitTransition.None },
-                            popEnterTransition = { EnterTransition.None },
-                            popExitTransition = { ExitTransition.None },
-                        ) {
-                            photosNavGraph(animatedNavController)
-                        }
-                    } else {
-                        PhotosScreen(
-                            viewComposeCoordinator = viewComposeCoordinator,
-                            getFeatureFlagUseCase = getFeatureFlagUseCase,
-                            photosViewModel = photosViewModel,
-                            timelineViewModel = timelineViewModel,
-                            albumsViewModel = albumsViewModel,
-                            photoDownloaderViewModel = photoDownloaderViewModel,
-                            onCameraUploadsClicked = ::onCameraUploadsButtonClicked,
-                            onEnableCameraUploads = ::enableCameraUploads,
-                            onNavigatePhotosFilter = ::openFilterFragment,
-                            onNavigateAlbumContent = ::openAlbum,
-                            onNavigateAlbumPhotosSelection = ::openAlbumPhotosSelection,
-                            onZoomIn = ::handleZoomIn,
-                            onZoomOut = ::handleZoomOut,
-                        )
-                    }
+                    PhotosScreen(
+                        viewComposeCoordinator = viewComposeCoordinator,
+                        getFeatureFlagUseCase = getFeatureFlagUseCase,
+                        photosViewModel = photosViewModel,
+                        timelineViewModel = timelineViewModel,
+                        albumsViewModel = albumsViewModel,
+                        photoDownloaderViewModel = photoDownloaderViewModel,
+                        onCameraUploadsClicked = ::onCameraUploadsButtonClicked,
+                        onEnableCameraUploads = ::enableCameraUploads,
+                        onNavigatePhotosFilter = ::openFilterFragment,
+                        onNavigateAlbumContent = ::openAlbum,
+                        onNavigateAlbumPhotosSelection = ::openAlbumPhotosSelection,
+                        onZoomIn = ::handleZoomIn,
+                        onZoomOut = ::handleZoomOut,
+                    )
                 }
             }
         }
