@@ -34,6 +34,7 @@ import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.VersionsFileActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
@@ -946,9 +947,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onRemoveLinkClicked(node: MegaNode) {
-        (requireActivity() as ManagerActivity).showConfirmationRemovePublicLink(
-            node
-        )
+        RemovePublicLinkDialogFragment.newInstance(listOf(node.handle))
+            .show(requireActivity().supportFragmentManager, RemovePublicLinkDialogFragment.TAG)
         setStateBottomSheetBehaviorHidden()
     }
 

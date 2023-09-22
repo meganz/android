@@ -42,6 +42,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
@@ -438,9 +439,8 @@ class FileBrowserComposeFragment : Fragment() {
                 }
 
                 OptionItems.REMOVE_LINK_CLICKED -> {
-                    (requireActivity() as ManagerActivity).showConfirmationRemovePublicLink(
-                        it.selectedMegaNode[0]
-                    )
+                    RemovePublicLinkDialogFragment.newInstance(it.selectedNode.map { node -> node.id.longValue })
+                        .show(childFragmentManager, RemovePublicLinkDialogFragment.TAG)
                     disableSelectMode()
                 }
 

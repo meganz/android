@@ -50,11 +50,12 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.managerSections.RotatableFragment
+import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
@@ -595,7 +596,11 @@ class SearchFragment : RotatableFragment() {
                     if (documents[0] == null) {
                         Timber.w("The selected node is NULL")
                     } else {
-                        managerActivity.showConfirmationRemovePublicLink(documents[0])
+                        RemovePublicLinkDialogFragment.newInstance(documents.map { it.handle })
+                            .show(
+                                managerActivity.supportFragmentManager,
+                                RemovePublicLinkDialogFragment.TAG
+                            )
                         closeSelectMode()
                     }
                 }

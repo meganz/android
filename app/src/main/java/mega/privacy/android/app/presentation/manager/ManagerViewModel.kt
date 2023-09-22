@@ -22,6 +22,7 @@ import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
@@ -64,6 +65,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
+import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
@@ -168,6 +170,8 @@ class ManagerViewModel @Inject constructor(
     private val removeShareUseCase: RemoveShareUseCase,
     private val removeShareResultMapper: RemoveShareResultMapper,
     getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
+    private val disableExportNodesUseCase: DisableExportNodesUseCase,
+    private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
 ) : ViewModel() {
 
     /**
@@ -820,6 +824,27 @@ class ManagerViewModel @Inject constructor(
                 Timber.e(it)
             }.onSuccess { result ->
                 val message = removeShareResultMapper(result)
+                _state.update { state ->
+                    state.copy(
+                        message = message,
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Disable export nodes
+     *
+     */
+    fun disableExport(nodeIds: List<Long>) {
+        viewModelScope.launch {
+            runCatching {
+                disableExportNodesUseCase(nodeIds.map { NodeId(it) })
+            }.onFailure {
+                Timber.e(it)
+            }.onSuccess { result ->
+                val message = removePublicLinkResultMapper(result)
                 _state.update { state ->
                     state.copy(
                         message = message,

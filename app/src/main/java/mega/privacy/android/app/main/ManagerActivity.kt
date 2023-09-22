@@ -133,7 +133,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ChatManagementCallback
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener
 import mega.privacy.android.app.main.controllers.ContactController
@@ -5757,49 +5756,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun attachNodesToChats(nodes: List<MegaNode?>?) {
         nodes?.let { nodeAttacher.attachNodes(it.filterNotNull()) }
-    }
-
-    fun showConfirmationRemovePublicLink(n: MegaNode) {
-        Timber.d("showConfirmationRemovePublicLink")
-        if (showTakenDownNodeActionNotAvailableDialog(n, this)) {
-            return
-        }
-        val nodes: ArrayList<MegaNode> = ArrayList()
-        nodes.add(n)
-        showConfirmationRemoveSeveralPublicLinks(nodes)
-    }
-
-    fun showConfirmationRemoveSeveralPublicLinks(nodes: ArrayList<MegaNode>) {
-        val message: String
-        var node: MegaNode? = null
-        if (nodes.size == 1) {
-            node = nodes[0]
-            message = resources.getQuantityString(R.plurals.remove_links_warning_text, 1)
-        } else {
-            message =
-                resources.getQuantityString(R.plurals.remove_links_warning_text, nodes.size)
-        }
-        val builder = MaterialAlertDialogBuilder(this)
-        val finalNode: MegaNode? = node
-        builder.setMessage(message)
-            .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int ->
-                if (finalNode != null) {
-                    if (!viewModel.isConnected) {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.error_server_connection_problem),
-                            -1
-                        )
-                        return@setPositiveButton
-                    }
-                    nodeController.removeLink(finalNode, ExportListener(this, 1))
-                } else {
-                    nodeController.removeLinks(nodes)
-                }
-            }
-            .setNegativeButton(R.string.general_cancel) { _: DialogInterface?, _: Int -> }
-            .show()
-        refreshAfterMovingToRubbish()
     }
 
     override fun confirmLeaveChat(chatId: Long) {

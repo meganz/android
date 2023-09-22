@@ -6,6 +6,7 @@ import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.LinksUtil
@@ -72,7 +73,11 @@ class ActionModeCallback constructor(
             R.id.cab_menu_remove_link -> {
                 Timber.d("Remove public link option")
                 if (selectedNodes.size == 1) {
-                    mainActivity.showConfirmationRemovePublicLink(selectedNodes[0])
+                    RemovePublicLinkDialogFragment.newInstance(listOf(selectedNodes[0].handle))
+                        .show(
+                            mainActivity.supportFragmentManager,
+                            RemovePublicLinkDialogFragment.TAG
+                        )
                 }
             }
 

@@ -23,6 +23,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -78,6 +79,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
+import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
@@ -243,6 +245,8 @@ class ManagerViewModelTest {
     private val removeShareUseCase: RemoveShareUseCase = mock()
     private val removeShareResultMapper: RemoveShareResultMapper = mock()
     private val getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase = mock()
+    private val disableExportNodesUseCase: DisableExportNodesUseCase = mock()
+    private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -305,6 +309,8 @@ class ManagerViewModelTest {
             removeShareUseCase = removeShareUseCase,
             removeShareResultMapper = removeShareResultMapper,
             getNumUnreadChatsUseCase = getNumUnreadChatsUseCase,
+            disableExportNodesUseCase = disableExportNodesUseCase,
+            removePublicLinkResultMapper = removePublicLinkResultMapper,
         )
     }
 
@@ -1027,6 +1033,19 @@ class ManagerViewModelTest {
         underTest.markHandledMessage()
         underTest.state.test {
             assertThat(awaitItem().message).isNull()
+        }
+    }
+
+    @Test
+    fun `test that message update correctly when call disableExport success`() = runTest {
+        val message = "message"
+        testScheduler.advanceUntilIdle()
+        whenever(removePublicLinkResultMapper(any())).thenReturn(message)
+        whenever(disableExportNodesUseCase(any())).thenReturn(mock())
+        underTest.state.test {
+            assertThat(awaitItem().message).isNull()
+            underTest.disableExport(listOf(1L))
+            assertThat(awaitItem().message).isEqualTo(message)
         }
     }
 }

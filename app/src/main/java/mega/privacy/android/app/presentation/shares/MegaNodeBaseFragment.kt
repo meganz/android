@@ -33,6 +33,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
 import mega.privacy.android.app.main.managerSections.RotatableFragment
@@ -697,8 +698,11 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     hideActionMode()
                 }
                 R.id.cab_menu_remove_link -> {
-                    val nodes = ArrayList(selected)
-                    managerActivity?.showConfirmationRemoveSeveralPublicLinks(nodes)
+                    RemovePublicLinkDialogFragment.newInstance(selected.map { it.handle })
+                        .show(
+                            requireActivity().supportFragmentManager,
+                            RemovePublicLinkDialogFragment.TAG
+                        )
                     hideActionMode()
                 }
                 R.id.cab_menu_leave_share -> showConfirmationLeaveIncomingShares(
