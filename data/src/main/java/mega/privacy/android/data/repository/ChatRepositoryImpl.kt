@@ -160,6 +160,22 @@ internal class ChatRepositoryImpl @Inject constructor(
             )?.map { chatListItemMapper(it) } ?: emptyList()
         }
 
+    override suspend fun getUnreadNonMeetingChatListItems(): List<ChatListItem> =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatListItems(
+                mask = MegaChatApi.CHAT_FILTER_BY_READ_OR_UNREAD or MegaChatApi.CHAT_FILTER_BY_MEETING_OR_NON_MEETING,
+                filter = MegaChatApi.CHAT_GET_UNREAD or MegaChatApi.CHAT_GET_NON_MEETING
+            )?.map(chatListItemMapper::invoke) ?: emptyList()
+        }
+
+    override suspend fun getUnreadMeetingChatListItems(): List<ChatListItem> =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatListItems(
+                mask = MegaChatApi.CHAT_FILTER_BY_READ_OR_UNREAD or MegaChatApi.CHAT_FILTER_BY_MEETING_OR_NON_MEETING,
+                filter = MegaChatApi.CHAT_GET_UNREAD or MegaChatApi.CHAT_GET_MEETING
+            )?.map(chatListItemMapper::invoke) ?: emptyList()
+        }
+
     override suspend fun setOpenInvite(chatId: Long): Boolean =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->

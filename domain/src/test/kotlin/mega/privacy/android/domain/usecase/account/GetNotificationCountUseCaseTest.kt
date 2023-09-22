@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.account
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
@@ -70,7 +71,7 @@ class GetNotificationCountUseCaseTest {
             on { size }.thenReturn(numIncomingContactRequests)
         }
         whenever(getIncomingContactRequestsUseCase()).thenReturn(incomingContactRequestsList)
-        whenever(getNumUnreadChatsUseCase()).thenReturn(numUnreadChats)
+        whenever(getNumUnreadChatsUseCase()).thenReturn(flowOf(numUnreadChats))
 
         assertEquals(underTest(withChatNotifications), expectedResult)
     }

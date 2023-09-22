@@ -11,6 +11,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -66,6 +68,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadFolderIconUpdateUseCase
+import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -239,6 +242,7 @@ class ManagerViewModelTest {
     private val renameRecoveryKeyFileUseCase = mock<RenameRecoveryKeyFileUseCase>()
     private val removeShareUseCase: RemoveShareUseCase = mock()
     private val removeShareResultMapper: RemoveShareResultMapper = mock()
+    private val getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -300,6 +304,7 @@ class ManagerViewModelTest {
             renameRecoveryKeyFileUseCase = renameRecoveryKeyFileUseCase,
             removeShareUseCase = removeShareUseCase,
             removeShareResultMapper = removeShareResultMapper,
+            getNumUnreadChatsUseCase = getNumUnreadChatsUseCase,
         )
     }
 

@@ -71,6 +71,20 @@ interface ChatRepository {
     suspend fun getAllChatListItems(): List<ChatListItem>
 
     /**
+     * Get unread non meeting chat list items
+     *
+     * @return  Chat List items
+     */
+    suspend fun getUnreadNonMeetingChatListItems(): List<ChatListItem>
+
+    /**
+     * Get unread meeting chat list items
+     *
+     * @return  Chat List items
+     */
+    suspend fun getUnreadMeetingChatListItems(): List<ChatListItem>
+
+    /**
      * Update open invite setting.
      *
      * @param chatId   The Chat id.

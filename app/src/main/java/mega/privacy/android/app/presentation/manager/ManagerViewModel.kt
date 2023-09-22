@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadFolderIconUpdateUseCase
+import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -110,6 +111,7 @@ import javax.inject.Inject
  * @param monitorContactRequestUpdates
  * @param monitorFinishActivityUseCase
  * @param monitorOfflineNodeAvailabilityUseCase monitor the offline availability of the file to update the UI
+ * @param getNumUnreadChatsUseCase  monitor number of unread chats
  * @property monitorBackupFolder
  */
 @HiltViewModel
@@ -165,6 +167,7 @@ class ManagerViewModel @Inject constructor(
     private val renameRecoveryKeyFileUseCase: RenameRecoveryKeyFileUseCase,
     private val removeShareUseCase: RemoveShareUseCase,
     private val removeShareResultMapper: RemoveShareResultMapper,
+    getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
 ) : ViewModel() {
 
     /**
@@ -201,6 +204,11 @@ class ManagerViewModel @Inject constructor(
      * Monitor offline file availability event
      */
     val monitorOfflineNodeAvailabilityEvent = monitorOfflineNodeAvailabilityUseCase()
+
+    /**
+     * Monitor number of unread chats
+     */
+    val monitorNumUnreadChats = getNumUnreadChatsUseCase()
 
     private val _incomingContactRequests = MutableStateFlow<List<ContactRequest>>(emptyList())
 

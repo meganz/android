@@ -36,7 +36,7 @@ fun ChatUnreadCountText(
         Text(
             modifier = Modifier
                 .testTag("chat_unread_count:text")
-                .padding(horizontal = 6.dp, vertical = 2.dp),
+                .padding(horizontal = 6.dp, vertical = 1.dp),
             text = count.takeIf { it <= MAX_COUNT }?.toString() ?: "$MAX_COUNT+",
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.body2,

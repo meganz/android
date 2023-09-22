@@ -7,8 +7,10 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
@@ -25,7 +27,7 @@ class GetChatsUnreadStatusUseCase @Inject constructor(
     /**
      * Retrieve the unread status of chats and meetings.
      *
-     * @return A [Flow] that emits a pair of booleans representing the unread status of chats and meetings.
+     * @return A [Flow] that emits a pair of booleans representing unread chats and meetings.
      */
     operator fun invoke(): Flow<Pair<Boolean, Boolean>> =
         flow {
@@ -40,7 +42,7 @@ class GetChatsUnreadStatusUseCase @Inject constructor(
      */
     private suspend fun hasUnreadChats(): Deferred<Boolean> = coroutineScope {
         async {
-            chatRepository.getNonMeetingChatRooms().any { it.unreadCount > 0 }
+            chatRepository.getUnreadNonMeetingChatListItems().any()
         }
     }
 
@@ -51,7 +53,7 @@ class GetChatsUnreadStatusUseCase @Inject constructor(
      */
     private suspend fun hasUnreadMeetings(): Deferred<Boolean> = coroutineScope {
         async {
-            chatRepository.getMeetingChatRooms().any { it.unreadCount > 0 }
+            chatRepository.getUnreadMeetingChatListItems().any()
         }
     }
 
@@ -62,6 +64,7 @@ class GetChatsUnreadStatusUseCase @Inject constructor(
      */
     private fun monitorUnreadUpdates(): Flow<Pair<Boolean, Boolean>> =
         chatRepository.monitorChatListItemUpdates()
+            .filter { it.changes == ChatListItemChanges.UnreadCount }
             .mapLatest { hasUnreadChats().await() to hasUnreadMeetings().await() }
             .distinctUntilChanged()
 }

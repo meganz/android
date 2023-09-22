@@ -1215,7 +1215,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false)
         itemView.addView(callBadge)
         callBadge.visibility = View.GONE
-        setChatBadge()
     }
 
     private fun setupAudioPlayerController() {
@@ -1598,7 +1597,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 )
             }
-            setChatBadge()
             Timber.d("Check if there any INCOMING pendingRequest contacts")
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
             val firstLaunch =
@@ -1991,6 +1989,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
                 waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
             }
+        }
+
+        collectFlow(
+            viewModel.monitorNumUnreadChats,
+            Lifecycle.State.RESUMED
+        ) { unreadCount ->
+            updateChatBadge(unreadCount)
         }
     }
 
@@ -7700,8 +7705,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-            Timber.d("Change unread count: %s", item.unreadCount)
-            setChatBadge()
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
         }
     }
@@ -7779,18 +7782,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
     }
 
-    private fun setChatBadge() {
-        val numberUnread = megaChatApi.unreadChats
-        if (numberUnread == 0) {
-            chatBadge.visibility = View.GONE
-        } else {
-            chatBadge.visibility = View.VISIBLE
-            if (numberUnread > 9) {
-                chatBadge.findViewById<TextView>(R.id.chat_badge_text).text = "9+"
-            } else {
-                chatBadge.findViewById<TextView>(R.id.chat_badge_text).text =
-                    "$numberUnread"
-            }
+    /**
+     * Update chat badge
+     *
+     * @param unreadCount   Number of unread chats
+     */
+    private fun updateChatBadge(unreadCount: Int) {
+        chatBadge.apply {
+            findViewById<TextView>(R.id.chat_badge_text)?.text =
+                unreadCount.takeIf { it <= 99 }?.toString() ?: "99+"
+
+            isVisible = unreadCount > 0
         }
     }
 

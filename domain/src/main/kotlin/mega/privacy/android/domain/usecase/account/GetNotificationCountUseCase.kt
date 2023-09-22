@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.account
 
+import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
@@ -24,7 +25,7 @@ class GetNotificationCountUseCase @Inject constructor(
     suspend operator fun invoke(withChatNotifications: Boolean) = if (rootNodeExistsUseCase()) {
         getNumUnreadUserAlertsUseCase() +
                 getIncomingContactRequestsUseCase().size +
-                if (withChatNotifications) getNumUnreadChatsUseCase() else 0
+                if (withChatNotifications) getNumUnreadChatsUseCase().firstOrNull() ?: 0 else 0
     } else {
         0
     }
