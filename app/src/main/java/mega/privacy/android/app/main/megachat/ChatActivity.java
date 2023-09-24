@@ -640,9 +640,6 @@ public class ChatActivity extends PasscodeActivity
 
     public int showRichLinkWarning = RICH_WARNING_TRUE;
 
-    private BadgeDrawerArrowDrawable badgeDrawable;
-    private Drawable upArrow;
-
     private final MegaAttacher nodeAttacher = new MegaAttacher(this);
     private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
             AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
@@ -1701,15 +1698,12 @@ public class ChatActivity extends PasscodeActivity
         privateIconToolbar.setVisibility(View.GONE);
 
         muteIconToolbar.setVisibility(View.GONE);
-        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext(),
-                R.color.red_600_red_300, R.color.white_dark_grey, R.color.white_dark_grey);
 
-        upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white)
+        Drawable upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white)
                 .mutate();
         upArrow.setColorFilter(getResources().getColor(R.color.grey_087_white_087),
                 PorterDuff.Mode.SRC_IN);
-
-        updateNavigationToolbarIcon();
+        aB.setHomeAsUpIndicator(upArrow);
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
         joinButton = findViewById(R.id.join_button);
@@ -8948,29 +8942,6 @@ public class ChatActivity extends PasscodeActivity
         MegaApplication.setOpenChatId(-1);
     }
 
-    public void updateNavigationToolbarIcon() {
-        if (!chatC.isInAnonymousMode()) {
-            int numberUnread = megaChatApi.getUnreadChats();
-
-            if (numberUnread == 0) {
-                aB.setHomeAsUpIndicator(upArrow);
-            } else {
-
-                badgeDrawable.setProgress(1.0f);
-
-                if (numberUnread > 9) {
-                    badgeDrawable.setText("9+");
-                } else {
-                    badgeDrawable.setText(numberUnread + "");
-                }
-
-                aB.setHomeAsUpIndicator(badgeDrawable);
-            }
-        } else {
-            aB.setHomeAsUpIndicator(upArrow);
-        }
-    }
-
     private void onChatConnectionStateUpdate(long chatid, int newState) {
         Timber.d("Chat ID: %d. New State: %d", chatid, newState);
 
@@ -10084,13 +10055,6 @@ public class ChatActivity extends PasscodeActivity
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((next) -> {
-                    if (next instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate) {
-                        MegaChatListItem item = ((GetChatChangesUseCase.Result.OnChatListItemUpdate) next).component1();
-                        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-                            updateNavigationToolbarIcon();
-                        }
-                    }
-
                     if (next instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
                         int status = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component2();
                         setChatSubtitle();

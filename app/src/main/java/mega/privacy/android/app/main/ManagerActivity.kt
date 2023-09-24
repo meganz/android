@@ -1210,6 +1210,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun initialiseChatBadgeView() {
         val itemView = menuView.getChildAt(3) as BottomNavigationItemView
         chatBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false)
+            .apply { isVisible = false }
         itemView.addView(chatBadge)
         callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false)
         itemView.addView(callBadge)

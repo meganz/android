@@ -19,13 +19,13 @@ import kotlin.random.Random
 /**
  * Chat unread count icon text view
  *
- * @param modifier
  * @param count     Number of unread items
+ * @param modifier  [Modifier]
  */
 @Composable
 fun ChatUnreadCountText(
-    modifier: Modifier,
     count: Int,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -52,7 +52,7 @@ private const val MAX_COUNT = 99
 @Composable
 private fun PreviewChatUnreadCountView() {
     ChatUnreadCountText(
-        Modifier,
-        Random.nextInt(110)
+        Random.nextInt(110),
+        Modifier
     )
 }
