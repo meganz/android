@@ -6,11 +6,13 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
@@ -24,6 +26,7 @@ import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
         ActiveTransferEntity::class,
         SyncRecordEntity::class,
         SdTransferEntity::class,
+        BackupEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -41,7 +44,10 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun activeTransfersDao(): ActiveTransferDao
 
     abstract fun syncRecordDao(): SyncRecordDao
+
     abstract fun sdTransferDao(): SdTransferDao
+
+    abstract fun backupDao(): BackupDao
 
     companion object {
         private val MIGRATION_67_68 = object : Migration(67, 68) {
@@ -84,6 +90,28 @@ internal abstract class MegaDatabase : RoomDatabase() {
                 }
             }
         }
-        val MIGRATIONS = arrayOf(MIGRATION_67_68, MIGRATION_68_69, MIGRATION_70_71, MIGRATION_71_72)
+
+        private val MIGRATION_74_75 = object : Migration(74, 75) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Migrate Type and Rename column backups.delete_empty_subolders and backups.exclude_subolders and backups.outdated from BOOLEAN to TEXT type
+                database.beginTransaction()
+                try {
+                    database.execSQL("ALTER TABLE backups RENAME TO backups_old")
+                    database.execSQL("CREATE TABLE IF NOT EXISTS `backups` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `backup_id` TEXT NOT NULL, `backup_type` INTEGER NOT NULL, `target_node` TEXT NOT NULL, `local_folder` TEXT NOT NULL, `backup_name` TEXT NOT NULL, `state` INTEGER NOT NULL, `sub_state` INTEGER NOT NULL, `extra_data` TEXT NOT NULL, `start_timestamp` TEXT NOT NULL, `last_sync_timestamp` TEXT NOT NULL, `target_folder_path` TEXT NOT NULL, `exclude_subFolders` TEXT NOT NULL, `delete_empty_subFolders` TEXT NOT NULL, `outdated` TEXT NOT NULL)")
+                    database.execSQL("INSERT INTO backups(id, backup_id, backup_type, target_node, local_folder, backup_name, state, sub_state, extra_data, start_timestamp, last_sync_timestamp, target_folder_path, exclude_subFolders, delete_empty_subFolders, outdated) SELECT id, backup_id, backup_type, target_node, local_folder, backup_name, state, sub_state, extra_data, start_timestamp, last_sync_timestamp, target_folder_path, exclude_subolders, delete_empty_subolders, outdated FROM backups_old")
+                    database.execSQL("DROP TABLE backups_old")
+                    database.setTransactionSuccessful()
+                } finally {
+                    database.endTransaction()
+                }
+            }
+        }
+        val MIGRATIONS = arrayOf(
+            MIGRATION_67_68,
+            MIGRATION_68_69,
+            MIGRATION_70_71,
+            MIGRATION_71_72,
+            MIGRATION_74_75
+        )
     }
 }

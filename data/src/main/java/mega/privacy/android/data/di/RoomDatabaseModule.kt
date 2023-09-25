@@ -11,6 +11,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.SdTransferDao
@@ -56,6 +57,11 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideSdTransferDao(database: MegaDatabase): SdTransferDao =
         database.sdTransferDao()
+
+    @Provides
+    @Singleton
+    internal fun provideBackupDao(database: MegaDatabase): BackupDao =
+        database.backupDao()
 
     @Provides
     @Singleton

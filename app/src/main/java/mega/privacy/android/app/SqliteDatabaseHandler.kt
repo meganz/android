@@ -4504,8 +4504,8 @@ class SqliteDatabaseHandler @Inject constructor(
         private const val KEY_BACKUP_START_TIME = "start_timestamp"
         private const val KEY_BACKUP_LAST_TIME = "last_sync_timestamp"
         private const val KEY_BACKUP_TARGET_NODE_PATH = "target_folder_path"
-        private const val KEY_BACKUP_EX = "exclude_subolders"
-        private const val KEY_BACKUP_DEL = "delete_empty_subolders"
+        private const val KEY_BACKUP_EX = "exclude_subFolders"
+        private const val KEY_BACKUP_DEL = "delete_empty_subFolders"
         private const val KEY_BACKUP_OUTDATED = "outdated"
         private const val CREATE_BACKUP_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_BACKUPS(" +
                 "$KEY_ID INTEGER PRIMARY KEY, " +                          //0
