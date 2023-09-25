@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
@@ -1721,6 +1722,36 @@ interface MegaApiGateway {
      * @return          True if notifications has to be created, false otherwise.
      */
     fun isChatNotifiable(chatId: Long): Boolean
+
+    /**
+     * Returns settings for push notifications
+     *
+     * The SDK retains the ownership of the returned value. It will be valid until
+     * the MegaRequest object is deleted.
+     *
+     * This value is valid for these requests in onRequestFinish when the
+     * error code is MegaError::API_OK:
+     * - MegaApi::getPushNotificationSettings - Returns settings for push notifications
+     *
+     * @return Object with settings for push notifications
+     */
+    fun getPushNotificationSettings(listener: MegaRequestListenerInterface)
+
+    /**
+     * Set push notification settings
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_PUSH_SETTINGS
+     * - MegaRequest::getMegaPushNotificationSettings - Returns settings for push notifications
+     *
+     * @param settings MegaPushNotificationSettings with the new settings
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setPushNotificationSettings(
+        settings: MegaPushNotificationSettings,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Invite contact

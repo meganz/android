@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.ChatRoomItemStatusMapper
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
@@ -57,6 +58,7 @@ internal class GetChatsUseCaseTest {
     private val getUserEmail = mock<GetContactEmail>()
     private val monitorScheduledMeetingUpdates = mock<MonitorScheduledMeetingUpdates>()
     private val monitorScheduledMeetingOccurrencesUpdates = mock<MonitorScheduledMeetingOccurrencesUpdates>()
+    private val notificationsRepository = mock<NotificationsRepository>()
 
     private val lastMessage: suspend (Long) -> String = { "test" }
     private val lastTimeMapper: (Long) -> String = { "test" }
@@ -104,6 +106,7 @@ internal class GetChatsUseCaseTest {
             getUserEmail,
             monitorScheduledMeetingUpdates,
             monitorScheduledMeetingOccurrencesUpdates,
+            notificationsRepository,
         )
 
         runBlocking {
@@ -201,7 +204,7 @@ internal class GetChatsUseCaseTest {
     }
 
     @Test
-    fun `test that isChatNotifiable is called accordingly`() = runTest {
+    fun `test that isChatEnabled is called accordingly`() = runTest {
         val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
 
         whenever(chatRoomItemMapper(any())).thenAnswer {
@@ -217,7 +220,7 @@ internal class GetChatsUseCaseTest {
             headerTimeMapper = headerTimeMapper,
         ).take(2).last()
 
-        verify(chatRepository, times(chatRooms.size)).isChatNotifiable(anyLong())
+        verify(notificationsRepository, times(chatRooms.size)).isChatEnabled(anyLong())
     }
 
     @Test
@@ -258,5 +261,93 @@ internal class GetChatsUseCaseTest {
         ).take(2).last()
 
         verify(getChatGroupAvatarUseCase, times(chatRooms.size)).invoke(anyLong())
+    }
+
+    @Test
+    fun `test that getScheduleMeetingDataUseCase is called accordingly`() = runTest {
+        val chatRoomType = GetChatsUseCase.ChatRoomType.MEETINGS
+
+        whenever(chatRoomItemMapper(any())).thenAnswer {
+            val chatRoom = ((it.arguments[0]) as CombinedChatRoom)
+            ChatRoomItem.MeetingChatRoomItem(chatId = chatRoom.chatId, title = chatRoom.title)
+        }
+
+        underTest.invoke(
+            chatRoomType = chatRoomType,
+            lastMessage = lastMessage,
+            lastTimeMapper = lastTimeMapper,
+            meetingTimeMapper = meetingTimeMapper,
+            headerTimeMapper = headerTimeMapper,
+        ).take(2).last()
+
+        verify(getScheduleMeetingDataUseCase, times(chatRooms.size)).invoke(anyLong(), any())
+    }
+
+    @Test
+    fun `test that getUserOnlineStatusByHandleUseCase is called accordingly`() = runTest {
+        val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
+
+        whenever(chatRoomItemMapper(any())).thenAnswer {
+            val chatRoom = ((it.arguments[0]) as CombinedChatRoom)
+            ChatRoomItem.IndividualChatRoomItem(
+                chatId = chatRoom.chatId,
+                title = chatRoom.title,
+                peerHandle = Random.nextLong()
+            )
+        }
+
+        underTest.invoke(
+            chatRoomType = chatRoomType,
+            lastMessage = lastMessage,
+            lastTimeMapper = lastTimeMapper,
+            meetingTimeMapper = meetingTimeMapper,
+            headerTimeMapper = headerTimeMapper,
+        ).take(2).last()
+
+        verify(getUserOnlineStatusByHandleUseCase, times(chatRooms.size)).invoke(anyLong())
+    }
+
+    @Test
+    fun `test that getUserEmail is called accordingly`() = runTest {
+        val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
+
+        whenever(chatRoomItemMapper(any())).thenAnswer {
+            val chatRoom = ((it.arguments[0]) as CombinedChatRoom)
+            ChatRoomItem.IndividualChatRoomItem(
+                chatId = chatRoom.chatId,
+                title = chatRoom.title,
+                peerHandle = Random.nextLong()
+            )
+        }
+
+        underTest.invoke(
+            chatRoomType = chatRoomType,
+            lastMessage = lastMessage,
+            lastTimeMapper = lastTimeMapper,
+            meetingTimeMapper = meetingTimeMapper,
+            headerTimeMapper = headerTimeMapper,
+        ).take(2).last()
+
+        verify(getUserEmail, times(chatRooms.size)).invoke(anyLong())
+    }
+
+    @Test
+    fun `test that monitorChatCallUpdates is called accordingly`() = runTest {
+        val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
+
+        whenever(chatRoomItemMapper(any())).thenAnswer {
+            val chatRoom = ((it.arguments[0]) as CombinedChatRoom)
+            ChatRoomItem.GroupChatRoomItem(chatId = chatRoom.chatId, title = chatRoom.title)
+        }
+
+        underTest.invoke(
+            chatRoomType = chatRoomType,
+            lastMessage = lastMessage,
+            lastTimeMapper = lastTimeMapper,
+            meetingTimeMapper = meetingTimeMapper,
+            headerTimeMapper = headerTimeMapper,
+        ).take(2).last()
+
+        verify(monitorChatCallUpdates, times(1)).invoke()
     }
 }

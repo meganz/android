@@ -214,10 +214,11 @@ internal fun WaitingRoomView(
             ) {
                 if (state.cameraEnabled) {
                     MegaVideoTextureView(
+                        videoStream = videoStream,
+                        mirrorEffect = true,
                         modifier = Modifier
                             .fillMaxSize()
                             .testTag("waiting_room:preview_camera"),
-                        videoStream = videoStream,
                     )
                 } else {
                     Box(

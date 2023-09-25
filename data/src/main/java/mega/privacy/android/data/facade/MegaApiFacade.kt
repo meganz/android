@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -949,6 +950,14 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun isChatNotifiable(chatId: Long): Boolean =
         megaApi.isChatNotifiable(chatId)
+
+    override fun getPushNotificationSettings(listener: MegaRequestListenerInterface) =
+        megaApi.getPushNotificationSettings(listener)
+
+    override fun setPushNotificationSettings(
+        settings: MegaPushNotificationSettings,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.setPushNotificationSettings(settings, listener)
 
     override fun inviteContact(email: String, listener: MegaRequestListenerInterface) =
         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, listener)

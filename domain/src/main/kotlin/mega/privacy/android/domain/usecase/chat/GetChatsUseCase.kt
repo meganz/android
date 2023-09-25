@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingData
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.ChatRoomItemStatusMapper
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
@@ -62,6 +63,7 @@ class GetChatsUseCase @Inject constructor(
     private val getUserEmail: GetContactEmail,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorScheduledMeetingOccurrencesUpdates: MonitorScheduledMeetingOccurrencesUpdates,
+    private val notificationsRepository: NotificationsRepository,
 ) {
 
     companion object {
@@ -439,7 +441,7 @@ class GetChatsUseCase @Inject constructor(
         }.getOrNull()
 
     private suspend fun isChatMuted(chatId: Long): Boolean =
-        runCatching { !chatRepository.isChatNotifiable(chatId) }.getOrNull() ?: false
+        runCatching { !notificationsRepository.isChatEnabled(chatId) }.getOrNull() ?: false
 
     private suspend fun getCurrentCall(chatId: Long): ChatRoomItemStatus =
         runCatching { getChatCall(chatId)?.let(chatRoomItemStatusMapper::invoke) }.getOrNull()

@@ -48,4 +48,25 @@ interface NotificationsRepository {
      * @param badgeCount Number of pending actions the current logged in account has.
      */
     suspend fun broadcastHomeBadgeCount(badgeCount: Int)
+
+    /**
+     * Check if notifications are enabled for a chat
+     *
+     * @param chatId    handle of the node that identifies the chat room
+     * @return          true if it is enabled, false otherwise
+     */
+    suspend fun isChatEnabled(chatId: Long): Boolean
+
+    /**
+     * Enable or disable notifications for a chat
+     *
+     * If notifications for this chat are disabled, the DND settings for this chat,
+     * if any, will be cleared.
+     *
+     * @note Settings per chat override any global notification setting.
+     *
+     * @param chatId    handle of the node that identifies the chat room
+     * @param enabled   true to enable, false to disable
+     */
+    suspend fun setChatEnabled(chatId: Long, enabled: Boolean)
 }

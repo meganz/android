@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -24,9 +26,10 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NotificationsRepository
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
@@ -169,4 +172,44 @@ internal class DefaultNotificationsRepository @Inject constructor(
     private suspend fun areMeetingInvitationsEnabled(): Boolean =
         callsPreferencesGateway.getCallsMeetingInvitationsPreference().firstOrNull() ==
                 CallsMeetingInvitations.Enabled
+
+    override suspend fun isChatEnabled(chatId: Long): Boolean = withContext(dispatcher) {
+        getPushNotificationSettings().isChatEnabled(chatId)
+    }
+
+    override suspend fun setChatEnabled(chatId: Long, enabled: Boolean) = withContext(dispatcher) {
+        val updatedSettings = getPushNotificationSettings().apply {
+            enableChat(chatId, enabled)
+        }
+
+        setPushNotificationSettings(updatedSettings)
+    }
+
+    private suspend fun getPushNotificationSettings(): MegaPushNotificationSettings =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getPushNotificationSettings") {
+                    it.megaPushNotificationSettings ?: MegaPushNotificationSettings.createInstance()
+                }
+
+                megaApiGateway.getPushNotificationSettings(listener)
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
+    private suspend fun setPushNotificationSettings(settings: MegaPushNotificationSettings) =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("setPushNotificationSettings") {}
+
+                megaApiGateway.setPushNotificationSettings(settings, listener)
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }

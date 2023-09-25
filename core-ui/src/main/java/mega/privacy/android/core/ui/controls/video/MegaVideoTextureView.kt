@@ -37,13 +37,15 @@ import java.nio.ByteBuffer
  * The destination rectangle for the Bitmap is computed based on the aspect ratio of the Bitmap.
  * Resources are cleaned up when the Composable is destroyed.
  *
- * @param modifier          [Modifier] to be applied to the TextureView.
  * @param videoStream       [Flow] emitting pairs of [Size] and [ByteArray] representing each video frame.
+ * @param modifier          [Modifier] to be applied to the TextureView.
+ * @param mirrorEffect      Flag to enable/disable image mirror effect.
  */
 @Composable
 fun MegaVideoTextureView(
-    modifier: Modifier,
     videoStream: Flow<Pair<Size, ByteArray>>,
+    modifier: Modifier = Modifier,
+    mirrorEffect: Boolean = false,
 ) {
     val lifecycle = LocalLifecycleOwner.current
     var textureView by remember { mutableStateOf<TextureView?>(null) }
@@ -87,7 +89,7 @@ fun MegaVideoTextureView(
         },
     )
 
-    // Create and draw bitmap when TextureView, byte array, or frame dimensions change.
+    // Collects frames from videoStream, updates bitmap, and draws it on TextureView's canvas.
     LaunchedEffect(videoStream) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             videoStream.collectLatest { videoFrame ->
@@ -97,21 +99,31 @@ fun MegaVideoTextureView(
                 if (textureView == null || bitmapRect == null) return@collectLatest
 
                 withContext(Dispatchers.Default) {
-                    // Reuse existing bitmap if it has the same dimensions as the current frame
-                    bitmap = (bitmap?.takeIf { it.width == frameWidth && it.height == frameHeight }
-                        ?: Bitmap.createBitmap(frameWidth, frameHeight, Bitmap.Config.ARGB_8888))
-                        .apply {
-                            // Copy pixel data from the byte array to the bitmap
-                            copyPixelsFromBuffer(ByteBuffer.wrap(videoFrame.second))
-                        }
+                    // Check if existing bitmap has the same dimensions as the current frame
+                    if (bitmap?.width != frameWidth || bitmap?.height != frameHeight) {
+                        // Recycle existing bitmap and create a new one
+                        bitmap?.recycle()
+                        bitmap = Bitmap.createBitmap(
+                            frameWidth,
+                            frameHeight,
+                            Bitmap.Config.ARGB_8888
+                        )
+                    }
+
+                    // Copy pixel data from the byte array to the bitmap
+                    bitmap?.copyPixelsFromBuffer(ByteBuffer.wrap(videoFrame.second))
                 }
 
                 // Draw the bitmap on the TextureView's canvas
                 textureView?.lockCanvas()?.let { canvas ->
                     try {
-                        // Flip the canvas horizontally for mirror effect
-                        canvas.withScale(-1.0f, 1.0f, canvas.width / 2f, canvas.height / 2f) {
-                            drawBitmap(bitmap!!, null, bitmapRect!!, null)
+                        if (mirrorEffect) {
+                            // Flip the canvas horizontally for mirror effect
+                            canvas.withScale(-1.0f, 1.0f, canvas.width / 2f, canvas.height / 2f) {
+                                drawBitmap(bitmap!!, null, bitmapRect!!, null)
+                            }
+                        } else {
+                            canvas.drawBitmap(bitmap!!, null, bitmapRect!!, null)
                         }
                     } catch (error: Exception) {
                         Log.e("TextureView", "Canvas error: ${error.stackTraceToString()}")

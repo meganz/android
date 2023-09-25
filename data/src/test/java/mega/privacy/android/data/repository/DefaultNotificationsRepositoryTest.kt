@@ -24,11 +24,12 @@ import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.NormalEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
+import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUserAlert
@@ -259,5 +260,54 @@ class DefaultNotificationsRepositoryTest {
             assertThat(awaitItem()).isEqualTo(expectedEvent)
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `test that isChatEnabled returns correct value`() = runTest {
+        val chatId = 123L
+        val enabled = true
+        val settings = mock<MegaPushNotificationSettings> {
+            on { isChatEnabled(chatId) }.thenReturn(enabled)
+        }
+        whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock { on { megaPushNotificationSettings }.thenReturn(settings) },
+                mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+            )
+        }
+
+        val result = underTest.isChatEnabled(chatId)
+
+        assertThat(result).isEqualTo(enabled)
+    }
+
+    @Test
+    fun `test that setChatEnabled updates settings correctly`() = runTest {
+        val chatId = 123L
+        val enabled = true
+        val settings = mock<MegaPushNotificationSettings> {
+            on { isChatEnabled(chatId) }.thenReturn(enabled)
+        }
+        whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock { on { megaPushNotificationSettings }.thenReturn(settings) },
+                mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+            )
+        }
+
+        whenever(megaApiGateway.setPushNotificationSettings(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+            )
+        }
+
+        underTest.setChatEnabled(chatId, enabled)
+
+        verify(megaApiGateway).getPushNotificationSettings(any())
+        verify(megaApiGateway).setPushNotificationSettings(any(), any())
     }
 }
