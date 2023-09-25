@@ -11,7 +11,7 @@ import mega.privacy.android.domain.exception.PublicNodeException
 import nz.mega.sdk.MegaNode
 
 /**
- * Data class defining the state of [mega.privacy.android.app.presentation.filelink.FileLinkActivity]
+ * Data class defining the state of [mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity]
  *
  * @property shouldLogin            Whether to show login screen
  * @property url                    Url of the file
@@ -25,8 +25,6 @@ import nz.mega.sdk.MegaNode
  * @property iconResource           the icon resource that represents this node
  * @property askForDecryptionDialog Whether to show AskForDecryptionDialog
  * @property collision              Node with existing names
- * @property copyThrowable          Throwable error on copy
- * @property collisionCheckThrowable Throwable error on collision check
  * @property copySuccess            Whether copy was success or not
  * @property fetchPublicNodeError   Exception while fetching current public node
  * @property jobInProgressState     indicates if there are any job in progress that needs to be notified
@@ -49,8 +47,6 @@ data class FileLinkState(
     val iconResource: Int? = null,
     val askForDecryptionDialog: Boolean = false,
     val collision: NameCollision? = null,
-    val collisionCheckThrowable: Throwable? = null,
-    val copyThrowable: Throwable? = null,
     val copySuccess: Boolean = false,
     val fetchPublicNodeError: PublicNodeException? = null,
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,

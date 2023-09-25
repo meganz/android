@@ -344,7 +344,6 @@ class ManagerViewModel @Inject constructor(
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
-            AppFeatures.FileLinkCompose.takeIf { getFeatureFlagValueUseCase(it) },
             AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) }
         )
     }

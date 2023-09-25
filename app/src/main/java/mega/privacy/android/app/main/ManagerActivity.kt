@@ -175,7 +175,6 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
@@ -2434,13 +2433,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 Constants.ACTION_OPEN_MEGA_LINK -> {
                     Timber.d("ACTION_OPEN_MEGA_LINK")
-                    val fileLinkIntent =
-                        if (viewModel.state().enabledFlags.contains(AppFeatures.FileLinkCompose)) {
-                            Intent(this, FileLinkComposeActivity::class.java)
-                        } else {
-                            Intent(this, FileLinkActivity::class.java)
-                        }
-
+                    val fileLinkIntent = Intent(this, FileLinkComposeActivity::class.java)
                     fileLinkIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     fileLinkIntent.action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
                     intent.dataString?.let {
@@ -5305,7 +5298,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
 
-                val linkType = nodeController.importLink(link, viewModel.state().enabledFlags)
+                val linkType = nodeController.importLink(link)
                 if (openLinkError?.visibility == View.VISIBLE) {
                     when (linkType) {
                         Constants.CHAT_LINK -> {

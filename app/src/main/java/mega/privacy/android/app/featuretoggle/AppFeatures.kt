@@ -197,11 +197,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     WaitingRoomSettings("Enable Waiting room settings", false),
 
     /**
-     * To switch into new FileLink compose screen
-     */
-    FileLinkCompose("Enable compose for FileLink", true),
-
-    /**
      * This is an MVP implementation where we include chips to the existing search functionality
      * This will later be replaced by the Clean implementation
      */

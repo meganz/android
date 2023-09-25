@@ -30,11 +30,9 @@ import android.net.Uri;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
@@ -45,14 +43,12 @@ import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity;
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.domain.entity.Feature;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -217,7 +213,7 @@ public class NodeController {
         return dBT;
     }
 
-    public int importLink(String url, Set<Feature> enabledFeatureFlags) {
+    public int importLink(String url) {
         try {
             url = URLDecoder.decode(url, "UTF-8");
         } catch (Exception e) {
@@ -233,12 +229,7 @@ public class NodeController {
 
         // Download link
         if (Util.matchRegexs(url, Constants.FILE_LINK_REGEXS)) {
-            Intent openFileIntent;
-            if (enabledFeatureFlags.contains(AppFeatures.FileLinkCompose)) {
-                openFileIntent = new Intent(context, FileLinkComposeActivity.class);
-            } else {
-                openFileIntent = new Intent(context, FileLinkActivity.class);
-            }
+            Intent openFileIntent = new Intent(context, FileLinkComposeActivity.class);
             openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
             openFileIntent.setData(Uri.parse(url));

@@ -23,7 +23,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener
@@ -31,7 +30,6 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -488,11 +486,10 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 openLinkState.enabledFeatureFlags != null -> {
                     if (openFileLink) {
                         val intent =
-                            if (viewModel.isFeatureEnabled(AppFeatures.FileLinkCompose) == true) {
-                                Intent(this@OpenLinkActivity, FileLinkComposeActivity::class.java)
-                            } else {
-                                Intent(this@OpenLinkActivity, FileLinkActivity::class.java)
-                            }.apply {
+                            Intent(
+                                this@OpenLinkActivity,
+                                FileLinkComposeActivity::class.java
+                            ).apply {
                                 putExtra(
                                     OPENED_FROM_CHAT,
                                     intent.getBooleanExtra(OPENED_FROM_CHAT, false)

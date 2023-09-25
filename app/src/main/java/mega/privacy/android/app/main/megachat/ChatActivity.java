@@ -328,7 +328,6 @@ import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
-import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
@@ -373,20 +372,19 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
-import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel;
 import mega.privacy.android.app.presentation.chat.ContactInvitation;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment;
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity;
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
 import mega.privacy.android.app.presentation.meeting.UsersInWaitingRoomDialogFragment;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
@@ -1387,11 +1385,7 @@ public class ChatActivity extends PasscodeActivity
         Intent openLink;
 
         if (isFile) {
-            if (viewModel.isFeatureEnabled(AppFeatures.FileLinkCompose)) {
-                openLink = new Intent(this, FileLinkComposeActivity.class);
-            } else {
-                openLink = new Intent(this, FileLinkActivity.class);
-            }
+            openLink = new Intent(this, FileLinkComposeActivity.class);
             openLink.setAction(ACTION_OPEN_MEGA_LINK);
         } else {
             openLink = new Intent(this, FolderLinkComposeActivity.class);

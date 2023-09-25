@@ -35,13 +35,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
@@ -857,11 +855,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun getFileLinkIntent(): Intent {
-        return if (viewModel.isFeatureEnabled(AppFeatures.FileLinkCompose)) {
-            Intent(requireContext(), FileLinkComposeActivity::class.java)
-        } else {
-            Intent(requireContext(), FileLinkActivity::class.java)
-        }
+        return Intent(requireContext(), FileLinkComposeActivity::class.java)
     }
 
     private fun onForgotPassword(typedEmail: String?) {

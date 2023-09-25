@@ -43,10 +43,6 @@ class OpenLinkViewModel @Inject constructor(
      */
     val state = _state.asStateFlow()
 
-    init {
-        viewModelScope.launch { getEnabledFeatures() }
-    }
-
     /**
      * logout confirmed
      * once logout is confirmed methods clears user related app data
@@ -83,13 +79,6 @@ class OpenLinkViewModel @Inject constructor(
         }.onFailure {
             Timber.d("Error on logout $it")
         }
-    }
-
-    private suspend fun getEnabledFeatures() {
-        val enabledFeatures = setOfNotNull(
-            AppFeatures.FileLinkCompose.takeIf { getFeatureFlagValueUseCase(it) }
-        )
-        _state.update { it.copy(enabledFeatureFlags = enabledFeatures) }
     }
 
     /**

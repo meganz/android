@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import dagger.hilt.android.scopes.ActivityScoped
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
@@ -40,11 +38,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                 }
 
             Constants.ACTION_OPEN_MEGA_LINK -> {
-                if (enabledFeatureFlags.contains(AppFeatures.FileLinkCompose)) {
-                    Intent(activity, FileLinkComposeActivity::class.java)
-                } else {
-                    Intent(activity, FileLinkActivity::class.java)
-                }.apply {
+                Intent(activity, FileLinkComposeActivity::class.java).apply {
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_IMPORT_LINK_FETCH_NODES

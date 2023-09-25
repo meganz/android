@@ -137,10 +137,6 @@ class LoginViewModel @Inject constructor(
 
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
 
-    init {
-        viewModelScope.launch { getEnabledFeatures() }
-    }
-
     /**
      * Reset some states values.
      */
@@ -207,13 +203,6 @@ class LoginViewModel @Inject constructor(
                             || it.type == AccountBlockedType.TOS_NON_COPYRIGHT
                 }.collectLatest { stopLogin() }
         }
-    }
-
-    private suspend fun getEnabledFeatures() {
-        val enabledFeatures = setOfNotNull(
-            AppFeatures.FileLinkCompose.takeIf { getFeatureFlagValueUseCase(it) }
-        )
-        _state.update { it.copy(enabledFlags = enabledFeatures) }
     }
 
     /**

@@ -207,13 +207,6 @@ class ChatViewModel @Inject constructor(
                 }
             }
         }
-
-        viewModelScope.launch {
-            val enabledFeatures = setOfNotNull(
-                AppFeatures.FileLinkCompose.takeIf { getFeatureFlagValueUseCase(it) }
-            )
-            _state.update { it.copy(enabledFeatureFlags = enabledFeatures) }
-        }
     }
 
     override fun onCleared() {
