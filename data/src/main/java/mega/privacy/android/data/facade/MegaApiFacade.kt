@@ -1414,4 +1414,9 @@ internal class MegaApiFacade @Inject constructor(
     )
     override val totalDownloads: Int
         get() = megaApi.totalDownloads
+
+    override fun getPsa(listener: MegaRequestListenerInterface) =
+        megaApi.getPSAWithUrl(listener)
+
+    override suspend fun setPsaHandled(psaId: Int) = megaApi.setPSA(psaId)
 }

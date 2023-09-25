@@ -3029,4 +3029,18 @@ interface MegaApiGateway {
                 "Replace with the corresponding value get from ActiveTransfers when ready"
     )
     val totalDownloads: Int
+
+    /**
+     * Get psa
+     *
+     * @param listener
+     */
+    fun getPsa(listener: MegaRequestListenerInterface)
+
+    /**
+     * Set psa handled
+     *
+     * @param psaId
+     */
+    suspend fun setPsaHandled(psaId: Int)
 }
