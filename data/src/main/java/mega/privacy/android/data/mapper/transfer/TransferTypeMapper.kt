@@ -19,7 +19,7 @@ internal class TransferTypeMapper @Inject constructor() {
         MegaTransfer.TYPE_DOWNLOAD -> TransferType.DOWNLOAD
         MegaTransfer.TYPE_UPLOAD -> when {
             appData.any { it is TransferAppData.ChatUpload } -> TransferType.CHAT_UPLOAD
-            appData.contains(TransferAppData.CameraUpload) -> TransferType.CAMERA_UPLOADS_UPLOAD
+            appData.contains(TransferAppData.CameraUpload) -> TransferType.CAMERA_UPLOAD
             else -> TransferType.GENERAL_UPLOAD
         }
 

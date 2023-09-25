@@ -82,7 +82,7 @@ data class Transfer(
      */
     @Deprecated(
         message = "deprecated in favor of transfer type",
-        replaceWith = ReplaceWith("transferType == TransferType.TYPE_CHAT_UPLOAD")
+        replaceWith = ReplaceWith("transferType == TransferType.CHAT_UPLOAD")
     )
     fun isChatUpload(): Boolean = transferType == TransferType.CHAT_UPLOAD
 
@@ -93,9 +93,9 @@ data class Transfer(
      */
     @Deprecated(
         message = "deprecated in favor of transfer type",
-        replaceWith = ReplaceWith("transferType == TransferType.TYPE_CU_UPLOAD")
+        replaceWith = ReplaceWith("transferType == TransferType.CAMERA_UPLOAD")
     )
-    fun isCUUpload(): Boolean = transferType == TransferType.CAMERA_UPLOADS_UPLOAD
+    fun isCUUpload(): Boolean = transferType == TransferType.CAMERA_UPLOAD
 
     /**
      * Is SD card download

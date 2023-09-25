@@ -39,7 +39,7 @@ class TransferTypeIntMapperTest {
             MegaTransfer.TYPE_UPLOAD,
         ),
         Arguments.of(
-            TransferType.CAMERA_UPLOADS_UPLOAD,
+            TransferType.CAMERA_UPLOAD,
             MegaTransfer.TYPE_UPLOAD,
         ),
         Arguments.of(

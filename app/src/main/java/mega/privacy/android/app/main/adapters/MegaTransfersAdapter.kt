@@ -132,7 +132,7 @@ class MegaTransfersAdapter(
                 }
             }
 
-            TransferType.GENERAL_UPLOAD, TransferType.CAMERA_UPLOADS_UPLOAD, TransferType.CHAT_UPLOAD -> {
+            TransferType.GENERAL_UPLOAD, TransferType.CAMERA_UPLOAD, TransferType.CHAT_UPLOAD -> {
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers)
                     showDefaultIcon(
