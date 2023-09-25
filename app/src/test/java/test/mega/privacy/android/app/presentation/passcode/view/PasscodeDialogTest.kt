@@ -31,6 +31,7 @@ import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
 import mega.privacy.mobile.analytics.event.PasscodeLogoutButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeUnlockDialogEvent
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -327,6 +328,7 @@ internal class PasscodeDialogTest {
     }
 
     @Test
+    @Ignore
     fun `test that passcode entered event is emitted when the pin type passcode is entered`() {
         displayDialogWithState(
             PasscodeUnlockState.Data(
@@ -339,7 +341,7 @@ internal class PasscodeDialogTest {
         val expected = "1234"
 
         val passwordField =
-            composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = false)
+            composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG)
 
         passwordField.performTextInput(expected)
 

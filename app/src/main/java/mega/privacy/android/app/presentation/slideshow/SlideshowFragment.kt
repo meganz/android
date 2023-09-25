@@ -177,13 +177,18 @@ class SlideshowFragment : Fragment() {
     private fun SlideshowBody() {
         val slideshowViewState by slideshowViewModel.state.collectAsStateWithLifecycle()
         val scaffoldState = rememberScaffoldState()
-        val pagerState = rememberPagerState()
         val photoState = rememberPhotoState()
         val items = slideshowViewState.slideshowItems
         val order = slideshowViewState.order ?: SlideshowOrder.Shuffle
         val speed = slideshowViewState.speed ?: SlideshowSpeed.Normal
         val repeat = slideshowViewState.repeat
         val isPlaying = slideshowViewState.isPlaying
+        val pagerState = rememberPagerState(
+            initialPage = 0,
+            initialPageOffsetFraction = 0f
+        ) {
+            items.size
+        }
 
         SlideshowCompose(
             scaffoldState = scaffoldState,
@@ -280,10 +285,9 @@ class SlideshowFragment : Fragment() {
                 HorizontalPager(
                     modifier = Modifier
                         .fillMaxSize(),
-                    pageCount = playItems.size,
                     state = pagerState,
                     beyondBoundsPageCount = 5,
-                    key = { playItems[it].photo.id }
+                    key = { playItems.getOrNull(it)?.photo?.id ?: -1L }
                 ) { index ->
 
                     val slideshowItem = playItems[index]

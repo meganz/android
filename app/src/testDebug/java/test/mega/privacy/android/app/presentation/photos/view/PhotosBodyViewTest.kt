@@ -1,11 +1,10 @@
 package test.mega.privacy.android.app.presentation.photos.view
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
@@ -31,7 +30,12 @@ class PhotosBodyViewTest {
             PhotosBodyView(
                 tabs = PhotosTab.values().asList(),
                 selectedTab = PhotosTab.Timeline,
-                pagerState = rememberPagerState(),
+                pagerState = rememberPagerState(
+                    initialPage = 0,
+                    initialPageOffsetFraction = 0f
+                ) {
+                    PhotosTab.values().size
+                },
                 onTabSelected = {},
                 timelineView = {},
                 albumsView = {},
@@ -49,7 +53,12 @@ class PhotosBodyViewTest {
             PhotosBodyView(
                 tabs = PhotosTab.values().asList(),
                 selectedTab = PhotosTab.Timeline,
-                pagerState = rememberPagerState(),
+                pagerState = rememberPagerState(
+                    initialPage = 0,
+                    initialPageOffsetFraction = 0f
+                ) {
+                    PhotosTab.values().size
+                },
                 onTabSelected = {},
                 timelineView = {},
                 albumsView = {},

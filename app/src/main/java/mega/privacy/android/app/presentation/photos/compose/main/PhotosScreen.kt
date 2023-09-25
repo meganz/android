@@ -61,7 +61,12 @@ fun PhotosScreen(
     val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
     val albumsViewState by albumsViewModel.state.collectAsStateWithLifecycle()
 
-    val pagerState = rememberPagerState(initialPage = photosViewState.selectedTab.ordinal)
+    val pagerState = rememberPagerState(
+        initialPage = photosViewState.selectedTab.ordinal,
+        initialPageOffsetFraction = 0f
+    ) {
+        photosViewState.tabs.size
+    }
     val timelineLazyGridState = rememberLazyGridState().also {
         viewComposeCoordinator.lazyGridState = it
     }

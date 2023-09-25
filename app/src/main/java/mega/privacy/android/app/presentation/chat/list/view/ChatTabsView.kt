@@ -86,7 +86,12 @@ fun ChatTabsView(
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(initialPage)
+    val pagerState = rememberPagerState(
+        initialPage = initialPage,
+        initialPageOffsetFraction = 0f
+    ) {
+        ChatTab.values().size
+    }
     var scrollToTop by remember { mutableStateOf(false) }
     var showFabButton by remember { mutableStateOf(true) }
     var filteredChats by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
@@ -156,7 +161,6 @@ fun ChatTabsView(
 
             HorizontalPager(
                 state = pagerState,
-                pageCount = ChatTab.values().size,
                 modifier = Modifier.fillMaxSize(),
             ) { page ->
                 val isMeetingView = page == ChatTab.MEETINGS.ordinal

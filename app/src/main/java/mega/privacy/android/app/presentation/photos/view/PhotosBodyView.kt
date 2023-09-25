@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
@@ -41,9 +40,9 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PhotosBodyView(
+    pagerState: PagerState,
     tabs: List<PhotosTab> = listOf(),
     selectedTab: PhotosTab = PhotosTab.Timeline,
-    pagerState: PagerState = rememberPagerState(),
     onTabSelected: (PhotosTab) -> Unit = {},
     timelineView: @Composable () -> Unit = {},
     albumsView: @Composable () -> Unit = {},
@@ -160,7 +159,6 @@ fun PagerView(
     albumsViewState: AlbumsViewState,
 ) {
     HorizontalPager(
-        pageCount = tabs.size,
         state = pagerState,
         modifier = modifier,
         userScrollEnabled = timelineViewState.selectedPhotoCount == 0 && albumsViewState.selectedAlbumIds.isEmpty(),

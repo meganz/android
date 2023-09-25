@@ -162,8 +162,7 @@ internal fun AchievementsInfoView(
                         .padding(vertical = 8.dp, horizontal = 12.dp)
                         .align(Alignment.Center),
                     text = getAchievementTitle(uiState = uiState),
-                    color = getAchievementTitleColor(uiState = uiState),
-                    style = MaterialTheme.typography.body2.copy(letterSpacing = 0.sp)
+                    style = MaterialTheme.typography.body2.copy(letterSpacing = 0.sp, color = getAchievementTitleColor(uiState = uiState))
                 )
             }
 
