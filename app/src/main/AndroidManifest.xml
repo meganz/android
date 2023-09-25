@@ -422,7 +422,8 @@
         <activity
             android:name=".presentation.qrcode.QRCodeActivity" />
         <activity
-            android:name=".presentation.qrcode.QRCodeComposeActivity" />
+            android:name=".presentation.qrcode.QRCodeComposeActivity"
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".presentation.twofactorauthentication.TwoFactorAuthenticationActivity"
             android:windowSoftInputMode="adjustResize" />
