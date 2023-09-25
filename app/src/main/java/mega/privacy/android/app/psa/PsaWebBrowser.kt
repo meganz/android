@@ -15,21 +15,26 @@ import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.databinding.FragmentPsaWebBrowserBinding
-import mega.privacy.android.app.psa.PsaManager.dismissPsa
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.isURLSanitized
 import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PsaWebBrowser : Fragment() {
     private var binding: FragmentPsaWebBrowserBinding? = null
 
     private var psaId = Constants.INVALID_VALUE
 
     private val uiHandler = Handler(Looper.getMainLooper())
+
+    @Inject
+    lateinit var psaManager: PsaManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -123,7 +128,7 @@ class PsaWebBrowser : Fragment() {
             binding?.webView?.visibility = View.VISIBLE
             onBackPressedCallback.isEnabled = true
             if (psaId != Constants.INVALID_VALUE) {
-                dismissPsa(psaId)
+                psaManager.dismissPsa(psaId)
             }
         }
     }

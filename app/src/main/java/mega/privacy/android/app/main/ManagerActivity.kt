@@ -432,6 +432,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     @Inject
     lateinit var inAppUpdateHandler: InAppUpdateHandler
 
+    @Inject
+    lateinit var psaManager: PsaManager
+
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
     private lateinit var getProText: TextView
@@ -975,7 +978,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         userInfoViewModel.checkPasswordReminderStatus()
         checkInitialScreens()
         lifecycleScope.launch {
-            PsaManager.checkPsa()
+            psaManager.checkPsa()
         }
         uploadBottomSheetDialogActionHandler.onRestoreInstanceState(savedInstanceState)
         Timber.d("END onCreate")
@@ -1027,7 +1030,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun initialiseViews() {
-        psaViewHolder = PsaViewHolder(findViewById(R.id.psa_layout), PsaManager)
+        psaViewHolder = PsaViewHolder(findViewById(R.id.psa_layout), psaManager)
         appBarLayout = findViewById(R.id.app_bar_layout)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)

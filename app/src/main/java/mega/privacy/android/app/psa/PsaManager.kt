@@ -1,38 +1,39 @@
 package mega.privacy.android.app.psa
 
-import android.annotation.SuppressLint
 import androidx.preference.PreferenceManager
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.di.CoroutineScopesModule
-import mega.privacy.android.app.di.CoroutinesDispatchersModule
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.EVENT_PSA
 import mega.privacy.android.domain.entity.psa.Psa
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaError
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * The ViewModel for PSA logic.
  */
-object PsaManager {
+@Singleton
+class PsaManager @Inject constructor(
+    @ApplicationScope private val coroutineScope: CoroutineScope,
+) {
 
-    private const val LAST_PSA_CHECK_TIME_KEY = "last_psa_check_time"
+    private val LAST_PSA_CHECK_TIME_KEY = "last_psa_check_time"
 
     /**
      * The minimum interval in milliseconds that we should keep between two calls to
      * SDK to get PSA from server.
      */
-    const val GET_PSA_INTERVAL_MS = 3600_000L
+    private val GET_PSA_INTERVAL_MS = 3600_000L
 
-    @SuppressLint("StaticFieldLeak")
     private val application = MegaApplication.getInstance()
     private val megaApi = application.megaApi
 
     private val preferences by lazy { PreferenceManager.getDefaultSharedPreferences(application) }
     private var psa: Psa? = null
-    private val coroutineScope = CoroutineScopesModule
-        .provideCoroutineScope(CoroutinesDispatchersModule.providesIoDispatcher())
 
     /**
      * Check PSA from server
