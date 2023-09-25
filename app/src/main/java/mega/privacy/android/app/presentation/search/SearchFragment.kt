@@ -60,6 +60,7 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
+import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.search.view.SearchFilterChipsView
@@ -82,9 +83,20 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.mobile.analytics.event.SearchAudioFilterPressed
+import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
+import mega.privacy.mobile.analytics.event.SearchDocsFilterPressed
+import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
+import mega.privacy.mobile.analytics.event.SearchImageFilterPressed
+import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchItemSelected
 import mega.privacy.mobile.analytics.event.SearchItemSelectedEvent
+import mega.privacy.mobile.analytics.event.SearchResetFilterPressed
+import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
+import mega.privacy.mobile.analytics.event.SearchVideosFilterPressed
+import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
@@ -263,7 +275,10 @@ class SearchFragment : RotatableFragment() {
                         SearchFilterChipsView(
                             filters = uiState.filters,
                             selectedFilter = uiState.selectedFilter,
-                            updateFilter = searchViewModel::updateFilter
+                            updateFilter = {
+                                trackAnalytics(selectedFilter = it)
+                                searchViewModel.updateFilter(selectedChip = it)
+                            }
                         )
                     }
                 }
@@ -1166,6 +1181,21 @@ class SearchFragment : RotatableFragment() {
                     this@SearchFragment.adapter.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
                 }
             }
+        }
+    }
+
+    private fun trackAnalytics(selectedFilter: SearchFilter?) {
+        selectedFilter?.let {
+            when (it.filter) {
+                SearchCategory.IMAGES -> Analytics.tracker.trackEvent(SearchImageFilterPressedEvent)
+                SearchCategory.VIDEO -> Analytics.tracker.trackEvent(SearchVideosFilterPressedEvent)
+                SearchCategory.AUDIO -> Analytics.tracker.trackEvent(SearchAudioFilterPressedEvent)
+                SearchCategory.DOCUMENTS -> Analytics.tracker.trackEvent(SearchDocsFilterPressedEvent)
+
+                else -> Analytics.tracker.trackEvent(SearchResetFilterPressedEvent)
+            }
+        } ?: run {
+            Analytics.tracker.trackEvent(SearchResetFilterPressedEvent)
         }
     }
 }

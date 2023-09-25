@@ -445,8 +445,8 @@ class SearchViewModel @Inject constructor(
      *
      * @param selectedChip
      */
-    fun updateFilter(selectedChip: SearchFilter) {
-        val searchFilter = if (selectedChip.filter != state.value.selectedFilter?.filter) {
+    fun updateFilter(selectedChip: SearchFilter?) {
+        val searchFilter = if (selectedChip?.filter != state.value.selectedFilter?.filter) {
             selectedChip
         } else {
             null
