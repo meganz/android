@@ -25,10 +25,10 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
-import org.junit.Ignore
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -39,7 +39,7 @@ import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorE
 @ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Ignore("Ignore the unstable test. Will add the tests back once stability issue is resolved.")
+@Disabled("Ignore the unstable test. Will add the tests back once stability issue is resolved.")
 internal class PdfViewerViewModelTest {
 
     private lateinit var underTest: PdfViewerViewModel
