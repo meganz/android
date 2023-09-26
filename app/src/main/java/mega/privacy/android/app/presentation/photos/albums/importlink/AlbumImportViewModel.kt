@@ -508,4 +508,8 @@ internal class AlbumImportViewModel @Inject constructor(
     fun mapPhotosToNodes(photos: Collection<Photo>) = photos.mapNotNull { photo ->
         legacyPublicAlbumPhotoNodeProvider.getPublicNode(photo.id)
     }
+
+    fun stopPreview() {
+        legacyPublicAlbumPhotoNodeProvider.stopPreview()
+    }
 }

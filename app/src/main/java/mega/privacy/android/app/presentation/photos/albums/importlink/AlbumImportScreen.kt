@@ -120,6 +120,8 @@ internal fun AlbumImportScreen(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 Analytics.tracker.trackEvent(AlbumImportScreenEvent)
+            } else if (event == Lifecycle.Event.ON_DESTROY) {
+                albumImportViewModel.stopPreview()
             }
         }
 

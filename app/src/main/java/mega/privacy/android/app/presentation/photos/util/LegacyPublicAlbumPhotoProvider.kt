@@ -70,4 +70,6 @@ class LegacyPublicAlbumPhotoNodeProvider @Inject constructor(
     fun getPublicNodes(): List<MegaNode> = publicNodesMap.map { (_, node) -> node }
 
     fun getPublicNode(handle: Long): MegaNode? = publicNodesMap[NodeId(handle)]
+
+    fun stopPreview() = megaApiGateway.stopPublicSetPreview()
 }
