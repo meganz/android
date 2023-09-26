@@ -84,7 +84,7 @@ class CompletedTransferMapper @Inject constructor(
         transfer.getSDCardTransferPath()?.takeUnless { it.isBlank() }
             ?: run {
                 when (transfer.transferType) {
-                    TransferType.GENERAL_UPLOAD, TransferType.CAMERA_UPLOAD, TransferType.CHAT_UPLOAD ->
+                    TransferType.GENERAL_UPLOAD, TransferType.CU_UPLOAD, TransferType.CHAT_UPLOAD ->
                         formatNodePath(transfer.parentHandle)
 
                     TransferType.DOWNLOAD -> {

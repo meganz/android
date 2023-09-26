@@ -59,7 +59,7 @@ class MonitorCameraUploadTransfersPausedUseCaseTest {
     }
 
     private fun getTransfers() = TransferType.values().map {
-        Arguments.of(mockTransfer(it), it == TransferType.CAMERA_UPLOAD)
+        Arguments.of(mockTransfer(it), it == TransferType.CU_UPLOAD)
     }
 
     private fun mockTransfer(

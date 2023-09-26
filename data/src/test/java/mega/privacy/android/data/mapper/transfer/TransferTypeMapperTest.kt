@@ -44,7 +44,7 @@ class TransferTypeMapperTest {
         ),
         Arguments.of(
             MegaTransfer.TYPE_UPLOAD,
-            TransferType.CAMERA_UPLOAD,
+            TransferType.CU_UPLOAD,
             listOf(TransferAppData.CameraUpload),
         ),
         Arguments.of(
