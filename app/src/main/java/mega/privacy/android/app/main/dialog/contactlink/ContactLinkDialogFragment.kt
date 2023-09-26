@@ -62,7 +62,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
                             val message = if (contactLink.isContact) {
                                 stringResource(id = R.string.context_contact_already_exists, email)
                             } else {
-                                stringResource(id = R.string.invite_not_sent)
+                                email
                             }
                             AndroidTheme(isDark = themeMode.isDarkMode()) {
                                 MegaAlertDialog(
