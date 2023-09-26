@@ -972,9 +972,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (handleRootNodeAndHeartbeatState(savedInstanceState)) return
         userInfoViewModel.checkPasswordReminderStatus()
         checkInitialScreens()
-        lifecycleScope.launch {
-            psaManager.checkPsa()
-        }
         uploadBottomSheetDialogActionHandler.onRestoreInstanceState(savedInstanceState)
         Timber.d("END onCreate")
         RatingHandlerImpl(this).showRatingBaseOnTransaction()

@@ -31,12 +31,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
@@ -82,7 +80,6 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
-import mega.privacy.android.app.utils.Constants.EVENT_PSA
 import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
@@ -122,6 +119,7 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferOverQuotaUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -151,6 +149,7 @@ import javax.inject.Inject
  * @property getAccountDetailsUseCase
  * @property billingViewModel
  * @property monitorTransferOverQuotaUseCase
+ * @property fetchPsaUseCase
  */
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
@@ -187,6 +186,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     @Inject
     lateinit var monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase
+
+    @Inject
+    lateinit var fetchPsaUseCase: FetchPsaUseCase
 
     /**
      * Monitor Chat Signal Presence Use Case
@@ -249,7 +251,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * Load the psa in the web browser fragment if the psa is a web one and this activity
      * is on the top of the task stack
      */
-    private val psaObserver = Observer { psa: Psa ->
+    private fun handlePsa(psa: Psa) {
         if (psa.url != null && Util.isTopActivity(javaClass.name, this)) {
             loadPsaInWebBrowser(psa)
         }
@@ -491,12 +493,12 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         // Add an invisible full screen Psa web browser container to the activity.
         addPsaWebBrowser()
 
-        LiveEventBus.get(EVENT_PSA, Psa::class.java).observeStickyForever(psaObserver)
 
         if (shouldSetStatusBarTextColor()) {
             setStatusBarTextColor(this)
         }
     }
+
 
     /**
      * Checks if should set status bar text color.
@@ -569,6 +571,13 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         Util.setAppFontSize(this)
         isActivityInBackground = false
         retryConnectionsAndSignalPresence()
+        lifecycleScope.launch {
+            kotlin.runCatching { fetchPsaUseCase(System.currentTimeMillis()) }
+                .onFailure { Timber.e(it) }
+                .getOrNull()?.let {
+                    handlePsa(it)
+                }
+        }
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -589,7 +598,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         dismissAlertDialogIfExists(resumeTransfersWarning)
         dismissAlertDialogIfExists(setDownloadLocationDialog)
         dismissAlertDialogIfExists(upgradeAlert)
-        LiveEventBus.get(EVENT_PSA, Psa::class.java).removeObserver(psaObserver)
         super.onDestroy()
     }
 
