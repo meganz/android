@@ -14,10 +14,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.DefaultGetThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Singleton
@@ -95,4 +97,8 @@ class AppModule {
     @Provides
     fun provideGetThemeModePreference(useCase: DefaultGetThemeMode): GetThemeMode =
         useCase
+
+    @Singleton
+    @Provides
+    internal fun provideAppNavigator(navigator: MegaNavigatorImpl): MegaNavigator = navigator
 }

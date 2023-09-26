@@ -295,6 +295,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":core-ui"))
     implementation(project(":data"))
+    implementation(project(":navigation"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     "baselineProfile"(project(":baselineprofile"))
     "qaImplementation"(project(":screenshot"))

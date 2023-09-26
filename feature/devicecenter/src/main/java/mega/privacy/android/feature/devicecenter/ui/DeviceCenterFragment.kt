@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
 
 /**
@@ -31,6 +32,9 @@ class DeviceCenterFragment : Fragment() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     /**
      * The View Model for the Device Center feature

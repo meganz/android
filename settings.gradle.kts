@@ -38,6 +38,7 @@ include("liveeventbus-x")
 include(":analytics")
 include(":core-ui-test")
 include(":baselineprofile")
+include(":navigation")
 
 println("isServerBuild = ${isServerBuild()}")
 buildCache {

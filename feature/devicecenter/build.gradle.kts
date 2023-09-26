@@ -74,6 +74,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":domain"))
+    implementation(project(":navigation"))
     implementation(project(":data"))
     implementation(project(":core-ui"))
 
