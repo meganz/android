@@ -6,6 +6,9 @@ import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.PsaLayoutBinding
@@ -99,7 +102,9 @@ class PsaViewHolder(
         // (receive null Psa event), so we need change visibility before calling
         // ViewModel.
         binding.root.visibility = View.GONE
-        psaManager.dismissPsa(id)
+        binding.root.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            psaManager.dismissPsa(id)
+        }
         bound = false
     }
 }

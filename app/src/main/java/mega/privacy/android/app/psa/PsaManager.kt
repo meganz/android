@@ -1,15 +1,11 @@
 package mega.privacy.android.app.psa
 
-import androidx.preference.PreferenceManager
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.Constants.EVENT_PSA
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.psa.Psa
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import nz.mega.sdk.MegaError
+import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
+import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
+import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,56 +14,23 @@ import javax.inject.Singleton
  */
 @Singleton
 class PsaManager @Inject constructor(
-    @ApplicationScope private val coroutineScope: CoroutineScope,
+    private val fetchPsaUseCase: FetchPsaUseCase,
+    private val clearPsaUseCase: ClearPsaUseCase,
+    private val dismissPsaUseCase: DismissPsaUseCase,
 ) {
-
-    private val LAST_PSA_CHECK_TIME_KEY = "last_psa_check_time"
-
-    /**
-     * The minimum interval in milliseconds that we should keep between two calls to
-     * SDK to get PSA from server.
-     */
-    private val GET_PSA_INTERVAL_MS = 3600_000L
-
-    private val application = MegaApplication.getInstance()
-    private val megaApi = application.megaApi
-
-    private val preferences by lazy { PreferenceManager.getDefaultSharedPreferences(application) }
-    private var psa: Psa? = null
 
     /**
      * Check PSA from server
      */
-    suspend fun checkPsa() = withContext(coroutineScope.coroutineContext) {
-        val timeSinceLastCheck =
-            System.currentTimeMillis() - preferences.getLong(LAST_PSA_CHECK_TIME_KEY, 0L)
-
-        if (timeSinceLastCheck >= GET_PSA_INTERVAL_MS) {
-            megaApi.getPSAWithUrl(OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
-                preferences.edit()
-                    .putLong(LAST_PSA_CHECK_TIME_KEY, System.currentTimeMillis())
-                    .apply()
-                if (error.errorCode == MegaError.API_OK) {
-                    psa = Psa(
-                        request.number.toInt(), request.name, request.text, request.file,
-                        request.password, request.link, request.email
-                    )
-                    LiveEventBus.get(EVENT_PSA, Psa::class.java).post(psa)
-                }
-            }))
-        }
+    suspend fun checkPsa() {
+        val psa = fetchPsaUseCase(System.currentTimeMillis())
+        LiveEventBus.get(Constants.EVENT_PSA, Psa::class.java).post(psa)
     }
 
     /**
      * Clean Psa Check timestamp from preferences
      */
-    suspend fun clearPsa() = withContext(coroutineScope.coroutineContext) {
-        // If user logout while there is a PSA displaying (not shown yet), if we don't
-        // reset psa, it will be displayed in LoginActivity again, which is not
-        // desired.
-        psa = null
-        preferences.edit().remove(LAST_PSA_CHECK_TIME_KEY).apply()
-    }
+    suspend fun clearPsa() = clearPsaUseCase()
 
 
     /**
@@ -75,8 +38,5 @@ class PsaManager @Inject constructor(
      *
      * @param id the id of the PSA
      */
-    fun dismissPsa(id: Int) {
-        megaApi.setPSA(id)
-        psa = null
-    }
+    suspend fun dismissPsa(id: Int) = dismissPsaUseCase(id)
 }

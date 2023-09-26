@@ -15,7 +15,9 @@ import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.databinding.FragmentPsaWebBrowserBinding
@@ -128,7 +130,9 @@ class PsaWebBrowser : Fragment() {
             binding?.webView?.visibility = View.VISIBLE
             onBackPressedCallback.isEnabled = true
             if (psaId != Constants.INVALID_VALUE) {
-                psaManager.dismissPsa(psaId)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    psaManager.dismissPsa(psaId)
+                }
             }
         }
     }
