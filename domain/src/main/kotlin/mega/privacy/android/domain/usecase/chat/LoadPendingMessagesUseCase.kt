@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isVoiceClip
+import mega.privacy.android.domain.entity.transfer.pendingMessageId
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
@@ -98,7 +101,7 @@ class LoadPendingMessagesUseCase @Inject constructor(
         getTransferDataUseCase()?.let { transferData ->
             transferData.uploadTags.forEach { tag ->
                 getTransferByTagUseCase(tag)?.let { transfer ->
-                    if (transfer.isChatUpload() && !transfer.isVoiceClip() && id == transfer.pendingMessageId()) {
+                    if (transfer.transferType == TransferType.CHAT_UPLOAD && !transfer.isVoiceClip() && id == transfer.pendingMessageId()) {
                         return transfer
                     }
                 }

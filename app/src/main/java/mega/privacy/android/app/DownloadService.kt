@@ -51,7 +51,6 @@ import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
@@ -66,6 +65,10 @@ import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
+import mega.privacy.android.domain.entity.transfer.getSDCardDownloadAppData
+import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isSDCardDownload
+import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -1347,8 +1350,7 @@ internal class DownloadService : LifecycleService() {
             backgroundTransfers.add(transfer.tag)
             return@withContext
         }
-        val appData = transfer.appData
-        if (appData.contains(Constants.APP_DATA_SD_CARD)) {
+        if (transfer.isSDCardDownload()) {
             insertSdTransferUseCase(
                 SdTransfer(
                     transfer.tag,
@@ -1356,7 +1358,7 @@ internal class DownloadService : LifecycleService() {
                     Util.getSizeString(transfer.totalBytes, this@DownloadService),
                     transfer.nodeHandle.toString(),
                     transfer.localPath,
-                    appData
+                    transfer.appData
                 )
             )
         }
@@ -1372,14 +1374,19 @@ internal class DownloadService : LifecycleService() {
         Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.transferType)
         if (transfer.isStreamingTransfer) return@withContext
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(applicationContext.packageName))
+            sendBroadcast(
+                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
+                    applicationContext.packageName
+                )
+            )
         }
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
         val isVoiceClip = transfer.isVoiceClip()
         val isBackgroundTransfer = transfer.isBackgroundTransfer()
         if (!isVoiceClip && !isBackgroundTransfer) transfersCount--
         val path = transfer.localPath
-        val targetPath = SDCardUtils.getSDCardTargetPath(transfer.appData)
+        val sdCardDownloadAppData = transfer.getSDCardDownloadAppData()
+        val targetPath = sdCardDownloadAppData?.targetPath
         if (!transfer.isFolderTransfer) {
             if (!isVoiceClip && !isBackgroundTransfer) {
                 val completedTransfer =
@@ -1436,7 +1443,7 @@ internal class DownloadService : LifecycleService() {
                         val isSuccess = sdCardOperator.moveDownloadedFileToDestinationPath(
                             source,
                             targetPath,
-                            SDCardUtils.getSDCardTargetUri(transfer.appData),
+                            sdCardDownloadAppData.targetUri,
                         )
                         if (isSuccess) {
                             deleteSdTransferByTagUseCase(transfer.tag)
@@ -1628,7 +1635,11 @@ internal class DownloadService : LifecycleService() {
     }
 
     private fun refreshOfflineFragment() {
-        sendBroadcast(Intent(OfflineFragment.REFRESH_OFFLINE_FILE_LIST).setPackage(applicationContext.packageName))
+        sendBroadcast(
+            Intent(OfflineFragment.REFRESH_OFFLINE_FILE_LIST).setPackage(
+                applicationContext.packageName
+            )
+        )
     }
 
     private fun refreshSettingsFragment() {

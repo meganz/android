@@ -1,5 +1,8 @@
 package mega.privacy.android.domain.entity
 
+import mega.privacy.android.domain.entity.transfer.AppDataOwner
+import mega.privacy.android.domain.entity.transfer.TransferAppData
+
 /**
  * Sd transfer
  *
@@ -16,5 +19,5 @@ data class SdTransfer(
     val size: String,
     val nodeHandle: String,
     val path: String,
-    val appData: String,
-)
+    override val appData: List<TransferAppData>,
+) : AppDataOwner

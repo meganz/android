@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferData
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.IsThereAnyPendingUploadsUseCase
@@ -30,11 +31,11 @@ class IsThereAnyChatUploadUseCaseTest {
     private lateinit var getTransferByTagUseCase: GetTransferByTagUseCase
 
     private val chatTransfer = mock<Transfer> {
-        on { isChatUpload() }.thenReturn(true)
-        on { isVoiceClip() }.thenReturn(false)
+        on { transferType }.thenReturn(TransferType.CHAT_UPLOAD)
+        on { appData }.thenReturn(emptyList())
     }
     private val nonChatTransfer = mock<Transfer> {
-        on { isChatUpload() }.thenReturn(false)
+        on { transferType }.thenReturn(TransferType.GENERAL_UPLOAD)
     }
     private val transferData = mock<TransferData> {
         on { numUploads }.thenReturn(3)

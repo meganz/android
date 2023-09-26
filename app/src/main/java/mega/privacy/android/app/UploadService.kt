@@ -53,6 +53,7 @@ import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
+import mega.privacy.android.domain.entity.transfer.getTextFileUploadAppData
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -371,7 +372,7 @@ internal class UploadService : LifecycleService() {
                         getTransferDataUseCase()?.let { transferData ->
                             for (i in 0 until transferData.numUploads) {
                                 getTransferByTagUseCase(transferData.uploadTags[i])?.takeIf { transfer ->
-                                    !transfer.isCUUpload() && !transfer.isChatUpload()
+                                    transfer.transferType == TransferType.GENERAL_UPLOAD
                                             && transfer.appData.isEmpty() && !transfer.isFolderTransfer
                                 }?.let { transfer ->
                                     mapProgressFileTransfers[transfer.tag] = transfer
@@ -817,10 +818,10 @@ internal class UploadService : LifecycleService() {
                 AndroidCompletedTransfer(transfer, error, this@UploadService)
 
             addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
-            if (appData.isNotEmpty() && appData.contains(Constants.APP_DATA_TXT_FILE)) {
+            getTextFileUploadAppData()?.let {
                 val message =
                     getCreationOrEditorText(
-                        appData = appData,
+                        textFileUpload = it,
                         isSuccess = error == null,
                         context = this@UploadService
                     )

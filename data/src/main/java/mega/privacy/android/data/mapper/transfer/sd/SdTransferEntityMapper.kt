@@ -2,11 +2,13 @@ package mega.privacy.android.data.mapper.transfer.sd
 
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.entity.SdTransferEntity
+import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.domain.entity.SdTransfer
 import javax.inject.Inject
 
 internal class SdTransferEntityMapper @Inject constructor(
     private val encryptData: EncryptData,
+    private val transferAppDataStringMapper: TransferAppDataStringMapper,
 ) {
     suspend operator fun invoke(sdTransfer: SdTransfer) = SdTransferEntity(
         tag = sdTransfer.tag,
@@ -14,6 +16,6 @@ internal class SdTransferEntityMapper @Inject constructor(
         encryptedName = encryptData(sdTransfer.name),
         encryptedSize = encryptData(sdTransfer.size),
         encryptedPath = encryptData(sdTransfer.path),
-        encryptedAppData = encryptData(sdTransfer.appData),
+        encryptedAppData = encryptData(transferAppDataStringMapper(sdTransfer.appData)),
     )
 }

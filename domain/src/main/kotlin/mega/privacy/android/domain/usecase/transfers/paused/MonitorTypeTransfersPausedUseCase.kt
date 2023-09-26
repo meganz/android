@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.repository.TransferRepository
 
 /**

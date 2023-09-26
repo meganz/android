@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.chatuploads
 
+import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.IsThereAnyPendingUploadsUseCase
@@ -29,7 +31,7 @@ class IsThereAnyChatUploadUseCase @Inject constructor(
             getTransferDataUseCase()?.let { transferData ->
                 transferData.uploadTags.forEach { tag ->
                     getTransferByTagUseCase(tag)?.let { transfer ->
-                        if (transfer.isChatUpload() && !transfer.isVoiceClip()) return true
+                        if (transfer.transferType == TransferType.CHAT_UPLOAD && !transfer.isVoiceClip()) return true
                     }
                 }
 

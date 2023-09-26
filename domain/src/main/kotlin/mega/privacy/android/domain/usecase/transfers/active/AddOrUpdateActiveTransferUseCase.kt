@@ -2,6 +2,8 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject

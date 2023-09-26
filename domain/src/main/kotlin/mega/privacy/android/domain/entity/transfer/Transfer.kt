@@ -33,7 +33,7 @@ import java.math.BigInteger
  * @property isFinished True if the transfer is at finished state (completed, cancelled or failed)
  * @property isFolderTransfer True if it's a folder transfer, false otherwise (file transfer).
  * @property appData  The application data associated with this transfer
- * @property transferAppData A list of [TransferAppData] that represents the application data associated with this transfer
+ * @property appData A list of [TransferAppData] that represents the application data associated with this transfer
  * @property state [TransferState]
  * @property priority Returns the priority of the transfer.
  *                    This value is intended to keep the order of the transfer queue on apps.
@@ -55,89 +55,14 @@ data class Transfer(
     val isStreamingTransfer: Boolean,
     override val isFinished: Boolean,
     override val isFolderTransfer: Boolean,
-    @Deprecated(message = "use transferAppData")
-    val appData: String,
-    val transferAppData: List<TransferAppData>,
+    override val appData: List<TransferAppData>,
     val state: TransferState,
     val priority: BigInteger,
     val notificationNumber: Long,
-) : ActiveTransfer {
+) : ActiveTransfer, AppDataOwner {
 
     /**
      * Gets paused state from [state]
      */
     override val isPaused get() = state == TransferState.STATE_PAUSED
-
-    /**
-     * Is voice clip.
-     *
-     * @return True if the transfer is a voice clip, false otherwise.
-     */
-    fun isVoiceClip(): Boolean = transferAppData.contains(TransferAppData.VoiceClip)
-
-    /**
-     * Is chat upload
-     *
-     * @return True if the transfer is a chat upload, false otherwise.
-     */
-    @Deprecated(
-        message = "deprecated in favor of transfer type",
-        replaceWith = ReplaceWith("transferType == TransferType.CHAT_UPLOAD")
-    )
-    fun isChatUpload(): Boolean = transferType == TransferType.CHAT_UPLOAD
-
-    /**
-     * Is CU upload
-     *
-     * @return True if the transfer is a CU upload, false otherwise.
-     */
-    @Deprecated(
-        message = "deprecated in favor of transfer type",
-        replaceWith = ReplaceWith("transferType == TransferType.CAMERA_UPLOAD")
-    )
-    fun isCUUpload(): Boolean = transferType == TransferType.CAMERA_UPLOAD
-
-    /**
-     * Is SD card download
-     *
-     * @return True if the transfer is an SD card download, false otherwise.
-     */
-    fun isSDCardDownload(): Boolean = transferAppData.any { it is TransferAppData.SdCardDownload }
-
-    /**
-     * Is text file upload
-     *
-     * @return True if the transfer is a text file upload, false otherwise.
-     */
-    fun isTextFileUpload(): Boolean = transferAppData.any { it is TransferAppData.TextFileUpload }
-
-    /**
-     * Is background transfer
-     *
-     * @return True if the transfer is a background transfer, false otherwise.
-     */
-    fun isBackgroundTransfer(): Boolean =
-        transferAppData.contains(TransferAppData.BackgroundTransfer)
-
-    /**
-     * Gets the pending message id if the transfer is a chat upload. Null otherwise.
-     */
-    fun pendingMessageId() =
-        transferAppData
-            .filterIsInstance(TransferAppData.ChatUpload::class.java)
-            .firstOrNull()
-            ?.pendingMessageId
-
-    /**
-     * Get the sdcard transfer path, if the transfer is a sdcard transfer
-     *
-     * @return a String representation of the transfer path, null if cannot be retrieved
-     */
-    fun getSDCardTransferPath(): String? =
-        if (isSDCardDownload()) {
-            transferAppData
-                .filterIsInstance<TransferAppData.SdCardDownload>()
-                .singleOrNull()
-                ?.targetPath
-        } else null
 }

@@ -1,21 +1,12 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
-import static mega.privacy.android.app.utils.Constants.APP_DATA_SD_CARD;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-
 import android.content.Context;
 
 import java.io.File;
 
 import kotlin.coroutines.Continuation;
-import timber.log.Timber;
 
 public class SDCardUtils {
-
-    public static final int APP_DATA_TARGET_PATH_POSITION = 1;
-    public static final int APP_DATA_TARGET_URI_POSITION = 2;
-    public static final int APP_DATA_SD_CARD_PARTS = 2;
 
     /**
      * Retrieves the Root SD Card path
@@ -60,59 +51,5 @@ public class SDCardUtils {
             return localPath.startsWith(sdRoot);
         }
         return false;
-    }
-
-    /**
-     * Extracts from appData the target path in SD card of a download.
-     *
-     * @param appData Info contained on MegaTransfer object to identify the transfer.
-     *                In this case should be SD card data.
-     * @return The target path of a download. It's the real path the user chose to download.
-     */
-    public static String getSDCardTargetPath(String appData) {
-        String[] appDataParts = getSDCardAppDataParts(appData);
-        if (appDataParts == null) {
-            return null;
-        }
-
-        return appDataParts[APP_DATA_TARGET_PATH_POSITION];
-    }
-
-    /**
-     * Extracts from appData the target uri in a SD card of a download.
-     *
-     * @param appData Info contained on MegaTransfer object to identify the transfer.
-     *                In this case should be SD card data.
-     * @return The target uri of a download. It's the path where the transfer is downloaded due to
-     * security matters of SD cars. It will be moved to target path when the download get complete.
-     */
-    public static String getSDCardTargetUri(String appData) {
-        String[] appDataParts = getSDCardAppDataParts(appData);
-        if (appDataParts == null || appDataParts.length <= APP_DATA_SD_CARD_PARTS) {
-            Timber.d("App data doesn't contain SD card uri.");
-            return null;
-        }
-
-        return appDataParts[APP_DATA_TARGET_URI_POSITION];
-    }
-
-    /**
-     * Splits appData to get all relevant info of an SD card download.
-     *
-     * @param appData Info contained on MegaTransfer object to identify the transfer.
-     *                In this case should be SD card data.
-     * @return The String array containing each part of appData.
-     */
-    public static String[] getSDCardAppDataParts(String appData) {
-        if (isTextEmpty(appData) || !appData.contains(APP_DATA_SD_CARD)) {
-            return null;
-        }
-
-        String[] appDataParts = appData.split(APP_DATA_INDICATOR);
-        if (appDataParts != null && appDataParts.length >= APP_DATA_SD_CARD_PARTS) {
-            return appDataParts;
-        }
-
-        return null;
     }
 }

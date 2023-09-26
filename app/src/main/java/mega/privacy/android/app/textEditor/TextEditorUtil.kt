@@ -2,8 +2,7 @@ package mega.privacy.android.app.textEditor
 
 import android.content.Context
 import mega.privacy.android.app.R
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
-import mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 
 /**
  * Util class related to [TextEditorActivity].
@@ -13,15 +12,18 @@ object TextEditorUtil {
     /**
      * Gets the result string to show after trying to upload a text file from [TextEditorActivity].
      *
-     * @param appData   String containing the data of the upload transfer for giving context.
+     * @param textFileUpload   data class containing the data of the upload transfer for giving context.
      * @param isSuccess True if the upload finished with success, false otherwise.
      * @return Result string.
      */
     @JvmStatic
-    fun getCreationOrEditorText(appData: String, isSuccess: Boolean, context: Context): String {
-        val appDataParts = appData.split(APP_DATA_INDICATOR).toTypedArray()
-        val isEditMode = appDataParts[1] == EDIT_MODE
-        val isCloudFile = appDataParts[2].toBoolean()
+    fun getCreationOrEditorText(
+        textFileUpload: TransferAppData.TextFileUpload,
+        isSuccess: Boolean,
+        context: Context,
+    ): String {
+        val isEditMode = textFileUpload.mode == TransferAppData.TextFileUpload.Mode.Edit
+        val isCloudFile = textFileUpload.fromHomePage
 
         return context.getString(
             when {

@@ -5,7 +5,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeFolderPath
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
@@ -13,6 +12,7 @@ import mega.privacy.android.data.extensions.mapTransferType
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.getSDCardTransferPath
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -92,7 +92,7 @@ class AndroidCompletedTransfer {
         state = MegaTransfer.STATE_COMPLETED
         size = transfer.size
         nodeHandle = transfer.nodeHandle
-        path = removeLastFileSeparator(SDCardUtils.getSDCardTargetPath(transfer.appData))
+        path = removeLastFileSeparator(transfer.getSDCardTransferPath())
         timeStamp = System.currentTimeMillis()
         error = context.getString(R.string.api_ok)
         originalPath = transfer.path

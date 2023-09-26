@@ -34,7 +34,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.toTransferStage
@@ -45,6 +44,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.getSDCardDownloadAppData
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -395,11 +395,22 @@ class TransfersManagement @Inject constructor(
                 deleteSdTransferByTagUseCase(sdtransfer.tag)
                 continue
             }
-            val appData = sdtransfer.appData
-            val targetPath = SDCardUtils.getSDCardTargetPath(appData)
-            if (isFinalDownloadFileExist(sdtransfer, originalDownload, targetPath)) continue
+            val sdCardDownload = sdtransfer.getSDCardDownloadAppData()
+            if (isFinalDownloadFileExist(
+                    sdtransfer,
+                    originalDownload,
+                    sdCardDownload?.targetPath
+                )
+            ) {
+                continue
+            }
             Timber.w("Movement incomplete")
-            moveSdTransferToTargetPath(originalDownload, targetPath, appData, sdtransfer)
+            moveSdTransferToTargetPath(
+                originalDownload,
+                sdCardDownload?.targetPath,
+                sdCardDownload?.targetUri,
+                sdtransfer
+            )
             val androidCompletedTransfer = AndroidCompletedTransfer(sdtransfer, context)
             val completedTransfer = LegacyCompletedTransferMapper().invoke(androidCompletedTransfer)
             completedTransfers.add(completedTransfer)
@@ -424,17 +435,17 @@ class TransfersManagement @Inject constructor(
     private suspend fun moveSdTransferToTargetPath(
         originalDownload: File,
         targetPath: String?,
-        appData: String,
-        sdtransfer: SdTransfer,
+        targetUri: String?,
+        sdTransfer: SdTransfer,
     ) {
         try {
             val sdCardOperator = SDCardOperator(getInstance())
             val isSuccess = sdCardOperator.moveDownloadedFileToDestinationPath(
                 originalDownload, targetPath,
-                SDCardUtils.getSDCardTargetUri(appData)
+                targetUri
             )
             if (isSuccess) {
-                deleteSdTransferByTagUseCase(sdtransfer.tag)
+                deleteSdTransferByTagUseCase(sdTransfer.tag)
             }
         } catch (e: Exception) {
             Timber.e(e, "Error moving file to the sd card path")

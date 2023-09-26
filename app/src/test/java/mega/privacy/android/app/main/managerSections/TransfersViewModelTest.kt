@@ -113,7 +113,7 @@ internal class TransfersViewModelTest {
                 val transfer = mock<Transfer> {
                     on { tag }.thenReturn(i)
                     on { isStreamingTransfer }.thenReturn(false)
-                    on { appData }.thenReturn("")
+                    on { appData }.thenReturn(emptyList())
                     on { priority }.thenReturn(BigInteger.valueOf(i.toLong()))
                     on { state }.thenReturn(TransferState.STATE_COMPLETED)
                 }
@@ -141,7 +141,7 @@ internal class TransfersViewModelTest {
                 val transfer = mock<Transfer> {
                     on { tag }.thenReturn(i)
                     on { isStreamingTransfer }.thenReturn(false)
-                    on { appData }.thenReturn("")
+                    on { appData }.thenReturn(emptyList())
                     on { priority }.thenReturn(BigInteger.valueOf(i.toLong()))
                     on { state }.thenReturn(TransferState.STATE_COMPLETED)
                 }

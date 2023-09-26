@@ -55,6 +55,8 @@ import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
+import mega.privacy.android.domain.entity.transfer.isVoiceClip
+import mega.privacy.android.domain.entity.transfer.pendingMessageId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.chat.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.AttachVoiceMessageUseCase
@@ -322,7 +324,7 @@ class ChatUploadService : LifecycleService() {
 
                 for (i in 0 until transferData.numUploads) {
                     getTransferByTagUseCase(transferData.uploadTags[i])?.takeIf { transfer ->
-                        transfer.isChatUpload()
+                        transfer.transferType == TransferType.CHAT_UPLOAD
                     }?.let { transfer ->
                         mapProgressTransfers[transfer.tag] = transfer
 

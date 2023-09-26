@@ -127,8 +127,7 @@ class MonitorTypeTransfersPausedUseCaseTest {
 
     private fun stubTransfer(correctType: Boolean) = transfer.also {
         transfer.stub {
-            on { it.isBackgroundTransfer() }.thenReturn(false)
-            on { it.isVoiceClip() }.thenReturn(false)
+            on { it.appData }.thenReturn(emptyList())
             on { it.tag }.thenReturn(if (correctType) CORRECT_TRANSFER_TAG else -1)
         }
     }

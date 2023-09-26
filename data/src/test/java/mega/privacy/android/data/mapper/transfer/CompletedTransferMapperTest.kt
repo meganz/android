@@ -257,7 +257,7 @@ class CompletedTransferMapperTest {
             on { it.isStreamingTransfer }.thenReturn(true)
             on { it.isFinished }.thenReturn(Random.nextBoolean())
             on { it.isFolderTransfer }.thenReturn(Random.nextBoolean())
-            on { it.transferAppData }.thenReturn(listOf(TransferAppData.CameraUpload))
+            on { it.appData }.thenReturn(listOf(TransferAppData.CameraUpload))
             on { it.state }.thenReturn(TransferState.STATE_COMPLETED)
             on { it.priority }.thenReturn(BigInteger.ONE)
             on { it.notificationNumber }.thenReturn(Random.nextLong())
