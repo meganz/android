@@ -68,12 +68,12 @@ class BackupDaoTest {
     }
 
     @Test
-    fun test_that_updateBackup_updates_the_corresponding_item() = runTest {
+    fun test_that_insertOrUpdateBackup_updates_the_corresponding_item() = runTest {
         insertEntities()
         val newPath = "/path/to/new/folder"
         val backup =
             backupDao.getBackupById(encryptedBackupId = "2").copy(encryptedLocalFolder = newPath)
-        backupDao.updateBackup(backup)
+        backupDao.insertOrUpdateBackup(backup)
         val actual = backupDao.getBackupById(encryptedBackupId = "2")
         Truth.assertThat(actual.encryptedLocalFolder).isEqualTo(newPath)
     }
@@ -83,6 +83,13 @@ class BackupDaoTest {
         insertEntities()
         backupDao.deleteAllBackups()
         Truth.assertThat(backupDao.getAllBackups().size).isEqualTo(0)
+    }
+
+    @Test
+    fun test_that_deleteBackupByBackupId_deletes_the_corresponding_item() = runTest {
+        insertEntities()
+        backupDao.deleteBackupByBackupId("2")
+        Truth.assertThat(backupDao.getAllBackups().size).isEqualTo(9)
     }
 
 

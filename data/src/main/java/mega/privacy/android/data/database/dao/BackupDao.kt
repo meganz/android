@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.entity.BackupEntity
 
@@ -28,9 +27,9 @@ internal interface BackupDao {
     @Query("UPDATE ${MegaDatabaseConstant.TABLE_BACKUPS} SET outdated = :encryptedIsOutdated WHERE backup_id = :encryptedBackupId")
     suspend fun updateBackupAsOutdated(encryptedBackupId: String, encryptedIsOutdated: String)
 
-    @Update
-    suspend fun updateBackup(entity: BackupEntity)
-
     @Query("DELETE FROM ${MegaDatabaseConstant.TABLE_BACKUPS}")
     suspend fun deleteAllBackups()
+
+    @Query("DELETE FROM ${MegaDatabaseConstant.TABLE_BACKUPS} WHERE backup_id = :encryptedBackupId")
+    suspend fun deleteBackupByBackupId(encryptedBackupId: String)
 }

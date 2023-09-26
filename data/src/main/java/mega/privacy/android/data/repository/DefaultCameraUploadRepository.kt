@@ -632,11 +632,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun getCuBackUpId() = withContext(ioDispatcher) {
-        localStorageGateway.getCuBackUpId()
+        megaLocalRoomGateway.getCuBackUpId()
     }
 
     override suspend fun getMuBackUpId() = withContext(ioDispatcher) {
-        localStorageGateway.getMuBackUpId()
+        megaLocalRoomGateway.getMuBackUpId()
     }
 
     override suspend fun sendBackupHeartbeat(
@@ -692,15 +692,15 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun getCuBackUp() = withContext(ioDispatcher) {
-        localStorageGateway.getCuBackUp()
+        megaLocalRoomGateway.getCuBackUp()
     }
 
     override suspend fun getMuBackUp() = withContext(ioDispatcher) {
-        localStorageGateway.getMuBackUp()
+        megaLocalRoomGateway.getMuBackUp()
     }
 
     override suspend fun getBackupById(id: Long) = withContext(ioDispatcher) {
-        localStorageGateway.getBackupById(id)
+        megaLocalRoomGateway.getBackupById(id)
     }
 
     override suspend fun updateRemoteBackupState(
@@ -730,7 +730,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun updateLocalBackup(backup: Backup) = withContext(ioDispatcher) {
-        localStorageGateway.updateBackup(backup)
+        megaLocalRoomGateway.updateBackup(backup)
     }
 
     override suspend fun setCoordinates(nodeId: NodeId, latitude: Double, longitude: Double) =
@@ -777,11 +777,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun deleteBackupById(backupId: Long) = withContext(ioDispatcher) {
-        localStorageGateway.deleteBackupById(backupId)
+        megaLocalRoomGateway.deleteBackupById(backupId)
     }
 
     override suspend fun setBackupAsOutdated(backupId: Long) = withContext(ioDispatcher) {
-        localStorageGateway.setBackupAsOutdated(backupId)
+        megaLocalRoomGateway.setBackupAsOutdated(backupId)
     }
 
     override fun monitorCameraUploadsStatusInfo() =

@@ -5,7 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.backup.BackupDeviceNamesMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoListMapper
@@ -52,7 +52,7 @@ internal class BackupRepositoryImplTest {
     private val backupInfoListMapper = mock<BackupInfoListMapper>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val appEventGateway = mock<AppEventGateway>()
-    private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
+    private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val backupInfoTypeIntMapper = mock<BackupInfoTypeIntMapper>()
     private val backupStateIntMapper = mock<BackupStateIntMapper>()
 
@@ -68,7 +68,7 @@ internal class BackupRepositoryImplTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             megaApiGateway = megaApiGateway,
             appEventGateway = appEventGateway,
-            megaLocalStorageGateway = megaLocalStorageGateway,
+            megaLocalRoomGateway = megaLocalRoomGateway,
             backupInfoTypeIntMapper = backupInfoTypeIntMapper,
             backupStateIntMapper = backupStateIntMapper,
         )

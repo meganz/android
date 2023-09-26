@@ -8,14 +8,19 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
+import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
+import mega.privacy.android.data.mapper.backup.BackupEntityMapper
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
+import mega.privacy.android.data.mapper.backup.BackupModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordEntityMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
@@ -30,6 +35,8 @@ import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -69,6 +76,10 @@ internal class MegaLocalRoomFacadeTest {
     private val sdTransferDao: SdTransferDao = mock()
     private val sdTransferEntityMapper = mock<SdTransferEntityMapper>()
     private val sdTransferModelMapper = mock<SdTransferModelMapper>()
+    private val backupDao = mock<BackupDao>()
+    private val backupEntityMapper = mock<BackupEntityMapper>()
+    private val backupModelMapper = mock<BackupModelMapper>()
+    private val backupInfoTypeIntMapper = mock<BackupInfoTypeIntMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -91,6 +102,10 @@ internal class MegaLocalRoomFacadeTest {
             sdTransferDao = sdTransferDao,
             sdTransferEntityMapper = sdTransferEntityMapper,
             sdTransferModelMapper = sdTransferModelMapper,
+            backupDao = backupDao,
+            backupEntityMapper = backupEntityMapper,
+            backupModelMapper = backupModelMapper,
+            backupInfoTypeIntMapper = backupInfoTypeIntMapper,
         )
     }
 
@@ -109,7 +124,11 @@ internal class MegaLocalRoomFacadeTest {
             syncRecordModelMapper,
             syncRecordEntityMapper,
             syncStatusIntMapper,
-            syncRecordTypeIntMapper
+            syncRecordTypeIntMapper,
+            backupDao,
+            backupEntityMapper,
+            backupModelMapper,
+            backupInfoTypeIntMapper,
         )
     }
 
@@ -445,12 +464,147 @@ internal class MegaLocalRoomFacadeTest {
             assertThat(underTest.getCompletedTransferById(id)).isEqualTo(completedTransferModel)
         }
 
+    @Test
+    fun `test that backupDao delete is invoked with the proper backup when deleteBackupById is invoked`() =
+        runTest {
+            val id = 1L
+            whenever(encryptData(id.toString())).thenReturn(id.toString())
+            underTest.deleteBackupById(id)
+            verify(backupDao).deleteBackupByBackupId(id.toString())
+        }
+
+    @Test
+    fun `test that backup is outdated when setBackupAsOutdated is invoked`() =
+        runTest {
+            val id = 1L
+            val outdatedString = "true"
+            whenever(encryptData(id.toString())).thenReturn(id.toString())
+            whenever(encryptData(outdatedString)).thenReturn(outdatedString)
+            underTest.setBackupAsOutdated(id)
+            verify(backupDao).updateBackupAsOutdated(id.toString(), outdatedString)
+        }
+
+    @Test
+    fun `test that backup is saved when saveBackup is invoked`() =
+        runTest {
+            val backup = mock<Backup>()
+            val entity = mock<BackupEntity>()
+            whenever(backupEntityMapper(backup)).thenReturn(entity)
+            underTest.saveBackup(backup)
+            verify(backupDao).insertOrUpdateBackup(entity)
+        }
+
+    @Test
+    fun `test that camera upload backup is returned when getCuBackUp is invoked`() =
+        runTest {
+            val entities = listOf<BackupEntity>(mock(), mock())
+            val backup = mock<Backup>()
+            val falseString = "false"
+            whenever(backupInfoTypeIntMapper(BackupInfoType.CAMERA_UPLOADS)).thenReturn(
+                BackupInfoType.CAMERA_UPLOADS.ordinal
+            )
+            whenever(encryptData(falseString)).thenReturn(falseString)
+            whenever(
+                backupDao.getBackupByType(
+                    backupType = BackupInfoType.CAMERA_UPLOADS.ordinal,
+                    encryptedIsOutdated = falseString
+                )
+            ).thenReturn(entities)
+            whenever(backupModelMapper(entities.first())).thenReturn(backup)
+            val actual = underTest.getCuBackUp()
+            assertThat(actual).isEqualTo(backup)
+        }
+
+    @Test
+    fun `test that media upload backup is returned when getMuBackUp is invoked`() =
+        runTest {
+            val entities = listOf<BackupEntity>(mock(), mock())
+            val backup = mock<Backup>()
+            val falseString = "false"
+            whenever(backupInfoTypeIntMapper(BackupInfoType.MEDIA_UPLOADS)).thenReturn(
+                BackupInfoType.MEDIA_UPLOADS.ordinal
+            )
+            whenever(encryptData(falseString)).thenReturn(falseString)
+            whenever(
+                backupDao.getBackupByType(
+                    backupType = BackupInfoType.MEDIA_UPLOADS.ordinal,
+                    encryptedIsOutdated = falseString
+                )
+            ).thenReturn(entities)
+            whenever(backupModelMapper(entities.first())).thenReturn(backup)
+            val actual = underTest.getMuBackUp()
+            assertThat(actual).isEqualTo(backup)
+        }
+
+    @Test
+    fun `test that camera upload backup id is returned when getCuBackUpId is invoked`() =
+        runTest {
+            val ids = listOf("1", "2")
+            val falseString = "false"
+            whenever(backupInfoTypeIntMapper(BackupInfoType.CAMERA_UPLOADS)).thenReturn(
+                BackupInfoType.CAMERA_UPLOADS.ordinal
+            )
+            whenever(encryptData(falseString)).thenReturn(falseString)
+            whenever(
+                backupDao.getBackupIdByType(
+                    backupType = BackupInfoType.CAMERA_UPLOADS.ordinal,
+                    encryptedIsOutdated = falseString
+                )
+            ).thenReturn(ids)
+            whenever(decryptData(ids.first())).thenReturn(ids.first())
+            val actual = underTest.getCuBackUpId()
+            assertThat(actual).isEqualTo(ids.first().toLong())
+        }
+
+    @Test
+    fun `test that media upload backup id is returned when getMuBackUpId is invoked`() =
+        runTest {
+            val ids = listOf("1", "2")
+            val falseString = "false"
+            whenever(backupInfoTypeIntMapper(BackupInfoType.MEDIA_UPLOADS)).thenReturn(
+                BackupInfoType.MEDIA_UPLOADS.ordinal
+            )
+            whenever(encryptData(falseString)).thenReturn(falseString)
+            whenever(
+                backupDao.getBackupIdByType(
+                    backupType = BackupInfoType.MEDIA_UPLOADS.ordinal,
+                    encryptedIsOutdated = falseString
+                )
+            ).thenReturn(ids)
+            whenever(decryptData(ids.first())).thenReturn(ids.first())
+            val actual = underTest.getMuBackUpId()
+            assertThat(actual).isEqualTo(ids.first().toLong())
+        }
+
+    @Test
+    fun `test that backup is returned when getBackupById is invoked`() =
+        runTest {
+            val id = 1L
+            val backup = mock<Backup>()
+            val entity = mock<BackupEntity>()
+            whenever(encryptData(id.toString())).thenReturn(id.toString())
+            whenever(backupModelMapper(entity)).thenReturn(backup)
+            whenever(backupDao.getBackupById(id.toString())).thenReturn(entity)
+            val actual = underTest.getBackupById(id)
+            assertThat(actual).isEqualTo(backup)
+        }
+
+    @Test
+    fun `test that backup is updated when updateBackup is invoked`() =
+        runTest {
+            val id = 1L
+            val backup = mock<Backup>()
+            val entity = mock<BackupEntity>()
+            whenever(encryptData(id.toString())).thenReturn(id.toString())
+            whenever(backupEntityMapper(backup)).thenReturn(entity)
+            underTest.updateBackup(backup)
+            verify(backupDao).insertOrUpdateBackup(entity)
+        }
+
     private fun provideDoesFileNameExistParameters() = Stream.of(
         Arguments.of(true, 1, true),
         Arguments.of(false, 1, true),
         Arguments.of(true, 2, false),
         Arguments.of(false, 2, false),
     )
-
-
 }

@@ -5,7 +5,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.backup.BackupDeviceNamesMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoListMapper
@@ -30,6 +30,9 @@ import javax.inject.Inject
  * @property ioDispatcher [CoroutineDispatcher]
  * @property megaApiGateway [MegaApiGateway]
  * @property appEventGateway [AppEventGateway]
+ * @property megaLocalRoomGateway [MegaLocalRoomGateway]
+ * @property backupInfoTypeIntMapper [BackupInfoTypeIntMapper]
+ * @property backupStateIntMapper [BackupStateIntMapper]
  */
 internal class BackupRepositoryImpl @Inject constructor(
     private val backupDeviceNamesMapper: BackupDeviceNamesMapper,
@@ -38,7 +41,7 @@ internal class BackupRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaApiGateway: MegaApiGateway,
     private val appEventGateway: AppEventGateway,
-    private val megaLocalStorageGateway: MegaLocalStorageGateway,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
     private val backupStateIntMapper: BackupStateIntMapper,
 ) : BackupRepository {
@@ -167,6 +170,6 @@ internal class BackupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveBackup(backup: Backup) = withContext(ioDispatcher) {
-        megaLocalStorageGateway.saveBackup(backup)
+        megaLocalRoomGateway.saveBackup(backup)
     }
 }

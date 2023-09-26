@@ -5,12 +5,16 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
+import mega.privacy.android.data.mapper.backup.BackupEntityMapper
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
+import mega.privacy.android.data.mapper.backup.BackupModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordEntityMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
@@ -26,6 +30,8 @@ import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -49,6 +55,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val sdTransferEntityMapper: SdTransferEntityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
+    private val backupDao: BackupDao,
+    private val backupEntityMapper: BackupEntityMapper,
+    private val backupModelMapper: BackupModelMapper,
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
     private val encryptData: EncryptData,
     private val decryptData: DecryptData,
 ) : MegaLocalRoomGateway {
@@ -300,5 +310,76 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) {
         // Implementation to be added with the implementation of the table
+    }
+
+    override suspend fun deleteBackupById(backupId: Long) {
+        encryptData(backupId.toString())?.let {
+            backupDao.deleteBackupByBackupId(it)
+        }
+    }
+
+    override suspend fun setBackupAsOutdated(backupId: Long) {
+        encryptData(backupId.toString())?.let { encryptedBackupId ->
+            encryptData("true")?.let { encryptedTrue ->
+                backupDao.updateBackupAsOutdated(
+                    encryptedBackupId = encryptedBackupId,
+                    encryptedIsOutdated = encryptedTrue
+                )
+            }
+        }
+    }
+
+    override suspend fun saveBackup(backup: Backup) {
+        backupEntityMapper(backup)?.let {
+            backupDao.insertOrUpdateBackup(it)
+        }
+    }
+
+    override suspend fun getCuBackUp(): Backup? {
+        return encryptData("false")?.let { encryptedFalse ->
+            backupDao.getBackupByType(
+                backupType = backupInfoTypeIntMapper(BackupInfoType.CAMERA_UPLOADS),
+                encryptedIsOutdated = encryptedFalse
+            ).firstOrNull()
+        }?.let { backupModelMapper(it) }
+    }
+
+    override suspend fun getMuBackUp(): Backup? {
+        return encryptData("false")?.let { encryptedFalse ->
+            backupDao.getBackupByType(
+                backupInfoTypeIntMapper(BackupInfoType.MEDIA_UPLOADS),
+                encryptedFalse
+            ).firstOrNull()
+        }?.let { backupModelMapper(it) }
+    }
+
+    override suspend fun getCuBackUpId(): Long? {
+        return encryptData("false")?.let { encryptedFalse ->
+            backupDao.getBackupIdByType(
+                backupInfoTypeIntMapper(BackupInfoType.CAMERA_UPLOADS),
+                encryptedFalse
+            ).firstOrNull()
+        }?.let { decryptData(it) }?.toLong()
+    }
+
+    override suspend fun getMuBackUpId(): Long? {
+        return encryptData("false")?.let { encryptedFalse ->
+            backupDao.getBackupIdByType(
+                backupInfoTypeIntMapper(BackupInfoType.MEDIA_UPLOADS),
+                encryptedFalse
+            ).firstOrNull()
+        }?.let { decryptData(it) }?.toLong()
+    }
+
+    override suspend fun getBackupById(id: Long): Backup? {
+        return encryptData(id.toString())?.let { encryptedBackupId ->
+            backupDao.getBackupById(encryptedBackupId)
+        }?.let { backupModelMapper(it) }
+    }
+
+    override suspend fun updateBackup(backup: Backup) {
+        backupEntityMapper(backup)?.let {
+            backupDao.insertOrUpdateBackup(it)
+        }
     }
 }
