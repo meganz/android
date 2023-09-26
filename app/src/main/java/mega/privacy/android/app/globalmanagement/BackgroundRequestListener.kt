@@ -7,14 +7,12 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
@@ -212,7 +210,7 @@ class BackgroundRequestListener @Inject constructor(
             myAccountInfo.resetDefaults()
             (application as MegaApplication).isEsid = true
             applicationScope.launch {
-                localLogoutAppUseCase(ClearPsa { PsaManager::clearPsa })
+                localLogoutAppUseCase()
             }
         } else if (e.errorCode == MegaError.API_EBLOCKED) {
             api.localLogout()

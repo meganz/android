@@ -5,12 +5,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
-import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.ClearPsa
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -35,6 +35,7 @@ class LocalLogoutAppUseCaseTest {
     private val stopAudioService = mock<StopAudioService>()
     private val photosRepository = mock<PhotosRepository>()
     private val albumRepository = mock<AlbumRepository>()
+    private val clearPsaUseCase = mock<ClearPsaUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -47,7 +48,8 @@ class LocalLogoutAppUseCaseTest {
             photosRepository = photosRepository,
             albumRepository = albumRepository,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
-            stopAudioService = stopAudioService
+            stopAudioService = stopAudioService,
+            clearPsaUseCase = clearPsaUseCase,
         )
     }
 
@@ -61,13 +63,13 @@ class LocalLogoutAppUseCaseTest {
             billingRepository,
             stopCameraUploadsUseCase,
             stopAudioService,
+            clearPsaUseCase,
         )
     }
 
     @Test
     fun `test that all required functionalities are invoked`() = runTest {
-        val clearPsa = mock<ClearPsa>()
-        underTest.invoke(clearPsa)
+        underTest.invoke()
 
         verify(transferRepository).cancelTransfers()
         verify(accountRepository).resetAccountAuth()
@@ -81,6 +83,6 @@ class LocalLogoutAppUseCaseTest {
         verify(loginRepository).broadcastLogout()
         verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
         verify(stopAudioService).invoke()
-        verify(clearPsa).invoke()
+        verify(clearPsaUseCase).invoke()
     }
 }

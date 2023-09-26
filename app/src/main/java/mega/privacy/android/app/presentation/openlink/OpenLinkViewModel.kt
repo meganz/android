@@ -11,10 +11,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
@@ -54,7 +52,7 @@ class OpenLinkViewModel @Inject constructor(
             applicationScope.launch {
                 runCatching {
                     clearEphemeralCredentialsUseCase()
-                    localLogoutAppUseCase(ClearPsa { PsaManager::clearPsa })
+                    localLogoutAppUseCase()
                 }.onSuccess {
                     MegaApplication.urlConfirmationLink = null
                     _state.update { it.copy(isLoggedOut = true) }

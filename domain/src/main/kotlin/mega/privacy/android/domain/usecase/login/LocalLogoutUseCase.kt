@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.login
 
 import mega.privacy.android.domain.repository.security.LoginRepository
-import mega.privacy.android.domain.usecase.ClearPsa
 import javax.inject.Inject
 
 /**
@@ -17,11 +16,10 @@ class LocalLogoutUseCase @Inject constructor(
      * Invoke.
      *
      * @param disableChatApiUseCase Temporary param for disabling megaChatApi.
-     * @param clearPsa       Temporary param for clearing Psa.
      */
-    suspend operator fun invoke(disableChatApiUseCase: DisableChatApiUseCase, clearPsa: ClearPsa) {
+    suspend operator fun invoke(disableChatApiUseCase: DisableChatApiUseCase) {
         chatLogoutUseCase(disableChatApiUseCase)
         runCatching { loginRepository.localLogout() }
-            .onSuccess { localLogoutAppUseCase(clearPsa) }
+            .onSuccess { localLogoutAppUseCase() }
     }
 }

@@ -12,12 +12,10 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.main.megachat.BadgeIntentService
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -117,7 +115,7 @@ class MegaChatRequestHandler @Inject constructor(
             Timber.d("Login status on %s", loggedState)
             if (loggedState == 0) {
                 sharingScope.launch {
-                    localLogoutAppUseCase(ClearPsa { PsaManager::clearPsa })
+                    localLogoutAppUseCase()
                     //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                     broadcastFinishActivityUseCase()
                     withContext(mainDispatcher) {

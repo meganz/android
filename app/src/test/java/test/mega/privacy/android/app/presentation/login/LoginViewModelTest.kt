@@ -276,7 +276,7 @@ internal class LoginViewModelTest {
 
     @Test
     fun `test that an exception from local logout is not propagated`() = runTest {
-        whenever(localLogoutUseCase(any(), any()))
+        whenever(localLogoutUseCase(any()))
             .thenAnswer { throw MegaException(1, "It's broken") }
 
         with(underTest) {

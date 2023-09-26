@@ -3,12 +3,12 @@ package mega.privacy.android.domain.usecase.login
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
-import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.ClearPsa
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import javax.inject.Inject
 
@@ -25,12 +25,13 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val stopAudioService: StopAudioService,
     private val photosRepository: PhotosRepository,
     private val albumRepository: AlbumRepository,
+    private val clearPsaUseCase: ClearPsaUseCase,
 ) {
 
     /**
      * Invoke.
      */
-    suspend operator fun invoke(clearPsa: ClearPsa) {
+    suspend operator fun invoke() {
         transferRepository.cancelTransfers()
         with(accountRepository) {
             resetAccountAuth()
@@ -47,6 +48,6 @@ class LocalLogoutAppUseCase @Inject constructor(
         loginRepository.broadcastLogout()
         stopCameraUploadsUseCase(shouldReschedule = false)
         stopAudioService()
-        clearPsa()
+        clearPsaUseCase()
     }
 }

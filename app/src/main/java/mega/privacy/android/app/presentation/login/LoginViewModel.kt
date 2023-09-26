@@ -31,7 +31,6 @@ import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
-import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountBlockedType
@@ -48,7 +47,6 @@ import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
-import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -290,7 +288,6 @@ class LoginViewModel @Inject constructor(
             runCatching {
                 localLogoutUseCase(
                     DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
-                    ClearPsa { PsaManager::clearPsa }
                 )
             }.onFailure {
                 Timber.w("Exception in local logout.", it)

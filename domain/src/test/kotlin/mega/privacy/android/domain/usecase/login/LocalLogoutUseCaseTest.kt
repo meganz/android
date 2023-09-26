@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase.login
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.security.LoginRepository
-import mega.privacy.android.domain.usecase.ClearPsa
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -31,15 +30,14 @@ class LocalLogoutUseCaseTest {
     @Test
     fun `test that local logout invokes ChatLogout`() = runTest {
         val disableChatApiUseCase = mock<DisableChatApiUseCase>()
-        underTest.invoke(disableChatApiUseCase, mock())
+        underTest.invoke(disableChatApiUseCase)
         verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
     }
 
     @Test
     fun `test that local logout invokes LocalLogoutApp on success`() = runTest {
         whenever(loginRepository.localLogout()).thenReturn(Unit)
-        val clearPsa = mock<ClearPsa>()
-        underTest.invoke(mock(), clearPsa)
-        verify(localLogoutAppUseCase).invoke(clearPsa)
+        underTest.invoke(mock())
+        verify(localLogoutAppUseCase).invoke()
     }
 }
