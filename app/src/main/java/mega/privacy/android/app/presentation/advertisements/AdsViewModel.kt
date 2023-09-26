@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.advertisements.model.AdsLoadState
 import mega.privacy.android.domain.entity.advertisements.FetchAdDetailRequest
@@ -25,10 +25,11 @@ class AdsViewModel @Inject constructor(
     /**
      * Ads state
      */
-    val state: StateFlow<AdsLoadState> = _state
+    val state = _state.asStateFlow()
+
 
     /**
-     * Update the url in AdsUIState
+     * Update AdsLoadState to Loaded when ad url is fetched
      */
     fun fetchAdUrl(
         slotId: String,
