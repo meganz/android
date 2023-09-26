@@ -13,16 +13,17 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorOngoingActiveDownloadTransfersUseCaseTest {
-    private lateinit var underTest: MonitorOngoingActiveDownloadTransfersUseCase
+class MonitorOngoingActiveTransfersUseCaseTest {
+    private lateinit var underTest: MonitorOngoingActiveTransfersUseCase
 
     private val monitorActiveTransferTotalsUseCase = mock<MonitorActiveTransferTotalsUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
@@ -41,54 +42,63 @@ class MonitorOngoingActiveDownloadTransfersUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = MonitorOngoingActiveDownloadTransfersUseCase(
+        underTest = MonitorOngoingActiveTransfersUseCase(
             monitorActiveTransferTotalsUseCase = monitorActiveTransferTotalsUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             monitorDownloadTransfersPausedUseCase = monitorDownloadTransfersPausedUseCase,
         )
     }
 
-    @Test
-    fun `test that getActiveTransferTotalsUseCase is emitted as first result`() = runTest {
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    fun `test that getActiveTransferTotalsUseCase is emitted as first result`(
+        transferType: TransferType,
+    ) = runTest {
         val activeTransferTotals = mockActiveTransfersTotals(true)
-        whenever(monitorActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
+        whenever(monitorActiveTransferTotalsUseCase(transferType))
             .thenReturn(flowOf())
         whenever(monitorDownloadTransfersPausedUseCase())
             .thenReturn(flowOf(false))
-        whenever(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
+        whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(activeTransferTotals)
-        underTest().test {
+        underTest(transferType).test {
             assertThat(awaitItem())
                 .isEqualTo(MonitorOngoingActiveTransfersResult(activeTransferTotals, false))
             cancelAndIgnoreRemainingEvents()
         }
     }
 
-    @Test
-    fun `test that flow ends when there are no more ongoing active transfers`() = runTest {
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    fun `test that flow ends when there are no more ongoing active transfers`(
+        transferType: TransferType,
+    ) = runTest {
         val first = mockActiveTransfersTotals(true)
         val last = mockActiveTransfersTotals(false)
-        whenever(monitorActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
+        whenever(monitorActiveTransferTotalsUseCase(transferType))
             .thenReturn(MutableStateFlow(last))
         whenever(monitorDownloadTransfersPausedUseCase())
             .thenReturn(flowOf(false))
-        whenever(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
+        whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(first)
-        val lastReceived = underTest(TEST_SAMPLE).last()
+        val lastReceived = underTest(transferType).last()
         assertThat(lastReceived).isEqualTo(MonitorOngoingActiveTransfersResult(last, false))
     }
 
-    @Test
-    fun `test that monitorDownloadTransfersPausedUseCase values are emitted`() = runTest {
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    fun `test that monitorDownloadTransfersPausedUseCase values are emitted`(
+        transferType: TransferType,
+    ) = runTest {
         val activeTransferTotals = mockActiveTransfersTotals(true)
-        whenever(monitorActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
+        whenever(monitorActiveTransferTotalsUseCase(transferType))
             .thenReturn(flowOf())
         val pausedFlow = MutableStateFlow(false)
         whenever(monitorDownloadTransfersPausedUseCase())
             .thenReturn(pausedFlow)
-        whenever(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
+        whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(activeTransferTotals)
-        underTest().test {
+        underTest(transferType).test {
             assertThat(awaitItem())
                 .isEqualTo(MonitorOngoingActiveTransfersResult(activeTransferTotals, false))
             pausedFlow.emit(true)
@@ -102,8 +112,4 @@ class MonitorOngoingActiveDownloadTransfersUseCaseTest {
         mock<ActiveTransferTotals> {
             on { hasOngoingTransfers() }.thenReturn(hasOngoingTransfers)
         }
-
-    companion object {
-        private const val TEST_SAMPLE = 50L
-    }
 }

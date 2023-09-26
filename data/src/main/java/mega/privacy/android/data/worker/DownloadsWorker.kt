@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveDownloadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -44,7 +44,7 @@ class DownloadsWorker @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
-    private val monitorOngoingActiveDownloadTransfersUseCase: MonitorOngoingActiveDownloadTransfersUseCase,
+    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val downloadNotificationMapper: DownloadNotificationMapper,
@@ -61,7 +61,7 @@ class DownloadsWorker @AssistedInject constructor(
         withContext(ioDispatcher) {
             val monitorJob = monitorTransferEvents(this)
             correctActiveTransfersUseCase(TransferType.DOWNLOAD) //to be sure we haven't missed any event before monitoring them
-            monitorOngoingActiveDownloadTransfersUseCase()
+            monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)
                 .catch { Timber.e("DownloadsWorker error: $it") }
                 .onEach { (transferTotals, paused) ->
                     //update the notification

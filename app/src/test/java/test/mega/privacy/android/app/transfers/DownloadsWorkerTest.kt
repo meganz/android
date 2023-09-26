@@ -35,7 +35,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveDownloadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import org.junit.After
 import org.junit.Before
@@ -62,8 +62,8 @@ class DownloadsWorkerTest {
 
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val addOrUpdateActiveTransferUseCase = mock<AddOrUpdateActiveTransferUseCase>()
-    private val monitorOngoingActiveDownloadTransfersUseCase =
-        mock<MonitorOngoingActiveDownloadTransfersUseCase>()
+    private val monitorOngoingActiveTransfersUseCase =
+        mock<MonitorOngoingActiveTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val downloadNotificationMapper = mock<DownloadNotificationMapper>()
@@ -106,7 +106,7 @@ class DownloadsWorkerTest {
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             addOrUpdateActiveTransferUseCase = addOrUpdateActiveTransferUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
-            monitorOngoingActiveDownloadTransfersUseCase = monitorOngoingActiveDownloadTransfersUseCase,
+            monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             downloadNotificationMapper = downloadNotificationMapper,
             areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
@@ -142,7 +142,7 @@ class DownloadsWorkerTest {
         runTest {
             commonStub()
             underTest.doWork()
-            verify(monitorOngoingActiveDownloadTransfersUseCase).invoke()
+            verify(monitorOngoingActiveTransfersUseCase).invoke(TransferType.DOWNLOAD)
         }
 
     @Test
@@ -153,11 +153,11 @@ class DownloadsWorkerTest {
                 inOrder(
                     monitorTransferEventsUseCase,
                     correctActiveTransfersUseCase,
-                    monitorOngoingActiveDownloadTransfersUseCase
+                    monitorOngoingActiveTransfersUseCase
                 )
             underTest.doWork()
             inOrder.verify(correctActiveTransfersUseCase).invoke(TransferType.DOWNLOAD)
-            inOrder.verify(monitorOngoingActiveDownloadTransfersUseCase).invoke()
+            inOrder.verify(monitorOngoingActiveTransfersUseCase).invoke(TransferType.DOWNLOAD)
         }
 
 
@@ -216,7 +216,7 @@ class DownloadsWorkerTest {
             .thenReturn(false)
         whenever(monitorTransferEventsUseCase())
             .thenReturn(flowOf(transferEvent))
-        whenever(monitorOngoingActiveDownloadTransfersUseCase())
+        whenever(monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD))
             .thenReturn(flow {
                 delay(100)//to be sure that other events are received
                 transferTotals.forEach {
