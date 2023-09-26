@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_012
@@ -148,6 +149,10 @@ fun MegaTextField(
         )
     }
 }
+
+@ShowkaseComposable("Text field - Generic", "Text fields")
+@Composable
+fun ShowkasePreviewTextField() = PreviewTextField()
 
 @Preview
 @Preview(

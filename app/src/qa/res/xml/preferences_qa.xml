@@ -2,6 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <androidx.preference.Preference
+        android:key="settings_qa_compose_browser"
+        android:summary="@string/settings_qa_compose_ui_browser_summary"
+        android:title="@string/settings_qa_compose_ui_browser_title"
+        app:allowDividerBelow="true" />
+
+    <androidx.preference.Preference
         android:key="settings_qa_feature_flags"
         android:summary="@string/settings_qa_feature_flags_summary"
         android:title="@string/settings_qa_feature_flags_title"
