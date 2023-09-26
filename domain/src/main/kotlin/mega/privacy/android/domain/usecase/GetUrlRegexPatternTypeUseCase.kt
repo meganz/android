@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.RegexPatternType.PENDING_CONTACTS_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESET_PASSWORD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESTRICTED
 import mega.privacy.android.domain.entity.RegexPatternType.REVERT_CHANGE_PASSWORD_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.UPGRADE_PAGE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.VERIFY_CHANGE_MAIL_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.WEB_SESSION_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.WHITELISTED_URL
@@ -69,6 +70,7 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, WEB_SESSION_LINK_REGEX) -> WEB_SESSION_LINK
             isUrlMatchesRegexUseCase(url, BUSINESS_INVITE_LINK_REGEX) -> BUSINESS_INVITE_LINK
             isUrlMatchesRegexUseCase(url, ALBUM_LINK_REGEX) -> ALBUM_LINK
+            isUrlMatchesRegexUseCase(url, UPGRADE_PAGE_LINK_REGEX) -> UPGRADE_PAGE_LINK
             else -> RESTRICTED
         }
 
@@ -293,6 +295,17 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val ALBUM_LINK_REGEX = arrayOf(
             "^https://mega\\.nz/collection/.+$"
+        )
+
+        /**
+         * Regex pattern for upgrade page
+         * Checks for a url that starts with, either:
+         * - https://mega.co.nz
+         * - https://mega.nz
+         * Followed by /pro and then ? for query parameters or / for additional path
+         */
+        private val UPGRADE_PAGE_LINK_REGEX = arrayOf(
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/pro[/?]?([^.]?)+$",
         )
     }
 }

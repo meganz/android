@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.QuerySignupLinkUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
@@ -87,7 +88,9 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.isURLSanitized
+import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.photos.AlbumLink
+import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -118,6 +121,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
+
+    /**
+     * Use case to check for matches in Regex Patterns
+     */
+    @Inject
+    lateinit var getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase
 
     private var urlConfirmationLink: String? = null
 
@@ -459,6 +468,18 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
 
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK -> {
+                lifecycleScope.launch {
+                    startActivity(
+                        Intent(
+                            this@OpenLinkActivity,
+                            UpgradeAccountActivity::class.java
+                        )
+                    )
+                    finish()
+                }
+            }
+
             else -> {
                 // Browser open the link which does not require app to handle
                 Timber.d("Browser open link: $url")
@@ -679,7 +700,10 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val isFromOpenChatPreview = request.flag
         val type = request.paramType
         val linkInvalid = TextUtil.isTextEmpty(request.link) && chatId == MEGACHAT_INVALID_HANDLE
-        val waitingRoom = MegaChatApi.hasChatOptionEnabled(MegaChatApi.CHAT_OPTION_WAITING_ROOM, request.privilege)
+        val waitingRoom = MegaChatApi.hasChatOptionEnabled(
+            MegaChatApi.CHAT_OPTION_WAITING_ROOM,
+            request.privilege
+        )
         Timber.d("Chat id: $chatId, type: $type, flag: $isFromOpenChatPreview")
 
         if (linkInvalid) {

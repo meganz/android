@@ -1,5 +1,8 @@
 package mega.privacy.android.domain.entity
 
+/**
+ * Regex Pattern Type for Urls
+ */
 enum class RegexPatternType {
     RESTRICTED,
     WHITELISTED_URL,
@@ -24,5 +27,6 @@ enum class RegexPatternType {
     EMAIL_VERIFY_LINK,
     WEB_SESSION_LINK,
     BUSINESS_INVITE_LINK,
-    ALBUM_LINK
+    ALBUM_LINK,
+    UPGRADE_PAGE_LINK
 }

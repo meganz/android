@@ -59,5 +59,7 @@ class GetUrlRegexPatternTypeUseCaseTest {
             RegexPatternType.CHAT_LINK
         ),
         Arguments.of("Play Store", PLAY_STORE_URL, RegexPatternType.WHITELISTED_URL),
+        Arguments.of("Upgrade Page", "https://mega.nz/pro", RegexPatternType.UPGRADE_PAGE_LINK),
+        Arguments.of("Upgrade Page", "https://mega.co.nz/pro", RegexPatternType.UPGRADE_PAGE_LINK),
     )
 }
