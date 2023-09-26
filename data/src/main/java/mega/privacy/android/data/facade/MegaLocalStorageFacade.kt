@@ -6,7 +6,6 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -327,32 +326,13 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun clearChatSettings() = dbHandler.clearChatSettings()
 
-    override suspend fun clearBackups() = dbHandler.clearBackups()
-
     override suspend fun loadOfflineNodes(
         path: String,
         searchQuery: String?,
     ): List<OfflineInformation> = dbHandler.getOfflineInformationList(path, searchQuery)
 
-    override suspend fun getCuBackUpId() = dbHandler.cuBackupID
-
-    override suspend fun getMuBackUpId() = dbHandler.muBackupID
-
-    override suspend fun getCuBackUp() = dbHandler.cuBackup
-
-    override suspend fun getMuBackUp() = dbHandler.muBackup
-
-    override suspend fun getBackupById(id: Long) = dbHandler.getBackupById(id)
-
-    override suspend fun updateBackup(backup: Backup) = dbHandler.updateBackup(backup)
-
     override suspend fun deleteOldestCompletedTransfers() =
         dbHandler.deleteOldestCompletedTransfers()
-
-    override suspend fun deleteBackupById(backupId: Long) = dbHandler.deleteBackupById(backupId)
-
-    override suspend fun setBackupAsOutdated(backupId: Long) =
-        dbHandler.setBackupAsOutdated(backupId)
 
     override suspend fun findPendingMessagesNotSent(chatId: Long) =
         dbHandler.findPendingMessagesNotSent(chatId)
@@ -368,12 +348,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.transferQueueStatus = isPause
     }
 
-    override suspend fun saveBackup(backup: Backup) {
-        dbHandler.saveBackup(backup)
-    }
-
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }
-
 }

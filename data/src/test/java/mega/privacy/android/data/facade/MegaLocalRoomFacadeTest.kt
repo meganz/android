@@ -601,6 +601,13 @@ internal class MegaLocalRoomFacadeTest {
             verify(backupDao).insertOrUpdateBackup(entity)
         }
 
+    @Test
+    fun `test that all backupDao deleteAllBackups is invoked when deleteAllBackups is invoked`() =
+        runTest {
+            underTest.deleteAllBackups()
+            verify(backupDao).deleteAllBackups()
+        }
+
     private fun provideDoesFileNameExistParameters() = Stream.of(
         Arguments.of(true, 1, true),
         Arguments.of(false, 1, true),

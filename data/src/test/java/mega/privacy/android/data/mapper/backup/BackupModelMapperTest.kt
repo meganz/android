@@ -53,7 +53,7 @@ internal class BackupModelMapperTest {
         val outdated = false
 
         val entity = BackupEntity(
-            id = null,
+            id = 1,
             encryptedBackupId = backupId.toString(),
             backupType = backupType,
             encryptedTargetNode = targetNode.toString(),
@@ -71,6 +71,7 @@ internal class BackupModelMapperTest {
         )
 
         val expected = Backup(
+            id = 1,
             backupId = backupId,
             backupType = backupType,
             targetNode = targetNode,
@@ -88,7 +89,6 @@ internal class BackupModelMapperTest {
         )
 
         whenever(decryptData(backupId.toString())).thenReturn(backupId.toString())
-        whenever(decryptData(backupType.toString())).thenReturn(backupType.toString())
         whenever(decryptData(targetNode.toString())).thenReturn(targetNode.toString())
         whenever(decryptData(localFolder)).thenReturn(localFolder)
         whenever(decryptData(backupName)).thenReturn(backupName)

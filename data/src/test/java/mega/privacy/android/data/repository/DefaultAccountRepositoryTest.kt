@@ -891,7 +891,7 @@ class DefaultAccountRepositoryTest {
             verify(megaLocalRoomGateway).deleteAllSyncRecordsTypeAny()
             verify(megaLocalRoomGateway).deleteAllCompletedTransfers()
             verify(localStorageGateway).clearChatSettings()
-            verify(localStorageGateway).clearBackups()
+            verify(megaLocalRoomGateway).deleteAllBackups()
         }
 
     @Test

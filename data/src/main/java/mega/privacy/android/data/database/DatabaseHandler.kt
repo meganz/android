@@ -8,7 +8,6 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -19,41 +18,6 @@ interface DatabaseHandler {
     companion object {
         const val MAX_TRANSFERS = 100
     }
-
-    /**
-     * Camera upload backup ID
-     *
-     * @return [Long].
-     */
-    val cuBackupID: Long?
-
-    /**
-     * Media upload backup id
-     *
-     *   @return [Long].
-     */
-    val muBackupID: Long?
-
-    /**
-     * Camera upload backup ID
-     *
-     * @return [Long].
-     */
-    val cuBackup: Backup?
-
-    /**
-     * Media upload backup
-     *
-     * @return [Backup].
-     */
-    val muBackup: Backup?
-
-    /**
-     * All Backups
-     *
-     * @return list of [Backup].
-     */
-    val allBackups: List<Backup>?
 
     val myEmail: String?
 
@@ -287,16 +251,6 @@ interface DatabaseHandler {
     fun removePendingMessageById(idMsg: Long)
     fun setAutoPlayEnabled(enabled: String)
     fun setShowInviteBanner(show: String)
-    fun setBackupAsOutdated(id: Long)
-
-    /**
-     * Delete a specific [Backup] from the Database
-     *
-     * @param backupId The Backup ID used to delete a specific [Backup] from the Database
-     */
-    fun deleteBackupById(backupId: Long)
-    fun clearBackups()
-
     fun findNonContactByHandle(handle: String?): NonContactInfo?
     fun findContactByHandle(handleParam: Long): Contact?
     fun findContactByEmail(mail: String?): Contact?
@@ -331,21 +285,6 @@ interface DatabaseHandler {
     ): List<OfflineInformation>
 
     /**
-     * Get Backup by id
-     *
-     * @param id
-     * @return [Backup]
-     */
-    fun getBackupById(id: Long): Backup?
-
-    /**
-     * Given an updated [Backup] object, this updates a specific [Backup] in the Database
-     *
-     * @param backup the updated [Backup] object
-     */
-    fun updateBackup(backup: Backup)
-
-    /**
      * Deletes the oldest completed transfers
      */
     fun deleteOldestCompletedTransfers()
@@ -357,6 +296,4 @@ interface DatabaseHandler {
      * @return A list of [AndroidMegaChatMessage].
      */
     fun findPendingMessagesNotSent(chatId: Long): List<AndroidMegaChatMessage>
-
-    fun saveBackup(backup: Backup): Boolean
 }

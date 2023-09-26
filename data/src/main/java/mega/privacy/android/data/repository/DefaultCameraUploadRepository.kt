@@ -756,9 +756,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun getBackupFolderId(cameraUploadFolderType: CameraUploadFolderType): Long? =
         withContext(ioDispatcher) {
             if (cameraUploadFolderType == CameraUploadFolderType.Primary) {
-                localStorageGateway.getCuBackUpId()
+                megaLocalRoomGateway.getCuBackUpId()
             } else {
-                localStorageGateway.getMuBackUpId()
+                megaLocalRoomGateway.getMuBackUpId()
             }
         }
 
@@ -808,7 +808,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         }
 
     private companion object {
-        private const val STATE_NO_CHANGE = -1
         private const val SUB_STATE_NO_CHANGE = -1
         private const val TARGET_NODE_NO_CHANGE = -1L
     }

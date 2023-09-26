@@ -36,11 +36,9 @@ import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
@@ -240,7 +238,6 @@ class SqliteDatabaseHandler @Inject constructor(
 
         db.execSQL(CREATE_SYNC_RECORDS_TABLE)
         db.execSQL(CREATE_SD_TRANSFERS_TABLE)
-        db.execSQL(CREATE_BACKUP_TABLE)
     }
 
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -606,9 +603,6 @@ class SqliteDatabaseHandler @Inject constructor(
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_TRANSFER_QUEUE_STATUS BOOLEAN;")
             db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_TRANSFER_QUEUE_STATUS = '${encrypt("false")}';")
             db.execSQL(CREATE_SD_TRANSFERS_TABLE)
-        }
-        if (oldVersion <= 59) {
-            db.execSQL(CREATE_BACKUP_TABLE)
         }
         if (oldVersion <= 60) {
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PASSCODE_LOCK_REQUIRE_TIME TEXT;")
@@ -3906,239 +3900,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun saveBackup(backup: Backup): Boolean {
-        val values = ContentValues()
-        values.put(KEY_BACKUP_ID, encrypt(backup.backupId.toString()))
-        values.put(KEY_BACKUP_TYPE, backup.backupType)
-        values.put(KEY_BACKUP_TARGET_NODE, encrypt(backup.targetNode.toString()))
-        values.put(KEY_BACKUP_LOCAL_FOLDER, encrypt(backup.localFolder))
-        values.put(KEY_BACKUP_NAME, encrypt(backup.backupName))
-        values.put(KEY_BACKUP_STATE, backup.state.value)
-        values.put(KEY_BACKUP_SUB_STATE, backup.subState)
-        values.put(KEY_BACKUP_EXTRA_DATA, encrypt(backup.extraData))
-        values.put(KEY_BACKUP_START_TIME, encrypt(backup.startTimestamp.toString()))
-        values.put(
-            KEY_BACKUP_LAST_TIME,
-            encrypt(backup.lastFinishTimestamp.toString())
-        )
-        values.put(KEY_BACKUP_TARGET_NODE_PATH, encrypt(backup.targetFolderPath))
-        values.put(KEY_BACKUP_EX, encrypt(backup.isExcludeSubFolders.toString()))
-        values.put(
-            KEY_BACKUP_DEL,
-            encrypt(java.lang.Boolean.toString(backup.isDeleteEmptySubFolders))
-        )
-        // Default value is false.
-        values.put(KEY_BACKUP_OUTDATED, encrypt("false"))
-        val result = db.insertOrThrow(TABLE_BACKUPS, null, values)
-        return if (result != -1L) {
-            Timber.d("Save sync pair %s successfully, row id is: %d", backup, result)
-            true
-        } else {
-            Timber.e("Save sync pair %s failed", backup)
-            false
-        }
-    }
-
-    override val cuBackupID: Long?
-        get() = cuBackup?.backupId
-
-    override val muBackupID: Long?
-        get() = muBackup?.backupId
-
-    override val cuBackup: Backup?
-        get() = getBackupByType(MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS)
-    override val muBackup: Backup?
-        get() = getBackupByType(MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS)
-
-    private fun getBackupByType(type: Int): Backup? {
-        val selectQuery =
-            "SELECT * FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_TYPE = $type AND $KEY_BACKUP_OUTDATED = '${
-                encrypt("false")
-            }' ORDER BY $KEY_ID DESC"
-
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    return getBackupFromCursor(cursor)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
-    }
-
-    override fun setBackupAsOutdated(id: Long) {
-        getBackupById(id)?.let { backup ->
-            updateBackup(backup.copy(outdated = true))
-        }
-    }
-
-    override fun getBackupById(id: Long): Backup? {
-        val selectQuery =
-            "SELECT * FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(id.toString())}'"
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    return getBackupFromCursor(cursor)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
-    }
-
-    override val allBackups: List<Backup>?
-        get() {
-            val selectQuery = "SELECT * FROM $TABLE_BACKUPS"
-            try {
-                db.rawQuery(selectQuery, null).use { cursor ->
-
-                    val list: MutableList<Backup> = ArrayList()
-                    cursor?.let {
-                        while (cursor.moveToNext()) {
-                            getBackupFromCursor(cursor)?.let { it1 -> list.add(it1) }
-                        }
-                    }
-                    return list
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return null
-        }
-
-    private fun getBackupFromCursor(cursor: Cursor): Backup? {
-        try {
-            return Backup(
-                backupId = (decrypt(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_BACKUP_ID
-                        )
-                    )
-                ) ?: return null)
-                    .toLong(),
-                backupType = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BACKUP_TYPE)),
-                targetNode = (decrypt(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_BACKUP_TARGET_NODE
-                        )
-                    )
-                ) ?: return null)
-                    .toLong(),
-                localFolder = decrypt(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_BACKUP_LOCAL_FOLDER
-                        )
-                    )
-                ) ?: return null,
-                backupName = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BACKUP_NAME)))!!,
-                state = BackupState.fromValue(
-                    cursor.getInt(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_BACKUP_STATE
-                        )
-                    )
-                ),
-                subState = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BACKUP_SUB_STATE)),
-                extraData = decrypt(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_BACKUP_EXTRA_DATA
-                        )
-                    )
-                ) ?: return null,
-                startTimestamp = (decrypt(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_BACKUP_START_TIME
-                        )
-                    )
-                ) ?: return null)
-                    .toLong(),
-                lastFinishTimestamp = (decrypt(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_BACKUP_LAST_TIME
-                        )
-                    )
-                ) ?: return null)
-                    .toLong(),
-                targetFolderPath = decrypt(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_BACKUP_TARGET_NODE_PATH
-                        )
-                    )
-                ) ?: return null,
-                isExcludeSubFolders = java.lang.Boolean.parseBoolean(
-                    decrypt(
-                        cursor.getString(
-                            cursor.getColumnIndexOrThrow(
-                                KEY_BACKUP_EX
-                            )
-                        )
-                    )
-                ),
-                isDeleteEmptySubFolders = java.lang.Boolean.parseBoolean(
-                    decrypt(
-                        cursor.getString(
-                            cursor.getColumnIndexOrThrow(
-                                KEY_BACKUP_DEL
-                            )
-                        )
-                    )
-                ),
-                outdated = java.lang.Boolean.parseBoolean(
-                    decrypt(
-                        cursor.getString(
-                            cursor.getColumnIndexOrThrow(
-                                KEY_BACKUP_OUTDATED
-                            )
-                        )
-                    )
-                )
-            )
-        } catch (exception: IllegalArgumentException) {
-            Timber.w(exception, "Exception getting Backup")
-        }
-        return null
-    }
-
-    override fun deleteBackupById(backupId: Long) {
-        val deleteBackupByIdQuery =
-            "DELETE FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(backupId.toString())}'"
-        db.execSQL(deleteBackupByIdQuery)
-    }
-
-    override fun updateBackup(backup: Backup) {
-        val updateBackupQuery = "UPDATE $TABLE_BACKUPS SET " +
-                "$KEY_BACKUP_NAME = '${encrypt(backup.backupName)}', " +
-                "$KEY_BACKUP_TYPE = ${backup.backupType}, " +
-                "$KEY_BACKUP_LOCAL_FOLDER = '${encrypt(backup.localFolder)}', " +
-                "$KEY_BACKUP_TARGET_NODE_PATH = '${encrypt(backup.targetFolderPath)}', " +
-                "$KEY_BACKUP_TARGET_NODE = '${encrypt(backup.targetNode.toString())}', " +
-                "$KEY_BACKUP_EX = '${encrypt(backup.isExcludeSubFolders.toString())}', " +
-                "$KEY_BACKUP_DEL = '${encrypt(backup.isDeleteEmptySubFolders.toString())}', " +
-                "$KEY_BACKUP_START_TIME = '${encrypt(backup.startTimestamp.toString())}', " +
-                "$KEY_BACKUP_LAST_TIME = '${encrypt(backup.lastFinishTimestamp.toString())}', " +
-                "$KEY_BACKUP_STATE = ${backup.state.value}, " +
-                "$KEY_BACKUP_SUB_STATE = ${backup.subState}, " +
-                "$KEY_BACKUP_EXTRA_DATA = '${encrypt(backup.extraData)}', " +
-                "$KEY_BACKUP_OUTDATED = '${encrypt(backup.outdated.toString())}'" +
-                "WHERE $KEY_BACKUP_ID = '${encrypt(backup.backupId.toString())}'"
-        db.execSQL(updateBackupQuery)
-    }
-
-    override fun clearBackups() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_BACKUPS")
-        onCreate(db)
-    }
-
     override suspend fun getOfflineInformation(handle: Long): OfflineInformation? {
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_HANDLE = '${encrypt(handle.toString())}'"
@@ -4322,7 +4083,6 @@ class SqliteDatabaseHandler @Inject constructor(
         private const val TABLE_EPHEMERAL = "ephemeral"
         private const val TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle"
         private const val TABLE_SYNC_RECORDS = "syncrecords"
-        const val TABLE_BACKUPS = "backups"
         private const val KEY_ID = "id"
         private const val KEY_EMAIL = "email"
         private const val KEY_PASSWORD = "password"
@@ -4493,39 +4253,7 @@ class SqliteDatabaseHandler @Inject constructor(
                     "$KEY_SD_TRANSFERS_HANDLE TEXT, " +                   // 4
                     "$KEY_SD_TRANSFERS_PATH TEXT, " +                     // 5
                     "$KEY_SD_TRANSFERS_APP_DATA TEXT)"                    // 6
-        private const val KEY_BACKUP_ID = "backup_id"
-        private const val KEY_BACKUP_TYPE = "backup_type"
-        private const val KEY_BACKUP_TARGET_NODE = "target_node"
-        private const val KEY_BACKUP_LOCAL_FOLDER = "local_folder"
-        private const val KEY_BACKUP_NAME = "backup_name"
-        private const val KEY_BACKUP_STATE = "state"
-        private const val KEY_BACKUP_SUB_STATE = "sub_state"
-        private const val KEY_BACKUP_EXTRA_DATA = "extra_data"
-        private const val KEY_BACKUP_START_TIME = "start_timestamp"
-        private const val KEY_BACKUP_LAST_TIME = "last_sync_timestamp"
-        private const val KEY_BACKUP_TARGET_NODE_PATH = "target_folder_path"
-        private const val KEY_BACKUP_EX = "exclude_subFolders"
-        private const val KEY_BACKUP_DEL = "delete_empty_subFolders"
-        private const val KEY_BACKUP_OUTDATED = "outdated"
-        private const val CREATE_BACKUP_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_BACKUPS(" +
-                "$KEY_ID INTEGER PRIMARY KEY, " +                          //0
-                "$KEY_BACKUP_ID TEXT, " +                                  //1
-                "$KEY_BACKUP_TYPE INTEGER," +                              //2
-                "$KEY_BACKUP_TARGET_NODE TEXT," +                          //3
-                "$KEY_BACKUP_LOCAL_FOLDER TEXT," +                         //4
-                "$KEY_BACKUP_NAME TEXT," +                                 //5
-                "$KEY_BACKUP_STATE INTEGER," +                             //6
-                "$KEY_BACKUP_SUB_STATE INTEGER," +                         //7
-                "$KEY_BACKUP_EXTRA_DATA TEXT," +                           //8
-                "$KEY_BACKUP_START_TIME TEXT," +                           //9
-                "$KEY_BACKUP_LAST_TIME TEXT," +                            //10
-                "$KEY_BACKUP_TARGET_NODE_PATH TEXT," +                     //11
-                "$KEY_BACKUP_EX BOOLEAN," +                                //12
-                "$KEY_BACKUP_DEL BOOLEAN," +                               //13
-                "$KEY_BACKUP_OUTDATED BOOLEAN)"                            //14
         private const val OLD_VIDEO_QUALITY_ORIGINAL = 0
-        private const val SYNC_RECORD_TYPE_VIDEO = 2
-        private const val SYNC_RECORD_TYPE_ANY = -1
 
         private fun encrypt(original: String?): String? =
             original?.let {

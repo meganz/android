@@ -53,6 +53,7 @@ internal class BackupEntityMapperTest {
         val isDeleteEmptySubFolders = false
         val outdated = false
         val model = Backup(
+            id = 1,
             backupId = backupId,
             backupType = backupType,
             targetNode = targetNode,
@@ -70,7 +71,7 @@ internal class BackupEntityMapperTest {
         )
 
         val expected = BackupEntity(
-            id = null,
+            id = 1,
             encryptedBackupId = backupId.toString(),
             backupType = backupType,
             encryptedTargetNode = targetNode.toString(),

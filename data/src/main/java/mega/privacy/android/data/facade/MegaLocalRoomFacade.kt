@@ -382,4 +382,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
             backupDao.insertOrUpdateBackup(it)
         }
     }
+
+    override suspend fun deleteAllBackups() {
+        backupDao.deleteAllBackups()
+    }
 }

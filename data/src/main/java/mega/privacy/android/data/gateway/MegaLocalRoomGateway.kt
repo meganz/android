@@ -395,4 +395,8 @@ interface MegaLocalRoomGateway {
      */
     suspend fun updateBackup(backup: Backup)
 
+    /**
+     * Delete All backups from the backups table
+     */
+    suspend fun deleteAllBackups()
 }

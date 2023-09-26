@@ -21,6 +21,7 @@ internal class BackupEntityMapper @Inject constructor(
      */
     suspend operator fun invoke(backup: Backup): BackupEntity? {
         return BackupEntity(
+            id = backup.id,
             encryptedBackupId = encryptData(backup.backupId.toString()) ?: return null,
             backupType = backup.backupType,
             encryptedTargetNode = encryptData(backup.targetNode.toString()) ?: return null,

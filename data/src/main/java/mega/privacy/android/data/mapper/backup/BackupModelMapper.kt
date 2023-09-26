@@ -21,8 +21,9 @@ internal class BackupModelMapper @Inject constructor(
      */
     suspend operator fun invoke(entity: BackupEntity): Backup? {
         return Backup(
+            id = entity.id,
             backupId = decryptData(entity.encryptedBackupId)?.toLong() ?: return null,
-            backupType = decryptData(entity.backupType.toString())?.toInt() ?: return null,
+            backupType = entity.backupType,
             targetNode = decryptData(entity.encryptedTargetNode)?.toLong() ?: return null,
             localFolder = decryptData(entity.encryptedLocalFolder) ?: return null,
             backupName = decryptData(entity.encryptedBackupName) ?: return null,

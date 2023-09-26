@@ -5,7 +5,6 @@ import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
 
@@ -597,11 +596,6 @@ interface MegaLocalStorageGateway {
     suspend fun clearChatSettings()
 
     /**
-     * Clears backups.
-     */
-    suspend fun clearBackups()
-
-    /**
      * Load offline nodes
      *
      * @param path
@@ -614,60 +608,9 @@ interface MegaLocalStorageGateway {
     ): List<OfflineInformation>
 
     /**
-     * Get Camera upload Backup
-     * @return [Backup]
-     */
-    suspend fun getCuBackUp(): Backup?
-
-    /**
-     * Get Media upload Backup
-     * @return [Backup]
-     */
-    suspend fun getMuBackUp(): Backup?
-
-    /**
-     * Get Camera upload Backup ID
-     * @return [Long]
-     */
-    suspend fun getCuBackUpId(): Long?
-
-
-    /**
-     * Get Media upload Backup ID
-     * @return [Long]
-     */
-    suspend fun getMuBackUpId(): Long?
-
-    /**
-     * Get upload backup by Id
-     * @return [Backup]
-     */
-    suspend fun getBackupById(id: Long): Backup?
-
-    /**
-     * Given an updated [Backup] object, this updates a specific [Backup] in the Database
-     *
-     * @param backup the updated [Backup] object
-     */
-    suspend fun updateBackup(backup: Backup)
-
-    /**
      * Delete oldest completed transfers
      */
     suspend fun deleteOldestCompletedTransfers()
-
-    /**
-     * Remove back up folder
-     *
-     * @param backupId back up id to be removed
-     */
-    suspend fun deleteBackupById(backupId: Long)
-
-    /**
-     * Set up back up as outdated
-     * @param backupId back up id to be removed
-     */
-    suspend fun setBackupAsOutdated(backupId: Long)
 
     /**
      * Gets pending messages.
@@ -692,18 +635,10 @@ interface MegaLocalStorageGateway {
         state: Int,
     )
 
-
     /**
      * Set transfer queue status
      *
      * @param isPause
      */
     suspend fun setTransferQueueStatus(isPause: Boolean)
-
-    /**
-     * Save a backup to Database
-     *
-     * @param backup [Backup]
-     */
-    suspend fun saveBackup(backup: Backup)
 }
