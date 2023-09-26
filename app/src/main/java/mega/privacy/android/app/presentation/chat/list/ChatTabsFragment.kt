@@ -20,23 +20,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.EventConstants.EVENT_DRAWER_OPEN
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -106,7 +105,6 @@ class ChatTabsFragment : Fragment() {
 
     private val viewModel by viewModels<ChatTabsViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
-    private val onDrawerObserver: Observer<Boolean> = Observer { viewModel.showTooltips(!it) }
 
     private val bluetoothPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGrant ->
@@ -131,6 +129,18 @@ class ChatTabsFragment : Fragment() {
                 Timber.w("StartConversationActivity invalid result: $result")
             }
         }
+
+    private val drawerListener = object : DrawerLayout.DrawerListener {
+        override fun onDrawerOpened(drawerView: View) {
+            viewModel.showTooltips(false)
+        }
+
+        override fun onDrawerClosed(drawerView: View) {
+            viewModel.showTooltips(true)
+        }
+        override fun onDrawerStateChanged(newState: Int) {}
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -216,7 +226,7 @@ class ChatTabsFragment : Fragment() {
                 handleUserInCall(isInCall)
             }
         }
-
+        (activity as? NavigationDrawerManager)?.addDrawerListener(drawerListener)
         view.post {
             (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
             (activity as? ManagerActivity?)?.invalidateOptionsMenu()
@@ -224,8 +234,6 @@ class ChatTabsFragment : Fragment() {
                 ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
             }
             setupMenu()
-
-            LiveEventBus.get(EVENT_DRAWER_OPEN, Boolean::class.java).observe(this, onDrawerObserver)
         }
     }
 
@@ -260,7 +268,7 @@ class ChatTabsFragment : Fragment() {
     override fun onDestroyView() {
         (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener(null)
         scheduledMeetingManagementViewModel.stopMonitoringLoadMessages()
-        LiveEventBus.get(EVENT_DRAWER_OPEN, Boolean::class.java).removeObserver(onDrawerObserver)
+        (activity as? NavigationDrawerManager)?.removeDrawerListener(drawerListener)
         super.onDestroyView()
     }
 

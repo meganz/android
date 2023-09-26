@@ -112,7 +112,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
@@ -1104,13 +1103,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             override fun onDrawerOpened(drawerView: View) {
                 refreshDrawerInfo(storageState === StorageState.Unknown)
-
-                LiveEventBus.get(EventConstants.EVENT_DRAWER_OPEN, Boolean::class.java).post(true)
             }
 
-            override fun onDrawerClosed(drawerView: View) {
-                LiveEventBus.get(EventConstants.EVENT_DRAWER_OPEN, Boolean::class.java).post(false)
-            }
+            override fun onDrawerClosed(drawerView: View) {}
 
             override fun onDrawerStateChanged(newState: Int) {}
 
@@ -1200,6 +1195,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     override fun addDrawerListener(listener: DrawerLayout.DrawerListener) {
         drawerLayout.addDrawerListener(listener)
+    }
+
+    override fun removeDrawerListener(listener: DrawerLayout.DrawerListener) {
+        drawerLayout.removeDrawerListener(listener)
     }
 
     private fun initialiseChatBadgeView() {

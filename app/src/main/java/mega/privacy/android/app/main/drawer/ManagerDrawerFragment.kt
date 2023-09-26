@@ -76,6 +76,18 @@ internal class ManagerDrawerFragment : Fragment() {
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
 
+    private val listener = object : DrawerLayout.DrawerListener {
+        override fun onDrawerOpened(drawerView: View) {
+            updateAccountDetailsVisibleInfo()
+        }
+
+        override fun onDrawerClosed(drawerView: View) {}
+
+        override fun onDrawerStateChanged(newState: Int) {}
+
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         drawerManager = context as? NavigationDrawerManager
@@ -102,6 +114,7 @@ internal class ManagerDrawerFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        drawerManager.removeDrawerListener(listener)
         _binding = null
     }
 
@@ -112,19 +125,7 @@ internal class ManagerDrawerFragment : Fragment() {
                 outMetrics
             )
         )
-        drawerManager.addDrawerListener(
-            object : DrawerLayout.DrawerListener {
-                override fun onDrawerOpened(drawerView: View) {
-                    updateAccountDetailsVisibleInfo()
-                }
-
-                override fun onDrawerClosed(drawerView: View) {}
-
-                override fun onDrawerStateChanged(newState: Int) {}
-
-                override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-            },
-        )
+        drawerManager.addDrawerListener(listener)
         binding.navigationDrawerAddPhoneNumberButton.doOnLayout {
             val lineCount = binding.navigationDrawerAddPhoneNumberButton.layout?.lineCount ?: 0
             binding.navigationDrawerAddPhoneNumberIcon.isGone = lineCount > 1

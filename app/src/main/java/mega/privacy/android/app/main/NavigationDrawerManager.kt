@@ -25,6 +25,13 @@ interface NavigationDrawerManager {
      */
     fun addDrawerListener(listener: DrawerLayout.DrawerListener)
 
+/**
+     * Remove drawer listener
+     *
+     * @param listener
+     */
+    fun removeDrawerListener(listener: DrawerLayout.DrawerListener)
+
     /**
      * Select drawer item
      *
