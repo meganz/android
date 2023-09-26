@@ -16,6 +16,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -28,12 +32,20 @@ import mega.privacy.android.app.main.managerSections.TransfersFragment
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
+import mega.privacy.android.app.usecase.DownloadNodeUseCase
+import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -43,6 +55,16 @@ internal class TransferPageFragment : Fragment() {
 
     @Inject
     lateinit var dbH: DatabaseHandler
+
+    @Inject
+    lateinit var downloadNodeUseCase: DownloadNodeUseCase
+
+    @Inject
+    lateinit var uploadUseCase: UploadUseCase
+
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
 
     private var _binding: FragmentTransferPageBinding? = null
     val binding: FragmentTransferPageBinding
@@ -64,6 +86,8 @@ internal class TransferPageFragment : Fragment() {
 
     private val transfersFragment: TransfersFragment?
         get() = childFragmentManager.findFragmentByTag(TRANSFERS_TAG) as? TransfersFragment
+
+    private val composite = CompositeDisposable()
 
     private var cancelAllTransfersMenuItem: MenuItem? = null
     private var playTransfersMenuIcon: MenuItem? = null
@@ -94,6 +118,7 @@ internal class TransferPageFragment : Fragment() {
     override fun onDestroyView() {
         _binding = null
         confirmationTransfersDialog?.dismiss()
+        composite.clear()
         super.onDestroyView()
     }
 
@@ -195,7 +220,7 @@ internal class TransferPageFragment : Fragment() {
     private fun handleDeleteFailedOrCancelledTransfersResult(transfers: List<CompletedTransfer>) {
         for (transfer in transfers) {
             // still call to activity, we will refactor later
-            (activity as? ManagerActivity)?.retryTransfer(transfer)
+            retryTransfer(transfer)
         }
     }
 
@@ -357,6 +382,65 @@ internal class TransferPageFragment : Fragment() {
             confirmationTransfersDialog?.setCanceledOnTouchOutside(false)
             confirmationTransfersDialog?.show()
         }
+    }
+
+
+    /**
+     * Retries a transfer that finished wrongly.
+     *
+     * @param transfer the transfer to retry
+     */
+    fun retryTransfer(transfer: CompletedTransfer) {
+        when (transfer.type) {
+            MegaTransfer.TYPE_DOWNLOAD -> {
+                val node = megaApi.getNodeByHandle(transfer.handle) ?: return
+                when (transfer.isOffline) {
+                    true -> {
+                        val offlineFile = File(transfer.originalPath)
+                        OfflineUtils.saveOffline(
+                            offlineFile.parentFile,
+                            node,
+                            requireActivity()
+                        )
+                    }
+
+                    false -> {
+                        downloadNodeUseCase.download(requireActivity(), node, transfer.path)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                { Timber.d("Transfer retried: ${node.handle}") },
+                                { throwable: Throwable? ->
+                                    Timber.e(throwable, "Retry transfer failed.")
+                                }
+                            )
+                            .addTo(composite)
+                    }
+
+                    null -> {
+                        Timber.d("Unable to retrieve transfer isOffline value")
+                    }
+                }
+            }
+
+            MegaTransfer.TYPE_UPLOAD -> {
+                PermissionUtils.checkNotificationsPermission(requireActivity())
+                val file = File(transfer.originalPath)
+                uploadUseCase.upload(requireActivity(), file, transfer.parentHandle)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        { Timber.d("Transfer retried.") },
+                        { t: Throwable? -> Timber.e(t) })
+                    .addTo(composite)
+            }
+
+            else -> {
+                Timber.d("Unable to retrieve transfer type value")
+            }
+        }
+
+        transfersViewModel.completedTransferRemoved(transfer, false)
     }
 
     companion object {

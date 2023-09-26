@@ -10,6 +10,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.main.adapters.MegaCompletedTransfersAdapter
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -74,6 +75,15 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
         }
         ManageTransferBottomSheetDialogFragment.newInstance(id)
             .show(childFragmentManager, ManageTransferBottomSheetDialogFragment.TAG)
+    }
+
+    /**
+     * Retry single transfer
+     *
+     * @param transfer
+     */
+    fun retrySingleTransfer(transfer: CompletedTransfer) {
+        (parentFragment as? TransferPageFragment)?.retryTransfer(transfer)
     }
 
     companion object {

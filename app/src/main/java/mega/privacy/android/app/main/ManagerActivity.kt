@@ -244,7 +244,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogS
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -387,9 +386,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
-
-    @Inject
-    lateinit var downloadNodeUseCase: DownloadNodeUseCase
 
     @Inject
     lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
@@ -7960,74 +7956,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Removes a completed transfer from Completed tab in Transfers section.
-     *
-     * @param transfer       the completed transfer to remove
-     * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
-     */
-    fun removeCompletedTransfer(transfer: CompletedTransfer, isRemovedCache: Boolean) {
-        transfersViewModel.completedTransferRemoved(transfer, isRemovedCache)
-    }
-
-    /**
-     * Retries a transfer that finished wrongly.
-     *
-     * @param transfer the transfer to retry
-     */
-    fun retryTransfer(transfer: CompletedTransfer) {
-        when (transfer.type) {
-            MegaTransfer.TYPE_DOWNLOAD -> {
-                val node = megaApi.getNodeByHandle(transfer.handle) ?: return
-                when (transfer.isOffline) {
-                    true -> {
-                        val offlineFile = File(transfer.originalPath)
-                        OfflineUtils.saveOffline(
-                            offlineFile.parentFile,
-                            node,
-                            this@ManagerActivity
-                        )
-                    }
-
-                    false -> {
-                        downloadNodeUseCase.download(this, node, transfer.path)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                { Timber.d("Transfer retried: ${node?.handle}") },
-                                { throwable: Throwable? ->
-                                    Timber.e(throwable, "Retry transfer failed.")
-                                }
-                            )
-                            .addTo(composite)
-                    }
-
-                    null -> {
-                        Timber.d("Unable to retrieve transfer isOffline value")
-                    }
-                }
-            }
-
-            MegaTransfer.TYPE_UPLOAD -> {
-                PermissionUtils.checkNotificationsPermission(this)
-                val file = File(transfer.originalPath)
-                uploadUseCase.upload(this, file, transfer.parentHandle)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { Timber.d("Transfer retried.") },
-                        { t: Throwable? -> Timber.e(t) })
-                    .addTo(composite)
-            }
-
-            else -> {
-                Timber.d("Unable to retrieve transfer type value")
-            }
-        }
-
-        removeCompletedTransfer(transfer, false)
-    }
-
-    /**
      * Opens a location of a transfer.
      *
      * @param transfer the transfer to open its location
@@ -8142,15 +8070,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             transfersManagement.isTransferOverQuotaBannerShown = true
             transfersManagement.isTransferOverQuotaNotificationShown = false
         }
-    }
-
-    /**
-     * Retry a single transfer.
-     *
-     * @param transfer CompletedTransfer to retry.
-     */
-    fun retrySingleTransfer(transfer: CompletedTransfer) {
-        retryTransfer(transfer)
     }
 
     private fun getRubbishBinComposeFragment(): RubbishBinComposeFragment? {

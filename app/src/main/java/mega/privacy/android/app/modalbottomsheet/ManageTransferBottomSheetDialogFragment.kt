@@ -20,6 +20,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding
 import mega.privacy.android.app.fetcher.ThumbnailRequest
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
@@ -188,7 +189,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
             } else {
-                managerActivity.retrySingleTransfer(transfer)
+                (parentFragment as? CompletedTransfersFragment)?.retrySingleTransfer(transfer)
             }
         }
         setStateBottomSheetBehaviorHidden()
@@ -197,7 +198,6 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
     companion object {
         const val TRANSFER_ID = "TRANSFER_ID"
         const val TAG = "ManageTransferBottomSheetDialogFragment"
-        private const val MARGIN_TRANSFER_TYPE_ICON_WITH_THUMBNAIL = -12
 
         fun newInstance(completedTransferId: Int) =
             ManageTransferBottomSheetDialogFragment().apply {

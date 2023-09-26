@@ -49,37 +49,39 @@
                 android:singleLine="true"
                 app:layout_constraintVertical_chainStyle="packed"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/manage_transfer_completed_image"
+                app:layout_constraintBottom_toTopOf="@+id/manage_transfer_completed_layout"
                 app:layout_constraintStart_toEndOf="@+id/manage_transfer_thumbnail_layout"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="File Name" />
 
-            <ImageView
-                android:id="@+id/manage_transfer_completed_image"
-                android:layout_width="wrap_content"
-                android:layout_height="25dp"
-                android:layout_toEndOf="@id/manage_transfer_thumbnail_layout"
-                android:src="@drawable/ic_transfers_completed"
-                app:layout_constraintBottom_toBottomOf="parent"
+            <LinearLayout
+                android:id="@+id/manage_transfer_completed_layout"
+                app:layout_constraintTop_toBottomOf="@+id/manage_transfer_filename"
                 app:layout_constraintStart_toStartOf="@+id/manage_transfer_filename"
-                app:layout_constraintTop_toBottomOf="@+id/manage_transfer_filename" />
-
-            <TextView
-                android:id="@+id/manage_transfer_location"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="13dp"
-                android:ellipsize="middle"
-                android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-                app:layout_constraintBottom_toBottomOf="@+id/manage_transfer_completed_image"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/manage_transfer_completed_image"
-                app:layout_constraintTop_toBottomOf="@+id/manage_transfer_filename"
-                app:layout_goneMarginStart="0dp"
-                tools:text="Mega Download/file.txt" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
+                <ImageView
+                    android:id="@+id/manage_transfer_completed_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="25dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/ic_transfers_completed" />
+                <TextView
+                    android:id="@+id/manage_transfer_location"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="13dp"
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+                    tools:text="Mega Download/file.txt" />
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
