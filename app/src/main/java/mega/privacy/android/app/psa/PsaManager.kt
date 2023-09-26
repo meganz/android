@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,7 +24,9 @@ class PsaManager @Inject constructor(
      * Check PSA from server
      */
     suspend fun checkPsa() {
-        val psa = fetchPsaUseCase(System.currentTimeMillis())
+        val psa = kotlin.runCatching { fetchPsaUseCase(System.currentTimeMillis()) }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
         LiveEventBus.get(Constants.EVENT_PSA, Psa::class.java).post(psa)
     }
 
