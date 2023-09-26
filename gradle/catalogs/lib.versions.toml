@@ -18,6 +18,7 @@ rx-android = "3.0.0"
 rx-coroutines = "1.6.4"
 rx-java = "3.0.6"
 rx-kotlin = "3.0.1"
+showkase = '1.0.0-beta18'
 simplestorage = "1.1.0"
 compose-state-events = "1.2.3"
 kotlinpoet = "1.14.2"
@@ -65,6 +66,9 @@ rx-java = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rx-java" }
 rx-kotlin = { module = "io.reactivex.rxjava3:rxkotlin", version.ref = "rx-kotlin" }
 shimmerlayout = 'io.supercharge:shimmerlayout:2.1.0'
 shortcutbadger = 'me.leolin:ShortcutBadger:1.1.22'
+showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
+showkase-processor = { module = "com.airbnb.android:showkase-processor", version.ref = "showkase" }
+showkase-screenshot-test = { module = "com.airbnb.android:showkase-screenshot-testing", version.ref = "showkase" }
 simplestorage = { module = "com.anggrayudi:storage", version.ref = "simplestorage" }
 stickyheader = 'com.brandongogetap:stickyheaders:0.6.1'
 vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
