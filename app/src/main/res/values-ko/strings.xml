@@ -2711,8 +2711,6 @@
     <string name="label_time_in_minutes">%d분</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d초</string>
-    <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
-    <string name="label_verify_credentials">자격 증명 인증 중</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">인증되지 않음</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
@@ -3662,13 +3660,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]읽기만 가능하게 변경되었습니다[/B]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]일반 역할로 변경되었습니다[/B]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to a standard participant by [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]주최자 역할로 변경되었습니다[/B]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s님이 %2$s님에 의해 읽기만 가능하게 변경되었습니다</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s님이 %2$s님에 의해 일반 역할로 변경되었습니다</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to a standard participant by %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s님이 %2$s님에 의해 주최자 역할로 변경되었습니다</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -4503,8 +4501,6 @@
     <string name="photos_timeline_filter_remember_preferences">설정 기억하기</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title">장치 센터</string>
-    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">장치 센터</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">매일</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4593,8 +4589,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III 구입</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">이용 약관</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
-    <string name="cloud_drive_subtitle_links_access_all_user">이 링크가 있는 누구나 당신의 데이터를 보고 다운로드할 수 있습니다</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">비밀번호가 있는 사람만 링크를 열 수 있습니다</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -4838,7 +4832,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">대기실</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">호스트가 승인한 이용자만 회의에 참여할 수 있습니다</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">통화 중에 호스트가 아닌 사람으로부터 추가된 참여자들은 대기실에 보내질 수 없습니다.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -4883,8 +4877,7 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">대기실 보기</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d participant is waiting to join the call.</item>
-        <item quantity="other">%1$d participants are waiting to join the call.</item>
+        <item quantity="other">%1$d명의 참여자가 통화에 참여하려고 대기 중입니다.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">%1$s 님의 입장을 거부할까요?</string>

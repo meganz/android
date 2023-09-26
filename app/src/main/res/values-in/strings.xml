@@ -2711,8 +2711,6 @@
     <string name="label_time_in_minutes">%dm</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%ds</string>
-    <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
-    <string name="label_verify_credentials">Verifikasi kredensial</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Tidak diverifikasi</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
@@ -3662,13 +3660,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] diubah menjadi hanya-baca oleh  [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] diubah menjadi peran standar oleh  [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to a standard participant by [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] diubah menjadi tuan rumah oleh [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s diubah menjadi hanya-baca oleh %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s diubah menjadi peran standar oleh %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to a standard participant by %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s diubah menjadi tuan rumah oleh %2$s</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -4503,8 +4501,6 @@
     <string name="photos_timeline_filter_remember_preferences">Ingat preferensi</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title">Pusat perangkat</string>
-    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Pusat perangkat</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Setiap hari</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4593,8 +4589,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii">Beli Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Persyaratan Layanan</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
-    <string name="cloud_drive_subtitle_links_access_all_user">Siapa saja yang memiliki tautan ini dapat melihat dan mengunduh data anda</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Hanya orang yang memiliki kata sandi yang dapat membuka tautan tersebut</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -4838,7 +4832,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Ruang tunggu</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Hanya pengguna yang diakui oleh penyelenggara yang dapat bergabung dalam rapat.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Peserta yang ditambahkan oleh non-host selama panggilan tidak akan dikirim ke ruang tunggu.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->

@@ -2853,8 +2853,6 @@
     <string name="label_time_in_minutes">%d m</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d s</string>
-    <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
-    <string name="label_verify_credentials">Confirmer le numéro d’identification</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Non confirmé</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
@@ -3860,13 +3858,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[/B][A]%2$s[/A] a attribué un droit lecture seule à [A]%1$s[/A][B]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[/B][A]%2$s[/A] a attribué un droit normal à [A]%1$s[/A][B]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[/B][A]%2$s[/A] a changé [A]%1$s[/A][B] en participant normal</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[/B][A]%2$s[/A] a attribué un droit d’hôte à [A]%1$s[/A][B]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s a attribué un droit lecture seule à %1$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s a attribué un droit normal à %1$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s a changé %1$s en participant normal</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s a attribué un droit d’hôte à %1$s</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -4927,8 +4925,6 @@
     <string name="photos_timeline_filter_remember_preferences">Mémoriser les préférences</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title">Centre des appareils</string>
-    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Centre des appareils</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Quotidienne</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -5019,8 +5015,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii">Acheter Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Conditions générales d’utilisation</string>
-    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
-    <string name="cloud_drive_subtitle_links_access_all_user">Quiconque disposant de ce lien peut consulter et télécharger vos données</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Seules les personnes qui connaissent le mot de passe peuvent ouvrir le lien</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5292,7 +5286,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Salle d’attente</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Seuls les utilisateurs admis par l’hôte peuvent se joindre à la réunion.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Les participants ajoutés par des non-hôtes pendant les appels ne seront pas envoyés dans la salle d’attente.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
