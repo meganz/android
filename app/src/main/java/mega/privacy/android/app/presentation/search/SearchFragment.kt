@@ -1186,13 +1186,28 @@ class SearchFragment : RotatableFragment() {
 
     private fun trackAnalytics(selectedFilter: SearchFilter?) {
         selectedFilter?.let {
-            when (it.filter) {
-                SearchCategory.IMAGES -> Analytics.tracker.trackEvent(SearchImageFilterPressedEvent)
-                SearchCategory.VIDEO -> Analytics.tracker.trackEvent(SearchVideosFilterPressedEvent)
-                SearchCategory.AUDIO -> Analytics.tracker.trackEvent(SearchAudioFilterPressedEvent)
-                SearchCategory.DOCUMENTS -> Analytics.tracker.trackEvent(SearchDocsFilterPressedEvent)
+            if (searchViewModel.state.value.selectedFilter?.filter == it.filter) {
+                Analytics.tracker.trackEvent(SearchResetFilterPressedEvent)
+            } else {
+                when (it.filter) {
+                    SearchCategory.IMAGES -> Analytics.tracker.trackEvent(
+                        SearchImageFilterPressedEvent
+                    )
 
-                else -> Analytics.tracker.trackEvent(SearchResetFilterPressedEvent)
+                    SearchCategory.VIDEO -> Analytics.tracker.trackEvent(
+                        SearchVideosFilterPressedEvent
+                    )
+
+                    SearchCategory.AUDIO -> Analytics.tracker.trackEvent(
+                        SearchAudioFilterPressedEvent
+                    )
+
+                    SearchCategory.DOCUMENTS -> Analytics.tracker.trackEvent(
+                        SearchDocsFilterPressedEvent
+                    )
+
+                    else -> Analytics.tracker.trackEvent(SearchResetFilterPressedEvent)
+                }
             }
         } ?: run {
             Analytics.tracker.trackEvent(SearchResetFilterPressedEvent)
