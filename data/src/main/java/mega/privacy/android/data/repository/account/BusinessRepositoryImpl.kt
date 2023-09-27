@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository.account
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.account.business.BusinessAccountStatusMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -13,6 +14,7 @@ import javax.inject.Inject
  */
 internal class BusinessRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val appEventGateway: AppEventGateway,
     private val businessAccountStatusMapper: BusinessAccountStatusMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BusinessRepository {
@@ -25,7 +27,13 @@ internal class BusinessRepositoryImpl @Inject constructor(
         megaApiGateway.isBusinessAccountActive()
     }
 
-    override suspend fun isMasterBusinessAccount() = withContext(ioDispatcher){
+    override suspend fun isMasterBusinessAccount() = withContext(ioDispatcher) {
         megaApiGateway.isMasterBusinessAccount()
     }
+
+    override suspend fun broadcastBusinessAccountExpired() = withContext(ioDispatcher) {
+        appEventGateway.broadcastBusinessAccountExpired()
+    }
+
+    override fun monitorBusinessAccountExpired() = appEventGateway.monitorBusinessAccountExpired()
 }

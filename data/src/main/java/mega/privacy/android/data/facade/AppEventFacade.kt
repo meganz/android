@@ -56,6 +56,7 @@ internal class AppEventFacade @Inject constructor(
 
     private val _monitorCameraUploadsSettingsActions =
         MutableSharedFlow<CameraUploadsSettingsAction>()
+    private val _businessAccountExpired = MutableSharedFlow<Unit>()
 
     override val monitorCameraUploadProgress =
         _monitorCameraUploadProgress.toSharedFlow(appScope)
@@ -197,6 +198,12 @@ internal class AppEventFacade @Inject constructor(
     override suspend fun broadCastBackupInfoType(backupInfoType: BackupInfoType) {
         _monitorBackupInfoType.emit(backupInfoType)
     }
+
+    override suspend fun broadcastBusinessAccountExpired() {
+        _businessAccountExpired.emit(Unit)
+    }
+
+    override fun monitorBusinessAccountExpired() = _businessAccountExpired.asSharedFlow()
 }
 
 private fun <T> Flow<T>.toSharedFlow(

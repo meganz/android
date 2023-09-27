@@ -333,4 +333,16 @@ internal interface AppEventGateway {
      * @param backupInfoType [BackupInfoType]
      */
     suspend fun broadCastBackupInfoType(backupInfoType: BackupInfoType)
+
+    /**
+     * Broadcast business account expired
+     */
+    suspend fun broadcastBusinessAccountExpired()
+
+    /**
+     * Monitor business account expired events
+     *
+     * @return a flow that emits each time a new business account expired error is received
+     */
+    fun monitorBusinessAccountExpired(): Flow<Unit>
 }

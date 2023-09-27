@@ -100,4 +100,12 @@ class AppEventFacadeTest {
             assertThat(awaitItem()).isEqualTo(Unit)
         }
     }
+
+    @Test
+    fun `test that broadcast business account expired fires an event`() = runTest {
+        underTest.monitorBusinessAccountExpired().test {
+            underTest.broadcastBusinessAccountExpired()
+            assertThat(awaitItem()).isEqualTo(Unit)
+        }
+    }
 }

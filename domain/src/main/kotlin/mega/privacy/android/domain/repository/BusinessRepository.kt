@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 
 /**
@@ -27,4 +28,16 @@ interface BusinessRepository {
      * @return True if the user's account is a master business account
      */
     suspend fun isMasterBusinessAccount(): Boolean
+
+    /**
+     * Broadcast business account expired
+     */
+    suspend fun broadcastBusinessAccountExpired()
+
+    /**
+     * Monitor business account expired events
+     *
+     * @return a flow that emits each time a new business account expired error is received
+     */
+    fun monitorBusinessAccountExpired(): Flow<Unit>
 }
