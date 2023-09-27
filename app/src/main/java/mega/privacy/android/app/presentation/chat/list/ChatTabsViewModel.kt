@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseC
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -56,25 +57,27 @@ import javax.inject.Inject
 /**
  * Chat tabs view model
  *
- * @property archiveChatUseCase
- * @property leaveChatUseCase
- * @property signalChatPresenceUseCase
- * @property getChatsUseCase
- * @property getLastMessageUseCase
- * @property chatRoomTimestampMapper
- * @property startChatCallNoRingingUseCase
- * @property openOrStartCall
- * @property answerChatCallUseCase
- * @property chatManagement
- * @property passcodeManagement
- * @property megaChatApiGateway
- * @property rtcAudioManagerGateway
- * @property getCurrentChatStatusUseCase
- * @property clearChatHistoryUseCase
- * @property isParticipatingInChatCallUseCase
- * @property getMeetingTooltipsUseCase
- * @property setNextMeetingTooltipUseCase
- * @property monitorScheduledMeetingCanceledUseCase
+ * @property archiveChatUseCase                         [ArchiveChatUseCase]
+ * @property leaveChatUseCase                           [LeaveChat]
+ * @property signalChatPresenceUseCase                  [SignalChatPresenceActivity]
+ * @property getChatsUseCase                            [GetChatsUseCase]
+ * @property getLastMessageUseCase                      [GetLastMessageUseCase]
+ * @property chatRoomTimestampMapper                    [ChatRoomTimestampMapper]
+ * @property startChatCallNoRingingUseCase              [StartChatCallNoRingingUseCase]
+ * @property openOrStartCall                            [OpenOrStartCall]
+ * @property answerChatCallUseCase                      [AnswerChatCallUseCase]
+ * @property chatManagement                             [ChatManagement]
+ * @property passcodeManagement                         [PasscodeManagement]
+ * @property megaChatApiGateway                         [MegaChatApiGateway]
+ * @property rtcAudioManagerGateway                     [RTCAudioManagerGateway]
+ * @property getCurrentChatStatusUseCase                [GetCurrentChatStatusUseCase]
+ * @property clearChatHistoryUseCase                    [ClearChatHistoryUseCase]
+ * @property isParticipatingInChatCallUseCase           [IsParticipatingInChatCallUseCase]
+ * @property getMeetingTooltipsUseCase                  [GetMeetingTooltipsUseCase]
+ * @property setNextMeetingTooltipUseCase               [SetNextMeetingTooltipUseCase]
+ * @property monitorScheduledMeetingCanceledUseCase     [MonitorScheduledMeetingCanceledUseCase]
+ * @property getChatsUnreadStatusUseCase                [GetChatsUnreadStatusUseCase]
+ * @property startMeetingInWaitingRoomChatUseCase       [StartMeetingInWaitingRoomChatUseCase]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -99,6 +102,7 @@ class ChatTabsViewModel @Inject constructor(
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase,
     private val monitorScheduledMeetingCanceledUseCase: MonitorScheduledMeetingCanceledUseCase,
     private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase,
+    private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -203,7 +207,7 @@ class ChatTabsViewModel @Inject constructor(
                         val meeting = item as MeetingChatRoomItem
                         when (meeting.currentCallStatus) {
                             is ChatRoomItemStatus.NotJoined -> {
-                                if (meeting.isWaitingRoom) {
+                                if (meeting.isWaitingRoom && !meeting.hasPermissions) {
                                     state.update { it.copy(currentWaitingRoom = chatId) }
                                 } else {
                                     answerChatCallUseCase(
@@ -221,17 +225,27 @@ class ChatTabsViewModel @Inject constructor(
                             }
 
                             is ChatRoomItemStatus.NotStarted -> {
-                                if (meeting.isWaitingRoom) {
+                                if (meeting.isWaitingRoom && !meeting.hasPermissions) {
                                     state.update { it.copy(currentWaitingRoom = chatId) }
                                 } else {
                                     if (meeting.schedId != null) {
-                                        startChatCallNoRingingUseCase(
-                                            chatId = chatId,
-                                            schedId = meeting.schedId!!,
-                                            enabledVideo = false,
-                                            enabledAudio = true
-                                        )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                            ?.let(::openCurrentCall)
+                                        if (meeting.isWaitingRoom) {
+                                            startMeetingInWaitingRoomChatUseCase(
+                                                chatId = chatId,
+                                                schedIdWr = meeting.schedId!!,
+                                                enabledVideo = false,
+                                                enabledAudio = true
+                                            )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
+                                                ?.let(::openCurrentCall)
+                                        } else {
+                                            startChatCallNoRingingUseCase(
+                                                chatId = chatId,
+                                                schedId = meeting.schedId!!,
+                                                enabledVideo = false,
+                                                enabledAudio = true
+                                            )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
+                                                ?.let(::openCurrentCall)
+                                        }
                                     } else {
                                         openOrStartCall(
                                             chatId = chatId,

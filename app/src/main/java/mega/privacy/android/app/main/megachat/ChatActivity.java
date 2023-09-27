@@ -3088,13 +3088,9 @@ public class ChatActivity extends PasscodeActivity
             }
 
             checkSelectOption();
-            callMenuItem.setEnabled(false);
-            callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_054_white_054));
+            enableCallMenuItems(false);
             if (chatRoom.isGroup()) {
                 videoMenuItem.setVisible(false);
-            } else {
-                videoMenuItem.setEnabled(false);
-                videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_054_white_054));
             }
 
             inviteMenuItem.setVisible(false);
@@ -3106,14 +3102,9 @@ public class ChatActivity extends PasscodeActivity
                 archiveMenuItem.setVisible(false);
             } else {
                 if (megaChatApi != null && (megaChatApi.getNumCalls() <= 0 || (!megaChatApi.hasCallInChatRoom(chatRoom.getChatId())))) {
-                    callMenuItem.setEnabled(true);
-                    callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_087_white_087));
-
+                    enableCallMenuItems(true);
                     if (chatRoom.isGroup() || chatRoom.isMeeting()) {
                         videoMenuItem.setVisible(false);
-                    } else {
-                        videoMenuItem.setEnabled(true);
-                        videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_087_white_087));
                     }
                 }
 
@@ -3736,8 +3727,12 @@ public class ChatActivity extends PasscodeActivity
     }
 
     private void enableCallMenuItems(Boolean enable) {
+        enable = enable && viewModel.shouldEnableCallOption();
+        int idColor = enable ? R.color.grey_087_white_087 : R.color.grey_054_white_054;
         callMenuItem.setEnabled(enable);
+        callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, idColor));
         videoMenuItem.setEnabled(enable);
+        videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, idColor));
     }
 
     /**

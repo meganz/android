@@ -33,7 +33,7 @@ class ChatRoomItemMapper @Inject constructor() {
                     isLastMessageVoiceClip = isLastMessageVoiceClip,
                     unreadCount = chatRoom.unreadCount,
                     hasPermissions = hasPermissions,
-                    isWaitingRoom = chatRoom.isWaitingRoom && !hasPermissions,
+                    isWaitingRoom = chatRoom.isWaitingRoom,
                     isActive = chatRoom.isActive,
                     isArchived = chatRoom.isArchived,
                     lastTimestamp = chatRoom.lastTimestamp,

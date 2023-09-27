@@ -880,4 +880,12 @@ class ChatViewModel @Inject constructor(
         private const val INVALID_HANDLE = -1L
     }
 
+    /**
+     * Check whether the call option should be enabled. It depends on several factors:
+     * - If the Waiting Room is enabled or not.
+     * - The rol of the participant (host or non-host).
+     *
+     * @return True if the call option should be enabled or False otherwise.
+     */
+    fun shouldEnableCallOption(): Boolean = !_state.value.isWaitingRoom || _state.value.isHost
 }

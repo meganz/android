@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -71,6 +72,7 @@ internal class ChatTabsViewModelTest {
     private val monitorScheduledMeetingCanceledUseCase: MonitorScheduledMeetingCanceledUseCase =
         mock()
     private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase = mock()
+    private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
 
 
     @BeforeAll
@@ -133,6 +135,7 @@ internal class ChatTabsViewModelTest {
             setNextMeetingTooltipUseCase,
             monitorScheduledMeetingCanceledUseCase,
             getChatsUnreadStatusUseCase,
+            startMeetingInWaitingRoomChatUseCase,
         )
     }
 
