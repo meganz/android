@@ -1,12 +1,11 @@
 package mega.privacy.android.data.mapper.backup
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoSubState
 import nz.mega.sdk.MegaSync.Error
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -30,12 +29,12 @@ internal class BackupInfoSubStateMapperTest {
         sdkSubState: Int,
         backupInfoSubState: BackupInfoSubState,
     ) {
-        Truth.assertThat(underTest(sdkSubState)).isEqualTo(backupInfoSubState)
+        assertThat(underTest(sdkSubState)).isEqualTo(backupInfoSubState)
     }
 
     @Test
-    fun `test that an unknown value throws an exception`() {
-        assertThrows<IllegalArgumentException> { underTest(123456) }
+    fun `test that a non matching value returns a default sub state`() {
+        assertThat(underTest(-100)).isEqualTo(BackupInfoSubState.UNKNOWN_BACKUP_INFO_SUB_STATE)
     }
 
     private fun provideParameters() = Stream.of(
@@ -172,6 +171,10 @@ internal class BackupInfoSubStateMapperTest {
         Arguments.of(
             Error.FILESYSTEM_FILE_IDS_ARE_UNSTABLE.swigValue(),
             BackupInfoSubState.FILESYSTEM_FILE_IDS_ARE_UNSTABLE,
+        ),
+        Arguments.of(
+            Error.FILESYSTEM_ID_UNAVAILABLE.swigValue(),
+            BackupInfoSubState.FILESYSTEM_ID_UNAVAILABLE,
         ),
     )
 }

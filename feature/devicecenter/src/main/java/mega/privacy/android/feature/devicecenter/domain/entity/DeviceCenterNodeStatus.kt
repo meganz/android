@@ -15,27 +15,27 @@ sealed class DeviceCenterNodeStatus(val priority: Int) {
      * The default value assigned when prioritizing what Device Status should be displayed and none
      * is found
      */
-    object Unknown : DeviceCenterNodeStatus(0)
+    data object Unknown : DeviceCenterNodeStatus(0)
 
     /**
      * The Device is Stopped
      */
-    object Stopped : DeviceCenterNodeStatus(1)
+    data object Stopped : DeviceCenterNodeStatus(1)
 
     /**
      * The Device is Disabled by the User
      */
-    object Disabled : DeviceCenterNodeStatus(2)
+    data object Disabled : DeviceCenterNodeStatus(2)
 
     /**
      * The Device is Offline
      */
-    object Offline : DeviceCenterNodeStatus(3)
+    data object Offline : DeviceCenterNodeStatus(3)
 
     /**
      * The Device is Up to Date
      */
-    object UpToDate : DeviceCenterNodeStatus(4)
+    data object UpToDate : DeviceCenterNodeStatus(4)
 
     /**
      * The Device is Blocked
@@ -46,23 +46,25 @@ sealed class DeviceCenterNodeStatus(val priority: Int) {
 
     /**
      * The Device is Overquota
+     *
+     * @property errorSubState The corresponding Error Sub State
      */
-    object Overquota : DeviceCenterNodeStatus(6)
+    data class Overquota(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(6)
 
     /**
      * The Device is Paused
      */
-    object Paused : DeviceCenterNodeStatus(7)
+    data object Paused : DeviceCenterNodeStatus(7)
 
     /**
      * The Device is Initializing
      */
-    object Initializing : DeviceCenterNodeStatus(8)
+    data object Initializing : DeviceCenterNodeStatus(8)
 
     /**
      * The Device is Scanning
      */
-    object Scanning : DeviceCenterNodeStatus(9)
+    data object Scanning : DeviceCenterNodeStatus(9)
 
     /**
      * The Device is Syncing
@@ -75,5 +77,5 @@ sealed class DeviceCenterNodeStatus(val priority: Int) {
      * The Device is found to have its Camera Uploads disabled. This is only applicable for the
      * User's Current Device, and has the highest priority amongst all Device Statuses
      */
-    object NoCameraUploads : DeviceCenterNodeStatus(11)
+    data object NoCameraUploads : DeviceCenterNodeStatus(11)
 }

@@ -317,7 +317,10 @@ fun NodeListViewItem(
                 }
                 Row(
                     modifier = Modifier
-                        .padding(top = 1.dp)
+                        .padding(
+                            top = 1.dp,
+                            end = if (nodeAvailableOffline) 48.dp else 24.dp,
+                        )
                         .constrainAs(infoRow) {
                             top.linkTo(nodeInfo.bottom)
                             start.linkTo(parent.start)

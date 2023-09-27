@@ -2,7 +2,7 @@ package mega.privacy.android.domain.entity.backup
 
 /**
  * Enum class representing the different Backup Sub States mapped from
- * nz.mega.sdk.MegaBackupInfo.substate
+ * nz.mega.sdk.MegaBackupInfo.substate, which also references nz.mega.sdk.MegaSync.Error
  */
 enum class BackupInfoSubState {
 
@@ -232,4 +232,15 @@ enum class BackupInfoSubState {
      * and frequently
      */
     FILESYSTEM_FILE_IDS_ARE_UNSTABLE,
+
+    /**
+     * Represents a Sub State in which the FSID of a File in an exFAT drive is unavailable
+     */
+    FILESYSTEM_ID_UNAVAILABLE,
+
+    /**
+     * Represents an Unknown Sub State. This is the default value assigned when there is no matching
+     * SDK value
+     */
+    UNKNOWN_BACKUP_INFO_SUB_STATE,
 }

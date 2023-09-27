@@ -6,6 +6,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
@@ -18,7 +19,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterUINodeStatus(
-    @PreviewParameter(DeviceCenterUINodeStatusProvider::class) status: DeviceCenterUINodeStatus
+    @PreviewParameter(DeviceCenterUINodeStatusProvider::class) status: DeviceCenterUINodeStatus,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
@@ -55,6 +56,9 @@ private class DeviceCenterUINodeStatusProvider :
         DeviceCenterUINodeStatus.Stopped,
         DeviceCenterUINodeStatus.Overquota,
         DeviceCenterUINodeStatus.Error,
+        DeviceCenterUINodeStatus.FolderError(
+            errorMessage = R.string.device_center_list_view_item_sub_state_storage_overquota,
+        ),
         DeviceCenterUINodeStatus.Blocked,
     ).asSequence()
 }

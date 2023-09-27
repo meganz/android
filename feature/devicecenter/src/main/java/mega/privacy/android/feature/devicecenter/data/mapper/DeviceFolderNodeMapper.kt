@@ -57,7 +57,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      */
     private fun BackupInfo.getDeviceFolderStatus(currentTimeInSeconds: Long) = when {
         isStopped() -> DeviceCenterNodeStatus.Stopped
-        isOverquota() -> DeviceCenterNodeStatus.Overquota
+        isOverquota() -> DeviceCenterNodeStatus.Overquota(subState)
         isBlocked() -> DeviceCenterNodeStatus.Blocked(subState)
         isDisabled() -> DeviceCenterNodeStatus.Disabled
         isOffline(currentTimeInSeconds) -> DeviceCenterNodeStatus.Offline

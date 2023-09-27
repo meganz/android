@@ -30,7 +30,7 @@ sealed class DeviceCenterUINodeStatus(
      * Represents an Unknown Status. This is the default Status assigned when no matching Status
      * is found
      */
-    object Unknown : DeviceCenterUINodeStatus(
+    data object Unknown : DeviceCenterUINodeStatus(
         name = R.string.device_center_list_view_item_status_unknown_status,
         icon = CoreR.drawable.ic_help_circle,
         color = null,
@@ -39,7 +39,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Up to Date Status
      */
-    object UpToDate : DeviceCenterUINodeStatus(
+    data object UpToDate : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_up_to_date,
         icon = CoreR.drawable.ic_check_circle,
         color = jade_400,
@@ -48,7 +48,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Initializing Status
      */
-    object Initializing : DeviceCenterUINodeStatus(
+    data object Initializing : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_initialising,
         icon = CoreR.drawable.ic_sync_02,
         color = blue_500,
@@ -57,7 +57,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a Scanning Status
      */
-    object Scanning : DeviceCenterUINodeStatus(
+    data object Scanning : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_scanning,
         icon = CoreR.drawable.ic_sync_02,
         color = blue_500,
@@ -66,7 +66,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a Syncing Status
      */
-    object Syncing : DeviceCenterUINodeStatus(
+    data object Syncing : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_updating,
         icon = CoreR.drawable.ic_sync_02,
         color = blue_500,
@@ -86,7 +86,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a No Camera Uploads Status
      */
-    object NoCameraUploads : DeviceCenterUINodeStatus(
+    data object NoCameraUploads : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_no_camera_uploads,
         icon = CoreR.drawable.ic_info,
         color = orange_400,
@@ -95,7 +95,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a Disabled Status
      */
-    object Disabled : DeviceCenterUINodeStatus(
+    data object Disabled : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_disabled,
         icon = CoreR.drawable.ic_alert_triangle,
         color = orange_400,
@@ -104,7 +104,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Offline Status
      */
-    object Offline : DeviceCenterUINodeStatus(
+    data object Offline : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_offline,
         icon = CoreR.drawable.ic_cloud_offline,
         color = null,
@@ -113,7 +113,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a Paused Status
      */
-    object Paused : DeviceCenterUINodeStatus(
+    data object Paused : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_paused,
         icon = CoreR.drawable.ic_pause,
         color = null,
@@ -122,7 +122,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a Stopped Status
      */
-    object Stopped : DeviceCenterUINodeStatus(
+    data object Stopped : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_backup_stopped,
         icon = CoreR.drawable.ic_x_circle,
         color = null,
@@ -131,7 +131,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Overquota Status
      */
-    object Overquota : DeviceCenterUINodeStatus(
+    data object Overquota : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_out_of_quota,
         icon = CoreR.drawable.ic_alert_circle,
         color = red_500,
@@ -140,16 +140,27 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Error Status
      */
-    object Error : DeviceCenterUINodeStatus(
+    data object Error : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_error,
         icon = CoreR.drawable.ic_x_circle,
         color = red_500,
     )
 
     /**
+     * Represents an Error Status for Device Folders
+     *
+     * @param errorMessage The Error Message
+     */
+    data class FolderError(@StringRes val errorMessage: Int) : DeviceCenterUINodeStatus(
+        name = errorMessage,
+        icon = null,
+        color = red_500,
+    )
+
+    /**
      * Represents a Blocked Status
      */
-    object Blocked : DeviceCenterUINodeStatus(
+    data object Blocked : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_blocked,
         icon = CoreR.drawable.ic_minus_circle,
         color = red_500,

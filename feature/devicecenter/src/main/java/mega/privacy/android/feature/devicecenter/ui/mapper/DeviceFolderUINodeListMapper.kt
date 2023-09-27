@@ -32,14 +32,20 @@ internal class DeviceFolderUINodeListMapper @Inject constructor(
                     id = folder.id,
                     name = folder.name,
                     icon = deviceFolderUINodeIconMapper(folder.type),
-                    status = deviceCenterUINodeStatusMapper(folder.status),
+                    status = deviceCenterUINodeStatusMapper(
+                        isDevice = false,
+                        status = folder.status,
+                    ),
                 )
             } else {
                 NonBackupDeviceFolderUINode(
                     id = folder.id,
                     name = folder.name,
                     icon = deviceFolderUINodeIconMapper(folder.type),
-                    status = deviceCenterUINodeStatusMapper(folder.status),
+                    status = deviceCenterUINodeStatusMapper(
+                        isDevice = false,
+                        status = folder.status,
+                    ),
                 )
             }
         }

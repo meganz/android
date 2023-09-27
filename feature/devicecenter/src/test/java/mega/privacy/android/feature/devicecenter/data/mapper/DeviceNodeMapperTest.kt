@@ -118,7 +118,7 @@ internal class DeviceNodeMapperTest {
         val otherDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Other Device Folder One") }
         )
-        val otherDeviceStatus = DeviceCenterNodeStatus.Overquota
+        val otherDeviceStatus = DeviceCenterNodeStatus.Overquota(null)
         whenever(deviceFolderNodeMapper(otherDeviceBackupInfo)).thenReturn(otherDeviceFolderNodes)
         whenever(
             deviceNodeStatusMapper(

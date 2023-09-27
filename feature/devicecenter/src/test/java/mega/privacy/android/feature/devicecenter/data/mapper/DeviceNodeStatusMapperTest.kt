@@ -90,16 +90,16 @@ internal class DeviceNodeStatusMapperTest {
         Arguments.of(
             listOf<DeviceFolderNode>(
                 mock { on { status }.thenReturn(DeviceCenterNodeStatus.Paused) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota) }
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota(BackupInfoSubState.STORAGE_OVERQUOTA)) }
             ),
             DeviceCenterNodeStatus.Paused,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota) },
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota(BackupInfoSubState.STORAGE_OVERQUOTA)) },
                 mock { on { status }.thenReturn(DeviceCenterNodeStatus.Blocked(BackupInfoSubState.ACCOUNT_BLOCKED)) }
             ),
-            DeviceCenterNodeStatus.Overquota,
+            DeviceCenterNodeStatus.Overquota(null),
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(

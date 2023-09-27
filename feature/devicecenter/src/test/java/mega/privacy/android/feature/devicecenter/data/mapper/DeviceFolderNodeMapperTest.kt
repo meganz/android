@@ -59,6 +59,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupSubState = BackupInfoSubState.STORAGE_OVERQUOTA
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -72,7 +73,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Overquota,
+                status = DeviceCenterNodeStatus.Overquota(backupSubState),
                 type = backupType,
             )
         )
@@ -84,7 +85,7 @@ internal class DeviceFolderNodeMapperTest {
         value = BackupInfoSubState::class, names = ["STORAGE_OVERQUOTA"],
         mode = EnumSource.Mode.EXCLUDE,
     )
-    fun `test that the mapped device folder has a blocked status when the backup statue is failed`(
+    fun `test that the mapped device folder has a blocked status when the backup state is failed`(
         backupSubState: BackupInfoSubState,
     ) {
         val backupId = 123456L
@@ -115,7 +116,7 @@ internal class DeviceFolderNodeMapperTest {
         value = BackupInfoSubState::class, names = ["STORAGE_OVERQUOTA"],
         mode = EnumSource.Mode.EXCLUDE,
     )
-    fun `test that the mapped device folder has a blocked status when the backup statue is temporary disabled`(
+    fun `test that the mapped device folder has a blocked status when the backup state is temporary disabled`(
         backupSubState: BackupInfoSubState,
     ) {
         val backupId = 123456L

@@ -62,6 +62,7 @@ internal class BackupInfoSubStateMapper @Inject constructor() {
         Error.FAILURE_ACCESSING_PERSISTENT_STORAGE.swigValue() -> BackupInfoSubState.FAILURE_ACCESSING_PERSISTENT_STORAGE
         Error.MISMATCH_OF_ROOT_FSID.swigValue() -> BackupInfoSubState.MISMATCH_OF_ROOT_FSID
         Error.FILESYSTEM_FILE_IDS_ARE_UNSTABLE.swigValue() -> BackupInfoSubState.FILESYSTEM_FILE_IDS_ARE_UNSTABLE
-        else -> throw IllegalArgumentException("The backup sub state value $sdkSubState is invalid")
+        Error.FILESYSTEM_ID_UNAVAILABLE.swigValue() -> BackupInfoSubState.FILESYSTEM_ID_UNAVAILABLE
+        else -> BackupInfoSubState.UNKNOWN_BACKUP_INFO_SUB_STATE
     }
 }
