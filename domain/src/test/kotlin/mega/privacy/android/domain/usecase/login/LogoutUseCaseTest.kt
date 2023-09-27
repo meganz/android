@@ -2,9 +2,8 @@ package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.security.LoginRepository
-import mega.privacy.android.domain.usecase.camerauploads.RemoveBackupFolderUseCase
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -17,13 +16,15 @@ internal class LogoutUseCaseTest {
     private lateinit var underTest: LogoutUseCase
 
     private val loginRepository = mock<LoginRepository>()
-    private val removeBackupFolderUseCase = mock<RemoveBackupFolderUseCase>()
+
+    private val logoutTask1 = mock<LogoutTask>()
+    private val logoutTask2 = mock<LogoutTask>()
 
     @BeforeEach
     internal fun setUp() {
         underTest = LogoutUseCase(
             loginRepository = loginRepository,
-            removeBackupFolderUseCase = removeBackupFolderUseCase,
+            logoutTasks = setOf(logoutTask1, logoutTask2),
         )
     }
 
@@ -34,10 +35,10 @@ internal class LogoutUseCaseTest {
     }
 
     @Test
-    internal fun `test that primary and secondary backup folders are removed`() = runTest {
+    internal fun `test that logout tasks are called`() = runTest {
         underTest()
-        verify(removeBackupFolderUseCase).invoke(CameraUploadFolderType.Primary)
-        verify(removeBackupFolderUseCase).invoke(CameraUploadFolderType.Secondary)
+        verify(logoutTask1).invoke()
+        verify(logoutTask2).invoke()
     }
 
     @Test

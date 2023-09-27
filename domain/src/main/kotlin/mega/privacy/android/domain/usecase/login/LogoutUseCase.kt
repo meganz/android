@@ -1,8 +1,7 @@
 package mega.privacy.android.domain.usecase.login
 
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.security.LoginRepository
-import mega.privacy.android.domain.usecase.camerauploads.RemoveBackupFolderUseCase
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import javax.inject.Inject
 
 /**
@@ -10,7 +9,7 @@ import javax.inject.Inject
  */
 class LogoutUseCase @Inject constructor(
     private val loginRepository: LoginRepository,
-    private val removeBackupFolderUseCase: RemoveBackupFolderUseCase,
+    private val logoutTasks: Set<@JvmSuppressWildcards LogoutTask>,
 ) {
 
     /**
@@ -19,8 +18,9 @@ class LogoutUseCase @Inject constructor(
     suspend operator fun invoke() {
         loginRepository.setLogoutInProgressFlag(true)
         runCatching {
-            removeBackupFolderUseCase(CameraUploadFolderType.Primary)
-            removeBackupFolderUseCase(CameraUploadFolderType.Secondary)
+            logoutTasks.forEach {
+                it()
+            }
             loginRepository.logout()
         }.onFailure {
             loginRepository.setLogoutInProgressFlag(false)
