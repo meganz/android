@@ -112,7 +112,6 @@ internal fun WaitingRoomView(
     ) { paddingValues ->
         ConstraintLayout(
             constraintSet = createWaitingRoomConstraintSet(isLandscape, state.guestMode),
-            animateChanges = true,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
