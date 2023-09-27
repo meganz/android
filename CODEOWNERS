@@ -1,3 +1,24 @@
 
 [Photos Owners]
 /app/src/main/java/mega/privacy/android/app/presentation/photos/ @es @jj @jta @ks @lh @kh @do @yenel @rsh
+
+[Chat Owners] @jg @raquelgc @gt @yenel @rsh @kh @do @lh
+app/src/main/java/mega/privacy/android/app/di/chat/
+app/src/main/java/mega/privacy/android/app/main/megachat/
+app/src/main/java/mega/privacy/android/app/modalbottomsheet/chatmodalbottomsheet/
+app/src/main/java/mega/privacy/android/app/presentation/chat/
+app/src/main/java/mega/privacy/android/app/usecase/chat/
+data/src/main/java/mega/privacy/android/data/mapper/chat/
+data/src/main/java/mega/privacy/android/data/model/chat/
+domain/src/main/kotlin/mega/privacy/android/data/mapper/chat/
+domain/src/main/kotlin/mega/privacy/android/domain/entity/chat/
+domain/src/main/kotlin/mega/privacy/android/domain/usecase/chat/
+
+[Meetings Owners] @jg @raquelgc @gt @yenel @rsh @kh @do @lh
+app/src/main/java/mega/privacy/android/app/meeting/
+app/src/main/java/mega/privacy/android/app/presentation/meeting/
+app/src/main/java/mega/privacy/android/app/usecase/call/
+data/src/main/java/mega/privacy/android/data/mapper/meeting/
+data/src/main/java/mega/privacy/android/data/model/meeting/
+domain/src/main/kotlin/mega/privacy/android/domain/entity/meeting/
+domain/src/main/kotlin/mega/privacy/android/domain/usecase/meeting/
