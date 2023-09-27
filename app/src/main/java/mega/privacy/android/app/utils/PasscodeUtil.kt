@@ -23,7 +23,7 @@ import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivi
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.passcode.view.PasscodeDialog
+import mega.privacy.android.app.presentation.passcode.view.PasscodeView
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
@@ -377,7 +377,7 @@ class PasscodeUtil @Inject constructor(
                         )
                         if (locked) {
                             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                                PasscodeDialog()
+                                PasscodeView()
                             }
                         }
                     }

@@ -39,8 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.analytics.Analytics
@@ -69,7 +67,7 @@ import mega.privacy.mobile.analytics.event.PasscodeUnlockDialogEvent
  * @param passcodeUnlockViewModel
  */
 @Composable
-internal fun PasscodeDialog(
+internal fun PasscodeView(
     passcodeUnlockViewModel: PasscodeUnlockViewModel = viewModel(),
     biometricAuthIsAvailable: (Context) -> Boolean = ::areBiometricsEnabled,
     showBiometricAuth: (
@@ -98,33 +96,23 @@ internal fun PasscodeDialog(
         }
 
     } else {
-        Dialog(
-            onDismissRequest = {},
-            properties = DialogProperties(
-                dismissOnBackPress = false,
-                dismissOnClickOutside = false,
-                usePlatformDefaultWidth = false,
-            )
-        ) {
-            LaunchedEffect(key1 = showBiometricPrompt) {
-                Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
+        LaunchedEffect(key1 = showBiometricPrompt) {
+            Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
+        }
+        when (val currentState = uiState) {
+            PasscodeUnlockState.Loading -> {}
+            is PasscodeUnlockState.Data -> {
+                PasscodeContent(
+                    onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
+                    onPasscodeEntered = { passcode ->
+                        Analytics.tracker.trackEvent(PasscodeEnteredEvent)
+                        passcodeUnlockViewModel.unlockWithPasscode(passcode)
+                    },
+                    failedAttemptCount = currentState.failedAttempts,
+                    showLogoutWarning = currentState.logoutWarning,
+                    passcodeType = currentState.passcodeType,
+                )
             }
-            when (val currentState = uiState) {
-                PasscodeUnlockState.Loading -> {}
-                is PasscodeUnlockState.Data -> {
-                    DialogContent(
-                        onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
-                        onPasscodeEntered = { passcode ->
-                            Analytics.tracker.trackEvent(PasscodeEnteredEvent)
-                            passcodeUnlockViewModel.unlockWithPasscode(passcode)
-                        },
-                        failedAttemptCount = currentState.failedAttempts,
-                        showLogoutWarning = currentState.logoutWarning,
-                        passcodeType = currentState.passcodeType,
-                    )
-                }
-            }
-
         }
     }
 }
@@ -162,7 +150,7 @@ private fun biometricPreferenceIsEnabled(uiState: PasscodeUnlockState) =
     (uiState as? PasscodeUnlockState.Data)?.passcodeType?.biometricEnabled == true
 
 @Composable
-private fun DialogContent(
+private fun PasscodeContent(
     onPasswordEntered: (String) -> Unit,
     onPasscodeEntered: (String) -> Unit,
     failedAttemptCount: Int,
@@ -320,7 +308,7 @@ private fun PasscodeDialogPreview(
     @PreviewParameter(PasscodeDialogParameterProvider::class) previewParameters: PreviewParameters,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        DialogContent(
+        PasscodeContent(
             onPasscodeEntered = {},
             onPasswordEntered = {},
             failedAttemptCount = previewParameters.attempts,

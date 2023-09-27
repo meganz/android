@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.passcode.view.FORGOT_PASSCODE_BUTTO
 import mega.privacy.android.app.presentation.passcode.view.LOGOUT_BUTTON_TAG
 import mega.privacy.android.app.presentation.passcode.view.PASSCODE_FIELD_TAG
 import mega.privacy.android.app.presentation.passcode.view.PASSWORD_FIELD_TAG
-import mega.privacy.android.app.presentation.passcode.view.PasscodeDialog
+import mega.privacy.android.app.presentation.passcode.view.PasscodeView
 import mega.privacy.android.core.ui.test.AnalyticsTestRule
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
@@ -44,7 +44,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-internal class PasscodeDialogTest {
+internal class PasscodeViewTest {
 
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
@@ -74,7 +74,7 @@ internal class PasscodeDialogTest {
             logoutWarning = false
         )
 
-        displayDialogWithState(uiState)
+        displayPasscodeViewWithState(uiState)
 
         composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
@@ -82,7 +82,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that attempts are displayed if above 0`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -96,7 +96,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that attempts are not displayed if 0`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 0,
@@ -110,7 +110,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that logout button is displayed if attempts are greater than 0`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -124,7 +124,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that forgot passcode button is displayed if attempts are greater than 0`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -138,7 +138,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that password field is displayed instead of passcode field when forgot password is tapped`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -158,7 +158,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that logout and forgot passcode is not displayed when password field is displayed`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -178,7 +178,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that verify with password is called if password is entered for forgotten passcode`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -207,7 +207,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that alphanumeric passcode type displays password field`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(false),
                 failedAttempts = 1,
@@ -221,7 +221,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that verify with passcode is called if alphanumeric passcode is entered`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(false),
                 failedAttempts = 1,
@@ -251,7 +251,7 @@ internal class PasscodeDialogTest {
             on { invoke(any()) }.thenReturn(true)
         }
 
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(true),
                 failedAttempts = 0,
@@ -269,7 +269,7 @@ internal class PasscodeDialogTest {
             on { invoke(any()) }.thenReturn(true)
         }
 
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(true, 4),
                 failedAttempts = 0,
@@ -300,7 +300,7 @@ internal class PasscodeDialogTest {
             logoutWarning = false
         )
 
-        displayDialogWithState(uiState)
+        displayPasscodeViewWithState(uiState)
 
         composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
@@ -314,7 +314,7 @@ internal class PasscodeDialogTest {
             on { invoke(any()) }.thenReturn(true)
         }
 
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(true),
                 failedAttempts = 0,
@@ -330,7 +330,7 @@ internal class PasscodeDialogTest {
     @Test
     @Ignore
     fun `test that passcode entered event is emitted when the pin type passcode is entered`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -351,7 +351,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that passcode entered event is emitted when the password type passcode is entered`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(false),
                 failedAttempts = 1,
@@ -377,7 +377,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that forgot passcode event is fired when forgot passcode is clicked`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -393,7 +393,7 @@ internal class PasscodeDialogTest {
 
     @Test
     fun `test that logout button pressed event is fired`() {
-        displayDialogWithState(
+        displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
@@ -406,7 +406,7 @@ internal class PasscodeDialogTest {
         assertThat(analyticsRule.events).contains(PasscodeLogoutButtonPressedEvent)
     }
 
-    private fun displayDialogWithState(uiState: PasscodeUnlockState) {
+    private fun displayPasscodeViewWithState(uiState: PasscodeUnlockState) {
         passcodeUnlockViewModel.stub {
             on { state }.thenReturn(
                 MutableStateFlow(
@@ -416,7 +416,7 @@ internal class PasscodeDialogTest {
         }
 
         composeTestRule.setContent {
-            PasscodeDialog(
+            PasscodeView(
                 passcodeUnlockViewModel = passcodeUnlockViewModel,
                 biometricAuthIsAvailable = biometricAuthIsAvailable,
                 showBiometricAuth = showBiometricAuth,

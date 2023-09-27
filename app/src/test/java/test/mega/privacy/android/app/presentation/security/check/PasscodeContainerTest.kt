@@ -33,10 +33,9 @@ class PasscodeContainerTest {
         composeTestRule.setContent {
             PasscodeContainer(
                 passcodeUI = {},
-                viewModel = passcodeCheckViewModel
-            ) {
-                Text(expected)
-            }
+                viewModel = passcodeCheckViewModel,
+                content = { Text(expected) }
+            )
         }
 
         composeTestRule.onNodeWithText(expected).assertIsDisplayed()
@@ -98,8 +97,7 @@ class PasscodeContainerTest {
     }
 
     @Test
-    fun `test that content is displayed while loading`() {
-        //This behaviour matches current implementation, can potentially be improved
+    fun `test that loading is displayed while loading`() {
         passcodeCheckViewModel.stub {
             on { state }.thenReturn(MutableStateFlow(PasscodeCheckState.Loading))
         }
@@ -108,10 +106,27 @@ class PasscodeContainerTest {
         composeTestRule.setContent {
             PasscodeContainer(
                 passcodeUI = {},
-                viewModel = passcodeCheckViewModel
-            ) {
-                Text(expected)
-            }
+                viewModel = passcodeCheckViewModel,
+                loading = { Text(expected) }
+            )
+        }
+
+        composeTestRule.onNodeWithText(expected).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that content is displayed while loading if no loading defined`() {
+        passcodeCheckViewModel.stub {
+            on { state }.thenReturn(MutableStateFlow(PasscodeCheckState.Loading))
+        }
+
+        val expected = "Expected"
+        composeTestRule.setContent {
+            PasscodeContainer(
+                passcodeUI = {},
+                viewModel = passcodeCheckViewModel,
+                content = { Text(expected) }
+            )
         }
 
         composeTestRule.onNodeWithText(expected).assertIsDisplayed()
