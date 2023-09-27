@@ -2019,6 +2019,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(
                 inMeetingViewModel,
+                sharedModel,
                 binding,
                 this,
                 resources.displayMetrics

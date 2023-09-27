@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.meeting.CallSoundType
-import mega.privacy.android.app.meeting.CallSoundsController
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
@@ -57,8 +55,6 @@ class WaitingRoomManagementViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WaitingRoomManagementState())
-    private val soundsController = CallSoundsController()
-
 
     /**
      * State flow
@@ -76,33 +72,39 @@ class WaitingRoomManagementViewModel @Inject constructor(
      *
      * @param chatId
      */
-    fun setChatIdCallOpened(chatId: Long) = _state.update { state ->
-        state.copy(
-            chatIdOfCallOpened = chatId
-        )
+    fun setChatIdCallOpened(chatId: Long) {
+        if (state.value.chatIdOfCallOpened != chatId) {
+            _state.update { state ->
+                state.copy(
+                    chatIdOfCallOpened = chatId
+                )
+            }
+        }
     }
 
-    private fun getCall() =
-        viewModelScope.launch {
-            runCatching {
-                getChatCallInProgress()
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { chatCall ->
-                chatCall?.let { call ->
-                    call.waitingRoom?.apply {
-                        peers?.let { peersInWaitingRoom ->
-                            val peersNonHost = peersInWaitingRoom.filterNot {
-                                call.moderators?.contains(it) ?: false
-                            }
-
-                            setTemporaryUsersList(users = peersNonHost)
-                            checkWaitingRoomParticipants(chatId = call.chatId)
+    /**
+     * Get call
+     */
+    private fun getCall() = viewModelScope.launch {
+        runCatching {
+            getChatCallInProgress()
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }.onSuccess { chatCall ->
+            chatCall?.let { call ->
+                call.waitingRoom?.apply {
+                    peers?.let { peersInWaitingRoom ->
+                        val peersNonHost = peersInWaitingRoom.filterNot {
+                            call.moderators?.contains(it) ?: false
                         }
+
+                        setTemporaryUsersList(users = peersNonHost)
+                        checkWaitingRoomParticipants(chatId = call.chatId)
                     }
                 }
             }
         }
+    }
 
     /**
      * Set temporary users list
@@ -118,87 +120,68 @@ class WaitingRoomManagementViewModel @Inject constructor(
     /**
      * Get chat call updates
      */
-    private fun startMonitoringChatCallUpdates() =
-        viewModelScope.launch {
-            monitorChatCallUpdates()
-                .collectLatest { call ->
-                    call.changes?.apply {
-                        if (contains(ChatCallChanges.Status)) {
-                            if (call.chatId == state.value.chatId &&
-                                (call.status == ChatCallStatus.UserNoPresent ||
-                                        call.status == ChatCallStatus.Destroyed)
-                            ) {
-                                setShowParticipantsInWaitingRoomDialogConsumed()
-                                setShowDenyParticipantDialogConsumed()
+    private fun startMonitoringChatCallUpdates() = viewModelScope.launch {
+        monitorChatCallUpdates().collectLatest { call ->
+            call.changes?.apply {
+                if (contains(ChatCallChanges.Status)) {
+                    if (call.chatId == state.value.chatId && (call.status == ChatCallStatus.UserNoPresent || call.status == ChatCallStatus.Destroyed)) {
+                        setShowParticipantsInWaitingRoomDialogConsumed()
+                        setShowDenyParticipantDialogConsumed()
+                    }
+                }
+
+                if (contains(ChatCallChanges.WaitingRoomUsersEntered) || contains(ChatCallChanges.WaitingRoomUsersLeave)) {
+                    call.waitingRoom?.apply {
+                        Timber.d("Users entered or left waiting room")
+                        peers?.let { peersInWaitingRoom ->
+                            val peersNonHost = peersInWaitingRoom.filterNot {
+                                call.moderators?.contains(it) ?: false
                             }
-                        }
-                        if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
-                            call.waitingRoom?.apply {
-                                Timber.d("Users entered in waiting room")
-
-                                peers?.let { peersInWaitingRoom ->
-                                    val positionUpdateHandler = Handler(Looper.getMainLooper())
-                                    val peersNonHost = peersInWaitingRoom.filterNot {
-                                        call.moderators?.contains(it) ?: false
-                                    }
-
-                                    setTemporaryUsersList(users = peersNonHost)
-                                    positionUpdateHandler.postDelayed({
-                                        checkWaitingRoomParticipants(
-                                            chatId = call.chatId,
-                                        )
-                                    }, 1000)
-                                }
-                            }
-                        }
-
-                        if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
-                            Timber.d("Users left in waiting room")
-                            call.waitingRoom?.apply {
-                                peers?.let { peersInWaitingRoom ->
-                                    val peersNonHost = peersInWaitingRoom.filterNot {
-                                        call.moderators?.contains(it) ?: false
-                                    }
-                                    setTemporaryUsersList(users = peersNonHost)
+                            setTemporaryUsersList(users = peersNonHost)
+                            if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     checkWaitingRoomParticipants(
                                         chatId = call.chatId,
                                     )
-
-                                }
+                                }, 1000)
                             }
-                        }
-                    }
-                }
-        }
-
-
-    /**
-     * Get scheduled meeting updates
-     */
-    private fun startMonitoringScheduledMeetingUpdates() =
-        viewModelScope.launch {
-            monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
-
-                if (scheduledMeetReceived.chatId != state.value.chatId)
-                    return@collectLatest
-
-                scheduledMeetReceived.changes?.let { changes ->
-                    Timber.d("Monitor scheduled meeting updated, changes $changes")
-                    changes.forEach {
-                        when (it) {
-                            ScheduledMeetingChanges.Title ->
-                                _state.update { state ->
-                                    state.copy(
-                                        scheduledMeetingTitle = scheduledMeetReceived.title ?: ""
-                                    )
-                                }
-
-                            else -> {}
+                            if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
+                                checkWaitingRoomParticipants(
+                                    chatId = call.chatId,
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+
+    /**
+     * Get scheduled meeting updates
+     */
+    private fun startMonitoringScheduledMeetingUpdates() = viewModelScope.launch {
+        monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
+
+            if (scheduledMeetReceived.chatId != state.value.chatId) return@collectLatest
+
+            scheduledMeetReceived.changes?.let { changes ->
+                Timber.d("Monitor scheduled meeting updated, changes $changes")
+                changes.forEach {
+                    when (it) {
+                        ScheduledMeetingChanges.Title -> _state.update { state ->
+                            state.copy(
+                                scheduledMeetingTitle = scheduledMeetReceived.title ?: ""
+                            )
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Check waiting room participants
@@ -246,16 +229,12 @@ class WaitingRoomManagementViewModel @Inject constructor(
                 getNameOfUserInWaitingRoom(users[0], chatId, true, users.size == 1)
                 if (users.size == 2) {
                     getNameOfUserInWaitingRoom(
-                        users[1], chatId,
-                        isFirstUser = false,
-                        shouldShowDialog = true
+                        users[1], chatId, isFirstUser = false, shouldShowDialog = true
                     )
                 }
             }
 
-            else -> {
-                setShowParticipantsInWaitingRoomDialog(shouldItSound = true)
-            }
+            else -> setShowParticipantsInWaitingRoomDialog()
         }
     }
 
@@ -264,27 +243,25 @@ class WaitingRoomManagementViewModel @Inject constructor(
      *
      * @param chatId Chat id.
      */
-    private fun getScheduledMeetingTitle(chatId: Long) =
-        viewModelScope.launch {
-            runCatching {
-                getScheduledMeetingByChat(chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-                setShowParticipantsInWaitingRoomDialogConsumed()
-            }.onSuccess { scheduledMeetingList ->
-                scheduledMeetingList
-                    ?.firstOrNull { !it.isCanceled && it.parentSchedId == -1L }
-                    ?.let { schedMeet ->
-                        val title = schedMeet.title ?: ""
-                        _state.update { state ->
-                            state.copy(
-                                scheduledMeetingTitle = title,
-                                chatId = chatId,
-                            )
-                        }
+    private fun getScheduledMeetingTitle(chatId: Long) = viewModelScope.launch {
+        runCatching {
+            getScheduledMeetingByChat(chatId)
+        }.onFailure { exception ->
+            Timber.e(exception)
+            setShowParticipantsInWaitingRoomDialogConsumed()
+        }.onSuccess { scheduledMeetingList ->
+            scheduledMeetingList?.firstOrNull { !it.isCanceled && it.parentSchedId == -1L }
+                ?.let { schedMeet ->
+                    val title = schedMeet.title ?: ""
+                    _state.update { state ->
+                        state.copy(
+                            scheduledMeetingTitle = title,
+                            chatId = chatId,
+                        )
                     }
-            }
+                }
         }
+    }
 
     /**
      * Get user name to show the participant in waiting room dialog
@@ -299,33 +276,32 @@ class WaitingRoomManagementViewModel @Inject constructor(
         chatId: Long,
         isFirstUser: Boolean,
         shouldShowDialog: Boolean,
+    ) = viewModelScope.launch {
+        runCatching {
+            getMessageSenderNameUseCase(handle, chatId)
+        }.onFailure { exception ->
+            Timber.e(exception)
+            setShowParticipantsInWaitingRoomDialogConsumed()
+        }.onSuccess { name ->
+            name?.let {
+                _state.update { state ->
+                    if (isFirstUser) {
+                        state.copy(
+                            nameOfTheFirstUserInTheWaitingRoom = it,
+                        )
+                    } else {
+                        state.copy(
+                            nameOfTheSecondUserInTheWaitingRoom = it,
+                        )
+                    }
+                }
 
-        ) =
-        viewModelScope.launch {
-            runCatching {
-                getMessageSenderNameUseCase(handle, chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-                setShowParticipantsInWaitingRoomDialogConsumed()
-            }.onSuccess { name ->
-                name?.let {
-                    _state.update { state ->
-                        if (isFirstUser) {
-                            state.copy(
-                                nameOfTheFirstUserInTheWaitingRoom = it,
-                            )
-                        } else {
-                            state.copy(
-                                nameOfTheSecondUserInTheWaitingRoom = it,
-                            )
-                        }
-                    }
-                    if (shouldShowDialog) {
-                        setShowParticipantsInWaitingRoomDialog(shouldItSound = true)
-                    }
+                if (shouldShowDialog) {
+                    setShowParticipantsInWaitingRoomDialog()
                 }
             }
         }
+    }
 
     /**
      * Sets showParticipantsInWaitingRoomDialog as consumed.
@@ -336,19 +312,14 @@ class WaitingRoomManagementViewModel @Inject constructor(
 
     /**
      * Sets showParticipantsInWaitingRoomDialog.
-     *
-     * @param shouldItSound True, if should sound, false if not.
      */
-    private fun setShowParticipantsInWaitingRoomDialog(shouldItSound: Boolean) =
+    private fun setShowParticipantsInWaitingRoomDialog() {
         _state.update { state ->
-            if (!state.showParticipantsInWaitingRoomDialog && shouldItSound) {
-                soundsController.playSound(CallSoundType.WAITING_ROOM_USERS_ENTERED)
-            }
             state.copy(
-                showParticipantsInWaitingRoomDialog = true,
-                showDenyParticipantDialog = false
+                showParticipantsInWaitingRoomDialog = true, showDenyParticipantDialog = false
             )
         }
+    }
 
     /**
      * Sets showDenyParticipantDialog as consumed.
@@ -378,49 +349,46 @@ class WaitingRoomManagementViewModel @Inject constructor(
         setShowParticipantsInWaitingRoomDialogConsumed()
         setShowDenyParticipantDialogConsumed()
 
-        if (state.value.usersInWaitingRoom.isEmpty())
-            return
+        if (state.value.usersInWaitingRoom.isEmpty()) return
 
         viewModelScope.launch {
             val numberOfUsers = state.value.usersInWaitingRoom.size
             runCatching {
                 allowUsersJoinCallUseCase(
-                    state.value.chatId,
-                    state.value.usersInWaitingRoom,
-                    numberOfUsers > 1
+                    state.value.chatId, state.value.usersInWaitingRoom, numberOfUsers > 1
                 )
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess {
-                Timber.d("Users admitted to the call")
-                _state.update { state ->
-                    state.copy(
-                        snackbarString =
-                        when {
-                            numberOfUsers == 1 && state.nameOfTheFirstUserInTheWaitingRoom.isNotEmpty() ->
-                                getStringFromStringResMapper(
+                Timber.d("Users admitted to the call chatIdOfCallOpened ${state.value.chatIdOfCallOpened}")
+                if (state.value.chatIdOfCallOpened == -1L) {
+                    _state.update { state ->
+                        state.copy(
+                            snackbarString = when {
+                                numberOfUsers == 1 && state.nameOfTheFirstUserInTheWaitingRoom.isNotEmpty() -> getStringFromStringResMapper(
                                     R.string.meeting_call_screen_one_participant_joined_call,
                                     state.nameOfTheFirstUserInTheWaitingRoom
                                 )
 
-                            numberOfUsers == 2 && state.nameOfTheFirstUserInTheWaitingRoom.isNotEmpty() && state.nameOfTheSecondUserInTheWaitingRoom.isNotEmpty() -> {
-                                getStringFromStringResMapper(
-                                    R.string.meeting_call_screen_two_participants_joined_call,
-                                    state.nameOfTheFirstUserInTheWaitingRoom,
-                                    state.nameOfTheSecondUserInTheWaitingRoom
-                                )
-                            }
+                                numberOfUsers == 2 && state.nameOfTheFirstUserInTheWaitingRoom.isNotEmpty() && state.nameOfTheSecondUserInTheWaitingRoom.isNotEmpty() -> {
+                                    getStringFromStringResMapper(
+                                        R.string.meeting_call_screen_two_participants_joined_call,
+                                        state.nameOfTheFirstUserInTheWaitingRoom,
+                                        state.nameOfTheSecondUserInTheWaitingRoom
+                                    )
+                                }
 
-                            else -> {
-                                getPluralStringFromStringResMapper(
-                                    R.plurals.meeting_call_screen_more_than_two_participants_joined_call,
-                                    numberOfUsers,
-                                    state.nameOfTheFirstUserInTheWaitingRoom,
-                                    (numberOfUsers - 1)
-                                )
+                                else -> {
+                                    getPluralStringFromStringResMapper(
+                                        R.plurals.meeting_call_screen_more_than_two_participants_joined_call,
+                                        numberOfUsers,
+                                        state.nameOfTheFirstUserInTheWaitingRoom,
+                                        (numberOfUsers - 1)
+                                    )
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -447,15 +415,14 @@ class WaitingRoomManagementViewModel @Inject constructor(
      */
     fun cancelDenyEntryClick() {
         setShowDenyParticipantDialogConsumed()
-        setShowParticipantsInWaitingRoomDialog(shouldItSound = false)
+        setShowParticipantsInWaitingRoomDialog()
     }
 
     /**
      * Deny user/users to waiting room
      */
     fun denyEntryClick() {
-        if (state.value.usersInWaitingRoom.isEmpty())
-            return
+        if (state.value.usersInWaitingRoom.isEmpty()) return
 
         viewModelScope.launch {
             runCatching {

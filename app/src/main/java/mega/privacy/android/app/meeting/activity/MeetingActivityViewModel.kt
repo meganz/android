@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
@@ -58,6 +59,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
@@ -65,6 +67,7 @@ import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.waitingroom.MonitorWaitingRoomParticipantsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -93,6 +96,7 @@ import javax.inject.Inject
  * @property monitorChatCallUpdates         [MonitorChatCallUpdates]
  * @property getChatRoomUseCase             [GetChatRoomUseCase]
  * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
+ * @property monitorWaitingRoomParticipantsUseCase     [MonitorWaitingRoomParticipantsUseCase]
  * @property state                      Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -111,7 +115,8 @@ class MeetingActivityViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoom,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     @ApplicationContext private val context: Context,
-) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
+    private val monitorWaitingRoomParticipantsUseCase: MonitorWaitingRoomParticipantsUseCase,
+    ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
     private val _state = MutableStateFlow(MeetingState())
@@ -293,7 +298,7 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Get chat room
      */
-    fun getChatRoom() = viewModelScope.launch {
+    private fun getChatRoom() = viewModelScope.launch {
         runCatching {
             getChatRoomUseCase(_state.value.chatId)
         }.onSuccess { chatRoom ->
@@ -478,6 +483,7 @@ class MeetingActivityViewModel @Inject constructor(
                 )
             }
             getChatRoom()
+            startMonitoringWaitingRoomParticipantsUpdated(chatId = chatId)
         }
     }
 
@@ -896,4 +902,36 @@ class MeetingActivityViewModel @Inject constructor(
     fun finishMeetingActivity() {
         _finishMeetingActivity.value = true
     }
+
+    /**
+     * Monitor waiting room participants updates
+     *
+     * @param chatId    Chat id
+     */
+    private fun startMonitoringWaitingRoomParticipantsUpdated(chatId: Long) =
+        viewModelScope.launch {
+            monitorWaitingRoomParticipantsUseCase(chatId).catch { exception ->
+                Timber.e(exception)
+            }.collectLatest { newList ->
+                Timber.d("List participants in waiting room $newList")
+                _state.update { state ->
+                    state.copy(
+                        chatParticipantsInWaitingRoom = newList,
+                        participantsSection = if (newList.isEmpty() && state.participantsSection == ParticipantsSection.WaitingRoomSection) ParticipantsSection.InCallSection else state.participantsSection
+                    )
+                }
+            }
+        }
+
+    /**
+     * Update Participants selection
+     *
+     * @param newSelection  New [ParticipantsSection]
+     */
+    fun updateParticipantsSelection(newSelection: ParticipantsSection) =
+        _state.update { state ->
+            state.copy(
+                participantsSection = newSelection
+            )
+        }
 }

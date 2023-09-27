@@ -21,10 +21,18 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.exception.NullMegaHandleListException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
-import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.RequestLastGreen
+import mega.privacy.android.domain.usecase.account.GetUserAliasUseCase
+import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromEmailUseCase
+import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromHandleUseCase
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
+import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
+import mega.privacy.android.domain.usecase.chat.GetUserPrivilegeUseCase
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactEmail
+import mega.privacy.android.domain.usecase.contact.GetContactFullNameUseCase
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRoom
 import java.io.File
@@ -33,22 +41,41 @@ import javax.inject.Inject
 /**
  * Default implementation of [ChatParticipantsRepository]
  *
- * @property megaChatApiGateway     [MegaChatApiGateway]
- * @property megaApiGateway         [MegaApiGateway]
- * @property avatarRepository       [AvatarRepository]
- * @property contactsRepository     [ContactsRepository]
- * @property requestLastGreen       [RequestLastGreen]
- * @property ioDispatcher           [CoroutineDispatcher]
+ * @property megaChatApiGateway             [MegaChatApiGateway]
+ * @property megaApiGateway                 [MegaApiGateway]
+ * @property getMyAvatarColorUseCase        [GetMyAvatarColorUseCase]
+ * @property requestLastGreen               [RequestLastGreen]
+ * @property getContactEmail                [GetContactEmail]
+ * @property getUserAvatarColorUseCase      [GetUserAvatarColorUseCase]
+ * @property userStatusToIntMapper          [UserStatusToIntMapper]
+ * @property megaHandleListMapper           [MegaHandleListMapper]
+ * @property chatPermissionsMapper          [ChatPermissionsMapper]
+ * @property getMyAvatarFileUseCase         [GetMyAvatarFileUseCase]
+ * @property getAvatarFileFromEmailUseCase  [GetAvatarFileFromEmailUseCase]
+ * @property getUserAliasUseCase            [GetUserAliasUseCase]
+ * @property getAvatarFileFromHandleUseCase [GetAvatarFileFromHandleUseCase]
+ * @property areCredentialsVerifiedUseCase  [AreCredentialsVerifiedUseCase]
+ * @property getContactFullNameUseCase      [GetContactFullNameUseCase]
+ * @property getUserPrivilegeUseCase        [GetUserPrivilegeUseCase]
+ * @property ioDispatcher                   [CoroutineDispatcher]
  */
 internal class DefaultChatParticipantsRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiGateway: MegaApiGateway,
-    private val avatarRepository: AvatarRepository,
-    private val contactsRepository: ContactsRepository,
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val requestLastGreen: RequestLastGreen,
+    private val getContactEmail: GetContactEmail,
+    private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase,
     private val chatPermissionsMapper: ChatPermissionsMapper,
     private val megaHandleListMapper: MegaHandleListMapper,
     private val userStatusToIntMapper: UserStatusToIntMapper,
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
+    private val getAvatarFileFromEmailUseCase: GetAvatarFileFromEmailUseCase,
+    private val getAvatarFileFromHandleUseCase: GetAvatarFileFromHandleUseCase,
+    private val getUserAliasUseCase: GetUserAliasUseCase,
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
+    private val getContactFullNameUseCase: GetContactFullNameUseCase,
+    private val getUserPrivilegeUseCase: GetUserPrivilegeUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatParticipantsRepository {
 
@@ -79,7 +106,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                             ),
                             email = myEmail,
                             isMe = true,
-                            defaultAvatarColor = avatarRepository.getMyAvatarColor(),
+                            defaultAvatarColor = getMyAvatarColorUseCase(),
                             privilege = chatPermissionsMapper(chatRoom.ownPrivilege)
                         )
                     )
@@ -89,10 +116,13 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                     val participantPrivilege = chatRoom.getPeerPrivilegeByHandle(handle)
                     if (participantPrivilege != MegaChatRoom.PRIV_RM) {
                         val alias = async { megaChatApiGateway.getUserAliasFromCache(handle) }
-                        val fullName = async { contactsRepository.getUserFullName(handle) }
-                        val email = async { contactsRepository.getUserEmail(handle) }
+                        val fullName = async {
+                            getContactFullNameUseCase(handle)
+
+                        }
+                        val email = async { getContactEmail(handle) }
                         val privilege = async { chatPermissionsMapper(participantPrivilege) }
-                        val avatarColor = async { avatarRepository.getAvatarColor(handle) }
+                        val avatarColor = async { getUserAvatarColorUseCase(handle) }
 
                         participants.add(
                             ChatParticipant(
@@ -102,7 +132,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                                     alias = alias.await(),
                                     avatarUri = null
                                 ),
-                                email = email.await(),
+                                email = email.await() ?: "",
                                 isMe = false,
                                 privilege = privilege.await(),
                                 defaultAvatarColor = avatarColor.await()
@@ -113,6 +143,43 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
                 return@withContext participants
             } ?: emptyList()
+        }
+
+    override suspend fun getSeveralChatParticipants(
+        chatId: Long,
+        peerHandles: List<Long>,
+        preloadUserAttributes: Boolean,
+    ): List<ChatParticipant> =
+        withContext(ioDispatcher) {
+            val participants = mutableListOf<ChatParticipant>()
+            if (preloadUserAttributes) {
+                peerHandles.map {
+                    async { loadUserAttributes(chatId, listOf(it)) }
+                }.awaitAll() // Retrieve User Attributes in parallel
+            }
+
+            peerHandles.forEach { handle ->
+                val participantPrivilege = async { getUserPrivilegeUseCase(chatId, handle) }
+                val alias = async { megaChatApiGateway.getUserAliasFromCache(handle) }
+                val fullName = async { getContactFullNameUseCase(handle) }
+                val email = async { getContactEmail(handle) }
+                val avatarColor = async { getUserAvatarColorUseCase(handle) }
+                participants.add(
+                    ChatParticipant(
+                        handle = handle,
+                        data = ContactData(
+                            fullName = fullName.await(),
+                            alias = alias.await(),
+                            avatarUri = null
+                        ),
+                        email = email.await() ?: "",
+                        isMe = false,
+                        privilege = participantPrivilege.await(),
+                        defaultAvatarColor = avatarColor.await()
+                    )
+                )
+            }
+            return@withContext participants
         }
 
     override suspend fun getChatParticipantsHandles(chatId: Long, limit: Int): List<Long> =
@@ -162,28 +229,26 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     }
 
     override suspend fun getAlias(participant: ChatParticipant): String? =
-        runCatching { contactsRepository.getUserAlias(participant.handle) }.fold(
+        runCatching { getUserAliasUseCase(participant.handle) }.fold(
             onSuccess = { alias -> alias },
             onFailure = { null }
         )
 
     override suspend fun getAvatarColor(participant: ChatParticipant): Int =
-        if (participant.isMe) avatarRepository.getMyAvatarColor() else avatarRepository.getAvatarColor(
-            participant.handle
-        )
+        if (participant.isMe) getMyAvatarColorUseCase() else getUserAvatarColorUseCase(participant.handle)
 
     override suspend fun getAvatarUri(participant: ChatParticipant, skipCache: Boolean): File? =
         runCatching {
             if (participant.isMe) {
-                avatarRepository.getMyAvatarFile()
+                getMyAvatarFileUseCase(false)
             } else {
                 if (participant.email.isNotBlank()) {
-                    avatarRepository.getAvatarFile(
+                    getAvatarFileFromEmailUseCase(
                         userEmail = participant.email,
                         skipCache = skipCache
                     )
                 } else {
-                    avatarRepository.getAvatarFile(
+                    getAvatarFileFromHandleUseCase(
                         userHandle = participant.handle,
                         skipCache = skipCache
                     )
@@ -232,7 +297,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
         }
 
     override suspend fun areCredentialsVerified(participant: ChatParticipant): Boolean =
-        runCatching { contactsRepository.areCredentialsVerified(participant.email) }.fold(
+        runCatching { areCredentialsVerifiedUseCase(participant.email) }.fold(
             onSuccess = { cred -> cred },
             onFailure = { false }
         )

@@ -16,9 +16,11 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
@@ -26,10 +28,14 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
+import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import timber.log.Timber
 
 /**
@@ -41,6 +47,7 @@ import timber.log.Timber
  */
 class BottomFloatingPanelViewHolder(
     private val inMeetingViewModel: InMeetingViewModel,
+    private val meetingViewModel: MeetingActivityViewModel,
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
     private val displayMetrics: DisplayMetrics,
@@ -223,10 +230,8 @@ class BottomFloatingPanelViewHolder(
      * Init the visibility of `ShareLink` & `Invite` Button
      */
     fun updateShareAndInviteButton() {
-        floatingPanelView.dividerAllowAddParticipants.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.invite.isVisible = inMeetingViewModel.isLinkVisible()
-        floatingPanelView.dividerParticipants.isVisible = inMeetingViewModel.isModerator()
         floatingPanelView.allowAddParticipantsLayout.isVisible = inMeetingViewModel.isModerator()
         floatingPanelView.allowAddParticipantsSwitch.isClickable = false
         updateAllowAddParticipantsSwitch(inMeetingViewModel.isOpenInvite())
@@ -281,9 +286,6 @@ class BottomFloatingPanelViewHolder(
         myOwnParticipant: Participant,
     ) {
         updateParticipants(participants, myOwnParticipant)
-        floatingPanelView.participantsNum.text = context.getString(
-            R.string.participants_number, participants.size
-        )
     }
 
     /**
@@ -434,15 +436,6 @@ class BottomFloatingPanelViewHolder(
     private fun setupRecyclerView() {
         itemDecoration = PositionDividerItemDecoration(context, displayMetrics)
         itemDecoration.setDrawAllDividers(true)
-
-        floatingPanelView.participants.apply {
-            layoutManager = LinearLayoutManager(context)
-            itemAnimator = Util.noChangeRecyclerViewItemAnimator()
-            clipToPadding = false
-            setHasFixedSize(true)
-            adapter = participantsAdapter
-            addItemDecoration(itemDecoration)
-        }
     }
 
     /**
@@ -508,6 +501,35 @@ class BottomFloatingPanelViewHolder(
             ) { view, value ->
                 view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
             })
+
+        binding.bottomFloatingPanel.participantsComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val meetingState by meetingViewModel.state.collectAsStateWithLifecycle()
+                AndroidTheme(isDark = Util.isDarkMode(context)) {
+                    ParticipantsBottomPanelView(
+                        state = meetingState,
+                        onWaitingRoomClick = {
+                            meetingViewModel.updateParticipantsSelection(
+                                ParticipantsSection.WaitingRoomSection
+                            )
+                        },
+                        onInCallClick = {
+                            meetingViewModel.updateParticipantsSelection(
+                                ParticipantsSection.InCallSection
+                            )
+                        },
+                        onNotInCallClick = {
+                            meetingViewModel.updateParticipantsSelection(
+                                ParticipantsSection.NotInCallSection
+                            )
+                        },
+                        onAdmitAllClick = { /*TODO*/ },
+                        onInviteParticipantsClick = { /*TODO*/ })
+                }
+            }
+        }
 
         setupFabUpdater()
         setupFabLabelUpdater()

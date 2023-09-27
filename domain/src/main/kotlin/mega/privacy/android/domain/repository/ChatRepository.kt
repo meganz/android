@@ -654,4 +654,21 @@ interface ChatRepository {
      * @return Tdentifier of the temp message attached.
      */
     suspend fun attachVoiceMessage(chatId: Long, nodeHandle: Long): Long
+
+    /**
+     * Get own privilege
+     *
+     * @param chatId    Chat id
+     * @return          [ChatRoomPermission]
+     */
+    suspend fun getOwnPrivilege(chatId: Long): ChatRoomPermission
+
+    /**
+     * Get user privilege
+     *
+     * @param chatId        Chat id
+     * @param userHandle    User handle
+     * @return              [ChatRoomPermission]
+     */
+    suspend fun getUserPrivilege(chatId: Long, userHandle: Long): ChatRoomPermission
 }

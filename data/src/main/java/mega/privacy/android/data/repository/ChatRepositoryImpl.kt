@@ -901,4 +901,15 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun getOwnPrivilege(chatId: Long): ChatRoomPermission =
+        withContext(ioDispatcher) {
+            getChatRoom(chatId)?.ownPrivilege ?: ChatRoomPermission.Unknown
+        }
+
+    override suspend fun getUserPrivilege(chatId: Long, userHandle: Long): ChatRoomPermission =
+        withContext(ioDispatcher) {
+            getChatRoom(chatId)?.peerPrivilegesByHandles?.get(userHandle)
+                ?: ChatRoomPermission.Unknown
+        }
 }

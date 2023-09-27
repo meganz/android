@@ -227,6 +227,12 @@ class GetCallSoundsUseCase @Inject constructor(
 
                                 }
                             }
+
+                            if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
+                                if (call.waitingRoom?.peers?.size == 1) {
+                                    emitter.onNext(CallSoundType.WAITING_ROOM_USERS_ENTERED)
+                                }
+                            }
                         }
                     }
             }

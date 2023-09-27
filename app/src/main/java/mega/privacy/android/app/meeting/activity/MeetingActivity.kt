@@ -37,7 +37,6 @@ import mega.privacy.android.app.meeting.fragments.MakeModeratorFragment
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
@@ -46,8 +45,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -97,9 +94,6 @@ class MeetingActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
-
-    @Inject
-    lateinit var getThemeMode: GetThemeMode
 
     /**
      * Rtc audio manager gateway
@@ -203,10 +197,8 @@ class MeetingActivity : BaseActivity() {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                val isDark = themeMode.isDarkMode()
                 val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = isDark) {
+                AndroidTheme(isDark = true) {
                     UsersInWaitingRoomDialog(
                         state = waitingRoomState,
                         onAdmitClick = {

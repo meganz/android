@@ -224,17 +224,6 @@
         app:layout_constraintStart_toEndOf="@id/share_link"
         app:layout_constraintTop_toTopOf="@id/share_link" />
 
-    <View
-        android:id="@+id/divider_allow_add_participants"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/grey_012_white_012"
-        android:layout_marginStart="17dp"
-        android:layout_marginEnd="13dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/invite" />
 
     <RelativeLayout
         android:id="@+id/allow_add_participants_layout"
@@ -242,7 +231,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_allow_add_participants"
+        app:layout_constraintTop_toBottomOf="@id/invite"
         android:visibility="visible">
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/allow_add_participants_switch"
@@ -257,28 +246,6 @@
             android:textAppearance="?attr/textAppearanceSubtitle1" />
     </RelativeLayout>
 
-    <View
-        android:id="@+id/divider_participants"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/grey_012_white_012"
-        android:layout_marginStart="17dp"
-        android:layout_marginEnd="13dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/allow_add_participants_layout" />
-
-    <TextView
-        android:id="@+id/participants_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="17dp"
-        android:textAppearance="?attr/textAppearanceSubtitle2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_participants"
-        tools:text="@string/participants_number" />
-
     <Button
         android:id="@+id/guest_share_link"
         style="?attr/materialButtonOutlinedStyle"
@@ -287,19 +254,16 @@
         android:drawableStart="@drawable/ic_social_share_white"
         android:text="@string/context_get_link"
         app:drawableTint="?attr/colorSecondary"
-        app:layout_constraintBottom_toBottomOf="@id/participants_num"
+        app:layout_constraintBottom_toBottomOf="@id/allow_add_participants_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toTopOf="@id/participants_num" />
+        app:layout_constraintTop_toTopOf="@id/allow_add_participants_layout" />
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/participants"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="21dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/participants_compose_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/participants_num" />
+        app:layout_constraintTop_toBottomOf="@id/allow_add_participants_layout"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,6 +23,20 @@ interface ChatParticipantsRepository {
     ): List<ChatParticipant>
 
     /**
+     * Get several chat participants and preload their UserAttributes
+     *
+     * @param chatId                Chat Room Id
+     * @param peerHandles           List of users
+     * @param preloadUserAttributes Flag to preload UserAttributes
+     * @return                      List of [ChatParticipant]
+     */
+    suspend fun getSeveralChatParticipants(
+        chatId: Long,
+        peerHandles: List<Long>,
+        preloadUserAttributes: Boolean = false,
+    ): List<ChatParticipant>
+
+    /**
      * Get chat participants handles
      *
      * @param chatId                Chat Room Id
