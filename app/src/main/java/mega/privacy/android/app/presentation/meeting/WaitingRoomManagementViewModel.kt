@@ -14,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -163,9 +164,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
      */
     private fun startMonitoringScheduledMeetingUpdates() = viewModelScope.launch {
         monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
-
             if (scheduledMeetReceived.chatId != state.value.chatId) return@collectLatest
-
             scheduledMeetReceived.changes?.let { changes ->
                 Timber.d("Monitor scheduled meeting updated, changes $changes")
                 changes.forEach {
@@ -343,19 +342,31 @@ class WaitingRoomManagementViewModel @Inject constructor(
     }
 
     /**
-     * Admit users to waiting room
+     * Sets usersAdmitted as consumed.
      */
-    fun admitUsersClick() {
+    fun onConsumeUsersAdmittedEvent() = _state.update { state ->
+        state.copy(usersAdmitted = false)
+    }
+
+    /**
+     * Admit users to waiting room
+     *
+     * @param chatParticipant   [ChatParticipant]
+     */
+    fun admitUsersClick(chatParticipant: ChatParticipant? = null) {
         setShowParticipantsInWaitingRoomDialogConsumed()
         setShowDenyParticipantDialogConsumed()
 
         if (state.value.usersInWaitingRoom.isEmpty()) return
 
         viewModelScope.launch {
-            val numberOfUsers = state.value.usersInWaitingRoom.size
+            val list = if (chatParticipant == null) state.value.usersInWaitingRoom else listOf(
+                chatParticipant.handle
+            )
+            val numberOfUsers = list.size
             runCatching {
                 allowUsersJoinCallUseCase(
-                    state.value.chatId, state.value.usersInWaitingRoom, numberOfUsers > 1
+                    state.value.chatId, list, numberOfUsers > 1
                 )
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -389,6 +400,10 @@ class WaitingRoomManagementViewModel @Inject constructor(
                             }
                         )
                     }
+                } else {
+                    _state.update { state ->
+                        state.copy(usersAdmitted = true)
+                    }
                 }
             }
         }
@@ -396,8 +411,13 @@ class WaitingRoomManagementViewModel @Inject constructor(
 
     /**
      * Deny users option selected
+     *
+     * @param chatParticipant   [ChatParticipant]
      */
-    fun denyUsersClick() {
+    fun denyUsersClick(chatParticipant: ChatParticipant? = null) {
+        _state.update { state ->
+            state.copy(participantToDenyEntry = chatParticipant)
+        }
         setShowParticipantsInWaitingRoomDialogConsumed()
         setShowDenyParticipantDialog()
     }
@@ -422,11 +442,14 @@ class WaitingRoomManagementViewModel @Inject constructor(
      * Deny user/users to waiting room
      */
     fun denyEntryClick() {
-        if (state.value.usersInWaitingRoom.isEmpty()) return
-
+        if (state.value.participantToDenyEntry == null || state.value.usersInWaitingRoom.isEmpty()) return
+        var list = state.value.usersInWaitingRoom
+        state.value.participantToDenyEntry?.let {
+            list = listOf(it.handle)
+        }
         viewModelScope.launch {
             runCatching {
-                kickUsersFromCallUseCase(state.value.chatId, state.value.usersInWaitingRoom)
+                kickUsersFromCallUseCase(state.value.chatId, list)
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess {

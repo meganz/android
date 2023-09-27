@@ -85,6 +85,7 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
+import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
@@ -1273,6 +1274,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
             }
         }
+
+        viewLifecycleOwner.collectFlow(sharedWaitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
+            if (state.usersAdmitted) {
+                sharedWaitingRoomManagementViewModel.onConsumeUsersAdmittedEvent()
+                collapsePanel()
+            }
+        }
     }
 
     /**
@@ -2020,6 +2028,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             BottomFloatingPanelViewHolder(
                 inMeetingViewModel,
                 sharedModel,
+                sharedWaitingRoomManagementViewModel,
                 binding,
                 this,
                 resources.displayMetrics

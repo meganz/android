@@ -62,10 +62,17 @@ fun UsersInWaitingRoomDialog(
                     )
                 }
 
-                else -> stringResource(
-                    R.string.meetings_waiting_room_deny_user_to_call_dialog_message,
-                    state.nameOfTheFirstUserInTheWaitingRoom
-                )
+                else -> {
+                    var name = state.nameOfTheFirstUserInTheWaitingRoom
+                    state.participantToDenyEntry?.apply {
+                        data.fullName?.let {
+                            name = it
+                        }
+                    }
+                    stringResource(
+                        R.string.meetings_waiting_room_deny_user_to_call_dialog_message, name
+                    )
+                }
             }
 
         MegaAlertDialog(

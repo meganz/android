@@ -32,6 +32,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -48,6 +49,7 @@ import timber.log.Timber
 class BottomFloatingPanelViewHolder(
     private val inMeetingViewModel: InMeetingViewModel,
     private val meetingViewModel: MeetingActivityViewModel,
+    private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel,
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
     private val displayMetrics: DisplayMetrics,
@@ -525,8 +527,18 @@ class BottomFloatingPanelViewHolder(
                                 ParticipantsSection.NotInCallSection
                             )
                         },
-                        onAdmitAllClick = { /*TODO*/ },
-                        onInviteParticipantsClick = { /*TODO*/ })
+                        onAdmitAllClick = { waitingRoomManagementViewModel.admitUsersClick() },
+                        onInviteParticipantsClick = { /*TODO*/ },
+                        onAdmitParticipantClicked = {
+                            waitingRoomManagementViewModel.admitUsersClick(
+                                it
+                            )
+                        },
+                        onDenyParticipantClicked = {
+                            waitingRoomManagementViewModel.denyUsersClick(
+                                it
+                            )
+                        })
                 }
             }
         }

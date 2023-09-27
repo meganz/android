@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewModel
+import mega.privacy.android.domain.entity.chat.ChatParticipant
 
 /**
  * Data class defining the state of [CreateScheduledMeetingViewModel]
@@ -15,6 +16,8 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewM
  * @property nameOfTheFirstUserInTheWaitingRoom      Name of the first user in the waiting room
  * @property nameOfTheSecondUserInTheWaitingRoom     Name of the second user in the waiting room
  * @property chatIdOfCallOpened                      Chat id of call opened
+ * @property usersAdmitted                           True if users were admitted, false if not
+ * @property participantToDenyEntry                  [ChatParticipant] to deny entry
  */
 data class WaitingRoomManagementState constructor(
     val snackbarString: String? = null,
@@ -27,6 +30,8 @@ data class WaitingRoomManagementState constructor(
     val nameOfTheFirstUserInTheWaitingRoom: String = "",
     val nameOfTheSecondUserInTheWaitingRoom: String = "",
     val chatIdOfCallOpened: Long = -1L,
+    val usersAdmitted: Boolean = false,
+    val participantToDenyEntry: ChatParticipant? = null,
 ) {
     /**
      * Check if the dialog is relative to the open call

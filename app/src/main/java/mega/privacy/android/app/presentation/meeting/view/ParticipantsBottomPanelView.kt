@@ -245,8 +245,6 @@ private fun WaitingRoomParticipantItemView(
     participant: ChatParticipant,
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
-    onMicParticipantClicked: (ChatParticipant) -> Unit = {},
-    onCamParticipantClicked: (ChatParticipant) -> Unit = {},
     onOptionsParticipantClicked: (ChatParticipant) -> Unit = {},
 ) {
     Column {
@@ -337,26 +335,19 @@ private fun WaitingRoomParticipantItemView(
                         }
 
                         ParticipantsSection.InCallSection, ParticipantsSection.NotInCallSection -> {
-                            IconButton(
-                                onClick = { onMicParticipantClicked(participant) }
-                            ) {
-                                Icon(
-                                    modifier = Modifier.padding(start = 5.dp),
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.mic_on_participant_icon),
-                                    contentDescription = "Mic icon",
-                                    tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038
-                                )
-                            }
-                            IconButton(
-                                onClick = { onCamParticipantClicked(participant) }
-                            ) {
-                                Icon(
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.video_on_participant_icon),
-                                    contentDescription = "Cam icon",
-                                    tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038
-                                )
-                            }
+                            Icon(
+                                modifier = Modifier.padding(start = 5.dp),
+                                imageVector = ImageVector.vectorResource(id = R.drawable.mic_on_participant_icon),
+                                contentDescription = "Mic icon",
+                                tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038
+                            )
+
+                            Icon(
+                                modifier = Modifier.padding(start = 10.dp),
+                                imageVector = ImageVector.vectorResource(id = R.drawable.video_on_participant_icon),
+                                contentDescription = "Cam icon",
+                                tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038
+                            )
 
                             IconButton(
                                 onClick = { onOptionsParticipantClicked(participant) }

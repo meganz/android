@@ -103,7 +103,7 @@ class MeetingActivity : BaseActivity() {
 
     lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
-    private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
+    private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
 
     private var meetingAction: String? = null
 

@@ -254,10 +254,9 @@
         android:drawableStart="@drawable/ic_social_share_white"
         android:text="@string/context_get_link"
         app:drawableTint="?attr/colorSecondary"
-        app:layout_constraintBottom_toBottomOf="@id/allow_add_participants_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toTopOf="@id/allow_add_participants_layout" />
+        app:layout_constraintTop_toBottomOf="@id/allow_add_participants_layout" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/participants_compose_view"
@@ -265,5 +264,5 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/allow_add_participants_layout"/>
+        app:layout_constraintTop_toBottomOf="@id/guest_share_link"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,6 +10,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.utils.permission.PermissionRequest
 import mega.privacy.android.app.utils.permission.PermissionType
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -39,6 +40,8 @@ open class MeetingBaseFragment : Fragment() {
     protected lateinit var permissionsRequester: PermissionsRequester
 
     protected val sharedModel: MeetingActivityViewModel by activityViewModels()
+    protected val sharedWaitingRoomManagementViewModel: WaitingRoomManagementViewModel by activityViewModels()
+
 
     // Indicate if permission has been requested. After requested, we should check "shouldShowRequestPermissionRationaleSnackBar"
     private var bRequested = false
