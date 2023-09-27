@@ -8,9 +8,11 @@ import mega.privacy.android.data.database.entity.SyncRecordEntity
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -27,6 +29,13 @@ class SyncRecordModelMapperTest {
         underTest = SyncRecordModelMapper(decryptData, syncRecordTypeMapper)
     }
 
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            decryptData,
+            syncRecordTypeMapper,
+        )
+    }
     @Test
     fun `test that mapper returns model correctly when invoke function`() = runTest {
         val entity = SyncRecordEntity(

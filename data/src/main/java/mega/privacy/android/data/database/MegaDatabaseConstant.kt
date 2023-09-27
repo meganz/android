@@ -44,4 +44,9 @@ object MegaDatabaseConstant {
      * Table Backups
      */
     const val TABLE_BACKUPS = "backups"
+
+    /**
+     * Table Camera Uploads Records
+     */
+    const val TABLE_CAMERA_UPLOADS_RECORDS = "camerauploadsrecords"
 }
