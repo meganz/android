@@ -13,7 +13,7 @@ import javax.inject.Inject
 /**
  * Use case for getting folder link information without logging and without fetching nodes.
  */
-class GetPublicLinkInformationUseCase @Inject constructor(
+class LegacyGetPublicLinkInformationUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
 ) {
 
@@ -32,6 +32,7 @@ class GetPublicLinkInformationUseCase @Inject constructor(
                         emitter.isDisposed -> {
                             return@OptionalMegaRequestListenerInterface
                         }
+
                         error.errorCode == API_OK -> {
                             val folderInfo = request.megaFolderInfo
                             val folderContent =
@@ -49,6 +50,7 @@ class GetPublicLinkInformationUseCase @Inject constructor(
                                 )
                             )
                         }
+
                         else -> {
                             emitter.onError(error.toMegaException())
                         }

@@ -389,7 +389,7 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
-import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
+import mega.privacy.android.app.usecase.LegacyGetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.usecase.call.EndCallUseCase;
@@ -539,7 +539,7 @@ public class ChatActivity extends PasscodeActivity
     @Inject
     GetAvatarUseCase getAvatarUseCase;
     @Inject
-    GetPublicLinkInformationUseCase getPublicLinkInformationUseCase;
+    LegacyGetPublicLinkInformationUseCase legacyGetPublicLinkInformationUseCase;
     @Inject
     GetPublicNodeUseCase getPublicNodeUseCase;
     @Inject
@@ -6369,7 +6369,7 @@ public class ChatActivity extends PasscodeActivity
             return MEGA_FILE_LINK;
         } else {
             Timber.d("isFolderLink");
-            internalComposite.add(getPublicLinkInformationUseCase.get(link, this)
+            internalComposite.add(legacyGetPublicLinkInformationUseCase.get(link, this)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((richLink, throwable) -> {
