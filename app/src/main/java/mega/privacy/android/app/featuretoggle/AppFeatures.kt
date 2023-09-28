@@ -61,7 +61,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     PasscodeBackend(
         "Enables the new compose passcode backend implementation",
-        false,
+        true,
     ),
 
     /**
