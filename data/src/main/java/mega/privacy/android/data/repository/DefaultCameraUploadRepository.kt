@@ -815,6 +815,20 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         megaLocalRoomGateway.getCameraUploadsRecordByUploadStatusAndTypes(uploadStatus, types)
     }
 
+    override suspend fun setRecordUploadStatus(
+        mediaId: Long,
+        timestamp: Long,
+        folderType: CameraUploadFolderType,
+        uploadStatus: CameraUploadsRecordUploadStatus,
+    ) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.updateCameraUploadsRecordUploadStatus(
+            mediaId,
+            timestamp,
+            folderType,
+            uploadStatus,
+        )
+    }
+
     private companion object {
         private const val SUB_STATE_NO_CHANGE = -1
         private const val TARGET_NODE_NO_CHANGE = -1L

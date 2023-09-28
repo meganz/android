@@ -806,4 +806,19 @@ interface CameraUploadRepository {
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
         types: List<SyncRecordType>,
     ): List<CameraUploadsRecord>
+
+    /**
+     * Set the upload status for the camera uploads record
+     *
+     * @param mediaId the id of the record
+     * @param timestamp the timestamp of the record
+     * @param folderType the folder type of the record
+     * @param uploadStatus the upload status to set
+     */
+    suspend fun setRecordUploadStatus(
+        mediaId: Long,
+        timestamp: Long,
+        folderType: CameraUploadFolderType,
+        uploadStatus: CameraUploadsRecordUploadStatus,
+    )
 }

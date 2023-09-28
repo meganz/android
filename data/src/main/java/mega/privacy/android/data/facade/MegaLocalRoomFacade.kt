@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
@@ -319,6 +320,15 @@ internal class MegaLocalRoomFacade @Inject constructor(
     ): List<CameraUploadsRecord> =
         // Implementation to be added with the implementation of the table
         emptyList()
+
+    override suspend fun updateCameraUploadsRecordUploadStatus(
+        mediaId: Long,
+        timestamp: Long,
+        folderType: CameraUploadFolderType,
+        uploadStatus: CameraUploadsRecordUploadStatus,
+    ) {
+        // Implementation to be added with the implementation of the table
+    }
 
     override suspend fun deleteBackupById(backupId: Long) {
         encryptData(backupId.toString())?.let {
