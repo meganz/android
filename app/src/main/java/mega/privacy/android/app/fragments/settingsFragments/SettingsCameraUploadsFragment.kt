@@ -621,7 +621,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     primaryFolderPath = it.primaryFolderPath,
                 )
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
-                handleBusinessAccountSuspendedPrompt(it.shouldShowBusinessAccountSuspendedPrompt)
                 handleTriggerCameraUploads(it.shouldTriggerCameraUploads)
                 handleMediaPermissionsRationale(it.shouldShowMediaPermissionsRationale)
                 handleNotificationPermissionRationale(it.shouldShowNotificationPermissionRationale)
@@ -940,24 +939,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 .setOnDismissListener { viewModel.resetBusinessAccountPromptState() }
             businessCameraUploadsAlertDialog = builder.create()
             businessCameraUploadsAlertDialog?.show()
-        }
-    }
-
-    /**
-     * Handle the Business Account Suspended prompt when a UI State change happens
-     *
-     * @param showPrompt If true, send a broadcast to display the Dialog informing
-     * that the current Business Account has expired
-     */
-    private fun handleBusinessAccountSuspendedPrompt(showPrompt: Boolean) {
-        if (showPrompt) {
-            requireContext().sendBroadcast(
-                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
-                    requireContext().applicationContext.packageName
-                )
-            )
-            // After sending the broadcast, reset the Business Account suspended prompt state
-            viewModel.resetBusinessAccountSuspendedPromptState()
         }
     }
 

@@ -80,6 +80,5 @@ data class TimelineViewState(
     val selectedPhoto: Photo? = null,
     val shouldTriggerCameraUploads: Boolean = false,
     val shouldShowBusinessAccountPrompt: Boolean = false,
-    val shouldShowBusinessAccountSuspendedPrompt: Boolean = false,
     val shouldTriggerMediaPermissionsDeniedLogic: Boolean = false,
 )

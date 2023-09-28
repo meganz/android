@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -125,6 +126,8 @@ class SettingsCameraUploadsViewModelTest {
         mock()
     private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase =
         mock()
+    private val broadcastBusinessAccountExpiredUseCase =
+        mock<BroadcastBusinessAccountExpiredUseCase>()
 
     @Before
     fun setUp() {
@@ -188,6 +191,7 @@ class SettingsCameraUploadsViewModelTest {
             monitorBackupInfoTypeUseCase = mock(),
             setupOrUpdateCameraUploadsBackupUseCase = setupOrUpdateCameraUploadsBackupUseCase,
             setupOrUpdateMediaUploadsBackupUseCase = setupOrUpdateMediaUploadsBackupUseCase,
+            broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
         )
     }
 
@@ -205,7 +209,6 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.invalidFolderSelectedTextId).isNull()
             assertThat(state.primaryFolderPath).isEmpty()
             assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
-            assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isFalse()
             assertThat(state.shouldTriggerCameraUploads).isFalse()
             assertThat(state.shouldShowMediaPermissionsRationale).isFalse()
             assertThat(state.shouldShowNotificationPermissionRationale).isFalse()
@@ -241,16 +244,13 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that shouldShowBusinessAccountSuspendedPrompt is true when checkEnableCameraUploadsStatus returns SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
+    fun `test that broadcastBusinessAccountExpiredUseCase is invoked when checkEnableCameraUploadsStatus returns SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
         runTest {
             setupUnderTest()
 
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
 
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isTrue()
-            }
+            verify(broadcastBusinessAccountExpiredUseCase).invoke()
         }
 
     @Test
@@ -276,19 +276,6 @@ class SettingsCameraUploadsViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that shouldShowBusinessAccountSuspendedPrompt is false when calling resetBusinessAccountSuspendedPromptState`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.resetBusinessAccountSuspendedPromptState()
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isFalse()
             }
         }
 

@@ -34,7 +34,6 @@ data class SettingsCameraUploadsState(
     @StringRes val invalidFolderSelectedTextId: Int? = null,
     val primaryFolderPath: String = "",
     val shouldShowBusinessAccountPrompt: Boolean = false,
-    val shouldShowBusinessAccountSuspendedPrompt: Boolean = false,
     val shouldTriggerCameraUploads: Boolean = false,
     val shouldShowMediaPermissionsRationale: Boolean = false,
     val shouldShowNotificationPermissionRationale: Boolean = false,

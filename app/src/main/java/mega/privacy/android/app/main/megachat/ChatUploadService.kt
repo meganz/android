@@ -58,6 +58,7 @@ import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.entity.transfer.pendingMessageId
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.chat.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.AttachVoiceMessageUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
@@ -143,6 +144,9 @@ class ChatUploadService : LifecycleService() {
 
     @Inject
     lateinit var resetTotalUploadsUseCase: ResetTotalUploadsUseCase
+
+    @Inject
+    lateinit var broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -1029,11 +1033,7 @@ class ChatUploadService : LifecycleService() {
         error: MegaException?,
     ) = with(transfer) {
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(
-                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
-                    applicationContext.packageName
-                )
-            )
+            broadcastBusinessAccountExpiredUseCase()
         }
 
         Timber.d("onTransferFinish: $nodeHandle")

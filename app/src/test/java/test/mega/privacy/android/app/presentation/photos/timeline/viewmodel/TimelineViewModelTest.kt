@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
@@ -100,6 +101,9 @@ class TimelineViewModelTest {
 
     private val timelinePreferencesMapper = mock<TimelinePreferencesMapper>()
 
+    private val broadcastBusinessAccountExpiredUseCase =
+        mock<BroadcastBusinessAccountExpiredUseCase>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -123,6 +127,7 @@ class TimelineViewModelTest {
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             timelinePreferencesMapper = timelinePreferencesMapper,
+            broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase
         )
     }
 
@@ -197,9 +202,6 @@ class TimelineViewModelTest {
             assertWithMessage("shouldShowBusinessAccountPrompt value is incorrect").that(
                 initialState.shouldShowBusinessAccountPrompt
             ).isFalse()
-            assertWithMessage("shouldShowBusinessAccountSuspendedPrompt value is incorrect").that(
-                initialState.shouldShowBusinessAccountSuspendedPrompt
-            ).isFalse()
             assertWithMessage("shouldTriggerMediaPermissionsDeniedLogic value is incorrect").that(
                 initialState.shouldTriggerMediaPermissionsDeniedLogic
             ).isFalse()
@@ -270,15 +272,12 @@ class TimelineViewModelTest {
         }
 
     @Test
-    fun `test that shouldShowBusinessAccountSuspendedPrompt is true when checkEnableCameraUploadsStatus returns SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
+    fun `test that broadcastBusinessAccountExpiredUseCase is invoked when checkEnableCameraUploadsStatus returns SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
         runTest {
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
             advanceUntilIdle()
 
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isTrue()
-            }
+            verify(broadcastBusinessAccountExpiredUseCase).invoke()
         }
 
     @Test

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.base.model.BaseState
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
+import mega.privacy.android.domain.usecase.business.MonitorBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import javax.inject.Inject
 
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class BaseViewModel @Inject constructor(
     private val monitorTransfersFinishedUseCase: MonitorTransfersFinishedUseCase,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
+    private var monitorBusinessAccountExpiredUseCase: MonitorBusinessAccountExpiredUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BaseState())
@@ -39,6 +41,11 @@ class BaseViewModel @Inject constructor(
                 _state.update { state -> state.copy(accountBlockedDetail = it) }
             }
         }
+        viewModelScope.launch {
+            monitorBusinessAccountExpiredUseCase().collect {
+                _state.update { state -> state.copy(showExpiredBusinessAlert = true) }
+            }
+        }
     }
 
     /**
@@ -52,4 +59,10 @@ class BaseViewModel @Inject constructor(
      */
     fun onAccountBlockedConsumed() =
         _state.update { state -> state.copy(accountBlockedDetail = null) }
+
+    /**
+     * Sets showExpiredBusinessAlert in state as false
+     */
+    fun onShowExpiredBusinessAlertConsumed() =
+        _state.update { state -> state.copy(showExpiredBusinessAlert = false) }
 }

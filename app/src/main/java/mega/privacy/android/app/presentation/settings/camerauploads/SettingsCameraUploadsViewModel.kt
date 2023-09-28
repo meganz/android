@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -105,6 +106,7 @@ import javax.inject.Inject
  * @property stopCameraUploadsUseCase Stop the camera upload
  * @property rescheduleCameraUploadUseCase Reschedule the camera upload
  * @property stopCameraUploadAndHeartbeatUseCase Stop the camera upload and heartbeat
+ * @property broadcastBusinessAccountExpiredUseCase broadcast business account expired
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -153,6 +155,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     monitorBackupInfoTypeUseCase: MonitorBackupInfoTypeUseCase,
     private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase,
     private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase,
+    private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -235,7 +238,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 }
 
                 EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
-                    _state.update { it.copy(shouldShowBusinessAccountSuspendedPrompt = true) }
+                    broadcastBusinessAccountExpiredUseCase()
                 }
             }
         }.onFailure { Timber.w("Exception checking CU status: $it") }
@@ -246,12 +249,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun resetBusinessAccountPromptState() =
         _state.update { it.copy(shouldShowBusinessAccountPrompt = false) }
-
-    /**
-     * Resets the value of [SettingsCameraUploadsState.shouldShowBusinessAccountSuspendedPrompt] to False
-     */
-    fun resetBusinessAccountSuspendedPromptState() =
-        _state.update { it.copy(shouldShowBusinessAccountSuspendedPrompt = false) }
 
     /**
      * Sets the value of [SettingsCameraUploadsState.shouldTriggerCameraUploads]

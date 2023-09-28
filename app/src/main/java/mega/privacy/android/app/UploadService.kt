@@ -60,6 +60,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.account.qr.CheckUploadedQRCodeFileUseCase
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
@@ -165,6 +166,9 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase
+
+    @Inject
+    lateinit var broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
 
     private val intentFlow = MutableSharedFlow<Intent>()
 
@@ -804,11 +808,7 @@ internal class UploadService : LifecycleService() {
         Timber.d("Path: $localPath, Size: $transferredBytes")
 
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(
-                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
-                    applicationContext.packageName
-                )
-            )
+            broadcastBusinessAccountExpiredUseCase()
         }
 
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)

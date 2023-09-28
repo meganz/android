@@ -74,7 +74,6 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateFil
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
@@ -290,14 +289,6 @@ class PhotosFragment : Fragment() {
         if (state.shouldTriggerCameraUploads) {
             enableCameraUploads()
             timelineViewModel.setTriggerCameraUploadsState(shouldTrigger = false)
-        }
-        if (state.shouldShowBusinessAccountSuspendedPrompt) {
-            requireContext().sendBroadcast(
-                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
-                    requireContext().applicationContext.packageName
-                )
-            )
-            timelineViewModel.setBusinessAccountSuspendedPromptState(shouldShow = false)
         }
         if (state.shouldTriggerMediaPermissionsDeniedLogic) {
             timelineViewModel.stopCameraUploadAndHeartbeat()

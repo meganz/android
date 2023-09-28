@@ -1,10 +1,5 @@
 package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_MEDIA_IMAGES
-import android.Manifest.permission.READ_MEDIA_VIDEO
-import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,6 +45,7 @@ import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
@@ -80,6 +76,7 @@ import javax.inject.Inject
  * @property defaultDispatcher
  * @property checkEnableCameraUploadsStatus
  * @property stopCameraUploadAndHeartbeatUseCase
+ * @property broadcastBusinessAccountExpiredUseCase
  * @param monitorCameraUploadProgress
  */
 @HiltViewModel
@@ -102,6 +99,7 @@ class TimelineViewModel @Inject constructor(
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
     private val timelinePreferencesMapper: TimelinePreferencesMapper,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
+    private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     monitorCameraUploadProgress: MonitorCameraUploadProgress,
 ) : ViewModel() {
 
@@ -206,7 +204,7 @@ class TimelineViewModel @Inject constructor(
                 }
 
                 SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
-                    setBusinessAccountSuspendedPromptState(shouldShow = true)
+                    broadcastBusinessAccountExpiredUseCase()
                 }
             }
         }.onFailure { Timber.w("Exception checking CU status: $it") }
@@ -234,14 +232,6 @@ class TimelineViewModel @Inject constructor(
      */
     fun setBusinessAccountPromptState(shouldShow: Boolean) {
         _state.update { it.copy(shouldShowBusinessAccountPrompt = shouldShow) }
-    }
-
-    /**
-     * Sets the value of [TimelineViewState.shouldShowBusinessAccountSuspendedPrompt]
-     * @param shouldShow The new state value
-     */
-    fun setBusinessAccountSuspendedPromptState(shouldShow: Boolean) {
-        _state.update { it.copy(shouldShowBusinessAccountSuspendedPrompt = shouldShow) }
     }
 
     internal fun handleAndUpdatePhotosUIState(

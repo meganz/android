@@ -8,13 +8,13 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastPushNotificationSettingsUseCase
@@ -60,6 +60,7 @@ class BackgroundRequestListener @Inject constructor(
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val initializeBackupsUseCase: InitializeBackupsUseCase,
+    private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -89,11 +90,9 @@ class BackgroundRequestListener @Inject constructor(
             return
         }
         if (e.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            application.sendBroadcast(
-                Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
-                    application.applicationContext.packageName
-                )
-            )
+            applicationScope.launch {
+                broadcastBusinessAccountExpiredUseCase()
+            }
             return
         }
         when (request.type) {

@@ -74,6 +74,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.file.EscapeFsIncompatibleUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.login.CompleteFastLoginUseCase
@@ -226,6 +227,9 @@ internal class DownloadService : LifecycleService() {
 
     @Inject
     lateinit var getTotalDownloadBytesUseCase: GetTotalDownloadBytesUseCase
+
+    @Inject
+    lateinit var broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -1374,11 +1378,7 @@ internal class DownloadService : LifecycleService() {
         Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.transferType)
         if (transfer.isStreamingTransfer) return@withContext
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-            sendBroadcast(
-                Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED).setPackage(
-                    applicationContext.packageName
-                )
-            )
+            broadcastBusinessAccountExpiredUseCase()
         }
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
         val isVoiceClip = transfer.isVoiceClip()

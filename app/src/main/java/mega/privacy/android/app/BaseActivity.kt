@@ -76,7 +76,6 @@ import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
@@ -293,15 +292,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     }
 
     /**
-     * Broadcast to show an alert informing about the current business account has expired.
-     */
-    private val businessExpiredReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            showExpiredBusinessAlert()
-        }
-    }
-
-    /**
      * Broadcast to show taken down files info
      */
     private val takenDownFilesReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -404,6 +394,10 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     checkWhyAmIBlocked(this)
                     viewModel.onAccountBlockedConsumed()
                 }
+                if (showExpiredBusinessAlert) {
+                    showExpiredBusinessAlert()
+                    viewModel.onShowExpiredBusinessAlertConsumed()
+                }
             }
         }
 
@@ -419,11 +413,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 retryConnectionsAndSignalPresence()
             }
         }
-
-        registerReceiver(
-            businessExpiredReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED)
-        )
 
         registerReceiver(
             takenDownFilesReceiver,
@@ -588,7 +577,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     override fun onDestroy() {
         composite.clear()
         unregisterReceiver(sslErrorReceiver)
-        unregisterReceiver(businessExpiredReceiver)
         unregisterReceiver(takenDownFilesReceiver)
         unregisterReceiver(showSnackbarReceiver)
         unregisterReceiver(resumeTransfersReceiver)
@@ -798,26 +786,31 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         ?: return,
                     Snackbar.LENGTH_LONG
                 )
+
                 NOT_SPACE_SNACKBAR_TYPE -> Snackbar.make(
                     view,
                     R.string.error_not_enough_free_space,
                     Snackbar.LENGTH_LONG
                 )
+
                 MUTE_NOTIFICATIONS_SNACKBAR_TYPE -> Snackbar.make(
                     view,
                     R.string.notifications_are_already_muted,
                     Snackbar.LENGTH_LONG
                 )
+
                 DISMISS_ACTION_SNACKBAR -> Snackbar.make(
                     view,
                     s ?: return,
                     Snackbar.LENGTH_INDEFINITE
                 )
+
                 NOT_CALL_PERMISSIONS_SNACKBAR_TYPE -> Snackbar.make(
                     view,
                     s ?: return,
                     Snackbar.LENGTH_LONG
                 )
+
                 else -> Snackbar.make(view, s ?: return, Snackbar.LENGTH_LONG)
             }
         } catch (e: Exception) {
@@ -840,6 +833,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     snackbarTextView.maxLines = 5
                     show()
                 }
+
                 MESSAGE_SNACKBAR_TYPE -> {
                     setAction(
                         R.string.action_see,
@@ -847,14 +841,17 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     )
                     show()
                 }
+
                 NOT_SPACE_SNACKBAR_TYPE -> {
                     setAction(R.string.action_settings, SnackbarNavigateOption(view.context))
                     show()
                 }
+
                 MUTE_NOTIFICATIONS_SNACKBAR_TYPE -> {
                     setAction(R.string.general_unmute, SnackbarNavigateOption(view.context, type))
                     show()
                 }
+
                 PERMISSIONS_TYPE -> {
                     val snackbarTextView =
                         snackbarLayout.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
@@ -862,6 +859,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     setAction(R.string.action_settings, toAppInfo(applicationContext))
                     show()
                 }
+
                 INVITE_CONTACT_TYPE -> {
                     setAction(
                         R.string.contact_invite,
@@ -869,6 +867,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     )
                     show()
                 }
+
                 DISMISS_ACTION_SNACKBAR -> {
                     val snackbarTextView =
                         snackbarLayout.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
@@ -876,10 +875,12 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     setAction(R.string.general_ok, SnackbarNavigateOption(view.context, type))
                     show()
                 }
+
                 OPEN_FILE_SNACKBAR_TYPE -> {
                     setAction(getString(R.string.general_confirmation_open)) { openDownloadedFile() }
                     show()
                 }
+
                 SENT_REQUESTS_TYPE -> {
                     setAction(
                         R.string.tab_sent_requests,
@@ -887,6 +888,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     )
                     show()
                 }
+
                 RESUME_TRANSFERS_TYPE -> {
                     setAction(
                         R.string.button_resume_individual_transfer,
@@ -894,6 +896,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     )
                     show()
                 }
+
                 NOT_CALL_PERMISSIONS_SNACKBAR_TYPE -> {
                     setAction(
                         R.string.general_allow, toAppInfo(applicationContext)
@@ -1383,10 +1386,12 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 builder.setTitle(getString(R.string.title_user_purchased_subscription))
                     .setMessage(getString(R.string.message_user_payment_pending))
                     .create()
+
             PurchaseType.DOWNGRADE -> upgradeAlert =
                 builder.setTitle(getString(R.string.my_account_upgrade_pro))
                     .setMessage(getString(R.string.message_user_purchased_subscription_down_grade))
                     .create()
+
             PurchaseType.SUCCESS -> {
                 upgradeAlert = builder.setView(R.layout.dialog_purchase_success).create().apply {
                     setOnShowListener {

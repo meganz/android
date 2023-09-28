@@ -8,8 +8,10 @@ import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
  *
  * @property transfersFinished [TransfersFinishedState]
  * @property accountBlockedDetail [AccountBlockedDetail]
+ * @property showExpiredBusinessAlert [Boolean]
  */
 data class BaseState(
     val transfersFinished: TransfersFinishedState? = null,
-    val accountBlockedDetail: AccountBlockedDetail? = null
+    val accountBlockedDetail: AccountBlockedDetail? = null,
+    val showExpiredBusinessAlert: Boolean = false,
 )
