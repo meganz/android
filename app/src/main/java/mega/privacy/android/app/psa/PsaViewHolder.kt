@@ -6,9 +6,6 @@ import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.PsaLayoutBinding
@@ -21,7 +18,7 @@ import mega.privacy.android.domain.entity.psa.Psa
  */
 class PsaViewHolder(
     psaLayout: View,
-    private val psaManager: PsaManager
+    private val dismissPsa: (Int) -> Unit,
 ) {
     private val binding = PsaLayoutBinding.bind(psaLayout)
     private var bound = false
@@ -58,14 +55,14 @@ class PsaViewHolder(
                 val intent = Intent(context, WebViewActivity::class.java)
                 intent.data = Uri.parse(psa.positiveLink)
                 context.startActivity(intent)
-                dismissPsa(psa.id)
+                onDismiss(psa.id)
             }
 
             binding.rightButton.visibility = View.VISIBLE
-            binding.rightButton.setOnClickListener { dismissPsa(psa.id) }
+            binding.rightButton.setOnClickListener { onDismiss(psa.id) }
         } else {
             binding.leftButton.setText(R.string.general_dismiss)
-            binding.leftButton.setOnClickListener { dismissPsa(psa.id) }
+            binding.leftButton.setOnClickListener { onDismiss(psa.id) }
         }
     }
 
@@ -97,14 +94,9 @@ class PsaViewHolder(
      *
      * @param id the id of the PSA
      */
-    private fun dismissPsa(id: Int) {
-        // ManagerActivity will check visibility of PSA view when dismiss PSA
-        // (receive null Psa event), so we need change visibility before calling
-        // ViewModel.
+    private fun onDismiss(id: Int) {
         binding.root.visibility = View.GONE
-        binding.root.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            psaManager.dismissPsa(id)
-        }
+        dismissPsa(id)
         bound = false
     }
 }

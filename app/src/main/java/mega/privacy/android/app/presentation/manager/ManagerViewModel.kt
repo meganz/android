@@ -71,6 +71,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
+import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -172,6 +173,7 @@ class ManagerViewModel @Inject constructor(
     getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
     private val disableExportNodesUseCase: DisableExportNodesUseCase,
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
+    private val dismissPsaUseCase: DismissPsaUseCase,
 ) : ViewModel() {
 
     /**
@@ -860,6 +862,13 @@ class ManagerViewModel @Inject constructor(
     fun markHandledMessage() {
         _state.update { it.copy(message = null) }
     }
+
+    /**
+     * Dismiss psa
+     *
+     * @param psaId
+     */
+    fun dismissPsa(psaId: Int) = viewModelScope.launch { dismissPsaUseCase(psaId) }
 
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"

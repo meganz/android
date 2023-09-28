@@ -11,8 +11,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -85,6 +83,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
+import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -247,9 +246,11 @@ class ManagerViewModelTest {
     private val getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase = mock()
     private val disableExportNodesUseCase: DisableExportNodesUseCase = mock()
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()
+    private val dismissPsaUseCase = mock<DismissPsaUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
+
 
     @Before
     fun setUp() {
@@ -311,6 +312,7 @@ class ManagerViewModelTest {
             getNumUnreadChatsUseCase = getNumUnreadChatsUseCase,
             disableExportNodesUseCase = disableExportNodesUseCase,
             removePublicLinkResultMapper = removePublicLinkResultMapper,
+            dismissPsaUseCase = dismissPsaUseCase,
         )
     }
 
@@ -1047,5 +1049,13 @@ class ManagerViewModelTest {
             underTest.disableExport(listOf(1L))
             assertThat(awaitItem().message).isEqualTo(message)
         }
+    }
+
+    @Test
+    internal fun `test that dismiss calls the use case`() = runTest{
+        val expected = 123
+        underTest.dismissPsa(expected)
+        testScheduler.advanceUntilIdle()
+        verify(dismissPsaUseCase).invoke(expected)
     }
 }

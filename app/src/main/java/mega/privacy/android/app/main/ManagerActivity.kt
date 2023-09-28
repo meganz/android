@@ -233,7 +233,6 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
-import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
@@ -426,8 +425,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     @Inject
     lateinit var inAppUpdateHandler: InAppUpdateHandler
 
-    @Inject
-    lateinit var psaManager: PsaManager
 
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
@@ -1021,7 +1018,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun initialiseViews() {
-        psaViewHolder = PsaViewHolder(findViewById(R.id.psa_layout), psaManager)
+        psaViewHolder = PsaViewHolder(
+            psaLayout = findViewById(R.id.psa_layout),
+            dismissPsa = viewModel::dismissPsa
+        )
         appBarLayout = findViewById(R.id.app_bar_layout)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
