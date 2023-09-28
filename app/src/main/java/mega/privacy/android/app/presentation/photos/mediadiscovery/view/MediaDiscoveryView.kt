@@ -99,11 +99,13 @@ fun MediaDiscoveryView(
     onCapture: () -> Unit,
     onStartModalSheetShow: () -> Unit,
     onEndModalSheetHide: () -> Unit,
+    onModalSheetVisibilityChange: (Boolean) -> Unit,
     isNewMediaDiscoveryFabEnabled
     : Boolean,
 ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
     val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
+    val shouldShowFabButton = mediaDiscoveryViewState.selectedTimeBarTab == TimeBarTab.All
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -122,9 +124,7 @@ fun MediaDiscoveryView(
 
     LaunchedEffect(key1 = modalSheetState.isVisible) {
         snapshotFlow { modalSheetState.isVisible }.distinctUntilChanged().collect { isVisible ->
-            if (!isVisible) {
-                onEndModalSheetHide()
-            }
+            onModalSheetVisibilityChange(isVisible)
         }
     }
 
@@ -179,7 +179,7 @@ fun MediaDiscoveryView(
                 onTimeBarTabSelected = onTimeBarTabSelected,
                 onSwitchListView = onSwitchListView,
                 addFabButton = {
-                    if (isNewMediaDiscoveryFabEnabled) {
+                    if (isNewMediaDiscoveryFabEnabled && shouldShowFabButton) {
                         AddFabButton(
                             onFabClick = {
                                 coroutineScope.launch {
@@ -195,7 +195,7 @@ fun MediaDiscoveryView(
             )
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
-                if (isNewMediaDiscoveryFabEnabled) {
+                if (isNewMediaDiscoveryFabEnabled && shouldShowFabButton) {
                     AddFabButton(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)

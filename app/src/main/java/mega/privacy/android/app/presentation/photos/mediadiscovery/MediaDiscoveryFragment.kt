@@ -121,6 +121,7 @@ class MediaDiscoveryFragment : Fragment() {
                         onUploadFiles = this@MediaDiscoveryFragment::onUploadFiles,
                         onStartModalSheetShow = this@MediaDiscoveryFragment::onStartModalSheetShow,
                         onEndModalSheetHide = this@MediaDiscoveryFragment::onEndModalSheetHide,
+                        onModalSheetVisibilityChange = this@MediaDiscoveryFragment::onModalSheetVisibilityChange,
                         isNewMediaDiscoveryFabEnabled = isNewMediaDiscoveryFabEnabled
                     )
                 }
@@ -129,11 +130,15 @@ class MediaDiscoveryFragment : Fragment() {
     }
 
     private fun onStartModalSheetShow() {
-        managerActivity?.showHideBottomNavigationView(true)
+        managerActivity?.showHideBottomNavigationView(hide = true)
     }
 
     private fun onEndModalSheetHide() {
-        managerActivity?.showHideBottomNavigationView(false)
+        managerActivity?.showHideBottomNavigationView(hide = false)
+    }
+
+    private fun onModalSheetVisibilityChange(isVisible: Boolean) {
+        managerActivity?.showHideBottomNavigationView(hide = isVisible)
     }
 
     private fun onUploadFiles() {
