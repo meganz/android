@@ -70,6 +70,7 @@ fun PasscodeField(
             }
             if (passcodeValue.length == numberOfCharacters) {
                 onComplete(passcodeValue)
+                passcodeValue = ""
             }
         },
         keyboardOptions = keyboardOptions,

@@ -2,7 +2,6 @@ package mega.privacy.android.core.ui.controls.textfields
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalTextInputService
-import androidx.compose.ui.semantics.SemanticsProperties.EditableText
 import androidx.compose.ui.semantics.SemanticsProperties.Text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -58,26 +57,6 @@ class PasscodeFieldTest {
     }
 
     @Test
-    fun `test that digits are limited to the required length`() {
-        val maxCharacters = 4
-        composeRule.setContent {
-            PasscodeField(
-                onComplete = {},
-                numberOfCharacters = maxCharacters,
-            )
-        }
-
-        val textField = composeRule.onNodeWithTag(PASSCODE_FIELD_TAG)
-        repeat(maxCharacters + 1) {
-            textField
-                .performTextInput("x")
-        }
-
-        val actual = textField.fetchSemanticsNode().config[EditableText]
-        assertThat(actual.text.length).isEqualTo(maxCharacters)
-    }
-
-    @Test
     fun `test that visible text is masked`() {
         val maxCharacters = 6
         val mask = '\u264C'
@@ -90,14 +69,15 @@ class PasscodeFieldTest {
         }
 
         val textField = composeRule.onNodeWithTag(PASSCODE_FIELD_TAG)
-        repeat(maxCharacters + 1) {
+        repeat(maxCharacters - 1) {
             textField
                 .performTextInput("x")
         }
 
         val actual = textField.fetchSemanticsNode().config[Text]
 
-        actual.forEach { assertThat(it.toString()).isEqualTo(mask.toString()) }
+        actual.take(maxCharacters - 1)
+            .forEach { assertThat(it.toString()).isEqualTo(mask.toString()) }
     }
 
     @Test
@@ -114,14 +94,14 @@ class PasscodeFieldTest {
 
         val textField = composeRule.onNodeWithTag(PASSCODE_FIELD_TAG)
         val expected = "x"
-        repeat(maxCharacters + 1) {
+        repeat(maxCharacters - 1) {
             textField
                 .performTextInput(expected)
         }
 
         val actual = textField.fetchSemanticsNode().config[Text]
 
-        actual.forEach { assertThat(it.toString()).isEqualTo(expected) }
+        actual.take(maxCharacters - 1).forEach { assertThat(it.toString()).isEqualTo(expected) }
     }
 
     @Test
@@ -136,7 +116,7 @@ class PasscodeFieldTest {
         }
 
         val textField = composeRule.onNodeWithTag(PASSCODE_FIELD_TAG)
-        repeat(maxCharacters + 1) {
+        repeat(maxCharacters) {
             textField
                 .performTextInput("x")
         }
@@ -144,5 +124,32 @@ class PasscodeFieldTest {
         val expected = buildString { repeat(maxCharacters) { append("x") } }
 
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that passcode value is cleared after submitting`() {
+        val maxCharacters = 4
+        val onComplete = mock<(String) -> Unit>()
+        composeRule.setContent {
+            PasscodeField(
+                onComplete = onComplete,
+                numberOfCharacters = maxCharacters,
+                maskCharacter = null,
+            )
+        }
+
+        val textField = composeRule.onNodeWithTag(PASSCODE_FIELD_TAG)
+        val input = "x"
+        repeat(maxCharacters) {
+            textField
+                .performTextInput(input)
+        }
+
+        verify(onComplete).invoke(any())
+
+        val actual = textField.fetchSemanticsNode().config[Text]
+
+        actual.forEach { assertThat(it.toString()).isEmpty() }
+
     }
 }
