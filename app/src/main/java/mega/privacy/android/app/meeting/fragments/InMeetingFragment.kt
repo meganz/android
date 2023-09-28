@@ -71,6 +71,7 @@ import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.OnDragTouchListener
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
@@ -79,6 +80,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
@@ -115,6 +117,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -184,6 +187,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
     private var isWaitingForMakeModerator = false
+    private var shouldExpandBottomPanel = false
 
     // Children fragments
     private var individualCallFragment: IndividualCallFragment? = null
@@ -584,7 +588,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         Timber.d("In the meeting fragment")
 
         blink = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
@@ -732,7 +735,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         pauseAudioPlayer(meetingActivity)
 
         // Keep screen on
@@ -1279,6 +1281,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (state.usersAdmitted) {
                 sharedWaitingRoomManagementViewModel.onConsumeUsersAdmittedEvent()
                 collapsePanel()
+            }
+            if (state.shouldWaitingRoomBeShown) {
+                sharedWaitingRoomManagementViewModel.onConsumeShouldWaitingRoomBeShownEvent()
+                sharedModel.updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
+                if (bottomFloatingPanelViewHolder?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomFloatingPanelViewHolder?.expand()
+                }
             }
         }
     }
@@ -2034,6 +2043,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 resources.displayMetrics
             )
 
+        shouldExpandBottomPanel = arguments?.getBoolean(MeetingActivity.MEETING_BOTTOM_PANEL_EXPANDED) ?: false
+
         //Observer the participant List
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants?.let {
@@ -2503,8 +2514,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             bottomFloatingPanelViewHolder?.getState() == BottomSheetBehavior.STATE_EXPANDED
         isWaitingForMakeModerator = isPanelExpanded
 
-        if (isPanelExpanded)
-            bottomFloatingPanelViewHolder?.collapse()
+        when {
+            !isPanelExpanded && shouldExpandBottomPanel -> bottomFloatingPanelViewHolder?.expand()
+            isPanelExpanded && !shouldExpandBottomPanel -> bottomFloatingPanelViewHolder?.collapse()
+        }
     }
 
     /**
@@ -2516,7 +2529,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         findNavController().navigate(
             InMeetingFragmentDirections.actionGlobalMakeModerator()
         )
-
     }
 
     /**

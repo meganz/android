@@ -513,22 +513,22 @@ class BottomFloatingPanelViewHolder(
                     ParticipantsBottomPanelView(
                         state = meetingState,
                         onWaitingRoomClick = {
-                            meetingViewModel.updateParticipantsSelection(
+                            meetingViewModel.updateParticipantsSection(
                                 ParticipantsSection.WaitingRoomSection
                             )
                         },
                         onInCallClick = {
-                            meetingViewModel.updateParticipantsSelection(
+                            meetingViewModel.updateParticipantsSection(
                                 ParticipantsSection.InCallSection
                             )
                         },
                         onNotInCallClick = {
-                            meetingViewModel.updateParticipantsSelection(
+                            meetingViewModel.updateParticipantsSection(
                                 ParticipantsSection.NotInCallSection
                             )
                         },
                         onAdmitAllClick = { waitingRoomManagementViewModel.admitUsersClick() },
-                        onInviteParticipantsClick = { /*TODO*/ },
+                        onInviteParticipantsClick = { listener.onInviteParticipants() },
                         onAdmitParticipantClicked = {
                             waitingRoomManagementViewModel.admitUsersClick(
                                 it

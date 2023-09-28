@@ -36,6 +36,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -63,6 +64,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
@@ -97,6 +99,7 @@ import javax.inject.Inject
  * @property getChatRoomUseCase             [GetChatRoomUseCase]
  * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
  * @property monitorWaitingRoomParticipantsUseCase     [MonitorWaitingRoomParticipantsUseCase]
+ * @property getFeatureFlagValue            [GetFeatureFlagValueUseCase]
  * @property state                      Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -116,7 +119,8 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     @ApplicationContext private val context: Context,
     private val monitorWaitingRoomParticipantsUseCase: MonitorWaitingRoomParticipantsUseCase,
-    ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
+) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
     private val _state = MutableStateFlow(MeetingState())
@@ -238,6 +242,12 @@ class MeetingActivityViewModel @Inject constructor(
     ).post(isVisible)
 
     init {
+        viewModelScope.launch {
+            getFeatureFlagValue(AppFeatures.WaitingRoomSettings).let { flag ->
+                _state.update { it.copy(isWaitingRoomFeatureFlagEnabled = flag) }
+            }
+        }
+
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
 
@@ -928,7 +938,7 @@ class MeetingActivityViewModel @Inject constructor(
      *
      * @param newSelection  New [ParticipantsSection]
      */
-    fun updateParticipantsSelection(newSelection: ParticipantsSection) =
+    fun updateParticipantsSection(newSelection: ParticipantsSection) =
         _state.update { state ->
             state.copy(
                 participantsSection = newSelection

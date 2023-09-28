@@ -45,6 +45,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -77,6 +78,7 @@ class MeetingActivity : BaseActivity() {
         const val MEETING_GUEST_FIRST_NAME = "guest_first_name"
         const val MEETING_GUEST_LAST_NAME = "guest_last_name"
         const val CALL_ACTION = "call_action"
+        const val MEETING_BOTTOM_PANEL_EXPANDED = "meeting_bottom_panel_expanded"
 
         fun getIntentOngoingCall(context: Context, chatId: Long): Intent {
             return Intent(context, MeetingActivity::class.java).apply {
@@ -411,6 +413,16 @@ class MeetingActivity : BaseActivity() {
             intent.getLongExtra(MEETING_PUBLIC_CHAT_HANDLE, MEGACHAT_INVALID_HANDLE)
         )
 
+        val shouldExpandPanel = intent.getBooleanExtra(MEETING_BOTTOM_PANEL_EXPANDED, false)
+        if (shouldExpandPanel) {
+            waitingRoomManagementViewModel.setDialogClosed()
+            meetingViewModel.updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
+        }
+
+        bundle.putBoolean(
+            MEETING_BOTTOM_PANEL_EXPANDED, shouldExpandPanel
+        )
+
         // Pass the meeting data to Join Meeting screen
         if (meetingAction == MEETING_ACTION_GUEST || meetingAction == MEETING_ACTION_JOIN) {
             bundle.putString(MEETING_LINK, intent.dataString)
@@ -456,7 +468,6 @@ class MeetingActivity : BaseActivity() {
                 else -> R.id.createMeetingFragment
             }
             setStartDestination(startDestination)
-
             navController?.setGraph(this, bundle)
         }
 

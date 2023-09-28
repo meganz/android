@@ -63,7 +63,7 @@ fun ParticipantsBottomPanelView(
                 .fillMaxWidth()
                 .padding(bottom = 10.dp)
         ) {
-            if (state.chatParticipantsInWaitingRoom.isNotEmpty() && state.hasHostPermission) {
+            if (state.chatParticipantsInWaitingRoom.isNotEmpty() && state.hasHostPermission && state.isWaitingRoomFeatureFlagEnabled) {
                 CallTextButtonChip(
                     modifier = Modifier
                         .padding(end = 8.dp),
@@ -89,7 +89,7 @@ fun ParticipantsBottomPanelView(
                 isChecked = state.participantsSection == ParticipantsSection.NotInCallSection
             )
 
-            if (state.chatParticipantsInWaitingRoom.isEmpty() && state.hasHostPermission) {
+            if (state.chatParticipantsInWaitingRoom.isEmpty() && state.hasHostPermission && state.isWaitingRoomFeatureFlagEnabled) {
                 CallTextButtonChip(
                     text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
                     onClick = onWaitingRoomClick,

@@ -84,6 +84,15 @@ class WaitingRoomManagementViewModel @Inject constructor(
     }
 
     /**
+     * Set dialog closed
+     */
+    fun setDialogClosed() = _state.update { state ->
+        state.copy(
+            isDialogClosed = true,
+        )
+    }
+
+    /**
      * Get call
      */
     private fun getCall() = viewModelScope.launch {
@@ -94,13 +103,21 @@ class WaitingRoomManagementViewModel @Inject constructor(
         }.onSuccess { chatCall ->
             chatCall?.let { call ->
                 call.waitingRoom?.apply {
-                    peers?.let { peersInWaitingRoom ->
-                        val peersNonHost = peersInWaitingRoom.filterNot {
-                            call.moderators?.contains(it) ?: false
-                        }
+                    _state.update { state ->
+                        state.copy(
+                            chatId = call.chatId,
+                        )
+                    }
 
-                        setTemporaryUsersList(users = peersNonHost)
-                        checkWaitingRoomParticipants(chatId = call.chatId)
+                    if (!state.value.isDialogClosed) {
+                        peers?.let { peersInWaitingRoom ->
+                            val peersNonHost = peersInWaitingRoom.filterNot {
+                                call.moderators?.contains(it) ?: false
+                            }
+
+                            setTemporaryUsersList(users = peersNonHost)
+                            checkWaitingRoomParticipants(chatId = call.chatId)
+                        }
                     }
                 }
             }
@@ -165,6 +182,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
     private fun startMonitoringScheduledMeetingUpdates() = viewModelScope.launch {
         monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
             if (scheduledMeetReceived.chatId != state.value.chatId) return@collectLatest
+
             scheduledMeetReceived.changes?.let { changes ->
                 Timber.d("Monitor scheduled meeting updated, changes $changes")
                 changes.forEach {
@@ -349,6 +367,13 @@ class WaitingRoomManagementViewModel @Inject constructor(
     }
 
     /**
+     * Sets shouldWaitingRoomBeShown as consumed.
+     */
+    fun onConsumeShouldWaitingRoomBeShownEvent() = _state.update { state ->
+        state.copy(shouldWaitingRoomBeShown = false)
+    }
+
+    /**
      * Admit users to waiting room
      *
      * @param chatParticipant   [ChatParticipant]
@@ -428,6 +453,9 @@ class WaitingRoomManagementViewModel @Inject constructor(
     fun seeWaitingRoomClick() {
         setShowParticipantsInWaitingRoomDialogConsumed()
         setShowDenyParticipantDialogConsumed()
+        _state.update { state ->
+            state.copy(shouldWaitingRoomBeShown = true)
+        }
     }
 
     /**
@@ -442,7 +470,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
      * Deny user/users to waiting room
      */
     fun denyEntryClick() {
-        if (state.value.participantToDenyEntry == null || state.value.usersInWaitingRoom.isEmpty()) return
+        if (state.value.usersInWaitingRoom.isEmpty() && state.value.participantToDenyEntry == null) return
         var list = state.value.usersInWaitingRoom
         state.value.participantToDenyEntry?.let {
             list = listOf(it.handle)

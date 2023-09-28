@@ -15,7 +15,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
@@ -34,6 +36,7 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_IN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_AUDIO_ENABLE
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_BOTTOM_PANEL_EXPANDED
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_VIDEO_ENABLE
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
@@ -60,6 +63,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -160,6 +164,11 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             waitingRoomManagementState.snackbarString?.let {
                 viewModel.triggerSnackbarMessage(it)
                 waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
+            }
+
+            if (waitingRoomManagementState.shouldWaitingRoomBeShown) {
+                waitingRoomManagementViewModel.onConsumeShouldWaitingRoomBeShownEvent()
+                launchCallScreen()
             }
         }
 
@@ -433,6 +442,23 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
+     * Open meeting
+     */
+    private fun launchCallScreen() {
+        val chatId = waitingRoomManagementViewModel.state.value.chatId
+        MegaApplication.getInstance().openCallService(chatId);
+        passcodeManagement.showPasscodeScreen = true
+
+        val intent = Intent(this@ScheduledMeetingInfoActivity, MeetingActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            action = MEETING_ACTION_IN
+            putExtra(MEETING_CHAT_ID, chatId)
+            putExtra(MEETING_BOTTOM_PANEL_EXPANDED, true)
+        }
+        startActivity(intent)
+    }
+
+    /**
      * Open invite contacts
      */
     private fun openInviteContact() {
@@ -477,7 +503,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 onDismissWaitingRoomDialog = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
                 onCancelDenyEntryClick = {
 
-                    waitingRoomManagementViewModel.cancelDenyEntryClick() }
+                    waitingRoomManagementViewModel.cancelDenyEntryClick()
+                }
             )
         }
     }

@@ -1983,6 +1983,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
                 waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
             }
+            if (state.shouldWaitingRoomBeShown) {
+                waitingRoomManagementViewModel.onConsumeShouldWaitingRoomBeShownEvent()
+                launchCallScreen()
+            }
         }
 
         collectFlow(
@@ -1991,6 +1995,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         ) { unreadCount ->
             updateChatBadge(unreadCount)
         }
+    }
+
+    /**
+     * Open meeting
+     */
+    private fun launchCallScreen() {
+        val chatId = waitingRoomManagementViewModel.state.value.chatId
+        MegaApplication.getInstance().openCallService(chatId);
+        passcodeManagement.showPasscodeScreen = true
+
+        val intent = Intent(this, MeetingActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            action = MeetingActivity.MEETING_ACTION_IN
+            putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
+            putExtra(MeetingActivity.MEETING_BOTTOM_PANEL_EXPANDED, true)
+        }
+        startActivity(intent)
     }
 
     private fun handleMovementResult(moveRequestResult: Result<MoveRequestResult>) {
