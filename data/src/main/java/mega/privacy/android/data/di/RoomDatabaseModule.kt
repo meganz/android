@@ -27,6 +27,8 @@ internal object RoomDatabaseModule {
         Room.databaseBuilder(
             applicationContext,
             MegaDatabase::class.java, MegaDatabaseConstant.DATABASE_NAME
+        ).fallbackToDestructiveMigrationFrom(
+            *(1..66).toList().toIntArray() // allow destructive migration for version 1 to 66
         ).addMigrations(*MegaDatabase.MIGRATIONS)
             .build().apply {
                 // this is workaround to make sure room migration run before sqlite database migration
