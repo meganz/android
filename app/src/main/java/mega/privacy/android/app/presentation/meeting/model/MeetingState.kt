@@ -17,6 +17,8 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property participantsSection                        [ParticipantsSection] opened
  * @property isOpenInvite                               If open invite option is enabled.
  * @property isWaitingRoomFeatureFlagEnabled            True, if waiting room feature flag is enabled. False, if not.
+ * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
+ * @property hasWaitingRoom                             True if has waiting room. False if not.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -29,4 +31,6 @@ data class MeetingState(
     val participantsSection: ParticipantsSection = ParticipantsSection.InCallSection,
     val isOpenInvite: Boolean = false,
     val isWaitingRoomFeatureFlagEnabled: Boolean = false,
+    val enabledAllowNonHostAddParticipantsOption: Boolean = true,
+    val hasWaitingRoom: Boolean = false,
 )

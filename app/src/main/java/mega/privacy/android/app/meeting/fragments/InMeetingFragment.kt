@@ -911,10 +911,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         collectFlow(inMeetingViewModel.state) { inMeetingState ->
             if (inMeetingState.error != null) {
                 sharedModel.showSnackBar(getString(inMeetingState.error))
-                bottomFloatingPanelViewHolder?.checkErrorAllowAddParticipants()
             } else if (inMeetingState.resultSetOpenInvite != null) {
                 bottomFloatingPanelViewHolder?.updateShareAndInviteButton()
-                bottomFloatingPanelViewHolder?.updateAllowAddParticipantsSwitch(inMeetingState.resultSetOpenInvite)
             }
         }
 
@@ -2607,10 +2605,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
             )
         }
-    }
-
-    override fun onAllowAddParticipants() {
-        inMeetingViewModel.onAllowAddParticipantsTap()
     }
 
     /**

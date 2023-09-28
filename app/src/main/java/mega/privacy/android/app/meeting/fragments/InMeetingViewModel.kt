@@ -113,7 +113,6 @@ class InMeetingViewModel @Inject constructor(
     private val endCallUseCase: EndCallUseCase,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
-    private val setOpenInvite: SetOpenInvite,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val passcodeManagement: PasscodeManagement,
@@ -2663,27 +2662,5 @@ class InMeetingViewModel @Inject constructor(
     fun hideBottomPanels() {
         _showEndMeetingAsModeratorBottomPanel.value = false
         _showAssignModeratorBottomPanel.value = false
-    }
-
-    /**
-     * Allow add participants
-     */
-    fun onAllowAddParticipantsTap() {
-        if (isConnected.value) {
-            viewModelScope.launch {
-                runCatching {
-                    setOpenInvite(currentChatId)
-                }.onFailure { exception ->
-                    Timber.e(exception)
-                    _state.update { it.copy(error = R.string.general_text_error) }
-                }.onSuccess { result ->
-                    _state.update {
-                        it.copy(resultSetOpenInvite = result)
-                    }
-                }
-            }
-        } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
-        }
     }
 }

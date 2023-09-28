@@ -232,12 +232,6 @@ class BottomFloatingPanelViewHolder(
      * Init the visibility of `ShareLink` & `Invite` Button
      */
     fun updateShareAndInviteButton() {
-        floatingPanelView.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
-        floatingPanelView.invite.isVisible = inMeetingViewModel.isLinkVisible()
-        floatingPanelView.allowAddParticipantsLayout.isVisible = inMeetingViewModel.isModerator()
-        floatingPanelView.allowAddParticipantsSwitch.isClickable = false
-        updateAllowAddParticipantsSwitch(inMeetingViewModel.isOpenInvite())
-
         floatingPanelView.guestShareLink.apply {
             isVisible = inMeetingViewModel.isGuestLinkVisible()
             text = inMeetingViewModel.getGuestLinkTitle(context)
@@ -248,20 +242,6 @@ class BottomFloatingPanelViewHolder(
                 0
             )
         }
-    }
-
-    /**
-     * Update allow add participant option
-     */
-    fun updateAllowAddParticipantsSwitch(enabled: Boolean) {
-        floatingPanelView.allowAddParticipantsSwitch.isChecked = enabled
-    }
-
-    /**
-     * Revert the switch status when set open invite update could not be completed.
-     */
-    fun checkErrorAllowAddParticipants() {
-        floatingPanelView.allowAddParticipantsSwitch.isChecked = inMeetingViewModel.isOpenInvite()
     }
 
     /**
@@ -409,25 +389,12 @@ class BottomFloatingPanelViewHolder(
                 listener.onEndMeeting()
             }
 
-            shareLink.setOnClickListener {
-                listener.onShareLink(true)
-            }
-
             guestShareLink.setOnClickListener {
                 if (inMeetingViewModel.isModeratorOfPrivateRoom()) {
                     listener.onInviteParticipants()
                 } else {
                     listener.onShareLink(true)
                 }
-            }
-
-            invite.setOnClickListener {
-                listener.onInviteParticipants()
-            }
-
-            allowAddParticipantsLayout.setOnClickListener {
-                updateAllowAddParticipantsSwitch(!floatingPanelView.allowAddParticipantsSwitch.isChecked)
-                listener.onAllowAddParticipants()
             }
         }
     }
@@ -529,6 +496,10 @@ class BottomFloatingPanelViewHolder(
                         },
                         onAdmitAllClick = { waitingRoomManagementViewModel.admitUsersClick() },
                         onInviteParticipantsClick = { listener.onInviteParticipants() },
+                        onShareMeetingLinkClick = { listener.onShareLink(true) },
+                        onAllowAddParticipantsClick = {
+                            meetingViewModel.allowAddParticipantsClick()
+                        },
                         onAdmitParticipantClicked = {
                             waitingRoomManagementViewModel.admitUsersClick(
                                 it

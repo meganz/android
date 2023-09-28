@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,30 +15,37 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.chips.CallTextButtonChip
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
 /**
@@ -51,143 +59,225 @@ fun ParticipantsBottomPanelView(
     onNotInCallClick: () -> Unit,
     onAdmitAllClick: () -> Unit,
     onInviteParticipantsClick: () -> Unit,
+    onShareMeetingLinkClick: () -> Unit,
+    onAllowAddParticipantsClick: () -> Unit,
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
+            .fillMaxWidth()
             .padding(start = 16.dp, top = 10.dp, end = 20.dp, bottom = 10.dp),
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 10.dp)
+                .weight(1f)
         ) {
-            if (state.chatParticipantsInWaitingRoom.isNotEmpty() && state.hasHostPermission && state.isWaitingRoomFeatureFlagEnabled) {
-                CallTextButtonChip(
-                    modifier = Modifier
-                        .padding(end = 8.dp),
-                    text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
-                    onClick = onWaitingRoomClick,
-                    isChecked = state.participantsSection == ParticipantsSection.WaitingRoomSection
-                )
-            }
-
-            CallTextButtonChip(
-                modifier = Modifier
-                    .padding(end = 8.dp),
-                text = stringResource(id = R.string.meetings_bottom_panel_participants_in_call_button),
-                onClick = onInCallClick,
-                isChecked = state.participantsSection == ParticipantsSection.InCallSection
-            )
-
-            CallTextButtonChip(
-                modifier = Modifier
-                    .padding(end = if (state.chatParticipantsInWaitingRoom.isEmpty()) 8.dp else 0.dp),
-                text = stringResource(id = R.string.meetings_bottom_panel_participants_not_in_call_button),
-                onClick = onNotInCallClick,
-                isChecked = state.participantsSection == ParticipantsSection.NotInCallSection
-            )
-
-            if (state.chatParticipantsInWaitingRoom.isEmpty() && state.hasHostPermission && state.isWaitingRoomFeatureFlagEnabled) {
-                CallTextButtonChip(
-                    text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
-                    onClick = onWaitingRoomClick,
-                    isChecked = state.participantsSection == ParticipantsSection.WaitingRoomSection
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Row(
-                modifier = Modifier
-                    .weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = when (state.participantsSection) {
-                        ParticipantsSection.WaitingRoomSection -> stringResource(
-                            id = R.string.meetings_bottom_panel_number_of_participants_in_the_waiting_room_label,
-                            state.chatParticipantsInWaitingRoom.size
-                        )
-
-                        ParticipantsSection.InCallSection -> stringResource(
-                            id = R.string.participants_number,
-                            state.usersInCallList.size
-                        )
-
-                        ParticipantsSection.NotInCallSection -> stringResource(
-                            id = R.string.participants_number,
-                            state.usersNotInCallList.size
-                        )
-                    },
-                    style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorPrimary),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            if (state.participantsSection == ParticipantsSection.WaitingRoomSection && state.hasHostPermission && state.chatParticipantsInWaitingRoom.isNotEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .wrapContentSize(Alignment.CenterEnd)
-                ) {
-                    Row(modifier = Modifier.align(Alignment.Center)) {
-                        TextMegaButton(
-                            text = stringResource(
-                                id = R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button,
-                            ),
-                            onClick = onAdmitAllClick,
-                        )
-                    }
-                }
-            }
-        }
-        if (state.participantsSection == ParticipantsSection.InCallSection) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .padding(bottom = 10.dp)
+            ) {
+                if (state.chatParticipantsInWaitingRoom.isNotEmpty() && state.hasHostPermission && state.isWaitingRoomFeatureFlagEnabled && state.hasWaitingRoom) {
+                    CallTextButtonChip(
+                        modifier = Modifier
+                            .padding(end = 8.dp),
+                        text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
+                        onClick = onWaitingRoomClick,
+                        isChecked = state.participantsSection == ParticipantsSection.WaitingRoomSection
+                    )
+                }
+
+                CallTextButtonChip(
+                    modifier = Modifier
+                        .padding(end = 8.dp),
+                    text = stringResource(id = R.string.meetings_bottom_panel_participants_in_call_button),
+                    onClick = onInCallClick,
+                    isChecked = state.participantsSection == ParticipantsSection.InCallSection
+                )
+
+                CallTextButtonChip(
+                    modifier = Modifier
+                        .padding(end = if (state.chatParticipantsInWaitingRoom.isEmpty()) 8.dp else 0.dp),
+                    text = stringResource(id = R.string.meetings_bottom_panel_participants_not_in_call_button),
+                    onClick = onNotInCallClick,
+                    isChecked = state.participantsSection == ParticipantsSection.NotInCallSection
+                )
+
+                if (state.chatParticipantsInWaitingRoom.isEmpty() && state.hasHostPermission && state.isWaitingRoomFeatureFlagEnabled && state.hasWaitingRoom) {
+                    CallTextButtonChip(
+                        text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
+                        onClick = onWaitingRoomClick,
+                        isChecked = state.participantsSection == ParticipantsSection.WaitingRoomSection
+                    )
+                }
+            }
+
+            if (state.isOpenInvite && state.participantsSection == ParticipantsSection.InCallSection) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .defaultMinSize(minHeight = 48.dp)
+                        .clickable {
+                            onAllowAddParticipantsClick()
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+
+                    ) {
+                    Row(
+                        modifier = Modifier
+                            .weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(end = 23.dp),
+                            style = MaterialTheme.typography.subtitle1.copy(
+                                color = MaterialTheme.colors.black_white,
+                                fontSize = 14.sp
+                            ),
+                            text = stringResource(id = R.string.chat_group_chat_info_allow_non_host_participants_option),
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize(Alignment.CenterEnd)
+                    ) {
+                        Switch(
+                            modifier = Modifier.align(Alignment.Center),
+                            checked = state.enabledAllowNonHostAddParticipantsOption,
+                            enabled = true,
+                            onCheckedChange = null,
+                            colors = switchColors()
+                        )
+                    }
+                }
+
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 56.dp)
+                    .padding(bottom = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                InviteParticipantsButton(
-                    isHost = state.hasHostPermission,
-                    isOpenInvite = state.isOpenInvite,
-                    onInviteParticipantsClicked = onInviteParticipantsClick
-                )
+                Row(
+                    modifier = Modifier
+                        .weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (state.participantsSection == ParticipantsSection.WaitingRoomSection || state.participantsSection == ParticipantsSection.InCallSection) {
+                        Text(
+                            text = when (state.participantsSection) {
+                                ParticipantsSection.WaitingRoomSection -> stringResource(
+                                    id = R.string.meetings_bottom_panel_number_of_participants_in_the_waiting_room_label,
+                                    state.chatParticipantsInWaitingRoom.size
+                                )
+
+                                ParticipantsSection.InCallSection -> stringResource(
+                                    id = R.string.participants_number,
+                                    state.usersInCallList.size
+                                )
+
+                                else -> {
+                                    ""
+                                }
+                            },
+                            style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorPrimary),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+                if (state.participantsSection == ParticipantsSection.WaitingRoomSection && state.hasHostPermission && state.chatParticipantsInWaitingRoom.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize(Alignment.CenterEnd)
+                    ) {
+                        Row(modifier = Modifier.align(Alignment.Center)) {
+                            TextMegaButton(
+                                text = stringResource(
+                                    id = R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button,
+                                ),
+                                onClick = onAdmitAllClick,
+                            )
+                        }
+                    }
+                }
+            }
+            if (state.participantsSection == ParticipantsSection.InCallSection) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    InviteParticipantsButton(
+                        isHost = state.hasHostPermission,
+                        isOpenInvite = state.isOpenInvite,
+                        onInviteParticipantsClicked = onInviteParticipantsClick
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                when (state.participantsSection) {
+                    ParticipantsSection.WaitingRoomSection ->
+                        state.chatParticipantsInWaitingRoom.indices.forEach { i ->
+                            ParticipantItemView(
+                                section = state.participantsSection,
+                                hasHostPermission = state.hasHostPermission,
+                                participant = state.chatParticipantsInWaitingRoom[i],
+                                onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                onDenyParticipantClicked = onDenyParticipantClicked
+                            )
+                        }
+
+                    ParticipantsSection.InCallSection ->
+                        state.usersInCallList.indices.forEach { i ->
+                            ParticipantItemView(
+                                section = state.participantsSection,
+                                hasHostPermission = state.hasHostPermission,
+                                participant = state.usersInCallList[i],
+                                onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                onDenyParticipantClicked = onDenyParticipantClicked
+                            )
+                        }
+
+                    ParticipantsSection.NotInCallSection -> {}
+                }
             }
         }
-        when (state.participantsSection) {
-            ParticipantsSection.WaitingRoomSection ->
-                state.chatParticipantsInWaitingRoom.indices.forEach { i ->
-                    WaitingRoomParticipantItemView(
-                        section = state.participantsSection,
-                        hasHostPermission = state.hasHostPermission,
-                        participant = state.chatParticipantsInWaitingRoom[i],
-                        onAdmitParticipantClicked = onAdmitParticipantClicked,
-                        onDenyParticipantClicked = onDenyParticipantClicked
-                    )
-                }
 
-            ParticipantsSection.InCallSection ->
-                state.usersInCallList.indices.forEach { i ->
-                    WaitingRoomParticipantItemView(
-                        section = state.participantsSection,
-                        hasHostPermission = state.hasHostPermission,
-                        participant = state.usersInCallList[i],
-                        onAdmitParticipantClicked = onAdmitParticipantClicked,
-                        onDenyParticipantClicked = onDenyParticipantClicked
-                    )
-                }
-
-            ParticipantsSection.NotInCallSection -> {}
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 130.dp),
+        ) {
+            RaisedDefaultMegaButton(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                textId = R.string.meetings_scheduled_meeting_info_share_meeting_link_label,
+                onClick = onShareMeetingLinkClick
+            )
         }
     }
 }
+
+/**
+ * Control the colours of the switch depending on the status
+ */
+@Composable
+private fun switchColors() = SwitchDefaults.colors(
+    checkedThumbColor = colorResource(id = R.color.teal_300_teal_200),
+    checkedTrackColor = colorResource(id = R.color.teal_100_teal_200_038),
+    uncheckedThumbColor = colorResource(id = R.color.grey_020_grey_100),
+    uncheckedTrackColor = colorResource(id = R.color.grey_700_grey_050_038),
+)
 
 /**
  * Invite participants button view
@@ -239,7 +329,7 @@ private fun InviteParticipantsButton(
  * @param onDenyParticipantClicked      Detect when deny is clicked
  */
 @Composable
-private fun WaitingRoomParticipantItemView(
+private fun ParticipantItemView(
     section: ParticipantsSection,
     hasHostPermission: Boolean,
     participant: ChatParticipant,
@@ -389,7 +479,9 @@ fun PreviewParticipantsBottomPanelView() {
             onAdmitAllClick = {},
             onInviteParticipantsClick = {},
             onAdmitParticipantClicked = {},
-            onDenyParticipantClicked = {}
+            onDenyParticipantClicked = {},
+            onAllowAddParticipantsClick = {},
+            onShareMeetingLinkClick = {},
         )
     }
 }
@@ -402,14 +494,46 @@ fun PreviewParticipantsBottomPanelView() {
 fun PreviewParticipantsBottomPanelWaitingRoomView() {
     AndroidTheme(isDark = true) {
         ParticipantsBottomPanelView(
-            state = MeetingState(participantsSection = ParticipantsSection.WaitingRoomSection),
+            state = MeetingState(
+                participantsSection = ParticipantsSection.WaitingRoomSection,
+                chatParticipantsInWaitingRoom = getListParticipants(),
+                hasWaitingRoom = true
+            ),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
             onAdmitAllClick = {},
             onInviteParticipantsClick = {},
             onAdmitParticipantClicked = {},
-            onDenyParticipantClicked = {}
+            onDenyParticipantClicked = {},
+            onAllowAddParticipantsClick = {},
+            onShareMeetingLinkClick = {},
         )
+    }
+}
+
+
+private fun getListParticipants(): List<ChatParticipant> {
+    val participant1 = ChatParticipant(
+        handle = 1111L,
+        data = ContactData(fullName = "Pepa", alias = null, avatarUri = null),
+        email = "pepa+test55@mega.nz",
+        isMe = false,
+        privilege = ChatRoomPermission.Standard,
+        defaultAvatarColor = 888
+    )
+
+    val participant2 = ChatParticipant(
+        handle = 2222L,
+        data = ContactData(fullName = "Juan", alias = null, avatarUri = null),
+        email = "juan+test255@mega.nz",
+        isMe = false,
+        privilege = ChatRoomPermission.Standard,
+        defaultAvatarColor = 888
+    )
+
+    return mutableListOf<ChatParticipant>().apply {
+        add(participant1)
+        add(participant2)
     }
 }

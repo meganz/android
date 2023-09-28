@@ -188,65 +188,6 @@
         app:layout_constraintTop_toBottomOf="@id/fab_mic_label" />
 
     <Button
-        android:id="@+id/share_link"
-        style="?attr/materialButtonStyle"
-        android:layout_width="0dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="6dp"
-        android:backgroundTint="@color/grey_020_grey_040"
-        android:drawableTop="@drawable/ic_social_share_white"
-        android:stateListAnimator="@null"
-        android:text="@string/context_get_link"
-        android:textColor="@color/grey_600_white"
-        android:visibility="visible"
-        app:drawableTint="?attr/colorSecondary"
-        app:layout_constraintEnd_toStartOf="@id/invite"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider" />
-
-    <Button
-        android:id="@+id/invite"
-        style="?attr/materialButtonStyle"
-        android:layout_width="0dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginEnd="15dp"
-        android:backgroundTint="@color/grey_020_grey_040"
-        android:drawableTop="@drawable/ic_invite_contact"
-        android:stateListAnimator="@null"
-        android:text="@string/invite_participants"
-        android:textColor="@color/grey_600_white"
-        android:visibility="visible"
-        app:drawableTint="?attr/colorSecondary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@id/share_link"
-        app:layout_constraintTop_toTopOf="@id/share_link" />
-
-
-    <RelativeLayout
-        android:id="@+id/allow_add_participants_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/invite"
-        android:visibility="visible">
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/allow_add_participants_switch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="14dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="14dp"
-            android:checked="false"
-            android:text="@string/chat_group_chat_info_allow_non_host_participants_option"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
-    </RelativeLayout>
-
-    <Button
         android:id="@+id/guest_share_link"
         style="?attr/materialButtonOutlinedStyle"
         android:layout_marginStart="15dp"
@@ -256,7 +197,7 @@
         app:drawableTint="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toBottomOf="@id/allow_add_participants_layout" />
+        app:layout_constraintTop_toBottomOf="@id/divider" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/participants_compose_view"
