@@ -330,6 +330,15 @@ internal class MegaLocalRoomFacade @Inject constructor(
         // Implementation to be added with the implementation of the table
     }
 
+    override suspend fun setCameraUploadsRecordGeneratedFingerprint(
+        mediaId: Long,
+        timestamp: Long,
+        folderType: CameraUploadFolderType,
+        generatedFingerprint: String,
+    ) {
+        // Implementation to be added with the implementation of the table
+    }
+
     override suspend fun deleteBackupById(backupId: Long) {
         encryptData(backupId.toString())?.let {
             backupDao.deleteBackupByBackupId(it)

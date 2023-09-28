@@ -829,6 +829,20 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         )
     }
 
+    override suspend fun setRecordGeneratedFingerprint(
+        mediaId: Long,
+        timestamp: Long,
+        folderType: CameraUploadFolderType,
+        generatedFingerprint: String,
+    ) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.setCameraUploadsRecordGeneratedFingerprint(
+            mediaId,
+            timestamp,
+            folderType,
+            generatedFingerprint,
+        )
+    }
+
     private companion object {
         private const val SUB_STATE_NO_CHANGE = -1
         private const val TARGET_NODE_NO_CHANGE = -1L

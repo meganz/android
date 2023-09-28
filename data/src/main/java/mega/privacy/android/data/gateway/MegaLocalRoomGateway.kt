@@ -368,6 +368,21 @@ interface MegaLocalRoomGateway {
     )
 
     /**
+     * Set the generated fingerprint for the camera uploads record
+     *
+     * @param mediaId the id of the record
+     * @param timestamp the timestamp of the record
+     * @param folderType the folder type of the record
+     * @param generatedFingerprint the fingerprint computed from the generated file
+     */
+    suspend fun setCameraUploadsRecordGeneratedFingerprint(
+        mediaId: Long,
+        timestamp: Long,
+        folderType: CameraUploadFolderType,
+        generatedFingerprint: String,
+    )
+
+    /**
      * Remove back up folder
      *
      * @param backupId back up id to be removed

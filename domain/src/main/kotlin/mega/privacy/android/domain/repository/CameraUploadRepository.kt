@@ -821,4 +821,19 @@ interface CameraUploadRepository {
         folderType: CameraUploadFolderType,
         uploadStatus: CameraUploadsRecordUploadStatus,
     )
+
+    /**
+     * Set the generated fingerprint for the camera uploads record
+     *
+     * @param mediaId the id of the record
+     * @param timestamp the timestamp of the record
+     * @param folderType the folder type of the record
+     * @param generatedFingerprint the fingerprint computed from the generated file
+     */
+    suspend fun setRecordGeneratedFingerprint(
+        mediaId: Long,
+        timestamp: Long,
+        folderType: CameraUploadFolderType,
+        generatedFingerprint: String,
+    )
 }
