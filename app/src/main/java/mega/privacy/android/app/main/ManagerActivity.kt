@@ -906,8 +906,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         super.onCreate(savedInstanceState)
-
-        lifecycleScope.launch {
+        runBlocking {
             enableOfflineCompose =
                 getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
         }
@@ -8323,7 +8322,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val isFromOpenChatPreview: Boolean = request.flag
         val type: Int = request.paramType
         val link: String = request.link
-        val waitingRoom = MegaChatApi.hasChatOptionEnabled(MegaChatApi.CHAT_OPTION_WAITING_ROOM, request.privilege)
+        val waitingRoom = MegaChatApi.hasChatOptionEnabled(
+            MegaChatApi.CHAT_OPTION_WAITING_ROOM,
+            request.privilege
+        )
         if (joiningToChatLink && TextUtil.isTextEmpty(link) && chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
