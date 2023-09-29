@@ -58,7 +58,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.stream.Stream
 
 /**
  * Test class for [DefaultTransfersRepository]
@@ -896,6 +895,13 @@ class DefaultTransfersRepositoryTest {
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class ActiveTransfersTest {
+        val transfer = mock<Transfer>()
+
+        @BeforeEach
+        internal fun resetMocks() {
+            reset(transfer)
+        }
+
         @Test
         fun `test that getActiveTransferByTag gateway result is returned when getActiveTransferByTag is called`() =
             runTest {
@@ -999,29 +1005,54 @@ class DefaultTransfersRepositoryTest {
         fun `test that updateTransferredBytes adds currentTransferred bytes and deleteAllActiveTransfersByType clears the values`(
             transferType: TransferType,
         ) = runTest {
-            val expected = 1024L
-            val tag = 1
-            val expectedMap = mapOf(tag to expected)
+            testCurrentActiveTransferTotals(
+                transferType = transferType,
+                expectedMap = { transfer ->
+                    mapOf(transfer.tag to transfer.transferredBytes)
+                },
+                callToTest = {
+                    underTest.updateTransferredBytes(transfer)
+                }
+            )
+        }
+
+        /**
+         * As getCurrentActiveTransferTotalsByType is based on a state flow, we need to reset this state to make testing stateless
+         * This is a convenient function to test changes on this state and then reset it to its initial empty value.
+         */
+        private suspend fun testCurrentActiveTransferTotals(
+            transferType: TransferType,
+            expectedMap: (Transfer) -> Map<Int, Long>,
+            callToTest: suspend () -> Unit,
+        ) {
+            stubActiveTransfer(transferType)
             val list = mock<List<ActiveTransfer>>()
-            val transfer = mock<Transfer> {
-                on { this.transferType }.thenReturn(transferType)
-                on { transferredBytes }.thenReturn(expected)
-                on { this.tag }.thenReturn(tag)
-            }
             whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
                 .thenReturn(list)
 
             // test updateTransferredBytes
-            underTest.updateTransferredBytes(transfer)
+            callToTest()
             underTest.getCurrentActiveTransferTotalsByType(transferType)
             //here we check that the mapper is called with the proper expectedMap
-            verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(expectedMap))
+            val map = expectedMap(transfer)
+            verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(map))
 
             // test deleteAllActiveTransfersByType so we also clear the cached values
             underTest.deleteAllActiveTransfersByType(transferType)
             underTest.getCurrentActiveTransferTotalsByType(transferType)
             //here we check that the mapper is called with the proper expectedMap
             verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(emptyMap()))
+        }
+
+        private fun stubActiveTransfer(transferType: TransferType) {
+            val transferred = 900L
+            val total = 1024L
+            val tag = 1
+
+            whenever(transfer.transferType).thenReturn(transferType)
+            whenever(transfer.transferredBytes).thenReturn(transferred)
+            whenever(transfer.totalBytes).thenReturn(total)
+            whenever(transfer.tag).thenReturn(tag)
         }
     }
 
@@ -1064,12 +1095,6 @@ class DefaultTransfersRepositoryTest {
             whenever(megaApiGateway.totalDownloadBytes).thenReturn(bytes)
             assertThat(underTest.getTotalDownloadBytes()).isEqualTo(bytes)
         }
-
-        private fun provideTotalDownloadsParameters(): Stream<Arguments> = Stream.of(
-            Arguments.of(0, 0),
-            Arguments.of(7, 0),
-            Arguments.of(7, 3),
-        )
     }
 
     private fun stubPauseTransfers(isPause: Boolean) {

@@ -1,11 +1,12 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
+import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import javax.inject.Inject
 
 /**
@@ -15,6 +16,7 @@ import javax.inject.Inject
  */
 class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
     private val transferRepository: TransferRepository,
+    private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
 ) {
 
     /**
@@ -40,11 +42,11 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
             }
 
             is TransferEvent.TransferFinishEvent -> {
-                if (event.error == null || event.transfer.state == TransferState.STATE_CANCELLED) {
-                    transferRepository.insertOrUpdateActiveTransfer(event.transfer)
-                    transferRepository.updateTransferredBytes(event.transfer)
-                } else {
-                    //TRAN-228: handle the error similar to what is done in DownloadService.doOnTransferFinish
+                transferRepository.insertOrUpdateActiveTransfer(event.transfer)
+                transferRepository.updateTransferredBytes(event.transfer)
+
+                if (event.error is BusinessAccountExpiredMegaException) {
+                    broadcastBusinessAccountExpiredUseCase()
                 }
             }
 

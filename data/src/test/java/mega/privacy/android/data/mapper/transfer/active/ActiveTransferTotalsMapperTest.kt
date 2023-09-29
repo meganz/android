@@ -34,7 +34,9 @@ class ActiveTransferTotalsMapperTest {
         val entities = createEntities(transferType)
         val transferredBytes = entities.associate { it.tag to it.totalBytes / 2 }
         val expectedTransferredBytes =
-            entities.filter { !it.isFolderTransfer }.sumOf { it.totalBytes / 2 }
+            entities.filter { !it.isFolderTransfer }.sumOf {
+                if (it.isFinished) it.totalBytes else it.totalBytes / 2
+            }
         val actual = underTest(transferType, entities, transferredBytes)
         assertThat(actual.transferredBytes).isEqualTo(expectedTransferredBytes)
     }

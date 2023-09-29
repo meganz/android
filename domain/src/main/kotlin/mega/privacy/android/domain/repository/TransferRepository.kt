@@ -359,7 +359,7 @@ interface TransferRepository {
     suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
 
     /**
-     * Delete an active transfer by its tag
+     * Set an active transfer as finished by its tag
      */
     suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
 

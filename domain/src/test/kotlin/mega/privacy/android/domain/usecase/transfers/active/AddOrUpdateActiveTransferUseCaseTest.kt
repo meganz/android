@@ -5,7 +5,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -22,17 +24,20 @@ class AddOrUpdateActiveTransferUseCaseTest {
     private lateinit var underTest: AddOrUpdateActiveTransferUseCase
 
     private val transferRepository = mock<TransferRepository>()
+    private val broadcastBusinessAccountExpiredUseCase =
+        mock<BroadcastBusinessAccountExpiredUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = AddOrUpdateActiveTransferUseCase(
-            transferRepository = transferRepository
+            transferRepository = transferRepository,
+            broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(transferRepository)
+        reset(transferRepository, broadcastBusinessAccountExpiredUseCase)
     }
 
     @ParameterizedTest
@@ -53,6 +58,14 @@ class AddOrUpdateActiveTransferUseCaseTest {
         verify(transferRepository).updateTransferredBytes(transferEvent.transfer)
     }
 
+    @ParameterizedTest
+    @MethodSource("provideFinishWithErrorEvents")
+    fun `test that invoke call broadcastBusinessAccountExpiredUseCase when the event is a finish event with BusinessAccountExpiredMegaException`(
+        transferEvent: TransferEvent,
+    ) = runTest {
+        underTest.invoke(transferEvent)
+        verify(broadcastBusinessAccountExpiredUseCase).invoke()
+    }
 
     private fun provideStartPauseFinishEvents() = TransferType.values().flatMap { transferType ->
         val transfer = mock<Transfer> {
@@ -83,5 +96,15 @@ class AddOrUpdateActiveTransferUseCaseTest {
                 on { this.transfer }.thenReturn(transfer)
             }
         )
+    }
+
+    private fun provideFinishWithErrorEvents() = TransferType.values().map { transferType ->
+        val transfer = mock<Transfer> {
+            on { this.transferType }.thenReturn(transferType)
+        }
+        mock<TransferEvent.TransferFinishEvent> {
+            on { this.transfer }.thenReturn(transfer)
+            on { this.error }.thenReturn(mock<BusinessAccountExpiredMegaException>())
+        }
     }
 }
