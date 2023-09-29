@@ -3,6 +3,7 @@ package mega.privacy.android.core.ui.controls.textfields
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.semantics.SemanticsProperties.Text
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -150,6 +151,18 @@ class PasscodeFieldTest {
         val actual = textField.fetchSemanticsNode().config[Text]
 
         actual.forEach { assertThat(it.toString()).isEmpty() }
+
+    }
+
+    @Test
+    fun `test that passcode requests focus on load`() {
+        composeRule.setContent {
+            PasscodeField(
+                onComplete = {},
+            )
+        }
+        val textField = composeRule.onNodeWithTag(PASSCODE_FIELD_TAG)
+        textField.assertIsFocused()
 
     }
 }

@@ -14,12 +14,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -61,6 +64,10 @@ fun PasscodeField(
     var passcodeValue by remember {
         mutableStateOf("")
     }
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(key1 = Unit) {
+        focusRequester.requestFocus()
+    }
 
     BasicTextField(
         value = passcodeValue,
@@ -74,7 +81,9 @@ fun PasscodeField(
             }
         },
         keyboardOptions = keyboardOptions,
-        modifier = Modifier.testTag(PASSCODE_FIELD_TAG),
+        modifier = Modifier
+            .testTag(PASSCODE_FIELD_TAG)
+            .focusRequester(focusRequester),
         decorationBox = {
             Row(
                 horizontalArrangement = Arrangement.Center,
