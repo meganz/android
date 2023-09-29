@@ -119,7 +119,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -434,8 +434,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
         )
 
-        collectFlow(monitorTransferOverQuotaUseCase()) {
-            showGeneralTransferOverQuotaWarning()
+        collectFlow(monitorTransferOverQuotaUseCase()) { isCurrentOverQuota ->
+            if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
+                transfersManagement.isCurrentTransferOverQuota = isCurrentOverQuota
+                transfersManagement.setTransferOverQuotaTimestamp()
+                showGeneralTransferOverQuotaWarning()
+            }
         }
 
         savedInstanceState?.apply {

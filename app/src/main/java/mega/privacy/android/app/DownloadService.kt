@@ -17,7 +17,9 @@ import android.os.PowerManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -82,7 +84,6 @@ import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
-import mega.privacy.android.domain.usecase.transfers.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
@@ -97,6 +98,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadB
 import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadedBytesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedLegacyUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.InsertSdTransferUseCase
@@ -1613,12 +1615,8 @@ internal class DownloadService : LifecycleService() {
      * @param isCurrentOverQuota true if the overquota is currently received, false otherwise
      */
     private suspend fun checkTransferOverQuota(isCurrentOverQuota: Boolean) {
-        if (activityLifecycleHandler.isActivityVisible) {
-            if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
-                transfersManagement.isCurrentTransferOverQuota = isCurrentOverQuota
-                transfersManagement.setTransferOverQuotaTimestamp()
-                broadcastTransferOverQuotaUseCase()
-            }
+        if (ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            broadcastTransferOverQuotaUseCase(isCurrentOverQuota)
         } else if (!transfersManagement.isTransferOverQuotaNotificationShown) {
             transfersManagement.isTransferOverQuotaNotificationShown = true
             isForeground = false

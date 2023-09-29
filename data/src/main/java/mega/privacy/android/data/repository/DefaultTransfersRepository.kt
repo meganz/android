@@ -348,8 +348,8 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun monitorTransferOverQuota(): Flow<Boolean> =
         appEventGateway.monitorTransferOverQuota()
 
-    override suspend fun broadcastTransferOverQuota() {
-        appEventGateway.broadcastTransferOverQuota()
+    override suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean) {
+        appEventGateway.broadcastTransferOverQuota(isCurrentOverQuota)
     }
 
     override fun monitorStorageOverQuota(): Flow<Boolean> =

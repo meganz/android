@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.transfers
+package mega.privacy.android.domain.usecase.transfers.overquota
 
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
@@ -14,5 +14,6 @@ class BroadcastTransferOverQuotaUseCase @Inject constructor(
      * Invoke
      *
      */
-    suspend operator fun invoke() = transferRepository.broadcastTransferOverQuota()
+    suspend operator fun invoke(isCurrentOverQuota: Boolean) =
+        transferRepository.broadcastTransferOverQuota(isCurrentOverQuota)
 }

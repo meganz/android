@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.transfers
+package mega.privacy.android.domain.usecase.transfers.overquota
 
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject

@@ -83,8 +83,8 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorTransferOverQuota(): Flow<Boolean> = _transferOverQuota.asSharedFlow()
 
-    override suspend fun broadcastTransferOverQuota() {
-        _transferOverQuota.emit(true)
+    override suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean) {
+        _transferOverQuota.emit(isCurrentOverQuota)
     }
 
     override fun monitorStorageOverQuota(): Flow<Boolean> = _storageOverQuota.asSharedFlow()

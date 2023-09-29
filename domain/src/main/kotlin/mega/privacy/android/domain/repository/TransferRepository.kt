@@ -137,9 +137,10 @@ interface TransferRepository {
 
     /**
      * Broadcast transfer over quota
+     * @param isCurrentOverQuota true if the overquota is currently received, false otherwise
      *
      */
-    suspend fun broadcastTransferOverQuota()
+    suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean)
 
     /**
      * Monitor storage over quota
