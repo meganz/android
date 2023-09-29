@@ -20,7 +20,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,7 +34,7 @@ import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -141,11 +140,6 @@ class HomepageFragment : Fragment() {
 
     var isFabExpanded = false
 
-    /**
-     * Feature Flag for OfflineCompose
-     */
-    private var enableOfflineCompose: Boolean = false
-
     /** The click listener for clicking on the file category buttons.
      *  Clicking to navigate to corresponding fragments */
     private val categoryClickListener = OnClickListener {
@@ -228,32 +222,26 @@ class HomepageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launch {
-            runCatching {
-                enableOfflineCompose = getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
-            }
-            setupMask()
-            setupSearchView()
-            setupBannerView()
-            setupCategories()
-            setupBottomSheetUI()
-            setupBottomSheetBehavior()
-            setupFabs()
+        setupMask()
+        setupSearchView()
+        setupBannerView()
+        setupCategories()
+        setupBottomSheetUI()
+        setupBottomSheetBehavior()
+        setupFabs()
 
-            (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
+        (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
 
-            if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
-                showChooseStartScreenDialog()
-            }
-            viewLifecycleOwner.collectFlow(viewModel.monitorConnectivity) { isConnected ->
-                if (isConnected) {
-                    showOnlineMode()
-                } else {
-                    showOfflineMode()
-                }
+        if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
+            showChooseStartScreenDialog()
+        }
+        viewLifecycleOwner.collectFlow(viewModel.monitorConnectivity) { isConnected ->
+            if (isConnected) {
+                showOnlineMode()
+            } else {
+                showOfflineMode()
             }
         }
-
     }
 
     override fun onResume() {
@@ -434,9 +422,16 @@ class HomepageFragment : Fragment() {
      * Set up the view pager, tab layout and fragments contained in the Homepage main bottom sheet
      */
     private fun setupBottomSheetUI() {
+        var enableOfflineCompose: Boolean
+        runBlocking {
+            enableOfflineCompose = getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
+        }
         viewPager = viewDataBinding.homepageBottomSheet.viewPager
         val adapter =
-            BottomSheetPagerAdapter(fragment = this, enableOfflineCompose = enableOfflineCompose)
+            BottomSheetPagerAdapter(
+                fragment = this@HomepageFragment,
+                enableOfflineCompose = enableOfflineCompose
+            )
         // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
         viewPager.offscreenPageLimit = adapter.itemCount
         viewPager.adapter = adapter
@@ -450,7 +445,6 @@ class HomepageFragment : Fragment() {
         // Pass selected page view to HomepageBottomSheetBehavior which would seek for
         // the nested scrolling child views and deal with the logic of nested scrolling
         viewPager.registerOnPageChangeCallback(pageChangeCallback)
-
         setupBottomSheetBackground()
     }
 
