@@ -3,12 +3,14 @@ package mega.privacy.android.domain.entity.chat
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.meeting.CallParticipantData
 
 /**
  * Chat participant.
  *
  * @property handle                     Participant identifier.
  * @property data                       [ContactData] of the participant in the chat room.
+ * @property callParticipantData        [CallParticipantData] of the participant in the call.
  * @property email                      Participant email.
  * @property isMe                       True, if it's me. False, if not.
  * @property privilege                  Participant privilege.
@@ -31,4 +33,5 @@ data class ChatParticipant(
     val lastSeen: Int? = null,
     val avatarUpdateTimestamp: Long? = null,
     val privilegesUpdated: Boolean = false,
+    val callParticipantData: CallParticipantData = CallParticipantData(),
 )

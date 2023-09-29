@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -63,7 +65,11 @@ fun ParticipantsBottomPanelView(
     onAllowAddParticipantsClick: () -> Unit,
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
+    onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
 ) {
+
+    val listState = rememberLazyListState()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,6 +110,7 @@ fun ParticipantsBottomPanelView(
                     onClick = onNotInCallClick,
                     isChecked = state.participantsSection == ParticipantsSection.NotInCallSection
                 )
+
 
                 if (state.chatParticipantsInWaitingRoom.isEmpty() && state.hasHostPermission && state.isWaitingRoomFeatureFlagEnabled && state.hasWaitingRoom) {
                     CallTextButtonChip(
@@ -178,7 +185,7 @@ fun ParticipantsBottomPanelView(
 
                                 ParticipantsSection.InCallSection -> stringResource(
                                     id = R.string.participants_number,
-                                    state.usersInCallList.size
+                                    state.chatParticipantsInCall.size
                                 )
 
                                 else -> {
@@ -225,30 +232,51 @@ fun ParticipantsBottomPanelView(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                when (state.participantsSection) {
-                    ParticipantsSection.WaitingRoomSection ->
-                        state.chatParticipantsInWaitingRoom.indices.forEach { i ->
-                            ParticipantItemView(
-                                section = state.participantsSection,
-                                hasHostPermission = state.hasHostPermission,
-                                participant = state.chatParticipantsInWaitingRoom[i],
-                                onAdmitParticipantClicked = onAdmitParticipantClicked,
-                                onDenyParticipantClicked = onDenyParticipantClicked
-                            )
-                        }
+                Column {
+                    LazyColumn(
+                        state = listState,
+                    ) {
 
-                    ParticipantsSection.InCallSection ->
-                        state.usersInCallList.indices.forEach { i ->
-                            ParticipantItemView(
-                                section = state.participantsSection,
-                                hasHostPermission = state.hasHostPermission,
-                                participant = state.usersInCallList[i],
-                                onAdmitParticipantClicked = onAdmitParticipantClicked,
-                                onDenyParticipantClicked = onDenyParticipantClicked
-                            )
-                        }
+                        item(key = "Participants list") {
+                            when (state.participantsSection) {
+                                ParticipantsSection.WaitingRoomSection ->
+                                    state.chatParticipantsInWaitingRoom.indices.forEach { i ->
+                                        ParticipantItemView(
+                                            section = state.participantsSection,
+                                            hasHostPermission = state.hasHostPermission,
+                                            participant = state.chatParticipantsInWaitingRoom[i],
+                                            onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                            onDenyParticipantClicked = onDenyParticipantClicked,
+                                            onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                        )
+                                    }
 
-                    ParticipantsSection.NotInCallSection -> {}
+                                ParticipantsSection.InCallSection ->
+                                    state.chatParticipantsInCall.indices.forEach { i ->
+                                        ParticipantItemView(
+                                            section = state.participantsSection,
+                                            hasHostPermission = state.hasHostPermission,
+                                            participant = state.chatParticipantsInCall[i],
+                                            onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                            onDenyParticipantClicked = onDenyParticipantClicked,
+                                            onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                        )
+                                    }
+
+                                ParticipantsSection.NotInCallSection ->
+                                    state.chatParticipantsNotInCall.indices.forEach { i ->
+                                        ParticipantItemView(
+                                            section = state.participantsSection,
+                                            hasHostPermission = state.hasHostPermission,
+                                            participant = state.chatParticipantsNotInCall[i],
+                                            onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                            onDenyParticipantClicked = onDenyParticipantClicked,
+                                            onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                        )
+                                    }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -327,6 +355,7 @@ private fun InviteParticipantsButton(
  * @param participant                   [ChatParticipant]
  * @param onAdmitParticipantClicked     Detect when admit is clicked
  * @param onDenyParticipantClicked      Detect when deny is clicked
+ * @param onParticipantMoreOptionsClicked    Detect when more options button is clicked
  */
 @Composable
 private fun ParticipantItemView(
@@ -335,7 +364,7 @@ private fun ParticipantItemView(
     participant: ChatParticipant,
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
-    onOptionsParticipantClicked: (ChatParticipant) -> Unit = {},
+    onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
 ) {
     Column {
         Row(
@@ -396,7 +425,10 @@ private fun ParticipantItemView(
                 modifier = Modifier
                     .wrapContentSize(Alignment.CenterEnd)
             ) {
-                Row(modifier = Modifier.align(Alignment.Center)) {
+                Row(
+                    modifier = Modifier.align(Alignment.Center),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     when (section) {
                         ParticipantsSection.WaitingRoomSection -> {
                             if (hasHostPermission) {
@@ -424,23 +456,23 @@ private fun ParticipantItemView(
 
                         }
 
-                        ParticipantsSection.InCallSection, ParticipantsSection.NotInCallSection -> {
+                        ParticipantsSection.InCallSection -> {
                             Icon(
                                 modifier = Modifier.padding(start = 5.dp),
-                                imageVector = ImageVector.vectorResource(id = R.drawable.mic_on_participant_icon),
+                                imageVector = ImageVector.vectorResource(id = if (participant.callParticipantData.isAudioOn) R.drawable.mic_on_participant_icon else R.drawable.mic_off_participant_icon),
                                 contentDescription = "Mic icon",
                                 tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038
                             )
 
                             Icon(
                                 modifier = Modifier.padding(start = 10.dp),
-                                imageVector = ImageVector.vectorResource(id = R.drawable.video_on_participant_icon),
+                                imageVector = ImageVector.vectorResource(id = if (participant.callParticipantData.isVideoOn) R.drawable.video_on_participant_icon else R.drawable.video_off_participant_icon),
                                 contentDescription = "Cam icon",
                                 tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038
                             )
 
                             IconButton(
-                                onClick = { onOptionsParticipantClicked(participant) }
+                                onClick = { onParticipantMoreOptionsClicked(participant) }
                             ) {
                                 Icon(
                                     modifier = Modifier.padding(start = 10.dp),
@@ -450,6 +482,8 @@ private fun ParticipantItemView(
                                 )
                             }
                         }
+
+                        else -> {}
                     }
                 }
             }
@@ -482,6 +516,7 @@ fun PreviewParticipantsBottomPanelView() {
             onDenyParticipantClicked = {},
             onAllowAddParticipantsClick = {},
             onShareMeetingLinkClick = {},
+            onParticipantMoreOptionsClicked = {}
         )
     }
 }
@@ -508,32 +543,50 @@ fun PreviewParticipantsBottomPanelWaitingRoomView() {
             onDenyParticipantClicked = {},
             onAllowAddParticipantsClick = {},
             onShareMeetingLinkClick = {},
+            onParticipantMoreOptionsClicked = {}
         )
     }
 }
 
-
 private fun getListParticipants(): List<ChatParticipant> {
     val participant1 = ChatParticipant(
-        handle = 1111L,
+        handle = 111L,
         data = ContactData(fullName = "Pepa", alias = null, avatarUri = null),
         email = "pepa+test55@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
-        defaultAvatarColor = 888
+        defaultAvatarColor = 111
     )
 
     val participant2 = ChatParticipant(
-        handle = 2222L,
+        handle = 222L,
         data = ContactData(fullName = "Juan", alias = null, avatarUri = null),
         email = "juan+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
-        defaultAvatarColor = 888
+        defaultAvatarColor = 222
+    )
+    val participant3 = ChatParticipant(
+        handle = 333L,
+        data = ContactData(fullName = "Rober", alias = null, avatarUri = null),
+        email = "rober+test255@mega.nz",
+        isMe = false,
+        privilege = ChatRoomPermission.Standard,
+        defaultAvatarColor = 333
+    )
+    val participant4 = ChatParticipant(
+        handle = 444L,
+        data = ContactData(fullName = "Marta", alias = null, avatarUri = null),
+        email = "marta+test255@mega.nz",
+        isMe = false,
+        privilege = ChatRoomPermission.Standard,
+        defaultAvatarColor = 444
     )
 
     return mutableListOf<ChatParticipant>().apply {
         add(participant1)
         add(participant2)
+        add(participant3)
+        add(participant4)
     }
 }

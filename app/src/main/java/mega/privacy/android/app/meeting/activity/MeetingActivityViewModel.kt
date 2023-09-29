@@ -43,11 +43,13 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
+import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -58,10 +60,12 @@ import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_M
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
+import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.SetOpenInvite
@@ -71,7 +75,6 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
-import mega.privacy.android.domain.usecase.meeting.waitingroom.MonitorWaitingRoomParticipantsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -92,6 +95,7 @@ import javax.inject.Inject
  * @property answerChatCallUseCase          [AnswerChatCallUseCase]
  * @property getCallUseCase                 [GetCallUseCase]
  * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
+ * @property getChatParticipants            [GetChatParticipants]
  * @property chatManagement                 [ChatManagement]
  * @property setChatVideoInDeviceUseCase    [SetChatVideoInDeviceUseCase]
  * @property checkChatLink                  [CheckChatLinkUseCase]
@@ -100,9 +104,9 @@ import javax.inject.Inject
  * @property monitorChatCallUpdates         [MonitorChatCallUpdates]
  * @property getChatRoomUseCase             [GetChatRoomUseCase]
  * @property getChatCall                    [GetChatCall]
- * @property monitorWaitingRoomParticipantsUseCase     [MonitorWaitingRoomParticipantsUseCase]
  * @property getFeatureFlagValue            [GetFeatureFlagValueUseCase]
  * @property setOpenInvite                  [MonitorChatRoomUpdates]
+ * @property chatParticipantMapper          [ChatParticipantMapper]
  * @property monitorChatRoomUpdates         [MonitorChatCallUpdates]
  * @property state                      Current view state as [MeetingState]
  */
@@ -116,6 +120,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val checkChatLink: CheckChatLinkUseCase,
+    private val getChatParticipants: GetChatParticipants,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
@@ -123,9 +128,9 @@ class MeetingActivityViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoom,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     @ApplicationContext private val context: Context,
-    private val monitorWaitingRoomParticipantsUseCase: MonitorWaitingRoomParticipantsUseCase,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val setOpenInvite: SetOpenInvite,
+    private val chatParticipantMapper: ChatParticipantMapper,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -264,7 +269,6 @@ class MeetingActivityViewModel @Inject constructor(
             .observeForever(meetingCreatedObserver)
 
         startMonitoringChatCallUpdates()
-        //startMonitoringChatListItemUpdates()
 
         getCallUseCase.getCallEnded()
             .subscribeOn(Schedulers.io())
@@ -340,12 +344,11 @@ class MeetingActivityViewModel @Inject constructor(
         runCatching {
             getChatCall(_state.value.chatId)
         }.onSuccess { call ->
-            _state.update {
-                it.copy(
+            _state.update { state ->
+                state.copy(
                     hasWaitingRoom = call?.waitingRoom != null
                 )
             }
-
         }.onFailure { exception ->
             Timber.e(exception)
         }
@@ -372,6 +375,22 @@ class MeetingActivityViewModel @Inject constructor(
                                 false -> context.getString(
                                     R.string.general_mic_mute
                                 )
+                            }
+                        }
+
+                        if (contains(ChatCallChanges.WaitingRoomUsersEntered) || contains(
+                                ChatCallChanges.WaitingRoomUsersLeave
+                            )
+                        ) {
+                            call.waitingRoom?.apply {
+                                peers?.let { usersInWaitingRoom ->
+                                    _state.update {
+                                        it.copy(
+                                            usersInWaitingRoom = usersInWaitingRoom
+                                        )
+                                    }
+                                    checkParticipantLists()
+                                }
                             }
                         }
                     }
@@ -498,7 +517,7 @@ class MeetingActivityViewModel @Inject constructor(
             }
             getChatRoom()
             getChatCall()
-            startMonitoringWaitingRoomParticipantsUpdated(chatId = chatId)
+            startMonitoringChatParticipantsUpdated(chatId = chatId)
             startMonitorChatRoomUpdates(chatId = chatId)
         }
     }
@@ -955,26 +974,6 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
     /**
-     * Monitor waiting room participants updates
-     *
-     * @param chatId    Chat id
-     */
-    private fun startMonitoringWaitingRoomParticipantsUpdated(chatId: Long) =
-        viewModelScope.launch {
-            monitorWaitingRoomParticipantsUseCase(chatId).catch { exception ->
-                Timber.e(exception)
-            }.collectLatest { newList ->
-                Timber.d("List participants in waiting room $newList")
-                _state.update { state ->
-                    state.copy(
-                        chatParticipantsInWaitingRoom = newList,
-                        participantsSection = if (newList.isEmpty() && state.participantsSection == ParticipantsSection.WaitingRoomSection) ParticipantsSection.InCallSection else state.participantsSection
-                    )
-                }
-            }
-        }
-
-    /**
      * Allow o deny non-hosts add participants to the call
      */
     fun allowAddParticipantsClick() {
@@ -1011,4 +1010,77 @@ class MeetingActivityViewModel @Inject constructor(
                 participantsSection = newSelection
             )
         }
+
+    /**
+     * Load all chat participants
+     */
+    private fun startMonitoringChatParticipantsUpdated(chatId: Long) = viewModelScope.launch {
+        runCatching {
+            getChatParticipants(chatId)
+                .catch { exception ->
+                    Timber.e(exception)
+                }
+                .collectLatest { list ->
+                    Timber.d("Updated list of participants: list ${list.size}")
+                    _state.update { state ->
+                        state.copy(
+                            chatParticipantList = list
+                        )
+                    }
+
+                    checkParticipantLists()
+                }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Update participants in call
+     */
+    fun updateChatParticipantsInCall(participants: List<Participant>) {
+        _state.update { state ->
+            state.copy(
+                usersInCall = participants
+            )
+        }
+        checkParticipantLists()
+    }
+
+    /**
+     * Check participant lists
+     */
+    private fun checkParticipantLists() {
+        val chatParticipantsInWaitingRoom = mutableListOf<ChatParticipant>()
+        val chatParticipantsInCall = mutableListOf<ChatParticipant>()
+        val chatParticipantsNotInCall = mutableListOf<ChatParticipant>()
+
+        state.value.chatParticipantList.forEach { chatParticipant ->
+            var participantAdded = false
+            state.value.usersInWaitingRoom.find { it == chatParticipant.handle }?.let {
+                participantAdded = true
+                chatParticipantsInWaitingRoom.add(chatParticipant)
+            }
+            state.value.usersInCall.find { it.peerId == chatParticipant.handle }
+                ?.let { participant ->
+                    participantAdded = true
+                    chatParticipantsInCall.add(chatParticipantMapper(participant, chatParticipant))
+                }
+
+            if (!participantAdded) {
+                chatParticipantsNotInCall.add(chatParticipant)
+
+            }
+        }
+
+        _state.update { state ->
+            state.copy(
+                chatParticipantsInWaitingRoom = chatParticipantsInWaitingRoom,
+                chatParticipantsInCall = chatParticipantsInCall,
+                chatParticipantsNotInCall = chatParticipantsNotInCall,
+                participantsSection = if (chatParticipantsInWaitingRoom.isEmpty() && state.participantsSection == ParticipantsSection.WaitingRoomSection) ParticipantsSection.InCallSection else state.participantsSection
+
+            )
+        }
+    }
 }

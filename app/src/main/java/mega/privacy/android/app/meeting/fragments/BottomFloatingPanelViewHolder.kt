@@ -30,7 +30,6 @@ import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
@@ -74,8 +73,6 @@ class BottomFloatingPanelViewHolder(
     private var savedCamState: Boolean = false
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
         AppRTCAudioManager.AudioDevice.NONE
-
-    private var participantsAdapter = ParticipantsAdapter(listener)
 
     private var currentHeight = 0
 
@@ -278,14 +275,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun updateParticipants(participants: MutableList<Participant>, myOwnParticipant: Participant) {
         participants.add(myOwnParticipant)
-        participantsAdapter.submitList(
-            participants.sortedWith(
-                compareBy(
-                    { !it.isMe },
-                    { !it.isModerator },
-                    { it.name })
-            ).toMutableList()
-        )
+        meetingViewModel.updateChatParticipantsInCall(participants)
     }
 
     /**
@@ -504,6 +494,12 @@ class BottomFloatingPanelViewHolder(
                             waitingRoomManagementViewModel.admitUsersClick(
                                 it
                             )
+                        },
+                        onParticipantMoreOptionsClicked = { chatParticipant ->
+                            meetingViewModel.state.value.usersInCall.find { it.peerId == chatParticipant.handle }
+                                ?.let {
+                                    listener.onParticipantOption(it)
+                                }
                         },
                         onDenyParticipantClicked = {
                             waitingRoomManagementViewModel.denyUsersClick(
