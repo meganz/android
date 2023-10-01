@@ -151,7 +151,7 @@ import javax.inject.Inject
  * @property fetchPsaUseCase
  */
 @AndroidEntryPoint
-open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
+abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
     SnackbarShower {
 
     @Inject
@@ -250,7 +250,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * Load the psa in the web browser fragment if the psa is a web one and this activity
      * is on the top of the task stack
      */
-    private fun handlePsa(psa: Psa) {
+    open fun handlePsa(psa: Psa) {
         if (psa.url != null && Util.isTopActivity(javaClass.name, this)) {
             loadPsaInWebBrowser(psa)
         }

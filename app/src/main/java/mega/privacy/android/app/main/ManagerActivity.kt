@@ -1750,7 +1750,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             EVENT_SESSION_ON_HOLD_CHANGE,
             android.util.Pair::class.java
         ).observe(this, sessionOnHoldObserver)
-        observePsa()
     }
 
     private fun registerBroadcastReceivers() {
@@ -2774,16 +2773,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         cookieDialogHandler.showDialogIfNeeded(this)
     }
 
-    /**
-     * Observe LiveData for PSA, and show PSA view when get it.
-     */
-    private fun observePsa() {
-        LiveEventBus.get(Constants.EVENT_PSA, Psa::class.java)
-            .observe(this) { psa: Psa ->
-                if (psa.url.isNullOrEmpty()) {
-                    showPsa(psa)
-                }
-            }
+
+    override fun handlePsa(psa: Psa) {
+        super.handlePsa(psa)
+        if (psa.url.isNullOrEmpty()) {
+            showPsa(psa)
+        }
     }
 
     /**
