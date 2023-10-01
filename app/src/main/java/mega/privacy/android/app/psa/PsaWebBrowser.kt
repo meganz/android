@@ -24,6 +24,7 @@ import mega.privacy.android.app.databinding.FragmentPsaWebBrowserBinding
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.isURLSanitized
+import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,7 +37,7 @@ class PsaWebBrowser : Fragment() {
     private val uiHandler = Handler(Looper.getMainLooper())
 
     @Inject
-    lateinit var psaManager: PsaManager
+    lateinit var dismissPsaUseCase: DismissPsaUseCase
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -131,7 +132,7 @@ class PsaWebBrowser : Fragment() {
             onBackPressedCallback.isEnabled = true
             if (psaId != Constants.INVALID_VALUE) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    psaManager.dismissPsa(psaId)
+                    dismissPsaUseCase(psaId)
                 }
             }
         }
