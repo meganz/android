@@ -4,6 +4,7 @@ appcompat = "1.6.1"
 biometric = "1.1.0"
 camerax = "1.2.3"
 cardview = "1.0.0"
+concurrent-futures = "1.1.0"
 constraintlayout = "2.1.4"
 constraintlayout-compose = "1.0.1"
 compose-activity = "1.7.2"
@@ -32,6 +33,7 @@ java-core = { module = "androidx.core:core", version.ref = "java-core"}
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
+concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrent-futures"}
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayout-compose" }
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }

@@ -96,6 +96,7 @@ dependencies {
     implementation(androidx.room)
     implementation(androidx.hilt.work)
     implementation(google.hilt.android)
+    implementation(androidx.concurrent.futures)
     kapt(google.hilt.android.compiler)
     kapt(androidx.hilt.compiler)
     ksp(androidx.room.compiler)

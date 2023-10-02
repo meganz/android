@@ -2,6 +2,7 @@ package mega.privacy.android.data.worker
 
 import android.content.Context
 import android.provider.MediaStore
+import androidx.concurrent.futures.await
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -9,7 +10,6 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import androidx.work.await
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -44,9 +44,7 @@ internal class NewMediaWorker @AssistedInject constructor(
             val workManager =
                 WorkManager.getInstance(context.applicationContext)
             if (isForce
-                || workManager.getWorkInfosByTag(NEW_MEDIA_WORKER_TAG)
-                    .await()
-                    .none { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
+                || isQueuedOrRunning(workManager)
             ) {
                 val photoCheckBuilder =
                     OneTimeWorkRequest.Builder(NewMediaWorker::class.java)
@@ -61,5 +59,10 @@ internal class NewMediaWorker @AssistedInject constructor(
                 workManager.enqueue(photoCheckBuilder.build())
             }
         }
+
+        private suspend fun isQueuedOrRunning(workManager: WorkManager) =
+            workManager.getWorkInfosByTag(NEW_MEDIA_WORKER_TAG)
+                .await()
+                .none { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
     }
 }
