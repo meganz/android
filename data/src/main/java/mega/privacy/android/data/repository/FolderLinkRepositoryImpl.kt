@@ -3,12 +3,15 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.FolderInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -31,6 +34,7 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     private val folderLoginStatusMapper: FolderLoginStatusMapper,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val nodeMapper: NodeMapper,
+    private val folderInfoMapper: FolderInfoMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FolderLinkRepository {
 
@@ -122,4 +126,21 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
 
     private suspend fun convertToUntypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(node, fromFolderLink = true)
+
+    override suspend fun getPublicLinkInformation(folderLink: String): FolderInfo =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getPublicLinkInformation") {
+                    folderInfoMapper(
+                        megaFolderInfo = it.megaFolderInfo,
+                        folderName = it.text
+                    )
+                }
+
+                megaApiFolderGateway.getPublicLinkInformation(folderLink, listener)
+                continuation.invokeOnCancellation {
+                    megaApiFolderGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }

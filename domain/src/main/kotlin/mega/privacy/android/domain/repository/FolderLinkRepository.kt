@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -49,4 +50,10 @@ interface FolderLinkRepository {
      * Get children nodes by handle
      */
     suspend fun getNodeChildren(handle: Long, order: Int? = null): List<UnTypedNode>
+
+    /**
+     * Get [FolderInfo] of a public link
+     * @param folderLink link of the folder. If link is invalid, exception will be thrown.
+     */
+    suspend fun getPublicLinkInformation(folderLink: String): FolderInfo
 }

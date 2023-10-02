@@ -13,18 +13,24 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.FolderInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SynchronisationException
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -42,6 +48,7 @@ class FolderLinkRepositoryImplTest {
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val untypedNode = mock<FolderNode>()
     private val nodeMapper: NodeMapper = mock()
+    private val folderInfoMapper: FolderInfoMapper = mock()
 
     @Before
     fun setup() {
@@ -53,6 +60,7 @@ class FolderLinkRepositoryImplTest {
                 folderLoginStatusMapper = folderLoginStatusMapper,
                 megaLocalStorageGateway = megaLocalStorageGateway,
                 nodeMapper = nodeMapper,
+                folderInfoMapper = folderInfoMapper,
                 ioDispatcher = UnconfinedTestDispatcher()
             )
     }
@@ -137,5 +145,67 @@ class FolderLinkRepositoryImplTest {
         whenever(nodeMapper(any(), any(), any())).thenReturn(untypedNode)
 
         assertThat(underTest.getFolderLinkNode(base64Handle)).isEqualTo(untypedNode)
+    }
+
+    @Test
+    fun `test that valid folder info of public link is returned`() = runTest {
+        val expectedResult = FolderInfo(
+            currentSize = 1000L,
+            numVersions = 1,
+            numFiles = 2,
+            numFolders = 3,
+            versionsSize = 4,
+            folderName = "folder_name",
+        )
+
+        val mockMegaFolderInfo = mock<MegaFolderInfo> {
+            on { numFolders }.thenReturn(expectedResult.numFolders)
+            on { numVersions }.thenReturn(expectedResult.numVersions)
+            on { currentSize }.thenReturn(expectedResult.currentSize)
+            on { numFiles }.thenReturn(expectedResult.numFiles)
+            on { versionsSize }.thenReturn(expectedResult.versionsSize)
+        }
+
+        val mockMegaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        val mockMegaRequest = mock<MegaRequest> {
+            on { megaFolderInfo }.thenReturn(mockMegaFolderInfo)
+            on { text }.thenReturn(expectedResult.folderName)
+        }
+
+        whenever(megaApiFolderGateway.getPublicLinkInformation(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mockMegaRequest,
+                mockMegaError
+            )
+        }
+
+        whenever(folderInfoMapper(any(), any())).thenReturn(expectedResult)
+
+        val folderLink = "folder_link"
+        assertThat(underTest.getPublicLinkInformation(folderLink)).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun `test that exception is thrown when failure to get folder info of public link`() = runTest {
+        val mockMegaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_ENOENT)
+        }
+
+        whenever(megaApiFolderGateway.getPublicLinkInformation(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mockMegaError
+            )
+        }
+
+        assertThrows<MegaException> {
+            val folderLink = "folder_link"
+            underTest.getPublicLinkInformation(folderLink)
+        }
     }
 }

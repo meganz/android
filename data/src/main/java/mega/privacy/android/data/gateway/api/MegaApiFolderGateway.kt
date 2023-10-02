@@ -182,4 +182,26 @@ interface MegaApiFolderGateway {
         order: Int,
         type: Int,
     ): List<MegaNode>
+
+    /**
+     * Retrieve basic information about a folder link
+     * This function retrieves basic information from a folder link, like the
+     * number of files / folders and the name of the folder. For folder links containing
+     * a lot of files/folders, this function is more efficient than a fetchNodes.
+     *
+     * Valid data in the MegaRequest object received on all callbacks:
+     * - MegaRequest::getLink() - Returns the public link to the folder
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code is MegaError::API_OK:
+     * - MegaRequest::getMegaFolderInfo() - Returns information about the contents of the folder
+     * - MegaRequest::getNodeHandle() - Returns the public handle of the folder
+     * - MegaRequest::getParentHandle() - Returns the handle of the owner of the folder
+     * - MegaRequest::getText() - Returns the name of the folder. If there's no name, it returns the special status string "CRYPTO_ERROR". If the length of the name is zero, it returns the special status string "BLANK".
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_EARGS - If the link is not a valid folder link - MegaError::API_EKEY - If the public link does not contain the key or it is invalid
+     *
+     * @param megaFolderLink – Public link to a folder in MEGA
+     * @param listener – MegaRequestListener to track this request
+     */
+    fun getPublicLinkInformation(megaFolderLink: String, listener: MegaRequestListenerInterface)
 }

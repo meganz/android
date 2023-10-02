@@ -95,4 +95,9 @@ internal class MegaApiFolderFacade @Inject constructor(
             order,
             type
         )
+
+    override fun getPublicLinkInformation(
+        folderLink: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApiFolder.getPublicLinkInformation(folderLink, listener)
 }
