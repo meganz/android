@@ -119,6 +119,7 @@ class DownloadsWorker @AssistedInject constructor(
     /**
      * Create a [ForegroundInfo] based on [Notification]
      */
+    @SuppressLint("SpecifyForegroundServiceType")
     private fun createForegroundInfo(notification: Notification) =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ForegroundInfo(
