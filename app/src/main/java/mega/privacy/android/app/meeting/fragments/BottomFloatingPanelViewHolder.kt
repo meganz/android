@@ -485,6 +485,7 @@ class BottomFloatingPanelViewHolder(
                             )
                         },
                         onAdmitAllClick = { waitingRoomManagementViewModel.admitUsersClick() },
+                        onSeeAllClick = {},
                         onInviteParticipantsClick = { listener.onInviteParticipants() },
                         onShareMeetingLinkClick = { listener.onShareLink(true) },
                         onAllowAddParticipantsClick = {

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.usecase.call
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Pair
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -73,6 +75,7 @@ class GetCallSoundsUseCase @Inject constructor(
 
     var finishCallCountDownTimer: CustomCountDownTimer? = null
     var waitingForOthersCountDownTimer: CustomCountDownTimer? = null
+    private var shouldPlaySoundWhenShowWaitingRoomDialog: Boolean = true
 
     val participants = ArrayList<ParticipantInfo>()
     val disposable = CompositeDisposable()
@@ -230,8 +233,17 @@ class GetCallSoundsUseCase @Inject constructor(
 
                             if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
                                 if (call.waitingRoom?.peers?.size == 1) {
-                                    emitter.onNext(CallSoundType.WAITING_ROOM_USERS_ENTERED)
+                                    shouldPlaySoundWhenShowWaitingRoomDialog = true
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        if (shouldPlaySoundWhenShowWaitingRoomDialog) {
+                                            emitter.onNext(CallSoundType.WAITING_ROOM_USERS_ENTERED)
+                                        }
+                                    }, 1000)
                                 }
+                            }
+
+                            if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
+                                shouldPlaySoundWhenShowWaitingRoomDialog = false
                             }
                         }
                     }
