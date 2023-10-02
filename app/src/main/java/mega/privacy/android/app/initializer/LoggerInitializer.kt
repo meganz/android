@@ -66,7 +66,6 @@ class LoggerInitializer : Initializer<Unit> {
         val entryPoint =
             EntryPointAccessors.fromApplication(context, LoggerInitializerEntryPoint::class.java)
 
-        entryPoint.loggingRepository()
         entryPoint.appScope().launch {
             entryPoint.enableLogAllToConsole().invoke()
             val permanentEnabled =
