@@ -190,6 +190,9 @@ class SlideshowFragment : Fragment() {
             items.size
         }
 
+        if (items.isEmpty())
+            return
+
         SlideshowCompose(
             scaffoldState = scaffoldState,
             playItems = items,
