@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.login
 
 import androidx.datastore.preferences.core.MutablePreferences
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
@@ -11,6 +12,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class EphemeralCredentialsPreferenceMapperTest {
     private val encryptData: EncryptData = mock()
     private lateinit var underTest: EphemeralCredentialsPreferenceMapper

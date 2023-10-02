@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.StreamingGateway
@@ -11,6 +12,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StreamingServerRepositoryImplTest {
     private lateinit var underTest: StreamingServerRepository
 

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.contact
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.database.entity.ContactEntity
@@ -10,6 +11,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class ContactModelMapperTest {
     private val decryptData: DecryptData = mock()
     private lateinit var underTest: ContactModelMapper

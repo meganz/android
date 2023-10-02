@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.mapper.AccountDetailMapper.Companion.HAS_PRO_DETAILS
 import mega.privacy.android.data.mapper.AccountDetailMapper.Companion.HAS_SESSIONS_DETAILS
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class AccountDetailMapperTest {
     private val accountStorageDetailMapper: AccountStorageDetailMapper = mock()
