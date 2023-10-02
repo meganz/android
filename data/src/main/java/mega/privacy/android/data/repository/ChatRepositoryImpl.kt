@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
+import mega.privacy.android.data.mapper.chat.ChatPreviewMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
@@ -91,6 +92,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiGateway: MegaApiGateway,
     private val chatRequestMapper: ChatRequestMapper,
+    private val chatPreviewMapper: ChatPreviewMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
     private val chatRoomMapper: ChatRoomMapper,
     private val combinedChatRoomMapper: CombinedChatRoomMapper,
@@ -397,12 +399,12 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun openChatPreview(link: String): ChatRequest = withContext(ioDispatcher) {
+    override suspend fun openChatPreview(link: String) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
                     if (error.errorCode == MegaChatError.ERROR_OK || error.errorCode == MegaChatError.ERROR_EXIST) {
-                        continuation.resume(chatRequestMapper(request))
+                        continuation.resume(chatPreviewMapper(request, error.errorCode))
                     } else {
                         continuation.failWithError(error, "openChatPreview")
                     }
@@ -912,4 +914,6 @@ internal class ChatRepositoryImpl @Inject constructor(
             getChatRoom(chatId)?.peerPrivilegesByHandles?.get(userHandle)
                 ?: ChatRoomPermission.Unknown
         }
+
+    override fun getChatInvalidHandle(): Long = megaChatApiGateway.getChatInvalidHandle()
 }

@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
+import mega.privacy.android.data.mapper.chat.ChatPreviewMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
@@ -33,6 +34,7 @@ import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.repository.ChatRepository
@@ -93,6 +95,7 @@ class ChatRepositoryImplTest {
     }
     private val appEventGateway = mock<AppEventGateway>()
     private val chatHistoryLoadStatusMapper = mock<ChatHistoryLoadStatusMapper>()
+    private val chatPreviewMapper = mock<ChatPreviewMapper>()
 
     @Before
     fun setUp() {
@@ -116,7 +119,8 @@ class ChatRepositoryImplTest {
             appEventGateway = appEventGateway,
             chatHistoryLoadStatusMapper = chatHistoryLoadStatusMapper,
             chatInitStateMapper = chatInitStateMapper,
-            pendingMessageListMapper = mock()
+            pendingMessageListMapper = mock(),
+            chatPreviewMapper = chatPreviewMapper,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)
@@ -501,5 +505,20 @@ class ChatRepositoryImplTest {
         val actual = underTest.attachVoiceMessage(chatId, handle)
         assertThat(actual).isEqualTo(expectedTempId)
         verify(megaChatApiGateway).attachVoiceMessage(any(), any(), any())
+    }
+
+    @Test
+    fun `test that openChatPreview returns data correctly when call megaApi`() = runTest {
+        val link = "link"
+        val chatPreview = mock<ChatPreview>()
+        whenever(megaChatApiGateway.openChatPreview(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaChatErrorSuccess,
+            )
+        }
+        whenever(chatPreviewMapper(any(), any())).thenReturn(chatPreview)
+        assertThat(underTest.openChatPreview(link)).isEqualTo(chatPreview)
     }
 }

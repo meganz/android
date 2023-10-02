@@ -298,10 +298,12 @@ public class CallUtil {
 
     /**
      * Retrieve the id of a chat that has a call in progress different that current one
+     * replace by GetAnotherCallParticipatingUseCase
      *
      * @param currentChatId the chat ID of the current call
      * @return A long data type. It's the id of chat
      */
+    @Deprecated
     public static long getAnotherCallParticipating(Long currentChatId) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
@@ -1259,11 +1261,12 @@ public class CallUtil {
     }
 
     /**
-     * Method to know if a meeting has ended
+     * Method to know if a meeting has ended use [IsMeetingEndUseCase]
      *
      * @param chatRequest [MegaChatRequest]
      * @return True, if the meeting is finished. False, if not.
      */
+    @Deprecated
     public static boolean isMeetingEnded(MegaChatRequest chatRequest) {
         return !MegaChatApi.hasChatOptionEnabled(
                 MegaChatApi.CHAT_OPTION_WAITING_ROOM,
@@ -1273,11 +1276,12 @@ public class CallUtil {
     }
 
     /**
-     * Method to know if I am participating in this meeting
+     * Method to know if I am participating in this meeting use [CheckInThisMeetingUseCase]
      *
      * @param chatId Chat ID of the meeting
      * @return True, f I am participating in this meeting. False, if not.
      */
+    @Deprecated
     public static boolean amIParticipatingInThisMeeting(long chatId) {
         MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
         return call != null && call.getStatus() != MegaChatCall.CALL_STATUS_DESTROYED &&

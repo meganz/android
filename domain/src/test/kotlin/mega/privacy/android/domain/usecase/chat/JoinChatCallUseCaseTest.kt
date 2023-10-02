@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRequestType
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.repository.ChatRepository
@@ -77,7 +78,9 @@ class JoinChatCallUseCaseTest {
             paramType = null
         )
 
-        whenever(chatRepository.openChatPreview(chatLink)).thenReturn(chatRequest)
+        val chatPreview = ChatPreview(chatRequest, false)
+
+        whenever(chatRepository.openChatPreview(chatLink)).thenReturn(chatPreview)
         whenever(getChatRoom(chatId)).thenReturn(chatRoom)
 
         underTest.invoke(chatLink)
@@ -111,7 +114,9 @@ class JoinChatCallUseCaseTest {
             paramType = null
         )
 
-        whenever(chatRepository.openChatPreview(chatLink)).thenReturn(chatRequest)
+        val chatPreview = ChatPreview(chatRequest, false)
+
+        whenever(chatRepository.openChatPreview(chatLink)).thenReturn(chatPreview)
         whenever(getChatRoom(chatId)).thenReturn(null)
 
         underTest.invoke(chatLink)
@@ -168,7 +173,9 @@ class JoinChatCallUseCaseTest {
                 paramType = null
             )
 
-            whenever(chatRepository.openChatPreview(chatLink)).thenReturn(chatRequest)
+            val chatPreview = ChatPreview(chatRequest, false)
+
+            whenever(chatRepository.openChatPreview(chatLink)).thenReturn(chatPreview)
             whenever(getChatRoom(chatId)).thenReturn(chatRoom)
 
             underTest.invoke(chatLink)
@@ -228,7 +235,9 @@ class JoinChatCallUseCaseTest {
                 paramType = null
             )
 
-            whenever(chatRepository.openChatPreview(chatLink)).thenReturn(chatRequest)
+            val chatPreview = ChatPreview(chatRequest, false)
+
+            whenever(chatRepository.openChatPreview(chatLink)).thenReturn(chatPreview)
             whenever(getChatRoom(chatId)).thenReturn(chatRoom)
 
             underTest.invoke(chatLink)

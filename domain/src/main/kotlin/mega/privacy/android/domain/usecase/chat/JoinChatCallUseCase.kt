@@ -23,7 +23,7 @@ class JoinChatCallUseCase @Inject constructor(
     suspend operator fun invoke(
         chatLink: String,
     ) {
-        val chatRequest = chatRepository.openChatPreview(chatLink)
+        val chatRequest = chatRepository.openChatPreview(chatLink).request
         val chatId = chatRequest.chatHandle ?: error("Invalid Chat")
         val chatPublicHandle = chatRequest.userHandle
 

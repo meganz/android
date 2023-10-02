@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
@@ -216,7 +217,7 @@ interface ChatRepository {
      * @param link  Public chat link.
      * @return      [ChatRequest]
      */
-    suspend fun openChatPreview(link: String): ChatRequest
+    suspend fun openChatPreview(link: String): ChatPreview
 
     /**
      * Obtain basic information abouts a public chat.
@@ -671,4 +672,10 @@ interface ChatRepository {
      * @return              [ChatRoomPermission]
      */
     suspend fun getUserPrivilege(chatId: Long, userHandle: Long): ChatRoomPermission
+
+    /**
+     * Get chat invalid handle
+     * it returns MEGACHAT_INVALID_HANDLE so don't need to be suspend
+     */
+    fun getChatInvalidHandle(): Long
 }
