@@ -27,6 +27,7 @@ import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.search.model.SearchType
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
@@ -78,6 +79,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -174,6 +176,7 @@ class ManagerViewModel @Inject constructor(
     private val disableExportNodesUseCase: DisableExportNodesUseCase,
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
     private val dismissPsaUseCase: DismissPsaUseCase,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
 ) : ViewModel() {
 
     /**
@@ -869,6 +872,36 @@ class ManagerViewModel @Inject constructor(
      * @param psaId
      */
     fun dismissPsa(psaId: Int) = viewModelScope.launch { dismissPsaUseCase(psaId) }
+
+    /**
+     * Get the parent handle from where the search is performed
+     *
+     * @param browserParentHandle
+     * @param rubbishBinParentHandle
+     * @param backupsParentHandle
+     * @param incomingParentHandle
+     * @param outgoingParentHandle
+     * @param linksParentHandle
+     *
+     * @return the parent handle from where the search is performed
+     */
+    suspend fun getParentHandleForSearch(
+        browserParentHandle: Long,
+        rubbishBinParentHandle: Long,
+        backupsParentHandle: Long,
+        incomingParentHandle: Long,
+        outgoingParentHandle: Long,
+        linksParentHandle: Long,
+        searchType: SearchType,
+    ): Long = when (searchType) {
+        SearchType.CLOUD_DRIVE -> browserParentHandle
+        SearchType.INCOMING_SHARES -> incomingParentHandle
+        SearchType.OUTGOING_SHARES -> outgoingParentHandle
+        SearchType.LINKS -> linksParentHandle
+        SearchType.RUBBISH_BIN -> rubbishBinParentHandle
+        SearchType.BACKUPS -> backupsParentHandle
+        SearchType.OTHER -> getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
+    }
 
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"

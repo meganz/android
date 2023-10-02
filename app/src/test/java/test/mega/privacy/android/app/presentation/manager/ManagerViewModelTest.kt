@@ -25,6 +25,7 @@ import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMap
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.search.model.SearchType
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.EventType
@@ -50,6 +51,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
@@ -247,6 +249,7 @@ class ManagerViewModelTest {
     private val disableExportNodesUseCase: DisableExportNodesUseCase = mock()
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()
     private val dismissPsaUseCase = mock<DismissPsaUseCase>()
+    private val rootNodeUseCase = mock<GetRootNodeUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -313,6 +316,7 @@ class ManagerViewModelTest {
             disableExportNodesUseCase = disableExportNodesUseCase,
             removePublicLinkResultMapper = removePublicLinkResultMapper,
             dismissPsaUseCase = dismissPsaUseCase,
+            getRootNodeUseCase = rootNodeUseCase,
         )
     }
 
@@ -1052,10 +1056,26 @@ class ManagerViewModelTest {
     }
 
     @Test
-    internal fun `test that dismiss calls the use case`() = runTest{
+    internal fun `test that dismiss calls the use case`() = runTest {
         val expected = 123
         underTest.dismissPsa(expected)
         testScheduler.advanceUntilIdle()
         verify(dismissPsaUseCase).invoke(expected)
     }
+
+    @Test
+    internal fun `test that getParentHandleForSearch returns parent handle based on search type`() =
+        runTest {
+            val expectedParentHandle = 678901
+            val actual = underTest.getParentHandleForSearch(
+                browserParentHandle = 123456,
+                rubbishBinParentHandle = 234567,
+                backupsParentHandle = 345678,
+                incomingParentHandle = 456789,
+                outgoingParentHandle = 567890,
+                linksParentHandle = 678901,
+                searchType = SearchType.LINKS
+            )
+            assertThat(actual).isEqualTo(expectedParentHandle)
+        }
 }

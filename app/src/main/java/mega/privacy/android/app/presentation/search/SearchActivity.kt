@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.search
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,6 +15,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.search.model.SearchActivityViewModel
+import mega.privacy.android.app.presentation.search.model.SearchType
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -33,6 +35,37 @@ class SearchActivity : AppCompatActivity() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    companion object {
+        /**
+         * Checks if first navigation level
+         */
+        const val IS_FIRST_LEVEL = "isFirstLevel"
+
+        /**
+         * Parent search handle
+         */
+        const val PARENT_HANDLE = "parentHandle"
+
+        /**
+         * Search type
+         */
+        const val SEARCH_TYPE = "searchType"
+
+        /**
+         * Get Search activity Intent
+         */
+        fun getIntent(
+            context: Context,
+            searchType: SearchType,
+            parentHandle: Long,
+            isFirstNavigationLevel: Boolean = false,
+        ): Intent = Intent(context, SearchActivity::class.java).apply {
+            putExtra(IS_FIRST_LEVEL, isFirstNavigationLevel)
+            putExtra(SEARCH_TYPE, searchType)
+            putExtra(PARENT_HANDLE, parentHandle)
+        }
+    }
 
     /**
      * onCreate

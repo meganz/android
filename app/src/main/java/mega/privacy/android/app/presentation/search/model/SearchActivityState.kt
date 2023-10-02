@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory
  * @property isInProgress to show loading or not
  * @property sortOrder [SortOrder] to display nodes
  * @property currentViewType current [ViewType]
+ * @property searchQuery current typed search query in search activity
  */
 data class SearchActivityState(
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
@@ -21,5 +22,6 @@ data class SearchActivityState(
     val parentHandle: Long = -1,
     val isInProgress: Boolean = false,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    val currentViewType: ViewType = ViewType.LIST
+    val currentViewType: ViewType = ViewType.LIST,
+    val searchQuery: String = "",
 )

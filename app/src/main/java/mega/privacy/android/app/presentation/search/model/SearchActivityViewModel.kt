@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.search.model
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,11 +9,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -52,7 +51,8 @@ class SearchActivityViewModel @Inject constructor(
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
     private val getParentNodeHandle: GetParentNodeHandle,
-    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    stateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
      * private UI state
@@ -64,6 +64,12 @@ class SearchActivityViewModel @Inject constructor(
      */
     val state: StateFlow<SearchActivityState> = _state
 
+    private val isFirstLevel = stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL) ?: false
+    private val searchType =
+        stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE) ?: SearchType.OTHER
+    private val parentHandle =
+        stateHandle.get<Long>(SearchActivity.PARENT_HANDLE) ?: MegaApiJava.INVALID_HANDLE
+
     init {
         viewModelScope.launch {
             monitorNodeUpdates().collect {
@@ -72,6 +78,16 @@ class SearchActivityViewModel @Inject constructor(
                 }
             }
         }
+        initializeSearch()
+    }
+
+    private fun initializeSearch() {
+        performSearch(
+            isFirstLevel = isFirstLevel,
+            query = state.value.searchQuery,
+            searchType = searchType,
+            parentHandle = parentHandle
+        )
     }
 
     /**
@@ -80,33 +96,24 @@ class SearchActivityViewModel @Inject constructor(
     fun performSearch(
         query: String,
         isFirstLevel: Boolean = false,
-        currentTab: DrawerItem?,
-        sharesTab: Int,
-        currentHandle: Long,
+        searchType: SearchType,
+        parentHandle: Long,
     ) {
         viewModelScope.launch {
             runCatching {
-                val parentHandle = getParentNodeHandle(currentHandle)
-                if (query.isBlank().not()) {
-                    _state.update {
-                        it.copy(isInProgress = true)
-                    }
-                    val node = getNodeHandle(currentTab = currentTab, parentHandle = parentHandle)
+                _state.update {
+                    it.copy(isInProgress = true)
+                }
+                val node = getSearchParentNode(searchType = searchType, parentHandle = parentHandle)
 
-                    val searchList = getSearchResults(
-                        currentTab = currentTab,
-                        query = query,
-                        isFirstLevel = isFirstLevel,
-                        node = node,
-                        sharesTab = sharesTab
-                    )
-                    _state.update {
-                        it.copy(searchItemList = getNodeUiItems(searchList), isInProgress = false)
-                    }
-                } else {
-                    _state.update {
-                        it.copy(searchItemList = emptyList(), isInProgress = false)
-                    }
+                val searchList = getSearchResults(
+                    query = query,
+                    isFirstLevel = isFirstLevel,
+                    node = node,
+                    searchType = searchType
+                )
+                _state.update {
+                    it.copy(searchItemList = getNodeUiItems(searchList), isInProgress = false)
                 }
             }.onFailure { ex ->
                 Timber.e(ex)
@@ -128,96 +135,50 @@ class SearchActivityViewModel @Inject constructor(
         }
     }
 
-    private fun isParentHandleIsInvalidHandle(handle: Long?) = handle == MegaApiJava.INVALID_HANDLE
-
     /**
-     * This method Returns [Node] for respective selected [DrawerItem]
-     * @param currentTab current selected tab
+     * This method Returns [Node] for respective selected [SearchType]
      * @param parentHandle parent handle
      * @return [Node]
      */
-    private suspend fun getNodeHandle(currentTab: DrawerItem?, parentHandle: Long?) =
-        if (isParentHandleIsInvalidHandle(state.value.parentHandle)) {
-            if (currentTab == DrawerItem.HOMEPAGE) getRootNodeUseCase()
-            else if (currentTab == DrawerItem.CLOUD_DRIVE) getNodeByHandleUseCase(state.value.parentHandle)
-            else {
-                if (!isParentHandleIsInvalidHandle(parentHandle))
-                    getNodeByHandleUseCase(state.value.parentHandle)
-                else {
-                    when (currentTab) {
-                        DrawerItem.RUBBISH_BIN -> {
-                            getRubbishNodeUseCase()
-                        }
-
-                        DrawerItem.BACKUPS -> {
-                            getBackupsNodeUseCase()
-                        }
-
-                        else -> {
-                            null
-                        }
-                    }
-                }
+    private suspend fun getSearchParentNode(searchType: SearchType, parentHandle: Long?): Node? =
+        if (parentHandle == null || parentHandle == -1L) {
+            when (searchType) {
+                SearchType.CLOUD_DRIVE -> getRootNodeUseCase()
+                SearchType.RUBBISH_BIN -> getRubbishNodeUseCase()
+                SearchType.BACKUPS -> getBackupsNodeUseCase()
+                else -> null
             }
         } else {
-            getNodeByHandleUseCase(state.value.parentHandle)
+            getNodeByHandleUseCase(parentHandle)
         }
 
     /**
      * This method returns list of search items
-     * @param currentTab current tab
-     * @param sharesTab share tab id
+     * @param searchType current tab
      * @param query query to be searched
      * @param isFirstLevel is first level
      * @param node Node
      * @return list of TypedNode
      */
     private suspend fun getSearchResults(
-        currentTab: DrawerItem?,
-        sharesTab: Int,
+        searchType: SearchType,
         query: String,
         isFirstLevel: Boolean,
         node: Node?,
     ) =
-        when (currentTab) {
-            DrawerItem.SHARED_ITEMS -> {
-                when (SharesTab.fromPosition(sharesTab)) {
-                    SharesTab.INCOMING_TAB -> {
-                        incomingSharesTabSearchUseCase(
-                            query = query
-                        )
-                    }
+        when (searchType) {
+            SearchType.INCOMING_SHARES -> incomingSharesTabSearchUseCase(query = query)
+            SearchType.OUTGOING_SHARES -> outgoingSharesTabSearchUseCase(query = query)
+            SearchType.LINKS -> linkSharesTabSearchUseCase(
+                query = query,
+                isFirstLevel = isFirstLevel
+            )
 
-                    SharesTab.OUTGOING_TAB -> {
-                        outgoingSharesTabSearchUseCase(
-                            query = query
-                        )
-                    }
-
-                    SharesTab.LINKS_TAB -> {
-                        linkSharesTabSearchUseCase(
-                            query = query,
-                            isFirstLevel = isFirstLevel
-                        )
-                    }
-
-                    else -> {
-                        searchInNodesUseCase(
-                            nodeId = node?.id,
-                            query = query,
-                            searchCategory = state.value.searchType
-                        )
-                    }
-                }
-            }
-
-            else -> {
-                searchInNodesUseCase(
-                    nodeId = node?.id,
-                    query = query,
-                    searchCategory = state.value.searchType
-                )
-            }
+            else -> searchInNodesUseCase(
+                nodeId = node?.id,
+                query = query,
+                searchCategory = state.value.searchType
+            )
         }
 
     /**

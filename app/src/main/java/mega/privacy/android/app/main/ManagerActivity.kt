@@ -207,8 +207,11 @@ import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment
 import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
+import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchFragment
 import mega.privacy.android.app.presentation.search.SearchViewModel
+import mega.privacy.android.app.presentation.search.mapper.SearchTypeMapper
+import mega.privacy.android.app.presentation.search.model.SearchType
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
@@ -426,6 +429,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var inAppUpdateHandler: InAppUpdateHandler
 
 
+    @Inject
+    lateinit var searchTypeMapper: SearchTypeMapper
+
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
     private lateinit var getProText: TextView
@@ -488,6 +494,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     var turnOnNotifications = false
 
     override var drawerItem: DrawerItem? = null
+    private var searchType: SearchType = SearchType.OTHER
     private lateinit var fragmentLayout: LinearLayout
     private lateinit var waitingRoomComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -3728,14 +3735,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.SEARCH -> {
-                showHideBottomNavigationView(true)
-                setBottomNavigationMenuItemChecked(NO_BNV)
-                drawerItem = DrawerItem.SEARCH
-                if (getSearchFragment() == null) {
-                    searchFragment = SearchFragment.newInstance()
+                lifecycleScope.launch {
+                    if (getFeatureFlagValueUseCase(AppFeatures.SearchWithChips)) {
+                        navigateToSearchActivity()
+                    } else {
+                        showHideBottomNavigationView(true)
+                        setBottomNavigationMenuItemChecked(NO_BNV)
+                        drawerItem = DrawerItem.SEARCH
+                        if (getSearchFragment() == null) {
+                            searchFragment = SearchFragment.newInstance()
+                        }
+                        searchFragment?.let { replaceFragment(it, FragmentTag.SEARCH.tag) }
+                        showFabButton()
+                    }
                 }
-                searchFragment?.let { replaceFragment(it, FragmentTag.SEARCH.tag) }
-                showFabButton()
             }
 
             DrawerItem.TRANSFERS -> {
@@ -3763,6 +3776,28 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         setTabsVisibility()
         checkScrollElevation()
         viewModel.checkToShow2FADialog(newAccount, firstLogin)
+    }
+
+    private suspend fun navigateToSearchActivity() {
+        searchExpand = false
+        val parentHandle = viewModel.getParentHandleForSearch(
+            fileBrowserViewModel.state.value.fileBrowserHandle,
+            rubbishBinViewModel.state.value.rubbishBinHandle,
+            backupsViewModel.state.value.backupsHandle,
+            incomingSharesViewModel.state.value.incomingHandle,
+            outgoingSharesViewModel.state.value.outgoingHandle,
+            legacyLinksViewModel.state.value.linksHandle,
+            searchType,
+        )
+        startActivity(
+            SearchActivity.getIntent(
+                context = this,
+                isFirstNavigationLevel = isFirstNavigationLevel,
+                searchType = searchType,
+                parentHandle = parentHandle
+            )
+        )
+        closeSearchSection()
     }
 
     private fun onSelectSharedItemsDrawerItem() {
@@ -7924,6 +7959,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun setSearchDrawerItem() {
         if (drawerItem === DrawerItem.SEARCH) return
+        searchType = searchTypeMapper(drawerItem = drawerItem, sharesTab = tabItemShares)
         drawerItem?.let { searchViewModel.setSearchDrawerItem(it) }
         searchViewModel.setSearchSharedTab(tabItemShares)
         drawerItem = DrawerItem.SEARCH

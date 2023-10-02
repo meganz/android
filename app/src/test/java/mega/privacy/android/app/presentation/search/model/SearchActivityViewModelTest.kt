@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.search.model
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +10,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -52,6 +52,7 @@ class SearchActivityViewModelTest {
     private val getBackupsNodeUseCase: GetBackupsNodeUseCase = mock()
     private val getParentNodeHandle: GetParentNodeHandle = mock()
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase = mock()
+    private val stateHandle: SavedStateHandle = mock()
 
     @BeforeAll
     fun setUp() {
@@ -68,6 +69,7 @@ class SearchActivityViewModelTest {
             getBackupsNodeUseCase = getBackupsNodeUseCase,
             getParentNodeHandle = getParentNodeHandle,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
+            stateHandle = stateHandle,
         )
     }
 
@@ -76,8 +78,7 @@ class SearchActivityViewModelTest {
     fun `test when search a query with valid handle`(
         query: String,
         isFirstLevel: Boolean,
-        currentTab: DrawerItem?,
-        sharesTab: Int,
+        searchType: SearchType,
         currentHandle: Long,
     ) = runTest {
         underTest.updateSearchHandle(1)
@@ -116,9 +117,8 @@ class SearchActivityViewModelTest {
         underTest.performSearch(
             query = query,
             isFirstLevel = isFirstLevel,
-            currentTab = currentTab,
-            sharesTab = sharesTab,
-            currentHandle = currentHandle
+            searchType = SearchType.INCOMING_SHARES,
+            parentHandle = currentHandle
         )
         underTest.state.test {
             val item = awaitItem()
@@ -131,8 +131,7 @@ class SearchActivityViewModelTest {
     fun `test when search a query with in valid handle`(
         query: String,
         isFirstLevel: Boolean,
-        currentTab: DrawerItem?,
-        sharesTab: Int,
+        searchType: SearchType,
         currentHandle: Long,
     ) = runTest {
         underTest.updateSearchHandle(-1)
@@ -169,9 +168,8 @@ class SearchActivityViewModelTest {
         underTest.performSearch(
             query = query,
             isFirstLevel = isFirstLevel,
-            currentTab = currentTab,
-            sharesTab = sharesTab,
-            currentHandle = currentHandle
+            searchType = SearchType.INCOMING_SHARES,
+            parentHandle = currentHandle
         )
         underTest.state.test {
             val item = awaitItem()
@@ -184,8 +182,7 @@ class SearchActivityViewModelTest {
     fun `test when search a query with in valid handle for shares tab`(
         query: String,
         isFirstLevel: Boolean,
-        currentTab: DrawerItem?,
-        sharesTab: Int,
+        searchType: SearchType,
         currentHandle: Long,
     ) = runTest {
         underTest.updateSearchHandle(-1)
@@ -222,9 +219,8 @@ class SearchActivityViewModelTest {
         underTest.performSearch(
             query = query,
             isFirstLevel = isFirstLevel,
-            currentTab = currentTab,
-            sharesTab = sharesTab,
-            currentHandle = currentHandle
+            searchType = SearchType.INCOMING_SHARES,
+            parentHandle = currentHandle
         )
         underTest.state.test {
             val item = awaitItem()
@@ -233,16 +229,13 @@ class SearchActivityViewModelTest {
     }
 
     private fun provideParams(): Stream<Arguments> = Stream.of(
-        Arguments.of("Query", false, null, 0, 1),
-        Arguments.of("Query", false, DrawerItem.HOMEPAGE, -1, 1),
-        Arguments.of("Query", false, DrawerItem.CLOUD_DRIVE, -1, 1),
-        Arguments.of("Query", false, DrawerItem.SHARED_ITEMS, -1, 1),
-        Arguments.of("Query", false, DrawerItem.SHARED_ITEMS, 0, 1),
-        Arguments.of("Query", false, DrawerItem.SHARED_ITEMS, 1, 1),
-        Arguments.of("Query", false, DrawerItem.SHARED_ITEMS, 2, 1),
-        Arguments.of("Query", false, null, -1, 1),
-        Arguments.of("Query", false, DrawerItem.RUBBISH_BIN, -1, 1),
-        Arguments.of("Query", false, DrawerItem.BACKUPS, -1, 1)
+        Arguments.of("Query", false, SearchType.CLOUD_DRIVE, 1),
+        Arguments.of("Query", false, SearchType.OTHER, 1),
+        Arguments.of("Query", false, SearchType.INCOMING_SHARES, 1),
+        Arguments.of("Query", false, SearchType.OUTGOING_SHARES, 1),
+        Arguments.of("Query", false, SearchType.LINKS, 1),
+        Arguments.of("Query", false, SearchType.RUBBISH_BIN, 1),
+        Arguments.of("Query", false, SearchType.BACKUPS, 1)
     )
 
     @AfterAll
