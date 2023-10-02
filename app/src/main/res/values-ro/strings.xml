@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation, TranslatedStringTemplate">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -4136,7 +4136,7 @@
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] de la [B]%2$s la %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->
-    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever">
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_daily_forever" >
         <item quantity="one">În fiecare zi, începând cu [A]%2$s%1$s[/A] de la [B]%3$s la %4$s[/B]</item>
         <item quantity="few">La fiecare %1$d zile, începând cu [A]%2$s%1$s[/A] de la [B]%3$s la %4$s[/B]</item>
         <item quantity="other">La fiecare %1$d de zile, începând cu [A]%2$s%1$s[/A] de la [B]%3$s la %4$s[/B]</item>
