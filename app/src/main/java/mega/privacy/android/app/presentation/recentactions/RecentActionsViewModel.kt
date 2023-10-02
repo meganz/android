@@ -7,6 +7,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
@@ -80,6 +81,9 @@ class RecentActionsViewModel @Inject constructor(
         // monitor node updates
         viewModelScope.launch {
             monitorNodeUpdates()
+                .catch {
+                    Timber.e(it)
+                }
                 .conflate()
                 .collect {
                     updateRecentActions()
@@ -130,15 +134,19 @@ class RecentActionsViewModel @Inject constructor(
      * Update the recent actions list by combination
      */
     private suspend fun updateRecentActions() = coroutineScope {
-        val getRecentActions = async {
-            getRecentActionsUseCase().also { _buckets = it }
+        runCatching {
+            val getRecentActions = async {
+                getRecentActionsUseCase().also { _buckets = it }
+            }
+            val getVisibleContacts = async { getVisibleContactsUseCase() }
+
+            val formattedList =
+                formatRecentActions(getRecentActions.await(), getVisibleContacts.await())
+
+            setUiRecentActionsItems(formattedList)
+        }.onFailure {
+            Timber.e(it)
         }
-        val getVisibleContacts = async { getVisibleContactsUseCase() }
-
-        val formattedList =
-            formatRecentActions(getRecentActions.await(), getVisibleContacts.await())
-
-        setUiRecentActionsItems(formattedList)
     }
 
     /**
