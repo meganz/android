@@ -133,7 +133,7 @@ internal class DeviceCenterUINodeStatusMapperTest {
         ),
         Arguments.of(
             DeviceCenterNodeStatus.NoCameraUploads,
-            DeviceCenterUINodeStatus.NoCameraUploads,
+            DeviceCenterUINodeStatus.CameraUploadsDisabled,
         ),
     )
 

@@ -61,7 +61,7 @@ internal class DeviceCenterUINodeStatusMapper @Inject constructor(
             }
         }
 
-        DeviceCenterNodeStatus.NoCameraUploads -> DeviceCenterUINodeStatus.NoCameraUploads
+        DeviceCenterNodeStatus.NoCameraUploads -> DeviceCenterUINodeStatus.CameraUploadsDisabled
         else -> DeviceCenterUINodeStatus.Unknown
     }
 }

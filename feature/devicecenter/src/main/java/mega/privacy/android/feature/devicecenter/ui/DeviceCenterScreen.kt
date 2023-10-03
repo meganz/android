@@ -337,7 +337,7 @@ private val ownDeviceUINode = OwnDeviceUINode(
     id = "1234-5678",
     name = "User's Pixel 6",
     icon = DeviceIconType.Android,
-    status = DeviceCenterUINodeStatus.NoCameraUploads,
+    status = DeviceCenterUINodeStatus.CameraUploadsDisabled,
     folders = emptyList(),
 )
 

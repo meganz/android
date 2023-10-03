@@ -84,10 +84,10 @@ sealed class DeviceCenterUINodeStatus(
     )
 
     /**
-     * Represents a No Camera Uploads Status
+     * Represents a Camera Uploads Disabled Status
      */
-    data object NoCameraUploads : DeviceCenterUINodeStatus(
-        name = DeviceCenterR.string.device_center_list_view_item_status_no_camera_uploads,
+    data object CameraUploadsDisabled : DeviceCenterUINodeStatus(
+        name = DeviceCenterR.string.device_center_list_view_item_status_camera_uploads_disabled,
         icon = CoreR.drawable.ic_info,
         color = orange_400,
     )
