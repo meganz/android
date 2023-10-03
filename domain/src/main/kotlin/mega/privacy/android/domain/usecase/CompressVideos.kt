@@ -15,7 +15,7 @@ interface CompressVideos {
      * @param pendingList [List] of [SyncRecord]
      * @return [Flow] of [VideoCompressionState]
      */
-    suspend operator fun invoke(
+    operator fun invoke(
         rootPath: String,
         pendingList: List<SyncRecord>,
     ): Flow<VideoCompressionState>

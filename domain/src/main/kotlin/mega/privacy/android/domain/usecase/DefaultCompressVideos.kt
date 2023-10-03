@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.usecase
 
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -16,12 +18,16 @@ class DefaultCompressVideos @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
 ) : CompressVideos {
-    override suspend fun invoke(
+    override fun invoke(
         rootPath: String,
         pendingList: List<SyncRecord>,
-    ) = cameraUploadRepository.compressVideos(
-        root = rootPath,
-        quality = getUploadVideoQualityUseCase() ?: VideoQuality.ORIGINAL,
-        records = pendingList,
-    )
+    ) = flow {
+        emitAll(
+            cameraUploadRepository.compressVideos(
+                root = rootPath,
+                quality = getUploadVideoQualityUseCase() ?: VideoQuality.ORIGINAL,
+                records = pendingList,
+            )
+        )
+    }
 }
