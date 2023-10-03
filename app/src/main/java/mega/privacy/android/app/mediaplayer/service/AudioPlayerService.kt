@@ -2,6 +2,7 @@ package mega.privacy.android.app.mediaplayer.service
 
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -93,6 +94,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     private var isForeground = true
 
     private var audioClosable = true
+
+    private var currentNotification: Notification? = null
 
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
@@ -250,6 +253,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     if (ongoing && isForeground) {
                         // Make sure the service will not get destroyed while playing media.
                         startForeground(notificationId, notification)
+                        currentNotification = notification
                     } else {
                         // Make notification cancellable.
                         stopForeground(STOP_FOREGROUND_DETACH)
@@ -275,6 +279,9 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             }
 
             COMMAND_RESUME -> {
+                currentNotification?.let {
+                    startForeground(PLAYBACK_NOTIFICATION_ID, it)
+                }
                 audioClosable = false
                 requestAudioFocus()
                 mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
