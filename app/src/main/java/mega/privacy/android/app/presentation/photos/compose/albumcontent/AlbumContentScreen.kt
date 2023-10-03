@@ -61,7 +61,6 @@ import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.mobile.analytics.event.DeleteAlbumsDialogButtonEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
 
 @Deprecated(message = "In favor of mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentScreen")
@@ -138,10 +137,7 @@ fun AlbumContentScreen(
         DeleteAlbumsConfirmationDialog(
             selectedAlbumIds = listOfNotNull(album?.id),
             onCancelClicked = albumsViewModel::closeDeleteAlbumsConfirmation,
-            onDeleteClicked = {
-                Analytics.tracker.trackEvent(DeleteAlbumsDialogButtonEvent)
-                albumContentViewModel.deleteAlbum()
-            },
+            onDeleteClicked = { albumContentViewModel.deleteAlbum() },
         )
     }
 

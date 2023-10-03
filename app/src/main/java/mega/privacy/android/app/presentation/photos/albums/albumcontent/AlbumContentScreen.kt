@@ -61,7 +61,6 @@ import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.mobile.analytics.event.DeleteAlbumsDialogButtonEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -126,10 +125,7 @@ internal fun AlbumContentScreen(
         DeleteAlbumsConfirmationDialog(
             selectedAlbumIds = listOfNotNull(album?.id),
             onCancelClicked = albumContentViewModel::closeDeleteAlbumsConfirmation,
-            onDeleteClicked = {
-                Analytics.tracker.trackEvent(DeleteAlbumsDialogButtonEvent)
-                albumContentViewModel.deleteAlbum()
-            },
+            onDeleteClicked = { albumContentViewModel.deleteAlbum() },
         )
     }
 
