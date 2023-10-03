@@ -30,6 +30,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
                 name = backupInfo.name.orEmpty(),
                 status = backupInfo.getDeviceFolderStatus(currentTimeInSeconds),
                 type = backupInfo.type,
+                userAgent = backupInfo.userAgent,
             )
         }
     }

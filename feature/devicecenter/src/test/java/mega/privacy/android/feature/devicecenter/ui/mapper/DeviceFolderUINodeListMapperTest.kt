@@ -2,6 +2,7 @@ package mega.privacy.android.feature.devicecenter.ui.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
@@ -47,12 +48,14 @@ internal class DeviceFolderUINodeListMapperTest {
         val folderName = "Backup Folder One"
         val folderStatus = DeviceCenterNodeStatus.UpToDate
         val folderType = BackupInfoType.BACKUP_UPLOAD
+        val folderUserAgent = BackupInfoUserAgent.WINDOWS
         val folderList = listOf(
             DeviceFolderNode(
                 id = folderId,
                 name = folderName,
                 status = folderStatus,
                 type = folderType,
+                userAgent = folderUserAgent,
             )
         )
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
@@ -89,12 +92,14 @@ internal class DeviceFolderUINodeListMapperTest {
         val folderId = "12345-6789"
         val folderName = "Backup Folder One"
         val folderStatus = DeviceCenterNodeStatus.UpToDate
+        val folderUserAgent = BackupInfoUserAgent.WINDOWS
         val folderList = listOf(
             DeviceFolderNode(
                 id = folderId,
                 name = folderName,
                 status = folderStatus,
                 type = folderType,
+                userAgent = folderUserAgent,
             )
         )
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate

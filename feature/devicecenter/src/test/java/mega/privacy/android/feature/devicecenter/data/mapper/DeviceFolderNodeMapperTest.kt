@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
 import mega.privacy.android.domain.entity.backup.BackupInfoSubState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import nz.mega.sdk.MegaApiJava
@@ -34,10 +35,12 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
+                on { userAgent }.thenReturn(backupUserAgent)
                 on { state }.thenReturn(BackupInfoState.NOT_INITIALIZED)
                 on { type }.thenReturn(backupType)
             },
@@ -48,6 +51,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Stopped,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -59,6 +63,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupSubState = BackupInfoSubState.STORAGE_OVERQUOTA
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -67,6 +72,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { state }.thenReturn(backupState)
                 on { subState }.thenReturn(BackupInfoSubState.STORAGE_OVERQUOTA)
                 on { type }.thenReturn(backupType)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -75,6 +81,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Overquota(backupSubState),
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -91,6 +98,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -98,6 +106,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { state }.thenReturn(BackupInfoState.FAILED)
                 on { subState }.thenReturn(backupSubState)
                 on { type }.thenReturn(backupType)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -106,6 +115,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Blocked(backupSubState),
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -122,6 +132,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -129,6 +140,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { state }.thenReturn(BackupInfoState.TEMPORARY_DISABLED)
                 on { subState }.thenReturn(backupSubState)
                 on { type }.thenReturn(backupType)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -137,6 +149,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Blocked(backupSubState),
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -147,12 +160,14 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(BackupInfoState.DISABLED)
                 on { type }.thenReturn(backupType)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -161,6 +176,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Disabled,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -177,6 +193,7 @@ internal class DeviceFolderNodeMapperTest {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -185,6 +202,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2)))
                 on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(1000L)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -193,6 +211,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Offline,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -209,6 +228,7 @@ internal class DeviceFolderNodeMapperTest {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -217,6 +237,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2)))
                 on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -225,6 +246,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Offline,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -242,6 +264,7 @@ internal class DeviceFolderNodeMapperTest {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -250,6 +273,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(1)))
                 on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(1000L)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -258,6 +282,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Offline,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -275,6 +300,7 @@ internal class DeviceFolderNodeMapperTest {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -283,6 +309,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(1)))
                 on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -291,6 +318,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Offline,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -372,6 +400,7 @@ internal class DeviceFolderNodeMapperTest {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
+        val backupUserAgent = BackupInfoUserAgent.UNKNOWN
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -380,6 +409,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { state }.thenReturn(backupState)
                 on { timestamp }.thenReturn(currentTimeInSeconds)
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -388,6 +418,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Paused,
                 type = backupType,
+                userAgent = backupUserAgent
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -405,6 +436,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.INVALID
+        val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -414,6 +446,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds)
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -422,6 +455,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.UpToDate,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -439,6 +473,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.INVALID
+        val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -448,6 +483,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds)
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -456,6 +492,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.UpToDate,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -467,6 +504,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -475,6 +513,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds)
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -483,6 +522,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Initializing,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -494,6 +534,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupProgress = 75
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -504,6 +545,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds)
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -512,6 +554,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Syncing(backupProgress),
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -523,6 +566,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -531,6 +575,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds)
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
+                on { userAgent }.thenReturn(backupUserAgent)
             },
         )
         val expected = listOf(
@@ -539,6 +584,7 @@ internal class DeviceFolderNodeMapperTest {
                 name = backupName,
                 status = DeviceCenterNodeStatus.Scanning,
                 type = backupType,
+                userAgent = backupUserAgent,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)

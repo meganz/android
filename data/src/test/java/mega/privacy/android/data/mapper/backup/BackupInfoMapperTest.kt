@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
 import mega.privacy.android.domain.entity.backup.BackupInfoSubState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBackupInfo
 import nz.mega.sdk.MegaSync
@@ -26,10 +27,11 @@ import org.mockito.kotlin.whenever
 internal class BackupInfoMapperTest {
     private lateinit var underTest: BackupInfoMapper
 
+    private val backupInfoHeartbeatStatusMapper = mock<BackupInfoHeartbeatStatusMapper>()
     private val backupInfoStateMapper = mock<BackupInfoStateMapper>()
     private val backupInfoSubStateMapper = mock<BackupInfoSubStateMapper>()
-    private val backupInfoHeartbeatStatusMapper = mock<BackupInfoHeartbeatStatusMapper>()
     private val backupInfoTypeMapper = mock<BackupInfoTypeMapper>()
+    private val backupInfoUserAgentMapper = mock<BackupInfoUserAgentMapper>()
 
     // MegaBackupInfo values
     private val id = 123456L
@@ -37,6 +39,7 @@ internal class BackupInfoMapperTest {
     private val rootHandle = 789012L
     private val localFolderPath = "test/local/folder"
     private val deviceId = "12345-6789-device"
+    private val deviceUserAgent = "android"
     private val sdkState = MegaBackupInfo.BACKUP_STATE_ACTIVE
     private val sdkSubState = MegaSync.Error.NO_SYNC_ERROR.swigValue()
     private val extraInfo = null
@@ -50,28 +53,31 @@ internal class BackupInfoMapperTest {
     private val lastSyncedNodeHandle = 432198L
 
     // Mapper converted values
-    private val expectedType = BackupInfoType.CAMERA_UPLOADS
+    private val expectedHeartbeatStatus = BackupInfoHeartbeatStatus.UPTODATE
     private val expectedState = BackupInfoState.ACTIVE
     private val expectedSubState = BackupInfoSubState.NO_SYNC_ERROR
-    private val expectedHeartbeatStatus = BackupInfoHeartbeatStatus.UPTODATE
+    private val expectedType = BackupInfoType.CAMERA_UPLOADS
+    private val expectedUserAgent = BackupInfoUserAgent.ANDROID
 
     @BeforeAll
     fun setup() {
         underTest = BackupInfoMapper(
+            backupInfoHeartbeatStatusMapper = backupInfoHeartbeatStatusMapper,
             backupInfoStateMapper = backupInfoStateMapper,
             backupInfoSubStateMapper = backupInfoSubStateMapper,
-            backupInfoHeartbeatStatusMapper = backupInfoHeartbeatStatusMapper,
             backupInfoTypeMapper = backupInfoTypeMapper,
+            backupInfoUserAgentMapper = backupInfoUserAgentMapper,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
+            backupInfoHeartbeatStatusMapper,
             backupInfoStateMapper,
             backupInfoSubStateMapper,
-            backupInfoHeartbeatStatusMapper,
             backupInfoTypeMapper,
+            backupInfoUserAgentMapper,
         )
     }
 
@@ -79,12 +85,13 @@ internal class BackupInfoMapperTest {
     fun `test that the mapping is correct`() {
         val sdkBackupInfo = initMegaBackupInfo()
 
-        whenever(backupInfoStateMapper(sdkState)).thenReturn(expectedState)
-        whenever(backupInfoSubStateMapper(sdkSubState)).thenReturn(expectedSubState)
         whenever(backupInfoHeartbeatStatusMapper(sdkHeartbeatStatus)).thenReturn(
             expectedHeartbeatStatus
         )
+        whenever(backupInfoStateMapper(sdkState)).thenReturn(expectedState)
+        whenever(backupInfoSubStateMapper(sdkSubState)).thenReturn(expectedSubState)
         whenever(backupInfoTypeMapper(sdkType)).thenReturn(expectedType)
+        whenever(backupInfoUserAgentMapper(deviceUserAgent)).thenReturn(expectedUserAgent)
 
         assertMappedBackupInfoObject(underTest(sdkBackupInfo))
     }
@@ -93,10 +100,11 @@ internal class BackupInfoMapperTest {
     fun `test that null is returned when mega backup info is null`() {
         assertThat(underTest(null)).isNull()
         verifyNoInteractions(
+            backupInfoHeartbeatStatusMapper,
             backupInfoStateMapper,
             backupInfoSubStateMapper,
-            backupInfoHeartbeatStatusMapper,
             backupInfoTypeMapper,
+            backupInfoUserAgentMapper,
         )
     }
 
@@ -111,6 +119,7 @@ internal class BackupInfoMapperTest {
         on { root() }.thenReturn(rootHandle)
         on { localFolder() }.thenReturn(localFolderPath)
         on { deviceId() }.thenReturn(deviceId)
+        on { deviceUserAgent() }.thenReturn(deviceUserAgent)
         on { state() }.thenReturn(sdkState)
         on { substate() }.thenReturn(sdkSubState)
         on { extra() }.thenReturn(extraInfo)
@@ -137,6 +146,7 @@ internal class BackupInfoMapperTest {
             { assertThat(it.rootHandle).isEqualTo(rootHandle) },
             { assertThat(it.localFolderPath).isEqualTo(localFolderPath) },
             { assertThat(it.deviceId).isEqualTo(deviceId) },
+            { assertThat(it.userAgent).isEqualTo(expectedUserAgent) },
             { assertThat(it.state).isEqualTo(expectedState) },
             { assertThat(it.subState).isEqualTo(expectedSubState) },
             { assertThat(it.extraInfo).isEqualTo(extraInfo) },

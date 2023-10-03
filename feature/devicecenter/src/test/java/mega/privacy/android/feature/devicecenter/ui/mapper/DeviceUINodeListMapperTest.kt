@@ -2,6 +2,7 @@ package mega.privacy.android.feature.devicecenter.ui.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
@@ -57,6 +58,7 @@ internal class DeviceUINodeListMapperTest {
         val folderName = "Backup Folder One"
         val folderStatus = DeviceCenterNodeStatus.UpToDate
         val folderType = BackupInfoType.BACKUP_UPLOAD
+        val folderUserAgent = BackupInfoUserAgent.WINDOWS
 
         val deviceFolders = listOf(
             DeviceFolderNode(
@@ -64,6 +66,7 @@ internal class DeviceUINodeListMapperTest {
                 name = folderName,
                 status = folderStatus,
                 type = folderType,
+                userAgent = folderUserAgent,
             ),
         )
         val deviceList = if (isCurrentDevice) {

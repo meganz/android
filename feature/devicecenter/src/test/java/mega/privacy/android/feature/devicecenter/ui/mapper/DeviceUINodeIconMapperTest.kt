@@ -2,6 +2,7 @@ package mega.privacy.android.feature.devicecenter.ui.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
@@ -25,7 +26,7 @@ internal class DeviceUINodeIconMapperTest {
         underTest = DeviceUINodeIconMapper()
     }
 
-    @ParameterizedTest(name = "device folders: {0}, expected device icon: {1}")
+    @ParameterizedTest(name = "expected device icon: {1}")
     @MethodSource("provideParameters")
     fun `test that the correct device icon is returned`(
         deviceFolders: List<DeviceFolderNode>,
@@ -36,32 +37,77 @@ internal class DeviceUINodeIconMapperTest {
 
     private fun provideParameters() = Stream.of(
         Arguments.of(
-            mockDeviceFolders(listOf(BackupInfoType.CAMERA_UPLOADS)),
-            DeviceIconType.Mobile
+            mockDeviceFoldersThroughBackupUserAgents(
+                listOf(
+                    BackupInfoUserAgent.WINDOWS,
+                    BackupInfoUserAgent.LINUX,
+                    BackupInfoUserAgent.MAC,
+                    BackupInfoUserAgent.ANDROID,
+                    BackupInfoUserAgent.IPHONE,
+                )
+            ),
+            DeviceIconType.Windows,
         ),
         Arguments.of(
-            mockDeviceFolders(listOf(BackupInfoType.MEDIA_UPLOADS)),
-            DeviceIconType.Mobile
+            mockDeviceFoldersThroughBackupUserAgents(
+                listOf(
+                    BackupInfoUserAgent.LINUX,
+                    BackupInfoUserAgent.MAC,
+                    BackupInfoUserAgent.ANDROID,
+                    BackupInfoUserAgent.IPHONE,
+                )
+            ),
+            DeviceIconType.Linux,
         ),
         Arguments.of(
-            mockDeviceFolders(listOf(BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS)),
+            mockDeviceFoldersThroughBackupUserAgents(
+                listOf(
+                    BackupInfoUserAgent.MAC,
+                    BackupInfoUserAgent.ANDROID,
+                    BackupInfoUserAgent.IPHONE,
+                )
+            ),
+            DeviceIconType.Mac,
+        ),
+        Arguments.of(
+            mockDeviceFoldersThroughBackupUserAgents(
+                listOf(
+                    BackupInfoUserAgent.ANDROID,
+                    BackupInfoUserAgent.IPHONE,
+                )
+            ),
+            DeviceIconType.Android,
+        ),
+        Arguments.of(
+            mockDeviceFoldersThroughBackupUserAgents(listOf(BackupInfoUserAgent.IPHONE)),
+            DeviceIconType.IOS,
+        ),
+        Arguments.of(
+            mockDeviceFoldersThroughBackupInfoTypes(listOf(BackupInfoType.CAMERA_UPLOADS)),
             DeviceIconType.Mobile,
         ),
         Arguments.of(
-            mockDeviceFolders(
+            mockDeviceFoldersThroughBackupInfoTypes(listOf(BackupInfoType.MEDIA_UPLOADS)),
+            DeviceIconType.Mobile,
+        ),
+        Arguments.of(
+            mockDeviceFoldersThroughBackupInfoTypes(
                 listOf(
                     BackupInfoType.CAMERA_UPLOADS,
                     BackupInfoType.MEDIA_UPLOADS,
-                    BackupInfoType.DOWN_SYNC,
                 )
             ),
             DeviceIconType.Mobile,
         ),
-        Arguments.of(mockDeviceFolders(emptyList()), DeviceIconType.PC),
-        Arguments.of(mockDeviceFolders(listOf(BackupInfoType.DOWN_SYNC)), DeviceIconType.PC),
+        Arguments.of(emptyList<DeviceFolderNode>(), DeviceIconType.PC)
     )
 
-    private fun mockDeviceFolders(backupFolderTypes: List<BackupInfoType>) =
+    private fun mockDeviceFoldersThroughBackupUserAgents(backupUserAgents: List<BackupInfoUserAgent>) =
+        backupUserAgents.map { backupUserAgent ->
+            mock<DeviceFolderNode> { on { userAgent }.thenReturn(backupUserAgent) }
+        }
+
+    private fun mockDeviceFoldersThroughBackupInfoTypes(backupFolderTypes: List<BackupInfoType>) =
         backupFolderTypes.map { backupInfoType ->
             mock<DeviceFolderNode> { on { type }.thenReturn(backupInfoType) }
         }

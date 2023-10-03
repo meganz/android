@@ -10,7 +10,7 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
     /**
      * Represents an Android Device Icon
      */
-    object Android : DeviceIconType {
+    data object Android : DeviceIconType {
         override val iconRes = R.drawable.ic_device_android
         override val applySecondaryColorTint = true
     }
@@ -18,7 +18,7 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
     /**
      * Represents an iOS Device Icon
      */
-    object IOS : DeviceIconType {
+    data object IOS : DeviceIconType {
         override val iconRes = R.drawable.ic_device_ios
         override val applySecondaryColorTint = true
     }
@@ -26,7 +26,7 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
     /**
      * Represents a Linux Device Icon
      */
-    object Linux : DeviceIconType {
+    data object Linux : DeviceIconType {
         override val iconRes = R.drawable.ic_device_pc_linux
         override val applySecondaryColorTint = true
     }
@@ -34,7 +34,7 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
     /**
      * Represents a Mac Device Icon
      */
-    object Mac : DeviceIconType {
+    data object Mac : DeviceIconType {
         override val iconRes = R.drawable.ic_device_pc_mac
         override val applySecondaryColorTint = true
     }
@@ -42,7 +42,7 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
     /**
      * Represents a Mobile Device Icon
      */
-    object Mobile : DeviceIconType {
+    data object Mobile : DeviceIconType {
         override val iconRes = R.drawable.ic_device_mobile
         override val applySecondaryColorTint = true
     }
@@ -50,7 +50,7 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
     /**
      * Represents a PC Device Icon
      */
-    object PC : DeviceIconType {
+    data object PC : DeviceIconType {
         override val iconRes = R.drawable.ic_device_pc
         override val applySecondaryColorTint = true
     }
@@ -58,7 +58,7 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
     /**
      * Represents a Windows Device Icon
      */
-    object Windows : DeviceIconType {
+    data object Windows : DeviceIconType {
         override val iconRes = R.drawable.ic_device_pc_windows
         override val applySecondaryColorTint = true
     }

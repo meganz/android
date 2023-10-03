@@ -7,16 +7,18 @@ import javax.inject.Inject
 /**
  * Mapper that converts a [MegaBackupInfo] into [BackupInfo]
  *
- * @param backupInfoTypeMapper [BackupInfoTypeMapper]
- * @param backupInfoStateMapper [BackupInfoStateMapper]
- * @param backupInfoSubStateMapper [BackupInfoSubStateMapper]
- * @param backupInfoHeartbeatStatusMapper [BackupInfoHeartbeatStatusMapper]
+ * @property backupInfoHeartbeatStatusMapper [BackupInfoHeartbeatStatusMapper]
+ * @property backupInfoStateMapper [BackupInfoStateMapper]
+ * @property backupInfoSubStateMapper [BackupInfoSubStateMapper]
+ * @property backupInfoTypeMapper [BackupInfoTypeMapper]
+ * @property backupInfoUserAgentMapper [BackupInfoUserAgentMapper]
  */
 internal class BackupInfoMapper @Inject constructor(
-    private val backupInfoTypeMapper: BackupInfoTypeMapper,
+    private val backupInfoHeartbeatStatusMapper: BackupInfoHeartbeatStatusMapper,
     private val backupInfoStateMapper: BackupInfoStateMapper,
     private val backupInfoSubStateMapper: BackupInfoSubStateMapper,
-    private val backupInfoHeartbeatStatusMapper: BackupInfoHeartbeatStatusMapper,
+    private val backupInfoTypeMapper: BackupInfoTypeMapper,
+    private val backupInfoUserAgentMapper: BackupInfoUserAgentMapper,
 ) {
 
     /**
@@ -32,6 +34,7 @@ internal class BackupInfoMapper @Inject constructor(
             rootHandle = megaBackupInfo.root(),
             localFolderPath = megaBackupInfo.localFolder(),
             deviceId = megaBackupInfo.deviceId(),
+            userAgent = backupInfoUserAgentMapper(megaBackupInfo.deviceUserAgent()),
             state = backupInfoStateMapper(megaBackupInfo.state()),
             subState = backupInfoSubStateMapper(megaBackupInfo.substate()),
             extraInfo = megaBackupInfo.extra(),
