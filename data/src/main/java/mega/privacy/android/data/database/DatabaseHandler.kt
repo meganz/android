@@ -1,6 +1,5 @@
 package mega.privacy.android.data.database
 
-import android.database.sqlite.SQLiteDatabase
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
@@ -10,7 +9,6 @@ import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
-import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 
 interface DatabaseHandler {
@@ -150,15 +148,6 @@ interface DatabaseHandler {
     fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int
     fun areNotificationsEnabled(handle: String?): String?
 
-    /**
-     * Gets a completed transfer.
-     *
-     * @param id the identifier of the transfer to get
-     * @return The completed transfer which has the id value as identifier.
-     */
-    fun getCompletedTransfer(id: Int): CompletedTransfer?
-
-    fun isPasscodeLockEnabled(db: SQLiteDatabase): Boolean
     fun setNonContactFirstName(name: String?, handle: String?): Int
     fun setNonContactLastName(lastName: String?, handle: String?): Int
     fun setNonContactEmail(email: String?, handle: String?): Int
@@ -215,7 +204,6 @@ interface DatabaseHandler {
     fun clearNonContacts()
     fun clearChatItems()
     fun clearChatSettings()
-    fun clearOffline(db: SQLiteDatabase)
     fun clearOffline()
 
     /**

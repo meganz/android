@@ -1,16 +1,14 @@
 package mega.privacy.android.app
 
 import android.content.ContentValues
-import android.content.Context
 import android.database.Cursor
-import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
-import android.database.sqlite.SQLiteOpenHelper
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
-import dagger.hilt.android.qualifiers.ApplicationContext
+import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.db.SupportSQLiteOpenHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -20,13 +18,10 @@ import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
-import mega.privacy.android.data.database.MegaDatabaseConstant
-import mega.privacy.android.data.database.MegaDatabaseConstant.DATABASE_NAME
-import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_CONTACTS
+import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_SD_TRANSFERS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
@@ -54,643 +49,22 @@ import java.util.Collections
 import java.util.Locale
 import javax.inject.Inject
 
+
 /**
  * Sqlite implementation of database handler
  */
 class SqliteDatabaseHandler @Inject constructor(
-    @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    val crashReporter: CrashReporter,
+    private val crashReporter: CrashReporter,
     private val legacyLoggingSettings: LegacyLoggingSettings,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-) : SQLiteOpenHelper(context, DATABASE_NAME, null, MegaDatabaseConstant.DATABASE_VERSION), LegacyDatabaseHandler {
-    private var db: SQLiteDatabase
-    override fun onCreate(db: SQLiteDatabase) {
-        Timber.d("onCreate")
-        val CREATE_OFFLINE_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_OFFLINE(" +
-                "$KEY_ID INTEGER PRIMARY KEY, " +
-                "$KEY_OFF_HANDLE TEXT," +
-                "$KEY_OFF_PATH TEXT," +
-                "$KEY_OFF_NAME TEXT," +
-                "$KEY_OFF_PARENT INTEGER," +
-                "$KEY_OFF_TYPE INTEGER, " +
-                "$KEY_OFF_INCOMING INTEGER, " +
-                "$KEY_OFF_HANDLE_INCOMING INTEGER )"
-        db.execSQL(CREATE_OFFLINE_TABLE)
-
-        val CREATE_CREDENTIALS_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_CREDENTIALS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY," +
-                    "$KEY_EMAIL TEXT, " +
-                    "$KEY_SESSION TEXT, " +
-                    "$KEY_FIRST_NAME TEXT, " +
-                    "$KEY_LAST_NAME TEXT, " +
-                    "$KEY_MY_HANDLE TEXT)"
-        db.execSQL(CREATE_CREDENTIALS_TABLE)
-
-        val CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_PREFERENCES (" +
-                "$KEY_ID INTEGER PRIMARY KEY," +                    //0
-                "$KEY_FIRST_LOGIN BOOLEAN, " +                      //1
-                "$KEY_CAM_SYNC_ENABLED BOOLEAN, " +                 //2
-                "$KEY_CAM_SYNC_HANDLE TEXT, " +                     //3
-                "$KEY_CAM_SYNC_LOCAL_PATH TEXT, " +                 //4
-                "$KEY_CAM_SYNC_WIFI BOOLEAN, " +                    //5
-                "$KEY_CAM_SYNC_FILE_UPLOAD TEXT, " +                //6
-                "$KEY_PASSCODE_LOCK_ENABLED TEXT, " +               //7
-                "$KEY_PASSCODE_LOCK_CODE TEXT, " +                  //8
-                "$KEY_STORAGE_ASK_ALWAYS TEXT, " +                  //9
-                "$KEY_STORAGE_DOWNLOAD_LOCATION TEXT, " +           //10
-                "$KEY_CAM_SYNC_TIMESTAMP TEXT, " +                  //11
-                "$KEY_LAST_UPLOAD_FOLDER TEXT, " +                  //12
-                "$KEY_LAST_CLOUD_FOLDER_HANDLE TEXT, " +            //13
-                "$KEY_SEC_FOLDER_ENABLED TEXT, " +                  //14
-                "$KEY_SEC_FOLDER_LOCAL_PATH TEXT, " +               //15
-                "$KEY_SEC_FOLDER_HANDLE TEXT, " +                   //16
-                "$KEY_SEC_SYNC_TIMESTAMP TEXT, " +                  //17
-                "$KEY_KEEP_FILE_NAMES BOOLEAN, " +                  //18
-                "$KEY_STORAGE_ADVANCED_DEVICES BOOLEAN, " +         //19
-                "$KEY_PREFERRED_VIEW_LIST BOOLEAN, " +              //20
-                "$KEY_PREFERRED_VIEW_LIST_CAMERA BOOLEAN, " +       //21
-                "$KEY_URI_EXTERNAL_SD_CARD TEXT, " +                //22
-                "$KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD BOOLEAN, " +   //23
-                "$KEY_PASSCODE_LOCK_TYPE TEXT, " +                  //24
-                "$KEY_PREFERRED_SORT_CLOUD TEXT, " +                //25
-                "$KEY_PREFERRED_SORT_OTHERS TEXT," +                //26
-                "$KEY_FIRST_LOGIN_CHAT BOOLEAN, " +                 //27
-                "$KEY_AUTO_PLAY BOOLEAN," +                         //28
-                "$KEY_UPLOAD_VIDEO_QUALITY TEXT DEFAULT '${encrypt(VideoQuality.ORIGINAL.value.toString())}'," +  //29
-                "$KEY_CONVERSION_ON_CHARGING BOOLEAN," +            //30
-                "$KEY_CHARGING_ON_SIZE TEXT," +                     //31
-                "$KEY_SHOULD_CLEAR_CAMSYNC_RECORDS TEXT," +         //32
-                "$KEY_CAM_VIDEO_SYNC_TIMESTAMP TEXT," +             //33
-                "$KEY_SEC_VIDEO_SYNC_TIMESTAMP TEXT," +             //34
-                "$KEY_REMOVE_GPS TEXT," +                           //35
-                "$KEY_SHOW_INVITE_BANNER TEXT," +                   //36
-                "$KEY_PREFERRED_SORT_CAMERA_UPLOAD TEXT," +         //37
-                "$KEY_SD_CARD_URI TEXT," +                          //38
-                "$KEY_ASK_FOR_DISPLAY_OVER TEXT," +                 //39
-                "$KEY_ASK_SET_DOWNLOAD_LOCATION BOOLEAN," +         //40
-                "$KEY_URI_MEDIA_EXTERNAL_SD_CARD TEXT," +           //41
-                "$KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD BOOLEAN," +     //42
-                "$KEY_PASSCODE_LOCK_REQUIRE_TIME TEXT DEFAULT '${encrypt(Constants.REQUIRE_PASSCODE_INVALID.toString())}', " + //43
-                "$KEY_FINGERPRINT_LOCK BOOLEAN DEFAULT '" + encrypt("false") + "'" + //44
-                ")"
-        db.execSQL(CREATE_PREFERENCES_TABLE)
-
-        val CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_ATTRIBUTES(" +
-                "$KEY_ID INTEGER PRIMARY KEY, " +                               //0
-                "$KEY_ATTR_ONLINE TEXT, " +                                     //1
-                "$KEY_ATTR_INTENTS TEXT, " +                                    //2
-                "$KEY_ATTR_ASK_SIZE_DOWNLOAD BOOLEAN, " +                       //3
-                "$KEY_ATTR_ASK_NOAPP_DOWNLOAD BOOLEAN, " +                      //4
-                "$KEY_ACCOUNT_DETAILS_TIMESTAMP TEXT, " +                       //5
-                "$KEY_PAYMENT_METHODS_TIMESTAMP TEXT, " +                       //6
-                "$KEY_PRICING_TIMESTAMP TEXT, " +                               //7
-                "$KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP TEXT, " +              //8
-                "$KEY_INVALIDATE_SDK_CACHE TEXT, " +                            //9
-                "$KEY_USE_HTTPS_ONLY TEXT, " +                                  //10
-                "$KEY_SHOW_COPYRIGHT TEXT, " +                                  //11
-                "$KEY_SHOW_NOTIF_OFF TEXT, " +                                  //12
-                "$KEY_LAST_PUBLIC_HANDLE TEXT, " +                              //13
-                "$KEY_LAST_PUBLIC_HANDLE_TIMESTAMP TEXT, " +                    //14
-                "$KEY_STORAGE_STATE INTEGER DEFAULT '${encrypt(storageStateIntMapper(StorageState.Unknown).toString())}'," +              //15
-                "$KEY_LAST_PUBLIC_HANDLE_TYPE INTEGER DEFAULT '${encrypt(MegaApiJava.AFFILIATE_TYPE_INVALID.toString())}', " +  //16
-                "$KEY_MY_CHAT_FILES_FOLDER_HANDLE TEXT DEFAULT '${encrypt(MegaApiJava.INVALID_HANDLE.toString())}', " +         //17
-                "$KEY_TRANSFER_QUEUE_STATUS BOOLEAN DEFAULT '${encrypt("false")}')"  //18 - True if the queue is paused, false otherwise
-        db.execSQL(CREATE_ATTRIBUTES_TABLE)
-
-        val CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_CONTACTS(" +
-                "$KEY_ID INTEGER PRIMARY KEY, " +
-                "$KEY_CONTACT_HANDLE TEXT, " +
-                "$KEY_CONTACT_MAIL TEXT, " +
-                "$KEY_CONTACT_NAME TEXT, " +
-                "$KEY_CONTACT_LAST_NAME TEXT, " +
-                "$KEY_CONTACT_NICKNAME TEXT)"
-        db.execSQL(CREATE_CONTACTS_TABLE)
-
-        val CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_CHAT_ITEMS(" +
-                "$KEY_ID INTEGER PRIMARY KEY, " +
-                "$KEY_CHAT_HANDLE TEXT, " +
-                "$KEY_CHAT_ITEM_NOTIFICATIONS BOOLEAN, " +
-                "$KEY_CHAT_ITEM_RINGTONE TEXT, " +
-                "$KEY_CHAT_ITEM_SOUND_NOTIFICATIONS TEXT, " +
-                "$KEY_CHAT_ITEM_WRITTEN_TEXT TEXT, " +
-                "$KEY_CHAT_ITEM_EDITED_MSG_ID TEXT)"
-        db.execSQL(CREATE_CHAT_ITEM_TABLE)
-
-        val CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_NON_CONTACTS(" +
-                "$KEY_ID INTEGER PRIMARY KEY, " +
-                "$KEY_NONCONTACT_HANDLE TEXT, " +
-                "$KEY_NONCONTACT_FULLNAME TEXT, " +
-                "$KEY_NONCONTACT_FIRSTNAME TEXT, " +
-                "$KEY_NONCONTACT_LASTNAME TEXT, " +
-                "$KEY_NONCONTACT_EMAIL TEXT)"
-        db.execSQL(CREATE_NONCONTACT_TABLE)
-
-        val CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_CHAT_SETTINGS(" +
-                "$KEY_ID INTEGER PRIMARY KEY, " +
-                "$KEY_CHAT_NOTIFICATIONS_ENABLED BOOLEAN, " +
-                "$KEY_CHAT_SOUND_NOTIFICATIONS TEXT, " +
-                "$KEY_CHAT_VIBRATION_ENABLED BOOLEAN, " +
-                "$KEY_CHAT_VIDEO_QUALITY TEXT DEFAULT '${encrypt(VideoQuality.MEDIUM.value.toString())}')"
-        db.execSQL(CREATE_CHAT_TABLE)
-
-        val CREATE_COMPLETED_TRANSFER_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_COMPLETED_TRANSFERS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +                      //0
-                    "$KEY_TRANSFER_FILENAME TEXT, " +                      //1
-                    "$KEY_TRANSFER_TYPE TEXT, " +                          //2
-                    "$KEY_TRANSFER_STATE TEXT, " +                         //3
-                    "$KEY_TRANSFER_SIZE TEXT, " +                          //4
-                    "$KEY_TRANSFER_HANDLE TEXT, " +                        //5
-                    "$KEY_TRANSFER_PATH TEXT, " +                          //6
-                    "$KEY_TRANSFER_OFFLINE BOOLEAN, " +                    //7
-                    "$KEY_TRANSFER_TIMESTAMP TEXT, " +                     //8
-                    "$KEY_TRANSFER_ERROR TEXT, " +                         //9
-                    "$KEY_TRANSFER_ORIGINAL_PATH TEXT, " +                 //10
-                    "$KEY_TRANSFER_PARENT_HANDLE TEXT)"                    //11
-        db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE)
-
-        val CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS $TABLE_EPHEMERAL(" +
-                "$KEY_ID INTEGER PRIMARY KEY, " +
-                "$KEY_EMAIL TEXT, " +
-                "$KEY_PASSWORD TEXT, " +
-                "$KEY_SESSION TEXT, " +
-                "$KEY_FIRST_NAME TEXT, " +
-                "$KEY_LAST_NAME TEXT)"
-        db.execSQL(CREATE_EPHEMERAL)
-
-        val CREATE_NEW_PENDING_MSG_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_PENDING_MSG_SINGLE(" +
-                    "$KEY_ID INTEGER PRIMARY KEY," +
-                    "$KEY_PENDING_MSG_ID_CHAT TEXT, " +
-                    "$KEY_PENDING_MSG_TIMESTAMP TEXT, " +
-                    "$KEY_PENDING_MSG_TEMP_KARERE TEXT, " +
-                    "$KEY_PENDING_MSG_FILE_PATH TEXT, " +
-                    "$KEY_PENDING_MSG_NAME TEXT, " +
-                    "$KEY_PENDING_MSG_NODE_HANDLE TEXT, " +
-                    "$KEY_PENDING_MSG_FINGERPRINT TEXT, " +
-                    "$KEY_PENDING_MSG_TRANSFER_TAG INTEGER, " +
-                    "$KEY_PENDING_MSG_STATE INTEGER)"
-        db.execSQL(CREATE_NEW_PENDING_MSG_TABLE)
-
-        db.execSQL(CREATE_SYNC_RECORDS_TABLE)
-        db.execSQL(CREATE_SD_TRANSFERS_TABLE)
-    }
-
-    override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // do nothing
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        Timber.i("Database upgraded from %d to %d", oldVersion, newVersion)
-
-        //Used to identify when the Chat Settings table has been already recreated
-        var chatSettingsAlreadyUpdated = false
-        //Used to identify when the Attributes table has been already recreated
-        var attributesAlreadyUpdated = false
-        //Used to identify when the Preferences table has been already recreated
-        var preferencesAlreadyUpdated = false
-        if (oldVersion <= 7) {
-            db.execSQL("ALTER TABLE $TABLE_OFFLINE ADD COLUMN $KEY_OFF_INCOMING INTEGER;")
-            db.execSQL("ALTER TABLE $TABLE_OFFLINE ADD COLUMN $KEY_OFF_HANDLE_INCOMING INTEGER;")
-            db.execSQL("UPDATE $TABLE_OFFLINE SET $KEY_OFF_INCOMING = '0';")
-        }
-        if (oldVersion <= 8) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_LAST_UPLOAD_FOLDER TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_PREFERENCES SET $KEY_LAST_UPLOAD_FOLDER = '" + encrypt(
-                    ""
-                ) + "';"
-            )
-        }
-        if (oldVersion <= 9) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_LAST_CLOUD_FOLDER_HANDLE TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_PREFERENCES SET $KEY_LAST_CLOUD_FOLDER_HANDLE = '" + encrypt(
-                    ""
-                ) + "';"
-            )
-        }
-        if (oldVersion <= 12) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SEC_FOLDER_ENABLED TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SEC_FOLDER_LOCAL_PATH TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SEC_FOLDER_HANDLE TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SEC_SYNC_TIMESTAMP TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_KEEP_FILE_NAMES TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_SEC_FOLDER_ENABLED = '${encrypt("false")}';")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_SEC_FOLDER_LOCAL_PATH = '${encrypt("-1")}';")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_SEC_FOLDER_HANDLE = '${encrypt("-1")}';")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_SEC_SYNC_TIMESTAMP = '${encrypt("0")}';")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_KEEP_FILE_NAMES = '${encrypt("false")}';")
-        }
-        if (oldVersion <= 13) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_STORAGE_ADVANCED_DEVICES BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_STORAGE_ADVANCED_DEVICES = '${encrypt("false")}';")
-        }
-        if (oldVersion <= 14) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_ATTR_INTENTS TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_ATTR_INTENTS = '${encrypt("0")}';")
-        }
-        if (oldVersion <= 15) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PREFERRED_VIEW_LIST BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_VIEW_LIST = '${encrypt("true")}';")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PREFERRED_VIEW_LIST_CAMERA BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_VIEW_LIST_CAMERA = '${encrypt("false")}';")
-        }
-        if (oldVersion <= 16) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_ATTR_ASK_SIZE_DOWNLOAD BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_ATTR_ASK_SIZE_DOWNLOAD = '${encrypt("true")}';")
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_ATTR_ASK_NOAPP_DOWNLOAD BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_ATTR_ASK_NOAPP_DOWNLOAD = '${encrypt("true")}';")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_URI_EXTERNAL_SD_CARD TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_URI_EXTERNAL_SD_CARD = '${encrypt("")}';")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD BOOLEAN;")
-            db.execSQL(
-                "UPDATE $TABLE_PREFERENCES SET $KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = '${
-                    encrypt("false")
-                }';"
-            )
-        }
-        if (oldVersion <= 17) {
-            val CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_CONTACTS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +
-                    "$KEY_CONTACT_HANDLE TEXT, " +
-                    "$KEY_CONTACT_MAIL TEXT, " +
-                    "$KEY_CONTACT_NAME TEXT, " +
-                    "$KEY_CONTACT_LAST_NAME TEXT)"
-            db.execSQL(CREATE_CONTACTS_TABLE)
-        }
-        if (oldVersion <= 18) {
-            //Changes to encrypt the Offline table
-            val offlinesOld = getOfflineFilesOld(db)
-            Timber.d("Clear the table offline")
-            this.clearOffline(db)
-            for (i in offlinesOld.indices) {
-                val offline = offlinesOld[i]
-                if (offline.type == null || offline.type == "0" || offline.type == "1") {
-                    Timber.d("Not encrypted: %s", offline.name)
-                    this.setOfflineFile(offline, db) //using the method that encrypts
-                } else {
-                    Timber.d("Encrypted: %s", offline.name)
-                    this.setOfflineFileOld(offline, db) //using the OLD method that doesn't encrypt
-                }
-            }
-        }
-        if (oldVersion <= 19) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PASSCODE_LOCK_TYPE TEXT;")
-            if (isPasscodeLockEnabled(db)) {
-                Timber.d("PIN enabled!")
-                db.execSQL(
-                    "UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_TYPE = '${
-                        encrypt(Constants.PIN_4)
-                    }';"
-                )
-            } else {
-                Timber.d("PIN NOT enabled!")
-                db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_TYPE = '${encrypt("")}';")
-            }
-        }
-        if (oldVersion <= 20) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PREFERRED_SORT_CLOUD TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PREFERRED_SORT_OTHERS TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_SORT_CLOUD = '${
-                    encrypt(MegaApiJava.ORDER_DEFAULT_ASC.toString())
-                }';"
-            )
-            db.execSQL(
-                "UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_SORT_OTHERS = '${
-                    encrypt(MegaApiJava.ORDER_DEFAULT_ASC.toString())
-                }';"
-            )
-        }
-        if (oldVersion <= 21) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_ACCOUNT_DETAILS_TIMESTAMP TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_ACCOUNT_DETAILS_TIMESTAMP = '${encrypt("")}';")
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_PAYMENT_METHODS_TIMESTAMP TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_PAYMENT_METHODS_TIMESTAMP = '${encrypt("")}';")
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_PRICING_TIMESTAMP TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_PRICING_TIMESTAMP = '${encrypt("")}';")
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_ATTRIBUTES SET $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = '${
-                    encrypt("")
-                }';"
-            )
-        }
-        if (oldVersion <= 22) {
-            val CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_CHAT_ITEMS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +
-                    "$KEY_CHAT_HANDLE TEXT, " +
-                    "$KEY_CHAT_ITEM_NOTIFICATIONS BOOLEAN, " +
-                    "$KEY_CHAT_ITEM_RINGTONE TEXT, " +
-                    "$KEY_CHAT_ITEM_SOUND_NOTIFICATIONS TEXT)"
-            db.execSQL(CREATE_CHAT_ITEM_TABLE)
-            val CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_NON_CONTACTS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +
-                    "$KEY_NONCONTACT_HANDLE TEXT, " +
-                    "$KEY_NONCONTACT_FULLNAME TEXT)"
-            db.execSQL(CREATE_NONCONTACT_TABLE)
-            val CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_CHAT_SETTINGS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +
-                    "$KEY_CHAT_NOTIFICATIONS_ENABLED BOOLEAN, " +
-                    "$KEY_CHAT_SOUND_NOTIFICATIONS TEXT, " +
-                    "$KEY_CHAT_VIBRATION_ENABLED BOOLEAN)"
-            db.execSQL(CREATE_CHAT_TABLE)
-        }
-        if (oldVersion <= 23) {
-            db.execSQL("ALTER TABLE $TABLE_CREDENTIALS ADD COLUMN $KEY_FIRST_NAME TEXT;")
-            db.execSQL("UPDATE $TABLE_CREDENTIALS SET $KEY_FIRST_NAME = '${encrypt("")}';")
-            db.execSQL("ALTER TABLE $TABLE_CREDENTIALS ADD COLUMN $KEY_LAST_NAME TEXT;")
-            db.execSQL("UPDATE $TABLE_CREDENTIALS SET $KEY_LAST_NAME = '${encrypt("")}';")
-        }
-        if (oldVersion <= 25) {
-            db.execSQL("ALTER TABLE $TABLE_NON_CONTACTS ADD COLUMN $KEY_NONCONTACT_FIRSTNAME TEXT;")
-            db.execSQL("UPDATE $TABLE_NON_CONTACTS SET $KEY_NONCONTACT_FIRSTNAME = '${encrypt("")}';")
-            db.execSQL("ALTER TABLE $TABLE_NON_CONTACTS ADD COLUMN $KEY_NONCONTACT_LASTNAME TEXT;")
-            db.execSQL("UPDATE $TABLE_NON_CONTACTS SET $KEY_NONCONTACT_LASTNAME = '${encrypt("")}';")
-        }
-        if (oldVersion <= 26) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_INVALIDATE_SDK_CACHE TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_INVALIDATE_SDK_CACHE = '${encrypt("true")}';")
-        }
-        if (oldVersion <= 27) {
-            db.execSQL("ALTER TABLE $TABLE_NON_CONTACTS ADD COLUMN $KEY_NONCONTACT_EMAIL TEXT;")
-            db.execSQL("UPDATE $TABLE_NON_CONTACTS SET $KEY_NONCONTACT_EMAIL = '${encrypt("")}';")
-        }
-        if (oldVersion <= 28) {
-            db.execSQL("ALTER TABLE $TABLE_CREDENTIALS ADD COLUMN $KEY_MY_HANDLE TEXT;")
-            db.execSQL("UPDATE $TABLE_CREDENTIALS SET $KEY_MY_HANDLE = '${encrypt("")}';")
-        }
-        if (oldVersion <= 29) {
-            val CREATE_COMPLETED_TRANSFER_TABLE =
-                "CREATE TABLE IF NOT EXISTS $TABLE_COMPLETED_TRANSFERS(" +
-                        "$KEY_ID INTEGER PRIMARY KEY, " +
-                        "$KEY_TRANSFER_FILENAME TEXT, " +
-                        "$KEY_TRANSFER_TYPE TEXT, " +
-                        "$KEY_TRANSFER_STATE TEXT, " +
-                        "$KEY_TRANSFER_SIZE TEXT, " +
-                        "$KEY_TRANSFER_HANDLE TEXT)"
-            db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE)
-        }
-        if (oldVersion <= 30) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_FIRST_LOGIN_CHAT BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_FIRST_LOGIN_CHAT = '${encrypt("true")}';")
-        }
-        if (oldVersion <= 31) {
-            val CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS $TABLE_EPHEMERAL(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +
-                    "$KEY_EMAIL TEXT, " +
-                    "$KEY_PASSWORD TEXT, " +
-                    "$KEY_SESSION TEXT, " +
-                    "$KEY_FIRST_NAME TEXT, " +
-                    "$KEY_LAST_NAME TEXT)"
-            db.execSQL(CREATE_EPHEMERAL)
-        }
-        if (oldVersion <= 34) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_USE_HTTPS_ONLY TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_USE_HTTPS_ONLY = '${encrypt("false")}';")
-        }
-        if (oldVersion <= 35) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_SHOW_COPYRIGHT TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_SHOW_COPYRIGHT = '${encrypt("true")}';")
-        }
-        if (oldVersion <= 37) {
-            db.execSQL("ALTER TABLE $TABLE_CHAT_ITEMS ADD COLUMN $KEY_CHAT_ITEM_WRITTEN_TEXT TEXT;")
-            db.execSQL("UPDATE $TABLE_CHAT_ITEMS SET $KEY_CHAT_ITEM_WRITTEN_TEXT = '';")
-        }
-        if (oldVersion <= 38) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_SHOW_NOTIF_OFF TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_SHOW_NOTIF_OFF = '${encrypt("true")}';")
-        }
-        if (oldVersion <= 41) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_LAST_PUBLIC_HANDLE TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_LAST_PUBLIC_HANDLE = '${encrypt("-1")}';")
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_LAST_PUBLIC_HANDLE_TIMESTAMP TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_ATTRIBUTES SET $KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = '${
-                    encrypt("-1")
-                }';"
-            )
-        }
-        if (oldVersion <= 42) {
-            val CREATE_NEW_PENDING_MSG_TABLE =
-                "CREATE TABLE IF NOT EXISTS $TABLE_PENDING_MSG_SINGLE(" +
-                        "$KEY_ID INTEGER PRIMARY KEY," +
-                        "$KEY_PENDING_MSG_ID_CHAT TEXT, " +
-                        "$KEY_PENDING_MSG_TIMESTAMP TEXT, " +
-                        "$KEY_PENDING_MSG_TEMP_KARERE TEXT, " +
-                        "$KEY_PENDING_MSG_FILE_PATH TEXT, " +
-                        "$KEY_PENDING_MSG_NAME TEXT, " +
-                        "$KEY_PENDING_MSG_NODE_HANDLE TEXT, " +
-                        "$KEY_PENDING_MSG_FINGERPRINT TEXT, " +
-                        "$KEY_PENDING_MSG_TRANSFER_TAG INTEGER, " +
-                        "$KEY_PENDING_MSG_STATE INTEGER)"
-            db.execSQL(CREATE_NEW_PENDING_MSG_TABLE)
-        }
-        if (oldVersion <= 43) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_AUTO_PLAY BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_AUTO_PLAY = '${encrypt("false")}';")
-        }
-        if (oldVersion <= 44) {
-            db.execSQL(CREATE_SYNC_RECORDS_TABLE)
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_UPLOAD_VIDEO_QUALITY TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_CONVERSION_ON_CHARGING BOOLEAN;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_CHARGING_ON_SIZE TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SHOULD_CLEAR_CAMSYNC_RECORDS TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_CAM_VIDEO_SYNC_TIMESTAMP TEXT;")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SEC_VIDEO_SYNC_TIMESTAMP TEXT;")
-        }
-        if (oldVersion <= 45) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_REMOVE_GPS TEXT;")
-            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_REMOVE_GPS + " = '" + encrypt("true") + "';")
-        }
-        if (oldVersion <= 46) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_STORAGE_STATE INTEGER;")
-            db.execSQL(
-                "UPDATE $TABLE_ATTRIBUTES SET $KEY_STORAGE_STATE = '${
-                    encrypt(storageStateIntMapper(StorageState.Unknown).toString())
-                }';"
-            )
-        }
-        if (oldVersion <= 47) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SHOW_INVITE_BANNER TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_SHOW_INVITE_BANNER = '${encrypt("true")}';")
-        }
-        if (oldVersion <= 48) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PREFERRED_SORT_CAMERA_UPLOAD TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_PREFERENCES " +
-                        "SET $KEY_PREFERRED_SORT_CAMERA_UPLOAD = " +
-                        "'${encrypt(MegaApiJava.ORDER_MODIFICATION_DESC.toString())}';"
-            )
-        }
-        if (oldVersion <= 49) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SD_CARD_URI TEXT;")
-        }
-        if (oldVersion <= 50) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_ASK_FOR_DISPLAY_OVER TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_ASK_FOR_DISPLAY_OVER = '${encrypt("true")}';")
-        }
-        if (oldVersion <= 51) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_LAST_PUBLIC_HANDLE_TYPE INTEGER;")
-            db.execSQL(
-                "UPDATE $TABLE_ATTRIBUTES " +
-                        "SET $KEY_LAST_PUBLIC_HANDLE_TYPE = " +
-                        "'${encrypt(MegaApiJava.AFFILIATE_TYPE_INVALID.toString())}';"
-            )
-        }
-        if (oldVersion <= 52) {
-            recreateChatSettings(db, getChatSettingsFromDBv52(db))
-            chatSettingsAlreadyUpdated = true
-        }
-        if (oldVersion <= 53) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_ASK_SET_DOWNLOAD_LOCATION BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_ASK_SET_DOWNLOAD_LOCATION = '${encrypt("true")}';")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_STORAGE_ASK_ALWAYS = '${encrypt("true")}';")
-            db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_PATH TEXT;")
-        }
-        if (oldVersion <= 54) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_MY_CHAT_FILES_FOLDER_HANDLE TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_ATTRIBUTES " +
-                        "SET $KEY_MY_CHAT_FILES_FOLDER_HANDLE = '${encrypt(MegaApiJava.INVALID_HANDLE.toString())}';"
-            )
-        }
-        if (oldVersion <= 55) {
-            db.execSQL("ALTER TABLE $TABLE_CONTACTS ADD COLUMN $KEY_CONTACT_NICKNAME TEXT;")
-        }
-        if (oldVersion <= 56) {
-            db.execSQL("ALTER TABLE $TABLE_CHAT_ITEMS ADD COLUMN $KEY_CHAT_ITEM_EDITED_MSG_ID TEXT;")
-            db.execSQL("UPDATE $TABLE_CHAT_ITEMS SET $KEY_CHAT_ITEM_EDITED_MSG_ID = '';")
-        }
-        if (oldVersion <= 57) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_URI_MEDIA_EXTERNAL_SD_CARD TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_URI_MEDIA_EXTERNAL_SD_CARD = '${encrypt("")}';")
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD BOOLEAN;")
-            db.execSQL(
-                "UPDATE $TABLE_PREFERENCES " +
-                        "SET $KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD = '${encrypt("false")}';"
-            )
-            db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_OFFLINE BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_OFFLINE = '${encrypt("false")}';")
-            db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_TIMESTAMP TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_COMPLETED_TRANSFERS " +
-                        "SET $KEY_TRANSFER_TIMESTAMP = '${
-                            encrypt(System.currentTimeMillis().toString())
-                        }';"
-            )
-            db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_ERROR TEXT;")
-            db.execSQL("UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_ERROR = '${encrypt("")}';")
-            db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_ORIGINAL_PATH TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_ORIGINAL_PATH = '${
-                    encrypt("")
-                }';"
-            )
-            db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_PARENT_HANDLE TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_PARENT_HANDLE = '${
-                    encrypt(MegaApiJava.INVALID_HANDLE.toString())
-                }';"
-            )
-        }
-        if (oldVersion <= 58) {
-            db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_TRANSFER_QUEUE_STATUS BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_TRANSFER_QUEUE_STATUS = '${encrypt("false")}';")
-            db.execSQL(CREATE_SD_TRANSFERS_TABLE)
-        }
-        if (oldVersion <= 60) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PASSCODE_LOCK_REQUIRE_TIME TEXT;")
-            db.execSQL(
-                "UPDATE $TABLE_PREFERENCES " +
-                        "SET $KEY_PASSCODE_LOCK_REQUIRE_TIME = '${
-                            encrypt("" + if (isPasscodeLockEnabled(db)) PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE else Constants.REQUIRE_PASSCODE_INVALID)
-                        }';"
-            )
-        }
-        if (oldVersion <= 61) {
-            recreateAttributes(db, getAttributes(db))
-            attributesAlreadyUpdated = true
-        }
-        if (oldVersion <= 62) {
-            if (!chatSettingsAlreadyUpdated) {
-                recreateChatSettings(db, getChatSettingsFromDBv62(db))
-            }
-            recreatePreferences(db, getPreferencesFromDBv62(db))
-            preferencesAlreadyUpdated = true
-        }
-        if (oldVersion <= 63 && !preferencesAlreadyUpdated) {
-            db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_FINGERPRINT_LOCK BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_FINGERPRINT_LOCK = '${encrypt("false")}';")
-        }
-        if (oldVersion <= 64 && !preferencesAlreadyUpdated) {
-            //KEY_CAM_SYNC_CHARGING and KEY_SMALL_GRID_CAMERA have been removed in DB v65
-            recreatePreferences(db, getPreferences(db))
-            preferencesAlreadyUpdated = true
-        }
-        if (oldVersion <= 65 && !preferencesAlreadyUpdated) {
-            //KEY_PREFERRED_SORT_CONTACTS has been removed in DB v66
-            recreatePreferences(db, getPreferences(db))
-        }
-        if (oldVersion <= 66 && !attributesAlreadyUpdated) {
-            //KEY_FILE_LOGGER_SDK and KEY_FILE_LOGGER_KARERE have been removed in DB v67
-            recreateAttributes(db, getAttributes(db))
-        }
-        this.db = db
-    }
-
-    /**
-     * Drops the chat settings table if exists, creates the new one,
-     * and then sets the updated chat settings.
-     *
-     * @param db           Current DB.
-     * @param chatSettings Chat Settings.
-     */
-    private fun recreateChatSettings(db: SQLiteDatabase, chatSettings: ChatSettings?) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_SETTINGS")
-        onCreate(db)
-        chatSettings?.let { setChatSettings(db, it) }
-
-        // Temporary fix to avoid wrong values in chat settings after upgrade.
-        getChatSettings(db)
-    }
-
-    /**
-     * Drops the attributes table if exists, creates the new one,
-     * and then sets the updated attributes.
-     *
-     * @param db   Current DB.
-     * @param attr Attributes.
-     */
-    private fun recreateAttributes(db: SQLiteDatabase, attr: MegaAttributes?) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ATTRIBUTES")
-        onCreate(db)
-        attr?.let { setAttributes(db, it) }
-
-        // Temporary fix to avoid wrong values in attributes after upgrade.
-        getAttributes(db)
-    }
-
-    /**
-     * Drops the preferences table if exists, creates the new one,
-     * and then sets the updated preferences.
-     *
-     * @param db          Current DB.
-     * @param preferences Preferences.
-     */
-    private fun recreatePreferences(db: SQLiteDatabase, preferences: MegaPreferences?) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_PREFERENCES")
-        onCreate(db)
-        preferences?.let { setPreferences(db, it) }
-
-        // Temporary fix to avoid wrong values in preferences after upgrade.
-        getPreferences(db)
-    }
+    private val sqLiteOpenHelper: SupportSQLiteOpenHelper,
+    private val legacyDatabaseMigration: LegacyDatabaseMigration,
+) : LegacyDatabaseHandler {
+    private val writableDatabase: SupportSQLiteDatabase by lazy { sqLiteOpenHelper.writableDatabase }
+    private val readableDatabase: SupportSQLiteDatabase by lazy { sqLiteOpenHelper.readableDatabase }
 
     override fun saveCredentials(userCredentials: UserCredentials) {
         val values = ContentValues().apply {
@@ -701,14 +75,14 @@ class SqliteDatabaseHandler @Inject constructor(
                 myHandle?.let { put(KEY_MY_HANDLE, encrypt(it)) }
             }
         }
-        db.insertWithOnConflict(TABLE_CREDENTIALS, null, values, SQLiteDatabase.CONFLICT_REPLACE)
+        writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_REPLACE, values)
     }
 
     override fun shouldClearCamsyncRecords(): Boolean {
         val selectQuery =
             "SELECT $KEY_SHOULD_CLEAR_CAMSYNC_RECORDS FROM $TABLE_PREFERENCES"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     var should = cursor.getString(
                         cursor.getColumnIndexOrThrow(
@@ -732,7 +106,7 @@ class SqliteDatabaseHandler @Inject constructor(
     override fun saveShouldClearCamsyncRecords(should: Boolean) {
         val sql =
             "UPDATE $TABLE_PREFERENCES SET $KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = '${encrypt(should.toString())}'"
-        db.execSQL(sql)
+        writableDatabase.execSQL(sql)
     }
 
     override fun findMaxTimestamp(isSecondary: Boolean, fileType: Int): Long? {
@@ -740,7 +114,7 @@ class SqliteDatabaseHandler @Inject constructor(
                 "WHERE $KEY_SYNC_SECONDARY = '${encrypt(isSecondary.toString())}' " +
                 "AND $KEY_SYNC_TYPE = $fileType"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val timestamps: MutableList<Long> = ArrayList(cursor.count)
                     do {
@@ -773,14 +147,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_UPLOAD_VIDEO_QUALITY= '${encrypt(quality.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(quality.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -792,16 +166,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_CONVERSION_ON_CHARGING= '${
                             encrypt(onCharging.toString())
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CONVERSION_ON_CHARGING, encrypt(onCharging.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -813,14 +187,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_CHARGING_ON_SIZE= '${encrypt(size.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CHARGING_ON_SIZE, encrypt(size.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -832,14 +206,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_REMOVE_GPS= '${encrypt(removeGPS.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_REMOVE_GPS, encrypt(removeGPS.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -852,14 +226,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_CREDENTIALS_TABLE =
                         "UPDATE $TABLE_CREDENTIALS SET $KEY_EMAIL= '${encrypt(email)}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_CREDENTIALS_TABLE)
+                    writableDatabase.execSQL(UPDATE_CREDENTIALS_TABLE)
                 } else {
                     values.put(KEY_EMAIL, encrypt(email))
-                    db.insert(TABLE_CREDENTIALS, null, values)
+                    writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -871,14 +245,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_CREDENTIALS_TABLE =
                         "UPDATE $TABLE_CREDENTIALS SET $KEY_FIRST_NAME= '${encrypt(firstName)}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_CREDENTIALS_TABLE)
+                    writableDatabase.execSQL(UPDATE_CREDENTIALS_TABLE)
                 } else {
                     values.put(KEY_FIRST_NAME, encrypt(firstName))
-                    db.insert(TABLE_CREDENTIALS, null, values)
+                    writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -890,14 +264,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_CREDENTIALS_TABLE =
                         "UPDATE $TABLE_CREDENTIALS SET $KEY_LAST_NAME= '${encrypt(lastName)}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_CREDENTIALS_TABLE)
+                    writableDatabase.execSQL(UPDATE_CREDENTIALS_TABLE)
                 } else {
                     values.put(KEY_LAST_NAME, encrypt(lastName))
-                    db.insert(TABLE_CREDENTIALS, null, values)
+                    writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -910,7 +284,7 @@ class SqliteDatabaseHandler @Inject constructor(
             val selectQuery = "SELECT $KEY_EMAIL FROM $TABLE_CREDENTIALS"
             var email: String? = null
             try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
+                readableDatabase.query(selectQuery).use { cursor ->
                     if (cursor.moveToFirst()) {
                         email = decrypt(cursor.getString(0))
                     }
@@ -927,7 +301,7 @@ class SqliteDatabaseHandler @Inject constructor(
             var userCredentials: UserCredentials? = null
             val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"
             try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
+                readableDatabase.query(selectQuery).use { cursor ->
                     //get the credential of last login
                     if (cursor.moveToFirst()) {
                         val email = decrypt(cursor.getString(1))
@@ -940,7 +314,7 @@ class SqliteDatabaseHandler @Inject constructor(
                     }
                 }
             } catch (e: SQLiteException) {
-                onCreate(db)
+                legacyDatabaseMigration.onCreate(writableDatabase)
             } catch (e: Exception) {
                 Timber.e(e, "Error decrypting DB field")
             }
@@ -952,7 +326,7 @@ class SqliteDatabaseHandler @Inject constructor(
             var ephemeralCredentials: EphemeralCredentials? = null
             val selectQuery = "SELECT * FROM $TABLE_EPHEMERAL"
             try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
+                readableDatabase.query(selectQuery).use { cursor ->
                     if (cursor.moveToFirst()) {
                         val email = decrypt(cursor.getString(1))
                         val password = decrypt(cursor.getString(2))
@@ -964,78 +338,12 @@ class SqliteDatabaseHandler @Inject constructor(
                     }
                 }
             } catch (e: SQLiteException) {
-                onCreate(db)
+                legacyDatabaseMigration.onCreate(writableDatabase)
             } catch (e: Exception) {
                 Timber.e(e, "Exception opening or managing DB cursor")
             }
             return ephemeralCredentials
         }
-
-    /**
-     * Sets preferences.
-     *
-     * @param db    Current DB.
-     * @param prefs Preferences.
-     */
-    private fun setPreferences(db: SQLiteDatabase, prefs: MegaPreferences) {
-        val values = ContentValues().apply {
-            put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()))
-            put(KEY_CAM_SYNC_WIFI, encrypt(prefs.getCamSyncWifi()))
-            put(KEY_CAM_SYNC_ENABLED, encrypt(prefs.getCamSyncEnabled()))
-            put(KEY_CAM_SYNC_HANDLE, encrypt(prefs.getCamSyncHandle()))
-            put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(prefs.getCamSyncLocalPath()))
-            put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(prefs.getCamSyncFileUpload()))
-            put(KEY_PASSCODE_LOCK_ENABLED, encrypt(prefs.getPasscodeLockEnabled()))
-            put(KEY_PASSCODE_LOCK_CODE, encrypt(prefs.getPasscodeLockCode()))
-            put(KEY_STORAGE_ASK_ALWAYS, encrypt(prefs.getStorageAskAlways()))
-            put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(prefs.getStorageDownloadLocation()))
-            put(KEY_CAM_SYNC_TIMESTAMP, encrypt(prefs.getCamSyncTimeStamp()))
-            put(KEY_CAM_VIDEO_SYNC_TIMESTAMP, encrypt(prefs.getCamVideoSyncTimeStamp()))
-            put(KEY_LAST_UPLOAD_FOLDER, encrypt(prefs.getLastFolderUpload()))
-            put(KEY_LAST_CLOUD_FOLDER_HANDLE, encrypt(prefs.getLastFolderCloud()))
-            put(KEY_SEC_FOLDER_ENABLED, encrypt(prefs.getSecondaryMediaFolderEnabled()))
-            put(KEY_SEC_FOLDER_LOCAL_PATH, encrypt(prefs.getLocalPathSecondaryFolder()))
-            put(KEY_SEC_FOLDER_HANDLE, encrypt(prefs.getMegaHandleSecondaryFolder()))
-            put(KEY_SEC_SYNC_TIMESTAMP, encrypt(prefs.getSecSyncTimeStamp()))
-            put(KEY_SEC_VIDEO_SYNC_TIMESTAMP, encrypt(prefs.getSecVideoSyncTimeStamp()))
-            put(KEY_STORAGE_ADVANCED_DEVICES, encrypt(prefs.getStorageAdvancedDevices()))
-            put(KEY_PREFERRED_VIEW_LIST, encrypt(prefs.getPreferredViewList()))
-            put(
-                KEY_PREFERRED_VIEW_LIST_CAMERA,
-                encrypt(prefs.getPreferredViewListCameraUploads())
-            )
-            put(KEY_URI_EXTERNAL_SD_CARD, encrypt(prefs.getUriExternalSDCard()))
-            put(
-                KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD,
-                encrypt(prefs.getCameraFolderExternalSDCard())
-            )
-            put(KEY_PASSCODE_LOCK_TYPE, encrypt(prefs.getPasscodeLockType()))
-            put(KEY_PREFERRED_SORT_CLOUD, encrypt(prefs.getPreferredSortCloud()))
-            put(KEY_PREFERRED_SORT_CAMERA_UPLOAD, encrypt(prefs.preferredSortCameraUpload))
-            put(KEY_PREFERRED_SORT_OTHERS, encrypt(prefs.getPreferredSortOthers()))
-            put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()))
-            put(KEY_REMOVE_GPS, encrypt(prefs.removeGPS))
-            put(KEY_KEEP_FILE_NAMES, encrypt(prefs.getKeepFileNames()))
-            put(KEY_AUTO_PLAY, encrypt(prefs.isAutoPlayEnabled().toString()))
-            put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(prefs.getUploadVideoQuality()))
-            put(KEY_CONVERSION_ON_CHARGING, encrypt(prefs.getConversionOnCharging()))
-            put(KEY_CHARGING_ON_SIZE, encrypt(prefs.getChargingOnSize()))
-            put(
-                KEY_SHOULD_CLEAR_CAMSYNC_RECORDS,
-                encrypt(prefs.getShouldClearCameraSyncRecords())
-            )
-            put(KEY_SHOW_INVITE_BANNER, encrypt(prefs.showInviteBanner))
-            put(KEY_SD_CARD_URI, encrypt(prefs.getSdCardUri()))
-            put(KEY_ASK_FOR_DISPLAY_OVER, encrypt(prefs.askForDisplayOver))
-            put(KEY_ASK_SET_DOWNLOAD_LOCATION, encrypt(prefs.askForSetDownloadLocation))
-            put(KEY_URI_MEDIA_EXTERNAL_SD_CARD, encrypt(prefs.mediaSDCardUri))
-            put(KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD, encrypt(prefs.isMediaOnSDCard))
-            put(KEY_PASSCODE_LOCK_REQUIRE_TIME, encrypt(prefs.passcodeLockRequireTime))
-            put(KEY_FINGERPRINT_LOCK, encrypt(prefs.fingerprintLock))
-        }
-
-        db.insert(TABLE_PREFERENCES, null, values)
-    }
 
     override fun shouldAskForDisplayOver(): Boolean {
         var should = true
@@ -1047,26 +355,13 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun dontAskForDisplayOver() {
-        db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_ASK_FOR_DISPLAY_OVER = '${encrypt("false")}';")
-    }
-
-    /**
-     * Gets preferences from the DB v62 (previous to add four available video qualities).
-     *
-     * @param db Current DB.
-     * @return Preferences.
-     */
-    private fun getPreferencesFromDBv62(db: SQLiteDatabase): MegaPreferences? {
-        Timber.d("getPreferencesFromDBv62")
-
-        return getPreferences(db)?.also { pref ->
-            val uploadVideoQuality = pref.getUploadVideoQuality()
-            if (!TextUtil.isTextEmpty(uploadVideoQuality)
-                && uploadVideoQuality.toInt() == OLD_VIDEO_QUALITY_ORIGINAL
-            ) {
-                pref.setUploadVideoQuality(VideoQuality.ORIGINAL.value.toString())
-            }
-        }
+        writableDatabase.execSQL(
+            "UPDATE $TABLE_PREFERENCES SET $KEY_ASK_FOR_DISPLAY_OVER = '${
+                encrypt(
+                    "false"
+                )
+            }';"
+        )
     }
 
     /**
@@ -1075,7 +370,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @return Preferences.
      */
     override val preferences: MegaPreferences?
-        get() = getPreferences(db)
+        get() = getPreferences(writableDatabase)
 
     /**
      * Gets preferences.
@@ -1083,11 +378,11 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param db Current DB.
      * @return Preferences.
      */
-    private fun getPreferences(db: SQLiteDatabase): MegaPreferences? {
+    private fun getPreferences(db: SupportSQLiteDatabase): MegaPreferences? {
         var prefs: MegaPreferences? = null
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            db.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val firstTime =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_FIRST_LOGIN)))
@@ -1322,70 +617,6 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     /**
-     * Get chat settings from the DB v52 (previous to remove the setting to enable/disable the chat).
-     * KEY_CHAT_ENABLED and KEY_CHAT_STATUS have been removed in DB v53.
-     *
-     * @return Chat settings.
-     */
-    private fun getChatSettingsFromDBv52(db: SQLiteDatabase): ChatSettings? {
-        Timber.d("getChatSettings")
-        var chatSettings: ChatSettings? = null
-        val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val notificationSound = decrypt(cursor.getString(3))
-                    val vibrationEnabled = decrypt(cursor.getString(4))
-                    val sendOriginalAttachments = decrypt(cursor.getString(6))
-                    val videoQuality =
-                        if (sendOriginalAttachments.toBoolean()) VideoQuality.ORIGINAL.value.toString() else VideoQuality.MEDIUM.value.toString()
-                    chatSettings =
-                        ChatSettings(
-                            notificationSound.orEmpty(),
-                            vibrationEnabled ?: VIBRATION_ON,
-                            videoQuality
-                        )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return chatSettings
-    }
-
-    /**
-     * Get chat settings from the DB v62 (previous to remove the setting to enable/disable
-     * the send original attachments and to add four available video qualities).
-     * KEY_CHAT_SEND_ORIGINALS has been removed in DB v63.
-     *
-     * @return Chat settings.
-     */
-    private fun getChatSettingsFromDBv62(db: SQLiteDatabase): ChatSettings? {
-        Timber.d("getChatSettings")
-        var chatSettings: ChatSettings? = null
-        val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val notificationSound = decrypt(cursor.getString(2))
-                    val vibrationEnabled = decrypt(cursor.getString(3))
-                    val sendOriginalAttachments = decrypt(cursor.getString(4))
-                    val videoQuality =
-                        if (sendOriginalAttachments.toBoolean()) VideoQuality.ORIGINAL.value.toString() else VideoQuality.MEDIUM.value.toString()
-                    chatSettings =
-                        ChatSettings(
-                            notificationSound.orEmpty(),
-                            vibrationEnabled ?: VIBRATION_ON,
-                            videoQuality
-                        )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return chatSettings
-    }
-    /**
      * Get chat settings from the current DB.
      *
      * @return Chat settings.
@@ -1396,9 +627,9 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param chatSettings Chat settings to save.
      */
     override var chatSettings: ChatSettings?
-        get() = getChatSettings(db)
+        get() = getChatSettings(writableDatabase)
         set(chatSettings) {
-            setChatSettings(db, chatSettings)
+            setChatSettings(writableDatabase, chatSettings)
         }
 
     /**
@@ -1407,12 +638,12 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param db Current DB.
      * @return Chat settings.
      */
-    private fun getChatSettings(db: SQLiteDatabase): ChatSettings? {
+    private fun getChatSettings(db: SupportSQLiteDatabase): ChatSettings? {
         Timber.d("getChatSettings")
         var chatSettings: ChatSettings? = null
         val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            db.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val notificationSound = decrypt(cursor.getString(2))
                     val vibrationEnabled = decrypt(cursor.getString(3))
@@ -1437,7 +668,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param db           DB object to save the settings.
      * @param chatSettings Chat settings to save.
      */
-    private fun setChatSettings(db: SQLiteDatabase, chatSettings: ChatSettings?) {
+    private fun setChatSettings(db: SupportSQLiteDatabase, chatSettings: ChatSettings?) {
         if (chatSettings == null) {
             Timber.e("Error: Chat settings are null")
             return
@@ -1450,7 +681,7 @@ class SqliteDatabaseHandler @Inject constructor(
             put(KEY_CHAT_VIDEO_QUALITY, encrypt(chatSettings.videoQuality))
         }
 
-        db.insert(TABLE_CHAT_SETTINGS, null, values)
+        db.insert(TABLE_CHAT_SETTINGS, SQLiteDatabase.CONFLICT_NONE, values)
     }
     /**
      * Gets the chat video quality value.
@@ -1482,16 +713,20 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_CHAT_SETTINGS SET $KEY_CHAT_SOUND_NOTIFICATIONS= '${
                             encrypt(sound)
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(sound))
-                    db.insert(TABLE_CHAT_SETTINGS, null, values)
+                    writableDatabase.insert(
+                        TABLE_CHAT_SETTINGS,
+                        SQLiteDatabase.CONFLICT_NONE,
+                        values
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -1503,16 +738,20 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_CHAT_SETTINGS SET $KEY_CHAT_VIBRATION_ENABLED= '${
                             encrypt(enabled)
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(enabled))
-                    db.insert(TABLE_CHAT_SETTINGS, null, values)
+                    writableDatabase.insert(
+                        TABLE_CHAT_SETTINGS,
+                        SQLiteDatabase.CONFLICT_NONE,
+                        values
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -1530,7 +769,7 @@ class SqliteDatabaseHandler @Inject constructor(
             put(KEY_CHAT_ITEM_EDITED_MSG_ID, encrypt(chatPrefs.editedMsgId))
         }
 
-        db.insert(TABLE_CHAT_ITEMS, null, values)
+        writableDatabase.insert(TABLE_CHAT_ITEMS, SQLiteDatabase.CONFLICT_NONE, values)
     }
 
     override fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int {
@@ -1543,8 +782,9 @@ class SqliteDatabaseHandler @Inject constructor(
             )
         }
 
-        return db.update(
+        return writableDatabase.update(
             TABLE_CHAT_ITEMS,
+            SQLiteDatabase.CONFLICT_REPLACE,
             values,
             "$KEY_CHAT_HANDLE = '${encrypt(handle)}'",
             null
@@ -1558,7 +798,7 @@ class SqliteDatabaseHandler @Inject constructor(
             "SELECT * FROM $TABLE_CHAT_ITEMS WHERE $KEY_CHAT_HANDLE = '${encrypt(handle)}'"
         Timber.d("QUERY: %s", selectQuery)
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val chatHandle = decrypt(cursor.getString(1))
                     val writtenText = decrypt(cursor.getString(5))
@@ -1580,7 +820,7 @@ class SqliteDatabaseHandler @Inject constructor(
             "SELECT * FROM $TABLE_CHAT_ITEMS WHERE $KEY_CHAT_HANDLE = '${encrypt(handle)}'"
         var result: String? = Constants.NOTIFICATIONS_ENABLED
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     result = decrypt(cursor.getString(2))
                 }
@@ -1596,9 +836,10 @@ class SqliteDatabaseHandler @Inject constructor(
      */
     override fun deleteOldestCompletedTransfers() {
         Timber.d("Delete oldest completed transfers")
-        db.beginTransaction()
+        writableDatabase.beginTransaction()
         try {
-            if (DatabaseUtils.queryNumEntries(db, TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
+
+            if (getNumberOfEntries(TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
                 val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
                 val transfers = getCompletedTransfers(selectQuery)
                 val ids = transfers.apply {
@@ -1609,33 +850,17 @@ class SqliteDatabaseHandler @Inject constructor(
                     .joinToString(separator = ",")
 
                 val query = "DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_ID IN ($ids)"
-                db.execSQL(query)
+                writableDatabase.execSQL(query)
             }
-            db.setTransactionSuccessful()
+            writableDatabase.setTransactionSuccessful()
         } finally {
-            db.endTransaction()
+            writableDatabase.endTransaction()
         }
     }
 
-    /**
-     * Gets a completed transfer.
-     *
-     * @param id the identifier of the transfer to get
-     * @return The completed transfer which has the id value as identifier.
-     */
-    override fun getCompletedTransfer(id: Int): CompletedTransfer? {
-        val selectQuery =
-            "SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_ID = '$id'"
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    return extractAndroidCompletedTransfer(cursor)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
+    private fun getNumberOfEntries(table: String): Long {
+        val sql = "SELECT COUNT(*) FROM $table"
+        return writableDatabase.compileStatement(sql).simpleQueryForLong()
     }
 
     /**
@@ -1669,10 +894,10 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param selectQuery the query which selects specific completed transfers
      * @return The list with the completed transfers.
      */
-    private fun getCompletedTransfers(selectQuery: String?): ArrayList<CompletedTransfer> {
+    private fun getCompletedTransfers(selectQuery: String): ArrayList<CompletedTransfer> {
         val cTs = ArrayList<CompletedTransfer>()
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToLast()) {
                     do {
                         cTs.add(extractAndroidCompletedTransfer(cursor))
@@ -1685,32 +910,13 @@ class SqliteDatabaseHandler @Inject constructor(
         return cTs
     }
 
-    override fun isPasscodeLockEnabled(db: SQLiteDatabase): Boolean {
-        Timber.d("getPinLockEnabled")
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        var result = false
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    //get pinLockEnabled
-                    decrypt(cursor.getString(7))?.let { pinLockEnabled ->
-                        result = pinLockEnabled.toBooleanStrictOrNull() ?: false
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return result
-    }
-
     /**
      * Saves attributes in DB.
      *
      * @param db   DB object to save the attributes.
      * @param attr Attributes to save.
      */
-    private fun setAttributes(db: SQLiteDatabase, attr: MegaAttributes?) {
+    private fun setAttributes(db: SupportSQLiteDatabase, attr: MegaAttributes?) {
         if (attr == null) {
             Timber.e("Error: Attributes are null")
             return
@@ -1748,7 +954,7 @@ class SqliteDatabaseHandler @Inject constructor(
             encrypt(attr.myChatFilesFolderHandle.toString())
         )
         values.put(KEY_TRANSFER_QUEUE_STATUS, encrypt(attr.transferQueueStatus))
-        db.insert(TABLE_ATTRIBUTES, null, values)
+        db.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
     }
 
     /**
@@ -1757,11 +963,11 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param db Current DB.
      * @return The attributes.
      */
-    private fun getAttributes(db: SQLiteDatabase): MegaAttributes? {
+    private fun getAttributes(db: SupportSQLiteDatabase): MegaAttributes? {
         var attr: MegaAttributes? = null
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            db.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val online = decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_ONLINE)))
                     val intents =
@@ -1903,9 +1109,9 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param attr Attributes to save.
      */
     override var attributes: MegaAttributes?
-        get() = getAttributes(db)
+        get() = getAttributes(writableDatabase)
         set(attr) {
-            setAttributes(db, attr)
+            setAttributes(writableDatabase, attr)
         }
 
     override fun setNonContactFirstName(name: String?, handle: String?): Int {
@@ -1913,15 +1119,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val values = ContentValues().apply {
             put(KEY_NONCONTACT_FIRSTNAME, encrypt(name))
         }
-        val rows = db.update(
+        val rows = writableDatabase.update(
             TABLE_NON_CONTACTS,
+            SQLiteDatabase.CONFLICT_REPLACE,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
             null
         )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
-            db.insert(TABLE_NON_CONTACTS, null, values)
+            writableDatabase.insert(TABLE_NON_CONTACTS, SQLiteDatabase.CONFLICT_NONE, values)
         }
         return rows
     }
@@ -1930,15 +1137,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val values = ContentValues().apply {
             put(KEY_NONCONTACT_LASTNAME, encrypt(lastName))
         }
-        val rows = db.update(
+        val rows = writableDatabase.update(
             TABLE_NON_CONTACTS,
+            SQLiteDatabase.CONFLICT_REPLACE,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
             null
         )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
-            db.insert(TABLE_NON_CONTACTS, null, values)
+            writableDatabase.insert(TABLE_NON_CONTACTS, SQLiteDatabase.CONFLICT_NONE, values)
         }
         return rows
     }
@@ -1947,15 +1155,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val values = ContentValues().apply {
             put(KEY_NONCONTACT_EMAIL, encrypt(email))
         }
-        val rows = db.update(
+        val rows = writableDatabase.update(
             TABLE_NON_CONTACTS,
+            SQLiteDatabase.CONFLICT_REPLACE,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
             null
         )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
-            db.insert(TABLE_NON_CONTACTS, null, values)
+            writableDatabase.insert(TABLE_NON_CONTACTS, SQLiteDatabase.CONFLICT_NONE, values)
         }
         return rows
     }
@@ -1966,7 +1175,7 @@ class SqliteDatabaseHandler @Inject constructor(
             "SELECT * FROM $TABLE_NON_CONTACTS WHERE $KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'"
         Timber.d("QUERY: %s", selectQuery)
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val fullName = decrypt(cursor.getString(2))
                     val firstName = decrypt(cursor.getString(3))
@@ -2004,7 +1213,6 @@ class SqliteDatabaseHandler @Inject constructor(
         val values = ContentValues()
         val checkInsert: MegaOffline? = findByHandle(offline.handle)
         if (checkInsert == null) {
-            val nullColumnHack: String? = null
             values.put(KEY_OFF_HANDLE, encrypt(offline.handle))
             values.put(KEY_OFF_PATH, encrypt(offline.path))
             values.put(KEY_OFF_NAME, encrypt(offline.name))
@@ -2012,24 +1220,7 @@ class SqliteDatabaseHandler @Inject constructor(
             values.put(KEY_OFF_TYPE, encrypt(offline.type))
             values.put(KEY_OFF_INCOMING, offline.origin)
             values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.handleIncoming))
-            return db.insert(TABLE_OFFLINE, nullColumnHack, values)
-        }
-        return -1
-    }
-
-    override fun setOfflineFile(offline: MegaOffline, db: SQLiteDatabase): Long {
-        val values = ContentValues()
-        val checkInsert: MegaOffline? = findByHandle(offline.handle)
-        if (checkInsert == null) {
-            val nullColumnHack: String? = null
-            values.put(KEY_OFF_HANDLE, encrypt(offline.handle))
-            values.put(KEY_OFF_PATH, encrypt(offline.path))
-            values.put(KEY_OFF_NAME, encrypt(offline.name))
-            values.put(KEY_OFF_PARENT, offline.parentId)
-            values.put(KEY_OFF_TYPE, encrypt(offline.type))
-            values.put(KEY_OFF_INCOMING, offline.origin)
-            values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.handleIncoming))
-            return db.insert(TABLE_OFFLINE, nullColumnHack, values)
+            return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
         }
         return -1
     }
@@ -2038,7 +1229,6 @@ class SqliteDatabaseHandler @Inject constructor(
         val values = ContentValues()
         val checkInsert: MegaOffline? = findByHandle(offline.handle)
         if (checkInsert == null) {
-            val nullColumnHack: String? = null
             values.put(KEY_OFF_HANDLE, offline.handle)
             values.put(KEY_OFF_PATH, offline.path)
             values.put(KEY_OFF_NAME, offline.name)
@@ -2046,24 +1236,7 @@ class SqliteDatabaseHandler @Inject constructor(
             values.put(KEY_OFF_TYPE, offline.type)
             values.put(KEY_OFF_INCOMING, offline.origin)
             values.put(KEY_OFF_HANDLE_INCOMING, offline.handleIncoming)
-            return db.insert(TABLE_OFFLINE, nullColumnHack, values)
-        }
-        return -1
-    }
-
-    override fun setOfflineFileOld(offline: MegaOffline, db: SQLiteDatabase): Long {
-        val values = ContentValues()
-        val checkInsert: MegaOffline? = findByHandle(offline.handle)
-        if (checkInsert == null) {
-            val nullColumnHack: String? = null
-            values.put(KEY_OFF_HANDLE, offline.handle)
-            values.put(KEY_OFF_PATH, offline.path)
-            values.put(KEY_OFF_NAME, offline.name)
-            values.put(KEY_OFF_PARENT, offline.parentId)
-            values.put(KEY_OFF_TYPE, offline.type)
-            values.put(KEY_OFF_INCOMING, offline.origin)
-            values.put(KEY_OFF_HANDLE_INCOMING, offline.handleIncoming)
-            return db.insert(TABLE_OFFLINE, nullColumnHack, values)
+            return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
         }
         return -1
     }
@@ -2073,7 +1246,7 @@ class SqliteDatabaseHandler @Inject constructor(
             val listOffline = ArrayList<MegaOffline>()
             val selectQuery = "SELECT * FROM $TABLE_OFFLINE"
             try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
+                readableDatabase.query(selectQuery).use { cursor ->
                     if (cursor.moveToFirst()) {
                         do {
                             val id = cursor.getString(0).toInt()
@@ -2104,47 +1277,12 @@ class SqliteDatabaseHandler @Inject constructor(
             return listOffline
         }
 
-    override fun getOfflineFilesOld(db: SQLiteDatabase): ArrayList<MegaOffline> {
-        val listOffline = ArrayList<MegaOffline>()
-        val selectQuery = "SELECT * FROM $TABLE_OFFLINE"
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val id = cursor.getString(0).toInt()
-                        val handle = cursor.getString(1)
-                        val path = cursor.getString(2)
-                        val name = cursor.getString(3)
-                        val parent = cursor.getInt(4)
-                        val type = cursor.getString(5)
-                        val incoming = cursor.getInt(6)
-                        val handleIncoming = cursor.getString(7)
-                        val offline = MegaOffline(
-                            id,
-                            handle,
-                            path,
-                            name,
-                            parent,
-                            type,
-                            incoming,
-                            handleIncoming
-                        )
-                        listOffline.add(offline)
-                    } while (cursor.moveToNext())
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return listOffline
-    }
-
     override fun exists(handle: Long): Boolean {
         //Get the foreign key of the node
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_HANDLE = '${encrypt(handle.toString())}'"
         try {
-            return db.rawQuery(selectQuery, null)?.use { it.moveToFirst() } ?: false
+            return readableDatabase.query(selectQuery).use { it.moveToFirst() }
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
         }
@@ -2170,7 +1308,7 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_HANDLE = '${encrypt(handle)}'"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val id = cursor.getString(0).toInt()
                     val nodeHandle = decrypt(cursor.getString(1))
@@ -2204,7 +1342,7 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PARENT = '$parentId'"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     do {
                         val _id = cursor.getString(0).toInt()
@@ -2240,7 +1378,7 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_ID = '$id'"
         var offline: MegaOffline? = null
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     do {
                         val _id = cursor.getString(0).toInt()
@@ -2271,7 +1409,7 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun removeById(id: Int): Int {
-        return db.delete(TABLE_OFFLINE, "$KEY_ID=$id", null)
+        return writableDatabase.delete(TABLE_OFFLINE, "$KEY_ID=$id", null)
     }
 
     override fun findByPath(path: String?): ArrayList<MegaOffline> {
@@ -2280,7 +1418,7 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PATH = '${encrypt(path)}'"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     do {
                         val _id = cursor.getString(0).toInt()
@@ -2320,7 +1458,7 @@ class SqliteDatabaseHandler @Inject constructor(
             }'"
         var offline: MegaOffline? = null
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     do {
                         val _id = cursor.getString(0).toInt()
@@ -2351,7 +1489,7 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun deleteOfflineFile(mOff: MegaOffline): Int {
-        return this.writableDatabase.delete(
+        return writableDatabase.delete(
             TABLE_OFFLINE,
             "$KEY_OFF_HANDLE = ?",
             arrayOf(encrypt(mOff.handle.toString()))
@@ -2362,14 +1500,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_FIRST_LOGIN= '${encrypt(firstTime.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_FIRST_LOGIN, encrypt(firstTime.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2381,14 +1519,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_CAM_SYNC_WIFI= '${encrypt(wifi.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CAM_SYNC_WIFI, encrypt(wifi.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2400,14 +1538,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_VIEW_LIST= '${encrypt(list.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_PREFERRED_VIEW_LIST, encrypt(list.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2419,16 +1557,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_VIEW_LIST_CAMERA= '${
                             encrypt(list.toString())
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_PREFERRED_VIEW_LIST_CAMERA, encrypt(list.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2440,14 +1578,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_SORT_CLOUD= '${encrypt(order)}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(order))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2464,14 +1602,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_SORT_OTHERS= '${encrypt(order)}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(order))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2483,16 +1621,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_LAST_UPLOAD_FOLDER= '${
                             encrypt(folderPath)
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_LAST_UPLOAD_FOLDER, encrypt(folderPath))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2504,20 +1642,20 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_LAST_CLOUD_FOLDER_HANDLE= '${
                             encrypt(folderHandle)
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                     Timber.d(
                         "KEY_LAST_CLOUD_FOLDER_HANDLE UPLOAD FOLDER: %s",
                         UPDATE_PREFERENCES_TABLE
                     )
                 } else {
                     values.put(KEY_LAST_CLOUD_FOLDER_HANDLE, encrypt(folderHandle))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2529,14 +1667,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_KEEP_FILE_NAMES= '${encrypt(charging.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_KEEP_FILE_NAMES, encrypt(charging.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2549,14 +1687,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_CAM_SYNC_ENABLED= '${encrypt(enabled.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CAM_SYNC_ENABLED, encrypt(enabled.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2569,14 +1707,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_SEC_FOLDER_ENABLED= '${encrypt(enabled.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_SEC_FOLDER_ENABLED, encrypt(enabled.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2588,14 +1726,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_CAM_SYNC_HANDLE= '${encrypt(handle.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CAM_SYNC_HANDLE, encrypt(handle.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
                 Timber.d("Set new primary handle: %s", handle)
             }
@@ -2609,14 +1747,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_SEC_FOLDER_HANDLE= '${encrypt(handle.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_SEC_FOLDER_HANDLE, encrypt(handle.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
                 Timber.d("Set new secondary handle: %s", handle)
             }
@@ -2629,16 +1767,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_CAM_SYNC_LOCAL_PATH= '${
                             encrypt(localPath)
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(localPath))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2650,17 +1788,17 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_URI_EXTERNAL_SD_CARD= '${
                             encrypt(uriExternalSDCard)
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                     Timber.d("KEY_URI_EXTERNAL_SD_CARD URI: %s", UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_URI_EXTERNAL_SD_CARD, encrypt(uriExternalSDCard))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2691,19 +1829,19 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD= '${
                             encrypt(cameraFolderExternalSDCard.toString())
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(
                         KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD,
                         encrypt(cameraFolderExternalSDCard.toString())
                     )
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2737,16 +1875,20 @@ class SqliteDatabaseHandler @Inject constructor(
             val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
             val values = ContentValues()
             try {
-                db.rawQuery(selectQuery, null).use { cursor ->
-                    if (cursor != null && cursor.moveToFirst()) {
+                readableDatabase.query(selectQuery).use { cursor ->
+                    if (cursor.moveToFirst()) {
                         val UPDATE_PREFERENCES_TABLE =
                             "UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_TYPE= '${
                                 encrypt(passcodeLockType)
                             }' WHERE $KEY_ID = '1'"
-                        db.execSQL(UPDATE_PREFERENCES_TABLE)
+                        writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                     } else {
                         values.put(KEY_PASSCODE_LOCK_TYPE, encrypt(passcodeLockType))
-                        db.insert(TABLE_PREFERENCES, null, values)
+                        writableDatabase.insert(
+                            TABLE_PREFERENCES,
+                            SQLiteDatabase.CONFLICT_NONE,
+                            values
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -2759,16 +1901,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_SEC_FOLDER_LOCAL_PATH= '${
                             encrypt(localPath)
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_SEC_FOLDER_LOCAL_PATH, encrypt(localPath))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2780,16 +1922,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_CAM_SYNC_FILE_UPLOAD= '${
                             encrypt(fileUpload.toString())
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(fileUpload.toString()))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2810,19 +1952,19 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTE_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_ACCOUNT_DETAILS_TIMESTAMP= '${
                             encrypt(accountDetailsTimeStamp.toString())
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_ATTRIBUTE_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTE_TABLE)
                 } else {
                     values.put(
                         KEY_ACCOUNT_DETAILS_TIMESTAMP,
                         encrypt(accountDetailsTimeStamp.toString())
                     )
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2836,19 +1978,19 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTE_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP= '${
                             encrypt(extendedAccountDetailsTimestamp.toString())
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_ATTRIBUTE_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTE_TABLE)
                 } else {
                     values.put(
                         KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
                         encrypt(extendedAccountDetailsTimestamp.toString())
                     )
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2862,19 +2004,19 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTE_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP= '${
                             encrypt(extendedAccountDetailsTimestamp.toString())
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_ATTRIBUTE_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTE_TABLE)
                 } else {
                     values.put(
                         KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
                         encrypt(extendedAccountDetailsTimestamp.toString())
                     )
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -2969,15 +2111,15 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         val selectQuery = "SELECT * FROM $tableName"
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_TABLE =
                         "UPDATE $tableName SET $columnName= '${encrypt(value)}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_TABLE)
+                    writableDatabase.execSQL(UPDATE_TABLE)
                 } else {
                     val values = ContentValues()
                     values.put(columnName, encrypt(value))
-                    db.insert(tableName, null, values)
+                    writableDatabase.insert(tableName, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3002,15 +2144,15 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery =
             "SELECT $columnName FROM $tableName WHERE $KEY_ID = '1'"
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     value = decrypt(cursor.getString(0))
                     Timber.d("%s value: %s", columnName, value)
                 } else {
                     Timber.w("No value found, setting default")
                     val values = ContentValues()
                     values.put(columnName, encrypt(defaultValue))
-                    db.insert(tableName, null, values)
+                    writableDatabase.insert(tableName, SQLiteDatabase.CONFLICT_NONE, values)
                     Timber.d("Default value: %s", defaultValue)
                 }
             }
@@ -3042,19 +2184,23 @@ class SqliteDatabaseHandler @Inject constructor(
             val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
             val values = ContentValues()
             try {
-                db.rawQuery(selectQuery, null).use { cursor ->
-                    if (cursor != null && cursor.moveToFirst()) {
+                readableDatabase.query(selectQuery).use { cursor ->
+                    if (cursor.moveToFirst()) {
                         val UPDATE_PREFERENCES_TABLE =
                             "UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_ENABLED= '${
                                 encrypt(passcodeLockEnabled.toString())
                             }' WHERE $KEY_ID = '1'"
-                        db.execSQL(UPDATE_PREFERENCES_TABLE)
+                        writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                     } else {
                         values.put(
                             KEY_PASSCODE_LOCK_ENABLED,
                             encrypt(passcodeLockEnabled.toString())
                         )
-                        db.insert(TABLE_PREFERENCES, null, values)
+                        writableDatabase.insert(
+                            TABLE_PREFERENCES,
+                            SQLiteDatabase.CONFLICT_NONE,
+                            values
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -3068,18 +2214,22 @@ class SqliteDatabaseHandler @Inject constructor(
             val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
             val values = ContentValues()
             try {
-                db.rawQuery(selectQuery, null).use { cursor ->
-                    if (cursor != null && cursor.moveToFirst()) {
+                readableDatabase.query(selectQuery).use { cursor ->
+                    if (cursor.moveToFirst()) {
                         val UPDATE_PREFERENCES_TABLE =
                             "UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_CODE= '${
                                 encrypt(
                                     passcodeLockCode
                                 )
                             }' WHERE $KEY_ID = '1'"
-                        db.execSQL(UPDATE_PREFERENCES_TABLE)
+                        writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                     } else {
                         values.put(KEY_PASSCODE_LOCK_CODE, encrypt(passcodeLockCode))
-                        db.insert(TABLE_PREFERENCES, null, values)
+                        writableDatabase.insert(
+                            TABLE_PREFERENCES,
+                            SQLiteDatabase.CONFLICT_NONE,
+                            values
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -3155,16 +2305,16 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_PREFERENCES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_STORAGE_DOWNLOAD_LOCATION= '${
                             encrypt(storageDownloadLocation)
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_PREFERENCES_TABLE)
+                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
                     values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(storageDownloadLocation))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3176,17 +2326,17 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_ATTR_ASK_SIZE_DOWNLOAD='${
                             encrypt(askSizeDownload)
                         }' WHERE $KEY_ID ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                     Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(askSizeDownload))
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3198,17 +2348,17 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_ATTR_ASK_NOAPP_DOWNLOAD='${
                             encrypt(askNoAppDownload)
                         }' WHERE $KEY_ID ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                     Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(askNoAppDownload))
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3220,17 +2370,17 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_ATTR_INTENTS='${
                             encrypt(attempt.toString())
                         }' WHERE $KEY_ID ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                     Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_ATTR_INTENTS, encrypt(attempt.toString()))
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3242,15 +2392,15 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_USE_HTTPS_ONLY='${encrypt(useHttpsOnly.toString())}' WHERE $KEY_ID ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                     Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_USE_HTTPS_ONLY, encrypt(useHttpsOnly.toString()))
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3263,7 +2413,7 @@ class SqliteDatabaseHandler @Inject constructor(
             val selectQuery =
                 "SELECT $KEY_USE_HTTPS_ONLY FROM $TABLE_ATTRIBUTES WHERE $KEY_ID = '1'"
             try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
+                readableDatabase.query(selectQuery).use { cursor ->
                     if (cursor.moveToFirst()) {
                         return decrypt(cursor.getString(0))
                     }
@@ -3278,14 +2428,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_SHOW_COPYRIGHT='${encrypt(showCopyright.toString())}' WHERE $KEY_ID ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_SHOW_COPYRIGHT, encrypt(showCopyright.toString()))
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3298,7 +2448,7 @@ class SqliteDatabaseHandler @Inject constructor(
             val selectQuery =
                 "SELECT $KEY_SHOW_COPYRIGHT FROM $TABLE_ATTRIBUTES WHERE $KEY_ID = '1'"
             try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
+                readableDatabase.query(selectQuery).use { cursor ->
                     if (cursor.moveToFirst()) {
                         return decrypt(cursor.getString(0))?.toBoolean() ?: true
                     }
@@ -3313,14 +2463,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_SHOW_NOTIF_OFF='${encrypt(showNotifOff.toString())}' WHERE $KEY_ID ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_SHOW_NOTIF_OFF, encrypt(showNotifOff.toString()))
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3332,14 +2482,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_LAST_PUBLIC_HANDLE= '${encrypt(handle.toString())}' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(handle.toString()))
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3351,19 +2501,19 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTE_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_LAST_PUBLIC_HANDLE_TIMESTAMP= '${
                             encrypt(lastPublicHandleTimeStamp.toString())
                         }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_ATTRIBUTE_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTE_TABLE)
                 } else {
                     values.put(
                         KEY_LAST_PUBLIC_HANDLE_TIMESTAMP,
                         encrypt(lastPublicHandleTimeStamp.toString())
                     )
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3477,7 +2627,7 @@ class SqliteDatabaseHandler @Inject constructor(
             val selectQuery =
                 "SELECT $KEY_SHOW_NOTIF_OFF FROM $TABLE_ATTRIBUTES WHERE $KEY_ID = '1'"
             try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
+                readableDatabase.query(selectQuery).use { cursor ->
                     if (cursor.moveToFirst()) {
                         return decrypt(cursor.getString(0))
                     }
@@ -3492,20 +2642,20 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_INVALIDATE_SDK_CACHE='" + encrypt(
                             invalidateSdkCache.toString()
                         ) + "' WHERE " + KEY_ID + " ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                     Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(
                         KEY_INVALIDATE_SDK_CACHE,
                         encrypt(invalidateSdkCache.toString())
                     )
-                    db.insert(TABLE_ATTRIBUTES, null, values)
+                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3515,18 +2665,18 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun clearCredentials() {
         Timber.w("Clear local credentials!")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_CREDENTIALS")
-        onCreate(db)
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CREDENTIALS")
+        legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
     override fun clearEphemeral() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_EPHEMERAL")
-        onCreate(db)
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_EPHEMERAL")
+        legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
     override fun clearPreferences() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_PREFERENCES")
-        onCreate(db)
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_PREFERENCES")
+        legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
     override fun clearAttributes() {
@@ -3542,8 +2692,8 @@ class SqliteDatabaseHandler @Inject constructor(
             Timber.w(e, "EXCEPTION getting last public handle info.")
             lastPublicHandle = MegaApiJava.INVALID_HANDLE
         }
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ATTRIBUTES")
-        onCreate(db)
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_ATTRIBUTES")
+        legacyDatabaseMigration.onCreate(writableDatabase)
         if (lastPublicHandle != MegaApiJava.INVALID_HANDLE) {
             try {
                 setLastPublicHandle(lastPublicHandle)
@@ -3562,28 +2712,23 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun clearNonContacts() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_NON_CONTACTS")
-        onCreate(db)
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_NON_CONTACTS")
+        legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
     override fun clearChatItems() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_ITEMS")
-        onCreate(db)
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_ITEMS")
+        legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
     override fun clearChatSettings() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_SETTINGS")
-        onCreate(db)
-    }
-
-    override fun clearOffline(db: SQLiteDatabase) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_OFFLINE")
-        onCreate(db)
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_SETTINGS")
+        legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
     override fun clearOffline() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_OFFLINE")
-        onCreate(db)
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_OFFLINE")
+        legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
     /**
@@ -3625,7 +2770,11 @@ class SqliteDatabaseHandler @Inject constructor(
         values.put(KEY_PENDING_MSG_NAME, encrypt(message.name))
         values.put(KEY_PENDING_MSG_TRANSFER_TAG, Constants.INVALID_ID)
         values.put(KEY_PENDING_MSG_STATE, state)
-        return db.insert(TABLE_PENDING_MSG_SINGLE, null, values)
+        return writableDatabase.insert(
+            TABLE_PENDING_MSG_SINGLE,
+            SQLiteDatabase.CONFLICT_NONE,
+            values
+        )
     }
 
     override fun findPendingMessageById(messageId: Long): PendingMessage? {
@@ -3635,7 +2784,7 @@ class SqliteDatabaseHandler @Inject constructor(
             "SELECT * FROM $TABLE_PENDING_MSG_SINGLE WHERE $KEY_ID ='$messageId'"
         Timber.d("QUERY: %s", selectQuery)
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val chatId = decrypt(cursor.getString(1))!!.toLong()
                     val timestamp = decrypt(cursor.getString(2))!!
@@ -3726,7 +2875,13 @@ class SqliteDatabaseHandler @Inject constructor(
         values.put(KEY_PENDING_MSG_NODE_HANDLE, encrypt(nodeHandle))
         values.put(KEY_PENDING_MSG_STATE, state)
         val where = "$KEY_ID=$idMessage"
-        db.update(TABLE_PENDING_MSG_SINGLE, values, where, null)
+        writableDatabase.update(
+            TABLE_PENDING_MSG_SINGLE,
+            SQLiteDatabase.CONFLICT_REPLACE,
+            values,
+            where,
+            null
+        )
     }
 
     override fun updatePendingMessageOnAttach(idMessage: Long, temporalId: String?, state: Int) {
@@ -3735,7 +2890,14 @@ class SqliteDatabaseHandler @Inject constructor(
         values.put(KEY_PENDING_MSG_TEMP_KARERE, encrypt(temporalId))
         values.put(KEY_PENDING_MSG_STATE, state)
         val where = "$KEY_ID=$idMessage"
-        val rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null)
+        val rows =
+            writableDatabase.update(
+                TABLE_PENDING_MSG_SINGLE,
+                SQLiteDatabase.CONFLICT_REPLACE,
+                values,
+                where,
+                null
+            )
         Timber.d("Rows updated: %s", rows)
     }
 
@@ -3749,7 +2911,7 @@ class SqliteDatabaseHandler @Inject constructor(
             }'"
         Timber.d("QUERY: %s", selectQuery)
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     do {
                         val id = cursor.getLong(0)
@@ -3806,7 +2968,7 @@ class SqliteDatabaseHandler @Inject constructor(
             }'"
         Timber.d("QUERY: %s", selectQuery)
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     id = cursor.getLong(0)
                 }
@@ -3819,7 +2981,7 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun removeSentPendingMessages() {
         Timber.d("removeSentPendingMessages")
-        db.delete(
+        writableDatabase.delete(
             TABLE_PENDING_MSG_SINGLE,
             KEY_PENDING_MSG_STATE + "=" + PendingMessageState.SENT.value,
             null
@@ -3828,7 +2990,7 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun removePendingMessageByChatId(idChat: Long) {
         Timber.d("removePendingMessageByChatId")
-        db.delete(
+        writableDatabase.delete(
             TABLE_PENDING_MSG_SINGLE,
             "$KEY_PENDING_MSG_ID_CHAT = '${encrypt(idChat.toString())}'",
             null
@@ -3836,7 +2998,7 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun removePendingMessageById(idMsg: Long) {
-        db.delete(TABLE_PENDING_MSG_SINGLE, "$KEY_ID=$idMsg", null)
+        writableDatabase.delete(TABLE_PENDING_MSG_SINGLE, "$KEY_ID=$idMsg", null)
     }
 
     override val autoPlayEnabled: String?
@@ -3844,7 +3006,7 @@ class SqliteDatabaseHandler @Inject constructor(
             val selectQuery =
                 "SELECT $KEY_AUTO_PLAY FROM $TABLE_PREFERENCES WHERE $KEY_ID = '1'"
             try {
-                db.rawQuery(selectQuery, null)?.use { cursor ->
+                readableDatabase.query(selectQuery).use { cursor ->
                     if (cursor.moveToFirst()) {
                         return decrypt(cursor.getString(0))
                     }
@@ -3865,14 +3027,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_AUTO_PLAY='${encrypt(enabled)}' WHERE $KEY_ID ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_AUTO_PLAY, encrypt(enabled))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3885,14 +3047,14 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()
         try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            readableDatabase.query(selectQuery).use { cursor ->
+                if (cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_PREFERENCES SET $KEY_SHOW_INVITE_BANNER='${encrypt(show)}' WHERE $KEY_ID ='1'"
-                    db.execSQL(UPDATE_ATTRIBUTES_TABLE)
+                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
                 } else {
                     values.put(KEY_SHOW_INVITE_BANNER, encrypt(show))
-                    db.insert(TABLE_PREFERENCES, null, values)
+                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {
@@ -3904,7 +3066,7 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_HANDLE = '${encrypt(handle.toString())}'"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     val id = cursor.getString(0).toInt()
                     val nodeHandle = decrypt(cursor.getString(1))
@@ -3941,7 +3103,7 @@ class SqliteDatabaseHandler @Inject constructor(
         values.put(KEY_OFF_TYPE, encrypt(offlineInformation.type))
         values.put(KEY_OFF_INCOMING, offlineInformation.origin)
         values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offlineInformation.handleIncoming))
-        return db.insert(TABLE_OFFLINE, null, values)
+        return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
     }
 
     override suspend fun getOfflineInformationList(
@@ -3967,7 +3129,7 @@ class SqliteDatabaseHandler @Inject constructor(
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PATH = '${encrypt(nodePath)}'"
         try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
+            readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     do {
                         val id = cursor.getString(0).toInt()
@@ -4072,141 +3234,141 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     companion object {
-        private const val TABLE_PREFERENCES = "preferences"
-        private const val TABLE_CREDENTIALS = "credentials"
-        private const val TABLE_ATTRIBUTES = "attributes"
-        private const val TABLE_OFFLINE = "offline"
-        private const val TABLE_CHAT_ITEMS = "chat"
-        private const val TABLE_NON_CONTACTS = "noncontacts"
-        private const val TABLE_CHAT_SETTINGS = "chatsettings"
-        private const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
-        private const val TABLE_EPHEMERAL = "ephemeral"
-        private const val TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle"
-        private const val TABLE_SYNC_RECORDS = "syncrecords"
-        private const val KEY_ID = "id"
-        private const val KEY_EMAIL = "email"
-        private const val KEY_PASSWORD = "password"
-        private const val KEY_SESSION = "session"
-        private const val KEY_FIRST_NAME = "firstname"
-        private const val KEY_LAST_NAME = "lastname"
-        private const val KEY_MY_HANDLE = "myhandle"
-        private const val KEY_FIRST_LOGIN = "firstlogin"
-        private const val KEY_CAM_SYNC_ENABLED = "camsyncenabled"
-        private const val KEY_SEC_FOLDER_ENABLED = "secondarymediafolderenabled"
-        private const val KEY_SEC_FOLDER_HANDLE = "secondarymediafolderhandle"
-        private const val KEY_SEC_FOLDER_LOCAL_PATH = "secondarymediafolderlocalpath"
-        private const val KEY_CAM_SYNC_HANDLE = "camsynchandle"
-        private const val KEY_CAM_SYNC_WIFI = "wifi"
-        private const val KEY_CAM_SYNC_LOCAL_PATH = "camsynclocalpath"
-        private const val KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload"
-        private const val KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp"
-        private const val KEY_CAM_VIDEO_SYNC_TIMESTAMP = "camVideoSyncTimeStamp"
-        private const val KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality"
-        private const val KEY_CONVERSION_ON_CHARGING = "conversionOnCharging"
-        private const val KEY_REMOVE_GPS = "removeGPS"
-        private const val KEY_CHARGING_ON_SIZE = "chargingOnSize"
-        private const val KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords"
-        private const val KEY_KEEP_FILE_NAMES = "keepFileNames"
-        private const val KEY_SHOW_INVITE_BANNER = "showinvitebanner"
-        private const val KEY_ASK_FOR_DISPLAY_OVER = "askfordisplayover"
-        private const val KEY_PASSCODE_LOCK_ENABLED = "pinlockenabled"
-        private const val KEY_PASSCODE_LOCK_TYPE = "pinlocktype"
-        private const val KEY_PASSCODE_LOCK_CODE = "pinlockcode"
-        private const val KEY_PASSCODE_LOCK_REQUIRE_TIME = "passcodelockrequiretime"
-        private const val KEY_FINGERPRINT_LOCK = "fingerprintlock"
-        private const val KEY_STORAGE_ASK_ALWAYS = "storageaskalways"
-        private const val KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation"
-        private const val KEY_LAST_UPLOAD_FOLDER = "lastuploadfolder"
-        private const val KEY_LAST_CLOUD_FOLDER_HANDLE = "lastcloudfolder"
-        private const val KEY_ATTR_ONLINE = "online"
-        private const val KEY_ATTR_INTENTS = "intents"
-        private const val KEY_ATTR_ASK_SIZE_DOWNLOAD = "asksizedownload"
-        private const val KEY_ATTR_ASK_NOAPP_DOWNLOAD = "asknoappdownload"
-        private const val KEY_OFF_HANDLE = "handle"
-        private const val KEY_OFF_PATH = "path"
-        private const val KEY_OFF_NAME = "name"
-        private const val KEY_OFF_PARENT = "parentId"
-        private const val KEY_OFF_TYPE = "type"
-        private const val KEY_OFF_INCOMING = "incoming"
-        private const val KEY_OFF_HANDLE_INCOMING = "incomingHandle"
-        private const val KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp"
-        private const val KEY_SEC_VIDEO_SYNC_TIMESTAMP = "secondaryVideoSyncTimeStamp"
-        private const val KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices"
-        private const val KEY_ASK_SET_DOWNLOAD_LOCATION = "askSetDefaultDownloadLocation"
-        private const val KEY_PREFERRED_VIEW_LIST = "preferredviewlist"
-        private const val KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera"
-        private const val KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard"
-        private const val KEY_URI_MEDIA_EXTERNAL_SD_CARD = "urimediaexternalsdcard"
-        private const val KEY_SD_CARD_URI = "sdcarduri"
-        private const val KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = "camerafolderexternalsdcard"
-        private const val KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD = "mediafolderexternalsdcard"
-        private const val KEY_CONTACT_HANDLE = "handle"
-        private const val KEY_CONTACT_MAIL = "mail"
-        private const val KEY_CONTACT_NAME = "name"
-        private const val KEY_CONTACT_LAST_NAME = "lastname"
-        private const val KEY_CONTACT_NICKNAME = "nickname"
-        private const val KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud"
-        private const val KEY_PREFERRED_SORT_CAMERA_UPLOAD = "preferredsortcameraupload"
-        private const val KEY_PREFERRED_SORT_OTHERS = "preferredsortothers"
-        private const val KEY_FILE_LOGGER_SDK = "filelogger"
-        private const val KEY_FILE_LOGGER_KARERE = "fileloggerkarere"
-        private const val KEY_USE_HTTPS_ONLY = "usehttpsonly"
-        private const val KEY_SHOW_COPYRIGHT = "showcopyright"
-        private const val KEY_SHOW_NOTIF_OFF = "shownotifoff"
-        private const val KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp"
+        const val TABLE_PREFERENCES = "preferences"
+        const val TABLE_CREDENTIALS = "credentials"
+        const val TABLE_ATTRIBUTES = "attributes"
+        const val TABLE_OFFLINE = "offline"
+        const val TABLE_CHAT_ITEMS = "chat"
+        const val TABLE_NON_CONTACTS = "noncontacts"
+        const val TABLE_CHAT_SETTINGS = "chatsettings"
+        const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
+        const val TABLE_EPHEMERAL = "ephemeral"
+        const val TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle"
+        const val TABLE_SYNC_RECORDS = "syncrecords"
+        const val KEY_ID = "id"
+        const val KEY_EMAIL = "email"
+        const val KEY_PASSWORD = "password"
+        const val KEY_SESSION = "session"
+        const val KEY_FIRST_NAME = "firstname"
+        const val KEY_LAST_NAME = "lastname"
+        const val KEY_MY_HANDLE = "myhandle"
+        const val KEY_FIRST_LOGIN = "firstlogin"
+        const val KEY_CAM_SYNC_ENABLED = "camsyncenabled"
+        const val KEY_SEC_FOLDER_ENABLED = "secondarymediafolderenabled"
+        const val KEY_SEC_FOLDER_HANDLE = "secondarymediafolderhandle"
+        const val KEY_SEC_FOLDER_LOCAL_PATH = "secondarymediafolderlocalpath"
+        const val KEY_CAM_SYNC_HANDLE = "camsynchandle"
+        const val KEY_CAM_SYNC_WIFI = "wifi"
+        const val KEY_CAM_SYNC_LOCAL_PATH = "camsynclocalpath"
+        const val KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload"
+        const val KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp"
+        const val KEY_CAM_VIDEO_SYNC_TIMESTAMP = "camVideoSyncTimeStamp"
+        const val KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality"
+        const val KEY_CONVERSION_ON_CHARGING = "conversionOnCharging"
+        const val KEY_REMOVE_GPS = "removeGPS"
+        const val KEY_CHARGING_ON_SIZE = "chargingOnSize"
+        const val KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords"
+        const val KEY_KEEP_FILE_NAMES = "keepFileNames"
+        const val KEY_SHOW_INVITE_BANNER = "showinvitebanner"
+        const val KEY_ASK_FOR_DISPLAY_OVER = "askfordisplayover"
+        const val KEY_PASSCODE_LOCK_ENABLED = "pinlockenabled"
+        const val KEY_PASSCODE_LOCK_TYPE = "pinlocktype"
+        const val KEY_PASSCODE_LOCK_CODE = "pinlockcode"
+        const val KEY_PASSCODE_LOCK_REQUIRE_TIME = "passcodelockrequiretime"
+        const val KEY_FINGERPRINT_LOCK = "fingerprintlock"
+        const val KEY_STORAGE_ASK_ALWAYS = "storageaskalways"
+        const val KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation"
+        const val KEY_LAST_UPLOAD_FOLDER = "lastuploadfolder"
+        const val KEY_LAST_CLOUD_FOLDER_HANDLE = "lastcloudfolder"
+        const val KEY_ATTR_ONLINE = "online"
+        const val KEY_ATTR_INTENTS = "intents"
+        const val KEY_ATTR_ASK_SIZE_DOWNLOAD = "asksizedownload"
+        const val KEY_ATTR_ASK_NOAPP_DOWNLOAD = "asknoappdownload"
+        const val KEY_OFF_HANDLE = "handle"
+        const val KEY_OFF_PATH = "path"
+        const val KEY_OFF_NAME = "name"
+        const val KEY_OFF_PARENT = "parentId"
+        const val KEY_OFF_TYPE = "type"
+        const val KEY_OFF_INCOMING = "incoming"
+        const val KEY_OFF_HANDLE_INCOMING = "incomingHandle"
+        const val KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp"
+        const val KEY_SEC_VIDEO_SYNC_TIMESTAMP = "secondaryVideoSyncTimeStamp"
+        const val KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices"
+        const val KEY_ASK_SET_DOWNLOAD_LOCATION = "askSetDefaultDownloadLocation"
+        const val KEY_PREFERRED_VIEW_LIST = "preferredviewlist"
+        const val KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera"
+        const val KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard"
+        const val KEY_URI_MEDIA_EXTERNAL_SD_CARD = "urimediaexternalsdcard"
+        const val KEY_SD_CARD_URI = "sdcarduri"
+        const val KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = "camerafolderexternalsdcard"
+        const val KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD = "mediafolderexternalsdcard"
+        const val KEY_CONTACT_HANDLE = "handle"
+        const val KEY_CONTACT_MAIL = "mail"
+        const val KEY_CONTACT_NAME = "name"
+        const val KEY_CONTACT_LAST_NAME = "lastname"
+        const val KEY_CONTACT_NICKNAME = "nickname"
+        const val KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud"
+        const val KEY_PREFERRED_SORT_CAMERA_UPLOAD = "preferredsortcameraupload"
+        const val KEY_PREFERRED_SORT_OTHERS = "preferredsortothers"
+        const val KEY_FILE_LOGGER_SDK = "filelogger"
+        const val KEY_FILE_LOGGER_KARERE = "fileloggerkarere"
+        const val KEY_USE_HTTPS_ONLY = "usehttpsonly"
+        const val KEY_SHOW_COPYRIGHT = "showcopyright"
+        const val KEY_SHOW_NOTIF_OFF = "shownotifoff"
+        const val KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp"
 
         @Deprecated("Unused database properties")
-        private const val KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp"
+        const val KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp"
 
         @Deprecated("Unused database properties")
-        private const val KEY_PRICING_TIMESTAMP = "pricingtimestamp"
-        private const val KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "extendedaccountdetailstimestamp"
-        private const val KEY_CHAT_HANDLE = "chathandle"
-        private const val KEY_CHAT_ITEM_NOTIFICATIONS = "chatitemnotifications"
-        private const val KEY_CHAT_ITEM_RINGTONE = "chatitemringtone"
-        private const val KEY_CHAT_ITEM_SOUND_NOTIFICATIONS = "chatitemnotificationsound"
-        private const val KEY_CHAT_ITEM_WRITTEN_TEXT = "chatitemwrittentext"
-        private const val KEY_CHAT_ITEM_EDITED_MSG_ID = "chatitemeditedmsgid"
-        private const val KEY_NONCONTACT_HANDLE = "noncontacthandle"
-        private const val KEY_NONCONTACT_FULLNAME = "noncontactfullname"
-        private const val KEY_NONCONTACT_FIRSTNAME = "noncontactfirstname"
-        private const val KEY_NONCONTACT_LASTNAME = "noncontactlastname"
-        private const val KEY_NONCONTACT_EMAIL = "noncontactemail"
-        private const val KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications"
-        private const val KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound"
-        private const val KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled"
-        private const val KEY_CHAT_VIDEO_QUALITY = "chatvideoQuality"
-        private const val KEY_INVALIDATE_SDK_CACHE = "invalidatesdkcache"
-        private const val KEY_TRANSFER_FILENAME = "transferfilename"
-        private const val KEY_TRANSFER_TYPE = "transfertype"
-        private const val KEY_TRANSFER_STATE = "transferstate"
-        private const val KEY_TRANSFER_SIZE = "transfersize"
-        private const val KEY_TRANSFER_HANDLE = "transferhandle"
-        private const val KEY_TRANSFER_PATH = "transferpath"
-        private const val KEY_TRANSFER_OFFLINE = "transferoffline"
-        private const val KEY_TRANSFER_TIMESTAMP = "transfertimestamp"
-        private const val KEY_TRANSFER_ERROR = "transfererror"
-        private const val KEY_TRANSFER_ORIGINAL_PATH = "transferoriginalpath"
-        private const val KEY_TRANSFER_PARENT_HANDLE = "transferparenthandle"
-        private const val KEY_FIRST_LOGIN_CHAT = "firstloginchat"
-        private const val KEY_AUTO_PLAY = "autoplay"
-        private const val KEY_ID_CHAT = "idchat"
+        const val KEY_PRICING_TIMESTAMP = "pricingtimestamp"
+        const val KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "extendedaccountdetailstimestamp"
+        const val KEY_CHAT_HANDLE = "chathandle"
+        const val KEY_CHAT_ITEM_NOTIFICATIONS = "chatitemnotifications"
+        const val KEY_CHAT_ITEM_RINGTONE = "chatitemringtone"
+        const val KEY_CHAT_ITEM_SOUND_NOTIFICATIONS = "chatitemnotificationsound"
+        const val KEY_CHAT_ITEM_WRITTEN_TEXT = "chatitemwrittentext"
+        const val KEY_CHAT_ITEM_EDITED_MSG_ID = "chatitemeditedmsgid"
+        const val KEY_NONCONTACT_HANDLE = "noncontacthandle"
+        const val KEY_NONCONTACT_FULLNAME = "noncontactfullname"
+        const val KEY_NONCONTACT_FIRSTNAME = "noncontactfirstname"
+        const val KEY_NONCONTACT_LASTNAME = "noncontactlastname"
+        const val KEY_NONCONTACT_EMAIL = "noncontactemail"
+        const val KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications"
+        const val KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound"
+        const val KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled"
+        const val KEY_CHAT_VIDEO_QUALITY = "chatvideoQuality"
+        const val KEY_INVALIDATE_SDK_CACHE = "invalidatesdkcache"
+        const val KEY_TRANSFER_FILENAME = "transferfilename"
+        const val KEY_TRANSFER_TYPE = "transfertype"
+        const val KEY_TRANSFER_STATE = "transferstate"
+        const val KEY_TRANSFER_SIZE = "transfersize"
+        const val KEY_TRANSFER_HANDLE = "transferhandle"
+        const val KEY_TRANSFER_PATH = "transferpath"
+        const val KEY_TRANSFER_OFFLINE = "transferoffline"
+        const val KEY_TRANSFER_TIMESTAMP = "transfertimestamp"
+        const val KEY_TRANSFER_ERROR = "transfererror"
+        const val KEY_TRANSFER_ORIGINAL_PATH = "transferoriginalpath"
+        const val KEY_TRANSFER_PARENT_HANDLE = "transferparenthandle"
+        const val KEY_FIRST_LOGIN_CHAT = "firstloginchat"
+        const val KEY_AUTO_PLAY = "autoplay"
+        const val KEY_ID_CHAT = "idchat"
 
         //columns for table sync records
-        private const val KEY_SYNC_FILEPATH_ORI = "sync_filepath_origin"
-        private const val KEY_SYNC_FILEPATH_NEW = "sync_filepath_new"
-        private const val KEY_SYNC_FP_ORI = "sync_fingerprint_origin"
-        private const val KEY_SYNC_FP_NEW = "sync_fingerprint_new"
-        private const val KEY_SYNC_TIMESTAMP = "sync_timestamp"
-        private const val KEY_SYNC_STATE = "sync_state"
-        private const val KEY_SYNC_FILENAME = "sync_filename"
-        private const val KEY_SYNC_HANDLE = "sync_handle"
-        private const val KEY_SYNC_COPYONLY = "sync_copyonly"
-        private const val KEY_SYNC_SECONDARY = "sync_secondary"
-        private const val KEY_SYNC_TYPE = "sync_type"
-        private const val KEY_SYNC_LONGITUDE = "sync_longitude"
-        private const val KEY_SYNC_LATITUDE = "sync_latitude"
-        private const val CREATE_SYNC_RECORDS_TABLE =
+        const val KEY_SYNC_FILEPATH_ORI = "sync_filepath_origin"
+        const val KEY_SYNC_FILEPATH_NEW = "sync_filepath_new"
+        const val KEY_SYNC_FP_ORI = "sync_fingerprint_origin"
+        const val KEY_SYNC_FP_NEW = "sync_fingerprint_new"
+        const val KEY_SYNC_TIMESTAMP = "sync_timestamp"
+        const val KEY_SYNC_STATE = "sync_state"
+        const val KEY_SYNC_FILENAME = "sync_filename"
+        const val KEY_SYNC_HANDLE = "sync_handle"
+        const val KEY_SYNC_COPYONLY = "sync_copyonly"
+        const val KEY_SYNC_SECONDARY = "sync_secondary"
+        const val KEY_SYNC_TYPE = "sync_type"
+        const val KEY_SYNC_LONGITUDE = "sync_longitude"
+        const val KEY_SYNC_LATITUDE = "sync_latitude"
+        const val CREATE_SYNC_RECORDS_TABLE =
             "CREATE TABLE IF NOT EXISTS $TABLE_SYNC_RECORDS(" +
                     "$KEY_ID INTEGER PRIMARY KEY, " +
                     "$KEY_SYNC_FILEPATH_ORI TEXT," +
@@ -4222,29 +3384,29 @@ class SqliteDatabaseHandler @Inject constructor(
                     "$KEY_SYNC_HANDLE TEXT," +
                     "$KEY_SYNC_COPYONLY BOOLEAN," +
                     "$KEY_SYNC_SECONDARY BOOLEAN)"
-        private const val KEY_LAST_PUBLIC_HANDLE = "lastpublichandle"
-        private const val KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp"
-        private const val KEY_LAST_PUBLIC_HANDLE_TYPE = "lastpublichandletype"
-        private const val KEY_STORAGE_STATE = "storagestate"
-        private const val KEY_MY_CHAT_FILES_FOLDER_HANDLE = "mychatfilesfolderhandle"
-        private const val KEY_TRANSFER_QUEUE_STATUS = "transferqueuestatus"
-        private const val KEY_PENDING_MSG_ID_CHAT = "idchat"
-        private const val KEY_PENDING_MSG_TIMESTAMP = "timestamp"
-        private const val KEY_PENDING_MSG_TEMP_KARERE = "idtempkarere"
-        private const val KEY_PENDING_MSG_FILE_PATH = "filePath"
-        private const val KEY_PENDING_MSG_NAME = "filename"
-        private const val KEY_PENDING_MSG_NODE_HANDLE = "nodehandle"
-        private const val KEY_PENDING_MSG_FINGERPRINT = "filefingerprint"
-        private const val KEY_PENDING_MSG_TRANSFER_TAG = "transfertag"
-        private const val KEY_PENDING_MSG_STATE = "state"
+        const val KEY_LAST_PUBLIC_HANDLE = "lastpublichandle"
+        const val KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp"
+        const val KEY_LAST_PUBLIC_HANDLE_TYPE = "lastpublichandletype"
+        const val KEY_STORAGE_STATE = "storagestate"
+        const val KEY_MY_CHAT_FILES_FOLDER_HANDLE = "mychatfilesfolderhandle"
+        const val KEY_TRANSFER_QUEUE_STATUS = "transferqueuestatus"
+        const val KEY_PENDING_MSG_ID_CHAT = "idchat"
+        const val KEY_PENDING_MSG_TIMESTAMP = "timestamp"
+        const val KEY_PENDING_MSG_TEMP_KARERE = "idtempkarere"
+        const val KEY_PENDING_MSG_FILE_PATH = "filePath"
+        const val KEY_PENDING_MSG_NAME = "filename"
+        const val KEY_PENDING_MSG_NODE_HANDLE = "nodehandle"
+        const val KEY_PENDING_MSG_FINGERPRINT = "filefingerprint"
+        const val KEY_PENDING_MSG_TRANSFER_TAG = "transfertag"
+        const val KEY_PENDING_MSG_STATE = "state"
 
-        private const val KEY_SD_TRANSFERS_TAG = "sdtransfertag"
-        private const val KEY_SD_TRANSFERS_NAME = "sdtransfername"
-        private const val KEY_SD_TRANSFERS_SIZE = "sdtransfersize"
-        private const val KEY_SD_TRANSFERS_HANDLE = "sdtransferhandle"
-        private const val KEY_SD_TRANSFERS_APP_DATA = "sdtransferappdata"
-        private const val KEY_SD_TRANSFERS_PATH = "sdtransferpath"
-        private const val CREATE_SD_TRANSFERS_TABLE =
+        const val KEY_SD_TRANSFERS_TAG = "sdtransfertag"
+        const val KEY_SD_TRANSFERS_NAME = "sdtransfername"
+        const val KEY_SD_TRANSFERS_SIZE = "sdtransfersize"
+        const val KEY_SD_TRANSFERS_HANDLE = "sdtransferhandle"
+        const val KEY_SD_TRANSFERS_APP_DATA = "sdtransferappdata"
+        const val KEY_SD_TRANSFERS_PATH = "sdtransferpath"
+        const val CREATE_SD_TRANSFERS_TABLE =
             "CREATE TABLE IF NOT EXISTS $TABLE_SD_TRANSFERS(" +
                     "$KEY_ID INTEGER PRIMARY KEY, " +                     // 0
                     "$KEY_SD_TRANSFERS_TAG INTEGER, " +                   // 1
@@ -4253,9 +3415,9 @@ class SqliteDatabaseHandler @Inject constructor(
                     "$KEY_SD_TRANSFERS_HANDLE TEXT, " +                   // 4
                     "$KEY_SD_TRANSFERS_PATH TEXT, " +                     // 5
                     "$KEY_SD_TRANSFERS_APP_DATA TEXT)"                    // 6
-        private const val OLD_VIDEO_QUALITY_ORIGINAL = 0
+        const val OLD_VIDEO_QUALITY_ORIGINAL = 0
 
-        private fun encrypt(original: String?): String? =
+        fun encrypt(original: String?): String? =
             original?.let {
                 try {
                     val encrypted = Util.aes_encrypt(aesKey, it.toByteArray())
@@ -4273,7 +3435,7 @@ class SqliteDatabaseHandler @Inject constructor(
                 return key.toByteArray().copyOfRange(0, 32)
             }
 
-        private fun decrypt(encodedString: String?): String? =
+        fun decrypt(encodedString: String?): String? =
             encodedString?.let {
                 try {
                     val encoded = Base64.decode(encodedString, Base64.DEFAULT)
@@ -4286,9 +3448,5 @@ class SqliteDatabaseHandler @Inject constructor(
                 }
             }
 
-    }
-
-    init {
-        db = this.writableDatabase
     }
 }

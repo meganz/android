@@ -3,13 +3,17 @@ package mega.privacy.android.data.di
 import android.content.Context
 import android.provider.Settings
 import androidx.room.Room
+import androidx.sqlite.db.SupportSQLiteOpenHelper
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.MegaDatabaseConstant
+import mega.privacy.android.data.database.MegaOpenHelperFactor
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
@@ -24,17 +28,28 @@ import javax.inject.Singleton
 internal object RoomDatabaseModule {
     @Provides
     @Singleton
-    internal fun provideMegaDatabase(@ApplicationContext applicationContext: Context): MegaDatabase =
+    internal fun provideMegaDatabase(
+        @ApplicationContext applicationContext: Context,
+        legacyDatabaseMigration: LegacyDatabaseMigration,
+    ): MegaDatabase =
         Room.databaseBuilder(
             applicationContext,
             MegaDatabase::class.java, MegaDatabaseConstant.DATABASE_NAME
         ).fallbackToDestructiveMigrationFrom(
             *(1..66).toList().toIntArray() // allow destructive migration for version 1 to 66
         ).addMigrations(*MegaDatabase.MIGRATIONS)
-            .build().apply {
-                // this is workaround to make sure room migration run before sqlite database migration
-                openHelper.writableDatabase
-            }
+            .openHelperFactory(
+                MegaOpenHelperFactor(
+                    FrameworkSQLiteOpenHelperFactory(),
+                    legacyDatabaseMigration
+                )
+            )
+            .build()
+
+    @Provides
+    @Singleton
+    internal fun provideSupportSQLiteOpenHelper(database: MegaDatabase): SupportSQLiteOpenHelper =
+        database.openHelper
 
     @Provides
     @Singleton

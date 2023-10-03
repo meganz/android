@@ -27,6 +27,7 @@ recyclerview-selection = "1.1.0"
 viewpager2 = "1.1.0-beta02"
 work = "2.8.1"
 room = "2.5.2"
+sqlite = "2.3.1"
 
 [libraries]
 java-core = { module = "androidx.core:core", version.ref = "java-core"}
@@ -79,6 +80,7 @@ work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 work-test = { module = "androidx.work:work-testing", version.ref = "work" }
 room = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+sqlite-ktx = { module = "androidx.sqlite:sqlite-ktx", version.ref = "sqlite" }
 
 [bundles]
 lifecycle = ["lifecycle-livedata", "lifecycle-viewmodel", "lifecycle-runtime", "lifecycle-reactivestreams", "lifecycle-common", "lifecycle-process", "lifecycle-service", "lifecycle-runtime-compose"]

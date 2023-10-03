@@ -505,6 +505,8 @@ dependencies {
 
     implementation(project(":feature:sync"))
     implementation(project(":feature:devicecenter"))
+
+    implementation(androidx.sqlite.ktx)
 }
 
 tasks.register("instrumentClasses") {

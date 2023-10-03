@@ -74,6 +74,10 @@ android {
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
     namespace = "mega.privacy.android.data"
 }
 
@@ -127,4 +131,5 @@ dependencies {
     androidTestImplementation(lib.bundles.unit.test)
     androidTestImplementation(testlib.junit.test.ktx)
     androidTestImplementation(testlib.runner)
+    androidTestImplementation(testlib.room.test)
 }

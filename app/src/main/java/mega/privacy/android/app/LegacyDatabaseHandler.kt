@@ -1,6 +1,5 @@
 package mega.privacy.android.app
 
-import android.database.sqlite.SQLiteDatabase
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.chat.PendingMessage
@@ -17,10 +16,7 @@ interface LegacyDatabaseHandler : DatabaseHandler {
     fun findChatPreferencesByHandle(handle: String?): ChatItemPreferences?
 
     fun setOfflineFile(offline: MegaOffline): Long
-    fun setOfflineFile(offline: MegaOffline, db: SQLiteDatabase): Long
     fun setOfflineFileOld(offline: MegaOffline): Long
-    fun setOfflineFileOld(offline: MegaOffline, db: SQLiteDatabase): Long
-    fun getOfflineFilesOld(db: SQLiteDatabase): ArrayList<MegaOffline>
     fun findByHandle(handle: Long): MegaOffline?
     fun findByHandle(handle: String?): MegaOffline?
     fun findByParentId(parentId: Int): ArrayList<MegaOffline>

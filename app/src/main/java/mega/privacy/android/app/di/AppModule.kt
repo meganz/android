@@ -13,8 +13,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.BuildConfig
+import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.nav.MegaNavigatorImpl
+import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.DefaultGetThemeMode
@@ -101,4 +103,8 @@ class AppModule {
     @Singleton
     @Provides
     internal fun provideAppNavigator(navigator: MegaNavigatorImpl): MegaNavigator = navigator
+
+    @Singleton
+    @Provides
+    internal fun provideLegacyDatabaseMigration(databaseMigration: LegacyDatabaseMigrationImpl): LegacyDatabaseMigration = databaseMigration
 }
