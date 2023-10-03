@@ -135,9 +135,9 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPr
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
@@ -807,8 +807,11 @@ class CameraUploadsWorker @AssistedInject constructor(
             if (!areLocationTagsEnabledUseCase()) {
                 flow<String> {
                     createTempFileAndRemoveCoordinatesUseCase(
-                        tempRoot,
-                        record
+                        rootPath = tempRoot,
+                        filePath = record.localPath,
+                        destinationPath = record.newPath
+                            ?: throw IllegalArgumentException("Destination path doesn't exist"),
+                        timestamp = record.timestamp,
                     )
                 }.retryWhen { cause, attempt ->
                     if (cause is NotEnoughStorageException) {

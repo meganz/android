@@ -24,8 +24,6 @@ import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
-import mega.privacy.android.domain.entity.SyncRecord
-import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
@@ -215,24 +213,8 @@ internal class FileSystemRepositoryImplTest {
         val localPath = "/path/to/local"
         val newPath = "/path/to/new"
         val rootPath = "/path/to/root"
-        val syncRecord = SyncRecord(
-            id = 0,
-            localPath = localPath,
-            newPath = newPath,
-            originFingerprint = null,
-            newFingerprint = null,
-            timestamp = 0L,
-            fileName = "fileName.jpg",
-            longitude = null,
-            latitude = null,
-            status = 0,
-            type = SyncRecordType.TYPE_ANY,
-            nodeHandle = null,
-            isCopyOnly = false,
-            isSecondary = false,
-        )
         whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenReturn(Unit)
-        val actual = underTest.createTempFile(rootPath, syncRecord)
+        val actual = underTest.createTempFile(rootPath, localPath, newPath)
         assertThat(actual).isEqualTo(newPath)
     }
 
@@ -242,28 +224,12 @@ internal class FileSystemRepositoryImplTest {
             val localPath = "/path/to/local"
             val newPath = "/path/to/new"
             val rootPath = "/path/to/root"
-            val syncRecord = SyncRecord(
-                id = 0,
-                localPath = localPath,
-                newPath = newPath,
-                originFingerprint = null,
-                newFingerprint = null,
-                timestamp = 0L,
-                fileName = "fileName.jpg",
-                longitude = null,
-                latitude = null,
-                status = 0,
-                type = SyncRecordType.TYPE_ANY,
-                nodeHandle = null,
-                isCopyOnly = false,
-                isSecondary = false,
-            )
             whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenThrow(
                 NotEnoughStorageException()
             )
             assertFailsWith(
                 exceptionClass = NotEnoughStorageException::class,
-                block = { underTest.createTempFile(rootPath, syncRecord) }
+                block = { underTest.createTempFile(rootPath, localPath, newPath) }
             )
         }
 
@@ -273,28 +239,12 @@ internal class FileSystemRepositoryImplTest {
             val localPath = "/path/to/local"
             val newPath = "/path/to/new"
             val rootPath = "/path/to/root"
-            val syncRecord = SyncRecord(
-                id = 0,
-                localPath = localPath,
-                newPath = newPath,
-                originFingerprint = null,
-                newFingerprint = null,
-                timestamp = 0L,
-                fileName = "fileName.jpg",
-                longitude = null,
-                latitude = null,
-                status = 0,
-                type = SyncRecordType.TYPE_ANY,
-                nodeHandle = null,
-                isCopyOnly = false,
-                isSecondary = false,
-            )
             whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenThrow(
                 FileNotCreatedException()
             )
             assertFailsWith(
                 exceptionClass = FileNotCreatedException::class,
-                block = { underTest.createTempFile(rootPath, syncRecord) }
+                block = { underTest.createTempFile(rootPath, localPath, newPath) }
             )
         }
 

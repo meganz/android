@@ -32,7 +32,6 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.qualifier.FileVersionsOption
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.ViewerNode
@@ -244,14 +243,14 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createTempFile(root: String, syncRecord: SyncRecord) =
-        withContext(ioDispatcher) {
-            val localPath = syncRecord.localPath
-            val destinationPath = syncRecord.newPath
-                ?: throw IllegalArgumentException("Destination path doesn't exist on sync record: $syncRecord")
-            fileGateway.createTempFile(root, localPath, destinationPath)
-            destinationPath
-        }
+    override suspend fun createTempFile(
+        rootPath: String,
+        localPath: String,
+        destinationPath: String,
+    ) = withContext(ioDispatcher) {
+        fileGateway.createTempFile(rootPath, localPath, destinationPath)
+        destinationPath
+    }
 
     override suspend fun removeGPSCoordinates(filePath: String) = withContext(ioDispatcher) {
         fileGateway.removeGPSCoordinates(filePath)
@@ -332,4 +331,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String? =
         withContext(ioDispatcher) { megaApiGateway.escapeFsIncompatible(fileName, dstPath) }
+
+    override suspend fun setLastModified(path: String, timestamp: Long) =
+        withContext(ioDispatcher) {
+            fileGateway.setLastModified(path, timestamp)
+        }
 }

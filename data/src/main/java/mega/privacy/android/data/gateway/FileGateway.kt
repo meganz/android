@@ -208,4 +208,13 @@ interface FileGateway {
      * @param path
      */
     suspend fun getAbsolutePath(path: String): String?
+
+    /**
+     * Sets the last-modified time of the file or directory named by this abstract pathname
+     *
+     * @param path
+     * @param timestamp
+     * @return true if and only if the operation succeeded; false otherwise, null if the file does not exist
+     */
+    suspend fun setLastModified(path: String, timestamp: Long): Boolean?
 }

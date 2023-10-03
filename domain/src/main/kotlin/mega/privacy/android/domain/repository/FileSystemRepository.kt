@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.repository
 
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.ViewerNode
@@ -78,11 +77,16 @@ interface FileSystemRepository {
 
     /**
      * create temp file in file system
-     * @param root root path
-     * @param syncRecord
+     * @param rootPath root path
+     * @param localPath
+     * @param destinationPath
      */
     @Throws(IOException::class)
-    suspend fun createTempFile(root: String, syncRecord: SyncRecord): String
+    suspend fun createTempFile(
+        rootPath: String,
+        localPath: String,
+        destinationPath: String,
+    ): String
 
     /**
      * remove GPS CoOrdinates from the file
@@ -227,4 +231,13 @@ interface FileSystemRepository {
      * @return Converted name (UTF8)
      */
     suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String?
+
+    /**
+     * Sets the last-modified time of the file or directory named by this abstract pathname
+     *
+     * @param path
+     * @param timestamp
+     * @return true if and only if the operation succeeded; false otherwise, null if the file does not exist
+     */
+    suspend fun setLastModified(path: String, timestamp: Long): Boolean?
 }
