@@ -35,6 +35,16 @@ enum class ABTestFeatures(
     sus2023(
         "Real experiment flag for Upgrade account screen",
         false
+    ),
+
+    /**
+     * To use remote feature flag 'ab_nsf' from API
+     * this flag is part of real experiment related to Upgrade account screen
+     * DO NOT USE this flag anywhere else, except the Search screen
+     */
+    nsf(
+        "Real experiment flag to show filters on search",
+        false
     );
 
     companion object : FeatureFlagValueProvider {

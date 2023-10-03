@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.search.SearchNodesUseCase
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -114,7 +114,7 @@ class SearchViewModel @Inject constructor(
     private fun getSearchFilterCategories() {
         viewModelScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.SearchWithChipsMVP)
+                getFeatureFlagValueUseCase(ABTestFeatures.nsf)
             }.onSuccess { isEnabled ->
                 val shouldShow = isEnabled && arrayOf(
                     DrawerItem.HOMEPAGE,
