@@ -115,4 +115,16 @@ class ChatRequestMapperTest {
         assertThat(actual.type).isEqualTo(ChatRequestType.DisableAudioVideoCall)
         assertThat(actual.paramType).isEqualTo(ChatRequestParamType.Audio)
     }
+
+    @Test
+    fun `test that mapping load preview request contain a valid param type`() {
+        val request = mock<MegaChatRequest> {
+            on { type }.thenReturn(MegaChatRequest.TYPE_LOAD_PREVIEW)
+            on { paramType }.thenReturn(1)
+        }
+
+        val actual = underTest(request)
+        assertThat(actual.type).isEqualTo(ChatRequestType.LoadPreview)
+        assertThat(actual.paramType).isEqualTo(ChatRequestParamType.MEETING_LINK)
+    }
 }

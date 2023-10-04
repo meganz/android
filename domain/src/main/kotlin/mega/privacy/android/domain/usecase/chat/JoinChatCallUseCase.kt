@@ -33,7 +33,7 @@ class JoinChatCallUseCase @Inject constructor(
                 // Already joined, do nothing
             }
 
-            !chatRoom.isActive && chatPublicHandle != null -> {
+            !chatRoom.isActive -> {
                 chatRepository.autorejoinPublicChat(chatId, chatPublicHandle)
             }
 

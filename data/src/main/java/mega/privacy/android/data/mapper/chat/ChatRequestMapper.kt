@@ -23,21 +23,21 @@ class ChatRequestMapper @Inject constructor() {
      * @return [ChatRequest]
      */
     operator fun invoke(megaChatRequest: MegaChatRequest) = ChatRequest(
-        mapChatRequestType(megaChatRequest.type),
-        megaChatRequest.requestString,
-        megaChatRequest.tag,
-        megaChatRequest.number,
-        megaChatRequest.numRetry,
-        megaChatRequest.flag,
-        mapChatRequestPeersList(megaChatRequest.megaChatPeerList),
-        megaChatRequest.chatHandle,
-        megaChatRequest.userHandle,
-        megaChatRequest.privilege,
-        megaChatRequest.text,
-        megaChatRequest.link,
-        mapChatRequestPeersListByChatHandle(megaChatRequest),
-        mapChatRequestHandleList(megaChatRequest.megaHandleList),
-        mapChatRequestParamType(megaChatRequest.paramType)
+        type = mapChatRequestType(megaChatRequest.type),
+        requestString = megaChatRequest.requestString,
+        tag = megaChatRequest.tag,
+        number = megaChatRequest.number,
+        numRetry = megaChatRequest.numRetry,
+        flag = megaChatRequest.flag,
+        peersList = mapChatRequestPeersList(megaChatRequest.megaChatPeerList),
+        chatHandle = megaChatRequest.chatHandle,
+        userHandle = megaChatRequest.userHandle,
+        privilege = megaChatRequest.privilege,
+        text = megaChatRequest.text,
+        link = megaChatRequest.link,
+        peersListByChatHandle = mapChatRequestPeersListByChatHandle(megaChatRequest),
+        handleList = mapChatRequestHandleList(megaChatRequest.megaHandleList),
+        paramType = mapChatRequestParamType(megaChatRequest.type, megaChatRequest.paramType)
     )
 
 
@@ -99,8 +99,17 @@ class ChatRequestMapper @Inject constructor() {
         else -> ChatRequestType.InvalidRequest
     }
 
-    private fun mapChatRequestParamType(chatRequestParamType: Int?): ChatRequestParamType? =
-        when (chatRequestParamType) {
+    private fun mapChatRequestParamType(
+        chatRequestType: Int,
+        chatRequestParamType: Int?,
+    ): ChatRequestParamType? =
+        if (chatRequestType == MegaChatRequest.TYPE_LOAD_PREVIEW) {
+            if (chatRequestParamType == 1) {
+                ChatRequestParamType.MEETING_LINK
+            } else {
+                null
+            }
+        } else when (chatRequestParamType) {
             MegaChatRequest.AUDIO -> ChatRequestParamType.Audio
             MegaChatRequest.VIDEO -> ChatRequestParamType.Video
             else -> null

@@ -70,7 +70,7 @@ class JoinChatCallUseCaseTest {
             peersList = null,
             chatHandle = chatId,
             userHandle = chatPublicHandle,
-            privilege = null,
+            privilege = 0,
             text = null,
             link = null,
             peersListByChatHandle = null,
@@ -106,7 +106,7 @@ class JoinChatCallUseCaseTest {
             peersList = null,
             chatHandle = chatId,
             userHandle = chatPublicHandle,
-            privilege = null,
+            privilege = 0,
             text = null,
             link = null,
             peersListByChatHandle = null,
@@ -165,7 +165,7 @@ class JoinChatCallUseCaseTest {
                 peersList = null,
                 chatHandle = chatId,
                 userHandle = chatPublicHandle,
-                privilege = null,
+                privilege = 0,
                 text = null,
                 link = null,
                 peersListByChatHandle = null,
@@ -186,7 +186,7 @@ class JoinChatCallUseCaseTest {
         }
 
     @Test
-    fun `test that autojoinPublicChat is called when chat room is active or public handle is null`() =
+    fun `test that autorejoinPublicChat is called when chat room is active`() =
         runBlocking {
             val chatLink = "chatLink"
             val chatId = 1L
@@ -226,8 +226,8 @@ class JoinChatCallUseCaseTest {
                 flag = false,
                 peersList = null,
                 chatHandle = chatId,
-                userHandle = null,
-                privilege = null,
+                userHandle = 0,
+                privilege = 0,
                 text = null,
                 link = null,
                 peersListByChatHandle = null,
@@ -244,6 +244,6 @@ class JoinChatCallUseCaseTest {
 
             Mockito.verify(chatRepository).openChatPreview(chatLink)
             Mockito.verify(getChatRoom).invoke(chatId)
-            Mockito.verify(chatRepository).autojoinPublicChat(chatId)
+            Mockito.verify(chatRepository).autorejoinPublicChat(chatId, chatRequest.userHandle)
         }
 }

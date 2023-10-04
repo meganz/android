@@ -99,12 +99,4 @@ class IsValidWaitingRoomUseCaseTest {
             whenever(chatRepository.hasWaitingRoomChatOptions(1)).thenReturn(false)
             assert(!underTest.invoke("validChatLink"))
         }
-
-    @Test(expected = IllegalStateException::class)
-    fun `test that exception is thrown when chat link is invalid`(): Unit = runBlocking {
-        val chatRequest = Mockito.mock(ChatRequest::class.java)
-        whenever(chatRequest.privilege).thenReturn(null)
-        whenever(checkChatLink("invalidChatLink")).thenReturn(chatRequest)
-        underTest.invoke("invalidChatLink")
-    }
 }

@@ -12,5 +12,10 @@ enum class ChatRequestParamType {
     /**
      * Video param type.
      */
-    Video
+    Video,
+
+    /**
+     * Meeting
+     */
+    MEETING_LINK
 }
