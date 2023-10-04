@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -28,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -112,18 +110,6 @@ fun EmptyState(
                     text = text.substring(text.indexOf(placeHolderEnd)).replace("[/B]", ""),
                     color = colorResource(id = R.color.grey_054_white_054),
                 )
-            }
-        }
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            FilterFAB(
-                timelineViewState = timelineViewState,
-                onClick = onFABClick,
-            ) {
-                timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
             }
         }
     }

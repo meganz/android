@@ -103,7 +103,7 @@ fun PhotosScreen(
                 photoDownload = photoDownloaderViewModel::downloadPhoto,
                 lazyGridState = timelineLazyGridState,
                 onTextButtonClick = onCameraUploadsClicked,
-                onFABClick = onNavigatePhotosFilter,
+                onFilterFabClick = onNavigatePhotosFilter,
                 onCardClick = timelineViewModel::onCardClick,
                 onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
                 enableCUView = {

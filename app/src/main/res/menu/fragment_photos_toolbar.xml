@@ -28,7 +28,7 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_photos_filter"
+        android:id="@+id/action_photos_filter_secondary"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="105"
         android:title="@string/photos_action_filter"

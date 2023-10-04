@@ -376,7 +376,7 @@ class PhotosFragment : Fragment() {
         this.menu?.findItem(R.id.action_cu_status)?.isVisible = isShowing && isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_in)?.isVisible = isShowing && !isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_out)?.isVisible = isShowing && !isNewCUEnabled
-        this.menu?.findItem(R.id.action_photos_filter)?.isVisible = isShowing
+        this.menu?.findItem(R.id.action_photos_filter_secondary)?.isVisible = isShowing
         this.menu?.findItem(R.id.action_photos_sortby)?.isVisible = isShowing
         this.menu?.findItem(R.id.action_zoom_in_secondary)?.isVisible = isShowing && isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_out_secondary)?.isVisible = isShowing && isNewCUEnabled
@@ -431,7 +431,7 @@ class PhotosFragment : Fragment() {
                 true
             }
 
-            R.id.action_photos_filter -> {
+            R.id.action_photos_filter_secondary -> {
                 openFilterFragment()
                 true
             }

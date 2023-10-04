@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.photos.timeline.view
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,7 +30,11 @@ import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -64,11 +68,13 @@ import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_038
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.teal_100
 import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_038
 import mega.privacy.android.core.ui.theme.white_alpha_087
@@ -82,7 +88,7 @@ fun TimelineView(
     timelineViewState: TimelineViewState,
     lazyGridState: LazyGridState,
     onTextButtonClick: () -> Unit,
-    onFABClick: () -> Unit,
+    onFilterFabClick: () -> Unit,
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     enableCUView: @Composable () -> Unit,
@@ -95,34 +101,103 @@ fun TimelineView(
     }
     val isScrollingDown by lazyGridState.isScrollingDown()
     val isScrolledToEnd by lazyGridState.isScrolledToEnd()
+    val scaffoldState = rememberScaffoldState()
+    val isLight = MaterialTheme.colors.isLight
+    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    val showEnableCUPage = timelineViewState.enableCameraUploadPageShowing
+            && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
+    val scrollInProgress by remember {
+        derivedStateOf { lazyGridState.isScrollInProgress }
+    }
 
-    if (timelineViewState.enableCameraUploadPageShowing
-        && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
-    ) {
-        enableCUView()
-    } else {
-        if (timelineViewState.loadPhotosDone) {
-            if (timelineViewState.currentShowingPhotos.isEmpty()) {
-                emptyView()
-            } else {
-                HandlePhotosGridView(
-                    timelineViewState = timelineViewState,
-                    lazyGridState = lazyGridState,
-                    onTextButtonClick = onTextButtonClick,
-                    isBarVisible = isBarVisible,
-                    isScrollingDown = isScrollingDown,
-                    isScrolledToEnd = isScrolledToEnd,
-                    photosGridView = photosGridView,
-                    photoDownload = photoDownload,
-                    onFABClick = onFABClick,
-                    onCardClick = onCardClick,
-                    onTimeBarTabSelected = onTimeBarTabSelected,
-                    isNewCUEnabled = isNewCUEnabled,
+    Scaffold(
+        scaffoldState = scaffoldState,
+        snackbarHost = { snackBarHostState ->
+            SnackbarHost(
+                hostState = snackBarHostState,
+                snackbar = { snackBarData ->
+                    Snackbar(
+                        snackbarData = snackBarData,
+                        backgroundColor = black.takeIf { isLight } ?: white,
+                    )
+                }
+            )
+        },
+        floatingActionButton = {
+            val showFilterFab =
+                timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
+                        && !showEnableCUPage
+            Row(
+                modifier = Modifier.padding(
+                    bottom = if (isPortrait && timelineViewState.currentShowingPhotos.isNotEmpty())
+                        68.dp else 16.dp,
+                    end = 16.dp
                 )
+            ) {
+                if (showFilterFab) {
+                    HandleFilterFab(scrollInProgress, onFilterFabClick)
+                }
             }
-        } else {
-            //show skeleton view.
-            PhotosSkeletonView()
+        }
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            if (showEnableCUPage) {
+                enableCUView()
+            } else {
+                if (timelineViewState.loadPhotosDone) {
+                    if (timelineViewState.currentShowingPhotos.isEmpty()) {
+                        emptyView()
+                    } else {
+                        HandlePhotosGridView(
+                            timelineViewState = timelineViewState,
+                            lazyGridState = lazyGridState,
+                            onTextButtonClick = onTextButtonClick,
+                            isBarVisible = isBarVisible,
+                            isScrollingDown = isScrollingDown,
+                            isScrolledToEnd = isScrolledToEnd,
+                            photosGridView = photosGridView,
+                            photoDownload = photoDownload,
+                            onCardClick = onCardClick,
+                            onTimeBarTabSelected = onTimeBarTabSelected,
+                            isNewCUEnabled = isNewCUEnabled,
+                        )
+                    }
+                } else {
+                    //show skeleton view.
+                    PhotosSkeletonView()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.HandleFilterFab(
+    scrollInProgress: Boolean,
+    onFilterFabClick: () -> Unit,
+) {
+    AnimatedVisibility(
+        visible = !scrollInProgress,
+        exit = scaleOut(),
+        enter = scaleIn()
+    ) {
+        FloatingActionButton(
+            onClick = onFilterFabClick,
+            modifier = Modifier
+                .size(40.dp)
+                .padding(all = 0.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = R.drawable.ic_filter
+                ),
+                contentDescription = "Exit filter",
+                tint = if (!MaterialTheme.colors.isLight) {
+                    Color.Black
+                } else {
+                    Color.White
+                }
+            )
         }
     }
 }
@@ -137,7 +212,6 @@ private fun HandlePhotosGridView(
     isScrolledToEnd: Boolean,
     photosGridView: @Composable () -> Unit,
     photoDownload: PhotoDownload,
-    onFABClick: () -> Unit,
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     isNewCUEnabled: suspend () -> Boolean,
@@ -203,18 +277,6 @@ private fun HandlePhotosGridView(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomEnd,
             ) {
-                val scrollInProgress by remember {
-                    derivedStateOf { lazyGridState.isScrollInProgress }
-                }
-                // We don't want to show the FAB if filter and source are default
-                if (
-                    timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
-                ) {
-                    FilterFAB(timelineViewState = timelineViewState, onClick = onFABClick) {
-                        !scrollInProgress
-                    }
-                }
-
                 TimeSwitchBar(
                     timeBarTabs = timelineViewState.timeBarTabs,
                     onTimeBarTabSelected = onTimeBarTabSelected,
@@ -222,57 +284,6 @@ private fun HandlePhotosGridView(
                 ) {
                     isBarVisible || (!isScrollingDown && !isScrolledToEnd)
                 }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun FilterFAB(
-    timelineViewState: TimelineViewState = TimelineViewState(),
-    onClick: () -> Unit = {},
-    isVisible: () -> Boolean = { true },
-) {
-    val orientation = LocalConfiguration.current.orientation
-
-    Row(
-        modifier = Modifier.padding(
-            bottom = if (
-                orientation == Configuration.ORIENTATION_PORTRAIT
-                && timelineViewState.currentShowingPhotos.isNotEmpty()
-            ) 68.dp
-            else 16.dp,
-            end = 16.dp
-        )
-    ) {
-        AnimatedVisibility(
-            visible = isVisible(),
-            exit = scaleOut(),
-            enter = scaleIn()
-        ) {
-            FloatingActionButton(
-                onClick = onClick,
-                modifier = Modifier
-
-                    .size(40.dp)
-                    .padding(all = 0.dp)
-            ) {
-                Icon(
-                    painter = painterResource(
-                        id = if (MaterialTheme.colors.isLight) {
-                            R.drawable.ic_filter_light
-                        } else {
-                            R.drawable.ic_filter_dark
-                        }
-                    ),
-                    contentDescription = "Exit filter",
-                    tint = if (!MaterialTheme.colors.isLight) {
-                        Color.Black
-                    } else {
-                        Color.White
-                    }
-                )
             }
         }
     }
@@ -404,7 +415,11 @@ private fun NewEnableCameraUploadsButton(onClick: () -> Unit, isVisible: () -> B
                         Text(
                             text = stringResource(id = R.string.settings_camera_upload_on),
                             modifier = Modifier.clickable {
-                                Toast.makeText(context, "Never take advice from electrons. They are always negative.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Never take advice from electrons. They are always negative.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 // onClick()
                             },
                             color = teal_300.takeIf { isLight } ?: teal_100,
