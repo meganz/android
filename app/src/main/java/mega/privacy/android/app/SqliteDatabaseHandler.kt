@@ -3110,7 +3110,7 @@ class SqliteDatabaseHandler @Inject constructor(
         nodePath: String,
         searchQuery: String?,
     ): List<OfflineInformation> {
-        return if (searchQuery != null && searchQuery.isNotEmpty()) {
+        return if (!searchQuery.isNullOrEmpty()) {
             searchOfflineInformationByQuery(nodePath, searchQuery)
         } else {
             searchOfflineInformationByPath(nodePath)
