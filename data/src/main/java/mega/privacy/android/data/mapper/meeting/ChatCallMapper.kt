@@ -45,10 +45,10 @@ internal class ChatCallMapper @Inject constructor(
         isOwnClientCaller = megaChatCall.isOwnClientCaller,
         isOwnModerator = megaChatCall.isOwnModerator,
         isRinging = megaChatCall.isRinging,
-        isSpeakAllow = megaChatCall.isSpeakAllow,
+        isSpeakAllowed = megaChatCall.isSpeakAllowed,
         hasLocalAudio = megaChatCall.hasLocalAudio(),
         hasLocalVideo = megaChatCall.hasLocalVideo(),
-        hasRequestSpeak = megaChatCall.hasRequestSpeak(),
+        hasPendingSpeakRequest = megaChatCall.hasPendingSpeakRequest(),
         waitingRoom = chatWaitingRoomMapper(megaChatCall.waitingRoom),
         waitingRoomStatus = waitingRoomStatusMapper(megaChatCall.wrJoiningState)
     )
