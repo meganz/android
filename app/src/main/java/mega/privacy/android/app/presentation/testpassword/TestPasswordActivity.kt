@@ -130,9 +130,14 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
                 onResetFinishedCopyingRecoveryKey = viewModel::resetFinishedCopyingRecoveryKey,
                 onExhaustedPasswordAttempts = ::navigateToChangePassword,
                 onResetExhaustedPasswordAttempts = viewModel::resetPasswordAttemptsState,
-                onPrintRecoveryKey = ::printRecoveryKey,
+                onPrintRecoveryKey = viewModel::printRecoveryKey,
                 onCopyRecoveryKey = ::copyRecoveryKey,
-                onSaveRecoveryKey = ::saveRecoveryKeyToStorage
+                onSaveRecoveryKey = ::saveRecoveryKeyToStorage,
+                onPrintRecoveryKeyConsumed = viewModel::resetPrintRecoveryKey,
+                onPrintRecoveryKeyCompleted = {
+                    viewModel.deleteRecoveryKeyFile(it)
+                    viewModel.notifyPasswordReminderSucceeded()
+                },
             )
         }
     }
@@ -207,12 +212,6 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
                     Timber.d("REQUEST_WRITE_STORAGE PERMISSIONS GRANTED")
                 }
             }
-        }
-    }
-
-    private fun printRecoveryKey() {
-        accountController.printRK {
-            viewModel.notifyPasswordReminderSucceeded()
         }
     }
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,14 +18,17 @@ import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.C
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.WRONG_PASSWORD_COUNTER
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
 import mega.privacy.android.app.presentation.testpassword.model.TestPasswordUIState
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BlockPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.NotifyPasswordCheckedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
+import mega.privacy.android.domain.usecase.account.GetPrintRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -40,6 +44,8 @@ class TestPasswordViewModel @Inject constructor(
     private val blockPasswordReminderUseCase: BlockPasswordReminderUseCase,
     private val notifyPasswordCheckedUseCase: NotifyPasswordCheckedUseCase,
     private val logoutUseCase: LogoutUseCase,
+    private val getPrintRecoveryKeyFileUseCase: GetPrintRecoveryKeyFileUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TestPasswordUIState())
 
@@ -242,4 +248,28 @@ class TestPasswordViewModel @Inject constructor(
             Timber.d("Error on logout $it")
         }
     }
+
+    /**
+     * Print recovery key
+     */
+    fun printRecoveryKey() = viewModelScope.launch {
+        val file = runCatching { getPrintRecoveryKeyFileUseCase() }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
+        _uiState.update { it.copy(printRecoveryKey = triggered(file)) }
+    }
+
+    /**
+     * Delete the temp recovery file
+     */
+    fun deleteRecoveryKeyFile(file: File) {
+        viewModelScope.launch(ioDispatcher) {
+            file.delete()
+        }
+    }
+
+    /**
+     * Reset and notify printRecoveryKey is consumed
+     */
+    fun resetPrintRecoveryKey() = _uiState.update { it.copy(printRecoveryKey = consumed()) }
 }

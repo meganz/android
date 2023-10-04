@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.testpassword.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import java.io.File
 
 /**
  * UI State for Test Password Feature
@@ -16,6 +17,7 @@ import de.palm.composestateevents.consumed
  * @param isUITestPasswordMode ui state to check whether screen is currently on test password mode layout
  * @param isLogoutMode ui state to check whether screen is in logout mode
  * @param wrongPasswordAttempts ui state to count number of wrong password attempts
+ * @param printRecoveryKey Print the given recovery key file
  */
 data class TestPasswordUIState(
     val isCurrentPassword: PasswordState = PasswordState.Initial,
@@ -28,6 +30,7 @@ data class TestPasswordUIState(
     val isUITestPasswordMode: Boolean = false,
     val isLogoutMode: Boolean = false,
     val wrongPasswordAttempts: Int = 0,
+    val printRecoveryKey: StateEventWithContent<File?> = consumed()
 )
 
 /**

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.exportrecoverykey.view
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,19 +21,28 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.print.PrintHelper
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.model.RecoveryKeyUIState
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.white
+import java.io.File
 
 private typealias ExportRecoveryAction = () -> Unit
 
@@ -63,8 +73,23 @@ fun ExportRecoveryKeyView(
     onClickPrint: ExportRecoveryAction,
     onClickCopy: ExportRecoveryAction,
     onClickSave: ExportRecoveryAction,
+    onPrintRecoveryKeyConsumed: () -> Unit,
+    onPrintRecoveryKeyCompleted: (File) -> Unit,
 ) {
+    val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
+    var errorAlertMessage by remember { mutableStateOf<String?>(null) }
+
+    EventEffect(
+        event = uiState.printRecoveryKey,
+        onConsumed = onPrintRecoveryKeyConsumed
+    ) { file ->
+        file?.let {
+            printRecoveryKey(context, it, onPrintRecoveryKeyCompleted)
+        } ?: run {
+            errorAlertMessage = context.getString(R.string.general_text_error)
+        }
+    }
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
@@ -78,7 +103,7 @@ fun ExportRecoveryKeyView(
             }
         },
     ) {
-        uiState.snackBarMessage?.let {
+        uiState.message?.let {
             LaunchedEffect(it) {
                 snackBarHostState.showSnackbar(it)
                 onSnackBarShown()
@@ -92,6 +117,16 @@ fun ExportRecoveryKeyView(
             onClickCopy = onClickCopy,
             onClickSave = onClickSave
         )
+
+        errorAlertMessage?.let { message ->
+            MegaAlertDialog(
+                text = message,
+                confirmButtonText = stringResource(id = R.string.general_ok),
+                cancelButtonText = null,
+                onConfirm = { errorAlertMessage = null },
+                onDismiss = { errorAlertMessage = null }
+            )
+        }
     }
 }
 
@@ -270,4 +305,17 @@ fun ActionButtonText(
             }
         }
     )
+}
+
+private fun printRecoveryKey(
+    context: Context,
+    file: File,
+    onPrintRecoveryKeyCompleted: (File) -> Unit
+) {
+    PrintHelper(context).apply {
+        scaleMode = PrintHelper.SCALE_MODE_FIT
+        printBitmap("rKPrint", file.toUri()) {
+            onPrintRecoveryKeyCompleted(file)
+        }
+    }
 }

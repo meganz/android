@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
+import java.io.File
 
 /**
  * Account repository
@@ -512,4 +513,9 @@ interface AccountRepository {
      * @return                True if success or false otherwise
      */
     suspend fun renameRecoveryKeyFile(relativePath: String, newName: String): Boolean
+
+    /**
+     * Get recovery key file
+     */
+    suspend fun getRecoveryKeyFile(): File?
 }

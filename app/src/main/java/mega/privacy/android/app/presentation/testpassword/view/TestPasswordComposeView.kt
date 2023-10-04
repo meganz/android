@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.testpassword.view
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.BackHandler
@@ -31,7 +32,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -81,6 +81,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.net.toUri
+import androidx.print.PrintHelper
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -106,6 +108,7 @@ import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PA
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_LAYOUT_TAG
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -115,8 +118,8 @@ import mega.privacy.android.core.ui.theme.extensions.green_500_green_400
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
+import java.io.File
 
 internal object Constants {
     /**
@@ -256,10 +259,13 @@ internal fun TestPasswordComposeView(
     onPrintRecoveryKey: () -> Unit,
     onCopyRecoveryKey: () -> Unit,
     onSaveRecoveryKey: () -> Unit,
+    onPrintRecoveryKeyConsumed: () -> Unit,
+    onPrintRecoveryKeyCompleted: (File) -> Unit,
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    var errorAlertMessage by remember { mutableStateOf<String?>(null) }
 
     EventEffect(event = uiState.userMessage, onConsumed = onResetUserMessage) { res ->
         snackBarHostState.showSnackbar(context.resources.getString(res))
@@ -282,6 +288,17 @@ internal fun TestPasswordComposeView(
         onConsumed = onExhaustedPasswordAttempts,
         action = onResetExhaustedPasswordAttempts
     )
+
+    EventEffect(
+        event = uiState.printRecoveryKey,
+        onConsumed = onPrintRecoveryKeyConsumed
+    ) { file ->
+        file?.let {
+            printRecoveryKey(context, it, onPrintRecoveryKeyCompleted)
+        } ?: run {
+            errorAlertMessage = context.getString(R.string.general_text_error)
+        }
+    }
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
@@ -382,6 +399,16 @@ internal fun TestPasswordComposeView(
             onCopy = onCopyRecoveryKey,
             onSave = onSaveRecoveryKey
         )
+
+        errorAlertMessage?.let { message ->
+            MegaAlertDialog(
+                text = message,
+                confirmButtonText = stringResource(id = R.string.general_ok),
+                cancelButtonText = null,
+                onConfirm = { errorAlertMessage = null },
+                onDismiss = { errorAlertMessage = null }
+            )
+        }
     }
 }
 
@@ -942,6 +969,20 @@ private fun PasswordState.toAttribute(): TestPasswordAttribute {
     }
 }
 
+private fun printRecoveryKey(
+    context: Context,
+    file: File,
+    onPrintRecoveryKeyCompleted: (File) -> Unit,
+) {
+    PrintHelper(context).apply {
+        scaleMode = PrintHelper.SCALE_MODE_FIT
+        printBitmap("rKPrint", file.toUri()) {
+            onPrintRecoveryKeyCompleted(file)
+        }
+    }
+}
+
+
 /**
  * Test Password Feature in Jetpack Compose Preview
  */
@@ -970,6 +1011,8 @@ private fun TestPasswordComposeViewPreview() {
             onPrintRecoveryKey = {},
             onCopyRecoveryKey = {},
             onSaveRecoveryKey = {},
+            onPrintRecoveryKeyConsumed = {},
+            onPrintRecoveryKeyCompleted = {},
         )
     }
 }

@@ -16,7 +16,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
 import mega.privacy.android.app.utils.FileUtil
@@ -36,12 +35,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ExportRecoveryKeyActivity : PasscodeActivity() {
     private val viewModel by viewModels<ExportRecoveryKeyViewModel>()
-
-    /**
-     * Account Controller class
-     */
-    @Inject
-    lateinit var accountController: AccountController
 
     /**
      * Application Theme Mode
@@ -76,9 +69,11 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
                     uiState = uiState,
                     onSnackBarShown = { viewModel.setSnackBarShown() },
                     onButtonOverflow = { viewModel.setActionGroupVertical() },
-                    onClickPrint = { printRecoveryKey() },
+                    onClickPrint = viewModel::printRecoveryKey,
                     onClickCopy = { copyRecoveryKey() },
-                    onClickSave = { chooseRecoverySaveLocation() }
+                    onClickSave = { chooseRecoverySaveLocation() },
+                    onPrintRecoveryKeyConsumed = viewModel::resetPrintRecoveryKey,
+                    onPrintRecoveryKeyCompleted = viewModel::onPrintRecoveryKeyCompleted,
                 )
             }
         }
@@ -188,14 +183,6 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
                 key
             )
         }
-
-    /**
-     * Prints the recovery key using Account Controller
-     * @see AccountController
-     */
-    private fun printRecoveryKey() {
-        accountController.printRK()
-    }
 
     /**
      * Copy the recovery key to Clipboard.

@@ -45,6 +45,7 @@ import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
+import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
@@ -77,6 +78,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
+import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
@@ -140,6 +142,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val accountBlockedDetailMapper: AccountBlockedDetailMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val fileGateway: FileGateway,
+    private val recoveryKeyToFileMapper: RecoveryKeyToFileMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -948,6 +951,10 @@ internal class DefaultAccountRepository @Inject constructor(
             val oldFile = fileGateway.buildExternalStorageFile(relativePath)
             fileGateway.renameFile(oldFile, newName)
         }
+
+    override suspend fun getRecoveryKeyFile(): File? = withContext(ioDispatcher) {
+        megaApiGateway.getExportMasterKey()?.let(recoveryKeyToFileMapper::invoke)
+    }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

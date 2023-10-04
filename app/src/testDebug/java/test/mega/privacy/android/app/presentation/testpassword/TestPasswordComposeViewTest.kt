@@ -66,7 +66,9 @@ class TestPasswordComposeViewTest {
                 onResetExhaustedPasswordAttempts = {},
                 onSaveRecoveryKey = {},
                 onCopyRecoveryKey = {},
-                onPrintRecoveryKey = {}
+                onPrintRecoveryKey = {},
+                onPrintRecoveryKeyConsumed = {},
+                onPrintRecoveryKeyCompleted = {}
             )
         }
     }

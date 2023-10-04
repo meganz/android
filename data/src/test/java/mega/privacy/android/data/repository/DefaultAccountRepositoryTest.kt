@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
+import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
@@ -101,6 +102,7 @@ class DefaultAccountRepositoryTest {
     private val accountBlockedDetailMapper = AccountBlockedDetailMapper()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val fileGateway = mock<FileGateway>()
+    private val recoveryKeyToFileMapper = mock<RecoveryKeyToFileMapper>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -160,7 +162,8 @@ class DefaultAccountRepositoryTest {
             ephemeralCredentialsGateway = ephemeralCredentialsGateway,
             accountBlockedDetailMapper = accountBlockedDetailMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
-            fileGateway = fileGateway
+            fileGateway = fileGateway,
+            recoveryKeyToFileMapper = recoveryKeyToFileMapper,
         )
 
     }
@@ -1043,5 +1046,24 @@ class DefaultAccountRepositoryTest {
             underTest.renameRecoveryKeyFile(relativePath, newName)
             verify(fileGateway).buildExternalStorageFile(relativePath)
             verify(fileGateway).renameFile(file, newName)
+        }
+
+    @Test
+    fun `test that valid file is returned when getRecoveryKeyFile is invoked and recovery key is valid `() =
+        runTest {
+            val recoveryKey = "qwerty"
+            val file = mock<File>()
+            whenever(megaApiGateway.getExportMasterKey()).thenReturn(recoveryKey)
+            whenever(recoveryKeyToFileMapper(recoveryKey)).thenReturn(file)
+            val result = underTest.getRecoveryKeyFile()
+            assertThat(result).isEqualTo(file)
+        }
+
+    @Test
+    fun `test that null is returned when getRecoveryKeyFile is invoked and getExportMasterKey is null`() =
+        runTest {
+            whenever(megaApiGateway.getExportMasterKey()).thenReturn(null)
+            val result = underTest.getRecoveryKeyFile()
+            assertThat(result).isNull()
         }
 }

@@ -3,9 +3,9 @@ package test.mega.privacy.android.app.presentation.testpassword
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.NotifyPasswordCheckedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
+import mega.privacy.android.domain.usecase.account.GetPrintRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -32,6 +33,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.verification.VerificationMode
+import java.io.File
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -45,10 +47,12 @@ internal class TestPasswordViewModelTest {
     private val blockPasswordReminderUseCase = mock<BlockPasswordReminderUseCase>()
     private val notifyPasswordCheckedUseCase = mock<NotifyPasswordCheckedUseCase>()
     private val logoutUseCase = mock<LogoutUseCase>()
+    private val getPrintRecoveryKeyFileUseCase = mock<GetPrintRecoveryKeyFileUseCase>()
+    private val dispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
     fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(dispatcher)
         init()
     }
 
@@ -67,6 +71,8 @@ internal class TestPasswordViewModelTest {
             blockPasswordReminderUseCase = blockPasswordReminderUseCase,
             notifyPasswordCheckedUseCase = notifyPasswordCheckedUseCase,
             logoutUseCase = logoutUseCase,
+            getPrintRecoveryKeyFileUseCase = getPrintRecoveryKeyFileUseCase,
+            ioDispatcher = dispatcher,
         )
     }
 
@@ -271,4 +277,26 @@ internal class TestPasswordViewModelTest {
         verify(key = null, expectedInvocation = 0)
         verify(key = fakeRecoveryKey, expectedInvocation = 1)
     }
+
+    @Test
+    fun `test that printRecoveryKey event is triggered when printRecoveryKey is invoked`() =
+        runTest {
+            val file = mock<File>()
+            whenever(getPrintRecoveryKeyFileUseCase()).thenReturn(file)
+            underTest.printRecoveryKey()
+            underTest.uiState.test {
+                val result = awaitItem()
+                assertThat(result.printRecoveryKey).isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that printRecoveryKey event is consumed when resetPrintRecoveryKey is invoked`() =
+        runTest {
+            underTest.resetPrintRecoveryKey()
+            underTest.uiState.test {
+                val result = awaitItem()
+                assertThat(result.printRecoveryKey).isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
 }

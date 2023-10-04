@@ -64,14 +64,14 @@ class ExportRecoveryKeyComposeViewTest {
 
     @Test
     fun `test that snackbar should show if message is not empty`() {
-        setComposeContent(uiState = RecoveryKeyUIState(snackBarMessage = "Message"))
+        setComposeContent(uiState = RecoveryKeyUIState(message = "Message"))
 
         composeTestRule.onNodeWithTag(SNACKBAR_TEST_TAG).assertIsDisplayed()
     }
 
     @Test
     fun `test that snackbar not show when message empty`() {
-        setComposeContent(uiState = RecoveryKeyUIState(snackBarMessage = null))
+        setComposeContent(uiState = RecoveryKeyUIState(message = null))
 
         composeTestRule.onNodeWithTag(SNACKBAR_TEST_TAG).assertDoesNotExist()
     }
@@ -84,7 +84,9 @@ class ExportRecoveryKeyComposeViewTest {
                 onButtonOverflow = {},
                 onClickPrint = {},
                 onClickCopy = {},
-                onClickSave = {}
+                onClickSave = {},
+                onPrintRecoveryKeyConsumed = {},
+                onPrintRecoveryKeyCompleted = {},
             )
         }
     }
