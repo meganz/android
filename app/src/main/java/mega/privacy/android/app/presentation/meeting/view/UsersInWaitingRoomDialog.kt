@@ -26,10 +26,10 @@ fun UsersInWaitingRoomDialog(
     onDismiss: () -> Unit,
     onDenyClick: () -> Unit = {},
 ) {
-    if (state.usersInWaitingRoom.isNotEmpty() && state.showParticipantsInWaitingRoomDialog && !state.showDenyParticipantDialog && !state.isWaitingRoomSectionOpened) {
-        val isOneParticipantInWaitingRoom = state.usersInWaitingRoom.size == 1
+    if (state.usersInWaitingRoomIDs.isNotEmpty() && state.showParticipantsInWaitingRoomDialog && !state.showDenyParticipantDialog && !state.isWaitingRoomSectionOpened) {
+        val isOneParticipantInWaitingRoom = state.usersInWaitingRoomIDs.size == 1
         val isDialogRelativeToTheOpenCall = state.isDialogRelativeToTheOpenCall()
-        val usersSize = state.usersInWaitingRoom.size
+        val usersSize = state.usersInWaitingRoomIDs.size
 
         val message =
             when {
@@ -51,8 +51,8 @@ fun UsersInWaitingRoomDialog(
 
                 else -> pluralStringResource(
                     id = R.plurals.meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message,
-                    count = state.usersInWaitingRoom.size,
-                    state.usersInWaitingRoom.size,
+                    count = state.usersInWaitingRoomIDs.size,
+                    state.usersInWaitingRoomIDs.size,
                     state.scheduledMeetingTitle
                 )
             }

@@ -220,7 +220,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
                 _state.update { state ->
                     state.copy(
                         chatId = chatId,
-                        usersInWaitingRoom = emptyList(),
+                        usersInWaitingRoomIDs = emptyList(),
                         nameOfTheFirstUserInTheWaitingRoom = "",
                         nameOfTheSecondUserInTheWaitingRoom = "",
                         scheduledMeetingTitle = "",
@@ -232,7 +232,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
                 val users = _state.value.temporaryUsersInWaitingRoomList
                 _state.update { state ->
                     state.copy(
-                        usersInWaitingRoom = users,
+                        usersInWaitingRoomIDs = users,
                     )
                 }
 
@@ -406,10 +406,10 @@ class WaitingRoomManagementViewModel @Inject constructor(
         setShowParticipantsInWaitingRoomDialogConsumed()
         setShowDenyParticipantDialogConsumed()
 
-        if (state.value.usersInWaitingRoom.isEmpty()) return
+        if (state.value.usersInWaitingRoomIDs.isEmpty()) return
 
         viewModelScope.launch {
-            val list = if (chatParticipant == null) state.value.usersInWaitingRoom else listOf(
+            val list = if (chatParticipant == null) state.value.usersInWaitingRoomIDs else listOf(
                 chatParticipant.handle
             )
             val numberOfUsers = list.size
@@ -495,8 +495,8 @@ class WaitingRoomManagementViewModel @Inject constructor(
      * Deny user/users to waiting room
      */
     fun denyEntryClick() {
-        if (state.value.usersInWaitingRoom.isEmpty() && state.value.participantToDenyEntry == null) return
-        var list = state.value.usersInWaitingRoom
+        if (state.value.usersInWaitingRoomIDs.isEmpty() && state.value.participantToDenyEntry == null) return
+        var list = state.value.usersInWaitingRoomIDs
         state.value.participantToDenyEntry?.let {
             list = listOf(it.handle)
         }

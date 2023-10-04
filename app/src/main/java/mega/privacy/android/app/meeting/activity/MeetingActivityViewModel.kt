@@ -344,10 +344,20 @@ class MeetingActivityViewModel @Inject constructor(
         runCatching {
             getChatCall(_state.value.chatId)
         }.onSuccess { call ->
-            _state.update { state ->
-                state.copy(
-                    hasWaitingRoom = call?.waitingRoom != null
-                )
+            call?.apply {
+                waitingRoom?.let { waitingRoom ->
+                    _state.update {
+                        it.copy(
+                            hasWaitingRoom = true,
+                            usersInWaitingRoomIDs = waitingRoom.peers ?: emptyList()
+                        )
+                    }
+
+                    if (state.value.usersInWaitingRoomIDs.isNotEmpty()) {
+                        updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
+                    }
+                    checkParticipantLists()
+                }
             }
         }.onFailure { exception ->
             Timber.e(exception)
@@ -383,10 +393,10 @@ class MeetingActivityViewModel @Inject constructor(
                             )
                         ) {
                             call.waitingRoom?.apply {
-                                peers?.let { usersInWaitingRoom ->
+                                peers?.let { ids ->
                                     _state.update {
                                         it.copy(
-                                            usersInWaitingRoom = usersInWaitingRoom
+                                            usersInWaitingRoomIDs = ids
                                         )
                                     }
                                     checkParticipantLists()
@@ -1101,7 +1111,7 @@ class MeetingActivityViewModel @Inject constructor(
 
         state.value.chatParticipantList.forEach { chatParticipant ->
             var participantAdded = false
-            state.value.usersInWaitingRoom.find { it == chatParticipant.handle }?.let {
+            state.value.usersInWaitingRoomIDs.find { it == chatParticipant.handle }?.let {
                 participantAdded = true
                 chatParticipantsInWaitingRoom.add(chatParticipant)
             }
@@ -1122,9 +1132,11 @@ class MeetingActivityViewModel @Inject constructor(
                 chatParticipantsInWaitingRoom = chatParticipantsInWaitingRoom,
                 chatParticipantsInCall = chatParticipantsInCall,
                 chatParticipantsNotInCall = chatParticipantsNotInCall,
-                participantsSection = if (chatParticipantsInWaitingRoom.isEmpty() && state.participantsSection == ParticipantsSection.WaitingRoomSection) ParticipantsSection.InCallSection else state.participantsSection
-
             )
         }
+
+        val newSelection =
+            if (state.value.usersInWaitingRoomIDs.isEmpty() && state.value.participantsSection == ParticipantsSection.WaitingRoomSection) ParticipantsSection.InCallSection else state.value.participantsSection
+        updateParticipantsSection(newSelection)
     }
 }

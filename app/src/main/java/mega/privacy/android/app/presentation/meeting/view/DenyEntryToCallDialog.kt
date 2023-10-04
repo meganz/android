@@ -21,7 +21,7 @@ fun DenyEntryToCallDialog(
     onDenyEntryClick: () -> Unit = {},
     onCancelDenyEntryClick: () -> Unit = {},
 ) {
-    if (state.usersInWaitingRoom.isNotEmpty() && !state.showParticipantsInWaitingRoomDialog && state.showDenyParticipantDialog) {
+    if (state.usersInWaitingRoomIDs.isNotEmpty() && !state.showParticipantsInWaitingRoomDialog && state.showDenyParticipantDialog) {
         var name = state.nameOfTheFirstUserInTheWaitingRoom
         state.participantToDenyEntry?.apply {
             data.fullName?.let {

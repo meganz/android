@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property usersInCall                                List of [Participant] in the call.
  * @property chatParticipantsNotInCall                  List of [ChatParticipant] not in the call.
  * @property chatParticipantsInWaitingRoom              List of [ChatParticipant] in the waiting room.
- * @property usersInWaitingRoom                         List of user handles in the waiting room.
+ * @property usersInWaitingRoomIDs                      List of user handles in the waiting room.
  * @property participantsSection                        [ParticipantsSection] opened
  * @property chatParticipantList                        List of [ChatParticipant]
  * @property isOpenInvite                               If open invite option is enabled.
@@ -37,7 +37,7 @@ data class MeetingState(
     val usersInCall: List<Participant> = emptyList(),
     val chatParticipantsNotInCall: List<ChatParticipant> = emptyList(),
     val chatParticipantsInWaitingRoom: List<ChatParticipant> = emptyList(),
-    val usersInWaitingRoom: List<Long> = emptyList(),
+    val usersInWaitingRoomIDs: List<Long> = emptyList(),
     val participantsSection: ParticipantsSection = ParticipantsSection.InCallSection,
     val chatParticipantList: List<ChatParticipant> = emptyList(),
     val isOpenInvite: Boolean = false,

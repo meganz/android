@@ -11,7 +11,7 @@ import mega.privacy.android.domain.entity.chat.ChatParticipant
  * @property snackbarString                          Snackbar string
  * @property scheduledMeetingTitle                   Scheduled meeting title
  * @property chatId                                  Chat id of call with waiting room
- * @property usersInWaitingRoom                      User list in the waiting room
+ * @property usersInWaitingRoomIDs                      User list in the waiting room
  * @property temporaryUsersInWaitingRoomList         Temporary list of users in waiting room
  * @property nameOfTheFirstUserInTheWaitingRoom      Name of the first user in the waiting room
  * @property nameOfTheSecondUserInTheWaitingRoom     Name of the second user in the waiting room
@@ -26,7 +26,7 @@ data class WaitingRoomManagementState constructor(
     val snackbarString: String? = null,
     val showParticipantsInWaitingRoomDialog: Boolean = false,
     val showDenyParticipantDialog: Boolean = false,
-    val usersInWaitingRoom: List<Long> = emptyList(),
+    val usersInWaitingRoomIDs: List<Long> = emptyList(),
     val temporaryUsersInWaitingRoomList: List<Long> = emptyList(),
     val chatId: Long = -1L,
     val scheduledMeetingTitle: String = "",

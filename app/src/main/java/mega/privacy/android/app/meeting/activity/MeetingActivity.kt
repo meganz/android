@@ -303,8 +303,7 @@ class MeetingActivity : PasscodeActivity() {
             if (state.chatId != -1L) {
                 waitingRoomManagementViewModel.setChatIdCallOpened(state.chatId)
             }
-            val isWaitingRoomOpened = state.isWaitingRoomOpened()
-            waitingRoomManagementViewModel.setWaitingRoomSectionOpened(isWaitingRoomOpened)
+            waitingRoomManagementViewModel.setWaitingRoomSectionOpened(state.isWaitingRoomOpened())
         }
 
         collectFlow(waitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
