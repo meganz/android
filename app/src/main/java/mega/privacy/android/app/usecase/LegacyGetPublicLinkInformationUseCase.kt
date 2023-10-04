@@ -13,6 +13,7 @@ import javax.inject.Inject
 /**
  * Use case for getting folder link information without logging and without fetching nodes.
  */
+@Deprecated("This class is deprecated as it uses RxJava. Use GetPublicLinkInformationUseCase instead.")
 class LegacyGetPublicLinkInformationUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
 ) {
