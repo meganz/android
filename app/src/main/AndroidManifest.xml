@@ -462,7 +462,7 @@
             android:label="@string/settings_file_management_category"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activities.settingsActivities.PasscodePreferencesActivity"
+            android:name=".activities.settingsActivities.LegacyPasscodePreferencesActivity"
             android:label="@string/settings_passcode_lock_switch"
             android:launchMode="singleTop" />
         <activity

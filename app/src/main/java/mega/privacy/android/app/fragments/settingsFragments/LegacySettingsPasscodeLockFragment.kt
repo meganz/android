@@ -28,7 +28,7 @@ import java.util.concurrent.Executor
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsPasscodeLockFragment : SettingsBaseFragment() {
+class LegacySettingsPasscodeLockFragment : SettingsBaseFragment() {
 
     companion object {
         private const val IS_REQUIRE_PASSCODE_DIALOG_SHOWN = "IS_REQUIRE_PASSCODE_DIALOG_SHOWN"
@@ -68,7 +68,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.preferences_passcode)
+        addPreferencesFromResource(R.xml.legacy_preferences_passcode)
         passcodeSwitch = findPreference(KEY_PASSCODE_ENABLE)
         passcodeSwitch?.setOnPreferenceClickListener {
             if (passcodeLock) {

@@ -39,7 +39,7 @@ import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesAct
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
-import mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity
+import mega.privacy.android.app.activities.settingsActivities.LegacyPasscodePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants.KEY_2FA
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_APP_VERSION
@@ -326,7 +326,7 @@ class SettingsFragment :
             KEY_PASSCODE_LOCK -> startActivity(
                 Intent(
                     context,
-                    PasscodePreferencesActivity::class.java
+                    LegacyPasscodePreferencesActivity::class.java
                 )
             )
 
