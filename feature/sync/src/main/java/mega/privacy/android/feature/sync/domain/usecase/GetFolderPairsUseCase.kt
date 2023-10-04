@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Returns all setup folder pairs.
  */
-class GetFolderPairsUseCase @Inject constructor(private val syncRepository: SyncRepository) {
+internal class GetFolderPairsUseCase @Inject constructor(private val syncRepository: SyncRepository) {
 
     suspend operator fun invoke(): List<FolderPair> =
         syncRepository.getFolderPairs()

@@ -14,6 +14,8 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
+import mega.privacy.android.feature.sync.data.mapper.StalledIssuesMapper
+import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import nz.mega.sdk.MegaSyncList
@@ -24,6 +26,7 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val syncStatsCacheGateway: SyncStatsCacheGateway,
     private val megaApiGateway: MegaApiGateway,
     private val folderPairMapper: FolderPairMapper,
+    private val stalledIssuesMapper: StalledIssuesMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SyncRepository {
 
@@ -89,4 +92,9 @@ internal class SyncRepositoryImpl @Inject constructor(
         megaApiGateway
             .globalUpdates
             .filterIsInstance()
+
+    override suspend fun getSyncStalledIssues(): List<StalledIssue> =
+        withContext(ioDispatcher) {
+            syncGateway.getSyncStalledIssues()?.let { stalledIssuesMapper(it) }.orEmpty()
+        }
 }

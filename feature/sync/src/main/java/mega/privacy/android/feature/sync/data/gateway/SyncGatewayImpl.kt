@@ -13,6 +13,9 @@ import mega.privacy.android.data.listener.OptionalMegaListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.feature.sync.data.mock.MegaApiMock
+import mega.privacy.android.feature.sync.data.mock.MegaSyncStallList
+import mega.privacy.android.feature.sync.data.mock.StalledIssuesReceiver
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
@@ -21,6 +24,8 @@ import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaSyncStats
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Gateway implementation to access Sync API
@@ -32,6 +37,7 @@ import javax.inject.Inject
 internal class SyncGatewayImpl @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationScope private val appScope: CoroutineScope,
+    private val mockSyncApi: MegaApiMock
 ) : SyncGateway {
 
     private val syncMegaListenerFlow = callbackFlow {
@@ -54,6 +60,8 @@ internal class SyncGatewayImpl @Inject constructor(
         appScope,
         SharingStarted.WhileSubscribed()
     )
+
+    private var stalledIssuesListener: StalledIssuesReceiver? = null
 
     override suspend fun syncFolderPair(
         name: String?,
@@ -105,12 +113,26 @@ internal class SyncGatewayImpl @Inject constructor(
             .filterIsInstance<MegaSyncListenerEvent.OnSyncStateChanged>()
             .map { it.sync }
 
-
     override fun resumeSync(folderPairId: Long) {
         megaApi.resumeSync(folderPairId)
     }
 
     override fun pauseSync(folderPairId: Long) {
         megaApi.pauseSync(folderPairId)
+    }
+
+    override suspend fun getSyncStalledIssues(): MegaSyncStallList? {
+        if (mockSyncApi.isSyncStalled) {
+            return suspendCoroutine { continuation ->
+                stalledIssuesListener = StalledIssuesReceiver { megaSyncStallList ->
+                    megaApi.removeRequestListener(stalledIssuesListener)
+                    stalledIssuesListener = null
+                    continuation.resume(megaSyncStallList)
+                }
+                mockSyncApi.requestMegaSyncStallList(stalledIssuesListener)
+            }
+        } else {
+            return null
+        }
     }
 }

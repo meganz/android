@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.feature.sync.ui.synclist.NoItemsPlaceholder
+import mega.privacy.android.feature.sync.ui.synclist.NoSyncsPlaceholder
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
 
@@ -32,7 +32,7 @@ internal fun SyncFoldersScreen(
 
         if (itemsCount == 0) {
             item {
-                NoItemsPlaceholder(
+                NoSyncsPlaceholder(
                     modifier
                         .fillParentMaxHeight(0.8f)
                         .fillParentMaxWidth()

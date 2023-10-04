@@ -1,27 +1,13 @@
 package mega.privacy.android.feature.sync.ui.model
 
+import androidx.annotation.DrawableRes
+import mega.privacy.android.feature.sync.domain.entity.StallIssueType
+
 internal data class StalledIssueUiItem(
-    val id: Long,
     val nodeId: Long,
+    val localPath: String,
     val issueType: StallIssueType,
     val conflictName: String,
     val nodeName: String,
+    @DrawableRes val icon: Int,
 )
-
-internal enum class StallIssueType {
-    NoReason,
-    FileIssue,
-    MoveOrRenameCannotOccur,
-    DeleteOrMoveWaitingOnScanning,
-    DeleteWaitingOnMoves,
-    UploadIssue,
-    DownloadIssue,
-    CannotCreateFolder,
-    CannotPerformDeletion,
-    SyncItemExceedsSupportedTreeDepth,
-    FolderMatchedAgainstFile,
-    LocalAndRemoteChangedSinceLastSyncedState_userMustChoose,
-    LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose,
-    NamesWouldClashWhenSynced,
-    SyncStallReason_LastPlusOne
-}

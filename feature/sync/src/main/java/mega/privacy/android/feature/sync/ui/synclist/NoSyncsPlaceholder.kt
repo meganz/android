@@ -23,7 +23,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.sync.R
 
 @Composable
-internal fun NoItemsPlaceholder(modifier: Modifier) {
+internal fun NoSyncsPlaceholder(modifier: Modifier) {
     Column(
         modifier,
         horizontalAlignment = Alignment.CenterHorizontally,

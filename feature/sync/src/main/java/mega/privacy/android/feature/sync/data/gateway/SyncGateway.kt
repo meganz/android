@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.data.gateway
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.feature.sync.data.mock.MegaSyncStallList
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaSyncStats
@@ -54,5 +55,7 @@ internal interface SyncGateway {
      * @param folderPairId - id of the folder pair to pause
      */
     fun pauseSync(folderPairId: Long)
+
+    suspend fun getSyncStalledIssues(): MegaSyncStallList?
 }
 

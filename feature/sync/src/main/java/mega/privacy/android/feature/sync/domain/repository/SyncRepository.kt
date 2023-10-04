@@ -1,13 +1,14 @@
 package mega.privacy.android.feature.sync.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 
 /**
  * Repository for syncing folder pairs
  *
  */
-interface SyncRepository {
+internal interface SyncRepository {
 
     /**
      * Establishes a pair between local and remote directories and starts the syncing process
@@ -26,4 +27,6 @@ interface SyncRepository {
     suspend fun resumeSync(folderPairId: Long)
 
     fun monitorSyncChanges(): Flow<Unit>
+
+    suspend fun getSyncStalledIssues(): List<StalledIssue>
 }

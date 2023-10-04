@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Establishes a pair between local and remote directories and starts the syncing process
  */
-class SyncFolderPairUseCase @Inject constructor(private val syncRepository: SyncRepository) {
+internal class SyncFolderPairUseCase @Inject constructor(private val syncRepository: SyncRepository) {
 
     suspend operator fun invoke(
         name: String?,
