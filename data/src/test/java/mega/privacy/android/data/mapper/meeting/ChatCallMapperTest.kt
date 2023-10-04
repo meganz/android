@@ -191,10 +191,10 @@ class ChatRequestMapperTest {
     }
 
     @Test
-    fun `test mapping chat call when isSpeakAllowed is true `() {
-        val chatCall = getMockChatCall(isSpeakAllowed = true)
+    fun `test mapping chat call when isSpeakAllow is true `() {
+        val chatCall = getMockChatCall(isSpeakAllow = true)
         val actual = underTest(chatCall)
-        Truth.assertThat(actual.isSpeakAllowed).isEqualTo(true)
+        Truth.assertThat(actual.isSpeakAllow).isEqualTo(true)
     }
 
     @Test
@@ -212,10 +212,10 @@ class ChatRequestMapperTest {
     }
 
     @Test
-    fun `test mapping chat call when hasPendingSpeakRequest is false `() {
-        val chatCall = getMockChatCall(hasPendingSpeakRequest = false)
+    fun `test mapping chat call when hasRequestSpeak is false `() {
+        val chatCall = getMockChatCall(hasRequestSpeak = false)
         val actual = underTest(chatCall)
-        Truth.assertThat(actual.hasPendingSpeakRequest).isEqualTo(false)
+        Truth.assertThat(actual.hasRequestSpeak).isEqualTo(false)
     }
 
     private fun getMockChatCall(
@@ -244,10 +244,10 @@ class ChatRequestMapperTest {
         isOwnClientCaller: Boolean = false,
         isOwnModerator: Boolean = false,
         isRinging: Boolean = false,
-        isSpeakAllowed: Boolean = false,
+        isSpeakAllow: Boolean = false,
         hasLocalAudio: Boolean = false,
         hasLocalVideo: Boolean = false,
-        hasPendingSpeakRequest: Boolean = false,
+        hasRequestSpeak: Boolean = false,
         waitingRoomStatus: Int = 0,
 
         ): MegaChatCall {
@@ -277,10 +277,10 @@ class ChatRequestMapperTest {
             on { this.isOwnClientCaller }.thenReturn(isOwnClientCaller)
             on { this.isOwnModerator }.thenReturn(isOwnModerator)
             on { this.isRinging }.thenReturn(isRinging)
-            on { this.isSpeakAllowed }.thenReturn(isSpeakAllowed)
+            on { this.isSpeakAllow }.thenReturn(isSpeakAllow)
             on { this.hasLocalAudio() }.thenReturn(hasLocalAudio)
             on { this.hasLocalVideo() }.thenReturn(hasLocalVideo)
-            on { this.hasPendingSpeakRequest() }.thenReturn(hasPendingSpeakRequest)
+            on { this.hasRequestSpeak() }.thenReturn(hasRequestSpeak)
             on { this.wrJoiningState }.thenReturn(waitingRoomStatus)
         }
 

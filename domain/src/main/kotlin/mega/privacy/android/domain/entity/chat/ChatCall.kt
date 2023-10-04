@@ -38,10 +38,10 @@ import java.time.Instant
  * @property isOwnClientCaller
  * @property isOwnModerator
  * @property isRinging
- * @property isSpeakAllowed
+ * @property isSpeakAllow
  * @property hasLocalAudio
  * @property hasLocalVideo
- * @property hasPendingSpeakRequest
+ * @property hasRequestSpeak
  * @property waitingRoom
  * @property waitingRoomStatus
  */
@@ -71,10 +71,10 @@ data class ChatCall(
     val isOwnClientCaller: Boolean = false,
     val isOwnModerator: Boolean = false,
     val isRinging: Boolean = false,
-    val isSpeakAllowed: Boolean = false,
+    val isSpeakAllow: Boolean = false,
     val hasLocalAudio: Boolean = false,
     val hasLocalVideo: Boolean = false,
-    val hasPendingSpeakRequest: Boolean = false,
+    val hasRequestSpeak: Boolean = false,
     val waitingRoom: ChatWaitingRoom? = null,
     val waitingRoomStatus: WaitingRoomStatus? = null,
 ) {
