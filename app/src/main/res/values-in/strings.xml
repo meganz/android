@@ -4934,4 +4934,12 @@
     <string name="contact_verify_credentials_verified_text">Terverifikasi</string>
     <!-- Description text from contact info screen when contact is not verified -->
     <string name="contact_verify_credentials_not_verified_text">Tidak diverifikasi</string>
+    <!-- Option to show the list of participants in the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_in_call_button">In call</string>
+    <!-- Option to show the list of participants who are not on the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_not_in_call_button">Not in call</string>
+    <!-- Label to show the number of participants in the waiting room-->
+    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Waiting (%d)</string>
+    <!-- Text of button to show all participants in the waiting room in call UI -->
+    <string name="meetings_waiting_room_call_ui_see_all_button">Lihat semua</string>
 </resources>

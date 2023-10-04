@@ -954,7 +954,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">此系統能確保您收到的資料是真實無誤地來自原寄件人，且其內容在傳輸過程中也不會被更動。</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_confidentiality_empty_screen">只有作者和指定的接收者才能解密和閱讀內容。</string>
+    <string name="mega_confidentiality_empty_screen">只有作者和指定的接收人才能解密和閱讀內容。</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_info_empty_screen">MEGA</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1876,7 +1876,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">網址連結預覽</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">您正停用網址連結預覽。您可以在設定中重新啟用。要繼續嗎？</string>
+    <string name="text_confirmation_disable_rich_links">您正停用連結預覽。您可以在設定中重新啟用。要繼續嗎？</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]未接來電[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -1980,7 +1980,7 @@
     <!-- Text button for init a group chat -->
     <string name="new_group_chat_label">新群組對話</string>
     <!-- Label shown when the user wants to add contacts into a chat conversation -->
-    <string name="send_contacts">加入聯絡人</string>
+    <string name="send_contacts">發送聯絡人</string>
     <!-- Title of the alert when the account have been logged out from another client -->
     <string name="title_alert_logged_out">已登出</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
@@ -2598,7 +2598,7 @@
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">請聯繫您的商業帳戶管理員來解決問題並啟用您的帳戶。</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
-    <string name="logout_warning_offline">當您登出時，裝置中可離線使用的檔案將會被刪除。</string>
+    <string name="logout_warning_offline">當您登出時，可離線使用的檔案將從您的裝置中刪除。</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
     <string name="logout_warning_transfers">當您登出時，正在進行中的傳輸將取消。</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
@@ -2996,7 +2996,7 @@
     <!-- settings of the Media section -->
     <string name="settings_media">媒體</string>
     <!-- settings title of the Media section -->
-    <string name="settings_media_audio_files">音樂檔案</string>
+    <string name="settings_media_audio_files">音訊檔案</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">在背景中播放</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
@@ -3660,13 +3660,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[/B][A]%2$s[/A]將[A]%1$s[/A][B]的權限更改為唯讀</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to a standard participant by [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B]被[/B][A]%2$s[/A]更改為標準與會者</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[/B][A]%2$s[/A]將[A]%1$s[/A][B]的權限更改為主持人</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s將%1$s的權限更改為唯讀</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to a standard participant by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s被%2$s更改為標準與會者</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s將%1$s的權限更改為主持人</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -3832,9 +3832,9 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未解密資料夾]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">若要存取共享資料夾，與您共享資料夾的人也會對您進行驗證。</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">若要存取共享資料夾，與您共享它的人也應驗證您。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">驗證：%s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">驗證%s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4284,7 +4284,7 @@
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">無法驗證聯絡人</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法驗證%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀啨。</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法驗證%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀請。</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4822,9 +4822,9 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">會議事件已更新</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您驗證您與之共享資訊，或從之接收資料的聯絡人。</string>
+    <string name="contact_approve_credentials_secure_share_description">我們採用零知識加密保護您的資料，因此您在MEGA上儲存、共享、接收的所有資訊都是安全的。為了確保額外的安全，我們要求您驗證與您共享資訊或傳送資料給您的聯絡人。</string>
     <!-- Message of contact verification in approve credentials screen -->
-    <string name="contact_approve_credentials_contact_verify_description">要驗證您的聯絡人，請確認您在上面看到的憑證與他們的帳戶憑證相符。您可以要求他們與您共享他們的憑證。</string>
+    <string name="contact_approve_credentials_contact_verify_description">若要驗證您的聯絡人，請確認您在上面看到的憑證與他們的帳戶憑證相符。您可以要求他們與您共享他們的憑證。</string>
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">驗證</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4832,11 +4832,11 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">等候室</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">只有主持人允許的與會者才能加入會議。</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
-    <string name="meetings_schedule_meeting_waiting_room_warning">非主持人在通話期間新增的與會者將不會被送到等候室。</string>
+    <string name="meetings_schedule_meeting_waiting_room_warning">非主持人在通話期間新增的與會者不會被送到等候室。</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">某些您與之共享資訊的聯絡人尚未經過您的驗證。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。點選您欲驗證的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">與您共享資訊的某些聯絡人尚未經過您的驗證。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。點選您要驗證的聯絡人旁邊的三個小圓點，然後點選「資訊」。</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="other">已移除%1$d個與會者</item>
@@ -4862,7 +4862,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">等待主持人讓你進入</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未驗證的聯絡人共享。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。 點選您要驗證的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">不要離開</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -4877,8 +4877,7 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">查看等候室</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d participant is waiting to join the call.</item>
-        <item quantity="other">%1$d participants are waiting to join the call.</item>
+        <item quantity="other">%1$d位與會者正在等待加入通話。</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">是否拒絕%1$s進入？</string>
@@ -4887,7 +4886,7 @@
     <!-- Dialog title when a participant has been denied entry to the call -->
     <string name="meetings_waiting_room_deny_user_dialog_title">主持人沒有讓您進入</string>
     <!-- Dialog description when a participant has been denied entry to the call -->
-    <string name="meetings_waiting_room_deny_user_dialog_description">你將從等候室被移除。</string>
+    <string name="meetings_waiting_room_deny_user_dialog_description">你將被從等候室移除。</string>
     <!-- Dialog title when waiting room has been inactive for a while -->
     <string name="meetings_waiting_room_inactive_host_dialog_title">主持人沒有回應</string>
     <!-- Dialog description when waiting room has been inactive for a while -->
@@ -4898,34 +4897,34 @@
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s正在等待加入「%2$s」</string>
     <!-- Success message when participants was added to the call from waiting room -->
     <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="other">%1$d個與會者加入了通話</item>
+        <item quantity="other">%1$d位與會者加入了通話</item>
     </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
-        <item quantity="other">%1$d個與會者正在等待加入「%2$s」。</item>
+        <item quantity="other">%1$d位與會者正在等待加入「%2$s」。</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">Snapshot</string>
+    <string name="media_player_video_option_snapshot_title">快照</string>
     <!-- Title of video option of lock-->
-    <string name="media_player_video_option_lock_title">Lock</string>
+    <string name="media_player_video_option_lock_title">鎖定</string>
     <!-- Title of video option of zoom to fill-->
-    <string name="media_player_video_option_zoom_to_fill_title">Zoom to fill</string>
+    <string name="media_player_video_option_zoom_to_fill_title">放大到全螢幕</string>
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">原始檔</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Media discovery in subfolders</string>
+    <string name="settings_media_discovery_sub_folder_title">子資料夾中的媒體探索</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">當主資料夾位於媒體探索檢視中時，子資料夾的影像和影片也將包含在媒體探索檢視中</string>
     <!-- Description text in empty search screen when no search results found -->
-    <string name="search_empty_screen_no_results">沒有符合搜尋的項目</string>
+    <string name="search_empty_screen_no_results">沒有搜尋結果</string>
     <!-- Description text in empty search screen when images filter selected -->
-    <string name="search_empty_screen_no_images">No images</string>
+    <string name="search_empty_screen_no_images">沒有圖片</string>
     <!-- Description text in empty search screen when audio filter selected -->
-    <string name="search_empty_screen_no_audio">No audio files</string>
+    <string name="search_empty_screen_no_audio">沒有音訊檔案</string>
     <!-- Description text in empty search screen when video filter selected -->
-    <string name="search_empty_screen_no_video">No video files</string>
+    <string name="search_empty_screen_no_video">沒有影片檔案</string>
     <!-- Description text in empty search screen when documents filter selected -->
-    <string name="search_empty_screen_no_documents">No documents</string>
+    <string name="search_empty_screen_no_documents">沒有文件</string>
     <!-- Description text cloud drive screen when no items are available in cloud drive -->
     <string name="cloud_drive_empty_screen_message">雲端硬碟是空的</string>
     <!-- Button text from verify credentials screen when contact is not verified -->
@@ -4934,4 +4933,12 @@
     <string name="contact_verify_credentials_verified_text">已驗證</string>
     <!-- Description text from contact info screen when contact is not verified -->
     <string name="contact_verify_credentials_not_verified_text">未驗證</string>
+    <!-- Option to show the list of participants in the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_in_call_button">通話中</string>
+    <!-- Option to show the list of participants who are not on the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_not_in_call_button">不在通話中</string>
+    <!-- Label to show the number of participants in the waiting room-->
+    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">正在等待（%d）</string>
+    <!-- Text of button to show all participants in the waiting room in call UI -->
+    <string name="meetings_waiting_room_call_ui_see_all_button">檢視全部</string>
 </resources>

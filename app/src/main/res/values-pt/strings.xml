@@ -3150,7 +3150,7 @@
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
     <!-- settings of the Media section -->
-    <string name="settings_media">Imprensa</string>
+    <string name="settings_media">Mídia</string>
     <!-- settings title of the Media section -->
     <string name="settings_media_audio_files">Arquivos de áudio</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
@@ -5286,7 +5286,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Sala de espera</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Somente participantes admitidos pelo host podem participar da reunião.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Os participantes adicionados durante as chamadas por usuários que não sejam hosts não serão encaminhados para a sala de espera.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -5395,4 +5395,12 @@
     <string name="contact_verify_credentials_verified_text">Verificado</string>
     <!-- Description text from contact info screen when contact is not verified -->
     <string name="contact_verify_credentials_not_verified_text">Verificação pendente</string>
+    <!-- Option to show the list of participants in the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_in_call_button">Na chamada</string>
+    <!-- Option to show the list of participants who are not on the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_not_in_call_button">Fora da chamada</string>
+    <!-- Label to show the number of participants in the waiting room-->
+    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Esperando (%d)</string>
+    <!-- Text of button to show all participants in the waiting room in call UI -->
+    <string name="meetings_waiting_room_call_ui_see_all_button">Ver todos</string>
 </resources>

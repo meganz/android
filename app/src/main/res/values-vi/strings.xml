@@ -4832,7 +4832,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Phòng chờ</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Chỉ những người tham&#160;gia được thừa&#160;nhận bởi người chủ&#160;trì mới có&#160;thể tham&#160;gia cuộc họp.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Những người tham&#160;gia cuộc gọi được thêm bởi người không phải là người chủ&#160;trì sẽ không được chuyển đến phòng chờ.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -4887,7 +4887,7 @@
     <!-- Dialog title when a participant has been denied entry to the call -->
     <string name="meetings_waiting_room_deny_user_dialog_title">Người chủ&#160;trì đã không cho bạn vào</string>
     <!-- Dialog description when a participant has been denied entry to the call -->
-    <string name="meetings_waiting_room_deny_user_dialog_description">You’ll be removed from the waiting room.</string>
+    <string name="meetings_waiting_room_deny_user_dialog_description">Bạn sẽ được đưa ra khỏi phòng chờ.</string>
     <!-- Dialog title when waiting room has been inactive for a while -->
     <string name="meetings_waiting_room_inactive_host_dialog_title">Người chủ&#160;trì không có trả&#160;lời</string>
     <!-- Dialog description when waiting room has been inactive for a while -->
@@ -4921,19 +4921,27 @@
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Không có kết&#160;quả</string>
     <!-- Description text in empty search screen when images filter selected -->
-    <string name="search_empty_screen_no_images">No images</string>
+    <string name="search_empty_screen_no_images">Không có hình&#160;ảnh</string>
     <!-- Description text in empty search screen when audio filter selected -->
-    <string name="search_empty_screen_no_audio">No audio files</string>
+    <string name="search_empty_screen_no_audio">Không có tệp&#160;tin âm&#160;thanh</string>
     <!-- Description text in empty search screen when video filter selected -->
-    <string name="search_empty_screen_no_video">No video files</string>
+    <string name="search_empty_screen_no_video">Không có tệp&#160;tin video</string>
     <!-- Description text in empty search screen when documents filter selected -->
-    <string name="search_empty_screen_no_documents">No documents</string>
+    <string name="search_empty_screen_no_documents">Không có tài&#160;liệu</string>
     <!-- Description text cloud drive screen when no items are available in cloud drive -->
     <string name="cloud_drive_empty_screen_message">Ổ&#160;Mây trống</string>
     <!-- Button text from verify credentials screen when contact is not verified -->
-    <string name="contact_verify_credentials_mark_as_verified_text">Mark as verified</string>
+    <string name="contact_verify_credentials_mark_as_verified_text">Đánh dấu là đã xác&#160;thực</string>
     <!-- Description text from contact info screen when contact is verified -->
     <string name="contact_verify_credentials_verified_text">Đã xác thực</string>
     <!-- Description text from contact info screen when contact is not verified -->
     <string name="contact_verify_credentials_not_verified_text">Chưa có xác thực</string>
+    <!-- Option to show the list of participants in the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_in_call_button">Đang trong cuộc gọi</string>
+    <!-- Option to show the list of participants who are not on the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_not_in_call_button">Ở ngoài cuộc gọi</string>
+    <!-- Label to show the number of participants in the waiting room-->
+    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Đang chờ (%d)</string>
+    <!-- Text of button to show all participants in the waiting room in call UI -->
+    <string name="meetings_waiting_room_call_ui_see_all_button">Xem tất&#160;cả</string>
 </resources>

@@ -3660,13 +3660,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[/B][A]%2$s[/A]将[A]%1$s[/A][B]的权限更改为只读</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to a standard participant by [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B]被[/B][A]%2$s[/A]更改为标准参与者</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[/B][A]%2$s[/A]将[A]%1$s[/A][B]的权限更改为主持人</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s将%1$s的权限更改为只读</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to a standard participant by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s被%2$s更改为标准参与者</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s将%1$s的权限更改为主持人</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -4832,7 +4832,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">正在等候室</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">只有主持人允许的参与者可以加入会议。</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">在通话期间，非主持人添加的参与者将不会被添加到等候室。</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -4933,4 +4933,12 @@
     <string name="contact_verify_credentials_verified_text">已验证</string>
     <!-- Description text from contact info screen when contact is not verified -->
     <string name="contact_verify_credentials_not_verified_text">未验证</string>
+    <!-- Option to show the list of participants in the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_in_call_button">通话中</string>
+    <!-- Option to show the list of participants who are not on the call in the meeting screen -->
+    <string name="meetings_bottom_panel_participants_not_in_call_button">未在通话中</string>
+    <!-- Label to show the number of participants in the waiting room-->
+    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">正在等候(%d)</string>
+    <!-- Text of button to show all participants in the waiting room in call UI -->
+    <string name="meetings_waiting_room_call_ui_see_all_button">查看全部</string>
 </resources>

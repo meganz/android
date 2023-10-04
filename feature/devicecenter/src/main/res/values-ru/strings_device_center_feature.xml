@@ -56,4 +56,86 @@
     <string name="device_center_bottom_sheet_item_show_in_backups">Показать в «Резервных копиях»</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Показать в Облачном диске</string>
+    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
+    <string name="device_center_list_view_item_sub_state_no_sync_error"></string>
+    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system"></string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
+    <string name="device_center_list_view_item_sub_state_invalid_remote_type"></string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
+    <string name="device_center_list_view_item_sub_state_invalid_local_type">Файл нельзя синхронизировать отдельно. Нужно настроить синхронизацию из папки.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed"></string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
+    <string name="device_center_list_view_item_sub_state_remote_node_not_found"></string>
+    <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
+    <string name="device_center_list_view_item_sub_state_storage_overquota"></string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
+    <string name="device_center_list_view_item_sub_state_account_expired"></string>
+    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
+    <string name="device_center_list_view_item_sub_state_foreign_target_overshare"></string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
+    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Не удаётся найти папку MEGA, так как она была перемещена.</string>
+    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
+    <string name="device_center_list_view_item_sub_state_share_non_full_access">Папку нельзя синхронизировать, поскольку это общая папка без полного доступа.</string>
+    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
+    <string name="device_center_list_view_item_sub_state_put_nodes_error"></string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
+    <string name="device_center_list_view_item_sub_state_active_sync_below_path">Папку нельзя синхронизировать, так как она уже содержит синхронизируемые папки.</string>
+    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
+    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported"></string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
+    <string name="device_center_list_view_item_sub_state_account_blocked"></string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
+    <string name="device_center_list_view_item_sub_state_unknown_temporary_error"></string>
+    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
+    <string name="device_center_list_view_item_sub_state_too_many_action_packets">Аккаунт перезагружен. Любые пропущенные обновления ваших резервных копий или синхронизаций не были применены.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
+    <string name="device_center_list_view_item_sub_state_logged_out"></string>
+    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
+    <string name="device_center_list_view_item_sub_state_missing_parent_node"></string>
+    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
+    <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Не удаётся найти папку на внешнем диске.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
+    <string name="device_center_list_view_item_sub_state_active_sync_same_path"></string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
+    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes"></string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file"></string>
+    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
+    <string name="device_center_list_view_item_sub_state_sync_config_read_failure"></string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
+    <string name="device_center_list_view_item_sub_state_unknown_drive_path"></string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
+    <string name="device_center_list_view_item_sub_state_invalid_scan_interval"></string>
+    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
+    <string name="device_center_list_view_item_sub_state_notification_system_unavailable"></string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
+    <string name="device_center_list_view_item_sub_state_unable_to_add_watch"></string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
+    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid"></string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
+    <string name="device_center_list_view_item_sub_state_unable_to_open_database"></string>
+    <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
+    <string name="device_center_list_view_item_sub_state_insufficient_disk_space"></string>
+    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
+    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage"></string>
+    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
+    <string name="device_center_list_view_item_sub_state_message_unknown_error"></string>
+    <!-- The name for specific Sub States to indicate that something went wrong -->
+    <string name="device_center_list_view_item_sub_state_message_something_went_wrong"></string>
+    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
+    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Папку нельзя синхронизировать или скопировать, так как папка MEGA находится в Корзине.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now"></string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive"></string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes"></string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue"></string>
+    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Папку нельзя синхронизировать, так как она уже находится внутри синхронизируемой папки.</string>
+    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
+    <string name="device_center_list_view_item_status_camera_uploads_disabled">Camera uploads disabled</string>
 </resources>
