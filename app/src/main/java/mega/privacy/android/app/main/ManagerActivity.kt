@@ -188,6 +188,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
@@ -1084,14 +1085,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         onDenyClick = {
                             waitingRoomManagementViewModel.denyUsersClick()
                         },
-                        onDenyEntryClick = {
-                            waitingRoomManagementViewModel.denyEntryClick()
-                        },
                         onSeeWaitingRoomClick = {
                             waitingRoomManagementViewModel.seeWaitingRoomClick()
                         },
                         onDismiss = {
                             waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                        },
+                    )
+                    DenyEntryToCallDialog(
+                        state = waitingRoomState,
+                        onDenyEntryClick = {
+                            waitingRoomManagementViewModel.denyEntryClick()
                         },
                         onCancelDenyEntryClick = {
                             waitingRoomManagementViewModel.cancelDenyEntryClick()
@@ -1984,7 +1988,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
                     it,
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                    MEGACHAT_INVALID_HANDLE
                 )
                 waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
             }

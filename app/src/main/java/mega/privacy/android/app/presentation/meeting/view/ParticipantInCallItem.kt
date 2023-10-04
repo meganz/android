@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,15 +23,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
 /**
@@ -55,6 +60,7 @@ fun ParticipantInCallItem(
     Column {
         Row(
             modifier = Modifier
+                .padding(start = 16.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -112,34 +118,37 @@ fun ParticipantInCallItem(
                     .wrapContentSize(Alignment.CenterEnd)
             ) {
                 Row(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(end = 20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     when (section) {
                         ParticipantsSection.WaitingRoomSection -> {
                             if (hasHostPermission) {
-                                IconButton(
-                                    onClick = { onDenyParticipantClicked(participant) }
-                                ) {
-                                    Icon(
-                                        modifier = Modifier.padding(start = 5.dp),
-                                        imageVector = ImageVector.vectorResource(id = R.drawable.deny_participant_icon),
-                                        contentDescription = "Deny icon",
-                                        tint = MaterialTheme.colors.grey_alpha_087_white
-                                    )
-                                }
-                                IconButton(
-                                    onClick = { onAdmitParticipantClicked(participant) }
-                                ) {
-                                    Icon(
-                                        modifier = Modifier.padding(start = 26.dp),
-                                        imageVector = ImageVector.vectorResource(id = R.drawable.admit_participant_icon),
-                                        contentDescription = "Admit icon",
-                                        tint = MaterialTheme.colors.grey_alpha_087_white
-                                    )
-                                }
+                                Icon(
+                                    modifier = Modifier.clickable {
+                                        onDenyParticipantClicked(
+                                            participant
+                                        )
+                                    },
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.deny_participant_icon),
+                                    contentDescription = "Deny icon",
+                                    tint = MaterialTheme.colors.grey_alpha_087_white
+                                )
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .clickable {
+                                            onAdmitParticipantClicked(
+                                                participant
+                                            )
+                                        },
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.admit_participant_icon),
+                                    contentDescription = "Admit icon",
+                                    tint = MaterialTheme.colors.grey_alpha_087_white
+                                )
                             }
-
                         }
 
                         ParticipantsSection.InCallSection -> {
@@ -164,7 +173,7 @@ fun ParticipantInCallItem(
                                     modifier = Modifier.padding(start = 10.dp),
                                     painter = painterResource(id = mega.privacy.android.core.R.drawable.ic_dots_vertical_grey),
                                     contentDescription = "Three dots icon",
-                                    tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038
+                                    tint = MaterialTheme.colors.black_white
                                 )
                             }
                         }
@@ -176,10 +185,34 @@ fun ParticipantInCallItem(
         }
 
         Divider(
-            modifier = Modifier.padding(start = 56.dp),
+            modifier = Modifier.padding(start = 72.dp),
             color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
             thickness = 1.dp
         )
     }
 }
 
+/**
+ * [PreviewParticipantInCallItem] preview
+ */
+@Preview
+@Composable
+fun PreviewParticipantInCallItem() {
+    AndroidTheme(isDark = true) {
+        ParticipantInCallItem(
+            section = ParticipantsSection.WaitingRoomSection,
+            hasHostPermission = true,
+            participant = ChatParticipant(
+                handle = 444L,
+                data = ContactData(fullName = "Marta", alias = null, avatarUri = null),
+                email = "marta+test255@mega.nz",
+                isMe = false,
+                privilege = ChatRoomPermission.Standard,
+                defaultAvatarColor = 444
+            ),
+            onAdmitParticipantClicked = {},
+            onDenyParticipantClicked = {},
+            onParticipantMoreOptionsClicked = {},
+        )
+    }
+}

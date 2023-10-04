@@ -17,13 +17,13 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -40,6 +40,9 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * On create view
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -60,13 +63,9 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
                         onDenyClick = {
                             viewModel.denyUsersClick()
                         },
-                        onDenyEntryClick = {
-                            viewModel.denyEntryClick()
-                            dismissAllowingStateLoss()
-                        },
                         onSeeWaitingRoomClick = {
                             val chatId = viewModel.state.value.chatId
-                            MegaApplication.getInstance().openCallService(chatId);
+                            MegaApplication.getInstance().openCallService(chatId)
 
                             val intent =
                                 Intent(requireContext(), MeetingActivity::class.java).apply {
@@ -82,6 +81,14 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
                             viewModel.setShowParticipantsInWaitingRoomDialogConsumed()
                             dismissAllowingStateLoss()
                         },
+                    )
+
+                    DenyEntryToCallDialog(
+                        state = state,
+                        onDenyEntryClick = {
+                            viewModel.denyEntryClick()
+                            dismissAllowingStateLoss()
+                        },
                         onCancelDenyEntryClick = {
                             viewModel.cancelDenyEntryClick()
                         },
@@ -91,6 +98,9 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
         }
     }
 
+    /**
+     * On view created
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.collectFlow(viewModel.state) { state ->
@@ -115,6 +125,9 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
     }
 
     companion object {
+        /**
+         * New instance
+         */
         fun newInstance() = UsersInWaitingRoomDialogFragment()
     }
 }

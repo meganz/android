@@ -169,9 +169,12 @@ fun ScheduledMeetingInfoView(
             state = waitingRoomManagementState,
             onAdmitClick = { onAdmitUsersInWaitingRoomClicked() },
             onDenyClick = { onDenyUsersInWaitingRoomClicked() },
-            onDenyEntryClick = { onDenyEntryInWaitingRoomClicked() },
             onSeeWaitingRoomClick = { onSeeWaitingRoomClicked() },
-            onDismiss = { onDismissWaitingRoomDialog() },
+            onDismiss = { onDismissWaitingRoomDialog() })
+
+        DenyEntryToCallDialog(
+            state = waitingRoomManagementState,
+            onDenyEntryClick = { onDenyEntryInWaitingRoomClicked() },
             onCancelDenyEntryClick = { onCancelDenyEntryClick() })
 
         Column {

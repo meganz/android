@@ -23,6 +23,10 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property isWaitingRoomFeatureFlagEnabled            True, if waiting room feature flag is enabled. False, if not.
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
  * @property hasWaitingRoom                             True if has waiting room. False if not.
+ * @property shouldWaitingRoomListBeShown               True if waiting room list must be shown or False otherwise (hidden).
+ * @property shouldInCallListBeShown                    True if in call list must be shown or False otherwise (hidden).
+ * @property shouldNotInCallListBeShown                 True if not in call list must be shown or False otherwise (hidden).
+ * @property isBottomPanelExpanded                      True if bottom panel is expanded or False otherwise (collapsed).
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -40,4 +44,14 @@ data class MeetingState(
     val isWaitingRoomFeatureFlagEnabled: Boolean = false,
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
     val hasWaitingRoom: Boolean = false,
-)
+    val shouldWaitingRoomListBeShown: Boolean = false,
+    val shouldInCallListBeShown: Boolean = false,
+    val shouldNotInCallListBeShown: Boolean = false,
+    val isBottomPanelExpanded: Boolean = false,
+) {
+    /**
+     * Check if waiting room is opened
+     */
+    fun isWaitingRoomOpened() =
+        participantsSection == ParticipantsSection.WaitingRoomSection && (shouldWaitingRoomListBeShown || isBottomPanelExpanded)
+}

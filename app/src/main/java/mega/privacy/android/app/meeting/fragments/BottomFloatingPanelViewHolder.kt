@@ -292,6 +292,8 @@ class BottomFloatingPanelViewHolder(
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
+                meetingViewModel.setBottomPanelExpanded(bottomFloatingPanelExpanded)
+
                 if (newState == BottomSheetBehavior.STATE_DRAGGING && inMeetingViewModel.isOneToOneCall()) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
@@ -300,6 +302,7 @@ class BottomFloatingPanelViewHolder(
                     newState == BottomSheetBehavior.STATE_EXPANDED && expandedTop == 0 -> {
                         expandedTop = binding.bottomFloatingPanel.root.top
                     }
+
                     newState == BottomSheetBehavior.STATE_COLLAPSED && collapsedTop == 0 -> {
                         collapsedTop = binding.bottomFloatingPanel.root.top
                     }
@@ -485,7 +488,12 @@ class BottomFloatingPanelViewHolder(
                             )
                         },
                         onAdmitAllClick = { waitingRoomManagementViewModel.admitUsersClick() },
-                        onSeeAllClick = {},
+                        onSeeAllClick = {
+                            meetingViewModel.onSeeAllClick()
+                            if (meetingViewModel.state.value.participantsSection == ParticipantsSection.WaitingRoomSection) {
+                                waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                            }
+                        },
                         onInviteParticipantsClick = { listener.onInviteParticipants() },
                         onShareMeetingLinkClick = { listener.onShareLink(true) },
                         onAllowAddParticipantsClick = {
@@ -585,15 +593,14 @@ class BottomFloatingPanelViewHolder(
     fun collapse() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomFloatingPanelExpanded = false
+        meetingViewModel.setBottomPanelExpanded(false)
         onBottomFloatingPanelSlide(BOTTOM_PANEL_COLLAPSE_OFFSET)
     }
 
     /**
      * Get current state of bottom panel
      */
-    fun getState(): Int {
-        return bottomSheetBehavior.state
-    }
+    fun getState() = bottomSheetBehavior.state
 
     /**
      * Expand the bottom sheet
@@ -601,6 +608,7 @@ class BottomFloatingPanelViewHolder(
     fun expand() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomFloatingPanelExpanded = true
+        meetingViewModel.setBottomPanelExpanded(true)
         onBottomFloatingPanelSlide(BOTTOM_PANEL_EXPAND_OFFSET)
     }
 
@@ -675,12 +683,14 @@ class BottomFloatingPanelViewHolder(
                 floatingPanelView.fabSpeaker.isOn = true
                 floatingPanelView.fabSpeakerLabel.text = context.getString(R.string.general_speaker)
             }
+
             AppRTCAudioManager.AudioDevice.EARPIECE -> {
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
                 floatingPanelView.fabSpeaker.enable = true
                 floatingPanelView.fabSpeaker.isOn = false
                 floatingPanelView.fabSpeakerLabel.text = context.getString(R.string.general_speaker)
             }
+
             AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
             AppRTCAudioManager.AudioDevice.BLUETOOTH,
             -> {
@@ -690,6 +700,7 @@ class BottomFloatingPanelViewHolder(
                 floatingPanelView.fabSpeakerLabel.text =
                     context.getString(R.string.general_headphone)
             }
+
             else -> {
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
                 floatingPanelView.fabSpeaker.enable = false

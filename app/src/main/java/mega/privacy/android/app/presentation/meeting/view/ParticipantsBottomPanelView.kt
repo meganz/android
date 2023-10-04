@@ -51,7 +51,7 @@ fun ParticipantsBottomPanelView(
     onInCallClick: () -> Unit,
     onNotInCallClick: () -> Unit,
     onAdmitAllClick: () -> Unit,
-    onSeeAllClick: (ParticipantsSection) -> Unit,
+    onSeeAllClick: () -> Unit,
     onInviteParticipantsClick: () -> Unit,
     onShareMeetingLinkClick: () -> Unit,
     onAllowAddParticipantsClick: () -> Unit,
@@ -66,7 +66,7 @@ fun ParticipantsBottomPanelView(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, top = 10.dp, end = 20.dp, bottom = 10.dp),
+            .padding(top = 10.dp, bottom = 10.dp),
     ) {
         Column(
             modifier = Modifier
@@ -76,7 +76,7 @@ fun ParticipantsBottomPanelView(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp)
+                    .padding(start = 16.dp, end = 20.dp, bottom = 10.dp)
             ) {
                 if (state.chatParticipantsInWaitingRoom.isNotEmpty() && state.hasHostPermission && state.isWaitingRoomFeatureFlagEnabled && state.hasWaitingRoom) {
                     CallTextButtonChip(
@@ -118,6 +118,7 @@ fun ParticipantsBottomPanelView(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(start = 16.dp, end = 20.dp)
                         .defaultMinSize(minHeight = 48.dp)
                         .clickable {
                             onAllowAddParticipantsClick()
@@ -153,14 +154,13 @@ fun ParticipantsBottomPanelView(
                         )
                     }
                 }
-
             }
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 56.dp)
-                    .padding(bottom = 10.dp),
+                    .padding(bottom = 10.dp, start = 16.dp, end = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
@@ -211,6 +211,7 @@ fun ParticipantsBottomPanelView(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(start = 16.dp, end = 20.dp)
                         .height(56.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -237,7 +238,6 @@ fun ParticipantsBottomPanelView(
                                     state.chatParticipantsInWaitingRoom.indices.forEach { i ->
                                         if (numParticipants > maxNumParticipantsNoSeeAllOption && i == maxNumParticipantsNoSeeAllOption) {
                                             SeeAllParticipantsButton(
-                                                section = state.participantsSection,
                                                 onSeeAllClicked = onSeeAllClick
                                             )
                                         } else if (i < maxNumParticipantsNoSeeAllOption) {
@@ -259,7 +259,6 @@ fun ParticipantsBottomPanelView(
                                     state.chatParticipantsInCall.indices.forEach { i ->
                                         if (numParticipants > maxNumParticipantsNoSeeAllOption && i == maxNumParticipantsNoSeeAllOption) {
                                             SeeAllParticipantsButton(
-                                                section = state.participantsSection,
                                                 onSeeAllClicked = onSeeAllClick
                                             )
                                         } else if (i < maxNumParticipantsNoSeeAllOption) {
@@ -280,7 +279,6 @@ fun ParticipantsBottomPanelView(
                                     state.chatParticipantsNotInCall.indices.forEach { i ->
                                         if (numParticipants > maxNumParticipantsNoSeeAllOption && i == maxNumParticipantsNoSeeAllOption) {
                                             SeeAllParticipantsButton(
-                                                section = state.participantsSection,
                                                 onSeeAllClicked = onSeeAllClick
                                             )
                                         } else if (i < maxNumParticipantsNoSeeAllOption) {
@@ -309,6 +307,7 @@ fun ParticipantsBottomPanelView(
         ) {
             RaisedDefaultMegaButton(
                 modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
                     .fillMaxWidth(),
                 textId = R.string.meetings_scheduled_meeting_info_share_meeting_link_label,
                 onClick = onShareMeetingLinkClick
@@ -335,11 +334,11 @@ private fun switchColors() = SwitchDefaults.colors(
  */
 @Composable
 private fun SeeAllParticipantsButton(
-    section: ParticipantsSection,
-    onSeeAllClicked: (ParticipantsSection) -> Unit,
+    onSeeAllClicked: () -> Unit,
 ) {
     Row(modifier = Modifier
-        .clickable { onSeeAllClicked(section) }
+        .clickable { onSeeAllClicked() }
+        .padding(start = 16.dp, end = 20.dp)
         .fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -600,4 +599,3 @@ private fun getListWith6Participants(): List<ChatParticipant> {
         add(participant6)
     }
 }
-

@@ -177,16 +177,6 @@
         app:layout_constraintStart_toStartOf="@id/fab_end"
         app:layout_constraintTop_toBottomOf="@id/fab_end" />
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="13dp"
-        android:background="@color/grey_012_white_012"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fab_mic_label" />
-
     <Button
         android:id="@+id/guest_share_link"
         style="?attr/materialButtonOutlinedStyle"
@@ -197,7 +187,7 @@
         app:drawableTint="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toBottomOf="@id/divider" />
+        app:layout_constraintTop_toBottomOf="@id/fab_mic_label" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/participants_compose_view"

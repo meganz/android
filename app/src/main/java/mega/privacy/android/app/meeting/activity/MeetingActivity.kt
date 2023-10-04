@@ -23,9 +23,9 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.CallNotificationIntentService
@@ -36,14 +36,15 @@ import mega.privacy.android.app.meeting.fragments.JoinMeetingFragment
 import mega.privacy.android.app.meeting.fragments.MakeModeratorFragment
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.app.presentation.meeting.view.CallParticipantsListView
+import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
-import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -51,7 +52,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MeetingActivity : BaseActivity() {
+class MeetingActivity : PasscodeActivity() {
 
     companion object {
         /** The name of actions denoting set
@@ -89,13 +90,7 @@ class MeetingActivity : BaseActivity() {
     }
 
     @Inject
-    lateinit var passcodeUtil: PasscodeUtil
-
-    @Inject
     lateinit var notificationManager: NotificationManagerCompat
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     /**
      * Rtc audio manager gateway
@@ -209,18 +204,65 @@ class MeetingActivity : BaseActivity() {
                         onDenyClick = {
                             waitingRoomManagementViewModel.denyUsersClick()
                         },
-                        onDenyEntryClick = {
-                            waitingRoomManagementViewModel.denyEntryClick()
-                        },
                         onSeeWaitingRoomClick = {
                             waitingRoomManagementViewModel.seeWaitingRoomClick()
                         },
                         onDismiss = {
                             waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
                         },
+                    )
+                    DenyEntryToCallDialog(
+                        state = waitingRoomState,
+                        onDenyEntryClick = {
+                            waitingRoomManagementViewModel.denyEntryClick()
+                        },
                         onCancelDenyEntryClick = {
                             waitingRoomManagementViewModel.cancelDenyEntryClick()
                         },
+                    )
+                }
+            }
+        }
+
+        binding.waitingRoomListComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val state by meetingViewModel.state.collectAsStateWithLifecycle()
+
+                AndroidTheme(isDark = true) {
+                    CallParticipantsListView(
+                        state = state,
+                        onScrollChange = { scrolled ->
+                            this@MeetingActivity.changeStatusBarColor(
+                                scrolled,
+                                true
+                            )
+                        },
+                        onBackPressed = {
+                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+                        },
+                        onDenyParticipantClicked = { participant ->
+                            waitingRoomManagementViewModel.denyUsersClick(
+                                participant
+                            )
+                        },
+                        onAdmitParticipantClicked = { participant ->
+                            waitingRoomManagementViewModel.admitUsersClick(
+                                participant
+                            )
+                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+                        },
+                        onAdmitAllClicked = {
+                            waitingRoomManagementViewModel.admitUsersClick()
+                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+                        },
+                        onParticipantMoreOptionsClicked = {
+                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+                        }
                     )
                 }
             }
@@ -261,6 +303,8 @@ class MeetingActivity : BaseActivity() {
             if (state.chatId != -1L) {
                 waitingRoomManagementViewModel.setChatIdCallOpened(state.chatId)
             }
+            val isWaitingRoomOpened = state.isWaitingRoomOpened()
+            waitingRoomManagementViewModel.setWaitingRoomSectionOpened(isWaitingRoomOpened)
         }
 
         collectFlow(waitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->

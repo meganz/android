@@ -80,6 +80,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -540,14 +541,17 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                         onDenyClick = {
                             waitingRoomManagementViewModel.denyUsersClick()
                         },
-                        onDenyEntryClick = {
-                            waitingRoomManagementViewModel.denyEntryClick()
-                        },
                         onSeeWaitingRoomClick = {
                             waitingRoomManagementViewModel.seeWaitingRoomClick()
                         },
                         onDismiss = {
                             waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+                        },
+                    )
+                    DenyEntryToCallDialog(
+                        state = waitingRoomState,
+                        onDenyEntryClick = {
+                            waitingRoomManagementViewModel.denyEntryClick()
                         },
                         onCancelDenyEntryClick = {
                             waitingRoomManagementViewModel.cancelDenyEntryClick()

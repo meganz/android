@@ -116,7 +116,10 @@ class WaitingRoomManagementViewModel @Inject constructor(
                             }
 
                             setTemporaryUsersList(users = peersNonHost)
-                            checkWaitingRoomParticipants(chatId = call.chatId)
+                            checkWaitingRoomParticipants(
+                                chatId = call.chatId,
+                                shouldDialogBeShown = true
+                            )
                         }
                     }
                 }
@@ -160,12 +163,15 @@ class WaitingRoomManagementViewModel @Inject constructor(
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     checkWaitingRoomParticipants(
                                         chatId = call.chatId,
+                                        shouldDialogBeShown = true
+
                                     )
                                 }, 1000)
                             }
                             if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
                                 checkWaitingRoomParticipants(
                                     chatId = call.chatId,
+                                    shouldDialogBeShown = state.value.showParticipantsInWaitingRoomDialog
                                 )
                             }
                         }
@@ -204,8 +210,9 @@ class WaitingRoomManagementViewModel @Inject constructor(
      * Check waiting room participants
      *
      * @param chatId Chat id
+     * @param shouldDialogBeShown   True, dialog should be shown. False, otherwise.
      */
-    private fun checkWaitingRoomParticipants(chatId: Long) {
+    private fun checkWaitingRoomParticipants(chatId: Long, shouldDialogBeShown: Boolean) {
         when {
             _state.value.temporaryUsersInWaitingRoomList.isEmpty() -> {
                 setShowDenyParticipantDialogConsumed()
@@ -222,36 +229,41 @@ class WaitingRoomManagementViewModel @Inject constructor(
             }
 
             else -> {
-                updateUsers(chatId, _state.value.temporaryUsersInWaitingRoomList)
-                getScheduledMeetingTitle(chatId)
-            }
-        }
-    }
-
-    /**
-     * Update users in waiting room
-     *
-     * @param chatId    Chat id
-     * @param users     List of users
-     */
-    private fun updateUsers(chatId: Long, users: List<Long>) {
-        _state.update { state ->
-            state.copy(
-                usersInWaitingRoom = users,
-            )
-        }
-
-        when (users.size) {
-            1, 2 -> {
-                getNameOfUserInWaitingRoom(users[0], chatId, true, users.size == 1)
-                if (users.size == 2) {
-                    getNameOfUserInWaitingRoom(
-                        users[1], chatId, isFirstUser = false, shouldShowDialog = true
+                val users = _state.value.temporaryUsersInWaitingRoomList
+                _state.update { state ->
+                    state.copy(
+                        usersInWaitingRoom = users,
                     )
                 }
-            }
 
-            else -> setShowParticipantsInWaitingRoomDialog()
+                val checkUserToDeny =
+                    users.find { it == state.value.participantToDenyEntry?.handle }
+                if (checkUserToDeny == null) {
+                    setShowDenyParticipantDialogConsumed()
+                }
+
+                when (users.size) {
+                    1, 2 -> {
+                        getNameOfUserInWaitingRoom(
+                            users[0],
+                            chatId,
+                            true,
+                            shouldDialogBeShown && users.size == 1
+                        )
+                        if (users.size == 2) {
+                            getNameOfUserInWaitingRoom(
+                                users[1],
+                                chatId,
+                                isFirstUser = false,
+                                shouldShowDialog = shouldDialogBeShown
+                            )
+                        }
+                    }
+
+                    else -> setShowParticipantsInWaitingRoomDialog(shouldDialogBeShown)
+                }
+                getScheduledMeetingTitle(chatId)
+            }
         }
     }
 
@@ -330,11 +342,16 @@ class WaitingRoomManagementViewModel @Inject constructor(
     /**
      * Sets showParticipantsInWaitingRoomDialog.
      */
-    private fun setShowParticipantsInWaitingRoomDialog() {
-        _state.update { state ->
-            state.copy(
-                showParticipantsInWaitingRoomDialog = true, showDenyParticipantDialog = false
-            )
+    private fun setShowParticipantsInWaitingRoomDialog(needToUpdateDialog: Boolean = true) {
+        if (needToUpdateDialog && !state.value.isWaitingRoomSectionOpened) {
+            _state.update { state ->
+                state.copy(
+                    showParticipantsInWaitingRoomDialog = true,
+                    showDenyParticipantDialog = false
+                )
+            }
+        } else {
+            setShowParticipantsInWaitingRoomDialogConsumed()
         }
     }
 
@@ -371,6 +388,13 @@ class WaitingRoomManagementViewModel @Inject constructor(
      */
     fun onConsumeShouldWaitingRoomBeShownEvent() = _state.update { state ->
         state.copy(shouldWaitingRoomBeShown = false)
+    }
+
+    /**
+     * Sets if waiting room section is opened
+     */
+    fun setWaitingRoomSectionOpened(isOpened: Boolean) = _state.update { state ->
+        state.copy(isWaitingRoomSectionOpened = isOpened)
     }
 
     /**
@@ -456,6 +480,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
         _state.update { state ->
             state.copy(shouldWaitingRoomBeShown = true)
         }
+        setShowParticipantsInWaitingRoomDialogConsumed()
     }
 
     /**

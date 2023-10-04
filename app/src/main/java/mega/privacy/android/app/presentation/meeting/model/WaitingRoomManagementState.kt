@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.chat.ChatParticipant
  * @property participantToDenyEntry                  [ChatParticipant] to deny entry
  * @property shouldWaitingRoomBeShown                True, it must be shown. False, must be hidden
  * @property isDialogClosed                          True, if waiting room dialog is closed. False if not
+ * @property isWaitingRoomSectionOpened              True, if waiting room section is opened. False if not
  */
 data class WaitingRoomManagementState constructor(
     val snackbarString: String? = null,
@@ -36,6 +37,7 @@ data class WaitingRoomManagementState constructor(
     val participantToDenyEntry: ChatParticipant? = null,
     val shouldWaitingRoomBeShown: Boolean = false,
     val isDialogClosed: Boolean = false,
+    val isWaitingRoomSectionOpened: Boolean = false,
 ) {
     /**
      * Check if the dialog is relative to the open call

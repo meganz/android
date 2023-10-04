@@ -80,7 +80,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
-import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener

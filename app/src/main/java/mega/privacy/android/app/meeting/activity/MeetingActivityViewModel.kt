@@ -974,6 +974,50 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
     /**
+     * See waiting room participant list
+     */
+    fun onSeeAllClick() =
+        _state.update { state ->
+            state.copy(
+                shouldWaitingRoomListBeShown = state.participantsSection == ParticipantsSection.WaitingRoomSection,
+                shouldInCallListBeShown = state.participantsSection == ParticipantsSection.InCallSection,
+                shouldNotInCallListBeShown = state.participantsSection == ParticipantsSection.NotInCallSection,
+            )
+        }
+
+    /**
+     * Set if bottom panel is expanded
+     *
+     * @param isExpanded    True if it's expanded. False, if it's collapsed.
+     */
+    fun setBottomPanelExpanded(isExpanded: Boolean) = _state.update { state ->
+        state.copy(
+            isBottomPanelExpanded = isExpanded
+        )
+    }
+
+    /**
+     * Sets shouldWaitingRoomListBeShown as consumed.
+     */
+    fun onConsumeShouldWaitingRoomListBeShownEvent() = _state.update { state ->
+        state.copy(shouldWaitingRoomListBeShown = false)
+    }
+
+    /**
+     * Sets shouldInCallListBeShown as consumed.
+     */
+    fun onConsumeShouldInCallListBeShownEvent() = _state.update { state ->
+        state.copy(shouldInCallListBeShown = false)
+    }
+
+    /**
+     * Sets shouldNotInCallListBeShown as consumed.
+     */
+    fun onConsumeShouldNotInCallListBeShownEvent() = _state.update { state ->
+        state.copy(shouldNotInCallListBeShown = false)
+    }
+
+    /**
      * Allow o deny non-hosts add participants to the call
      */
     fun allowAddParticipantsClick() {
