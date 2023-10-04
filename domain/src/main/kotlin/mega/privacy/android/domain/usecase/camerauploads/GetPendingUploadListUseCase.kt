@@ -72,7 +72,10 @@ class GetPendingUploadListUseCase @Inject constructor(
 
                     // Check if the file already exists somewhere in the cloud drive
                     val nodeExists =
-                        getNodeFromCloudUseCase(localFingerPrint, NodeId(parentNodeHandle))
+                        getNodeFromCloudUseCase(
+                            originalFingerprint = localFingerPrint,
+                            parentNodeId = NodeId(parentNodeHandle),
+                        )
 
                     val sourceFile = File(media.filePath)
 

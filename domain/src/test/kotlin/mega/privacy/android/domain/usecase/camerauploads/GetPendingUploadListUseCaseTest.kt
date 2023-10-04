@@ -16,15 +16,19 @@ import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.LinkedList
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetPendingUploadListUseCaseTest {
 
     private lateinit var underTest: GetPendingUploadListUseCase
@@ -110,7 +114,7 @@ class GetPendingUploadListUseCaseTest {
         isSecondary = true
     )
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = GetPendingUploadListUseCase(
             getNodeFromCloudUseCase,
@@ -122,7 +126,23 @@ class GetPendingUploadListUseCaseTest {
             shouldCompressVideo,
             getGPSCoordinatesUseCase,
             isNodeInRubbishBin,
-            getNodeGPSCoordinatesUseCase
+            getNodeGPSCoordinatesUseCase,
+        )
+    }
+
+    @BeforeEach
+    fun resetMock() {
+        reset(
+            getNodeFromCloudUseCase,
+            getParentNodeUseCase,
+            getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase,
+            getFingerprintUseCase,
+            mediaLocalPathExists,
+            shouldCompressVideo,
+            getGPSCoordinatesUseCase,
+            isNodeInRubbishBin,
+            getNodeGPSCoordinatesUseCase,
         )
     }
 
@@ -133,7 +153,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
-            whenever(getNodeFromCloudUseCase("", NodeId(1L))).thenReturn(null)
+            whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
@@ -157,7 +177,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
-            whenever(getNodeFromCloudUseCase("", NodeId(1L))).thenReturn(null)
+            whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(null)
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
@@ -182,7 +202,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(true)
-            whenever(getNodeFromCloudUseCase("", NodeId(1L))).thenReturn(null)
+            whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
@@ -203,7 +223,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
-            whenever(getNodeFromCloudUseCase("", NodeId(1L))).thenReturn(null)
+            whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
@@ -227,7 +247,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
-            whenever(getNodeFromCloudUseCase("", NodeId(1L))).thenReturn(node)
+            whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(node)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
@@ -250,7 +270,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
-            whenever(getNodeFromCloudUseCase("", NodeId(1L))).thenReturn(node)
+            whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(node)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))

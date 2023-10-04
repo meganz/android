@@ -8,12 +8,16 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.AddNodeType
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetNodeFromCloudUseCaseTest {
 
     private lateinit var underTest: GetNodeFromCloudUseCase
@@ -31,13 +35,23 @@ class GetNodeFromCloudUseCaseTest {
         on { id }.thenReturn(nodeId)
     }
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = GetNodeFromCloudUseCase(
             getNodeByFingerprintUseCase,
             getNodeByOriginalFingerprintUseCase,
             getNodeByFingerprintAndParentNodeUseCase,
-            addNodeType
+            addNodeType,
+        )
+    }
+
+    @BeforeEach
+    fun resetMock() {
+        reset(
+            getNodeByFingerprintUseCase,
+            getNodeByOriginalFingerprintUseCase,
+            getNodeByFingerprintAndParentNodeUseCase,
+            addNodeType,
         )
         runBlocking {
             whenever(addNodeType.invoke(expected)).thenReturn(actual)
@@ -47,7 +61,7 @@ class GetNodeFromCloudUseCaseTest {
     @Test
     fun `test that node is found by original fingerprint from parent node`() = runTest {
         whenever(getNodeByOriginalFingerprintUseCase("", nodeId)).thenReturn(expected)
-        val actual = underTest("", nodeId)
+        val actual = underTest("", null, nodeId)
         assertThat(actual).isNotNull()
         assertThat(actual?.id).isEqualTo(expected.id)
     }
@@ -56,7 +70,7 @@ class GetNodeFromCloudUseCaseTest {
     fun `test that node is found by fingerprint from parent node`() = runTest {
         whenever(getNodeByOriginalFingerprintUseCase("", nodeId)).thenReturn(null)
         whenever(getNodeByFingerprintAndParentNodeUseCase("", nodeId)).thenReturn(expected)
-        val actual = underTest("", nodeId)
+        val actual = underTest("", null, nodeId)
         assertThat(actual).isNotNull()
         assertThat(actual?.id).isEqualTo(expected.id)
     }
@@ -65,7 +79,7 @@ class GetNodeFromCloudUseCaseTest {
     fun `test that node is found by original fingerprint without parent node`() = runTest {
         whenever(getNodeByOriginalFingerprintUseCase("", null)).thenReturn(expected)
         whenever(getNodeByFingerprintAndParentNodeUseCase("", nodeId)).thenReturn(null)
-        val actual = underTest("", nodeId)
+        val actual = underTest("", null, nodeId)
         assertThat(actual).isNotNull()
         assertThat(actual?.id).isEqualTo(expected.id)
     }
@@ -75,7 +89,34 @@ class GetNodeFromCloudUseCaseTest {
         whenever(getNodeByOriginalFingerprintUseCase("", nodeId)).thenReturn(null)
         whenever(getNodeByFingerprintAndParentNodeUseCase("", nodeId)).thenReturn(null)
         whenever(getNodeByFingerprintUseCase("")).thenReturn(expected)
-        val actual = underTest("", nodeId)
+        val actual = underTest("", null, nodeId)
+        assertThat(actual).isNotNull()
+        assertThat(actual?.id).isEqualTo(expected.id)
+    }
+
+    @Test
+    fun `test that node is found by generated fingerprint with parent node`() = runTest {
+        whenever(getNodeByOriginalFingerprintUseCase("", nodeId)).thenReturn(null)
+        whenever(getNodeByFingerprintAndParentNodeUseCase("", nodeId)).thenReturn(null)
+        whenever(getNodeByFingerprintUseCase("")).thenReturn(null)
+        whenever(getNodeByFingerprintAndParentNodeUseCase("generatedFingerprint", nodeId))
+            .thenReturn(expected)
+
+        val actual = underTest("", "generatedFingerprint", nodeId)
+        assertThat(actual).isNotNull()
+        assertThat(actual?.id).isEqualTo(expected.id)
+    }
+
+    @Test
+    fun `test that node is found by generated fingerprint without parent node`() = runTest {
+        whenever(getNodeByOriginalFingerprintUseCase("", nodeId)).thenReturn(null)
+        whenever(getNodeByFingerprintAndParentNodeUseCase("", nodeId)).thenReturn(null)
+        whenever(getNodeByFingerprintUseCase("")).thenReturn(null)
+        whenever(getNodeByFingerprintAndParentNodeUseCase("generatedFingerprint", nodeId))
+            .thenReturn(null)
+        whenever(getNodeByFingerprintUseCase("generatedFingerprint"))
+            .thenReturn(expected)
+        val actual = underTest("", "generatedFingerprint", nodeId)
         assertThat(actual).isNotNull()
         assertThat(actual?.id).isEqualTo(expected.id)
     }
@@ -86,6 +127,6 @@ class GetNodeFromCloudUseCaseTest {
         whenever(getNodeByFingerprintAndParentNodeUseCase("", nodeId)).thenReturn(null)
         whenever(getNodeByFingerprintUseCase("")).thenReturn(null)
 
-        assertThat(underTest("", nodeId)).isEqualTo(null)
+        assertThat(underTest("", null, nodeId)).isEqualTo(null)
     }
 }
