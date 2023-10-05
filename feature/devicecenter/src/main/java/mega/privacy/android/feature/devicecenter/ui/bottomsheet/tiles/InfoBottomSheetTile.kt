@@ -27,7 +27,6 @@ internal fun InfoBottomSheetTile(
 ) {
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_INFO),
-        addSeparator = false,
         text = stringResource(R.string.device_center_bottom_sheet_item_info),
         icon = R.drawable.ic_bottom_sheet_info,
         onActionClicked = onActionClicked,

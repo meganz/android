@@ -29,8 +29,8 @@ internal fun NonBackupFolderBottomSheetBody(
     onInfoClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_NON_BACKUP_FOLDER)) {
-        ShowInCloudDriveBottomSheetTile(onActionClicked = onShowInCloudDriveClicked)
         InfoBottomSheetTile(onActionClicked = onInfoClicked)
+        ShowInCloudDriveBottomSheetTile(onActionClicked = onShowInCloudDriveClicked)
     }
 }
 

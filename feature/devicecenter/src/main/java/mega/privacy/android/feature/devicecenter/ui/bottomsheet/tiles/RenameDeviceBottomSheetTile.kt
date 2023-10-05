@@ -27,6 +27,7 @@ internal fun RenameDeviceBottomSheetTile(
 ) {
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_RENAME_DEVICE),
+        addSeparator = false,
         text = stringResource(R.string.device_center_bottom_sheet_item_rename),
         icon = R.drawable.ic_bottom_sheet_rename,
         onActionClicked = onActionClicked,

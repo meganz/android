@@ -29,8 +29,8 @@ internal fun OtherDeviceBottomSheetBody(
     onInfoClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_OTHER_DEVICE)) {
-        RenameDeviceBottomSheetTile(onActionClicked = onRenameDeviceClicked)
         InfoBottomSheetTile(onActionClicked = onInfoClicked)
+        RenameDeviceBottomSheetTile(onActionClicked = onRenameDeviceClicked)
     }
 }
 

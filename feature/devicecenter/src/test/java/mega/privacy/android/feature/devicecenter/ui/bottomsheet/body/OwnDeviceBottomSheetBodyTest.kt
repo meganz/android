@@ -21,7 +21,7 @@ internal class OwnDeviceBottomSheetBodyTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that the bottom sheet body is displayed with the correct tiles`() {
+    fun `test that the bottom sheet body is displayed with the correct tiles when camera uploads is enabled`() {
         composeTestRule.setContent {
             OwnDeviceBottomSheetBody(
                 isCameraUploadsEnabled = true,
@@ -34,5 +34,21 @@ internal class OwnDeviceBottomSheetBodyTest {
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_CAMERA_UPLOADS).assertIsDisplayed()
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_RENAME_DEVICE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_INFO).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the bottom sheet body is displayed with the correct tiles when camera uploads is disabled`() {
+        composeTestRule.setContent {
+            OwnDeviceBottomSheetBody(
+                isCameraUploadsEnabled = false,
+                onCameraUploadsClicked = {},
+                onRenameDeviceClicked = {},
+                onInfoClicked = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_BODY_OWN_DEVICE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_CAMERA_UPLOADS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_RENAME_DEVICE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_INFO).assertDoesNotExist()
     }
 }

@@ -27,6 +27,7 @@ internal fun ShowInCloudDriveBottomSheetTile(
 ) {
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_SHOW_IN_CLOUD_DRIVE),
+        addSeparator = false,
         text = stringResource(R.string.device_center_bottom_sheet_item_show_in_cloud_drive),
         icon = R.drawable.ic_bottom_sheet_cloud_drive,
         onActionClicked = onActionClicked,

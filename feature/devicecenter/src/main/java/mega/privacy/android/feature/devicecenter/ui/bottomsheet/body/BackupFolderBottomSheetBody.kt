@@ -28,8 +28,8 @@ internal fun BackupFolderBottomSheetBody(
     onInfoClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_BACKUP_FOLDER)) {
-        ShowInBackupsBottomSheetTile(onActionClicked = onShowInBackupsClicked)
         InfoBottomSheetTile(onActionClicked = onInfoClicked)
+        ShowInBackupsBottomSheetTile(onActionClicked = onShowInBackupsClicked)
     }
 }
 

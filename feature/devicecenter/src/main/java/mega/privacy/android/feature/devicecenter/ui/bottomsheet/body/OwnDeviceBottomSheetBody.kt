@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.CameraUploadsBottomSheetTile
@@ -34,25 +36,31 @@ internal fun OwnDeviceBottomSheetBody(
     onInfoClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_OWN_DEVICE)) {
+        if (isCameraUploadsEnabled) {
+            InfoBottomSheetTile(onActionClicked = onInfoClicked)
+        }
         CameraUploadsBottomSheetTile(
             isCameraUploadsEnabled = isCameraUploadsEnabled,
             onActionClicked = onCameraUploadsClicked,
         )
         RenameDeviceBottomSheetTile(onActionClicked = onRenameDeviceClicked)
-        InfoBottomSheetTile(onActionClicked = onInfoClicked)
     }
 }
 
 /**
  * A Preview Composable that displays the Bottom Sheet and its options for a Device under the
  * "This device" category
+ *
+ * @param isCameraUploadsEnabled The Camera Uploads state
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewOwnDeviceBottomSheet() {
+private fun PreviewOwnDeviceBottomSheet(
+    @PreviewParameter(BooleanProvider::class) isCameraUploadsEnabled: Boolean,
+) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         OwnDeviceBottomSheetBody(
-            isCameraUploadsEnabled = true,
+            isCameraUploadsEnabled = isCameraUploadsEnabled,
             onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
             onInfoClicked = {},
