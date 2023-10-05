@@ -18,7 +18,6 @@ import androidx.compose.ui.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -56,13 +55,6 @@ fun LabelledSwitch(
         )
     }
 }
-
-/**
- * Preview showkase
- */
-@ShowkaseComposable("Labelled Switch", "Controls and sliders")
-@Composable
-fun ShowkasePreviewLabelledSwitch() = PreviewLabelledSwitch(true)
 
 @CombinedTextAndThemePreviews
 @Composable

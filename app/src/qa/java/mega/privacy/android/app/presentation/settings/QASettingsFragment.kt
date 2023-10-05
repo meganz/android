@@ -14,14 +14,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.featureflag.FeatureFlagActivity
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.screenshot.navigateToShowkase
 import java.io.File
 
 @AndroidEntryPoint
 class QASettingsFragment : PreferenceFragmentCompat() {
     val viewModel by viewModels<QASettingViewModel>()
 
-    private val composeBrowserPreferenceKey = "settings_qa_compose_browser"
     private val checkForUpdatesPreferenceKey = "settings_qa_check_update"
     private val exportLogsPreferenceKey = "settings_qa_export_logs"
     private val saveLogsPreferenceKey = "settings_qa_save_logs"
@@ -34,11 +32,6 @@ class QASettingsFragment : PreferenceFragmentCompat() {
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         return when (preference.key) {
-            composeBrowserPreferenceKey -> {
-                activity?.navigateToShowkase()
-                true
-            }
-
             checkForUpdatesPreferenceKey -> {
                 viewModel.checkUpdatePressed()
                 true

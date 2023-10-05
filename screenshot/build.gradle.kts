@@ -3,7 +3,6 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("app.cash.paparazzi")
-
 }
 
 android {
@@ -57,15 +56,10 @@ dependencies {
     implementation(platform(androidx.compose.bom))
     implementation(androidx.bundles.compose.bom)
 
-    implementation(lib.showkase)
     implementation(lib.compose.state.events)
-//    kapt(lib.showkase.processor)
 
     testImplementation(testlib.junit)
-    testImplementation(lib.showkase.screenshot.test)
     testImplementation(testlib.test.parameter.injector)
-
-    kaptTest(lib.showkase.processor)
 
     debugImplementation(androidx.compose.ui.tooling)
     debugImplementation(androidx.compose.ui.tooling.preview)
