@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -39,7 +38,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,6 +85,7 @@ fun TimelineView(
     photoDownload: PhotoDownload,
     timelineViewState: TimelineViewState,
     lazyGridState: LazyGridState,
+    isNewCUEnabled: Boolean,
     onTextButtonClick: () -> Unit,
     onFilterFabClick: () -> Unit,
     onCardClick: (DateCard) -> Unit,
@@ -94,7 +93,6 @@ fun TimelineView(
     enableCUView: @Composable () -> Unit,
     photosGridView: @Composable () -> Unit,
     emptyView: @Composable () -> Unit,
-    isNewCUEnabled: suspend () -> Boolean,
 ) {
     val isBarVisible by remember {
         derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
@@ -210,16 +208,12 @@ private fun HandlePhotosGridView(
     isBarVisible: Boolean,
     isScrollingDown: Boolean,
     isScrolledToEnd: Boolean,
+    isNewCUEnabled: Boolean,
     photosGridView: @Composable () -> Unit,
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
-    isNewCUEnabled: suspend () -> Boolean,
 ) {
-    val useNewCU by produceState(initialValue = false) {
-        value = isNewCUEnabled()
-    }
-
     LaunchedEffect(
         timelineViewState.scrollStartIndex,
         timelineViewState.scrollStartOffset
@@ -235,11 +229,7 @@ private fun HandlePhotosGridView(
             TimeBarTab.All -> {
                 Column {
                     if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0) {
-                        if (useNewCU) {
-                            NewEnableCameraUploadsButton(onClick = onTextButtonClick) {
-                                isBarVisible || (!isScrollingDown && !isScrolledToEnd)
-                            }
-                        } else {
+                        if (!isNewCUEnabled) {
                             EnableCameraUploadsButton(onClick = onTextButtonClick) {
                                 isBarVisible || (!isScrollingDown && !isScrolledToEnd)
                             }
@@ -372,74 +362,60 @@ private fun EnableCameraUploadsButton(onClick: () -> Unit, isVisible: () -> Bool
 }
 
 @Composable
-private fun NewEnableCameraUploadsButton(onClick: () -> Unit, isVisible: () -> Boolean) {
+fun NewEnableCameraUploadsButton(onClick: () -> Unit) {
     val isLight = MaterialTheme.colors.isLight
-    val context = LocalContext.current
 
-    AnimatedVisibility(
-        visible = isVisible(),
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            content = {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    content = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_cu_status),
-                            contentDescription = null,
-                            tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038,
-                        )
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        content = {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                content = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_cu_status),
+                        contentDescription = null,
+                        tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038,
+                    )
 
-                        Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                        Text(
-                            text = stringResource(id = R.string.enable_cu_subtitle),
-                            color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W400,
-                            style = MaterialTheme.typography.body2,
-                        )
-                    },
-                )
+                    Text(
+                        text = stringResource(id = R.string.enable_cu_subtitle),
+                        color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W400,
+                        style = MaterialTheme.typography.body2,
+                    )
+                },
+            )
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    contentAlignment = Alignment.CenterEnd,
-                    content = {
-                        Text(
-                            text = stringResource(id = R.string.settings_camera_upload_on),
-                            modifier = Modifier.clickable {
-                                Toast.makeText(
-                                    context,
-                                    "Never take advice from electrons. They are always negative.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                // onClick()
-                            },
-                            color = teal_300.takeIf { isLight } ?: teal_100,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W500,
-                            textAlign = TextAlign.End,
-                            style = MaterialTheme.typography.button,
-                        )
-                    },
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterEnd,
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.settings_camera_upload_on),
+                        modifier = Modifier.clickable { onClick() },
+                        color = teal_300.takeIf { isLight } ?: teal_100,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W500,
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.button,
+                    )
+                },
+            )
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Divider(
-                    color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
-                    thickness = 1.dp,
-                )
-            },
-        )
-    }
+            Divider(
+                color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
+                thickness = 1.dp,
+            )
+        },
+    )
 }
 
 /**

@@ -26,12 +26,14 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestMultiple
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.TwoLineCheckPreference
@@ -63,6 +65,7 @@ import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
@@ -82,10 +85,12 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 /**
  * [SettingsBaseFragment] that enables or disables Camera Uploads in Settings
@@ -123,6 +128,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private var canStartCameraUploads = true
 
     private val viewModel by viewModels<SettingsCameraUploadsViewModel>()
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * Register the permissions callback when the user attempts to enable Camera Uploads
@@ -1368,6 +1376,12 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      */
     private fun enableCameraUploads() {
         Timber.d("Camera Uploads Enabled")
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (!getFeatureFlagValueUseCase(AppFeatures.NewCU)) return@launch
+
+            val message = getString(R.string.settings_camera_notif_initializing_title)
+            snackbarCallBack?.showSnackbar(message)
+        }
 
         viewModel.onCameraUploadsEnabled(prefs?.secondaryMediaFolderEnabled == null)
 

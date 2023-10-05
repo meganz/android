@@ -6,6 +6,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.view.EmptyState
 import mega.privacy.android.app.presentation.photos.timeline.view.EnableCU
+import mega.privacy.android.app.presentation.photos.timeline.view.EnableCameraUploadsScreen
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
@@ -56,6 +58,7 @@ fun PhotosScreen(
     onNavigateAlbumPhotosSelection: (AlbumId) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onNavigateCameraUploadsSettings: () -> Unit,
 ) {
     val photosViewState by photosViewModel.state.collectAsStateWithLifecycle()
     val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
@@ -74,6 +77,10 @@ fun PhotosScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    val isNewCUEnabled by produceState(initialValue = false) {
+        value = getFeatureFlagUseCase(AppFeatures.NewCU)
+    }
 
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -107,12 +114,18 @@ fun PhotosScreen(
                 onCardClick = timelineViewModel::onCardClick,
                 onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
                 enableCUView = {
-                    EnableCU(
-                        timelineViewState = timelineViewState,
-                        onUploadVideosChanged = timelineViewModel::setCUUploadVideos,
-                        onUseCellularConnectionChanged = timelineViewModel::setCUUseCellularConnection,
-                        enableCUClick = onCameraUploadsClicked,
-                    )
+                    if (isNewCUEnabled) {
+                        EnableCameraUploadsScreen(
+                            onEnable = onNavigateCameraUploadsSettings,
+                        )
+                    } else {
+                        EnableCU(
+                            timelineViewState = timelineViewState,
+                            onUploadVideosChanged = timelineViewModel::setCUUploadVideos,
+                            onUseCellularConnectionChanged = timelineViewModel::setCUUseCellularConnection,
+                            enableCUClick = onCameraUploadsClicked,
+                        )
+                    }
                 },
                 photosGridView = {
                     PhotosGridView(
@@ -126,6 +139,8 @@ fun PhotosScreen(
                         lazyGridState = timelineLazyGridState,
                         onClick = timelineViewModel::onClick,
                         onLongPress = timelineViewModel::onLongPress,
+                        isNewCUEnabled = isNewCUEnabled,
+                        onEnableCameraUploads = onNavigateCameraUploadsSettings,
                     )
                 },
                 emptyView = {
@@ -135,7 +150,7 @@ fun PhotosScreen(
                         setEnableCUPage = timelineViewModel::shouldEnableCUPage,
                     )
                 },
-                isNewCUEnabled = { getFeatureFlagUseCase(AppFeatures.NewCU) },
+                isNewCUEnabled = isNewCUEnabled,
             )
         },
         albumsView = {

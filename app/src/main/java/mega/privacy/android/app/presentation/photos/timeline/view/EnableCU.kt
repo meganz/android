@@ -7,9 +7,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -39,6 +42,13 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.dark_grey
+import mega.privacy.android.core.ui.theme.grey_200
+import mega.privacy.android.core.ui.theme.grey_500
+import mega.privacy.android.core.ui.theme.teal_200
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white
 
 /**
  * Enable Camera Uploads View
@@ -192,6 +202,96 @@ fun EnableCU(
             )
         }
     }
+}
+
+@Composable
+fun EnableCameraUploadsScreen(
+    onEnable: () -> Unit,
+) {
+    val isLight = MaterialTheme.colors.isLight
+    val orientation = LocalConfiguration.current.orientation
+
+    val scrollState = rememberScrollState()
+
+    Scaffold(
+        bottomBar = {
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                EnableCameraUploadsButton(onEnable = onEnable)
+            }
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                content = {
+                    Image(
+                        painter = painterResource(id = R.drawable.enable_camera_uploads_image),
+                        contentDescription = "Enable camera uploads",
+                        modifier = Modifier.size(180.dp),
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.settings_camera_upload_on),
+                        color = black.takeIf { isLight } ?: white,
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.W500,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.enable_cu_subtitle),
+                        color = grey_500.takeIf { isLight } ?: grey_200,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.W400,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.body1,
+                    )
+
+                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        EnableCameraUploadsButton(onEnable = onEnable)
+                    }
+                },
+            )
+        }
+    )
+}
+
+@Composable
+fun EnableCameraUploadsButton(
+    modifier: Modifier = Modifier,
+    onEnable: () -> Unit,
+) {
+    val isLight = MaterialTheme.colors.isLight
+
+    Button(
+        onClick = onEnable,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        shape = RoundedCornerShape(4.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = teal_300.takeIf { isLight } ?: teal_200,
+        ),
+        content = {
+            Text(
+                text = stringResource(id = R.string.general_enable),
+                color = white.takeIf { isLight } ?: dark_grey,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W500,
+                style = MaterialTheme.typography.button,
+            )
+        },
+    )
 }
 
 /**

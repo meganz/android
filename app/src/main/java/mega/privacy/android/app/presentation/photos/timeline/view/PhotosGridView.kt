@@ -46,8 +46,10 @@ fun PhotosGridView(
     timelineViewState: TimelineViewState = TimelineViewState(),
     downloadPhoto: PhotoDownload,
     lazyGridState: LazyGridState = rememberLazyGridState(),
+    isNewCUEnabled: Boolean,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
+    onEnableCameraUploads: () -> Unit,
 ) {
 
     val configuration = LocalConfiguration.current
@@ -65,6 +67,14 @@ fun PhotosGridView(
             .fillMaxSize(),
         state = lazyGridState,
     ) {
+        if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0 && isNewCUEnabled) {
+            item(
+                key = "enable-camera-uploads-banner",
+                span = { GridItemSpan(maxLineSpan) },
+            ) {
+                NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
+            }
+        }
 
         this.items(
             items = timelineViewState.photosListItems,

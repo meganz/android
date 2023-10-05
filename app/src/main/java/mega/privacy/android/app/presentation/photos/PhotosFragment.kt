@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
@@ -171,6 +172,7 @@ class PhotosFragment : Fragment() {
                         onNavigateAlbumPhotosSelection = ::openAlbumPhotosSelection,
                         onZoomIn = ::handleZoomIn,
                         onZoomOut = ::handleZoomOut,
+                        onNavigateCameraUploadsSettings = ::openCameraUploadsSettings,
                     )
                 }
             }
@@ -239,6 +241,7 @@ class PhotosFragment : Fragment() {
                         handleOptionsMenu(state)
                         handleActionMode(state)
                         handleActionsForCameraUploads(state)
+                        adjustCameraUploadsMenuVisibility()
                     }
                 }
 
@@ -373,7 +376,8 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleMenuIcons(isShowing: Boolean) {
-        this.menu?.findItem(R.id.action_cu_status)?.isVisible = isShowing && isNewCUEnabled
+        adjustCameraUploadsMenuVisibility()
+
         this.menu?.findItem(R.id.action_zoom_in)?.isVisible = isShowing && !isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_out)?.isVisible = isShowing && !isNewCUEnabled
         this.menu?.findItem(R.id.action_photos_filter_secondary)?.isVisible = isShowing
@@ -381,6 +385,21 @@ class PhotosFragment : Fragment() {
         this.menu?.findItem(R.id.action_zoom_in_secondary)?.isVisible = isShowing && isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_out_secondary)?.isVisible = isShowing && isNewCUEnabled
         this.menu?.findItem(R.id.action_cu_settings)?.isVisible = isShowing && isNewCUEnabled
+    }
+
+    private fun adjustCameraUploadsMenuVisibility() {
+        val isAllMenuVisible = photosViewModel.state.value.isMenuShowing
+        val isCameraUploadsButtonShowing = timelineViewModel.state.value.enableCameraUploadButtonShowing
+        val isMenuVisible = isAllMenuVisible && isCameraUploadsButtonShowing && isNewCUEnabled
+
+        this.menu?.findItem(R.id.action_cu_status)?.isVisible = isMenuVisible
+    }
+
+    private fun openCameraUploadsSettings() {
+        val context = context ?: return
+
+        val intent = Intent(context, CameraUploadsPreferencesActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -468,7 +487,7 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_settings -> {
-                Toast.makeText(requireContext(), "Why is Peter Pan always flying? Because he Neverlands", Toast.LENGTH_SHORT).show()
+                openCameraUploadsSettings()
                 true
             }
 
