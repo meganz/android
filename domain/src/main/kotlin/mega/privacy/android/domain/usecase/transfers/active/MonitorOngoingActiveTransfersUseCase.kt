@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.transformWhile
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.TransfersConstants.ON_TRANSFER_UPDATE_REFRESH_MILLIS
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
 import javax.inject.Inject
 
@@ -24,6 +25,7 @@ class MonitorOngoingActiveTransfersUseCase @Inject constructor(
     private val monitorActiveTransferTotalsUseCase: MonitorActiveTransferTotalsUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val monitorDownloadTransfersPausedUseCase: MonitorDownloadTransfersPausedUseCase,
+    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
 ) {
 
     /**
@@ -35,12 +37,17 @@ class MonitorOngoingActiveTransfersUseCase @Inject constructor(
             .sample(ON_TRANSFER_UPDATE_REFRESH_MILLIS)
             .onStart { emit(getActiveTransferTotalsUseCase(transferType)) }
         val pausedFlow = monitorDownloadTransfersPausedUseCase()
+        val overQuotaFlow = monitorTransferOverQuotaUseCase().onStart { emit(false) }
 
-        return combine(transfersFlow, pausedFlow) { transferTotals, paused ->
-            MonitorOngoingActiveTransfersResult(transferTotals, paused)
+        return combine(
+            transfersFlow,
+            pausedFlow,
+            overQuotaFlow
+        ) { transferTotals, paused, overQuota ->
+            MonitorOngoingActiveTransfersResult(transferTotals, paused, overQuota)
         }.transformWhile {
             emit(it)
-            it.activeTransferTotals.hasOngoingTransfers()
+            it.activeTransferTotals.hasOngoingTransfers() && !it.overQuota
         }
     }
 }

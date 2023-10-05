@@ -24,6 +24,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
+import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -69,6 +70,7 @@ class DownloadsWorkerTest {
     private val downloadNotificationMapper = mock<DownloadNotificationMapper>()
     private val areNotificationsEnabledUseCase = mock<AreNotificationsEnabledUseCase>()
     private val correctActiveTransfersUseCase = mock<CorrectActiveTransfersUseCase>()
+    private val overQuotaNotificationBuilder = mock<OverQuotaNotificationBuilder>()
 
     @Before
     fun setup() {
@@ -109,6 +111,7 @@ class DownloadsWorkerTest {
             monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             downloadNotificationMapper = downloadNotificationMapper,
+            overQuotaNotificationBuilder = overQuotaNotificationBuilder,
             areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
             notificationManager = mock(),
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
@@ -164,21 +167,21 @@ class DownloadsWorkerTest {
     @Test
     fun `test that worker finishes with success if last transfer is completed`() = runTest {
         val transferTotal = mockActiveTransferTotals(true)
-        commonStub(transferTotal = transferTotal)
+        commonStub(transferTotals = listOf(transferTotal))
         assertThat(underTest.doWork()).isEqualTo(ListenableWorker.Result.success())
     }
 
     @Test
     fun `test that worker finishes with failure if last transfer is not completed`() = runTest {
         val transferTotal = mockActiveTransferTotals(false)
-        commonStub(transferTotal)
+        commonStub(transferTotals = listOf(transferTotal))
         assertThat(underTest.doWork()).isEqualTo(ListenableWorker.Result.failure())
     }
 
     @Test
     fun `test that notification is created when worker starts`() = runTest {
         val transferTotal: ActiveTransferTotals = mockActiveTransferTotals(true)
-        commonStub(transferTotal)
+        commonStub(transferTotals = listOf(transferTotal))
         underTest.doWork()
         verify(downloadNotificationMapper).invoke(transferTotal, false)
     }
@@ -200,13 +203,18 @@ class DownloadsWorkerTest {
         }
     }
 
-    private suspend fun commonStub(transferTotal: ActiveTransferTotals) = commonStub(
-        transferTotals = listOf(transferTotal)
-    )
+    @Test
+    fun `test that overQuotaNotificationBuilder is invoked when`() = runTest {
+        val transferTotal = mockActiveTransferTotals(false)
+        commonStub(transferTotals = listOf(transferTotal), overQuota = true)
+        underTest.doWork()
+        verify(overQuotaNotificationBuilder).invoke()
+    }
 
     private suspend fun commonStub(
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
+        overQuota: Boolean = false,
     ) = runTest {
         val transfer: Transfer = mock()
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
@@ -220,7 +228,7 @@ class DownloadsWorkerTest {
             .thenReturn(flow {
                 delay(100)//to be sure that other events are received
                 transferTotals.forEach {
-                    emit(MonitorOngoingActiveTransfersResult(it, false))
+                    emit(MonitorOngoingActiveTransfersResult(it, false, overQuota))
                 }
             })
         whenever(areNotificationsEnabledUseCase()).thenReturn(true)

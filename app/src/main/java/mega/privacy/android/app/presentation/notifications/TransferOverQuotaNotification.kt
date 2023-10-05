@@ -20,7 +20,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
@@ -29,11 +28,14 @@ import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCas
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 
+@Deprecated(
+    "There's an equivalent use case for that",
+    ReplaceWith("OverQuotaNotificationBuilder")
+)
 internal object TransferOverQuotaNotification {
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface TransferOverQuotaNotificationEntryPoint {
-        fun databaseHandler(): DatabaseHandler
 
         @ApplicationScope
         fun applicationScope(): CoroutineScope

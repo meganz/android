@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -29,6 +30,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val monitorDownloadTransfersPausedUseCase =
         mock<MonitorDownloadTransfersPausedUseCase>()
+    private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
 
 
     @BeforeEach
@@ -37,6 +39,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
             monitorActiveTransferTotalsUseCase,
             getActiveTransferTotalsUseCase,
             monitorDownloadTransfersPausedUseCase,
+            monitorTransferOverQuotaUseCase,
         )
     }
 
@@ -46,6 +49,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
             monitorActiveTransferTotalsUseCase = monitorActiveTransferTotalsUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             monitorDownloadTransfersPausedUseCase = monitorDownloadTransfersPausedUseCase,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
         )
     }
 
@@ -61,9 +65,10 @@ class MonitorOngoingActiveTransfersUseCaseTest {
             .thenReturn(flowOf(false))
         whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(activeTransferTotals)
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf())
         underTest(transferType).test {
             assertThat(awaitItem())
-                .isEqualTo(MonitorOngoingActiveTransfersResult(activeTransferTotals, false))
+                .isEqualTo(MonitorOngoingActiveTransfersResult(activeTransferTotals, false, false))
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -81,8 +86,15 @@ class MonitorOngoingActiveTransfersUseCaseTest {
             .thenReturn(flowOf(false))
         whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(first)
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf())
         val lastReceived = underTest(transferType).last()
-        assertThat(lastReceived).isEqualTo(MonitorOngoingActiveTransfersResult(last, false))
+        assertThat(lastReceived).isEqualTo(
+            MonitorOngoingActiveTransfersResult(
+                last,
+                paused = false,
+                overQuota = false
+            )
+        )
     }
 
     @ParameterizedTest
@@ -98,12 +110,61 @@ class MonitorOngoingActiveTransfersUseCaseTest {
             .thenReturn(pausedFlow)
         whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(activeTransferTotals)
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf())
         underTest(transferType).test {
             assertThat(awaitItem())
-                .isEqualTo(MonitorOngoingActiveTransfersResult(activeTransferTotals, false))
+                .isEqualTo(
+                    MonitorOngoingActiveTransfersResult(
+                        activeTransferTotals,
+                        paused = false,
+                        overQuota = false
+                    )
+                )
             pausedFlow.emit(true)
             assertThat(awaitItem())
-                .isEqualTo(MonitorOngoingActiveTransfersResult(activeTransferTotals, true))
+                .isEqualTo(
+                    MonitorOngoingActiveTransfersResult(
+                        activeTransferTotals,
+                        paused = true,
+                        overQuota = false
+                    )
+                )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    fun `test that monitorTransferOverQuotaUseCase values are emitted`(
+        transferType: TransferType,
+    ) = runTest {
+        val activeTransferTotals = mockActiveTransfersTotals(true)
+        whenever(monitorActiveTransferTotalsUseCase(transferType))
+            .thenReturn(flowOf())
+        val overQuotaFlow = MutableStateFlow(false)
+        whenever(monitorTransferOverQuotaUseCase())
+            .thenReturn(overQuotaFlow)
+        whenever(getActiveTransferTotalsUseCase(transferType))
+            .thenReturn(activeTransferTotals)
+        whenever(monitorDownloadTransfersPausedUseCase()).thenReturn(flowOf(false))
+        underTest(transferType).test {
+            assertThat(awaitItem())
+                .isEqualTo(
+                    MonitorOngoingActiveTransfersResult(
+                        activeTransferTotals,
+                        paused = false,
+                        overQuota = false
+                    )
+                )
+            overQuotaFlow.emit(true)
+            assertThat(awaitItem())
+                .isEqualTo(
+                    MonitorOngoingActiveTransfersResult(
+                        activeTransferTotals,
+                        paused = false,
+                        overQuota = true
+                    )
+                )
             cancelAndIgnoreRemainingEvents()
         }
     }

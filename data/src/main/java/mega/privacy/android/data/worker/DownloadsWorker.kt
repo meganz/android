@@ -7,6 +7,8 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
+import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -48,6 +51,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val downloadNotificationMapper: DownloadNotificationMapper,
+    private val overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
     private val notificationManager: NotificationManagerCompat,
     private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
     private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
@@ -63,19 +67,27 @@ class DownloadsWorker @AssistedInject constructor(
             correctActiveTransfersUseCase(TransferType.DOWNLOAD) //to be sure we haven't missed any event before monitoring them
             monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)
                 .catch { Timber.e("DownloadsWorker error: $it") }
-                .onEach { (transferTotals, paused) ->
+                .onEach { (transferTotals, paused, _) ->
                     //update the notification
                     if (areNotificationsEnabledUseCase()) {
                         notify(downloadNotificationMapper(transferTotals, paused))
                     }
                     Timber.d("DownloadsWorker ${if (paused) "(paused) " else ""} Notification update (${transferTotals.progressPercent}):${transferTotals.hasOngoingTransfers()}")
                 }
-                .last().let { (lastActiveTransferTotals, _) ->
+                .last().let { (lastActiveTransferTotals, _, overQuota) ->
                     stopService(monitorJob)
                     if (lastActiveTransferTotals.hasCompleted()) {
                         Timber.d("DownloadsWorker Finished Successful: $lastActiveTransferTotals")
                         Result.success()
                     } else {
+                        if (overQuota
+                            && !ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(
+                                Lifecycle.State.STARTED
+                            )
+                        ) {
+                            //the over quota notification is shown if the app is in background (if not a full dialog will be shown in the app)
+                            finalNotification(overQuotaNotificationBuilder())
+                        }
                         Timber.d("DownloadsWorker finished Failure: $lastActiveTransferTotals")
                         Result.failure()//to retry in the future
                     }
@@ -104,14 +116,22 @@ class DownloadsWorker @AssistedInject constructor(
         }
 
     private fun stopService(monitorJob: Job) {
-        monitorJob.cancel()
         notificationManager.cancel(DOWNLOAD_NOTIFICATION_ID)
+        monitorJob.cancel()
     }
 
     @SuppressLint("MissingPermission")
     private fun notify(notification: Notification) {
         notificationManager.notify(
             DOWNLOAD_NOTIFICATION_ID,
+            notification,
+        )
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun finalNotification(notification: Notification) {
+        notificationManager.notify(
+            NOTIFICATION_DOWNLOAD_FINAL,
             notification,
         )
     }
@@ -141,5 +161,6 @@ class DownloadsWorker @AssistedInject constructor(
          */
         const val SINGLE_DOWNLOAD_TAG = "MEGA_DOWNLOAD_TAG"
         private const val DOWNLOAD_NOTIFICATION_ID = 2
+        private const val NOTIFICATION_DOWNLOAD_FINAL = 4
     }
 }

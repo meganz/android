@@ -7,6 +7,7 @@ import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import javax.inject.Inject
 
 /**
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
     private val transferRepository: TransferRepository,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
+    private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
 ) {
 
     /**
@@ -52,7 +54,7 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
 
             is TransferEvent.TransferTemporaryErrorEvent -> {
                 if (event.error is QuotaExceededMegaException && event.error.value != 0L) {
-                    //TRAN-228: show TRANSFER OVERQUOTA ERROR similar to what is done in DownloadService.checkTransferOverQuota
+                    broadcastTransferOverQuotaUseCase(true)
                 }
             }
         }

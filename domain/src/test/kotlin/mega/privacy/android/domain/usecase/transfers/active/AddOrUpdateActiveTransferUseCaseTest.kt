@@ -6,8 +6,10 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -26,18 +28,24 @@ class AddOrUpdateActiveTransferUseCaseTest {
     private val transferRepository = mock<TransferRepository>()
     private val broadcastBusinessAccountExpiredUseCase =
         mock<BroadcastBusinessAccountExpiredUseCase>()
+    private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = AddOrUpdateActiveTransferUseCase(
             transferRepository = transferRepository,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
+            broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(transferRepository, broadcastBusinessAccountExpiredUseCase)
+        reset(
+            transferRepository,
+            broadcastBusinessAccountExpiredUseCase,
+            broadcastTransferOverQuotaUseCase
+        )
     }
 
     @ParameterizedTest
@@ -65,6 +73,15 @@ class AddOrUpdateActiveTransferUseCaseTest {
     ) = runTest {
         underTest.invoke(transferEvent)
         verify(broadcastBusinessAccountExpiredUseCase).invoke()
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideQuotaExceededMegaExceptionTemporaryErrorEvents")
+    fun `test that broadcastTransferOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error`(
+        transferEvent: TransferEvent,
+    ) = runTest {
+        underTest.invoke(transferEvent)
+        verify(broadcastTransferOverQuotaUseCase).invoke(true)
     }
 
     private fun provideStartPauseFinishEvents() = TransferType.values().flatMap { transferType ->
@@ -107,4 +124,18 @@ class AddOrUpdateActiveTransferUseCaseTest {
             on { this.error }.thenReturn(mock<BusinessAccountExpiredMegaException>())
         }
     }
+
+    private fun provideQuotaExceededMegaExceptionTemporaryErrorEvents() =
+        TransferType.values().map { transferType ->
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(transferType)
+            }
+            val error = mock<QuotaExceededMegaException>() {
+                on { value }.thenReturn(1L)
+            }
+            mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { this.transfer }.thenReturn(transfer)
+                on { this.error }.thenReturn(error)
+            }
+        }
 }
