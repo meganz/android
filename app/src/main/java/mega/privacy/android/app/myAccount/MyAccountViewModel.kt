@@ -42,7 +42,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
 import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
-import mega.privacy.android.app.myAccount.usecase.CheckVersionsUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmCancelAccountUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmChangeEmailUseCase
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
@@ -84,6 +83,7 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
@@ -592,14 +592,20 @@ class MyAccountViewModel @Inject constructor(
      */
     fun checkVersions() {
         if (myAccountInfo.numVersions == INVALID_VALUE) {
-            checkVersionsUseCase.check()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = { setVersionsInfo() },
-                    onError = Timber::w
-                )
-                .addTo(composite)
+            viewModelScope.launch {
+                runCatching { checkVersionsUseCase() }
+                    .fold(
+                        onSuccess = { value ->
+                            value?.let {
+                                myAccountInfo.numVersions = value.numberOfVersions
+                                myAccountInfo.previousVersionsSize =
+                                    value.sizeOfPreviousVersionsInBytes
+                                setVersionsInfo()
+                            }
+                        },
+                        onFailure = Timber::w
+                    )
+            }
         } else setVersionsInfo()
     }
 
