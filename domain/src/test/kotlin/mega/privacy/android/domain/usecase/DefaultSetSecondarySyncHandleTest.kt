@@ -13,15 +13,14 @@ class DefaultSetSecondarySyncHandleTest {
     private lateinit var underTest: SetSecondarySyncHandle
 
     private val setupMediaUploadsSyncHandleUseCase = mock<SetupMediaUploadsSyncHandleUseCase>()
-    private val updateFolderIconBroadcast = mock<UpdateFolderIconBroadcast>()
-    private val updateFolderDestinationBroadcast = mock<UpdateFolderDestinationBroadcast>()
+    private val broadcastFolderDestinationUpdateUseCase =
+        mock<BroadcastFolderDestinationUpdateUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultSetSecondarySyncHandle(
             setupMediaUploadsSyncHandleUseCase = setupMediaUploadsSyncHandleUseCase,
-            updateFolderIconBroadcast = updateFolderIconBroadcast,
-            updateFolderDestinationBroadcast = updateFolderDestinationBroadcast
+            broadcastFolderDestinationUpdateUseCase = broadcastFolderDestinationUpdateUseCase
         )
     }
 
@@ -31,7 +30,6 @@ class DefaultSetSecondarySyncHandleTest {
             val result = 69L
             underTest(result)
             verify(setupMediaUploadsSyncHandleUseCase).invoke(result)
-            verify(updateFolderIconBroadcast).invoke(result, true)
-            verify(updateFolderDestinationBroadcast).invoke(result, true)
+            verify(broadcastFolderDestinationUpdateUseCase).invoke(result, true)
         }
 }

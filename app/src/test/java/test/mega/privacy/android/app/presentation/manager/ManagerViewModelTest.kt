@@ -27,7 +27,7 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.model.SearchType
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
+import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
@@ -68,7 +68,7 @@ import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFolders
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadFolderIconUpdateUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
@@ -142,12 +142,12 @@ class ManagerViewModelTest {
     }
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
-    private val monitorCameraUploadFolderIconUpdateUseCase =
-        mock<MonitorCameraUploadFolderIconUpdateUseCase> {
+    private val monitorCameraUploadsFolderDestinationUpdateUseCase =
+        mock<MonitorCameraUploadsFolderDestinationUseCase> {
             onBlocking { invoke() }.thenReturn(
                 flowOf(
-                    CameraUploadFolderIconUpdate(6L, CameraUploadFolderType.Primary),
-                    CameraUploadFolderIconUpdate(9L, CameraUploadFolderType.Secondary)
+                    CameraUploadsFolderDestinationUpdate(6L, CameraUploadFolderType.Primary),
+                    CameraUploadsFolderDestinationUpdate(9L, CameraUploadFolderType.Secondary)
                 )
             )
         }
@@ -271,7 +271,7 @@ class ManagerViewModelTest {
             savedStateHandle = savedStateHandle,
             getBackupsNode = getBackupsNode,
             monitorStorageStateEventUseCase = monitorStorageState,
-            monitorCameraUploadFolderIconUpdateUseCase = monitorCameraUploadFolderIconUpdateUseCase,
+            monitorCameraUploadsFolderDestinationUseCase = monitorCameraUploadsFolderDestinationUpdateUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             areCameraUploadsFoldersInRubbishBinUseCase = areCameraUploadsFoldersInRubbishBinUseCase,
@@ -516,13 +516,13 @@ class ManagerViewModelTest {
         runTest {
             underTest.monitorCameraUploadFolderIconUpdateEvent.distinctUntilChanged().test {
                 assertThat(awaitItem()).isEqualTo(
-                    CameraUploadFolderIconUpdate(
+                    CameraUploadsFolderDestinationUpdate(
                         6L,
                         CameraUploadFolderType.Primary
                     )
                 )
                 assertThat(awaitItem()).isEqualTo(
-                    CameraUploadFolderIconUpdate(
+                    CameraUploadsFolderDestinationUpdate(
                         9L,
                         CameraUploadFolderType.Secondary
                     )

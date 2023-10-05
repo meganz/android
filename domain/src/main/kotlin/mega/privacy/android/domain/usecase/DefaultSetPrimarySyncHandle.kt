@@ -8,12 +8,10 @@ import javax.inject.Inject
  */
 class DefaultSetPrimarySyncHandle @Inject constructor(
     private val setupCameraUploadsSyncHandleUseCase: SetupCameraUploadsSyncHandleUseCase,
-    private val updateFolderIconBroadcast: UpdateFolderIconBroadcast,
-    private val updateFolderDestinationBroadcast: UpdateFolderDestinationBroadcast,
+    private val broadcastFolderDestinationUpdateUseCase: BroadcastFolderDestinationUpdateUseCase,
 ) : SetPrimarySyncHandle {
     override suspend fun invoke(newPrimaryHandle: Long) {
         setupCameraUploadsSyncHandleUseCase(newPrimaryHandle)
-        updateFolderIconBroadcast(nodeHandle = newPrimaryHandle, isSecondary = false)
-        updateFolderDestinationBroadcast(nodeHandle = newPrimaryHandle, isSecondary = false)
+        broadcastFolderDestinationUpdateUseCase(nodeHandle = newPrimaryHandle, isSecondary = false)
     }
 }

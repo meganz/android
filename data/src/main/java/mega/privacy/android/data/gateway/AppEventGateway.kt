@@ -1,7 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
+import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.backup.BackupInfoType
@@ -133,18 +133,18 @@ internal interface AppEventGateway {
     suspend fun broadcastFetchNodesFinish()
 
     /**
-     * Monitor camera upload folder icon update
+     * Monitor camera upload folder destination update
      *
-     * @return Flow of [CameraUploadFolderIconUpdate]
+     * @return Flow of [CameraUploadsFolderDestinationUpdate]
      */
-    fun monitorCameraUploadFolderIconUpdate(): Flow<CameraUploadFolderIconUpdate>
+    fun monitorCameraUploadsFolderDestination(): Flow<CameraUploadsFolderDestinationUpdate>
 
     /**
      * Broadcast camera upload folder icon update
      *
-     * @param data [CameraUploadFolderIconUpdate]
+     * @param data [CameraUploadsFolderDestinationUpdate]
      */
-    suspend fun broadcastCameraUploadFolderIconUpdate(data: CameraUploadFolderIconUpdate)
+    suspend fun broadcastCameraUploadsFolderDestination(data: CameraUploadsFolderDestinationUpdate)
 
     /**
      * Broadcast push notification settings

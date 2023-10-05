@@ -81,8 +81,10 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getPartialMedia
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasAccessMediaLocationPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -645,6 +647,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             collectFlow(viewModel.monitorBackupInfoType) {
                 reEnableCameraUploadsPreference(it)
             }
+
+            collectFlow(viewModel.monitorCameraUploadsFolderDestination) {
+                setCameraUploadsDestinationFolder(it)
+            }
         }
     }
 
@@ -1140,20 +1146,19 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     /**
      * Setup the Destination Folder of either Primary or Secondary Uploads
      *
-     * @param isSecondary Set "true" if the Destination Folder is for Secondary Uploads, and
-     * "false" if set for Primary Uploads
+     * @param destination CameraUploadsFolderDestinationUpdate
      */
-    @Synchronized
-    fun setCUDestinationFolder(isSecondary: Boolean, handle: Long) {
-        if (isSecondary) {
-            checkSecondaryMediaFolder()
-        } else {
-            // Reset Primary Timeline
-            val targetNode = megaApi.getNodeByHandle(handle) ?: return
-            camSyncHandle = handle
-            camSyncMegaNode = targetNode
-            camSyncMegaPath = camSyncMegaNode?.name.orEmpty()
-            megaCameraFolder?.summary = camSyncMegaPath
+    private fun setCameraUploadsDestinationFolder(destination: CameraUploadsFolderDestinationUpdate) {
+        when (destination.cameraUploadFolderType) {
+            CameraUploadFolderType.Primary -> {
+                val targetNode = megaApi.getNodeByHandle(destination.nodeHandle) ?: return
+                camSyncHandle = destination.nodeHandle
+                camSyncMegaNode = targetNode
+                camSyncMegaPath = camSyncMegaNode?.name.orEmpty()
+                megaCameraFolder?.summary = camSyncMegaPath
+            }
+
+            CameraUploadFolderType.Secondary -> checkSecondaryMediaFolder()
         }
     }
 

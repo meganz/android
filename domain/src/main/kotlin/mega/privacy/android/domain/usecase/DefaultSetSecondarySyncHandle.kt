@@ -8,12 +8,10 @@ import javax.inject.Inject
  */
 class DefaultSetSecondarySyncHandle @Inject constructor(
     private val setupMediaUploadsSyncHandleUseCase: SetupMediaUploadsSyncHandleUseCase,
-    private val updateFolderIconBroadcast: UpdateFolderIconBroadcast,
-    private val updateFolderDestinationBroadcast: UpdateFolderDestinationBroadcast,
+    private val broadcastFolderDestinationUpdateUseCase: BroadcastFolderDestinationUpdateUseCase,
 ) : SetSecondarySyncHandle {
     override suspend fun invoke(newSecondaryHandle: Long) {
         setupMediaUploadsSyncHandleUseCase(newSecondaryHandle)
-        updateFolderIconBroadcast(nodeHandle = newSecondaryHandle, isSecondary = true)
-        updateFolderDestinationBroadcast(nodeHandle = newSecondaryHandle, isSecondary = true)
+        broadcastFolderDestinationUpdateUseCase(nodeHandle = newSecondaryHandle, isSecondary = true)
     }
 }

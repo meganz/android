@@ -55,7 +55,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
-import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadFolderIconUpdateUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
@@ -94,7 +94,7 @@ import javax.inject.Inject
  * @property sendStatisticsMediaDiscoveryUseCase
  * @property savedStateHandle
  * @property monitorStorageStateEventUseCase
- * @param monitorCameraUploadFolderIconUpdateUseCase
+ * @param monitorCameraUploadsFolderDestinationUseCase
  * @property getPrimarySyncHandleUseCase
  * @property getSecondarySyncHandleUseCase
  * @property areCameraUploadsFoldersInRubbishBinUseCase
@@ -131,7 +131,7 @@ class ManagerViewModel @Inject constructor(
     private val sendStatisticsMediaDiscoveryUseCase: SendStatisticsMediaDiscoveryUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    monitorCameraUploadFolderIconUpdateUseCase: MonitorCameraUploadFolderIconUpdateUseCase,
+    monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase,
@@ -207,7 +207,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Monitor Camera Upload Folder Icon Update event
      */
-    val monitorCameraUploadFolderIconUpdateEvent = monitorCameraUploadFolderIconUpdateUseCase()
+    val monitorCameraUploadFolderIconUpdateEvent = monitorCameraUploadsFolderDestinationUseCase()
 
     /**
      * Monitor offline file availability event

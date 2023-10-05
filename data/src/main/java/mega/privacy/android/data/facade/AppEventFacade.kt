@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
+import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.backup.BackupInfoType
@@ -27,7 +27,7 @@ internal class AppEventFacade @Inject constructor(
 ) : AppEventGateway {
 
     private val _monitorCameraUploadProgress = MutableSharedFlow<Pair<Int, Int>>()
-    private val cameraUploadFolderIconUpdate = MutableSharedFlow<CameraUploadFolderIconUpdate>()
+    private val cameraUploadsFolderDestinationUpdate = MutableSharedFlow<CameraUploadsFolderDestinationUpdate>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
     private val _storageOverQuota = MutableSharedFlow<Boolean>()
     private val _fileAvailableOffline = MutableSharedFlow<Long>()
@@ -139,11 +139,11 @@ internal class AppEventFacade @Inject constructor(
     override suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState) =
         transfersFinished.emit(transfersFinishedState)
 
-    override fun monitorCameraUploadFolderIconUpdate(): Flow<CameraUploadFolderIconUpdate> =
-        cameraUploadFolderIconUpdate.toSharedFlow(appScope)
+    override fun monitorCameraUploadsFolderDestination(): Flow<CameraUploadsFolderDestinationUpdate> =
+        cameraUploadsFolderDestinationUpdate.toSharedFlow(appScope)
 
-    override suspend fun broadcastCameraUploadFolderIconUpdate(data: CameraUploadFolderIconUpdate) =
-        cameraUploadFolderIconUpdate.emit(data)
+    override suspend fun broadcastCameraUploadsFolderDestination(data: CameraUploadsFolderDestinationUpdate) =
+        cameraUploadsFolderDestinationUpdate.emit(data)
 
     override fun monitorChatArchived(): Flow<String> = chatArchived.toSharedFlow(appScope)
 

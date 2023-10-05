@@ -2,7 +2,6 @@ package mega.privacy.android.data.facade
 
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -11,36 +10,9 @@ import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
-import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.max
-
-/**
- * Intent action for broadcast on camera upload attributes change
- */
-const val BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE"
-
-/**
- * Intent extra data if camera upload folder is secondary
- */
-const val INTENT_EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER"
-
-/**
- * Intent action for broadcast to update camera upload destination folder in settings
- */
-const val BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING =
-    "ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING"
-
-/**
- * Intent extra data if camera upload destination folder is secondary
- */
-const val INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY = "SECONDARY_FOLDER"
-
-/**
- * Intent extra data of camera upload destination folder handle to be changed
- */
-const val INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE = "PRIMARY_HANDLE"
 
 /**
  * Camera Upload Media Facade implements [CameraUploadsMediaGateway]
@@ -69,33 +41,6 @@ internal class CameraUploadsMediaFacade @Inject constructor(
     }.getOrElse {
         Timber.e(it)
         emptyList()
-    }
-
-    override suspend fun sendUpdateFolderIconBroadcast(
-        nodeHandle: Long,
-        isSecondary: Boolean,
-    ) {
-        val intent = Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE).apply {
-            putExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary)
-            putExtra(INTENT_EXTRA_NODE_HANDLE, nodeHandle)
-            setPackage(context.packageName)
-        }
-        context.sendBroadcast(intent)
-    }
-
-    override suspend fun sendUpdateFolderDestinationBroadcast(
-        nodeHandle: Long,
-        isSecondary: Boolean,
-    ) {
-        val destinationIntent =
-            Intent(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING).apply {
-                if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
-                    putExtra(INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, isSecondary)
-                    putExtra(INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE, nodeHandle)
-                    setPackage(context.packageName)
-                }
-            }
-        context.sendBroadcast(destinationIntent)
     }
 
     override fun getMediaSelectionQuery(parentPath: String): String =

@@ -13,15 +13,14 @@ class DefaultSetPrimarySyncHandleTest {
     private lateinit var underTest: SetPrimarySyncHandle
 
     private val setupCameraUploadsSyncHandleUseCase = mock<SetupCameraUploadsSyncHandleUseCase>()
-    private val updateFolderIconBroadcast = mock<UpdateFolderIconBroadcast>()
-    private val updateFolderDestinationBroadcast = mock<UpdateFolderDestinationBroadcast>()
+    private val broadcastFolderDestinationUpdateUseCase =
+        mock<BroadcastFolderDestinationUpdateUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultSetPrimarySyncHandle(
             setupCameraUploadsSyncHandleUseCase = setupCameraUploadsSyncHandleUseCase,
-            updateFolderIconBroadcast = updateFolderIconBroadcast,
-            updateFolderDestinationBroadcast = updateFolderDestinationBroadcast
+            broadcastFolderDestinationUpdateUseCase = broadcastFolderDestinationUpdateUseCase
         )
     }
 
@@ -31,7 +30,6 @@ class DefaultSetPrimarySyncHandleTest {
             val result = 69L
             underTest(result)
             verify(setupCameraUploadsSyncHandleUseCase).invoke(result)
-            verify(updateFolderIconBroadcast).invoke(result, false)
-            verify(updateFolderDestinationBroadcast).invoke(result, false)
+            verify(broadcastFolderDestinationUpdateUseCase).invoke(result, false)
         }
 }

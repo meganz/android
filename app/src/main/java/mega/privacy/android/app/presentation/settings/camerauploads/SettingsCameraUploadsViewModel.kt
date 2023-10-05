@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUs
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
@@ -156,6 +157,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase,
     private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
+    private val monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -185,6 +187,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     val isConnected: Boolean
         get() = isConnectedToInternetUseCase()
+
+    /**
+     * Monitor Camera Uploads Folder Destination
+     */
+    val monitorCameraUploadsFolderDestination = monitorCameraUploadsFolderDestinationUseCase()
 
     init {
         initializeSettings()

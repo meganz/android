@@ -37,7 +37,7 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.entity.BackupState
-import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
+import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -366,26 +366,21 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         "Replace with data flow after refactoring of CameraUploadsPreferencesActivity ",
         replaceWith = ReplaceWith("BroadcastCameraUploadFolderIconUpdateUseCase")
     )
-    override suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean) =
-        withContext(ioDispatcher) {
-            cameraUploadsMediaGateway.sendUpdateFolderIconBroadcast(nodeHandle, isSecondary)
-            appEventGateway.broadcastCameraUploadFolderIconUpdate(
-                CameraUploadFolderIconUpdate(
-                    nodeHandle = nodeHandle,
-                    cameraUploadFolderType = if (isSecondary) {
-                        CameraUploadFolderType.Secondary
-                    } else {
-                        CameraUploadFolderType.Primary
-                    }
-                )
-            )
-        }
 
     override suspend fun sendUpdateFolderDestinationBroadcast(
         nodeHandle: Long,
         isSecondary: Boolean,
     ) = withContext(ioDispatcher) {
-        cameraUploadsMediaGateway.sendUpdateFolderDestinationBroadcast(nodeHandle, isSecondary)
+        appEventGateway.broadcastCameraUploadsFolderDestination(
+            CameraUploadsFolderDestinationUpdate(
+                nodeHandle = nodeHandle,
+                cameraUploadFolderType = if (isSecondary) {
+                    CameraUploadFolderType.Secondary
+                } else {
+                    CameraUploadFolderType.Primary
+                }
+            )
+        )
     }
 
     override suspend fun getMediaList(
@@ -565,11 +560,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) =
         appEventGateway.broadcastCameraUploadProgress(progress, pending)
 
-    override fun monitorCameraUploadFolderIconUpdate(): Flow<CameraUploadFolderIconUpdate> =
-        appEventGateway.monitorCameraUploadFolderIconUpdate()
+    override fun monitorCameraUploadsFolderDestination(): Flow<CameraUploadsFolderDestinationUpdate> =
+        appEventGateway.monitorCameraUploadsFolderDestination()
 
-    override suspend fun broadcastCameraUploadFolderIconUpdate(data: CameraUploadFolderIconUpdate) =
-        appEventGateway.broadcastCameraUploadFolderIconUpdate(data)
+    override suspend fun broadcastCameraUploadsFolderDestination(data: CameraUploadsFolderDestinationUpdate) =
+        appEventGateway.broadcastCameraUploadsFolderDestination(data)
 
     override fun monitorBatteryInfo() = deviceGateway.monitorBatteryInfo
 

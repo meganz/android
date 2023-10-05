@@ -192,6 +192,7 @@ class SettingsCameraUploadsViewModelTest {
             setupOrUpdateCameraUploadsBackupUseCase = setupOrUpdateCameraUploadsBackupUseCase,
             setupOrUpdateMediaUploadsBackupUseCase = setupOrUpdateMediaUploadsBackupUseCase,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
+            monitorCameraUploadsFolderDestinationUseCase = mock(),
         )
     }
 

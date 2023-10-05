@@ -3,7 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
-import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
+import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -436,18 +436,6 @@ interface CameraUploadRepository {
     suspend fun setVideoCompressionSizeLimit(size: Int)
 
     /**
-     * Update camera upload folder (node list) icon
-     *
-     * @param nodeHandle    updated node handle
-     * @param isSecondary   if updated node handle is secondary media
-     */
-    @Deprecated(
-        message = "Replace with data flow after refactoring of CameraUploadsPreferencesActivity ",
-        replaceWith = ReplaceWith("broadcastCameraUploadFolderIconUpdate")
-    )
-    suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean)
-
-    /**
      * Update camera upload folder destination in settings
      *
      * @param nodeHandle    updated node handle
@@ -546,12 +534,12 @@ interface CameraUploadRepository {
     /**
      * Monitor camera upload folder icon updates
      */
-    fun monitorCameraUploadFolderIconUpdate(): Flow<CameraUploadFolderIconUpdate>
+    fun monitorCameraUploadsFolderDestination(): Flow<CameraUploadsFolderDestinationUpdate>
 
     /**
      * Broadcast camera upload folder icon updates
      */
-    suspend fun broadcastCameraUploadFolderIconUpdate(data: CameraUploadFolderIconUpdate)
+    suspend fun broadcastCameraUploadsFolderDestination(data: CameraUploadsFolderDestinationUpdate)
 
     /**
      * rename camera uploads folder name

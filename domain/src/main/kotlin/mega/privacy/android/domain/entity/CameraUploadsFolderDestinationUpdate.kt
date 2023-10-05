@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
  * @property nodeHandle
  * @property cameraUploadFolderType
  */
-data class CameraUploadFolderIconUpdate(
+data class CameraUploadsFolderDestinationUpdate(
     val nodeHandle: Long,
     val cameraUploadFolderType: CameraUploadFolderType,
 )
