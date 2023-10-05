@@ -122,18 +122,20 @@ fun TimelineView(
             )
         },
         floatingActionButton = {
-            val showFilterFab =
-                timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
-                        && !showEnableCUPage
-            Row(
-                modifier = Modifier.padding(
-                    bottom = if (isPortrait && timelineViewState.currentShowingPhotos.isNotEmpty())
-                        68.dp else 16.dp,
-                    end = 16.dp
-                )
-            ) {
-                if (showFilterFab) {
-                    HandleFilterFab(scrollInProgress, onFilterFabClick)
+            if (!isNewCUEnabled) {
+                val showFilterFab =
+                    timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
+                            && !showEnableCUPage
+                Row(
+                    modifier = Modifier.padding(
+                        bottom = if (isPortrait && timelineViewState.currentShowingPhotos.isNotEmpty())
+                            68.dp else 16.dp,
+                        end = 16.dp
+                    )
+                ) {
+                    if (showFilterFab) {
+                        HandleFilterFab(scrollInProgress, onFilterFabClick)
+                    }
                 }
             }
         }

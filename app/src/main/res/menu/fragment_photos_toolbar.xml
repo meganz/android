@@ -2,6 +2,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_photos_filter"
+        android:icon="@drawable/ic_filter"
+        android:orderInCategory="75"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_cu_status"
         android:icon="@drawable/ic_cu_status"
         android:orderInCategory="80"

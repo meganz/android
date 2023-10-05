@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
+import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
@@ -89,6 +90,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.PhotoScreenEvent
+import timber.log.Timber
 import javax.inject.Inject
 
 /** A temporary bridge to support compatibility between view and compose architecture. */
@@ -242,6 +244,7 @@ class PhotosFragment : Fragment() {
                         handleActionMode(state)
                         handleActionsForCameraUploads(state)
                         adjustCameraUploadsMenuVisibility()
+                        handleFilterIcons(state)
                     }
                 }
 
@@ -252,6 +255,13 @@ class PhotosFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun handleFilterIcons(timelineViewState: TimelineViewState) {
+        this.menu?.findItem(R.id.action_photos_filter)?.isVisible =
+            isNewCUEnabled && timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
+        Timber.e("jizhe+menu" + this.menu)
+        Timber.e("jizhe+" + timelineViewState.applyFilterMediaType)
     }
 
     /**
@@ -368,7 +378,7 @@ class PhotosFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         this.menu = menu
         handleMenuIcons(isShowing = photosViewModel.state.value.isMenuShowing)
-
+        handleFilterIcons(timelineViewModel.state.value)
         viewLifecycleOwner.lifecycleScope.launch {
             val isEnabled = false
             this@PhotosFragment.menu?.findItem(R.id.action_import)?.isVisible = isEnabled
@@ -389,7 +399,8 @@ class PhotosFragment : Fragment() {
 
     private fun adjustCameraUploadsMenuVisibility() {
         val isAllMenuVisible = photosViewModel.state.value.isMenuShowing
-        val isCameraUploadsButtonShowing = timelineViewModel.state.value.enableCameraUploadButtonShowing
+        val isCameraUploadsButtonShowing =
+            timelineViewModel.state.value.enableCameraUploadButtonShowing
         val isMenuVisible = isAllMenuVisible && isCameraUploadsButtonShowing && isNewCUEnabled
 
         this.menu?.findItem(R.id.action_cu_status)?.isVisible = isMenuVisible
@@ -450,6 +461,11 @@ class PhotosFragment : Fragment() {
                 true
             }
 
+            R.id.action_photos_filter -> {
+                openFilterFragment()
+                true
+            }
+
             R.id.action_photos_filter_secondary -> {
                 openFilterFragment()
                 true
@@ -472,7 +488,11 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_status -> {
-                Toast.makeText(requireContext(), "Whoever invented the knock-knock joke, should get a no bell prize.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Whoever invented the knock-knock joke, should get a no bell prize.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 true
             }
 

@@ -6,8 +6,11 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -78,8 +81,10 @@ fun PhotosScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    var isNewCUFlagReady by remember { mutableStateOf(false) }
     val isNewCUEnabled by produceState(initialValue = false) {
         value = getFeatureFlagUseCase(AppFeatures.NewCU)
+        isNewCUFlagReady = true
     }
 
     LaunchedEffect(pagerState.currentPage) {
@@ -128,20 +133,22 @@ fun PhotosScreen(
                     }
                 },
                 photosGridView = {
-                    PhotosGridView(
-                        modifier = Modifier
-                            .photosZoomGestureDetector(
-                                onZoomIn = onZoomIn,
-                                onZoomOut = onZoomOut,
-                            ),
-                        timelineViewState = timelineViewState,
-                        downloadPhoto = photoDownloaderViewModel::downloadPhoto,
-                        lazyGridState = timelineLazyGridState,
-                        onClick = timelineViewModel::onClick,
-                        onLongPress = timelineViewModel::onLongPress,
-                        isNewCUEnabled = isNewCUEnabled,
-                        onEnableCameraUploads = onNavigateCameraUploadsSettings,
-                    )
+                    if (isNewCUFlagReady) {
+                        PhotosGridView(
+                            modifier = Modifier
+                                .photosZoomGestureDetector(
+                                    onZoomIn = onZoomIn,
+                                    onZoomOut = onZoomOut,
+                                ),
+                            timelineViewState = timelineViewState,
+                            downloadPhoto = photoDownloaderViewModel::downloadPhoto,
+                            lazyGridState = timelineLazyGridState,
+                            onClick = timelineViewModel::onClick,
+                            onLongPress = timelineViewModel::onLongPress,
+                            isNewCUEnabled = isNewCUEnabled,
+                            onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                        )
+                    }
                 },
                 emptyView = {
                     EmptyState(
