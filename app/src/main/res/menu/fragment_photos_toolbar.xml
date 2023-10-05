@@ -18,6 +18,39 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_cu_status_sync"
+        android:icon="@drawable/ic_cu_status_sync"
+        android:orderInCategory="80"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_cu_status_uploading"
+        android:icon="@drawable/ic_cu_status_uploading"
+        android:orderInCategory="80"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+
+    <item
+        android:id="@+id/action_cu_status_complete"
+        android:icon="@drawable/ic_cu_status_completed"
+        android:orderInCategory="80"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_cu_status_warning"
+        android:icon="@drawable/ic_cu_status_warning"
+        android:orderInCategory="80"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_zoom_out"
         android:icon="@drawable/ic_zoom_out"
         android:orderInCategory="85"
@@ -78,6 +111,14 @@
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="120"
         android:title="Import (Fake)"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_cu_status_test"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="150"
+        android:title="CU Status test"
         android:visible="false"
         app:showAsAction="never" />
 </menu>

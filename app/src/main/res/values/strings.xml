@@ -5139,7 +5139,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Media discovery in subfolders</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in the media discovery view when the main folder is in this view</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in media discovery view.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">No results</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5168,4 +5168,14 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">See all</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
+    <string name="camera_uploads_up_to_date">Camera uploads is up to date</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
+        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
+        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+    </plurals>
 </resources>

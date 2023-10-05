@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +60,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.timeline.CUStatusFabs
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
@@ -155,6 +157,9 @@ fun TimelineView(
                     enter = scaleIn()
                 ) {
                     if (isNewCUEnabled) {
+                        if (timelineViewState.showCUStatusFabs) {
+                            CUStatusFabs()
+                        }
                         HandleCameraUploadStatusFab(
                             cameraUploadsStatus = timelineViewState.cameraUploadsStatus,
                             cameraUploadsProgress = timelineViewState.cameraUploadsProgress,
@@ -162,6 +167,7 @@ fun TimelineView(
                             scaffoldState = scaffoldState,
                             coroutineScope = coroutineScope,
                             setCameraUploadsMessage = setCameraUploadsMessage,
+                            cameraUploadsTotalFiles = timelineViewState.cameraUploadsTotalFiles
                         )
                     } else {
                         val showFilterFab =
@@ -453,6 +459,7 @@ fun HandleCameraUploadStatusFab(
     cameraUploadsStatus: CameraUploadsStatus,
     cameraUploadsProgress: Float,
     cameraUploadsPending: Int,
+    cameraUploadsTotalFiles: Int,
     scaffoldState: ScaffoldState,
     coroutineScope: CoroutineScope,
     setCameraUploadsMessage: (String) -> Unit,
@@ -460,34 +467,50 @@ fun HandleCameraUploadStatusFab(
     when (cameraUploadsStatus) {
         CameraUploadsStatus.None -> {}
         CameraUploadsStatus.Sync -> CameraUploadsStatusSync()
-        CameraUploadsStatus.Uploading -> CameraUploadsStatusUploading(
-            progress = cameraUploadsProgress,
-            onClick = {
-                coroutineScope.launch {
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = "Camera uploads in progress, $cameraUploadsPending files pending",
-                    )
+        CameraUploadsStatus.Uploading -> {
+            val snackBarMessage = pluralStringResource(
+                id = R.plurals.camera_uploads_in_progress_pending_files,
+                count = cameraUploadsPending,
+                cameraUploadsPending
+            )
+            CameraUploadsStatusUploading(
+                progress = cameraUploadsProgress,
+                onClick = {
+                    coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = snackBarMessage,
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
 
         CameraUploadsStatus.Completed -> {
+            val snackBarMessage = pluralStringResource(
+                id = R.plurals.camera_uploads_complete_uploaded_files,
+                count = cameraUploadsTotalFiles,
+                cameraUploadsTotalFiles,
+            )
             CameraUploadsStatusCompleted()
-            setCameraUploadsMessage("Camera uploads complete, 10000 files uploaded")
+            setCameraUploadsMessage(snackBarMessage)
         }
 
         CameraUploadsStatus.Idle -> {}
 
-        CameraUploadsStatus.Warning -> CameraUploadsStatusWarning(
-            progress = cameraUploadsProgress,
-            onClick = {
-                coroutineScope.launch {
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = "Upload paused due to no internet connection",
-                    )
+        CameraUploadsStatus.Warning -> {
+            val snackBarMessage =
+                stringResource(id = R.string.camera_uploads_paused_due_to_no_internet)
+            CameraUploadsStatusWarning(
+                progress = cameraUploadsProgress,
+                onClick = {
+                    coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = snackBarMessage,
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
 
         CameraUploadsStatus.Error -> {}
     }

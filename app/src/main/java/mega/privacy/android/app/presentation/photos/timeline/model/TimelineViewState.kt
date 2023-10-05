@@ -88,4 +88,7 @@ data class TimelineViewState(
     val cameraUploadsProgress: Float = 0f,
     val cameraUploadsPending: Int = 0,
     val cameraUploadsMessage: String = "",
+    //Test data, will remove after QA
+    val showCUStatusFabs: Boolean = false,
+    val cameraUploadsTotalFiles: Int = 1,
 )
