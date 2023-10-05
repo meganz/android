@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 
 fun TimelineViewModel.updateZoomLevel(newZoomLevel: ZoomLevel) {
@@ -161,5 +162,18 @@ fun TimelineViewModel.updateProgress(
 ) {
     _state.update {
         it.copy(pending = pending, progressBarShowing = showProgress, progress = progress)
+    }
+}
+
+//New CU
+fun TimelineViewModel.setCameraUploadsStatus(cameraUploadsStatus: CameraUploadsStatus) {
+    _state.update {
+        it.copy(cameraUploadsStatus = cameraUploadsStatus)
+    }
+}
+
+fun TimelineViewModel.setCameraUploadsMessage(message: String) {
+    _state.update {
+        it.copy(cameraUploadsMessage = message)
     }
 }

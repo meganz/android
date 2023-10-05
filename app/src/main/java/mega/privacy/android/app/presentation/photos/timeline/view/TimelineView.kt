@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +29,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
@@ -39,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,11 +53,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.view.CardListView
@@ -93,6 +97,9 @@ fun TimelineView(
     enableCUView: @Composable () -> Unit,
     photosGridView: @Composable () -> Unit,
     emptyView: @Composable () -> Unit,
+    setCameraUploadsStatus: (CameraUploadsStatus) -> Unit,
+    setCameraUploadsMessage: (String) -> Unit,
+    clearCameraUploadsMessage: () -> Unit = {},
 ) {
     val isBarVisible by remember {
         derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
@@ -102,10 +109,23 @@ fun TimelineView(
     val scaffoldState = rememberScaffoldState()
     val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    val coroutineScope = rememberCoroutineScope()
     val showEnableCUPage = timelineViewState.enableCameraUploadPageShowing
             && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
-    val scrollInProgress by remember {
-        derivedStateOf { lazyGridState.isScrollInProgress }
+    val scrollNotInProgress by remember {
+        derivedStateOf { !lazyGridState.isScrollInProgress }
+    }
+
+    if (timelineViewState.cameraUploadsMessage.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = timelineViewState.cameraUploadsMessage,
+            )
+            if (timelineViewState.cameraUploadsStatus == CameraUploadsStatus.Completed) {
+                setCameraUploadsStatus(CameraUploadsStatus.Idle)
+            }
+            clearCameraUploadsMessage()
+        }
     }
 
     Scaffold(
@@ -122,19 +142,34 @@ fun TimelineView(
             )
         },
         floatingActionButton = {
-            if (!isNewCUEnabled) {
-                val showFilterFab =
-                    timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
-                            && !showEnableCUPage
-                Row(
-                    modifier = Modifier.padding(
-                        bottom = if (isPortrait && timelineViewState.currentShowingPhotos.isNotEmpty())
-                            68.dp else 16.dp,
-                        end = 16.dp
-                    )
+            Row(
+                modifier = Modifier.padding(
+                    bottom = if (isPortrait && timelineViewState.currentShowingPhotos.isNotEmpty())
+                        68.dp else 16.dp,
+                    end = 16.dp
+                )
+            ) {
+                AnimatedVisibility(
+                    visible = scrollNotInProgress,
+                    exit = scaleOut(),
+                    enter = scaleIn()
                 ) {
-                    if (showFilterFab) {
-                        HandleFilterFab(scrollInProgress, onFilterFabClick)
+                    if (isNewCUEnabled) {
+                        HandleCameraUploadStatusFab(
+                            cameraUploadsStatus = timelineViewState.cameraUploadsStatus,
+                            cameraUploadsProgress = timelineViewState.cameraUploadsProgress,
+                            cameraUploadsPending = timelineViewState.cameraUploadsPending,
+                            scaffoldState = scaffoldState,
+                            coroutineScope = coroutineScope,
+                            setCameraUploadsMessage = setCameraUploadsMessage,
+                        )
+                    } else {
+                        val showFilterFab =
+                            timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
+                                    && !showEnableCUPage
+                        if (showFilterFab) {
+                            HandleFilterFab(onFilterFabClick = onFilterFabClick)
+                        }
                     }
                 }
             }
@@ -172,33 +207,26 @@ fun TimelineView(
 }
 
 @Composable
-private fun RowScope.HandleFilterFab(
-    scrollInProgress: Boolean,
+private fun HandleFilterFab(
     onFilterFabClick: () -> Unit,
 ) {
-    AnimatedVisibility(
-        visible = !scrollInProgress,
-        exit = scaleOut(),
-        enter = scaleIn()
+    FloatingActionButton(
+        onClick = onFilterFabClick,
+        modifier = Modifier
+            .size(40.dp)
+            .padding(all = 0.dp)
     ) {
-        FloatingActionButton(
-            onClick = onFilterFabClick,
-            modifier = Modifier
-                .size(40.dp)
-                .padding(all = 0.dp)
-        ) {
-            Icon(
-                painter = painterResource(
-                    id = R.drawable.ic_filter
-                ),
-                contentDescription = "Exit filter",
-                tint = if (!MaterialTheme.colors.isLight) {
-                    Color.Black
-                } else {
-                    Color.White
-                }
-            )
-        }
+        Icon(
+            painter = painterResource(
+                id = R.drawable.ic_filter
+            ),
+            contentDescription = "Exit filter",
+            tint = if (!MaterialTheme.colors.isLight) {
+                Color.Black
+            } else {
+                Color.White
+            }
+        )
     }
 }
 
@@ -418,6 +446,51 @@ fun NewEnableCameraUploadsButton(onClick: () -> Unit) {
             )
         },
     )
+}
+
+@Composable
+fun HandleCameraUploadStatusFab(
+    cameraUploadsStatus: CameraUploadsStatus,
+    cameraUploadsProgress: Float,
+    cameraUploadsPending: Int,
+    scaffoldState: ScaffoldState,
+    coroutineScope: CoroutineScope,
+    setCameraUploadsMessage: (String) -> Unit,
+) {
+    when (cameraUploadsStatus) {
+        CameraUploadsStatus.None -> {}
+        CameraUploadsStatus.Sync -> CameraUploadsStatusSync()
+        CameraUploadsStatus.Uploading -> CameraUploadsStatusUploading(
+            progress = cameraUploadsProgress,
+            onClick = {
+                coroutineScope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = "Camera uploads in progress, $cameraUploadsPending files pending",
+                    )
+                }
+            }
+        )
+
+        CameraUploadsStatus.Completed -> {
+            CameraUploadsStatusCompleted()
+            setCameraUploadsMessage("Camera uploads complete, 10000 files uploaded")
+        }
+
+        CameraUploadsStatus.Idle -> {}
+
+        CameraUploadsStatus.Warning -> CameraUploadsStatusWarning(
+            progress = cameraUploadsProgress,
+            onClick = {
+                coroutineScope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = "Upload paused due to no internet connection",
+                    )
+                }
+            }
+        )
+
+        CameraUploadsStatus.Error -> {}
+    }
 }
 
 /**

@@ -63,11 +63,13 @@ import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCameraUploadsMessage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
@@ -90,7 +92,6 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.PhotoScreenEvent
-import timber.log.Timber
 import javax.inject.Inject
 
 /** A temporary bridge to support compatibility between view and compose architecture. */
@@ -245,6 +246,7 @@ class PhotosFragment : Fragment() {
                         handleActionsForCameraUploads(state)
                         adjustCameraUploadsMenuVisibility()
                         handleFilterIcons(state)
+                        handleCUIconStatus(state)
                     }
                 }
 
@@ -257,11 +259,56 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    private fun handleCUIconStatus(state: TimelineViewState) {
+        when (state.cameraUploadsStatus) {
+            CameraUploadsStatus.None -> {
+                this.menu?.findItem(R.id.action_cu_status)?.isVisible = true
+                this.menu?.findItem(R.id.action_cu_status)?.setIcon(R.drawable.ic_cu_status)
+            }
+
+            CameraUploadsStatus.Idle -> {
+                this.menu?.findItem(R.id.action_cu_status)?.isVisible = true
+                this.menu?.findItem(R.id.action_cu_status)
+                    ?.setIcon(R.drawable.ic_cu_status_completed)
+            }
+
+            CameraUploadsStatus.Warning -> {
+                this.menu?.findItem(R.id.action_cu_status)?.isVisible = true
+                this.menu?.findItem(R.id.action_cu_status)
+                    ?.setIcon(R.drawable.ic_cu_status_warning)
+            }
+
+            CameraUploadsStatus.Error -> {}
+            CameraUploadsStatus.Sync,
+            CameraUploadsStatus.Uploading,
+            CameraUploadsStatus.Completed,
+            -> {
+                this.menu?.findItem(R.id.action_cu_status)?.isVisible = false
+            }
+        }
+    }
+
+    private fun handleCUIconStatusClick() {
+        when (timelineViewModel.state.value.cameraUploadsStatus) {
+            CameraUploadsStatus.None -> {}
+
+            CameraUploadsStatus.Idle -> {
+                timelineViewModel.setCameraUploadsMessage("Camera uploads is up to date")
+            }
+
+            CameraUploadsStatus.Warning -> {}
+
+            CameraUploadsStatus.Error -> {}
+            CameraUploadsStatus.Sync -> {}
+            CameraUploadsStatus.Uploading -> {}
+            CameraUploadsStatus.Completed -> {}
+
+        }
+    }
+
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
         this.menu?.findItem(R.id.action_photos_filter)?.isVisible =
             isNewCUEnabled && timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
-        Timber.e("jizhe+menu" + this.menu)
-        Timber.e("jizhe+" + timelineViewState.applyFilterMediaType)
     }
 
     /**
@@ -488,11 +535,7 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_status -> {
-                Toast.makeText(
-                    requireContext(),
-                    "Whoever invented the knock-knock joke, should get a no bell prize.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                handleCUIconStatusClick()
                 true
             }
 

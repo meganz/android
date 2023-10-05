@@ -43,8 +43,11 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property selectedPhoto                              Selected photo
  * @property shouldTriggerCameraUploads                 True if Camera Uploads can be triggered
  * @property shouldShowBusinessAccountPrompt            True if the Business Account prompt should be shown
- * @property shouldShowBusinessAccountSuspendedPrompt   True if the Suspended Business Account prompt should be shown
  * @property shouldTriggerMediaPermissionsDeniedLogic   True if certain logic should be executed when Media Permissions are denied
+ * @property cameraUploadsStatus                        CameraU
+ * @property cameraUploadsProgress
+ * @property cameraUploadsPending
+ * @property cameraUploadsMessage
  */
 data class TimelineViewState(
     val photos: List<Photo> = emptyList(),
@@ -81,4 +84,8 @@ data class TimelineViewState(
     val shouldTriggerCameraUploads: Boolean = false,
     val shouldShowBusinessAccountPrompt: Boolean = false,
     val shouldTriggerMediaPermissionsDeniedLogic: Boolean = false,
+    val cameraUploadsStatus: CameraUploadsStatus = CameraUploadsStatus.None,
+    val cameraUploadsProgress: Float = 0f,
+    val cameraUploadsPending: Int = 0,
+    val cameraUploadsMessage: String = "",
 )

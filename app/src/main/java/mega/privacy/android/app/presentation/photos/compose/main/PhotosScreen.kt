@@ -35,6 +35,8 @@ import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUploadVideos
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCameraUploadsMessage
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
@@ -158,6 +160,11 @@ fun PhotosScreen(
                     )
                 },
                 isNewCUEnabled = isNewCUEnabled,
+                setCameraUploadsStatus = timelineViewModel::setCameraUploadsStatus,
+                setCameraUploadsMessage = timelineViewModel::setCameraUploadsMessage,
+                clearCameraUploadsMessage = {
+                    timelineViewModel.setCameraUploadsMessage("")
+                }
             )
         },
         albumsView = {
@@ -260,6 +267,7 @@ private fun getSelectedAlbumImageCount(album: UIAlbum): Int? = if (album.id !is 
 } else {
     album.imageCount
 }
+
 private fun getSelectedAlbumVideoCount(album: UIAlbum): Int? = if (album.id !is Album.UserAlbum) {
     null
 } else {

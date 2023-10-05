@@ -13,13 +13,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.theme.amber_400
 import mega.privacy.android.core.ui.theme.blue_400
 import mega.privacy.android.core.ui.theme.green_400
 
 @Composable
 fun CameraUploadsStatusSync(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     CameraUploadsStatus(
         loadingIndicatorColor = Color.Transparent,
@@ -39,9 +40,9 @@ fun CameraUploadsStatusSync(
 
 @Composable
 fun CameraUploadsStatusUploading(
-    progress: Float,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    progress: Float,
+    onClick: () -> Unit = {},
 ) {
     CameraUploadsStatus(
         loadingIndicatorColor = blue_400,
@@ -61,8 +62,8 @@ fun CameraUploadsStatusUploading(
 
 @Composable
 fun CameraUploadsStatusCompleted(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     CameraUploadsStatus(
         loadingIndicatorColor = green_400,
@@ -81,10 +82,32 @@ fun CameraUploadsStatusCompleted(
 }
 
 @Composable
-private fun CameraUploadsStatus(
-    loadingIndicatorColor: Color,
-    onClick: () -> Unit,
+fun CameraUploadsStatusWarning(
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    progress: Float,
+) {
+    CameraUploadsStatus(
+        loadingIndicatorColor = amber_400,
+        onClick = onClick,
+        modifier = modifier,
+        progress = progress,
+        statusIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_cu_status_warning),
+                contentDescription = "Camera uploads status warning",
+                modifier = Modifier.size(24.dp),
+                tint = Color.Unspecified,
+            )
+        },
+    )
+}
+
+@Composable
+private fun CameraUploadsStatus(
+    modifier: Modifier = Modifier,
+    loadingIndicatorColor: Color,
+    onClick: () -> Unit = {},
     progress: Float = 0f,
     statusIcon: @Composable () -> Unit,
 ) {
@@ -121,4 +144,10 @@ fun PreviewCameraUploadsStatusUploading() {
 @Composable
 fun PreviewCameraUploadsStatusCompleted() {
     CameraUploadsStatusCompleted(onClick = { /*TODO*/ })
+}
+
+@Preview
+@Composable
+fun PreviewCameraUploadsStatusWarning() {
+    CameraUploadsStatusWarning(progress = 0.4f, onClick = { /*TODO*/ })
 }
