@@ -29,12 +29,11 @@ class SearchInNodesUseCase @Inject constructor(
         nodeId: NodeId?,
         searchCategory: SearchCategory = SearchCategory.ALL,
         query: String,
-    ): List<TypedNode> =
-        searchRepository.search(
-            nodeId = nodeId,
-            query = query,
-            searchCategory = searchCategory,
-            order = getCloudSortOrder()
-        ).map { addNodeType(it) }
+    ): List<TypedNode> = searchRepository.search(
+        nodeId = nodeId,
+        query = query,
+        searchCategory = searchCategory,
+        order = getCloudSortOrder()
+    ).map { addNodeType(it) }
 
 }

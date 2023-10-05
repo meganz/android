@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.search.model
+package mega.privacy.android.domain.entity.search
 
 /**
  * Enum class containing all search types available

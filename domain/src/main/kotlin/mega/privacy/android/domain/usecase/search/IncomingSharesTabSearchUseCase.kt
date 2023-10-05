@@ -20,7 +20,7 @@ class IncomingSharesTabSearchUseCase @Inject constructor(
 
     /**
      * invoke
-     * @param query querry to be searched
+     * @param query query to be searched
      */
     suspend operator fun invoke(query: String): List<TypedNode> {
         val list = searchRepository.searchInShares(

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.mapper.SearchTypeMapper
-import mega.privacy.android.app.presentation.search.model.SearchType
+import mega.privacy.android.domain.entity.search.SearchType
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

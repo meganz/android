@@ -15,10 +15,10 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.search.model.SearchActivityViewModel
-import mega.privacy.android.app.presentation.search.model.SearchType
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 

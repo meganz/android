@@ -14,7 +14,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 data class NodeUIItem<T : TypedNode>(
     val node: T,
     var isSelected: Boolean,
-    val isInvisible: Boolean,
+    val isInvisible: Boolean = false,
     val isAvailableOffline: Boolean = false,
     val fileDuration: String? = null
 ) : Node by node

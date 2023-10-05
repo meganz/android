@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.search.mapper
 
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.search.model.SearchType
+import mega.privacy.android.domain.entity.search.SearchType
 import javax.inject.Inject
 
 /**
