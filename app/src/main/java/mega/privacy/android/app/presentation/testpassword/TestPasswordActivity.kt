@@ -1,11 +1,12 @@
 package mega.privacy.android.app.presentation.testpassword
 
+import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -18,41 +19,28 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.testpassword.view.TestPasswordComposeView
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
  * Test Password Activity
  */
 @AndroidEntryPoint
-class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
+class TestPasswordActivity : PasscodeActivity() {
 
     /**
      * Application Theme Mode
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    /**
-     * Account Controller
-     */
-    @Inject
-    lateinit var accountController: AccountController
 
     private val activity = this@TestPasswordActivity
     private val viewModel: TestPasswordViewModel by viewModels()
@@ -65,13 +53,20 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
     private val downloadFolderActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                Timber.d("REQUEST_DOWNLOAD_FOLDER")
-                var parentPath = result.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
+                val parentPath = result.data?.data
                 if (parentPath != null) {
                     Timber.d("parentPath no NULL")
-                    parentPath = parentPath + File.separator + FileUtil.getRecoveryKeyFileName(this)
-                    accountController.exportMK(parentPath)
+                    viewModel.exportRecoveryKey(parentPath.toString())
                 }
+            }
+        }
+
+    private val permissionsLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isPermissionGranted ->
+            if (isPermissionGranted) {
+                saveRecoveryKeyToStorage()
+            } else {
+                viewModel.setUserMessage(R.string.denied_write_permissions)
             }
         }
 
@@ -132,7 +127,7 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
                 onResetExhaustedPasswordAttempts = viewModel::resetPasswordAttemptsState,
                 onPrintRecoveryKey = viewModel::printRecoveryKey,
                 onCopyRecoveryKey = ::copyRecoveryKey,
-                onSaveRecoveryKey = ::saveRecoveryKeyToStorage,
+                onSaveRecoveryKey = ::chooseRecoverySaveLocation,
                 onPrintRecoveryKeyConsumed = viewModel::resetPrintRecoveryKey,
                 onPrintRecoveryKeyCompleted = {
                     viewModel.deleteRecoveryKeyFile(it)
@@ -196,26 +191,6 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
     }
 
     /**
-     * onRequestPermissionsResult
-     * This permission was requested from [AccountController.exportMK]
-     */
-    @Deprecated("This permission result needs to be removed when permission is no longer requested from AccountController.exportMK")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            Constants.REQUEST_WRITE_STORAGE -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Timber.d("REQUEST_WRITE_STORAGE PERMISSIONS GRANTED")
-                }
-            }
-        }
-    }
-
-    /**
      * Copy the recovery key to Clipboard.
      */
     private fun copyRecoveryKey() {
@@ -229,6 +204,18 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
     }
 
     /**
+     * Action when save button is clicked. Will save to storage if permission granted
+     * else will ask for permission to write external storage
+     */
+    private fun chooseRecoverySaveLocation() {
+        if (PermissionUtils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            saveRecoveryKeyToStorage()
+        } else {
+            permissionsLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+    }
+
+    /**
      * Open folder selection, where user can select the location the recovery key will be stored.
      */
     private fun saveRecoveryKeyToStorage() {
@@ -238,46 +225,6 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
         }
 
         downloadFolderActivityResult.launch(intent)
-    }
-
-    /**
-     * Callback after Recovery Key has been exported from AccountController
-     * @see AccountController.exportMK
-     */
-    @Deprecated("Need to remove this in the future, it's dependent on AccountController.exportMK")
-    fun onRecoveryKeyExported() {
-        viewModel.notifyPasswordReminderSucceeded()
-    }
-
-    /**
-     * onRequestStart
-     */
-    @Deprecated("Need to remove this when AccountController.logout has been converted into use case")
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-    }
-
-    /**
-     * onRequestUpdate
-     */
-    @Deprecated("Need to remove this when AccountController.logout has been converted into use case")
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-    }
-
-    /**
-     * onRequestFinish
-     */
-    @Deprecated("Need to remove this when AccountController.logout has been converted into use case")
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        if (request.type == MegaRequest.TYPE_LOGOUT) {
-            Timber.d("END logout sdk request - wait chat logout")
-        }
-    }
-
-    /**
-     * onRequestTemporaryError
-     */
-    @Deprecated("Need to remove this when AccountController.logout has been converted into use case")
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
     }
 
     companion object {

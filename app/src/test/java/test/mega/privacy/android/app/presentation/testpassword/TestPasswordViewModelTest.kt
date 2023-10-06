@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.NotifyPasswordCheckedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
+import mega.privacy.android.domain.usecase.account.ExportRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.GetPrintRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import org.junit.jupiter.api.AfterEach
@@ -48,6 +49,7 @@ internal class TestPasswordViewModelTest {
     private val notifyPasswordCheckedUseCase = mock<NotifyPasswordCheckedUseCase>()
     private val logoutUseCase = mock<LogoutUseCase>()
     private val getPrintRecoveryKeyFileUseCase = mock<GetPrintRecoveryKeyFileUseCase>()
+    private val exportRecoveryKeyUseCase = mock<ExportRecoveryKeyUseCase>()
     private val dispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
@@ -73,6 +75,7 @@ internal class TestPasswordViewModelTest {
             logoutUseCase = logoutUseCase,
             getPrintRecoveryKeyFileUseCase = getPrintRecoveryKeyFileUseCase,
             ioDispatcher = dispatcher,
+            exportRecoveryKeyUseCase = exportRecoveryKeyUseCase,
         )
     }
 
@@ -298,5 +301,23 @@ internal class TestPasswordViewModelTest {
                 val result = awaitItem()
                 assertThat(result.printRecoveryKey).isInstanceOf(StateEventWithContentConsumed::class.java)
             }
+        }
+
+    @Test
+    fun `test that notifyPasswordCheckedUseCase is called when exportRecoveryKey succeeds`() =
+        runTest {
+            val uri = "testUri"
+            whenever(exportRecoveryKeyUseCase(uri)).thenReturn(true)
+            underTest.exportRecoveryKey(uri)
+            verify(notifyPasswordCheckedUseCase).invoke()
+        }
+
+    @Test
+    fun `test that notifyPasswordCheckedUseCase is not called when exportRecoveryKey fails`() =
+        runTest {
+            val uri = "testUri"
+            whenever(exportRecoveryKeyUseCase(uri)).thenReturn(false)
+            underTest.exportRecoveryKey(uri)
+            verify(notifyPasswordCheckedUseCase, never()).invoke()
         }
 }

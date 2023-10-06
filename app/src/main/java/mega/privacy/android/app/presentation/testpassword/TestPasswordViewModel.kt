@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.NotifyPasswordCheckedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
+import mega.privacy.android.domain.usecase.account.ExportRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.GetPrintRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import timber.log.Timber
@@ -46,6 +47,7 @@ class TestPasswordViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val getPrintRecoveryKeyFileUseCase: GetPrintRecoveryKeyFileUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val exportRecoveryKeyUseCase: ExportRecoveryKeyUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TestPasswordUIState())
 
@@ -191,6 +193,27 @@ class TestPasswordViewModel @Inject constructor(
     }
 
     /**
+     * Export recovery key to given content uri
+     */
+    fun exportRecoveryKey(uri: String) {
+        viewModelScope.launch {
+            runCatching { exportRecoveryKeyUseCase(uri) }
+                .onSuccess { result ->
+                    if (result) {
+                        _uiState.update { it.copy(userMessage = triggered(R.string.save_MK_confirmation)) }
+                        notifyPasswordReminderSucceeded()
+                    } else {
+                        _uiState.update { it.copy(userMessage = triggered(R.string.general_text_error)) }
+                    }
+                }
+                .onFailure { error ->
+                    Timber.e(error)
+                    _uiState.update { it.copy(userMessage = triggered(R.string.general_text_error)) }
+                }
+        }
+    }
+
+    /**
      * Resets [uiState] isCurrentPassword state to default
      */
     fun resetCurrentPasswordState() {
@@ -206,6 +229,13 @@ class TestPasswordViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isFinishedCopyingRecoveryKey = consumed()) }
         }
+    }
+
+    /**
+     * Set the user message
+     */
+    fun setUserMessage(messageId: Int) {
+        viewModelScope.launch { _uiState.update { it.copy(userMessage = triggered(messageId)) } }
     }
 
     /**

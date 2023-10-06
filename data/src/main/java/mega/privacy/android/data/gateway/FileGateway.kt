@@ -217,4 +217,12 @@ interface FileGateway {
      * @return true if and only if the operation succeeded; false otherwise, null if the file does not exist
      */
     suspend fun setLastModified(path: String, timestamp: Long): Boolean?
+
+    /**
+     * Saves the text in the given content uri
+     *
+     * @param uri content uri to be written in
+     * @param text Text to write in the content uri
+     */
+    suspend fun saveTextOnContentUri(uri: String, text: String): Boolean
 }

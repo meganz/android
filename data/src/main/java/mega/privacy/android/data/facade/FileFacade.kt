@@ -286,6 +286,21 @@ class FileFacade @Inject constructor(
     override suspend fun setLastModified(path: String, timestamp: Long) =
         File(path).takeIf { it.exists() }?.setLastModified(timestamp)
 
+    override suspend fun saveTextOnContentUri(uri: String, text: String) =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val file = context.contentResolver.openFileDescriptor(uri.toUri(), "w")
+                file?.use {
+                    FileOutputStream(file.fileDescriptor).use {
+                        it.write(text.toByteArray())
+                    }
+                } ?: return@runCatching false
+            }.fold(
+                onSuccess = { true },
+                onFailure = { false }
+            )
+        }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val OFFLINE_DIR = "MEGA Offline"

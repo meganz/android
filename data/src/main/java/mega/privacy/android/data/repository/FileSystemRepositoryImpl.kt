@@ -336,4 +336,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             fileGateway.setLastModified(path, timestamp)
         }
+
+    override suspend fun saveTextOnContentUri(uri: String, text: String) =
+        withContext(ioDispatcher) {
+            fileGateway.saveTextOnContentUri(uri, text)
+        }
 }
