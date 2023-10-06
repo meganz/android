@@ -319,7 +319,7 @@ class FileBrowserViewModel @Inject constructor(
      * Performs action when folder is clicked from adapter
      * @param handle node handle
      */
-    fun onFolderItemClicked(
+    private fun onFolderItemClicked(
         handle: Long,
     ) {
         viewModelScope.launch {

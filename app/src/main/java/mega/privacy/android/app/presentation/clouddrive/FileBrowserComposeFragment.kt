@@ -45,12 +45,13 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
-import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
+import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -336,7 +337,10 @@ class FileBrowserComposeFragment : Fragment() {
      * Shows Options menu for item clicked
      */
     private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<TypedNode>) {
-        (requireActivity() as ManagerActivity).showNodeOptionsPanel(nodeId = nodeUIItem.id)
+        (requireActivity() as ManagerActivity).showNodeOptionsPanel(
+            nodeId = nodeUIItem.id,
+            mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
+        )
     }
 
     /**

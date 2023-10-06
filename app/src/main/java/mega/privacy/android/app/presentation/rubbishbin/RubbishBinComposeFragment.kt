@@ -34,6 +34,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
@@ -326,7 +327,10 @@ class RubbishBinComposeFragment : Fragment() {
      * Shows Options menu for item clicked
      */
     private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<TypedNode>) {
-        (requireActivity() as ManagerActivity).showNodeOptionsPanel(nodeId = nodeUIItem.id)
+        (requireActivity() as ManagerActivity).showNodeOptionsPanel(
+            nodeId = nodeUIItem.id,
+            mode = NodeOptionsBottomSheetDialogFragment.RUBBISH_BIN_MODE
+        )
     }
 
     private fun updateActionModeTitle(fileCount: Int, folderCount: Int) {

@@ -4,22 +4,35 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.search.model.SearchActivityViewModel
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.usecase.GetThemeMode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -29,6 +42,8 @@ import javax.inject.Inject
 class SearchActivity : AppCompatActivity() {
 
     private val viewModel: SearchActivityViewModel by viewModels()
+
+    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
     /**
      * Application Theme Mode
@@ -53,6 +68,11 @@ class SearchActivity : AppCompatActivity() {
         const val SEARCH_TYPE = "searchType"
 
         /**
+         * Search node handle
+         */
+        const val SEARCH_NODE_HANDLE = "searchNodeHandle"
+
+        /**
          * Get Search activity Intent
          */
         fun getIntent(
@@ -66,6 +86,12 @@ class SearchActivity : AppCompatActivity() {
             putExtra(PARENT_HANDLE, parentHandle)
         }
     }
+
+    /**
+     * Mapper to open file
+     */
+    @Inject
+    lateinit var getIntentToOpenFileMapper: GetIntentToOpenFileMapper
 
     /**
      * onCreate
@@ -83,15 +109,24 @@ class SearchActivity : AppCompatActivity() {
                         SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                             ?: R.string.sortby_name
                     ),
-                    onItemClick = {},
-                    onLongClick = {},
-                    onChangeViewTypeClick = {},
-                    onSortOrderClick = {},
-                    onMenuClick = {},
+                    onItemClick = viewModel::onItemClicked,
+                    onLongClick = viewModel::onLongItemClicked,
+                    onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
+                    onSortOrderClick = {
+                        showSortOrderBottomSheet()
+                    },
+                    onMenuClick = ::showOptionsMenuForItem,
                     onDisputeTakeDownClicked = ::navigateToLink,
-                    onLinkClicked = ::navigateToLink
+                    onLinkClicked = ::navigateToLink,
+                    onErrorShown = viewModel::errorMessageShown
                 )
             }
+            openFileClicked(uiState.currentFileNode)
+            openFolderClicked(uiState.currentFolderClickedHandle)
+        }
+
+        sortByHeaderViewModel.orderChangeEvent.observe(this) {
+            viewModel.onSortOrderChanged()
         }
     }
 
@@ -105,5 +140,89 @@ class SearchActivity : AppCompatActivity() {
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             .setData(uriUrl)
         startActivity(launchBrowser)
+    }
+
+    /**
+     * On Item click event received from [FileBrowserViewModel]
+     *
+     * @param folderHandle FolderHandle of current selected Folder
+     */
+    private fun openFolderClicked(folderHandle: Long?) {
+        folderHandle?.let {
+            val intent = Intent().apply {
+                putExtra(SEARCH_NODE_HANDLE, it)
+            }
+            setResult(RESULT_OK, intent)
+            finish()
+        }
+    }
+
+    /**
+     * On Item click event received from [FileBrowserViewModel]
+     *
+     * @param currentFileNode [FileNode]
+     */
+    private fun openFileClicked(currentFileNode: FileNode?) {
+        currentFileNode?.let {
+            openFile(fileNode = it)
+            viewModel.onItemPerformedClicked()
+        } ?: run {
+            // Update toolbar title here
+        }
+    }
+
+    /**
+     * Open File
+     * @param fileNode [FileNode]
+     */
+    private fun openFile(fileNode: FileNode) {
+        lifecycleScope.launch {
+            runCatching {
+                val intent = getIntentToOpenFileMapper(
+                    activity = this@SearchActivity,
+                    fileNode = fileNode,
+                    viewType = Constants.FILE_BROWSER_ADAPTER
+                )
+                intent?.let {
+                    if (MegaApiUtils.isIntentAvailable(this@SearchActivity, it)) {
+                        startActivity(it)
+                    } else {
+                        Toast.makeText(
+                            this@SearchActivity,
+                            getString(R.string.intent_not_available),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }.onFailure {
+                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+                viewModel.showShowErrorMessage(errorMessageResId = R.string.general_text_error)
+            }
+        }
+    }
+
+    private fun showSortOrderBottomSheet() {
+        val bottomSheetDialogFragment =
+            SortByBottomSheetDialogFragment.newInstance(Constants.ORDER_CLOUD)
+        bottomSheetDialogFragment.show(
+            supportFragmentManager,
+            bottomSheetDialogFragment.tag
+        )
+    }
+
+    /**
+     * Shows Options menu for item clicked
+     */
+    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<TypedNode>) {
+        Timber.d("showNodeOptionsPanel")
+        val bottomSheetDialogFragment =
+            NodeOptionsBottomSheetDialogFragment.newInstance(
+                nodeId = nodeUIItem.id,
+                mode = NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
+            )
+        bottomSheetDialogFragment.show(
+            supportFragmentManager,
+            bottomSheetDialogFragment.tag
+        )
     }
 }

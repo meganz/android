@@ -45,6 +45,8 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -381,6 +383,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
+    private val searchResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val handle =
+                    result.data?.getLongExtra(SearchActivity.SEARCH_NODE_HANDLE, INVALID_HANDLE)
+                        ?: INVALID_HANDLE
+                openSearchFolder(handle)
+            }
+        }
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
@@ -3780,14 +3791,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             legacyLinksViewModel.state.value.linksHandle,
             searchType,
         )
-        startActivity(
-            SearchActivity.getIntent(
-                context = this,
-                isFirstNavigationLevel = isFirstNavigationLevel,
-                searchType = searchType,
-                parentHandle = parentHandle
-            )
+
+        val searchActivityIntent = SearchActivity.getIntent(
+            context = this,
+            isFirstNavigationLevel = isFirstNavigationLevel,
+            searchType = searchType,
+            parentHandle = parentHandle
         )
+
+        searchResultLauncher.launch(searchActivityIntent)
+
         closeSearchSection()
     }
 
@@ -7870,38 +7883,42 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         searchView?.isIconified = false
     }
 
-    fun openSearchFolder(node: MegaNode) {
+    private fun openSearchFolder(handle: Long) {
         when (drawerItem) {
             DrawerItem.HOMEPAGE -> {
                 // Redirect to Cloud drive.
                 selectDrawerItem(DrawerItem.CLOUD_DRIVE)
-                fileBrowserViewModel.setBrowserParentHandle(node.handle)
+                fileBrowserViewModel.setBrowserParentHandle(handle)
                 refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
             }
 
             DrawerItem.CLOUD_DRIVE -> {
-                fileBrowserViewModel.setBrowserParentHandle(node.handle)
+                fileBrowserViewModel.setBrowserParentHandle(handle)
                 refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
             }
 
             DrawerItem.SHARED_ITEMS -> {
                 if (tabItemShares === SharesTab.INCOMING_TAB) {
-                    incomingSharesViewModel.increaseIncomingTreeDepth(node.handle)
+                    incomingSharesViewModel.increaseIncomingTreeDepth(handle)
                 } else if (tabItemShares === SharesTab.OUTGOING_TAB) {
-                    outgoingSharesViewModel.increaseOutgoingTreeDepth(node.handle)
+                    outgoingSharesViewModel.increaseOutgoingTreeDepth(handle)
                 } else if (tabItemShares === SharesTab.LINKS_TAB) {
-                    legacyLinksViewModel.increaseLinksTreeDepth(node.handle)
+                    legacyLinksViewModel.increaseLinksTreeDepth(handle)
                 }
                 refreshSharesPageAdapter()
             }
 
             DrawerItem.BACKUPS -> {
-                backupsViewModel.updateBackupsHandle(node.handle)
+                backupsViewModel.updateBackupsHandle(handle)
                 refreshFragment(FragmentTag.BACKUPS.tag)
             }
 
             else -> {}
         }
+    }
+
+    fun openSearchFolder(node: MegaNode) {
+        openSearchFolder(node.handle)
     }
 
     fun closeSearchView() {

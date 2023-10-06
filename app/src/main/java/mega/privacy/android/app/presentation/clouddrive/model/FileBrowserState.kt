@@ -1,14 +1,12 @@
 package mega.privacy.android.app.presentation.clouddrive.model
 
-import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import nz.mega.sdk.MegaNode
 
 /**
  * File browser UI state
@@ -16,7 +14,6 @@ import nz.mega.sdk.MegaNode
  * @property currentViewType serves as the original view type
  * @property fileBrowserHandle current file browser handle
  * @property mediaDiscoveryViewSettings current settings for displaying discovery view
- * @property nodes List of FileBrowser Nodes
  * @property parentHandle Parent Handle of current Node
  * @property mediaHandle MediaHandle of current Node
  * @property isPendingRefresh
@@ -56,16 +53,4 @@ data class FileBrowserState(
     val shouldShowBannerVisibility: Boolean = false,
     val bannerTime: Long = 0L,
     val showMediaDiscoveryIcon: Boolean = false,
-)
-
-/**
- * This will hold the necessary information when option item is clicked
- * @property optionClickedType option item type
- * @property selectedMegaNode list selected Mega Node
- * @property selectedNode list of selected Node
- */
-data class OptionsItemInfo(
-    val optionClickedType: OptionItems,
-    val selectedMegaNode: List<MegaNode>,
-    val selectedNode: List<Node>,
 )

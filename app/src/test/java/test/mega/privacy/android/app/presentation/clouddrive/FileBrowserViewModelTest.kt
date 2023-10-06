@@ -20,9 +20,9 @@ import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
-import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
+import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -225,21 +225,6 @@ class FileBrowserViewModelTest {
                     MediaDiscoveryViewSettings.ENABLED.ordinal
                 )
             Truth.assertThat(shouldEnter).isFalse()
-        }
-
-    @Test
-    fun `test that when folder is clicked from adapter, then stack gets updated with appropriate value`() =
-        runTest {
-            val newValue = 12345L
-
-            val update = mapOf<Node, List<NodeChanges>>(
-                mock<Node>() to emptyList(),
-                mock<Node>() to emptyList()
-            )
-            monitorNodeUpdates.emit(NodeUpdate(update))
-            underTest.setBrowserParentHandle(newValue)
-
-            underTest.onFolderItemClicked(newValue)
         }
 
     @Test
