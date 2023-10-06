@@ -4,6 +4,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ShuffleOrder
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
@@ -224,4 +225,18 @@ interface MediaPlayerGateway {
      * @param speed playback speed
      */
     fun updatePlaybackSpeed(speed: Float)
+
+    /**
+     * Update the mediaNotAllowPlayState
+     *
+     * @param value true is not allow play, otherwise is false
+     */
+    fun updateMediaNotAllowPlayState(value: Boolean)
+
+    /**
+     * Monitor the mediaNotAllowPlayState
+     *
+     * @return mediaNotAllowPlayState
+     */
+    fun monitorMediaNotAllowPlayState(): Flow<Boolean>
 }

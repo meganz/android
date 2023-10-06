@@ -40,12 +40,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -75,7 +76,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
-import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -268,11 +268,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
         }
-
-        LiveEventBus.get(EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
-            .observe(this) {
-                showNotAllowPlayAlert()
-            }
         AudioPlayerService.pauseAudioPlayer(this)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
     }
@@ -702,6 +697,12 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
             }
         }
+
+        mediaPlayerGateway.monitorMediaNotAllowPlayState().onEach { notAllow ->
+            if (notAllow) {
+                showNotAllowPlayAlert()
+            }
+        }.launchIn(lifecycleScope)
 
         with(videoViewModel) {
             collectFlow(screenLockState) { isLock ->

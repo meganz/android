@@ -24,7 +24,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -344,6 +343,9 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         }
     }
 
+    override fun monitorMediaNotAllowPlayState() =
+        mediaPlayerGateway.monitorMediaNotAllowPlayState()
+
     private fun playSource(mediaPlaySources: MediaPlaySources) {
         Timber.d("playSource ${mediaPlaySources.mediaItems.size} items")
 
@@ -395,8 +397,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         if (!playWhenReady) {
             mediaPlayerGateway.setPlayWhenReady(false)
         } else if (participatingInACall()) {
-            LiveEventBus.get(Constants.EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
-                .post(true)
+            mediaPlayerGateway.updateMediaNotAllowPlayState(true)
         } else {
             mediaPlayerGateway.setPlayWhenReady(true)
         }

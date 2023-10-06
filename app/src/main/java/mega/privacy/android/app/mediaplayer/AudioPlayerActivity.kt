@@ -19,11 +19,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
@@ -47,7 +49,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -138,6 +139,12 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                         stopPlayer()
                     }
                 }
+
+                service.serviceGateway.monitorMediaNotAllowPlayState().onEach { notAllow ->
+                    if (notAllow) {
+                        showNotAllowPlayAlert()
+                    }
+                }.launchIn(lifecycleScope)
             }
         }
     }
@@ -208,11 +215,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
         }
-
-        LiveEventBus.get(EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
-            .observe(this) {
-                showNotAllowPlayAlert()
-            }
     }
 
     @OptIn(FlowPreview::class)

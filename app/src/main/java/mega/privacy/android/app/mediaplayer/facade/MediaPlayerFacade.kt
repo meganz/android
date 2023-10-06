@@ -28,6 +28,7 @@ import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import com.google.android.exoplayer2.video.VideoSize
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
@@ -404,6 +405,13 @@ class MediaPlayerFacade @Inject constructor(
     override fun updatePlaybackSpeed(speed: Float) {
         player?.playbackParameters = PlaybackParameters(speed)
     }
+
+    override fun updateMediaNotAllowPlayState(value: Boolean) {
+        player?.updateMediaNotAllowPlayState(value)
+    }
+
+    override fun monitorMediaNotAllowPlayState() =
+        player?.monitorMediaNotAllowPlayState() ?: flowOf(false)
 
     companion object {
         private const val INCREMENT_TIME_IN_MS = 15000L

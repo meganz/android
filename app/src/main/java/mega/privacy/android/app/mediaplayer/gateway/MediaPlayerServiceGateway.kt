@@ -18,6 +18,13 @@ interface MediaPlayerServiceGateway {
     fun metadataUpdate(): Flow<Metadata>
 
     /**
+     * Monitor the mediaNotAllowPlayState
+     *
+     * @return mediaNotAllowPlayState
+     */
+    fun monitorMediaNotAllowPlayState(): Flow<Boolean>
+
+    /**
      * Stop player
      */
     fun stopPlayer()
