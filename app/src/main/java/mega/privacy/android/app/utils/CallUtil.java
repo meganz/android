@@ -1307,11 +1307,10 @@ public class CallUtil {
      * @param chatId                the Chat Id of the meeting link
      * @param isFromOpenChatPreview True, if I come from doing openChatPreview. False, if I came from doing checkChatLink.
      * @param link                  The meeting link
-     * @param list                  The MegaHandleList with the call ID
      * @param titleChat             The title of the chat
      * @param passcodeManagement    To disable passcode.
      */
-    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat, boolean alreadyExist, long publicChatHandle, PasscodeManagement passcodeManagement, boolean isWaitingRoom) {
+    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, String titleChat, boolean alreadyExist, long publicChatHandle, PasscodeManagement passcodeManagement, boolean isWaitingRoom) {
         if (amIParticipatingInThisMeeting(chatId)) {
             Timber.d("I am participating in the meeting of this meeting link");
             returnCall(context, chatId, passcodeManagement);
@@ -1325,19 +1324,23 @@ public class CallUtil {
         }
 
         if (isFromOpenChatPreview) {
-            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-            if (call == null || call.getStatus() == CALL_STATUS_USER_NO_PRESENT || call.getStatus() == CALL_STATUS_WAITING_ROOM) {
-                Timber.d("Call id: %d. It's a meeting, open to join", chatId);
-                CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist, passcodeManagement, isWaitingRoom);
-            } else {
-                Timber.d("Call id: %d. Return to call", chatId);
-                returnCall(context, chatId, passcodeManagement);
-            }
+            joinMeetingOrReturnCall(context, chatId, link, titleChat, alreadyExist, publicChatHandle, passcodeManagement, isWaitingRoom);
             return;
         }
 
         Timber.d("Open chat preview");
         MegaApplication.getInstance().getMegaChatApi().openChatPreview(link, new LoadPreviewListener(context, activity, CHECK_LINK_TYPE_MEETING_LINK));
+    }
+
+    public static void joinMeetingOrReturnCall(Context context, long chatId, String link, String titleChat, boolean alreadyExist, long publicChatHandle, PasscodeManagement passcodeManagement, boolean isWaitingRoom) {
+        MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+        if (call == null || call.getStatus() == CALL_STATUS_USER_NO_PRESENT || call.getStatus() == CALL_STATUS_WAITING_ROOM) {
+            Timber.d("Call id: %d. It's a meeting, open to join", chatId);
+            CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist, passcodeManagement, isWaitingRoom);
+        } else {
+            Timber.d("Call id: %d. Return to call", chatId);
+            returnCall(context, chatId, passcodeManagement);
+        }
     }
 
     /**

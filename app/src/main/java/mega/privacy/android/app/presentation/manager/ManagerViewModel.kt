@@ -56,6 +56,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
@@ -177,6 +178,7 @@ class ManagerViewModel @Inject constructor(
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
     private val dismissPsaUseCase: DismissPsaUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val getChatLinkContentUseCase: GetChatLinkContentUseCase,
 ) : ViewModel() {
 
     /**
@@ -901,6 +903,29 @@ class ManagerViewModel @Inject constructor(
         SearchType.RUBBISH_BIN -> rubbishBinParentHandle
         SearchType.BACKUPS -> backupsParentHandle
         SearchType.OTHER -> getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
+    }
+
+    /**
+     * Check link
+     *
+     * @param link
+     */
+    fun checkLink(link: String?) {
+        viewModelScope.launch {
+            if (link.isNullOrEmpty()) return@launch
+            val result = runCatching { getChatLinkContentUseCase(link) }
+                .onFailure {
+                    Timber.e(it)
+                }
+            _state.update { state -> state.copy(chatLinkContent = result) }
+        }
+    }
+
+    /**
+     * Mark handle check link result
+     */
+    fun markHandleCheckLinkResult() {
+        _state.update { it.copy(chatLinkContent = null) }
     }
 
     internal companion object {

@@ -132,7 +132,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ChatManagementCallback
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
@@ -293,6 +292,7 @@ import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -302,6 +302,9 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
+import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
@@ -349,8 +352,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     View.OnClickListener,
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
     ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-    MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback,
-    NotificationNavigationHandler,
+    MeetingBottomSheetDialogActionListener, NotificationNavigationHandler,
     ParentNodeManager, CameraPermissionManager, NavigationDrawerManager {
     /**
      * The cause bitmap of elevating the app bar
@@ -1491,28 +1493,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         drawerItem = DrawerItem.CHAT
                         selectDrawerItem(drawerItem)
                         selectDrawerItemPending = false
-                        megaChatApi.checkChatLink(
-                            intent.dataString,
-                            LoadPreviewListener(
-                                this@ManagerActivity,
-                                this@ManagerActivity,
-                                Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
-                            )
-                        )
+                        viewModel.checkLink(intent.dataString)
                         intent.action = null
                         intent = null
                     } else if (intent.action == Constants.ACTION_JOIN_OPEN_CHAT_LINK) {
                         linkJoinToChatLink = intent.dataString
                         joiningToChatLink = true
                         if (megaChatApi.connectionState == MegaChatApi.CONNECTED) {
-                            megaChatApi.checkChatLink(
-                                linkJoinToChatLink,
-                                LoadPreviewListener(
-                                    this@ManagerActivity,
-                                    this@ManagerActivity,
-                                    Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
-                                )
-                            )
+                            viewModel.checkLink(linkJoinToChatLink)
                         }
                         intent.action = null
                         intent = null
@@ -1592,14 +1580,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             Timber.d("Check if there any unread chat")
             if (joiningToChatLink && !TextUtil.isTextEmpty(linkJoinToChatLink)) {
-                megaChatApi.checkChatLink(
-                    linkJoinToChatLink,
-                    LoadPreviewListener(
-                        this@ManagerActivity,
-                        this@ManagerActivity,
-                        Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
-                    )
-                )
+                viewModel.checkLink(linkJoinToChatLink)
             }
             Timber.d("Check if there any INCOMING pendingRequest contacts")
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
@@ -1932,6 +1913,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (!managerState.message.isNullOrEmpty()) {
                 showSnackbar(content = managerState.message)
                 viewModel.markHandledMessage()
+            }
+
+            managerState.chatLinkContent?.let {
+                handleCheckLinkResult(it)
+                viewModel.markHandleCheckLinkResult()
             }
         }
         this.collectFlow(
@@ -5351,14 +5337,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         Constants.CHAT_LINK -> {
                             Timber.d("Open chat link: correct chat link")
                             // Identify the link is a meeting or normal chat link
-                            megaChatApi.checkChatLink(
-                                link,
-                                LoadPreviewListener(
-                                    this@ManagerActivity,
-                                    this@ManagerActivity,
-                                    Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
-                                )
-                            )
+                            viewModel.checkLink(link)
                             dismissAlertDialogIfExists(openLinkDialog)
                         }
 
@@ -5390,14 +5369,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
         } else if (drawerItem === DrawerItem.CHAT || MEETING_TYPE == MeetingActivity.MEETING_ACTION_JOIN) {
-            megaChatApi.checkChatLink(
-                link,
-                LoadPreviewListener(
-                    this@ManagerActivity,
-                    this@ManagerActivity,
-                    Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
-                )
-            )
+            viewModel.checkLink(link)
         }
     }
 
@@ -5486,8 +5458,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         openChatLinkIntent.data = Uri.parse(link)
         startActivity(openChatLinkIntent)
-        drawerItem = DrawerItem.CHAT
-        selectDrawerItem(drawerItem)
+        if (drawerItem != DrawerItem.CHAT) {
+            drawerItem = DrawerItem.CHAT
+            selectDrawerItem(drawerItem)
+        }
     }
 
     /**
@@ -8207,67 +8181,68 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         //No update needed
     }
 
-    override fun onPreviewLoaded(request: MegaChatRequest, alreadyExist: Boolean) {
-        val chatId: Long = request.chatHandle
-        val isFromOpenChatPreview: Boolean = request.flag
-        val type: Int = request.paramType
-        val link: String = request.link
-        val waitingRoom = MegaChatApi.hasChatOptionEnabled(
-            MegaChatApi.CHAT_OPTION_WAITING_ROOM,
-            request.privilege
-        )
-        if (joiningToChatLink && TextUtil.isTextEmpty(link) && chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-            showSnackbar(
-                Constants.SNACKBAR_TYPE,
-                getString(R.string.error_chat_link_init_error),
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-            )
-            resetJoiningChatLink()
-            return
-        }
-        if (type == Constants.LINK_IS_FOR_MEETING) {
-            Timber.d("It's a meeting")
-            val linkInvalid =
-                TextUtil.isTextEmpty(link) && chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-            if (linkInvalid) {
-                Timber.e("Invalid link")
-                return
-            }
-            if (CallUtil.isMeetingEnded(request)) {
-                Timber.d("It's a meeting, open dialog: Meeting has ended")
-                MeetingHasEndedDialogFragment(object : MeetingHasEndedDialogFragment.ClickCallback {
-                    override fun onViewMeetingChat() {
-                        showChatLink(link)
-                    }
-
-                    override fun onLeave() {}
-                }, false).show(
-                    supportFragmentManager,
-                    MeetingHasEndedDialogFragment.TAG
-                )
-            } else {
-                CallUtil.checkMeetingInProgress(
-                    this@ManagerActivity,
-                    this@ManagerActivity,
-                    chatId,
-                    isFromOpenChatPreview,
-                    link,
-                    request.megaHandleList,
-                    request.text,
-                    alreadyExist,
-                    request.userHandle,
+    private fun handleCheckLinkResult(result: Result<ChatLinkContent>) {
+        if (result.isSuccess) {
+            dismissAlertDialogIfExists(openLinkDialog)
+            val chatLinkContent = result.getOrNull()
+            if (chatLinkContent is ChatLinkContent.MeetingLink) {
+                if (joiningToChatLink && TextUtil.isTextEmpty(chatLinkContent.link) && chatLinkContent.chatHandle == MEGACHAT_INVALID_HANDLE) {
+                    showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        getString(R.string.error_chat_link_init_error),
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                    resetJoiningChatLink()
+                    return
+                }
+                if (chatLinkContent.link.isEmpty()) return
+                CallUtil.joinMeetingOrReturnCall(
+                    this,
+                    chatLinkContent.chatHandle,
+                    chatLinkContent.link,
+                    chatLinkContent.text,
+                    chatLinkContent.exist,
+                    chatLinkContent.userHandle,
                     passcodeManagement,
-                    waitingRoom
+                    chatLinkContent.isWaitingRoom,
                 )
+            } else if (chatLinkContent is ChatLinkContent.ChatLink) {
+                Timber.d("It's a chat")
+                if (chatLinkContent.link.isEmpty()) return
+                showChatLink(chatLinkContent.link)
             }
-        } else {
-            Timber.d("It's a chat")
-            showChatLink(link)
+        } else if (result.exceptionOrNull() != null) {
+            when (val e = result.exceptionOrNull()) {
+                is IAmOnAnotherCallException -> {
+                    CallUtil.showConfirmationInACall(
+                        this,
+                        getString(R.string.text_join_call),
+                        passcodeManagement
+                    )
+                    dismissAlertDialogIfExists(openLinkDialog)
+                }
+
+                is MeetingEndedException -> {
+                    MeetingHasEndedDialogFragment(object :
+                        MeetingHasEndedDialogFragment.ClickCallback {
+                        override fun onViewMeetingChat() {
+                            showChatLink(e.link)
+                        }
+
+                        override fun onLeave() {}
+                    }, false).show(
+                        supportFragmentManager,
+                        MeetingHasEndedDialogFragment.TAG
+                    )
+                    dismissAlertDialogIfExists(openLinkDialog)
+                }
+
+                is MegaException -> onErrorLoadingPreview(e.errorCode)
+            }
         }
-        dismissAlertDialogIfExists(openLinkDialog)
     }
 
-    override fun onErrorLoadingPreview(errorCode: Int) {
+    private fun onErrorLoadingPreview(errorCode: Int) {
         if (errorCode == MegaChatError.ERROR_NOENT) {
             dismissAlertDialogIfExists(openLinkDialog)
             Util.showAlert(

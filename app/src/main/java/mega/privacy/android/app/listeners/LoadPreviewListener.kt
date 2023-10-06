@@ -9,6 +9,7 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 
+@Deprecated("Use GetChatLinkContentUseCase instead")
 class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
     private var callback: OnPreviewLoadedCallback? = null
     private var callbackChatLink: OnChatPreviewLoadedCallback? = null
@@ -44,6 +45,7 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
             CHECK_LINK_TYPE_CHAT_LINK -> {
                 callbackChatLink?.onPreviewLoaded(request, e.errorCode)
             }
+
             else -> {
                 if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_EEXIST) {
                     Timber.d("Preview loaded")

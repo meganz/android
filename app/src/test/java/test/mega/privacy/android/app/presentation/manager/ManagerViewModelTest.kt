@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -68,6 +69,7 @@ import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFolders
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
@@ -250,6 +252,7 @@ class ManagerViewModelTest {
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()
     private val dismissPsaUseCase = mock<DismissPsaUseCase>()
     private val rootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val getChatLinkContentUseCase: GetChatLinkContentUseCase = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -317,6 +320,7 @@ class ManagerViewModelTest {
             removePublicLinkResultMapper = removePublicLinkResultMapper,
             dismissPsaUseCase = dismissPsaUseCase,
             getRootNodeUseCase = rootNodeUseCase,
+            getChatLinkContentUseCase = getChatLinkContentUseCase,
         )
     }
 
@@ -1077,5 +1081,35 @@ class ManagerViewModelTest {
                 searchType = SearchType.LINKS
             )
             assertThat(actual).isEqualTo(expectedParentHandle)
+        }
+
+    @Test
+    fun `test that checkLinkResult updates correctly when call get chat link content returns`() =
+        runTest {
+            val link = "link"
+            val linkContent = mock<ChatLinkContent.ChatLink>()
+            testScheduler.advanceUntilIdle()
+            whenever(getChatLinkContentUseCase(link)).thenReturn(linkContent)
+            underTest.state.test {
+                assertThat(awaitItem().chatLinkContent).isNull()
+                underTest.checkLink("link")
+                assertThat(awaitItem().chatLinkContent).isEqualTo(Result.success(linkContent))
+            }
+        }
+
+    @Test
+    fun `test that checkLinkResult resets to null when call markHandleCheckLinkResult`() =
+        runTest {
+            val link = "link"
+            val linkContent = mock<ChatLinkContent.ChatLink>()
+            testScheduler.advanceUntilIdle()
+            whenever(getChatLinkContentUseCase(link)).thenReturn(linkContent)
+            underTest.state.test {
+                assertThat(awaitItem().chatLinkContent).isNull()
+                underTest.checkLink("link")
+                assertThat(awaitItem().chatLinkContent).isEqualTo(Result.success(linkContent))
+                underTest.markHandleCheckLinkResult()
+                assertThat(awaitItem().chatLinkContent).isNull()
+            }
         }
 }

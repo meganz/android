@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.manager.model
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property nodeNameCollisionResult
  * @property moveRequestResult
  * @property message
+ * @property chatLinkContent Result of check link request
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -41,4 +43,5 @@ data class ManagerState(
     val nodeNameCollisionResult: NodeNameCollisionResult? = null,
     val moveRequestResult: Result<MoveRequestResult>? = null,
     val message: String? = null,
+    val chatLinkContent: Result<ChatLinkContent>? = null,
 )
