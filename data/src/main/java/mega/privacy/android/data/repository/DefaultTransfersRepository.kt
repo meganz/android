@@ -34,6 +34,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
+import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -89,6 +91,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val workerManagerGateway: WorkManagerGateway,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val transferDataMapper: TransferDataMapper,
+    private val completedTransferMapper: CompletedTransferMapper,
     private val cancelTokenProvider: CancelTokenProvider,
 ) : TransferRepository {
 
@@ -422,11 +425,23 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.getAllCompletedTransfers(size)
             .flowOn(ioDispatcher)
 
+    @Deprecated(
+        "Mapping to CompletedTransfer should be done in the repository. Replace with addCompletedTransfer(transfer: Transfer, megaException: MegaException)",
+        replaceWith = ReplaceWith("addCompletedTransfer(transfer: Transfer, megaException: MegaException)")
+    )
     override suspend fun addCompletedTransfer(transfer: CompletedTransfer) =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.addCompletedTransfer(transfer)
             appEventGateway.broadcastCompletedTransfer(transfer)
         }
+
+    override suspend fun addCompletedTransfer(transfer: Transfer, megaException: MegaException?) {
+        withContext(ioDispatcher) {
+            val completedTransfer = completedTransferMapper(transfer, megaException)
+            megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
+            appEventGateway.broadcastCompletedTransfer(completedTransfer)
+        }
+    }
 
     override suspend fun addCompletedTransfersIfNotExist(transfers: List<CompletedTransfer>) =
         withContext(ioDispatcher) {

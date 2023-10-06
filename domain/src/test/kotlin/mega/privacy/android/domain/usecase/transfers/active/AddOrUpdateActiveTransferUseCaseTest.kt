@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.KStubbing
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -67,7 +68,7 @@ class AddOrUpdateActiveTransferUseCaseTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideFinishWithErrorEvents")
+    @MethodSource("provideFinishEventsWithError")
     fun `test that invoke call broadcastBusinessAccountExpiredUseCase when the event is a finish event with BusinessAccountExpiredMegaException`(
         transferEvent: TransferEvent,
     ) = runTest {
@@ -84,58 +85,47 @@ class AddOrUpdateActiveTransferUseCaseTest {
         verify(broadcastTransferOverQuotaUseCase).invoke(true)
     }
 
-    private fun provideStartPauseFinishEvents() = TransferType.values().flatMap { transferType ->
-        val transfer = mock<Transfer> {
-            on { this.transferType }.thenReturn(transferType)
-        }
-        listOf(
-            mock<TransferEvent.TransferStartEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            },
-            mock<TransferEvent.TransferPaused> {
-                on { this.transfer }.thenReturn(transfer)
-            },
-            mock<TransferEvent.TransferFinishEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            }
-        )
+    @ParameterizedTest
+    @MethodSource("provideFinishEvents")
+    fun `test that invoke call addCompletedTransfer when the event is a finish event`(
+        transferEvent: TransferEvent.TransferFinishEvent,
+    ) = runTest {
+        underTest.invoke(transferEvent)
+        verify(transferRepository).addCompletedTransfer(transferEvent.transfer, transferEvent.error)
     }
 
-    private fun provideUpdateFinishEvents() = TransferType.values().flatMap { transferType ->
-        val transfer = mock<Transfer> {
-            on { this.transferType }.thenReturn(transferType)
-        }
-        listOf(
-            mock<TransferEvent.TransferUpdateEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            },
-            mock<TransferEvent.TransferFinishEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            }
-        )
-    }
+    private fun provideStartPauseFinishEvents() =
+        provideTransferEvents<TransferEvent.TransferStartEvent>() +
+                provideTransferEvents<TransferEvent.TransferPaused>() +
+                provideTransferEvents<TransferEvent.TransferFinishEvent>()
 
-    private fun provideFinishWithErrorEvents() = TransferType.values().map { transferType ->
-        val transfer = mock<Transfer> {
-            on { this.transferType }.thenReturn(transferType)
+    private fun provideUpdateFinishEvents() =
+        provideTransferEvents<TransferEvent.TransferUpdateEvent>() +
+                provideTransferEvents<TransferEvent.TransferFinishEvent>()
+
+    private fun provideFinishEvents(): List<TransferEvent.TransferFinishEvent> =
+        provideFinishEventsWithError() +
+                provideTransferEvents()
+
+    private fun provideFinishEventsWithError() =
+        provideTransferEvents<TransferEvent.TransferFinishEvent> {
+            on { this.error }.thenReturn(BusinessAccountExpiredMegaException(1))
         }
-        mock<TransferEvent.TransferFinishEvent> {
-            on { this.transfer }.thenReturn(transfer)
-            on { this.error }.thenReturn(mock<BusinessAccountExpiredMegaException>())
-        }
-    }
 
     private fun provideQuotaExceededMegaExceptionTemporaryErrorEvents() =
+        provideTransferEvents<TransferEvent.TransferTemporaryErrorEvent> {
+            on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+        }
+
+
+    private inline fun <reified T : TransferEvent> provideTransferEvents(stubbing: KStubbing<T>.(T) -> Unit = {}) =
         TransferType.values().map { transferType ->
             val transfer = mock<Transfer> {
                 on { this.transferType }.thenReturn(transferType)
             }
-            val error = mock<QuotaExceededMegaException>() {
-                on { value }.thenReturn(1L)
-            }
-            mock<TransferEvent.TransferTemporaryErrorEvent> {
+            mock<T> {
                 on { this.transfer }.thenReturn(transfer)
-                on { this.error }.thenReturn(error)
+                stubbing(it)
             }
         }
 }

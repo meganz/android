@@ -46,6 +46,9 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
             is TransferEvent.TransferFinishEvent -> {
                 transferRepository.insertOrUpdateActiveTransfer(event.transfer)
                 transferRepository.updateTransferredBytes(event.transfer)
+                if (!event.transfer.isFolderTransfer) {
+                    transferRepository.addCompletedTransfer(event.transfer, event.error)
+                }
 
                 if (event.error is BusinessAccountExpiredMegaException) {
                     broadcastBusinessAccountExpiredUseCase()
