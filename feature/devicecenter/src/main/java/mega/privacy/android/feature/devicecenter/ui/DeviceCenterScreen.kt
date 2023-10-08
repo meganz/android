@@ -24,6 +24,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceCenterBottomSheet
 import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
+import mega.privacy.android.feature.devicecenter.ui.lists.loading.DeviceCenterLoadingScreen
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
@@ -110,17 +111,21 @@ internal fun DeviceCenterScreen(
             )
         },
         content = { paddingValues ->
-            DeviceCenterContent(
-                itemsToDisplay = uiState.itemsToDisplay,
-                onDeviceClicked = onDeviceClicked,
-                onNodeMenuIconClicked = { menuClickedNode ->
-                    onNodeMenuIconClicked(menuClickedNode)
-                    if (!modalSheetState.isVisible) {
-                        coroutineScope.launch { modalSheetState.show() }
-                    }
-                },
-                modifier = Modifier.padding(paddingValues),
-            )
+            if (uiState.isInitialLoadingOngoing) {
+                DeviceCenterLoadingScreen()
+            } else {
+                DeviceCenterContent(
+                    itemsToDisplay = uiState.itemsToDisplay,
+                    onDeviceClicked = onDeviceClicked,
+                    onNodeMenuIconClicked = { menuClickedNode ->
+                        onNodeMenuIconClicked(menuClickedNode)
+                        if (!modalSheetState.isVisible) {
+                            coroutineScope.launch { modalSheetState.show() }
+                        }
+                    },
+                    modifier = Modifier.padding(paddingValues),
+                )
+            }
             DeviceCenterBottomSheet(
                 coroutineScope = coroutineScope,
                 modalSheetState = modalSheetState,
@@ -216,6 +221,26 @@ private fun DeviceCenterContent(
                 }
             }
         }
+    }
+}
+
+/**
+ * A Preview Composable that shows the Loading Screen
+ */
+@CombinedThemePreviews
+@Composable
+private fun PreviewDeviceCenterInInitialLoading() {
+    val uiState = DeviceCenterState(isInitialLoadingOngoing = true)
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        DeviceCenterScreen(
+            uiState = uiState,
+            onDeviceClicked = {},
+            onNodeMenuIconClicked = {},
+            onRenameDeviceClicked = {},
+            onRenameDeviceCancelled = {},
+            onBackPressHandled = {},
+            onFeatureExited = {},
+        )
     }
 }
 

@@ -98,6 +98,7 @@ internal class DeviceCenterViewModelTest {
             val initialState = awaitItem()
             assertThat(initialState.devices).isEmpty()
             assertThat(initialState.isCameraUploadsEnabled).isFalse()
+            assertThat(initialState.isInitialLoadingOngoing).isFalse()
             assertThat(initialState.selectedDevice).isNull()
             assertThat(initialState.menuIconClickedNode).isNull()
             assertThat(initialState.deviceToRename).isNull()

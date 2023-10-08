@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.BOTTOM_SHEET_CONTAINER
+import mega.privacy.android.feature.devicecenter.ui.lists.loading.DEVICE_CENTER_LOADING_SCREEN
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
@@ -210,5 +211,22 @@ internal class DeviceCenterScreenTest {
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertDoesNotExist()
         composeTestRule.onNodeWithTag(DEVICE_CENTER_OTHER_DEVICES_HEADER).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the loading screen is shown`() {
+        val uiState = DeviceCenterState(isInitialLoadingOngoing = true)
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = uiState,
+                onDeviceClicked = {},
+                onNodeMenuIconClicked = {},
+                onRenameDeviceClicked = {},
+                onRenameDeviceCancelled = {},
+                onBackPressHandled = {},
+                onFeatureExited = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(DEVICE_CENTER_LOADING_SCREEN).assertIsDisplayed()
     }
 }

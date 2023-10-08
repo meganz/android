@@ -48,6 +48,8 @@ internal class DeviceCenterViewModel @Inject constructor(
      * Retrieves the User's Backup Information
      */
     private fun retrieveBackupInfo() = viewModelScope.launch {
+        _state.update { state -> state.copy(isInitialLoadingOngoing = true) }
+
         runCatching {
             val isCameraUploadsEnabled = isCameraUploadsEnabledUseCase()
             val backupDevices = getDevicesUseCase(isCameraUploadsEnabled = isCameraUploadsEnabled)
@@ -55,10 +57,12 @@ internal class DeviceCenterViewModel @Inject constructor(
                 it.copy(
                     devices = deviceUINodeListMapper(backupDevices),
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
+                    isInitialLoadingOngoing = false,
                 )
             }
         }.onFailure {
             Timber.w(it)
+            _state.update { state -> state.copy(isInitialLoadingOngoing = false) }
         }
     }
 

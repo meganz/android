@@ -8,6 +8,8 @@ import de.palm.composestateevents.consumed
  *
  * @property devices The list of [DeviceCenterUINode] objects that are Devices
  * @property isCameraUploadsEnabled true if Camera Uploads is enabled, and false if otherwise
+ * @property isInitialLoadingOngoing true if the call to retrieve the User's Backup Information is
+ * ongoing when the User enters the Device Center, and false if otherwise
  * @property selectedDevice The Device selected by the User. It is null when the User is in Device View
  * @property menuIconClickedNode The Node that was Menu-selected by the User
  * @property deviceToRename The Device to be renamed by the User
@@ -19,6 +21,7 @@ import de.palm.composestateevents.consumed
 data class DeviceCenterState(
     val devices: List<DeviceCenterUINode> = emptyList(),
     val isCameraUploadsEnabled: Boolean = false,
+    val isInitialLoadingOngoing: Boolean = false,
     val selectedDevice: DeviceUINode? = null,
     val menuIconClickedNode: DeviceCenterUINode? = null,
     val deviceToRename: DeviceUINode? = null,
