@@ -108,5 +108,5 @@ interface PasscodeRepository {
      *
      * @param passcodeType
      */
-    suspend fun setPasscodeType(passcodeType: PasscodeType)
+    suspend fun setPasscodeType(passcodeType: PasscodeType?)
 }

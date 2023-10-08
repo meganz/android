@@ -339,4 +339,11 @@ internal class PasscodeRepositoryImplTest {
 
         verify(passcodeTypeMapper).invoke(value, true)
     }
+
+    @Test
+    internal fun `test that null passcode type sets biometrics to false`() = runTest {
+        underTest.setPasscodeType(null)
+
+        verify(passcodeStoreGateway).setBiometricsEnabled(false)
+    }
 }

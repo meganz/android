@@ -87,13 +87,22 @@ internal class PasscodeRepositoryImpl @Inject constructor(
         passcodeTypeMapper(type, biometricsEnabled)
     }.flowOn(ioDispatcher)
 
-    override suspend fun setPasscodeType(passcodeType: PasscodeType) = withContext(ioDispatcher) {
-        if (passcodeType is PasscodeType.Biometric) {
-            passcodeStoreGateway.setBiometricsEnabled(true)
-            passcodeStoreGateway.setPasscodeType(passcodeTypeStringMapper(passcodeType.fallback))
-        } else {
-            passcodeStoreGateway.setBiometricsEnabled(false)
-            passcodeStoreGateway.setPasscodeType(passcodeTypeStringMapper(passcodeType))
+    override suspend fun setPasscodeType(passcodeType: PasscodeType?) = withContext(ioDispatcher) {
+        when (passcodeType) {
+            null -> {
+                passcodeStoreGateway.setBiometricsEnabled(false)
+                passcodeStoreGateway.setPasscodeType(null)
+            }
+
+            is PasscodeType.Biometric -> {
+                passcodeStoreGateway.setBiometricsEnabled(true)
+                passcodeStoreGateway.setPasscodeType(passcodeTypeStringMapper(passcodeType.fallback))
+            }
+
+            else -> {
+                passcodeStoreGateway.setBiometricsEnabled(false)
+                passcodeStoreGateway.setPasscodeType(passcodeTypeStringMapper(passcodeType))
+            }
         }
     }
 }
