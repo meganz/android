@@ -855,7 +855,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         sendBackupHeartbeatJob =
             scope?.launch(ioDispatcher) {
-                sendBackupHeartBeatSyncUseCase(state.value)
+                sendBackupHeartBeatSyncUseCase { state.value }
                     .catch { Timber.e(it) }
                     .collect()
             }

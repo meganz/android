@@ -24,16 +24,16 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(private val cameraUploa
 
     /**
      * Invocation function
-     * @param cameraUploadsState    current state of camera uploads process
+     * @param cameraUploadsStateProvider    provide current state of camera uploads process
      */
     operator fun invoke(
-        cameraUploadsState: CameraUploadsState,
+        cameraUploadsStateProvider: () -> CameraUploadsState,
     ) = flow {
         while (true) {
             emit(Unit)
             cameraUploadRepository.getCuBackUp()?.let {
                 sendCameraUploadsHeartbeatIfNeeded(
-                    cameraUploadsFolderState = cameraUploadsState.primaryCameraUploadsState,
+                    cameraUploadsFolderState = cameraUploadsStateProvider().primaryCameraUploadsState,
                     backup = it,
                     cameraUploadsFolderType = CameraUploadFolderType.Primary
                 )
@@ -41,7 +41,7 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(private val cameraUploa
 
             cameraUploadRepository.getMuBackUp()?.let {
                 sendCameraUploadsHeartbeatIfNeeded(
-                    cameraUploadsFolderState = cameraUploadsState.secondaryCameraUploadsState,
+                    cameraUploadsFolderState = cameraUploadsStateProvider().secondaryCameraUploadsState,
                     backup = it,
                     cameraUploadsFolderType = CameraUploadFolderType.Secondary
                 )
