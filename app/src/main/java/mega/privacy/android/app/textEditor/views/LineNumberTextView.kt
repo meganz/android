@@ -5,8 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
-import com.jeremyliao.liveeventbus.LiveEventBus
-import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.addExtraOnDrawBehaviour
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.initTextPaint
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.updatePaddingsAndView

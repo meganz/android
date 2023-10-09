@@ -24,17 +24,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.Scrollable
@@ -125,10 +122,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     private val nodeSaver by lazy {
         NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
-    }
-
-    private val performScrollObserver = Observer<Int> { scrollY ->
-        binding.fileEditorScrollView.scrollY = scrollY
     }
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -245,9 +238,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     override fun onDestroy() {
-        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
-            .removeObserver(performScrollObserver)
-
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
         }
@@ -602,9 +592,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         viewModel.onFatalError().observe(this) {
             showFatalErrorWarningAndFinish()
         }
-
-        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
-            .observeForever(performScrollObserver)
     }
 
     /**
