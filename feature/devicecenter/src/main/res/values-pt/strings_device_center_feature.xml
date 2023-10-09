@@ -137,5 +137,5 @@
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Não é possível sincronizar esta pasta porque está dentro de uma pasta sincronizada.</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Camera uploads disabled</string>
+    <string name="device_center_list_view_item_status_camera_uploads_disabled">Uploads da câmera desativados</string>
 </resources>

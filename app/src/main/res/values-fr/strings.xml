@@ -2182,7 +2182,7 @@
     <!-- Title of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_title">Voulez-vous fermer toutes les autres sessions ?</string>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
-    <string name="number_of_participants">%d participants</string>
+    <string name="number_of_participants">%d&#160;participants</string>
     <!-- Label of the button to join a chat by a chat link -->
     <string name="action_join">Vous y joindre</string>
     <!-- Label for observers of a group chat -->
@@ -2369,9 +2369,9 @@
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
-        <item quantity="one">%d participant</item>
-        <item quantity="many">%d participants</item>
-        <item quantity="other">%d participants</item>
+        <item quantity="one">%d&#160;participant</item>
+        <item quantity="many">%d de participants</item>
+        <item quantity="other">%d&#160;participants</item>
     </plurals>
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s et %2$d de plus</string>
@@ -4006,7 +4006,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Ouvrir automatiquement les dossiers qui ne comprennent qu’images et vidéos en mode de découverte des médias. Cela vous permet de visualiser les médias en mode galerie et de les filtrer par date.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Comme ce dossier ne comprend que des images et des vidéos, nous l’avons automatiquement ouvert dans la vue de découvertes des médias. Ceci vous permet de visualiser les médias en mode galerie et de les filtrer par date. Vous pouvez désactiver cette option dans Paramètres.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Comme ce dossier ne comprend que des images et des vidéos, nous l’avons automatiquement ouvert en mode de découverte des médias. Vous pouvez profiter de votre contenu visuel avec une mise en page plus immersive. Vous pouvez désactiver cette option dans Paramètres.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Paramètres</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5376,7 +5376,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Découverte des médias dans les sous-dossiers</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Les images et vidéos des sous-dossiers seront aussi comprises en mode de découverte des médias si le dossier principal se trouve dans cette vue</string>
+    <string name="settings_media_discovery_sub_folder_context">Les images et vidéos des sous-dossiers seront aussi comprises en mode de découverte des médias.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Aucun résultat</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5403,4 +5403,23 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">En attente (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Afficher tous les participants</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Ne pas refuser</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Les téléversements ont été mis en pause, car il n’y a pas de connexion à Internet</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Téléversements de l’appareil photo en cours, %1$d&#160;fichier en attente</item>
+        <item quantity="many">Téléversements de l’appareil photo en cours, %1$d de fichiers en attente</item>
+        <item quantity="other">Téléversements de l’appareil photo en cours, %1$d&#160;fichiers en attente</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Téléversements de l’appareil photo terminés, %1$d&#160;fichier téléversé</item>
+        <item quantity="many">Téléversements de l’appareil photo terminés, %1$d de fichiers téléversés</item>
+        <item quantity="other">Téléversements de l’appareil photo terminés, %1$d&#160;fichiers téléversés</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

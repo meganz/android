@@ -517,7 +517,7 @@
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">I Caricamenti da fotocamera sono stati disattivati. La tua cartella locale non è disponibile.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">I Caricamenti dei media sono stati disattivati. La tua cartella locale non è disponibile.</string>
+    <string name="camera_notif_secondary_local_unavailable">I caricamenti dei media sono stati disattivati. La tua cartella locale non è disponibile.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Apparenza</string>
     <!-- settings of the Features section -->
@@ -616,7 +616,7 @@
         <item>Solo Wi-Fi</item>
     </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
-    <string name="settings_camera_upload_what_to_upload">Carica File</string>
+    <string name="settings_camera_upload_what_to_upload">Carica file</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string-array name="settings_camera_upload_file_upload_entries">
         <item>Solo foto</item>
@@ -1415,7 +1415,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i Caricamenti da fotocamera.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i Caricamenti dei media secondari.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i caricamenti dei media secondari.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Spostare nel Cestino?</string>
     <!-- confirmation message before removing a file -->
@@ -4002,11 +4002,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s settimanale</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Visualizzazione a galleria</string>
+    <string name="settings_media_discovery_view_title">Esplorazione dei media</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Apri automaticamente le cartelle che contengono solamente immagini e video nella visualizzazione a galleria. Questo ti permette di vedere i media in modalità galleria e di filtrare per data.</string>
+    <string name="settings_media_discovery_view_context">Apri automaticamente le cartelle che contengono solamente immagini e video nell\’esplorazione dei media. Questo ti permette di vedere i media in modalità galleria e di filtrare per data.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Dato che questa cartella contiene solamente immagini e video, la abbiamo aperta automaticamente nella visualizzazione a galleria. Questo ti permette di vedere i media in modalità galleria e di filtrare per data. Puoi disabilitarlo nelle Impostazioni.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Dato che questa cartella contiene solamente immagini e video, la abbiamo aperta automaticamente nella modalità di esplorazione dei media. Questo ti permette di vedere i media in modalità galleria e di filtrare per data. Puoi disabilitarlo nelle Impostazioni.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Impostazioni</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5374,9 +5374,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Originale</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Trova media nelle sottocartelle</string>
+    <string name="settings_media_discovery_sub_folder_title">Esplora i media nelle sottocartelle</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Immagini e video dalle sottocartelle saranno inclusi nella vista dei media quando la cartella principale è in mostra</string>
+    <string name="settings_media_discovery_sub_folder_context">Immagini e video dalle sottocartelle saranno inclusi nell\’esplorazione dei media.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Nessun risultato</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5403,4 +5403,21 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Waiting (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Vedi tutti</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
+        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
+        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

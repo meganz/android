@@ -3806,7 +3806,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">在媒體探索檢視中自動開啟僅含有圖片和影片的資料夾。這能讓你在相簿模式中看到媒體內容並且依日期進行篩選。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">由於此資料夾內僅包含圖片和影片，我們已經自動在媒體探索檢視中開啟它。這能讓你在相簿模式中看到媒體並且依日期進行篩選。您可以在設定中停用此功能。</string>
+    <string name="cloud_drive_media_discovery_banner_context">由於此資料夾僅包含圖片和影片，我們已經自動在媒體探索檢視中開啟它。您可以透過更身臨其境的佈局享受您的視覺內容。您可以在設定中停用此功能。</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">設定</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4914,7 +4914,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">子資料夾中的媒體探索</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">當主資料夾位於媒體探索檢視中時，子資料夾的影像和影片也將包含在媒體探索檢視中</string>
+    <string name="settings_media_discovery_sub_folder_context">子資料夾中的影像和影片也將包含在媒體探檢檢視中。</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">沒有搜尋結果</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4940,5 +4940,20 @@
     <!-- Label to show the number of participants in the waiting room-->
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">正在等待（%d）</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
-    <string name="meetings_waiting_room_call_ui_see_all_button">檢視全部</string>
+    <string name="meetings_waiting_room_call_ui_see_all_button">查看全部</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">不要拒絕</string>
+    <string name="camera_uploads_up_to_date">相機上傳已更新</string>
+    <string name="camera_uploads_paused_due_to_no_internet">由於沒有網路連線，上傳已暫停</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="other">相機上傳正在進行中，%1$d個檔案待處理</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

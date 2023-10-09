@@ -3906,7 +3906,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Ordner, die nur Bilder und Videos enthalten, automatisch in der Medienerkennungsansicht öffnen. Dadurch können Sie Medien im Galeriemodus ansehen und nach Datum filtern.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Da dieser Ordner nur Bilder und Videos enthält, haben wir ihn automatisch in der Medienerkennungsansicht geöffnet. Dadurch können Sie Medien im Galeriemodus ansehen und nach Datum filtern. Sie können dies in den Einstellungen deaktivieren.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Da dieser Ordner nur Bilder und Videos enthält, haben wir ihn automatisch in der Medienerkennungsansicht geöffnet. So können Sie Ihre visuellen Inhalte in einem ablenkungsfreien Layout genießen. Sie können dies in den Einstellungen deaktivieren.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Einstellungen</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5098,7 +5098,7 @@
     <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
     <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">Alle hereinlassen</string>
     <!-- Deny button in admit users to waiting room dialog in a meeting -->
-    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Ablehnen</string>
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Abweisen</string>
     <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
     <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s wartet darauf, der Konferenz beizutreten.</string>
     <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
@@ -5109,11 +5109,11 @@
         <item quantity="other">%1$d Teilnehmer warten darauf, der Konferenz beizutreten.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
-    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">%1$s den Beitritt verweigern?</string>
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">%1$s abweisen?</string>
     <!-- Dialog button to deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Beitritt verweigern</string>
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Abweisen</string>
     <!-- Dialog title when a participant has been denied entry to the call -->
-    <string name="meetings_waiting_room_deny_user_dialog_title">Der Gastgeber hat Sie nicht hereingelassen</string>
+    <string name="meetings_waiting_room_deny_user_dialog_title">Der Gastgeber hat Sie abgewiesen</string>
     <!-- Dialog description when a participant has been denied entry to the call -->
     <string name="meetings_waiting_room_deny_user_dialog_description">Sie werden aus dem Warteraum entfernt.</string>
     <!-- Dialog title when waiting room has been inactive for a while -->
@@ -5145,7 +5145,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Medienerkennung in Unterordnern</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">In der Medienerkennungsansicht werden auch Bilder und Videos in Unterordnern angezeigt</string>
+    <string name="settings_media_discovery_sub_folder_context">Bilder und Videos in Unterordnern werden in der Medienerkennungsansicht ebenfalls angezeigt.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Keine Treffer</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5172,4 +5172,21 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Wartend (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Alle anzeigen</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Nicht abweisen</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Upload-Pause wegen fehlender Internetverbindung</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Kamera-Uploads aktiv, noch %1$d Datei</item>
+        <item quantity="other">Kamera-Uploads aktiv, noch %1$d Dateien</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Kamera-Uploads abgeschlossen, %1$d Datei hochgeladen</item>
+        <item quantity="other">Kamera-Uploads abgeschlossen, %1$d Dateien hochgeladen</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

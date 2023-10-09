@@ -137,5 +137,5 @@
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Thư&#160;mục không thể đồng&#160;bộ được bởi vì nó đang nằm ở trong một thư&#160;mục được đồng&#160;bộ.</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Camera uploads disabled</string>
+    <string name="device_center_list_view_item_status_camera_uploads_disabled">Đăng tải camêra đã tắt</string>
 </resources>

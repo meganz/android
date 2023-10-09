@@ -3806,7 +3806,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">在媒体发现视图中自动打开只包含图片和视频的文件夹。这让您可以在图库模式下看到媒体，并按日期过滤。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">由于这个文件夹只包含图片和视频，我们已经自动在媒体发现视图中打开它。这可以让你在图库模式下看到媒体，并按日期过滤。您可以在设置中停用这个功能。</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">设置</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4662,7 +4662,7 @@
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Friday -->
     <string name="meetings_custom_recurrence_friday_option">周五</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Saturday -->
-    <string name="meetings_custom_recurrence_saturday_option">周日</string>
+    <string name="meetings_custom_recurrence_saturday_option">周六</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Sunday -->
     <string name="meetings_custom_recurrence_sunday_option">周日</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
@@ -4914,7 +4914,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">子文件夹中的媒体发现</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">当主文件夹启用媒体发现视图时，子文件夹中的图片和视频也会包含在媒体发现视图中。</string>
+    <string name="settings_media_discovery_sub_folder_context">子文件夹中的图像和视频也将包含在媒体发现视图中。</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">没有符合搜索的项目</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4941,4 +4941,19 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">正在等候(%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">查看全部</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">不要拒绝</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">由于没有互联网连接，上传已暂停</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="other">正在相机上传，%1$d个文件待处理</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="other">相机上传完成，%1$d个文件已上传</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

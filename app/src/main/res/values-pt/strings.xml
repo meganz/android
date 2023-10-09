@@ -517,7 +517,7 @@
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Os Uploads da câmera foram desativados - a pasta local não está disponível.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">O Upload de mídias foi desativados - a pasta local não está disponível.</string>
+    <string name="camera_notif_secondary_local_unavailable">O upload de mídias foi desativados - a pasta local não está disponível.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Aparência</string>
     <!-- settings of the Features section -->
@@ -4002,11 +4002,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s semanal</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Visualização na Galeria multimídia</string>
+    <string name="settings_media_discovery_view_title">Visualização do explorador multimídia</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Abrir automaticamente pastas somente com imagens e vídeos na Galeria multimídia. Isso permite que você veja os arquivos na galeria e filtre por data.</string>
+    <string name="settings_media_discovery_view_context">Abrir automaticamente pastas somente com imagens e vídeos na visualização do explorador multimídia. Isso permite que você veja os arquivos na galeria e filtre por data.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Como esta pasta somente inclui imagens e vídeos, nós a abrimos automaticamente na Galeria multimídia, o que permite que você veja os arquivos na galeria e filtre por data. Você pode desativar esta opção nas Configurações.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Como essa pasta contém apenas imagens e vídeos, nós a abrimos automaticamente na visualização do explorador multimídia. Você pode aproveitar o seu conteúdo visual com um layout mais envolvente. Para desativar essa função, acesse as Configurações.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Configurações</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5338,9 +5338,9 @@
         <item quantity="other">%1$d participantes estão esperando para entrar na chamada.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
-    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Não permitir o acesso de %1$s?</string>
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Rejeitar o acesso de %1$s?</string>
     <!-- Dialog button to deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Não permitir o acesso</string>
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Rejeitar o acesso</string>
     <!-- Dialog title when a participant has been denied entry to the call -->
     <string name="meetings_waiting_room_deny_user_dialog_title">O anfitrião não deixou você entrar</string>
     <!-- Dialog description when a participant has been denied entry to the call -->
@@ -5374,9 +5374,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Original</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Galeria multimídia nas subpastas</string>
+    <string name="settings_media_discovery_sub_folder_title">Explorador multimídia nas subpastas</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Imagens e vídeos de subpastas também serão incluídos na visualização na galeria multimídia quando a pasta principal estiver nesta configuração</string>
+    <string name="settings_media_discovery_sub_folder_context">Imagens e vídeos de subpastas também serão incluídos na visualização do explorador multimídia.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Não há resultados</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5403,4 +5403,23 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Esperando (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Ver todos</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Não rejeitar</string>
+    <string name="camera_uploads_up_to_date">Uploads da câmera atualizados</string>
+    <string name="camera_uploads_paused_due_to_no_internet">O upload foi pausado por falta de conexão à Internet</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Uploads da câmera em andamento, %1$d arquivo pendente</item>
+        <item quantity="many">Uploads da câmera em andamento, %1$d de arquivos pendentes</item>
+        <item quantity="other">Uploads da câmera em andamento, %1$d arquivos pendentes</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Uploads da câmera concluídos, foi feito o upload de %1$d arquivo</item>
+        <item quantity="many">Uploads da câmera concluídos, foi feito o upload de %1$d de arquivos</item>
+        <item quantity="other">Uploads da câmera concluídos, foi feito o upload de %1$d arquivos</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>
