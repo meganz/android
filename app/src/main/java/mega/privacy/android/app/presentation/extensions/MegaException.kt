@@ -41,10 +41,10 @@ internal fun MegaException.getErrorStringId(): Int =
         MegaError.API_EKEY -> R.string.api_ekey
         MegaError.API_ESID -> R.string.api_esid
         MegaError.API_EBLOCKED ->
-            if (errorString == "Not accessible due to ToS/AUP violation" || errorString == "Blocked") {
-                R.string.error_download_takendown_file
-            } else {
-                R.string.payment_egeneric_api_error_unknown
+            when (errorString) {
+                "File removed as it violated our Terms of Service" -> R.string.error_download_takendown_file
+                "Blocked" -> R.string.api_eblocked
+                else -> R.string.payment_egeneric_api_error_unknown
             }
 
         MegaError.API_EOVERQUOTA -> R.string.api_eoverquota

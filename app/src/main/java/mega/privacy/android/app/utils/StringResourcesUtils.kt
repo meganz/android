@@ -49,35 +49,27 @@ object StringResourcesUtils {
             MegaError.API_ERATELIMIT -> context.getString(R.string.api_eratelimit)
             MegaError.API_EFAILED -> context.getString(R.string.api_efailed)
             MegaError.API_ETOOMANY -> when (errorString) {
-                "Terms of Service breached" -> {
-                    context.getString(R.string.api_etoomany_ec_download)
-                }
-                "Too many concurrent connections or transfers" -> {
-                    context.getString(R.string.api_etoomay)
-                }
-                else -> {
-                    errorString
-                }
+                "Terms of Service breached" -> context.getString(R.string.api_etoomany_ec_download)
+                "Too many concurrent connections or transfers" -> context.getString(R.string.api_etoomay)
+                else -> errorString
             }
             MegaError.API_ERANGE -> context.getString(R.string.api_erange)
             MegaError.API_EEXPIRED -> context.getString(R.string.api_eexpired)
             MegaError.API_ENOENT -> context.getString(R.string.api_enoent)
-            MegaError.API_ECIRCULAR -> if (errorString == "Upload produces recursivity") {
-                context.getString(R.string.api_ecircular_ec_upload)
-            } else if (errorString == "Circular linkage detected") {
-                context.getString(R.string.api_ecircular)
-            } else {
-                errorString
+            MegaError.API_ECIRCULAR -> when (errorString) {
+                "Upload produces recursivity" -> context.getString(R.string.api_ecircular_ec_upload)
+                "Circular linkage detected" -> context.getString(R.string.api_ecircular)
+                else -> errorString
             }
             MegaError.API_EACCESS -> context.getString(R.string.api_eaccess)
             MegaError.API_EEXIST -> context.getString(R.string.api_eexist)
             MegaError.API_EINCOMPLETE -> context.getString(R.string.api_eincomplete)
             MegaError.API_EKEY -> context.getString(R.string.api_ekey)
             MegaError.API_ESID -> context.getString(R.string.api_esid)
-            MegaError.API_EBLOCKED -> if (errorString == "Not accessible due to ToS/AUP violation" || errorString == "Blocked") {
-                context.getString(R.string.error_download_takendown_file)
-            } else {
-                errorString
+            MegaError.API_EBLOCKED -> when (errorString) {
+                "File removed as it violated our Terms of Service" -> context.getString(R.string.error_download_takendown_file)
+                "Blocked" -> context.getString(R.string.api_eblocked)
+                else -> errorString
             }
             MegaError.API_EOVERQUOTA -> context.getString(R.string.api_eoverquota)
             MegaError.API_ETEMPUNAVAIL -> context.getString(R.string.api_etempunavail)
