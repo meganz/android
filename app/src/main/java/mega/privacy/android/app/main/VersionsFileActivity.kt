@@ -3,7 +3,6 @@ package mega.privacy.android.app.main
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -17,10 +16,13 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -155,8 +157,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
             node?.let {
                 accessLevel = megaApi.getAccess(node)
                 nodeVersions = megaApi.getVersions(node)
-                val getVersionsSizeTask = GetVersionsSizeTask()
-                getVersionsSizeTask.execute()
+                updateVersionsSize()
                 binding.recyclerViewVersionsFile.visibility = View.VISIBLE
 
                 adapter?.let {
@@ -187,21 +188,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.versionsMainLayout, content, chatId)
-    }
-
-    private inner class GetVersionsSizeTask : AsyncTask<String?, Void?, Long>() {
-
-        override fun doInBackground(vararg params: String?): Long {
-
-            val sizeNumber: Long = nodeVersions?.sumOf { node -> node.size } ?: 0L
-            Timber.d("doInBackground-AsyncTask GetVersionsSizeTask: $sizeNumber")
-            return sizeNumber
-        }
-
-        override fun onPostExecute(size: Long) {
-            Timber.d("GetVersionsSizeTask::onPostExecute")
-            updateSize(size)
-        }
     }
 
     private inner class ActionBarCallBack : ActionMode.Callback {
@@ -924,8 +910,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
                 binding.recyclerViewVersionsFile.adapter = adapter
             }
 
-            val getVersionsSizeTask = GetVersionsSizeTask()
-            getVersionsSizeTask.execute()
+            updateVersionsSize()
         }
     }
 
@@ -979,11 +964,14 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
         showSnackbar(binding.versionsMainLayout, s!!)
     }
 
-    fun updateSize(size: Long?) {
-        Timber.d("Size: %s", size)
-        val sizeString = size?.let { Util.getSizeString(it, this) }
-        versionsSize = sizeString
-        adapter?.notifyItemChanged(1)
+    private fun updateVersionsSize() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val size: Long = nodeVersions?.sumOf { node -> node.size } ?: 0L
+            Timber.d("Size: %s", size)
+            val sizeString = size.let { Util.getSizeString(it, this@VersionsFileActivity) }
+            versionsSize = sizeString
+            adapter?.notifyItemChanged(1)
+        }
     }
 
     fun showConfirmationRemoveVersion() {
