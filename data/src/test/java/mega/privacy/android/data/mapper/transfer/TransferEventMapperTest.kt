@@ -26,6 +26,7 @@ internal class TransferEventMapperTest {
 
     private val exceptionMapper = mock<MegaExceptionMapper>()
     private val transferMapper = mock<TransferMapper>()
+    private val errorContextMapper = mock<ErrorContextMapper>()
     private val mockTransfer = mock<Transfer>()
     private val megaTransfer = mock<MegaTransfer>()
 
@@ -47,7 +48,7 @@ internal class TransferEventMapperTest {
 
     @BeforeAll
     fun setup() {
-        underTest = TransferEventMapper(transferMapper, exceptionMapper)
+        underTest = TransferEventMapper(transferMapper, exceptionMapper, errorContextMapper)
     }
 
     @BeforeEach

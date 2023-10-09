@@ -12,6 +12,7 @@ import javax.inject.Inject
 internal class TransferEventMapper @Inject constructor(
     private val transferMapper: TransferMapper,
     private val exceptionMapper: MegaExceptionMapper,
+    private val errorContextMapper: ErrorContextMapper,
 ) {
     operator fun invoke(
         event: GlobalTransfer,
@@ -24,7 +25,10 @@ internal class TransferEventMapper @Inject constructor(
         is GlobalTransfer.OnTransferFinish -> {
             val exception = when (event.error.errorCode) {
                 MegaError.API_OK -> null
-                else -> exceptionMapper(event.error)
+                else -> exceptionMapper(
+                    error = event.error,
+                    errorContext = errorContextMapper(event.transfer.type)
+                )
             }
             TransferEvent.TransferFinishEvent(
                 transferMapper(event.transfer),
@@ -39,7 +43,10 @@ internal class TransferEventMapper @Inject constructor(
         is GlobalTransfer.OnTransferTemporaryError -> {
             val exception = when (event.error.errorCode) {
                 MegaError.API_OK -> null
-                else -> exceptionMapper(event.error)
+                else -> exceptionMapper(
+                    error = event.error,
+                    errorContext = errorContextMapper(event.transfer.type)
+                )
             }
             TransferEvent.TransferTemporaryErrorEvent(
                 transferMapper(event.transfer),
