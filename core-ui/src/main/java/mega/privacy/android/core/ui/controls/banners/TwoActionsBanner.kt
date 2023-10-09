@@ -33,7 +33,7 @@ fun TwoActionsBanner(
             text = mainText,
             modifier = Modifier.padding(horizontal = 16.dp),
             style = MaterialTheme.typography.body2,
-            color = MegaTheme.colors.textPrimary
+            color = MegaTheme.colors.text.primary
         )
         Row(Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.weight(1f))

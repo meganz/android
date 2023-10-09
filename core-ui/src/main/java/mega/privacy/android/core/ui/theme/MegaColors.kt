@@ -4,40 +4,31 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import mega.privacy.android.core.ui.theme.tokens.SemanticTokens
 
 /**
  * Theme colors to be used in all core-ui components.
  */
 @Immutable
 internal data class MegaColors(
-    val buttonPrimary: Color,
-    val buttonOutline: Color,
-    val buttonDisabled: Color,
-    val borderDisabled: Color,
-    val textPrimary: Color,
-    val textInverse: Color,
-    val textWarning: Color,
-    val textAccent: Color,
-    val textDisabled: Color,
-    val iconPrimary: Color,
-    val notificationWarning: Color,
+    private val semanticTokens: SemanticTokens,
     val isLight: Boolean,
-) {
+) : SemanticTokens by semanticTokens {
 
     val buttonsColors
         @Composable
         get() = ButtonDefaults.buttonColors(
             backgroundColor = Color.Transparent,
-            contentColor = textAccent,
+            contentColor = text.accent,
             disabledBackgroundColor = Color.Transparent,
-            disabledContentColor = textDisabled,
+            disabledContentColor = text.disabled,
         )
     val raisedButtonColors
         @Composable
         get() = ButtonDefaults.buttonColors(
-            backgroundColor = buttonPrimary,
-            contentColor = textInverse,
-            disabledBackgroundColor = buttonDisabled,
-            disabledContentColor = textDisabled,
+            backgroundColor = button.primary,
+            contentColor = text.inverse,
+            disabledBackgroundColor = button.disabled,
+            disabledContentColor = text.disabled,
         )
 }

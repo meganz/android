@@ -3,6 +3,7 @@ package mega.privacy.android.core.ui.buildscripts.deserializers
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import mega.privacy.android.core.ui.buildscripts.jsonNameToKotlinName
 import mega.privacy.android.core.ui.buildscripts.model.json.JsonTokenName
 import java.lang.reflect.Type
 import java.util.Locale

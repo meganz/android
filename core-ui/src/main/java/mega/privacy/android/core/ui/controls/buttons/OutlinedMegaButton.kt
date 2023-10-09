@@ -67,9 +67,9 @@ fun OutlinedMegaButton(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
         border = BorderStroke(
             1.dp, if (enabled) {
-                MegaTheme.colors.buttonOutline
+                MegaTheme.colors.button.outline
             } else {
-                MegaTheme.colors.borderDisabled
+                MegaTheme.colors.border.disabled
             }
         )
     ) {

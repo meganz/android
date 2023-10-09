@@ -4,172 +4,109 @@
 //
 package mega.privacy.android.core.ui.theme.tokens
 
-import androidx.compose.ui.graphics.Color
-
-internal object Dark {
-    public object Focus {
-        public val colorFocus: Color = Colors.Secondary.Indigo.n700
-    }
-
-    public object Indicator {
-        public val colorIndicatorMagenta: Color = Colors.Secondary.Magenta.n300
-
-        public val colorIndicatorYellow: Color = Colors.Warning.n400
-
-        public val colorIndicatorOrange: Color = Colors.Secondary.Orange.n300
-
-        public val colorIndicatorIndigo: Color = Colors.Secondary.Indigo.n300
-
-        public val colorIndicatorBlue: Color = Colors.Secondary.Blue.n400
-
-        public val colorIndicatorGreen: Color = Colors.Success.n400
-
-        public val colorIndicatorPink: Color = Colors.Error.n400
-    }
-
-    public object Support {
-        public val colorSupportError: Color = Colors.Error.n400
-
-        public val colorSupportWarning: Color = Colors.Warning.n500
-
-        public val colorSupportSuccess: Color = Colors.Success.n500
-
-        public val colorSupportInfo: Color = Colors.Secondary.Blue.n600
-    }
-
-    public object Button {
-        public val colorButtonDisabled: Color = Colors.WhiteOpacity.n010
-
-        public val colorButtonErrorPressed: Color = Colors.Error.n300
-
-        public val colorButtonErrorHover: Color = Colors.Error.n400
-
-        public val colorButtonError: Color = Colors.Error.n500
-
-        public val colorButtonOutlineBackgroundHover: Color = Colors.WhiteOpacity.n005
-
-        public val colorButtonOutlineHover: Color = Colors.Accent.n300
-
-        public val colorButtonOutline: Color = Colors.Accent.n050
-
-        public val colorButtonPrimaryHover: Color = Colors.Accent.n300
-
-        public val colorButtonSecondaryPressed: Color = Colors.Neutral.n500
-
-        public val colorButtonBrandPressed: Color = Colors.Primary.n300
-
-        public val colorButtonSecondaryHover: Color = Colors.Neutral.n600
-
-        public val colorButtonSecondary: Color = Colors.Neutral.n700
-
-        public val colorButtonBrandHover: Color = Colors.Primary.n400
-
-        public val colorButtonBrand: Color = Colors.Primary.n500
-
-        public val colorButtonPrimaryPressed: Color = Colors.Accent.n200
-
-        public val colorButtonOutlinePressed: Color = Colors.Accent.n200
-
-        public val colorButtonPrimary: Color = Colors.Accent.n050
-    }
-
-    public object Text {
-        public val ColorTextInverse: Color = Colors.Neutral.n800
-
-        public val colorTextDisabled: Color = Colors.Neutral.n500
-
-        public val colorTextWarning: Color = Colors.Warning.n500
-
-        public val colorTextInfo: Color = Colors.Secondary.Blue.n500
-
-        public val colorTextSuccess: Color = Colors.Success.n500
-
-        public val colorTextError: Color = Colors.Error.n400
-
-        public val colorTextOnColorDisabled: Color = Colors.Neutral.n400
-
-        public val colorTextOnColor: Color = Colors.Neutral.n025
-
-        public val colorTextPlaceholder: Color = Colors.Neutral.n200
-
-        public val colorTextAccent: Color = Colors.Accent.n025
-
-        public val colorTextSecondary: Color = Colors.Neutral.n300
-
-        public val colorTextPrimary: Color = Colors.Neutral.n050
-
-        public val colorTextInverseAccent: Color = Colors.Accent.n900
-    }
-
-    public object Background {
-        public val colorBackgroundBlur: Color = Colors.BlackOpacity.n020
-
-        public val colorSurface2: Color = Colors.Neutral.n700
-
-        public val colorSurface3: Color = Colors.Neutral.n600
-
-        public val colorSurface1: Color = Colors.Neutral.n800
-
-        public val colorBackgroundInverse: Color = Colors.Neutral.n050
-
-        public val colorPageBackground: Color = Colors.Neutral.n900
-    }
-
-    public object Icon {
-        public val colorIconDisabled: Color = Colors.Neutral.n500
-
-        public val colorIconInverse: Color = Colors.Neutral.n800
-
-        public val colorIconOnColorDisabled: Color = Colors.Neutral.n400
-
-        public val colorIconOnColor: Color = Colors.Neutral.n025
-
-        public val colorIconInverseAccent: Color = Colors.Accent.n900
-
-        public val colorIconAccent: Color = Colors.Accent.n025
-
-        public val colorIconSecondary: Color = Colors.Neutral.n300
-
-        public val colorIconPrimary: Color = Colors.Neutral.n050
-    }
-
-    public object Components {
-        public val colorToastBackground: Color = Colors.Neutral.n200
-
-        public val colorInteractive: Color = Colors.Primary.n400
-
-        public val colorSelectionControl: Color = Colors.Accent.n050
-    }
-
-    public object Link {
-        public val colorLinkVisited: Color = Colors.Secondary.Indigo.n100
-
-        public val colorLinkInverse: Color = Colors.Secondary.Indigo.n600
-
-        public val colorLinkPrimary: Color = Colors.Secondary.Indigo.n400
-    }
-
-    public object Notifications {
-        public val colorNotificationInfo: Color = Colors.Secondary.Blue.n900
-
-        public val colorNotificationError: Color = Colors.Error.n900
-
-        public val colorNotificationWarning: Color = Colors.Warning.n800
-
-        public val colorNotificationSuccess: Color = Colors.Success.n900
-    }
-
-    public object Border {
-        public val colorBorderDisabled: Color = Colors.Neutral.n700
-
-        public val colorBorderStrong: Color = Colors.Neutral.n600
-
-        public val colorBorderInteractive: Color = Colors.Primary.n400
-
-        public val colorBorderSubtleSelected: Color = Colors.Accent.n050
-
-        public val colorBorderSubtle: Color = Colors.Neutral.n800
-
-        public val colorBorderStrongSelected: Color = Colors.Accent.n050
-    }
+internal object SemanticTokensDark : SemanticTokens {
+    override val focus: Focus = Focus(
+            colorFocus = Colors.Secondary.Indigo.n700,
+            )
+
+    override val indicator: Indicator = Indicator(
+            magenta = Colors.Secondary.Magenta.n300,
+            yellow = Colors.Warning.n400,
+            orange = Colors.Secondary.Orange.n300,
+            indigo = Colors.Secondary.Indigo.n300,
+            blue = Colors.Secondary.Blue.n400,
+            green = Colors.Success.n400,
+            pink = Colors.Error.n400,
+            )
+
+    override val support: Support = Support(
+            error = Colors.Error.n400,
+            warning = Colors.Warning.n500,
+            success = Colors.Success.n500,
+            info = Colors.Secondary.Blue.n600,
+            )
+
+    override val button: Button = Button(
+            disabled = Colors.WhiteOpacity.n010,
+            errorPressed = Colors.Error.n300,
+            errorHover = Colors.Error.n400,
+            error = Colors.Error.n500,
+            outlineBackgroundHover = Colors.WhiteOpacity.n005,
+            outlineHover = Colors.Accent.n300,
+            outline = Colors.Accent.n050,
+            primaryHover = Colors.Accent.n300,
+            secondaryPressed = Colors.Neutral.n500,
+            brandPressed = Colors.Primary.n300,
+            secondaryHover = Colors.Neutral.n600,
+            secondary = Colors.Neutral.n700,
+            brandHover = Colors.Primary.n400,
+            brand = Colors.Primary.n500,
+            primaryPressed = Colors.Accent.n200,
+            outlinePressed = Colors.Accent.n200,
+            primary = Colors.Accent.n050,
+            )
+
+    override val text: Text = Text(
+            inverse = Colors.Neutral.n800,
+            disabled = Colors.Neutral.n500,
+            warning = Colors.Warning.n500,
+            info = Colors.Secondary.Blue.n500,
+            success = Colors.Success.n500,
+            error = Colors.Error.n400,
+            onColorDisabled = Colors.Neutral.n400,
+            onColor = Colors.Neutral.n025,
+            placeholder = Colors.Neutral.n200,
+            accent = Colors.Accent.n025,
+            secondary = Colors.Neutral.n300,
+            primary = Colors.Neutral.n050,
+            inverseAccent = Colors.Accent.n900,
+            )
+
+    override val background: Background = Background(
+            blur = Colors.BlackOpacity.n020,
+            surface2 = Colors.Neutral.n700,
+            surface3 = Colors.Neutral.n600,
+            surface1 = Colors.Neutral.n800,
+            inverse = Colors.Neutral.n050,
+            pageBackground = Colors.Neutral.n900,
+            )
+
+    override val icon: Icon = Icon(
+            disabled = Colors.Neutral.n500,
+            inverse = Colors.Neutral.n800,
+            onColorDisabled = Colors.Neutral.n400,
+            onColor = Colors.Neutral.n025,
+            inverseAccent = Colors.Accent.n900,
+            accent = Colors.Accent.n025,
+            secondary = Colors.Neutral.n300,
+            primary = Colors.Neutral.n050,
+            )
+
+    override val components: Components = Components(
+            toastBackground = Colors.Neutral.n200,
+            interactive = Colors.Primary.n400,
+            selectionControl = Colors.Accent.n050,
+            )
+
+    override val link: Link = Link(
+            visited = Colors.Secondary.Indigo.n100,
+            inverse = Colors.Secondary.Indigo.n600,
+            primary = Colors.Secondary.Indigo.n400,
+            )
+
+    override val notifications: Notifications = Notifications(
+            notificationInfo = Colors.Secondary.Blue.n900,
+            notificationError = Colors.Error.n900,
+            notificationWarning = Colors.Warning.n800,
+            notificationSuccess = Colors.Success.n900,
+            )
+
+    override val border: Border = Border(
+            disabled = Colors.Neutral.n700,
+            strong = Colors.Neutral.n600,
+            interactive = Colors.Primary.n400,
+            subtleSelected = Colors.Accent.n050,
+            subtle = Colors.Neutral.n800,
+            strongSelected = Colors.Accent.n050,
+            )
 }

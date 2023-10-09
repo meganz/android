@@ -1,24 +1,25 @@
 package mega.privacy.android.core.ui.theme
 
-import androidx.compose.ui.graphics.Color
-import mega.privacy.android.core.ui.theme.tokens.Dark
-import mega.privacy.android.core.ui.theme.tokens.Light
+import mega.privacy.android.core.ui.theme.tokens.Background
+import mega.privacy.android.core.ui.theme.tokens.Border
+import mega.privacy.android.core.ui.theme.tokens.Button
+import mega.privacy.android.core.ui.theme.tokens.Components
+import mega.privacy.android.core.ui.theme.tokens.Focus
+import mega.privacy.android.core.ui.theme.tokens.Icon
+import mega.privacy.android.core.ui.theme.tokens.Indicator
+import mega.privacy.android.core.ui.theme.tokens.Link
+import mega.privacy.android.core.ui.theme.tokens.Notifications
+import mega.privacy.android.core.ui.theme.tokens.SemanticTokens
+import mega.privacy.android.core.ui.theme.tokens.SemanticTokensDark
+import mega.privacy.android.core.ui.theme.tokens.SemanticTokensLight
+import mega.privacy.android.core.ui.theme.tokens.Support
+import mega.privacy.android.core.ui.theme.tokens.Text
 
 /**
  * [MegaColors] palette to be used in Light Theme
  */
 internal val lightColorPalette = MegaColors(
-    buttonPrimary = Light.Button.colorButtonPrimary,
-    buttonOutline = Light.Button.colorButtonOutline,
-    buttonDisabled = Light.Button.colorButtonDisabled,
-    borderDisabled = Light.Border.colorBorderDisabled,
-    textPrimary = Light.Text.colorTextPrimary,
-    textInverse = Light.Text.ColorTextInverse,
-    textWarning = Light.Text.colorTextWarning,
-    textAccent = Light.Text.colorTextAccent,
-    textDisabled = Light.Text.colorTextDisabled,
-    iconPrimary = Light.Icon.colorIconPrimary,
-    notificationWarning = Light.Notifications.colorNotificationWarning,
+    SemanticTokensLight,
     isLight = true
 )
 
@@ -26,17 +27,7 @@ internal val lightColorPalette = MegaColors(
  * [MegaColors] palette to be used in Dark Theme
  */
 internal val darkColorPalette = MegaColors(
-    buttonPrimary = Dark.Button.colorButtonPrimary,
-    buttonOutline = Dark.Button.colorButtonOutline,
-    buttonDisabled = Dark.Button.colorButtonDisabled,
-    borderDisabled = Dark.Border.colorBorderDisabled,
-    textPrimary = Dark.Text.colorTextPrimary,
-    textInverse = Dark.Text.ColorTextInverse,
-    textWarning = Dark.Text.colorTextWarning,
-    textAccent = Dark.Text.colorTextAccent,
-    textDisabled = Dark.Text.colorTextDisabled,
-    iconPrimary = Dark.Icon.colorIconPrimary,
-    notificationWarning = Dark.Notifications.colorNotificationWarning,
+    SemanticTokensDark,
     isLight = false
 )
 
@@ -44,16 +35,18 @@ internal val darkColorPalette = MegaColors(
  * [MegaColors] default palette for testing purposes, all magenta to easily detect it.
  */
 internal val testColorPalette = MegaColors(
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
-    Color.Magenta,
+    object : SemanticTokens {
+        override val focus = Focus()
+        override val indicator = Indicator()
+        override val support = Support()
+        override val button = Button()
+        override val text = Text()
+        override val background = Background()
+        override val icon = Icon()
+        override val components = Components()
+        override val link = Link()
+        override val notifications = Notifications()
+        override val border = Border()
+    },
     false,
 )

@@ -56,8 +56,8 @@ fun WarningBanner(
     onCloseClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val textColour = MegaTheme.colors.textPrimary
-    val buttonColor = MegaTheme.colors.iconPrimary
+    val textColour = MegaTheme.colors.text.primary
+    val buttonColor = MegaTheme.colors.icon.primary
     ProvideTextStyle(
         MaterialTheme.typography.caption.copy(color = textColour)
     ) {
@@ -113,7 +113,7 @@ private fun BannerContent(
 ) {
     Row(
         modifier = modifier
-            .background(MegaTheme.colors.notificationWarning),
+            .background(MegaTheme.colors.notifications.notificationWarning),
         verticalAlignment = verticalAlignment
     ) {
         Box(

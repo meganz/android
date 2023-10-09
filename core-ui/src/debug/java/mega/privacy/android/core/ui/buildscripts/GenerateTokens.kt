@@ -36,14 +36,29 @@ class GenerateTokens {
             type = JsonColor::class,
             jsonFileName = jsonCoreFileName,
             kotlinOutputName = "CoreColors",
+            generationType = TokenGenerationType.NestedObjects
         )
+
+
+        //generate color semantic tokens interface
+        generateTokensKotlinFile(
+            type = JsonColorRef::class,
+            jsonFileName = "Semantic tokens.Light.tokens",
+            kotlinOutputName = jsonSemanticFileNamePrefix,
+            generationType = TokenGenerationType.InterfaceDefinition,
+            rootGroupName = jsonSemanticFileNamePrefix,
+        )
+
         //generate color semantic tokens for each theme mode
         listOf("Light", "Dark").forEach { mode ->
             generateTokensKotlinFile(
                 type = JsonColorRef::class,
                 jsonFileName = "Semantic tokens.$mode.tokens",
                 kotlinOutputName = "$jsonSemanticFileNamePrefix$mode",
-                rootGroupName = mode
+                generationType = TokenGenerationType.InterfaceImplementation(
+                    jsonSemanticFileNamePrefix
+                ),
+                rootGroupName = "$jsonSemanticFileNamePrefix$mode",
             )
         }
     }
@@ -52,13 +67,21 @@ class GenerateTokens {
         type: KClass<T>,
         jsonFileName: String,
         kotlinOutputName: String,
+        generationType: TokenGenerationType,
         rootGroupName: String? = null,
     ) {
         val json =
             File("designSystemAssets/$jsonFileName.json").bufferedReader().readText()
         val coreObject = gson.fromJson(json, JsonCoreUiObject::class.java)
-        if (rootGroupName != null) coreObject.name = rootGroupName
-        KotlinTokensGenerator(type, coreObject, kotlinOutputName).generateFile()
+        if (rootGroupName != null) {
+            coreObject.name = rootGroupName
+        }
+        KotlinTokensGenerator(
+            type = type,
+            coreObject = coreObject,
+            fileName = kotlinOutputName,
+            generationType = generationType,
+        ).generateFile()
     }
 }
 

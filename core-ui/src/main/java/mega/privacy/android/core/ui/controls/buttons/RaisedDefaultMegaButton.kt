@@ -37,7 +37,7 @@ fun RaisedDefaultMegaButton(
     border = if (enabled) {
         null
     } else {
-        BorderStroke(1.dp, MegaTheme.colors.borderDisabled)
+        BorderStroke(1.dp, MegaTheme.colors.border.disabled)
     },
     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
     elevation = ButtonDefaults.elevation(8.dp),
