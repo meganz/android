@@ -149,6 +149,12 @@ fun PhotosScreen(
                             onLongPress = timelineViewModel::onLongPress,
                             isNewCUEnabled = isNewCUEnabled,
                             onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                            onChangePermissionsCameraUploads = {
+                                timelineViewModel.showCameraUploadsChangePermissionsMessage(true)
+                            },
+                            onCloseCameraUploadsLimitedAccess = {
+                                timelineViewModel.setCameraUploadsLimitedAccess(false)
+                            }
                         )
                     }
                 },
@@ -164,6 +170,9 @@ fun PhotosScreen(
                 setCameraUploadsMessage = timelineViewModel::setCameraUploadsMessage,
                 clearCameraUploadsMessage = {
                     timelineViewModel.setCameraUploadsMessage("")
+                },
+                clearCameraUploadsChangePermissionsMessage = {
+                    timelineViewModel.showCameraUploadsChangePermissionsMessage(false)
                 }
             )
         },

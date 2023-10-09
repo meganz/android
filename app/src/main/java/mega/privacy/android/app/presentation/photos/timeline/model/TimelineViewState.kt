@@ -91,4 +91,6 @@ data class TimelineViewState(
     //Test data, will remove after QA
     val showCUStatusFabs: Boolean = false,
     val cameraUploadsTotalFiles: Int = 1,
+    val isCameraUploadsLimitedAccess: Boolean = false,
+    val showCameraUploadsChangePermissionsMessage: Boolean = false,
 )

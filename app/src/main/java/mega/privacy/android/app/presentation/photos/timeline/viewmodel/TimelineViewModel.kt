@@ -547,5 +547,17 @@ class TimelineViewModel @Inject constructor(
     fun stopCameraUploadAndHeartbeat() = viewModelScope.launch {
         stopCameraUploadAndHeartbeatUseCase()
     }
+
+    fun setCameraUploadsLimitedAccess(isLimitedAccess: Boolean) {
+        _state.update {
+            it.copy(isCameraUploadsLimitedAccess = isLimitedAccess)
+        }
+    }
+
+    fun showCameraUploadsChangePermissionsMessage(show: Boolean) {
+        _state.update {
+            it.copy(showCameraUploadsChangePermissionsMessage = show)
+        }
+    }
 }
 

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.photos.timeline.view
 
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
+import android.widget.Toast
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -50,8 +52,10 @@ fun PhotosGridView(
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
     onEnableCameraUploads: () -> Unit,
+    onChangePermissionsCameraUploads: () -> Unit,
+    onCloseCameraUploadsLimitedAccess: () -> Unit,
 ) {
-
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val spanCount = remember(configuration.orientation, timelineViewState.currentZoomLevel) {
         if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -61,12 +65,37 @@ fun PhotosGridView(
         }
     }
 
+    LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
+        if (timelineViewState.isCameraUploadsLimitedAccess && isNewCUEnabled) {
+            lazyGridState.scrollToItem(0)
+        }
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(spanCount),
         modifier = modifier
             .fillMaxSize(),
         state = lazyGridState,
     ) {
+        if (timelineViewState.isCameraUploadsLimitedAccess && isNewCUEnabled) {
+            item(
+                key = "camera-uploads-limited-access-banner",
+                span = { GridItemSpan(maxLineSpan) },
+            ) {
+                CameraUploadsLimitedAccess(
+                    onChangePermissions = onChangePermissionsCameraUploads,
+                    onClose = {
+                        Toast.makeText(
+                            context,
+                            "What kind of tree fits in your hand? A palm tree!",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                        onCloseCameraUploadsLimitedAccess()
+                    },
+                )
+            }
+        }
+
         if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0 && isNewCUEnabled) {
             item(
                 key = "enable-camera-uploads-banner",

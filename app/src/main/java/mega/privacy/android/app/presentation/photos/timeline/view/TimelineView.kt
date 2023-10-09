@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -8,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +34,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -56,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
@@ -77,11 +81,16 @@ import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_038
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.teal_100
+import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_038
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.core.ui.theme.yellow_100
+import mega.privacy.android.core.ui.theme.yellow_700
+import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Base Compose Timeline View
@@ -102,6 +111,7 @@ fun TimelineView(
     setCameraUploadsStatus: (CameraUploadsStatus) -> Unit,
     setCameraUploadsMessage: (String) -> Unit,
     clearCameraUploadsMessage: () -> Unit = {},
+    clearCameraUploadsChangePermissionsMessage: () -> Unit,
 ) {
     val isBarVisible by remember {
         derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
@@ -129,6 +139,29 @@ fun TimelineView(
             clearCameraUploadsMessage()
         }
     }
+    val context = LocalContext.current
+
+    LaunchedEffect(timelineViewState.showCameraUploadsChangePermissionsMessage) {
+        if (timelineViewState.showCameraUploadsChangePermissionsMessage) {
+            val result = scaffoldState.snackbarHostState.showSnackbar(
+                message = context.getString(R.string.camera_uploads_limited_access),
+                actionLabel = context.getString(R.string.file_properties_shared_folder_change_permissions),
+            )
+            when (result) {
+                SnackbarResult.Dismissed -> {}
+
+                SnackbarResult.ActionPerformed -> {
+                    Toast.makeText(
+                        context,
+                        "What did the late tomato say to early tomato? I'll ketch up",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+
+            clearCameraUploadsChangePermissionsMessage()
+        }
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -138,7 +171,9 @@ fun TimelineView(
                 snackbar = { snackBarData ->
                     Snackbar(
                         snackbarData = snackBarData,
+                        actionOnNewLine = true,
                         backgroundColor = black.takeIf { isLight } ?: white,
+                        actionColor = teal_200.takeIf { isLight } ?: teal_300,
                     )
                 }
             )
@@ -147,8 +182,7 @@ fun TimelineView(
             Row(
                 modifier = Modifier.padding(
                     bottom = if (isPortrait && timelineViewState.currentShowingPhotos.isNotEmpty())
-                        68.dp else 16.dp,
-                    end = 16.dp
+                        52.dp else 0.dp,
                 )
             ) {
                 AnimatedVisibility(
@@ -157,18 +191,23 @@ fun TimelineView(
                     enter = scaleIn()
                 ) {
                     if (isNewCUEnabled) {
-                        if (timelineViewState.showCUStatusFabs) {
-                            CUStatusFabs()
+                        Column {
+                            if (timelineViewState.showCUStatusFabs) {
+                                CUStatusFabs()
+                            }
+
+                            Spacer(modifier = Modifier.size(if (isPortrait) 1.dp else 24.dp))
+
+                            HandleCameraUploadStatusFab(
+                                cameraUploadsStatus = timelineViewState.cameraUploadsStatus,
+                                cameraUploadsProgress = timelineViewState.cameraUploadsProgress,
+                                cameraUploadsPending = timelineViewState.cameraUploadsPending,
+                                scaffoldState = scaffoldState,
+                                coroutineScope = coroutineScope,
+                                setCameraUploadsMessage = setCameraUploadsMessage,
+                                cameraUploadsTotalFiles = timelineViewState.cameraUploadsTotalFiles
+                            )
                         }
-                        HandleCameraUploadStatusFab(
-                            cameraUploadsStatus = timelineViewState.cameraUploadsStatus,
-                            cameraUploadsProgress = timelineViewState.cameraUploadsProgress,
-                            cameraUploadsPending = timelineViewState.cameraUploadsPending,
-                            scaffoldState = scaffoldState,
-                            coroutineScope = coroutineScope,
-                            setCameraUploadsMessage = setCameraUploadsMessage,
-                            cameraUploadsTotalFiles = timelineViewState.cameraUploadsTotalFiles
-                        )
                     } else {
                         val showFilterFab =
                             timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
@@ -514,6 +553,67 @@ fun HandleCameraUploadStatusFab(
 
         CameraUploadsStatus.Error -> {}
     }
+}
+
+@Composable
+fun CameraUploadsLimitedAccess(
+    modifier: Modifier = Modifier,
+    onChangePermissions: () -> Unit,
+    onClose: () -> Unit,
+) {
+    val isLight = MaterialTheme.colors.isLight
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onChangePermissions() }
+            .background(yellow_100.takeIf { isLight } ?: yellow_700_alpha_015),
+        content = {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                content = {
+                    Text(
+                        text = "${
+                            stringResource(
+                                id = R.string.camera_uploads_limited_access
+                            )
+                        } ${
+                            stringResource(
+                                id = R.string.camera_uploads_change_permissions
+                            )
+                        }",
+                        modifier = Modifier.weight(1f),
+                        color = black.takeIf { isLight } ?: yellow_700,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W400,
+                        lineHeight = 18.sp,
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column {
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_close),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clickable { onClose() },
+                            tint = grey_alpha_087.takeIf { isLight } ?: yellow_700,
+                        )
+                    }
+                },
+            )
+
+            if (isLight) {
+                Divider(
+                    color = grey_alpha_012,
+                    thickness = 1.dp,
+                )
+            }
+        },
+    )
 }
 
 /**

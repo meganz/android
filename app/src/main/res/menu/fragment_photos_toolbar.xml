@@ -22,7 +22,6 @@
         android:icon="@drawable/ic_cu_status_sync"
         android:orderInCategory="80"
         android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item
@@ -30,7 +29,6 @@
         android:icon="@drawable/ic_cu_status_uploading"
         android:orderInCategory="80"
         android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
 
@@ -39,7 +37,6 @@
         android:icon="@drawable/ic_cu_status_completed"
         android:orderInCategory="80"
         android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item
@@ -47,7 +44,6 @@
         android:icon="@drawable/ic_cu_status_warning"
         android:orderInCategory="80"
         android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item

@@ -541,6 +541,11 @@ class PhotosFragment : Fragment() {
                 true
             }
 
+            R.id.action_cu_status_warning -> {
+                timelineViewModel.setCameraUploadsLimitedAccess(true)
+                true
+            }
+
             R.id.action_zoom_in_secondary -> { // +
                 handleZoomIn()
                 true

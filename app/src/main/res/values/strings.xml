@@ -5178,4 +5178,8 @@
         <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
         <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
     </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot backup all your photos.</string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
 </resources>
