@@ -27,6 +27,8 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property shouldInCallListBeShown                    True if in call list must be shown or False otherwise (hidden).
  * @property shouldNotInCallListBeShown                 True if not in call list must be shown or False otherwise (hidden).
  * @property isBottomPanelExpanded                      True if bottom panel is expanded or False otherwise (collapsed).
+ * @property isGuest                                    True if it's guest. False, if not.
+ * @property sendMeetingLink                            True, should send the meeting link. False, if not.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -48,6 +50,8 @@ data class MeetingState(
     val shouldInCallListBeShown: Boolean = false,
     val shouldNotInCallListBeShown: Boolean = false,
     val isBottomPanelExpanded: Boolean = false,
+    val isGuest: Boolean = false,
+    val sendMeetingLink: Boolean = false,
 ) {
     /**
      * Check if waiting room is opened

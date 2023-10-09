@@ -69,6 +69,7 @@ import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
@@ -108,6 +109,7 @@ import javax.inject.Inject
  * @property setOpenInvite                  [MonitorChatRoomUpdates]
  * @property chatParticipantMapper          [ChatParticipantMapper]
  * @property monitorChatRoomUpdates         [MonitorChatCallUpdates]
+ * @property isEphemeralPlusPlusUseCase     [IsEphemeralPlusPlusUseCase]
  * @property state                      Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -131,6 +133,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val setOpenInvite: SetOpenInvite,
     private val chatParticipantMapper: ChatParticipantMapper,
+    private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -328,6 +331,7 @@ class MeetingActivityViewModel @Inject constructor(
                         hasHostPermission = ownPrivilege == ChatRoomPermission.Moderator,
                         isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                         enabledAllowNonHostAddParticipantsOption = isOpenInvite,
+                        hasWaitingRoom = isWaitingRoom
                     )
                 }
             }
@@ -345,10 +349,15 @@ class MeetingActivityViewModel @Inject constructor(
             getChatCall(_state.value.chatId)
         }.onSuccess { call ->
             call?.apply {
+                _state.update {
+                    it.copy(
+                        isGuest = isEphemeralPlusPlusUseCase(),
+                    )
+                }
                 waitingRoom?.let { waitingRoom ->
                     _state.update {
+
                         it.copy(
-                            hasWaitingRoom = true,
                             usersInWaitingRoomIDs = waitingRoom.peers ?: emptyList()
                         )
                     }
@@ -973,10 +982,18 @@ class MeetingActivityViewModel @Inject constructor(
                             isOpenInvite
                         }
 
+                        val waitingRoomValue = if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {
+                            Timber.d("Changes in waiting room")
+                            chat.isWaitingRoom
+                        } else {
+                            hasWaitingRoom
+                        }
+
                         copy(
                             hasHostPermission = hostValue,
                             isOpenInvite = openInviteValue,
-                            enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite
+                            enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite,
+                            hasWaitingRoom = waitingRoomValue
                         )
                     }
                 }
@@ -994,6 +1011,22 @@ class MeetingActivityViewModel @Inject constructor(
                 shouldNotInCallListBeShown = state.participantsSection == ParticipantsSection.NotInCallSection,
             )
         }
+
+    /**
+     * Send meeting link
+     */
+    fun sendMeetingLink() = _state.update { state ->
+        state.copy(
+            sendMeetingLink = true
+        )
+    }
+
+    /**
+     * Sets sendMeetingLink as consumed.
+     */
+    fun onConsumeSendMeetingLinkEvent() = _state.update { state ->
+        state.copy(sendMeetingLink = false)
+    }
 
     /**
      * Set if bottom panel is expanded

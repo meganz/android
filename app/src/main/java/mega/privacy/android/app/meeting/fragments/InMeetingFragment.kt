@@ -86,6 +86,7 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
@@ -1287,6 +1288,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state){ state: MeetingState ->
+            if(state.sendMeetingLink) {
+                sharedModel.onConsumeSendMeetingLinkEvent()
+                onShareLink(true)
+            }
+        }
     }
 
     /**
@@ -2040,7 +2048,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 resources.displayMetrics
             )
 
-        shouldExpandBottomPanel = arguments?.getBoolean(MeetingActivity.MEETING_BOTTOM_PANEL_EXPANDED) ?: false
+        shouldExpandBottomPanel =
+            arguments?.getBoolean(MeetingActivity.MEETING_BOTTOM_PANEL_EXPANDED) ?: false
+
+        bottomFloatingPanelViewHolder?.updateWidth(
+            meetingActivity.resources.configuration.orientation,
+            meetingActivity.resources.displayMetrics.widthPixels
+        )
 
         //Observer the participant List
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->

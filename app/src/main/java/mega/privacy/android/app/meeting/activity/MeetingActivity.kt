@@ -40,8 +40,8 @@ import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.app.presentation.meeting.view.CallParticipantsListView
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
+import mega.privacy.android.app.presentation.meeting.view.ParticipantsFullListView
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
@@ -229,9 +229,8 @@ class MeetingActivity : PasscodeActivity() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by meetingViewModel.state.collectAsStateWithLifecycle()
-
                 AndroidTheme(isDark = true) {
-                    CallParticipantsListView(
+                    ParticipantsFullListView(
                         state = state,
                         onScrollChange = { scrolled ->
                             this@MeetingActivity.changeStatusBarColor(
@@ -254,10 +253,20 @@ class MeetingActivity : PasscodeActivity() {
                                 participant
                             )
                             meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
                         },
                         onAdmitAllClicked = {
                             waitingRoomManagementViewModel.admitUsersClick()
                             meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+                        },
+                        onShareMeetingLink = {
+                            meetingViewModel.sendMeetingLink()
+                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
                         },
                         onParticipantMoreOptionsClicked = {
                             meetingViewModel.onConsumeShouldInCallListBeShownEvent()
