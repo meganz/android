@@ -35,7 +35,6 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -46,6 +45,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -118,7 +118,7 @@ internal class UploadService : LifecycleService() {
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
 
     @Inject
-    lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
+    lateinit var completedTransferMapper: CompletedTransferMapper
 
     @Inject
     lateinit var getRootFolder: GetRootFolder
@@ -814,10 +814,7 @@ internal class UploadService : LifecycleService() {
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
 
         if (!isFolderTransfer) {
-            val completedTransfer =
-                AndroidCompletedTransfer(transfer, error, this@UploadService)
-
-            addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
+            addCompletedTransferUseCase(completedTransferMapper(transfer, error))
             getTextFileUploadAppData()?.let {
                 val message =
                     getCreationOrEditorText(

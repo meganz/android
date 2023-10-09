@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
@@ -32,7 +31,6 @@ import mega.privacy.android.app.VideoDownSampling
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CacheFolderManager.buildChatTempFile
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
@@ -44,6 +42,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
@@ -110,7 +109,7 @@ class ChatUploadService : LifecycleService() {
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
 
     @Inject
-    lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
+    lateinit var completedTransferMapper: CompletedTransferMapper
 
     @Inject
     lateinit var getTransferDataUseCase: GetTransferDataUseCase
@@ -1046,9 +1045,7 @@ class ChatUploadService : LifecycleService() {
             transfersCount--
             totalUploadsCompleted++
         }
-        val completedTransfer =
-            AndroidCompletedTransfer(transfer, error, this@ChatUploadService)
-        addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
+        addCompletedTransferUseCase(completedTransferMapper(transfer, error))
         mapProgressTransfers[tag] = transfer
 
         if (canceled) {

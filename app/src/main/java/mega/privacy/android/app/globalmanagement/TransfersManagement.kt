@@ -19,7 +19,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -29,7 +28,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRA
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.FileUtil
@@ -37,6 +35,7 @@ import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.toTransferStage
+import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.StorageState
@@ -50,6 +49,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastFailedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastStopTransfersWorkUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
@@ -57,7 +57,6 @@ import mega.privacy.android.domain.usecase.transfers.sd.GetAllSdTransfersUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -83,6 +82,8 @@ class TransfersManagement @Inject constructor(
     private val deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase,
     private val getAllSdTransfersUseCase: GetAllSdTransfersUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getTransferByTagUseCase: GetTransferByTagUseCase,
+    private val completedTransferMapper: CompletedTransferMapper,
 ) {
 
     companion object {
@@ -386,8 +387,8 @@ class TransfersManagement @Inject constructor(
         if (sdTransfers.isEmpty()) return emptyList()
         val completedTransfers = ArrayList<CompletedTransfer>()
         for (sdtransfer in sdTransfers) {
-            val transfer = megaApi.getTransferByTag(sdtransfer.tag)
-            if (transfer != null && transfer.state < MegaTransfer.STATE_COMPLETED) {
+            val transfer = getTransferByTagUseCase(sdtransfer.tag)
+            if (transfer != null && transfer.state < TransferState.STATE_COMPLETED) {
                 continue
             }
             val originalDownload = File(sdtransfer.path)
@@ -411,9 +412,7 @@ class TransfersManagement @Inject constructor(
                 sdCardDownload?.targetUri,
                 sdtransfer
             )
-            val androidCompletedTransfer = AndroidCompletedTransfer(sdtransfer, context)
-            val completedTransfer = LegacyCompletedTransferMapper().invoke(androidCompletedTransfer)
-            completedTransfers.add(completedTransfer)
+            transfer?.let { completedTransfers.add(completedTransferMapper(it, null)) }
         }
         return completedTransfers
     }

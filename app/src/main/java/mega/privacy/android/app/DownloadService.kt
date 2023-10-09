@@ -45,7 +45,6 @@ import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.presentation.offline.OfflineFragment
-import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
@@ -57,6 +56,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
+import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.SdTransfer
@@ -171,10 +171,10 @@ internal class DownloadService : LifecycleService() {
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
 
     @Inject
-    lateinit var cancelAllDownloadTransfersUseCase: CancelAllDownloadTransfersUseCase
+    lateinit var completedTransferMapper: CompletedTransferMapper
 
     @Inject
-    lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
+    lateinit var cancelAllDownloadTransfersUseCase: CancelAllDownloadTransfersUseCase
 
     @Inject
     lateinit var getTransferDataUseCase: GetTransferDataUseCase
@@ -1391,16 +1391,11 @@ internal class DownloadService : LifecycleService() {
         val targetPath = sdCardDownloadAppData?.targetPath
         if (!transfer.isFolderTransfer) {
             if (!isVoiceClip && !isBackgroundTransfer) {
-                val completedTransfer =
-                    AndroidCompletedTransfer(transfer, error, this@DownloadService)
-                if (!TextUtil.isTextEmpty(targetPath)) {
-                    completedTransfer.path = targetPath
+                var completedTransfer = completedTransferMapper(transfer, error)
+                if (!targetPath.isNullOrEmpty()) {
+                    completedTransfer = completedTransfer.copy(path = targetPath)
                 }
-                addCompletedTransferUseCase(
-                    legacyCompletedTransferMapper(
-                        completedTransfer
-                    )
-                )
+                addCompletedTransferUseCase(completedTransfer)
             }
             if (transfer.state == TransferState.STATE_FAILED) {
                 transfersManagement.setAreFailedTransfers(true)
