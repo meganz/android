@@ -24,23 +24,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.ContactsContract
-import android.text.Editable
 import android.text.TextUtils
-import android.text.TextWatcher
 import android.view.Display
 import android.view.Gravity
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.Chronometer
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -100,7 +94,6 @@ import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
@@ -142,6 +135,7 @@ import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessGraceDialogFragment
 import mega.privacy.android.app.main.dialog.connect.ConfirmConnectDialogFragment
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
+import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
@@ -199,7 +193,6 @@ import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineFragm
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
@@ -300,7 +293,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
-import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -617,13 +609,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var psaViewHolder: PsaViewHolder? = null
-    private var openLinkDialog: AlertDialog? = null
-    private var openLinkDialogIsErrorShown = false
-    private var openLinkText: EditText? = null
-    private var openLinkError: RelativeLayout? = null
-    private var openLinkErrorText: TextView? = null
-    private var openLinkOpenButton: Button? = null
-    private var chatLinkDialogType = LINK_DIALOG_CHAT
 
     // end for Meeting
     private var backupHandleList: ArrayList<Long>? = null
@@ -837,14 +822,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             "comesFromNotificationDeepBrowserTreeIncoming",
             comesFromNotificationDeepBrowserTreeIncoming
         )
-        if (isAlertDialogShown(openLinkDialog)) {
-            outState.putBoolean(OPEN_LINK_DIALOG_SHOWN, true)
-            outState.putBoolean(OPEN_LINK_ERROR, openLinkDialogIsErrorShown)
-            outState.putString(
-                OPEN_LINK_TEXT,
-                openLinkText?.text?.toString() ?: ""
-            )
-        }
         outState.putInt(Constants.TYPE_CALL_PERMISSION, typesCameraPermission)
         outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink)
         outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink)
@@ -1851,16 +1828,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1)
         backupDialogType =
             savedInstanceState.getInt(BACKUP_DIALOG_WARN, BACKUP_DIALOG_SHOW_NONE)
-
-        if (savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false)) {
-            showOpenLinkDialog()
-            val text = savedInstanceState.getString(OPEN_LINK_TEXT, "")
-            openLinkText?.setText(text)
-            text?.length?.let { openLinkText?.setSelection(it) }
-            if (savedInstanceState.getBoolean(OPEN_LINK_ERROR, false)) {
-                text?.let { openLink(it) }
-            }
-        }
     }
 
     /**
@@ -2701,7 +2668,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         cancelSearch()
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
-        dismissAlertDialogIfExists(openLinkDialog)
         nodeSaver.destroy()
         super.onDestroy()
     }
@@ -5248,216 +5214,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Shows an error in the Open link dialog.
-     *
-     * @param show  True if should show an error.
-     * @param error Error value to identify and show the corresponding error.
-     */
-    private fun showOpenLinkError(show: Boolean, error: Int) {
-        if (openLinkDialog != null) {
-            if (show) {
-                openLinkDialogIsErrorShown = true
-                openLinkText?.let { ColorUtils.setErrorAwareInputAppearance(it, true) }
-                openLinkError?.visibility = View.VISIBLE
-                if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                    if (openLinkText?.text.toString().isEmpty()) {
-                        openLinkErrorText?.setText(R.string.invalid_file_folder_link_empty)
-                        return
-                    }
-                    when (error) {
-                        Constants.CHAT_LINK -> {
-                            openLinkText?.setTextColor(
-                                ColorUtils.getThemeColor(
-                                    this,
-                                    android.R.attr.textColorPrimary
-                                )
-                            )
-                            openLinkErrorText?.setText(R.string.valid_chat_link)
-                            openLinkOpenButton?.setText(R.string.action_open_chat_link)
-                        }
-
-                        Constants.CONTACT_LINK -> {
-                            openLinkText?.setTextColor(
-                                ColorUtils.getThemeColor(
-                                    this,
-                                    android.R.attr.textColorPrimary
-                                )
-                            )
-                            openLinkErrorText?.setText(R.string.valid_contact_link)
-                            openLinkOpenButton?.setText(R.string.action_open_contact_link)
-                        }
-
-                        Constants.ERROR_LINK -> {
-                            openLinkErrorText?.setText(R.string.invalid_file_folder_link)
-                        }
-                    }
-                } else if (drawerItem === DrawerItem.CHAT || MEETING_TYPE == MeetingActivity.MEETING_ACTION_JOIN) {
-                    if (openLinkText?.text.toString().isEmpty()) {
-                        openLinkErrorText?.setText(if (chatLinkDialogType == LINK_DIALOG_CHAT) R.string.invalid_chat_link_empty else R.string.invalid_meeting_link_empty)
-                        return
-                    }
-                    openLinkErrorText?.setText(if (chatLinkDialogType == LINK_DIALOG_CHAT) R.string.invalid_chat_link_args else R.string.invalid_meeting_link_args)
-                }
-            } else {
-                openLinkDialogIsErrorShown = false
-                if (openLinkError?.visibility == View.VISIBLE) {
-                    openLinkText?.let {
-                        ColorUtils.setErrorAwareInputAppearance(
-                            it, false
-                        )
-                    }
-                    openLinkError?.visibility = View.GONE
-                    openLinkOpenButton?.setText(R.string.context_open_link)
-                }
-            }
-        }
-    }
-
-    /**
-     * Opens a links via Open link dialog.
-     *
-     * @param link The link to open.
-     */
-    private fun openLink(link: String) {
-        // Password link
-        if (Util.matchRegexs(link, Constants.PASSWORD_LINK_REGEXS)) {
-            dismissAlertDialogIfExists(openLinkDialog)
-            val openLinkIntent = Intent(this, OpenPasswordLinkActivity::class.java)
-            openLinkIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            openLinkIntent.data = Uri.parse(link)
-            startActivity(openLinkIntent)
-            return
-        }
-        if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-            lifecycleScope.launch {
-                if (Util.matchRegexs(link, Constants.ALBUM_LINK_REGEXS)) {
-                    if (getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)) {
-                        dismissAlertDialogIfExists(openLinkDialog)
-                        val intent = AlbumScreenWrapperActivity.createAlbumImportScreen(
-                            context = this@ManagerActivity,
-                            albumLink = AlbumLink(link),
-                        ).apply {
-                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        }
-                        startActivity(intent)
-                        return@launch
-                    }
-                }
-
-                val linkType = nodeController.importLink(link)
-                if (openLinkError?.visibility == View.VISIBLE) {
-                    when (linkType) {
-                        Constants.CHAT_LINK -> {
-                            Timber.d("Open chat link: correct chat link")
-                            // Identify the link is a meeting or normal chat link
-                            viewModel.checkLink(link)
-                            dismissAlertDialogIfExists(openLinkDialog)
-                        }
-
-                        Constants.CONTACT_LINK -> {
-                            Timber.d("Open contact link: correct contact link")
-                            val s =
-                                link.split("C!".toRegex()).dropLastWhile { it.isEmpty() }
-                                    .toTypedArray()
-                            if (s.size > 1) {
-                                val handle: Long =
-                                    MegaApiAndroid.base64ToHandle(s[1].trim { it <= ' ' })
-                                openContactLink(handle)
-                                dismissAlertDialogIfExists(openLinkDialog)
-                            }
-                        }
-                    }
-                } else {
-                    when (linkType) {
-                        Constants.FILE_LINK, Constants.FOLDER_LINK -> {
-                            Timber.d("Do nothing: correct file or folder link")
-                            dismissAlertDialogIfExists(openLinkDialog)
-                        }
-
-                        Constants.CHAT_LINK, Constants.CONTACT_LINK, Constants.ERROR_LINK -> {
-                            Timber.w("Show error: invalid link or correct chat or contact link")
-                            showOpenLinkError(true, linkType)
-                        }
-                    }
-                }
-            }
-        } else if (drawerItem === DrawerItem.CHAT || MEETING_TYPE == MeetingActivity.MEETING_ACTION_JOIN) {
-            viewModel.checkLink(link)
-        }
-    }
-
-    /**
      * Shows an Open link dialog.
      */
-    private fun showOpenLinkDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
-        val inflater: LayoutInflater = layoutInflater
-        val v = inflater.inflate(R.layout.dialog_error_hint, null)
-        builder.setView(v).setPositiveButton(R.string.context_open_link, null)
-            .setNegativeButton(R.string.general_cancel, null)
-        openLinkText = v.findViewById(R.id.text)
-        openLinkText?.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable) {
-                showOpenLinkError(false, 0)
-            }
-        })
-        openLinkText?.setOnEditorActionListener { v1: TextView?, actionId: Int, _: KeyEvent? ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                Util.hideKeyboardView(this, v1, 0)
-                openLink(openLinkText?.text.toString())
-            }
-            false
-        }
-        Util.showKeyboardDelayed(openLinkText)
-        openLinkError = v.findViewById(R.id.error)
-        openLinkErrorText = v.findViewById(R.id.error_text)
-        val isJoinMeeting = MEETING_TYPE == MeetingActivity.MEETING_ACTION_JOIN
-        if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-            builder.setTitle(R.string.action_open_link)
-            openLinkText?.setHint(R.string.hint_paste_link)
-        } else if (drawerItem === DrawerItem.CHAT || isJoinMeeting) {
-            val fragment = supportFragmentManager
-                .findFragmentByTag(MeetingBottomSheetDialogFragment.TAG)
-            chatLinkDialogType = if (fragment != null || isJoinMeeting) {
-                builder.setTitle(R.string.paste_meeting_link_guest_dialog_title)
-                    .setMessage(
-                        getString(
-                            R.string.paste_meeting_link_guest_instruction
-                        )
-                    )
-                openLinkText?.setHint(R.string.meeting_link)
-                LINK_DIALOG_MEETING
-            } else {
-                builder.setTitle(R.string.action_open_chat_link)
-                openLinkText?.setHint(R.string.hint_enter_chat_link)
-                LINK_DIALOG_CHAT
-            }
-        }
-        openLinkDialog = builder.create()
-        openLinkDialog?.setCanceledOnTouchOutside(false)
-        try {
-            openLinkDialog?.show()
-            openLinkText?.requestFocus()
-
-            // Set onClickListeners for buttons after showing the dialog would prevent
-            // the dialog from dismissing automatically on clicking the buttons
-            openLinkOpenButton = openLinkDialog?.getButton(AlertDialog.BUTTON_POSITIVE)
-            openLinkOpenButton?.setOnClickListener {
-                Util.hideKeyboard(this, 0)
-                openLink(openLinkText?.text.toString())
-            }
-            openLinkDialog?.setOnKeyListener { _: DialogInterface?, keyCode: Int, event: KeyEvent ->
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0) {
-                    dismissAlertDialogIfExists(openLinkDialog)
-                    return@setOnKeyListener true
-                }
-                false
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception showing Open Link dialog")
-        }
+    private fun showOpenLinkDialog(isJoinMeeting: Boolean = false) {
+        val isChatScreen = drawerItem == DrawerItem.CHAT
+        OpenLinkDialogFragment.newInstance(
+            isChatScreen = isChatScreen,
+            isJoinMeeting = isJoinMeeting
+        ).show(supportFragmentManager, OpenLinkDialogFragment.TAG)
     }
 
     fun showChatLink(link: String?) {
@@ -5655,7 +5419,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onJoinMeeting() {
-        MEETING_TYPE = MeetingActivity.MEETING_ACTION_JOIN
         if (CallUtil.participatingInACall()) {
             CallUtil.showConfirmationInACall(
                 this,
@@ -5663,7 +5426,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 passcodeManagement
             )
         } else {
-            showOpenLinkDialog()
+            showOpenLinkDialog(isJoinMeeting = true)
         }
     }
 
@@ -8200,7 +7963,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun handleCheckLinkResult(result: Result<ChatLinkContent>) {
         if (result.isSuccess) {
-            dismissAlertDialogIfExists(openLinkDialog)
             val chatLinkContent = result.getOrNull()
             if (chatLinkContent is ChatLinkContent.MeetingLink) {
                 if (joiningToChatLink && TextUtil.isTextEmpty(chatLinkContent.link) && chatLinkContent.chatHandle == MEGACHAT_INVALID_HANDLE) {
@@ -8236,7 +7998,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         getString(R.string.text_join_call),
                         passcodeManagement
                     )
-                    dismissAlertDialogIfExists(openLinkDialog)
                 }
 
                 is MeetingEndedException -> {
@@ -8251,7 +8012,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         supportFragmentManager,
                         MeetingHasEndedDialogFragment.TAG
                     )
-                    dismissAlertDialogIfExists(openLinkDialog)
                 }
 
                 is MegaException -> onErrorLoadingPreview(e.errorCode)
@@ -8261,14 +8021,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun onErrorLoadingPreview(errorCode: Int) {
         if (errorCode == MegaChatError.ERROR_NOENT) {
-            dismissAlertDialogIfExists(openLinkDialog)
             Util.showAlert(
                 this,
                 getString(R.string.invalid_chat_link),
                 getString(R.string.title_alert_chat_link_error)
             )
-        } else {
-            showOpenLinkError(true, 0)
         }
     }
 
@@ -8565,9 +8322,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         const val JOINING_CHAT_LINK = "JOINING_CHAT_LINK"
         const val LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK"
         private const val PROCESS_FILE_DIALOG_SHOWN = "PROGRESS_DIALOG_SHOWN"
-        private const val OPEN_LINK_DIALOG_SHOWN = "OPEN_LINK_DIALOG_SHOWN"
-        private const val OPEN_LINK_TEXT = "OPEN_LINK_TEXT"
-        private const val OPEN_LINK_ERROR = "OPEN_LINK_ERROR"
         private const val COMES_FROM_NOTIFICATIONS_SHARED_INDEX =
             "COMES_FROM_NOTIFICATIONS_SHARED_INDEX"
 
@@ -8583,8 +8337,5 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         private const val STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent"
         private const val STATE_KEY_IS_IN_PHOTOS_FILTER = "isInFilterPage"
         var drawerMenuItem: MenuItem? = null
-        private const val LINK_DIALOG_MEETING = 1
-        private const val LINK_DIALOG_CHAT = 2
-        private var MEETING_TYPE: String = MeetingActivity.MEETING_ACTION_CREATE
     }
 }

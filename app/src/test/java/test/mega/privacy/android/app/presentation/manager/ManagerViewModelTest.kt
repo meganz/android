@@ -69,8 +69,8 @@ import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFolders
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
-import mega.privacy.android.domain.usecase.chat.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
@@ -1084,7 +1084,7 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that checkLinkResult updates correctly when call get chat link content returns`() =
+    fun `test that chatLinkContent updates correctly when call get chat link content returns`() =
         runTest {
             val link = "link"
             val linkContent = mock<ChatLinkContent.ChatLink>()
@@ -1098,7 +1098,7 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that checkLinkResult resets to null when call markHandleCheckLinkResult`() =
+    fun `test that chatLinkContent resets to null when call markHandleCheckLinkResult`() =
         runTest {
             val link = "link"
             val linkContent = mock<ChatLinkContent.ChatLink>()

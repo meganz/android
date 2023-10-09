@@ -487,12 +487,6 @@ public class Constants {
     public static final int ITEM_PROGRESS = 2;
     public static final int ITEM_PLACEHOLDER_TYPE = 3;
 
-    public static final int FILE_LINK = 200;
-    public static final int FOLDER_LINK = 201;
-    public static final int CHAT_LINK = 202;
-    public static final int CONTACT_LINK = 203;
-    public static final int ERROR_LINK = -1;
-
     public static final int BACK_PRESS_NOT_HANDLED = 0;
     public static final int BACK_PRESS_HANDLED = 1;
 

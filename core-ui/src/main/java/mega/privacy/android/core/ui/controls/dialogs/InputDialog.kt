@@ -31,6 +31,7 @@ import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 /**
  * Alert dialog with a text input field and a confirmation button with optional cancel button
@@ -52,11 +53,13 @@ fun InputDialog(
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    message: String = "",
     hint: String = "",
     text: String = "",
     error: String? = null,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    onInputChange: (String) -> Unit = {},
 ) {
     var textFieldValue by remember {
         mutableStateOf(
@@ -83,6 +86,17 @@ fun InputDialog(
             },
             text = {
                 Column {
+                    if (message.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier
+                                .testTag(INPUT_DIALOG_TITLE_TAG)
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            text = message,
+                            style = MaterialTheme.typography.subtitle1,
+                            color = MaterialTheme.colors.textColorSecondary
+                        )
+                    }
                     GenericTextField(
                         modifier = Modifier
                             .testTag(INPUT_DIALOG_TEXT_TAG)
@@ -93,6 +107,7 @@ fun InputDialog(
                         placeholder = hint,
                         onTextChange = {
                             textFieldValue = it
+                            onInputChange(it.text)
                         },
                         textFieldValue = textFieldValue,
                         errorText = error,
@@ -144,6 +159,27 @@ private fun InputDialogPreview() {
                 InputDialog(
                     title = "Dialog title",
                     hint = "hint text",
+                    confirmButtonText = "Accept",
+                    cancelButtonText = "Cancel",
+                    onConfirm = {},
+                    onDismiss = {},
+                )
+            },
+        )
+    }
+}
+
+@CombinedThemeRtlPreviews
+@Composable
+private fun InputDialogWithMessagePreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        Box(
+            modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
+            content = {
+                InputDialog(
+                    title = "Dialog title",
+                    hint = "hint text",
+                    message = "Message",
                     confirmButtonText = "Accept",
                     cancelButtonText = "Cancel",
                     onConfirm = {},

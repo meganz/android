@@ -2,14 +2,7 @@ package mega.privacy.android.app.main.controllers;
 
 import static mega.privacy.android.app.listeners.ShareListener.REMOVE_SHARE_LISTENER;
 import static mega.privacy.android.app.listeners.ShareListener.SHARE_LISTENER;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
-import static mega.privacy.android.app.utils.Constants.CHAT_LINK;
-import static mega.privacy.android.app.utils.Constants.CONTACT_LINK;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
-import static mega.privacy.android.app.utils.Constants.ERROR_LINK;
-import static mega.privacy.android.app.utils.Constants.FILE_LINK;
-import static mega.privacy.android.app.utils.Constants.FOLDER_LINK;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_COPY;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTACT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
@@ -19,15 +12,12 @@ import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTr
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +25,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
-import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.AddContactActivity;
@@ -43,15 +32,10 @@ import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
-import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import timber.log.Timber;
 
@@ -212,82 +196,6 @@ public class NodeController {
 
         return dBT;
     }
-
-    public int importLink(String url) {
-        try {
-            url = URLDecoder.decode(url, "UTF-8");
-        } catch (Exception e) {
-            Timber.e(e, "Error decoding URL: %s", url);
-        }
-
-        url.replace(' ', '+');
-        if (url.startsWith("mega://")) {
-            url = url.replace("mega://", "https://mega.co.nz/");
-        }
-
-        Timber.d("url %s", url);
-
-        // Download link
-        if (Util.matchRegexs(url, Constants.FILE_LINK_REGEXS)) {
-            Intent openFileIntent = new Intent(context, FileLinkComposeActivity.class);
-            openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
-            openFileIntent.setData(Uri.parse(url));
-            ((ManagerActivity) context).startActivity(openFileIntent);
-            return FILE_LINK;
-        } else if (Util.matchRegexs(url, Constants.FOLDER_LINK_REGEXS)) {
-            Intent openFolderIntent = new Intent(context, FolderLinkComposeActivity.class);
-            openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
-            openFolderIntent.setData(Uri.parse(url));
-            context.startActivity(openFolderIntent);
-            return FOLDER_LINK;
-        } else if (Util.matchRegexs(url, Constants.CHAT_LINK_REGEXS)) {
-            return CHAT_LINK;
-        } else if (Util.matchRegexs(url, Constants.CONTACT_LINK_REGEXS)) {
-            return CONTACT_LINK;
-        }
-
-        Timber.w("wrong url");
-        return ERROR_LINK;
-    }
-
-    //old getPublicLinkAndShareIt
-    public void exportLink(MegaNode document) {
-        Timber.d("exportLink");
-        if (!isOnline(context)) {
-            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
-        } else if (context instanceof MegaRequestListenerInterface) {
-            megaApi.exportNode(document, ((MegaRequestListenerInterface) context));
-        }
-    }
-
-    public void exportLinkTimestamp(MegaNode document, int timestamp) {
-        Timber.d("exportLinkTimestamp: %s", timestamp);
-        if (!isOnline(context)) {
-            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
-        } else if (context instanceof MegaRequestListenerInterface) {
-            megaApi.exportNode(document, timestamp, ((MegaRequestListenerInterface) context));
-        }
-    }
-
-    public void removeLink(MegaNode document, ExportListener exportListener) {
-        megaApi.disableExport(document, exportListener);
-    }
-
-    public void removeLinks(ArrayList<MegaNode> nodes) {
-        if (!isOnline(context)) {
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            return;
-        }
-
-        ExportListener exportListener = new ExportListener(context, nodes.size());
-
-        for (MegaNode node : nodes) {
-            removeLink(node, exportListener);
-        }
-    }
-
 
     public void selectContactToShareFolders(ArrayList<Long> handleList) {
         Timber.d("shareFolders ArrayListLong");
