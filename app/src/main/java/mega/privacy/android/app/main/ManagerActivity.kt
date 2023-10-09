@@ -39,7 +39,6 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -112,6 +111,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANG
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
+import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
@@ -157,6 +157,11 @@ import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetD
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.advertisements.AdsViewModel
+import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
+import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_HOME_SLOT_ID
+import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
+import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -375,6 +380,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
+    private val adsViewModel: AdsViewModel by viewModels()
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -505,6 +511,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var waitingRoomComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
+    private lateinit var adsComposeView: ComposeView
 
     private var miniAudioPlayerController: MiniAudioPlayerController? = null
     private lateinit var cameraUploadViewTypes: LinearLayout
@@ -994,6 +1001,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
         checkForInAppUpdate()
+        if (this.isPortrait()) {
+            showAdsView()
+        } else {
+            hideAdsView()
+        }
     }
 
     private fun checkForInAppUpdate() {
@@ -1027,7 +1039,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setDisplayHomeAsUpEnabled(true)
         }
         waitingRoomComposeView = findViewById(R.id.waiting_room_dialog_compose_view)
-
+        adsComposeView = findViewById(R.id.ads_web_compose_view)
         fragmentLayout = findViewById(R.id.fragment_layout)
         bottomNavigationView =
             findViewById(R.id.bottom_navigation_view)
@@ -2223,6 +2235,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         selectDrawerItem(drawerItem)
     }
 
+    /**
+     * Checks for the screen orientation and handle showing the Ads view
+     */
+    private fun handleShowingAds(slotId: String) {
+        if (this.isPortrait()) {
+            adsViewModel.fetchNewAd(slotId)
+        } else {
+            hideAdsView()
+        }
+    }
+
     override fun onResume() {
         if (drawerItem === DrawerItem.SEARCH && getSearchFragment() != null) {
             searchFragment?.isWaitingForSearchedNodes = true
@@ -2589,6 +2612,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 //Check the tab to shown and the title of the actionBar
                 setToolbarTitle()
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
+                handleShowingAds(TAB_CLOUD_SLOT_ID)
             }
 
             DrawerItem.SHARED_ITEMS -> {
@@ -2602,6 +2626,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.e(e, "Exception NotificationManager - remove contact notification")
                 }
                 setToolbarTitle()
+                hideAdsView()
             }
 
             DrawerItem.SEARCH -> {
@@ -2610,19 +2635,32 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 setToolbarTitle()
+                hideAdsView()
             }
 
             DrawerItem.CHAT -> {
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
+                hideAdsView()
             }
 
             DrawerItem.PHOTOS -> {
                 setBottomNavigationMenuItemChecked(PHOTOS_BNV)
+                handleShowingAds(TAB_PHOTOS_SLOT_ID)
             }
 
-            DrawerItem.NOTIFICATIONS -> {}
-            DrawerItem.HOMEPAGE -> setBottomNavigationMenuItemChecked(HOME_BNV)
-            else -> setBottomNavigationMenuItemChecked(HOME_BNV)
+            DrawerItem.NOTIFICATIONS -> {
+                hideAdsView()
+            }
+
+            DrawerItem.HOMEPAGE -> {
+                setBottomNavigationMenuItemChecked(HOME_BNV)
+                handleShowingAds(TAB_HOME_SLOT_ID)
+            }
+
+            else -> {
+                setBottomNavigationMenuItemChecked(HOME_BNV)
+                handleShowingAds(TAB_HOME_SLOT_ID)
+            }
         }
     }
 
@@ -3171,6 +3209,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 clickDrawerItem(drawerItem)
             }
             supportInvalidateOptionsMenu()
+            hideAdsView()
         } catch (e: Exception) {
             Timber.w(e)
         }
@@ -3188,26 +3227,32 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         when (item) {
             DrawerItem.CLOUD_DRIVE -> {
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
+                handleShowingAds(TAB_CLOUD_SLOT_ID)
             }
 
             DrawerItem.HOMEPAGE -> {
                 setBottomNavigationMenuItemChecked(HOME_BNV)
+                handleShowingAds(TAB_HOME_SLOT_ID)
             }
 
             DrawerItem.PHOTOS -> {
                 setBottomNavigationMenuItemChecked(PHOTOS_BNV)
+                handleShowingAds(TAB_PHOTOS_SLOT_ID)
             }
 
             DrawerItem.SHARED_ITEMS -> {
                 setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
+                hideAdsView()
             }
 
             DrawerItem.CHAT -> {
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
+                hideAdsView()
             }
 
             DrawerItem.SEARCH, DrawerItem.TRANSFERS, DrawerItem.NOTIFICATIONS, DrawerItem.BACKUPS -> {
                 setBottomNavigationMenuItemChecked(NO_BNV)
+                hideAdsView()
             }
 
             else -> {}
@@ -3476,6 +3521,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             updatePsaViewVisibility()
             appBarLayout.visibility = View.VISIBLE
             showHideBottomNavigationView(true)
+            hideAdsView()
             supportInvalidateOptionsMenu()
             setToolbarTitle()
             setDrawerLockMode(true)
@@ -3577,6 +3623,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 ) {
                     fileBrowserViewModel.refreshNodes()
                 }
+                handleShowingAds(TAB_CLOUD_SLOT_ID)
                 Timber.d("END for Cloud Drive")
             }
 
@@ -3603,6 +3650,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 supportInvalidateOptionsMenu()
                 setToolbarTitle()
                 showFabButton()
+                hideAdsView()
             }
 
             DrawerItem.DEVICE_CENTER -> {
@@ -3613,6 +3661,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 supportInvalidateOptionsMenu()
                 deviceCenterFragment?.let { replaceFragment(it, FragmentTag.DEVICE_CENTER.tag) }
                 showFabButton()
+                hideAdsView()
             }
 
             DrawerItem.SYNC -> {
@@ -3625,6 +3674,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 syncFragment?.let { replaceFragment(it, FragmentTag.SYNC.tag) }
                 showFabButton()
                 updateTransfersWidgetPosition(false)
+                hideAdsView()
             }
 
             DrawerItem.HOMEPAGE -> {
@@ -3648,6 +3698,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 if (homepageScreen === HomepageScreen.HOMEPAGE) {
                     changeAppBarElevation(false)
                 }
+                handleShowingAds(TAB_HOME_SLOT_ID)
             }
 
             DrawerItem.PHOTOS -> {
@@ -3670,6 +3721,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         bottomNavigationCurrentItem = PHOTOS_BNV
                     }
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV)
+                    handleShowingAds(TAB_PHOTOS_SLOT_ID)
                 }
             }
 
@@ -3689,10 +3741,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 supportInvalidateOptionsMenu()
                 setToolbarTitle()
                 showFabButton()
+                hideAdsView()
             }
 
             DrawerItem.SHARED_ITEMS -> {
                 onSelectSharedItemsDrawerItem()
+                hideAdsView()
             }
 
             DrawerItem.NOTIFICATIONS -> {
@@ -3700,6 +3754,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 selectDrawerItemNotifications()
                 supportInvalidateOptionsMenu()
                 showFabButton()
+                hideAdsView()
             }
 
             DrawerItem.SEARCH -> {
@@ -3715,6 +3770,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                         searchFragment?.let { replaceFragment(it, FragmentTag.SEARCH.tag) }
                         showFabButton()
+                        hideAdsView()
                     }
                 }
             }
@@ -3725,6 +3781,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 selectDrawerItemTransfers()
                 supportInvalidateOptionsMenu()
                 showFabButton()
+                hideAdsView()
             }
 
             DrawerItem.CHAT -> {
@@ -3737,6 +3794,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
                 hideFabButton()
+                hideAdsView()
             }
 
             else -> {}
@@ -3906,9 +3964,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val params = CoordinatorLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
         )
+        val padding =
+            if (adsComposeView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+            else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
         params.setMargins(
             0, 0, 0,
-            resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
+            padding
         )
         fragmentLayout.layoutParams = params
     }
@@ -4994,6 +5055,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     drawerItem = DrawerItem.CLOUD_DRIVE
                     setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
                 }
+                handleShowingAds(TAB_CLOUD_SLOT_ID)
             }
 
             R.id.bottom_navigation_item_homepage -> {
@@ -5004,6 +5066,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     setBottomNavigationMenuItemChecked(HOME_BNV)
                 }
+                handleShowingAds(TAB_HOME_SLOT_ID)
             }
 
             R.id.bottom_navigation_item_camera_uploads -> {
@@ -5013,6 +5076,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     drawerItem = DrawerItem.PHOTOS
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV)
                 }
+                handleShowingAds(TAB_PHOTOS_SLOT_ID)
             }
 
             R.id.bottom_navigation_item_shared_items -> {
@@ -5033,11 +5097,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     drawerItem = DrawerItem.SHARED_ITEMS
                     setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
                 }
+                hideAdsView()
             }
 
             R.id.bottom_navigation_item_chat -> {
                 drawerItem = DrawerItem.CHAT
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
+                hideAdsView()
             }
         }
         checkIfShouldCloseSearchView(oldDrawerItem)
@@ -7343,7 +7409,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun hideFabButton() {
         initFabButtonShow = false
-        fabButton.hide()
+        fabButton.isVisible = false
     }
 
     /**
@@ -7575,7 +7641,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             val height: Int =
-                resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
+                if (adsComposeView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+                else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
+
             if (hide && visibility == View.VISIBLE) {
                 updateMiniAudioPlayerVisibility(false)
                 params.setMargins(0, 0, 0, 0)
@@ -7583,6 +7651,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 animate().translationY(height.toFloat())
                     .setDuration(Constants.ANIMATION_DURATION)
                     .withEndAction { bottomNavigationView.visibility = View.GONE }
+                    .start()
+            } else if (!hide && visibility == View.VISIBLE) {
+                animate().translationY(0f)
+                    .setDuration(Constants.ANIMATION_DURATION)
+                    .withStartAction { visibility = View.VISIBLE }
+                    .withEndAction {
+                        updateMiniAudioPlayerVisibility(true)
+                        params.setMargins(0, 0, 0, height)
+                        fragmentLayout.layoutParams = params
+                    }
                     .start()
             } else if (!hide && visibility == View.GONE) {
                 animate().translationY(0f).setDuration(Constants.ANIMATION_DURATION)
@@ -8312,6 +8390,59 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 .onSuccess { archivedMenuItem?.isVisible = it }
                 .onFailure { Timber.e(it) }
         }
+    }
+
+    private fun showAdsView() {
+        adsComposeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val uiState by adsViewModel.uiState.collectAsStateWithLifecycle()
+                AndroidTheme(isDark = isDark) {
+                    AdsBannerView(uiState = uiState,
+                        onAdsViewVisibilityUpdated = ::onAdsViewVisibilityUpdated,
+                        onAdClicked = { uri ->
+                            uri?.let {
+                                val intent = Intent(Intent.ACTION_VIEW, it)
+                                if (intent.resolveActivity(packageManager) != null) {
+                                    startActivity(intent)
+                                } else {
+                                    Timber.d("No Application found to can handle Ads intent")
+                                }
+                            }
+                        }, onAdDismissed = {
+                            //To handle the close button behaviour in ticket: AP-658
+                            hideAdsView()
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun hideAdsView() {
+        adsViewModel.hideAdsView()
+    }
+
+    /**
+     * Check of the currently selected drawer item to update the bottom navigation bar position
+     */
+    private fun updateBottomNavOnAdsVisibilityChange() {
+        if (drawerItem == DrawerItem.HOMEPAGE
+            || drawerItem == DrawerItem.CHAT
+            || drawerItem == DrawerItem.SHARED_ITEMS
+            || drawerItem == DrawerItem.PHOTOS
+            || drawerItem == DrawerItem.CLOUD_DRIVE
+        ) {
+            showBNVImmediate()
+            showHideBottomNavigationView(hide = false)
+        }
+    }
+
+    private fun onAdsViewVisibilityUpdated(showAdsView: Boolean) {
+        adsComposeView.isVisible = showAdsView
+        updateBottomNavOnAdsVisibilityChange()
     }
 
     companion object {

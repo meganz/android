@@ -16,8 +16,8 @@ internal class AdDetailMapper @Inject constructor() {
      */
     operator fun invoke(megaStringMap: MegaStringMap): List<AdDetail> {
         val keys = megaStringMap.keys
-        return (0 until keys.size()).map {
-            val slotId = keys.get(it)
+        return List(keys.size()) { i ->
+            val slotId = keys.get(i)
             val url = megaStringMap.get(slotId)
             AdDetail(slotId = slotId, url = url)
         }

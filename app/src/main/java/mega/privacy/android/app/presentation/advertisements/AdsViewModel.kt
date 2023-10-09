@@ -3,47 +3,114 @@ package mega.privacy.android.app.presentation.advertisements
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.advertisements.model.AdsLoadState
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
+import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
 import mega.privacy.android.domain.entity.advertisements.FetchAdDetailRequest
+import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.advertisements.FetchAdDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View model for Ads related data
+ * View model of [AdsBannerView]
  */
 @HiltViewModel
 class AdsViewModel @Inject constructor(
     private val fetchAdDetailUseCase: FetchAdDetailUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorStartScreenPreference: MonitorStartScreenPreference,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<AdsLoadState>(AdsLoadState.Empty)
+    private val _uiState = MutableStateFlow(AdsUIState())
 
     /**
      * Ads state
      */
-    val state = _state.asStateFlow()
-
+    val uiState = _uiState.asStateFlow()
 
     /**
-     * Update AdsLoadState to Loaded when ad url is fetched
+     * Feature Flag for InAppAdvertisement
      */
-    fun fetchAdUrl(
+    private var isAdsFeatureEnabled: Boolean = false
+    private var fetchAdUrlJob: Job? = null
+
+    init {
+        getDefaultStartScreen()
+    }
+
+    /**
+     * gets the default start screen and fetch the Ad based on the assigned slot
+     */
+    private fun getDefaultStartScreen() {
+        viewModelScope.launch {
+            isAdsFeatureEnabled = getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
+            if (isAdsFeatureEnabled) {
+                when (monitorStartScreenPreference().firstOrNull()) {
+                    StartScreen.CloudDrive -> {
+                        fetchNewAd(AdsSlotIDs.TAB_CLOUD_SLOT_ID)
+                    }
+
+                    StartScreen.Photos -> {
+                        fetchNewAd(AdsSlotIDs.TAB_PHOTOS_SLOT_ID)
+                    }
+
+                    StartScreen.Home -> {
+                        fetchNewAd(AdsSlotIDs.TAB_HOME_SLOT_ID)
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    /**
+     * hides the visibility of the Ads view
+     */
+    fun hideAdsView() {
+        fetchAdUrlJob?.cancel()
+        _uiState.update { state ->
+            state.copy(showAdsView = false, adsBannerUrl = "")
+        }
+    }
+
+    /**
+     * Update the url in AdsUIState
+     * @param slotId  The ad slot id to fetch ad
+     * @param linkHandle  The public handle for file/folder link if user visits Share Link screen, this parameter is optional
+     */
+    fun fetchNewAd(
         slotId: String,
         linkHandle: Long? = null,
     ) {
-        val fetchAdDetailRequest = FetchAdDetailRequest(slotId, linkHandle)
-        viewModelScope.launch {
-            runCatching {
-                fetchAdDetailUseCase(fetchAdDetailRequest)
-            }.onFailure {
-                Timber.w(it)
-                _state.emit(AdsLoadState.Empty)
-            }.onSuccess {
-                _state.emit(AdsLoadState.Loaded(it.url))
+        if (isAdsFeatureEnabled) {
+            val fetchAdDetailRequest = FetchAdDetailRequest(slotId, linkHandle)
+            fetchAdUrlJob?.cancel()
+            fetchAdUrlJob = viewModelScope.launch {
+                runCatching {
+                    val url = fetchAdDetailUseCase(fetchAdDetailRequest)?.url
+                    _uiState.update { state ->
+                        state.copy(
+                            showAdsView = url != null,
+                            adsBannerUrl = url.orEmpty()
+                        )
+                    }
+                }.onFailure { e ->
+                    Timber.e(e)
+                }
+            }
+        } else {
+            _uiState.update { state ->
+                state.copy(showAdsView = false, adsBannerUrl = "")
             }
         }
     }

@@ -19,11 +19,11 @@ class FetchAdDetailUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         fetchAdDetailRequest: FetchAdDetailRequest,
-    ): AdDetail =
+    ): AdDetail? =
         adsRepository.fetchAdDetails(
             listOf(fetchAdDetailRequest.slotId),
             fetchAdDetailRequest.linkHandle
-        ).first { adDetail ->
+        ).firstOrNull { adDetail ->
             adDetail.slotId == fetchAdDetailRequest.slotId
         }
 }

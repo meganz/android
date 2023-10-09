@@ -9,162 +9,171 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinator_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar">
-
-        <LinearLayout
-            android:id="@+id/fragment_layout"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/coordinator_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="@dimen/bottom_navigation_view_height"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/app_bar_layout"
+            <LinearLayout
+                android:id="@+id/fragment_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:elevation="0dp">
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/bottom_navigation_view_height"
+                android:orientation="vertical">
 
-                <!-- As per the doc of MaterialToolbar, set it to transparent background
-                to make the whole AppBarLayout elevation overlay effect correct -->
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
+                <com.google.android.material.appbar.AppBarLayout
+                    android:id="@+id/app_bar_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?attr/actionBarSize" />
+                    app:elevation="0dp">
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_shares"
-                    style="@style/Widget.Mega.TabLayout"
+                    <!-- As per the doc of MaterialToolbar, set it to transparent background
+                    to make the whole AppBarLayout elevation overlay effect correct -->
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/actionBarSize" />
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_shares"
+                        style="@style/Widget.Mega.TabLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.tabs.TabItem
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tab_incoming_shares" />
+
+                        <com.google.android.material.tabs.TabItem
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tab_outgoing_shares" />
+
+                        <com.google.android.material.tabs.TabItem
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tab_links_shares" />
+                    </com.google.android.material.tabs.TabLayout>
+
+                </com.google.android.material.appbar.AppBarLayout>
+
+                <include
+                    layout="@layout/item_call_in_progress_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/tab_incoming_shares"/>
-                    <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/tab_outgoing_shares"/>
-                    <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/tab_links_shares"/>
-                </com.google.android.material.tabs.TabLayout>
+                    android:layout_height="wrap_content"
+                    android:elevation="16dp"
+                    android:visibility="gone" />
 
-            </com.google.android.material.appbar.AppBarLayout>
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/shares_tabs_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
-            <include
-                layout="@layout/item_call_in_progress_layout"
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/nav_host_fragment"
+                    android:name="androidx.navigation.fragment.NavHostFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:defaultNavHost="true"
+                    app:navGraph="@navigation/homepage" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/fragment_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/container_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:elevation="16dp"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:fitsSystemWindows="true"
+                android:orientation="vertical">
+
+                <include
+                    layout="@layout/transfers_widget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/floating_button"
+                    android:layout_width="@dimen/fab_button_diameter"
+                    android:layout_height="@dimen/fab_button_diameter"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:elevation="@dimen/elevation_low"
+                    android:src="@drawable/ic_add_white"
+                    android:stateListAnimator="@anim/button_elevation"
+                    android:tint="@android:color/white" />
+
+                <include
+                    android:id="@+id/cu_view_type"
+                    layout="@layout/cu_view_type_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="@dimen/cu_view_type_button_vertical_margin"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="@dimen/cu_view_type_button_vertical_margin"
+                    android:visibility="gone" />
+
+                <com.google.android.exoplayer2.ui.StyledPlayerView
+                    android:id="@+id/mini_audio_player"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/audio_player_mini_controller_height"
+                    android:background="?attr/colorPrimary"
+                    android:visibility="gone"
+                    app:controller_layout_id="@layout/audio_player_control_in_mini_player"
+                    app:player_layout_id="@layout/audio_player_view_controller_only"
+                    app:surface_type="none"
+                    tools:visibility="visible" />
+
+                <include
+                    android:id="@+id/psa_layout"
+                    layout="@layout/psa_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/bottom_navigation_view"
+                    style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/bottom_navigation_view_height"
+                    android:background="@color/grey_020_dark_grey"
+                    app:itemIconTint="@drawable/bottom_navigation_item_tint"
+                    app:labelVisibilityMode="unlabeled"
+                    app:menu="@menu/bottom_navigation_items" />
+
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/ads_web_compose_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:visibility="gone"
+                    tools:visibility="gone" />
+
+            </LinearLayout>
+
+            <include
+                layout="@layout/layout_get_pro_account"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom"
+                android:elevation="@dimen/elevation_high"
                 android:visibility="gone" />
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/shares_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" >
-            </androidx.viewpager2.widget.ViewPager2>
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/nav_host_fragment"
-                android:name="androidx.navigation.fragment.NavHostFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/homepage" />
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/container_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:fitsSystemWindows="true"
-            android:orientation="vertical">
-
-            <include
-                layout="@layout/transfers_widget"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/floating_button"
-                android:layout_width="@dimen/fab_button_diameter"
-                android:layout_height="@dimen/fab_button_diameter"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:elevation="@dimen/elevation_low"
-                android:src="@drawable/ic_add_white"
-                android:stateListAnimator="@anim/button_elevation"
-                android:tint="@android:color/white" />
-
-            <include
-                android:id="@+id/cu_view_type"
-                layout="@layout/cu_view_type_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="@dimen/cu_view_type_button_vertical_margin"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="@dimen/cu_view_type_button_vertical_margin"
-                android:visibility="gone" />
-
-            <com.google.android.exoplayer2.ui.StyledPlayerView
-                android:id="@+id/mini_audio_player"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/audio_player_mini_controller_height"
-                android:background="?attr/colorPrimary"
-                android:visibility="gone"
-                app:controller_layout_id="@layout/audio_player_control_in_mini_player"
-                app:player_layout_id="@layout/audio_player_view_controller_only"
-                app:surface_type="none"
-                tools:visibility="visible" />
-
-            <include
-                android:id="@+id/psa_layout"
-                layout="@layout/psa_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottom_navigation_view"
-                style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/bottom_navigation_view_height"
-                android:background="@color/grey_020_dark_grey"
-                app:itemIconTint="@drawable/bottom_navigation_item_tint"
-                app:menu="@menu/bottom_navigation_items"
-                app:labelVisibilityMode="unlabeled"/>
-
-        </LinearLayout>
-
-        <include
-            layout="@layout/layout_get_pro_account"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom"
-            android:elevation="@dimen/elevation_high"
-            android:visibility="gone" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/waiting_room_dialog_compose_view"
@@ -186,7 +195,6 @@
             android:layout_height="match_parent" />
 
     </com.google.android.material.navigation.NavigationView>
-
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

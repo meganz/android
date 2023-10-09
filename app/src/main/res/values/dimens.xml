@@ -107,6 +107,7 @@
     <dimen name="default_thumbnail_margin_start">12dp</dimen>
 
     <dimen name="bottom_navigation_view_height">56dp</dimen>
+    <dimen name="ads_web_view_and_bottom_navigation_view_height">146dp</dimen>
 
     <dimen name="cu_view_type_button_height">36dp</dimen>
     <dimen name="cu_view_type_button_vertical_margin">8dp</dimen>

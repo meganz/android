@@ -42,7 +42,7 @@ internal class AdsRepositoryImpl @Inject constructor(
                     }
                 )
                 adsGateway.fetchAds(
-                    adFlags = MegaApiJava.ADS_DEFAULT,
+                    adFlags = MegaApiJava.ADS_FORCE_ADS,
                     adUnits = megaStringListMapper(adSlots),
                     publicHandle = linkHandle ?: MegaApiJava.INVALID_HANDLE,
                     listener = listener

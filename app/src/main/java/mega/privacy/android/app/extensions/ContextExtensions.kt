@@ -2,6 +2,7 @@ package mega.privacy.android.app.extensions
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.provider.Settings
 import androidx.annotation.NonNull
@@ -34,3 +35,9 @@ fun Context.navigateToAppSettings() {
         }
     }
 }
+
+/**
+ * Check if device is in Portrait mode
+ */
+fun Context.isPortrait() =
+    resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
