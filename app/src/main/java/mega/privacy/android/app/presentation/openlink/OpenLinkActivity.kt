@@ -132,7 +132,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private var isLoggedIn = false
     private var needsRefreshSession = false
-    private var openFileLink = false
 
     private var url: String? = null
     private val viewModel by viewModels<OpenLinkViewModel>()
@@ -210,7 +209,18 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             // File link
             matchRegexs(url, FILE_LINK_REGEXS) -> {
                 Timber.d("Open link url")
-                openFileLink = true
+                val intent =
+                    Intent(this@OpenLinkActivity, FileLinkComposeActivity::class.java).apply {
+                        putExtra(
+                            OPENED_FROM_CHAT,
+                            intent.getBooleanExtra(OPENED_FROM_CHAT, false)
+                        )
+                        flags = FLAG_ACTIVITY_CLEAR_TOP
+                        action = ACTION_OPEN_MEGA_LINK
+                        data = Uri.parse(url)
+                    }
+                startActivity(intent)
+                finish()
             }
             // Confirmation link
             matchRegexs(url, CONFIRMATION_LINK_REGEXS) -> {
@@ -502,26 +512,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             .setAction(ACTION_CONFIRM)
                     )
                     finish()
-                }
-
-                openLinkState.enabledFeatureFlags != null -> {
-                    if (openFileLink) {
-                        val intent =
-                            Intent(
-                                this@OpenLinkActivity,
-                                FileLinkComposeActivity::class.java
-                            ).apply {
-                                putExtra(
-                                    OPENED_FROM_CHAT,
-                                    intent.getBooleanExtra(OPENED_FROM_CHAT, false)
-                                )
-                                flags = FLAG_ACTIVITY_CLEAR_TOP
-                                action = ACTION_OPEN_MEGA_LINK
-                                data = Uri.parse(url)
-                            }
-                        startActivity(intent)
-                        finish()
-                    }
                 }
             }
         }

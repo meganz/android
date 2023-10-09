@@ -9,11 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -28,7 +25,6 @@ class OpenLinkViewModel @Inject constructor(
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -78,10 +74,5 @@ class OpenLinkViewModel @Inject constructor(
             Timber.d("Error on logout $it")
         }
     }
-
-    /**
-     * Check if given feature flag is enabled or not
-     */
-    fun isFeatureEnabled(feature: Feature) = state.value.enabledFeatureFlags?.contains(feature)
 
 }
