@@ -3660,13 +3660,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]읽기만 가능하게 변경되었습니다[/B]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to a standard participant by [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A] 님이 [A]%2$s[/A] 님에 의해 [B]일반 참여자로 변경되었습니다[/B]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]주최자 역할로 변경되었습니다[/B]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s님이 %2$s님에 의해 읽기만 가능하게 변경되었습니다</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to a standard participant by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s 님이 %2$s 님에 의해 일반 참여자로 변경되었습니다</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s님이 %2$s님에 의해 주최자 역할로 변경되었습니다</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -3806,7 +3806,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">미디어 발견 보기에서 자동으로 이미지와 동영상만 담긴 폴더를 엽니다. 이것은 갤러리 모드에서 미디어를 보고 날짜에 따라 필터하게 해줍니다.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">이 폴더가 이미지와 동영상만 담고 있으므로, 우리가 자동으로 미디어 발견 보기에서 열었습니다. 이것은 미디어를 갤러리 모드에서 보고 날짜에 따라 필터할 수 있게 해줍니다. 설정에서 이것을 해제할 수 있습니다.</string>
+    <string name="cloud_drive_media_discovery_banner_context">이 폴더가 이미지와 동영상만 담고 있으므로, 자동으로 미디어 발견 보기에서 열었습니다. 시각 콘텐츠를 더욱 몰입되는 레이아웃에서 즐길 수 있습니다. 이것을 설정에서 비활성화 할 수 있습니다.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">설정</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4832,7 +4832,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">대기실</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">호스트가 승인한 참여자만 회의에 참여할 수 있습니다</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">통화 중에 호스트가 아닌 사람으로부터 추가된 참여자들은 대기실에 보내질 수 없습니다.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -4914,7 +4914,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">하위 폴더에서 미디어 찾기</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">메인 폴더가 미디어 발견 보기에 있을 때 하위 폴더의 이미지와 동영상도 포함합니다</string>
+    <string name="settings_media_discovery_sub_folder_context">하위 폴더의 이미지와 동영상도 미디어 발견 보기에 포함합니다.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">결과 없음</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4941,4 +4941,19 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">대기 중 (%d명)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">모두 보기</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">거부하지 않기</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">인터넷 연결이 없어서 업로드가 일시정지 되었습니다</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

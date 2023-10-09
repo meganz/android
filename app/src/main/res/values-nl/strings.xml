@@ -204,7 +204,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recent</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Media Uploads</string>
+    <string name="section_secondary_media_uploads">Media uploads</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -597,9 +597,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Hoe te uploaden</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Secundaire Media uploads inschakelen</string>
+    <string name="settings_secondary_upload_on">Secundaire media uploads inschakelen</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Secundaire Media uploads uitschakelen</string>
+    <string name="settings_secondary_upload_off">Secundaire media uploads uitschakelen</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Map kiezen</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -622,11 +622,11 @@
     <!-- Option to choose that the camera sync will maintain the local file names when uploading -->
     <string name="settings_keep_file_names">Behoud bestandsnamen als in het apparaat</string>
     <!-- The location of where the user photos or videos are stored in the device. -->
-    <string name="settings_local_camera_upload_folder">Lokale Camera map</string>
+    <string name="settings_local_camera_upload_folder">Lokale camera map</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
     <string name="settings_mega_camera_upload_folder">MEGA Camera uploads map</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">Lokale Secundaire map</string>
+    <string name="settings_local_secondary_folder">Lokale secundaire map</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
     <string name="settings_mega_secondary_folder">MEGA secundaire map</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -1384,7 +1384,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Weet u zeker dat u deze map naar de Prullenbak wilt verplaatsen? Dit schakelt de Camera uploads uit.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Weet u zeker dat u deze map wilt verplaatsen naar de Prullenbak? Hierdoor worden Secundaire Media Uploads uitgeschakeld.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Weet u zeker dat u deze map wilt verplaatsen naar de Prullenbak? Hierdoor worden secundaire media uploads uitgeschakeld.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Verplaatsen naar Prullenbak?</string>
     <!-- confirmation message before removing a file -->
@@ -3906,7 +3906,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Open automatisch mappen die alleen afbeeldingen en video\’s bevatten in de media discovery weergave. Hiermee kunt u media in galerijmodus bekijken en filteren op datum.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Aangezien deze map alleen afbeeldingen en video\’s bevat, hebben we deze automatisch geopend in de media discovery weergave. Hiermee kunt u media in galerijmodus bekijken en filteren op datum. U kunt dit uitschakelen in Instellingen.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Omdat deze map alleen afbeeldingen en video\’s bevat, hebben we deze automatisch geopend in de media ontdekkingsweergave. U kunt genieten van uw visuele inhoud met een meer meeslepende lay-out. U kunt dit uitschakelen in Instellingen.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Instellingen</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5145,7 +5145,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Media discovery in submappen</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Afbeeldingen en video\’s uit submappen worden ook opgenomen in de media discovery weergave wanneer de hoofdmap zich in deze weergave bevindt</string>
+    <string name="settings_media_discovery_sub_folder_context">Afbeeldingen en video\’s uit submappen worden ook opgenomen in de mediaontdekkingsweergave.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Geen resultaten</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5172,4 +5172,21 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Wachtend (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Alles weergeven</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Niet weigeren</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Upload onderbroken omdat er geen internetverbinding is</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Camera uploads zijn in behandeling,%1$d bestand in wachtrij</item>
+        <item quantity="other">Camera uploads zijn in behandeling, %1$d bestanden in wachtrij</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Camera uploads voltooid, %1$d bestand geüpload</item>
+        <item quantity="other">Camera uploads voltooid, %1$d bestanden geüpload</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

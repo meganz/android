@@ -95,7 +95,7 @@
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">Șterge selecția</string>
     <!-- Menu item to change from list view to grid view -->
-    <string name="action_grid">Vizualizare tip miniaturi</string>
+    <string name="action_grid">Modul miniaturi</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">Fă backup cheii de recuperare</string>
     <!-- Menu item to let the user cancel subscriptions -->
@@ -616,7 +616,7 @@
         <item>Numai Wi-Fi</item>
     </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
-    <string name="settings_camera_upload_what_to_upload">Încarcă fișier(e)</string>
+    <string name="settings_camera_upload_what_to_upload">Încărcarea de fișiere</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string-array name="settings_camera_upload_file_upload_entries">
         <item>Numai fotografii</item>
@@ -4006,7 +4006,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Deschideți automat folderele care conțin numai imagini și videoclipuri în vizualizarea de descoperire media. Acest lucru vă permite să vedeți fișierele media în modul galerie și să filtrați după dată.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Deoarece acest folder conține doar imagini și videoclipuri, l-am deschis automat în vizualizarea de descoperire media. Acest lucru vă permite să vedeți fișierele media în modul galerie și să filtrați după dată. Puteți dezactiva acest lucru în Setări.</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Setări</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5326,7 +5326,7 @@
     <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
     <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">Admite toate</string>
     <!-- Deny button in admit users to waiting room dialog in a meeting -->
-    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Refuză</string>
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Refuza</string>
     <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
     <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s așteaptă să se alăture apelului</string>
     <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
@@ -5340,7 +5340,7 @@
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Să-i refuzi intrarea %1$s?</string>
     <!-- Dialog button to deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Refuzați intrarea</string>
+    <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Refuza intrarea</string>
     <!-- Dialog title when a participant has been denied entry to the call -->
     <string name="meetings_waiting_room_deny_user_dialog_title">Gazda nu v-a lăsat să intre</string>
     <!-- Dialog description when a participant has been denied entry to the call -->
@@ -5376,7 +5376,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Descoperire media în subfoldere</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Imaginile și videoclipurile din subfoldere vor fi, de asemenea, incluse în vizualizarea de descoperire media atunci când folderul principal se află în această vizualizare</string>
+    <string name="settings_media_discovery_sub_folder_context">Imaginile și videoclipurile din subfoldere vor fi, de asemenea, incluse î în modul de descoperire media</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Niciun rezultat</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5403,4 +5403,21 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">În așteptare (%d</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Vezi toți</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Nu refuza</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
+        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
+        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

@@ -201,7 +201,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Baru-baru ini</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Unggahan Media</string>
+    <string name="section_secondary_media_uploads">Unggahan media</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -501,7 +501,7 @@
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Unggahan camera telah dinonaktifkan. Folder lokal anda tidak tersedia.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">Unggahan Media telah dinonaktifkan. Folder lokal anda tidak tersedia.</string>
+    <string name="camera_notif_secondary_local_unavailable">Unggahan media telah dinonaktifkan. Folder lokal anda tidak tersedia.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Penampilan</string>
     <!-- settings of the Features section -->
@@ -589,9 +589,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Bagaimana cara mengunggah</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Aktifkan Unggahan Media Sekunder</string>
+    <string name="settings_secondary_upload_on">Aktifkan unggahan media sekunder</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Nonaktifkan Unggahan Media Sekunder</string>
+    <string name="settings_secondary_upload_off">Nonaktifkan unggahan media sekunder</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Pilih folder</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -600,7 +600,7 @@
         <item>Hanya Wi-Fi</item>
     </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
-    <string name="settings_camera_upload_what_to_upload">Unggah File</string>
+    <string name="settings_camera_upload_what_to_upload">Unggah file</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string-array name="settings_camera_upload_file_upload_entries">
         <item>Hanya foto</item>
@@ -614,11 +614,11 @@
     <!-- Option to choose that the camera sync will maintain the local file names when uploading -->
     <string name="settings_keep_file_names">Simpan nama file apa adanya seperti pada perangkat</string>
     <!-- The location of where the user photos or videos are stored in the device. -->
-    <string name="settings_local_camera_upload_folder">Folder Kamera lokal</string>
+    <string name="settings_local_camera_upload_folder">Folder kamera lokal</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
     <string name="settings_mega_camera_upload_folder">Folder Unggahan camera MEGA</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">Folder Secondary lokal</string>
+    <string name="settings_local_secondary_folder">Folder secondary lokal</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
     <string name="settings_mega_secondary_folder">Folder sekunder MEGA</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -1353,7 +1353,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Anda yakin ingin memindahkan folder ini ke Tempat Sampah? Ini akan menonaktifkan Unggahan camera.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Anda yakin ingin memindahkan folder ini ke Tempat Sampah? Ini akan menonaktifkan Unggahan Media Sekunder.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Anda yakin ingin memindahkan folder ini ke Tempat Sampah? Ini akan menonaktifkan unggahan media sekunder.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Pindahkan ke Sampah?</string>
     <!-- confirmation message before removing a file -->
@@ -3806,7 +3806,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Secara otomatis membuka folder yang hanya berisi gambar dan video dalam tampilan penemuan media. Ini memungkinkan anda melihat media dalam mode galeri dan memfilter berdasarkan tanggal.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Karena folder ini hanya berisi gambar dan video, kami membukanya secara otomatis dalam tampilan penemuan media. Ini memungkinkan anda melihat media dalam mode galeri dan memfilter berdasarkan tanggal. Anda dapat menonaktifkan ini di Pengaturan.</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Pengaturan</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4915,7 +4915,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Penemuan media di subfolder</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Gambar dan video dari subfolder juga akan disertakan dalam tampilan penemuan media bila folder utama berada dalam tampilan ini</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in media discovery view.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Tidak ada hasil</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4942,4 +4942,21 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Waiting (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Lihat semua</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
+        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
+        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

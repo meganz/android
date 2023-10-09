@@ -3806,7 +3806,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">メディア検出ビューで画像と動画のみを含むフォルダを自動的に開きます。これにより、ギャラリーモードでメディアを表示し、日付でフィルター処理できます。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">このフォルダには画像と動画のみが含まれているため、メディア検出ビューで自動的に開かれています。これにより、ギャラリーモードでメディアを表示し、日付でフィルター処理できます。これは「設定」で無効にできます。</string>
+    <string name="cloud_drive_media_discovery_banner_context">このフォルダには画像と動画のみが含まれているため、自動的にメディア検出ビューで開きます。また、より没入感のあるレイアウトでビジュアルコンテンツを楽しむことができます。これは「設定」で無効にできます。</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">設定</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4914,7 +4914,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">サブフォルダ内のメディアディスカバリー</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">メインフォルダがメディアディスカバリービューにある場合、サブフォルダの画像と動画もメディアディスカバリービューに含まれます。</string>
+    <string name="settings_media_discovery_sub_folder_context">サブフォルダの画像と動画もメディア検出ビューに含まれます。</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">結果なし</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4941,4 +4941,19 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">待機中（%d人）</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">すべて表示</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">拒否しない</string>
+    <string name="camera_uploads_up_to_date">カメラアップロードが更新されました</string>
+    <string name="camera_uploads_paused_due_to_no_internet">インターネット接続がないためアップロードが一時停止されました</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="other">カメラアップロードが進行中です。%1$d個のファイルが保留中です。</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="other">カメラアップロードが完了しました。%1$d個のファイルがアップロードされました。</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

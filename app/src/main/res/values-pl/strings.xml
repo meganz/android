@@ -4106,7 +4106,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Automatyczne otwieranie katalogów zawierających tylko obrazy i filmy w widoku Media Discovery. Umożliwia to oglądanie multimediów w trybie galerii i filtrowanie według daty.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Ponieważ ten katalog zawiera tylko obrazy i filmy, automatycznie otworzyliśmy go w widoku Media Discovery. Dzięki temu możesz oglądać multimedia w trybie galerii i filtrować je według daty. Możesz to wyłączyć w Ustawieniach.</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Ustawienia</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5607,7 +5607,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Wykrywanie multimediów w podfolderach</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Obrazy i filmy z podfolderów będą również uwzględniane w widoku wykrywania multimediów, gdy katalog główny znajduje się w tym widoku</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in media discovery view.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Brak wyników</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5634,4 +5634,21 @@
     <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Oczekiwanie (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Zobacz wszystkie</string>
+    <!-- Dialog button to don't deny entry to a participant in the call -->
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
+    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <plurals name="camera_uploads_in_progress_pending_files">
+        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
+        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+    </plurals>
+    <plurals name="camera_uploads_complete_uploaded_files">
+        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
+        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+    </plurals>
+    <!-- camera uploads limited access -->
+    <string name="camera_uploads_limited_access"></string>
+    <!-- camera uploads change permissions -->
+    <string name="camera_uploads_change_permissions"></string>
 </resources>

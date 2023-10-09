@@ -45,9 +45,9 @@
     <!-- The name of one of the Device Center Bottom Sheet items which takes the User to the Camera uploads feature when clicked -->
     <string name="device_center_bottom_sheet_item_camera_uploads">相機上傳</string>
     <!-- The enabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
-    <string name="device_center_bottom_sheet_item_camera_uploads_enabled_status">啟用</string>
+    <string name="device_center_bottom_sheet_item_camera_uploads_enabled_status">已啟用</string>
     <!-- The disabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
-    <string name="device_center_bottom_sheet_item_camera_uploads_disabled_status">停用</string>
+    <string name="device_center_bottom_sheet_item_camera_uploads_disabled_status">已停用</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, opens the "Rename device" Dialog to let the User rename the selected Device -->
     <string name="device_center_bottom_sheet_item_rename">重新命名</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
@@ -137,5 +137,5 @@
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">由於資料夾已位於同步的資料夾中，因此無進行同步。</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Camera uploads disabled</string>
+    <string name="device_center_list_view_item_status_camera_uploads_disabled">相機上傳已停用</string>
 </resources>
