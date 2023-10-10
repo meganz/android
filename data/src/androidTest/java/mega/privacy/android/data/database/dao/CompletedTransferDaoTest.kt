@@ -173,7 +173,7 @@ class CompletedTransferDaoTest {
         val entity = completedTransferDao.getCompletedTransferById(id ?: return@runTest)
         assertThat(entity).isNotNull()
 
-        completedTransferDao.deleteCompletedTransferById(id.toString())
+        completedTransferDao.deleteCompletedTransferByIds(listOf(id))
         val actual = completedTransferDao.getCompletedTransferById(id)
 
         assertThat(actual).isNull()

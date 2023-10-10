@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -452,5 +451,9 @@ class TransfersViewModel @Inject constructor(
      */
     fun markHandledCancelTransfersResult() {
         _uiState.update { it.copy(cancelTransfersResult = null) }
+    }
+
+    companion object {
+        const val MAX_TRANSFERS = 100
     }
 }

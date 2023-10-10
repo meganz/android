@@ -608,11 +608,6 @@ interface MegaLocalStorageGateway {
     ): List<OfflineInformation>
 
     /**
-     * Delete oldest completed transfers
-     */
-    suspend fun deleteOldestCompletedTransfers()
-
-    /**
      * Gets pending messages.
      *
      * @param chatId Chat identifier from which the messages has to be get.

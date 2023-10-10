@@ -331,9 +331,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         searchQuery: String?,
     ): List<OfflineInformation> = dbHandler.getOfflineInformationList(path, searchQuery)
 
-    override suspend fun deleteOldestCompletedTransfers() =
-        dbHandler.deleteOldestCompletedTransfers()
-
     override suspend fun findPendingMessagesNotSent(chatId: Long) =
         dbHandler.findPendingMessagesNotSent(chatId)
 

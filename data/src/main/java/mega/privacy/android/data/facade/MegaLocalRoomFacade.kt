@@ -150,14 +150,30 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteCompletedTransfersByState(states: List<Int>): List<CompletedTransfer> {
         val encryptedStates = states.mapNotNull { encryptData(it.toString()) }
         val entities = completedTransferDao.getCompletedTransfersByState(encryptedStates)
-        completedTransferDao.deleteCompletedTransfer(entities)
+        completedTransferDao.deleteCompletedTransferByIds(entities.mapNotNull { it.id })
         return entities.map { entity -> completedTransferModelMapper(entity) }
     }
 
     override suspend fun deleteCompletedTransfer(completedTransfer: CompletedTransfer) {
-        completedTransferDao.deleteCompletedTransfer(
-            listOf(completedTransferEntityMapper(completedTransfer))
+        completedTransferDao.deleteCompletedTransferByIds(
+            listOf(completedTransfer.id ?: return)
         )
+    }
+
+    override suspend fun deleteOldestCompletedTransfers() {
+        val count = completedTransferDao.getCompletedTransfersCount()
+        if (count > MAX_COMPLETED_TRANSFER_ROWS) {
+            val transfers = completedTransferDao.getAllCompletedTransfers().first()
+                .map { completedTransferModelMapper(it) }
+            val deletedTransfers =
+                transfers.sortedWith(compareByDescending { it.timestamp })
+                    .drop(MAX_COMPLETED_TRANSFER_ROWS)
+                    .mapNotNull { it.id }
+
+            if (deletedTransfers.isNotEmpty()) {
+                completedTransferDao.deleteCompletedTransferByIds(deletedTransfers)
+            }
+        }
     }
 
     override suspend fun getActiveTransferByTag(tag: Int) =
@@ -412,5 +428,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun deleteAllBackups() {
         backupDao.deleteAllBackups()
+    }
+
+    companion object {
+        private const val MAX_COMPLETED_TRANSFER_ROWS = 100
     }
 }

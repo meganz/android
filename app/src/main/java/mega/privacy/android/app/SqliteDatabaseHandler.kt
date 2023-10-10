@@ -20,7 +20,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_SD_TRANSFERS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -829,38 +828,6 @@ class SqliteDatabaseHandler @Inject constructor(
             Timber.e(e, "Exception opening or managing DB cursor")
         }
         return result
-    }
-
-    /**
-     * Deletes the oldest completed transfers
-     */
-    override fun deleteOldestCompletedTransfers() {
-        Timber.d("Delete oldest completed transfers")
-        writableDatabase.beginTransaction()
-        try {
-
-            if (getNumberOfEntries(TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
-                val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
-                val transfers = getCompletedTransfers(selectQuery)
-                val ids = transfers.apply {
-                    sortWith(compareByDescending { it.timestamp })
-                }
-                    .filterIndexed { index, _ -> index >= MAX_TRANSFERS }
-                    .map { it.id }
-                    .joinToString(separator = ",")
-
-                val query = "DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_ID IN ($ids)"
-                writableDatabase.execSQL(query)
-            }
-            writableDatabase.setTransactionSuccessful()
-        } finally {
-            writableDatabase.endTransaction()
-        }
-    }
-
-    private fun getNumberOfEntries(table: String): Long {
-        val sql = "SELECT COUNT(*) FROM $table"
-        return writableDatabase.compileStatement(sql).simpleQueryForLong()
     }
 
     /**

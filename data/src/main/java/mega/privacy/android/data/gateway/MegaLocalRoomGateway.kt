@@ -157,6 +157,11 @@ interface MegaLocalRoomGateway {
     suspend fun deleteCompletedTransfer(completedTransfer: CompletedTransfer)
 
     /**
+     * Delete oldest completed transfers
+     */
+    suspend fun deleteOldestCompletedTransfers()
+
+    /**
      * Get active transfer by tag
      */
     suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?

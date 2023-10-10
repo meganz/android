@@ -46,6 +46,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -606,6 +607,52 @@ internal class MegaLocalRoomFacadeTest {
         runTest {
             underTest.deleteAllBackups()
             verify(backupDao).deleteAllBackups()
+        }
+
+    @Test
+    fun `test that delete entities correctly when deleteOldestCompletedTransfers is called`() =
+        runTest {
+            val completedTransfers = (1..110).map { id ->
+                CompletedTransferEntity(
+                    id = id,
+                    fileName = "2023-03-24 00.13.20_1.jpg",
+                    type = "1",
+                    state = "6",
+                    size = "3.57 MB",
+                    handle = "27169983390750",
+                    path = "Cloud drive/Camera uploads",
+                    isOffline = "false",
+                    timestamp = System.nanoTime().toString(),
+                    error = "No error",
+                    originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
+                    parentHandle = "11622336899311",
+                )
+            }
+            completedTransfers.forEach { entity ->
+                whenever(completedTransferModelMapper(entity)).thenReturn(
+                    CompletedTransfer(
+                        id = entity.id,
+                        fileName = entity.fileName.orEmpty(),
+                        type = entity.type.orEmpty().toInt(),
+                        state = entity.state.orEmpty().toInt(),
+                        size = entity.size.orEmpty(),
+                        handle = entity.handle.orEmpty().toLong(),
+                        path = entity.path.orEmpty(),
+                        isOffline = entity.isOffline.toBoolean(),
+                        timestamp = entity.timestamp.orEmpty().toLong(),
+                        error = entity.error,
+                        originalPath = entity.originalPath.orEmpty(),
+                        parentHandle = entity.parentHandle.orEmpty().toLong(),
+                    )
+                )
+            }
+            val deletedTransfers = completedTransfers.take(10)
+            whenever(completedTransferDao.getCompletedTransfersCount()) doReturn completedTransfers.size
+            whenever(completedTransferDao.getAllCompletedTransfers()) doReturn flowOf(
+                completedTransfers
+            )
+            underTest.deleteOldestCompletedTransfers()
+            verify(completedTransferDao).deleteCompletedTransferByIds(deletedTransfers.mapNotNull { it.id }.sortedDescending())
         }
 
     private fun provideDoesFileNameExistParameters() = Stream.of(

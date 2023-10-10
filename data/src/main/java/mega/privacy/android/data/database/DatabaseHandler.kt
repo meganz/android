@@ -13,10 +13,6 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 
 interface DatabaseHandler {
 
-    companion object {
-        const val MAX_TRANSFERS = 100
-    }
-
     val myEmail: String?
 
     //get the credential of last login
@@ -271,11 +267,6 @@ interface DatabaseHandler {
         nodePath: String,
         searchQuery: String?,
     ): List<OfflineInformation>
-
-    /**
-     * Deletes the oldest completed transfers
-     */
-    fun deleteOldestCompletedTransfers()
 
     /**
      * Gets pending messages.

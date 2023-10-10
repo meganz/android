@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -166,7 +165,7 @@ internal class TransfersViewModelTest {
         runTest {
             val completedTransfer = mock<CompletedTransfer>()
             val completedTransfers = listOf(completedTransfer)
-            whenever(getAllCompletedTransfersUseCase(DatabaseHandler.MAX_TRANSFERS)).thenReturn(
+            whenever(getAllCompletedTransfersUseCase(TransfersViewModel.MAX_TRANSFERS)).thenReturn(
                 flowOf(completedTransfers)
             )
             initViewModel()

@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import timber.log.Timber
 
 /**
@@ -16,11 +16,11 @@ import timber.log.Timber
 internal class DeleteOldestCompletedTransfersWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val megaLocalStorageGateway: MegaLocalStorageGateway,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         runCatching {
-            megaLocalStorageGateway.deleteOldestCompletedTransfers()
+            megaLocalRoomGateway.deleteOldestCompletedTransfers()
         }.onFailure {
             Timber.e(it)
             return Result.failure()
