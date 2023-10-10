@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
 
 /**
  * Participants bottom panel view
@@ -302,7 +304,10 @@ fun ParticipantsBottomPanelView(
                     .padding(start = 16.dp, end = 16.dp)
                     .fillMaxWidth(),
                 textId = R.string.meetings_scheduled_meeting_info_share_meeting_link_label,
-                onClick = onShareMeetingLinkClick
+                onClick = {
+                    Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
+                    onShareMeetingLinkClick()
+                }
             )
         }
     }

@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
 import androidx.core.content.ContextCompat
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.CallNotificationIntentService
@@ -20,6 +21,8 @@ import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMAR
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.entity.pushes.PushMessage.ScheduledMeetingPushMessage
+import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationJoinButtonEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationMessageButtonEvent
 import javax.inject.Inject
 
 /**
@@ -101,6 +104,8 @@ class ScheduledMeetingPushMessageNotification @Inject constructor(
      * @return          PendingIntent
      */
     private fun getShowChatIntent(context: Context, chatId: Long): PendingIntent {
+        Analytics.initialise(context)
+        Analytics.tracker.trackEvent(ScheduledMeetingReminderNotificationMessageButtonEvent)
         val intent = Intent(context, ChatActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             action = Constants.ACTION_CHAT_SHOW_MESSAGES
@@ -123,6 +128,8 @@ class ScheduledMeetingPushMessageNotification @Inject constructor(
      * @return          PendingIntent
      */
     private fun getJoinMeetingIntent(context: Context, chatId: Long, schedId: Long): PendingIntent {
+        Analytics.initialise(context)
+        Analytics.tracker.trackEvent(ScheduledMeetingReminderNotificationJoinButtonEvent)
         val intent = Intent(context, MeetingActivity::class.java).apply {
             action = CallNotificationIntentService.START_SCHED_MEET
             putExtra(CHAT_ID_OF_INCOMING_CALL, chatId)

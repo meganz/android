@@ -19,6 +19,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -40,6 +41,12 @@ import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.mobile.analytics.event.ScheduledMeetingCreateConfirmButtonEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingRecurrenceButtonEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingSendCalendarInviteButtonEvent
+import mega.privacy.mobile.analytics.event.WaitingRoomEnableButtonEvent
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.time.Instant
@@ -186,7 +193,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         managementState = managementState,
                         onButtonClicked = ::onActionTap,
                         onDiscardClicked = viewModel::onDiscardMeetingTap,
-                        onAcceptClicked = viewModel::onScheduleMeetingTap,
+                        onAcceptClicked = ::onScheduleMeetingTap,
                         onStartTimeClicked = { showTimePicker(true) },
                         onStartDateClicked = { showDatePicker(START_DATE) },
                         onEndTimeClicked = { showTimePicker(false) },
@@ -253,6 +260,14 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 }
             }
         }
+    }
+
+    /**
+     * Tap on Schedule meeting option
+     */
+    private fun onScheduleMeetingTap() {
+        Analytics.tracker.trackEvent(ScheduledMeetingCreateConfirmButtonEvent)
+        viewModel.onScheduleMeetingTap()
     }
 
     /**
@@ -389,19 +404,65 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun onActionTap(action: ScheduleMeetingAction) {
         when (action) {
-            ScheduleMeetingAction.Recurrence -> viewModel.onRecurrenceTap()
+            ScheduleMeetingAction.Recurrence -> onRecurrenceTap()
             ScheduleMeetingAction.EndRecurrence -> {
                 viewModel.setInitialCustomRules()
                 navController.navigate(CUSTOM_RECURRENCE_TAG)
             }
 
-            ScheduleMeetingAction.MeetingLink -> viewModel.onMeetingLinkTap()
+            ScheduleMeetingAction.MeetingLink -> onMeetingLinkTap()
             ScheduleMeetingAction.AddParticipants -> viewModel.onAddParticipantsTap()
-            ScheduleMeetingAction.SendCalendarInvite -> viewModel.onSendCalendarInviteTap()
-            ScheduleMeetingAction.AllowNonHostAddParticipants -> viewModel.onAllowNonHostAddParticipantsTap()
+            ScheduleMeetingAction.SendCalendarInvite -> onSendCalendarInviteTap()
+            ScheduleMeetingAction.AllowNonHostAddParticipants -> onAllowNonHostAddParticipantsTap()
             ScheduleMeetingAction.AddDescription -> viewModel.onAddDescriptionTap()
-            ScheduleMeetingAction.WaitingRoom -> viewModel.onWaitingRoomTap()
+            ScheduleMeetingAction.WaitingRoom -> onWaitingRoomTap()
         }
+    }
+
+    /**
+     * Tap recurring meeting button
+     */
+    private fun onRecurrenceTap() {
+        Analytics.tracker.trackEvent(ScheduledMeetingSettingRecurrenceButtonEvent)
+        viewModel.onRecurrenceTap()
+    }
+
+    /**
+     * Tap to enable or disable meeting link option
+     */
+    private fun onMeetingLinkTap() {
+        if (!viewModel.state.value.enabledMeetingLinkOption) {
+            Analytics.tracker.trackEvent(ScheduledMeetingSettingEnableMeetingLinkButtonEvent)
+        }
+        viewModel.onMeetingLinkTap()
+    }
+
+    /**
+     * Tap to enable or disable send calendar invite option
+     */
+    private fun onSendCalendarInviteTap() {
+        if (!viewModel.state.value.enabledSendCalendarInviteOption) {
+            Analytics.tracker.trackEvent(ScheduledMeetingSettingSendCalendarInviteButtonEvent)
+        }
+        viewModel.onSendCalendarInviteTap()
+    }
+
+    /**
+     * Tap to enable or disable allow non-hosts to add participants option
+     */
+    private fun onAllowNonHostAddParticipantsTap() {
+        Analytics.tracker.trackEvent(ScheduledMeetingSettingEnableOpenInviteButtonEvent)
+        viewModel.onAllowNonHostAddParticipantsTap()
+    }
+
+    /**
+     * Tap to enable or disable waiting room option
+     */
+    private fun onWaitingRoomTap() {
+        if (!viewModel.state.value.enabledWaitingRoomOption) {
+            Analytics.tracker.trackEvent(WaitingRoomEnableButtonEvent)
+        }
+        viewModel.onWaitingRoomTap()
     }
 
     /**

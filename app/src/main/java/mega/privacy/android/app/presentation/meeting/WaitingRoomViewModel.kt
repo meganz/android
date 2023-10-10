@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.waitingroom.IsValidWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.mobile.analytics.event.WaitingRoomTimeoutEvent
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -361,6 +363,7 @@ class WaitingRoomViewModel @Inject constructor(
     private fun ChatCall.updateUiState() {
         when {
             hasTimeoutExpired() -> {
+                Analytics.tracker.trackEvent(WaitingRoomTimeoutEvent)
                 shouldAnswerCall.set(false)
                 _state.update { it.copy(callId = callId, inactiveHostDialog = true) }
             }

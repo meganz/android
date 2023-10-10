@@ -61,6 +61,7 @@ import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
@@ -75,6 +76,8 @@ import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.grey_900
 import mega.privacy.android.core.ui.utils.rememberPermissionState
+import mega.privacy.mobile.analytics.event.ScheduledMeetingJoinGuestButtonEvent
+import mega.privacy.mobile.analytics.event.WaitingRoomLeaveButtonEvent
 import org.jetbrains.anko.landscape
 import kotlin.random.Random
 
@@ -278,7 +281,10 @@ internal fun WaitingRoomView(
                 RaisedDefaultMegaButton(
                     textId = R.string.action_join,
                     enabled = firstName.isNotBlank() && lastName.isNotBlank(),
-                    onClick = { onGuestNameChange(firstName, lastName) },
+                    onClick = {
+                        Analytics.tracker.trackEvent(ScheduledMeetingJoinGuestButtonEvent)
+                        onGuestNameChange(firstName, lastName)
+                    },
                     modifier = Modifier
                         .layoutId("joinButton")
                         .testTag("waiting_room:button_join")
@@ -301,7 +307,10 @@ internal fun WaitingRoomView(
             text = stringResource(R.string.meetings_leave_meeting_confirmation_dialog_title),
             confirmButtonText = stringResource(R.string.general_leave),
             cancelButtonText = stringResource(R.string.meetings__waiting_room_leave_meeting_dialog_cancel_button),
-            onConfirm = onCloseClicked,
+            onConfirm = {
+                Analytics.tracker.trackEvent(WaitingRoomLeaveButtonEvent)
+                onCloseClicked()
+            },
             onDismiss = { showLeaveDialog = false },
         )
 

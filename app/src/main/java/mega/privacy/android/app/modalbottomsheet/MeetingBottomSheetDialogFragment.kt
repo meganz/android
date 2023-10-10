@@ -9,10 +9,12 @@ import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.databinding.BottomSheetMeetingSimpleBinding
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
+import mega.privacy.mobile.analytics.event.ScheduleMeetingMenuItemEvent
 
 @AndroidEntryPoint
 class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
@@ -46,7 +48,8 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
 
             dialog.setContentView(binding.root)
         } else {
-            val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
+            val binding =
+                BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
             binding.ivStartMeeting.setOnClickListener(this)
             binding.ivJoinMeeting.setOnClickListener(this)
             dialog.setContentView(binding.root)
@@ -68,11 +71,14 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
                 listener?.onCreateMeeting()
                 dismiss()
             }
+
             R.id.iv_join_meeting, R.id.btn_join_meeting -> {
                 listener?.onJoinMeeting()
                 dismiss()
             }
+
             R.id.btn_schedule_meeting -> {
+                Analytics.tracker.trackEvent(ScheduleMeetingMenuItemEvent)
                 listener?.onScheduleMeeting()
                 dismiss()
             }

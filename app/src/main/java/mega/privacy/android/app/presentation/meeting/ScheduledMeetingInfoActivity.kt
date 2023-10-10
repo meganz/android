@@ -15,11 +15,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
@@ -42,7 +41,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -63,7 +61,11 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
+import mega.privacy.mobile.analytics.event.WaitingRoomEnableButtonEvent
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -446,7 +448,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun launchCallScreen() {
         val chatId = waitingRoomManagementViewModel.state.value.chatId
-        MegaApplication.getInstance().openCallService(chatId);
+        MegaApplication.getInstance().openCallService(chatId)
         passcodeManagement.showPasscodeScreen = true
 
         val intent = Intent(this@ScheduledMeetingInfoActivity, MeetingActivity::class.java).apply {
@@ -513,6 +515,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * Edit scheduled meeting if there is internet connection, shows an error if not.
      */
     private fun onEditTap() {
+        Analytics.tracker.trackEvent(ScheduledMeetingEditMenuToolbarEvent)
         editSchedMeetLauncher.launch(
             Intent(
                 this@ScheduledMeetingInfoActivity,
@@ -526,18 +529,36 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun onActionTap(action: ScheduledMeetingInfoAction) {
         when (action) {
-            ScheduledMeetingInfoAction.MeetingLink -> scheduledMeetingManagementViewModel.onMeetingLinkTap()
+            ScheduledMeetingInfoAction.MeetingLink -> {
+                if (!scheduledMeetingManagementViewModel.state.value.enabledMeetingLinkOption) {
+                    Analytics.tracker.trackEvent(ScheduledMeetingSettingEnableMeetingLinkButtonEvent)
+                }
+                scheduledMeetingManagementViewModel.onMeetingLinkTap()
+            }
+
             ScheduledMeetingInfoAction.ShareMeetingLink,
             ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
-            -> showGetChatLinkPanel()
+            -> {
+                Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
+                showGetChatLinkPanel()
+            }
 
             ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
-            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
+            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> {
+                Analytics.tracker.trackEvent(ScheduledMeetingSettingEnableOpenInviteButtonEvent)
+                viewModel.onAllowAddParticipantsTap()
+            }
+
             ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()
             ScheduledMeetingInfoAction.ManageChatHistory -> openManageChatHistory()
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> {}
-            ScheduledMeetingInfoAction.WaitingRoom -> viewModel.setWaitingRoom()
+            ScheduledMeetingInfoAction.WaitingRoom -> {
+                if (!viewModel.state.value.enabledWaitingRoomOption) {
+                    Analytics.tracker.trackEvent(WaitingRoomEnableButtonEvent)
+                }
+                viewModel.setWaitingRoom()
+            }
         }
     }
 
