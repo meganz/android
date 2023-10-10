@@ -3,11 +3,8 @@ package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.COPY_FILE_BUFFER_SIZE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
@@ -17,7 +14,6 @@ import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -169,20 +165,6 @@ public class FileUtil {
         if (megaApi.httpServerIsRunning() == 0) {
             megaApi.httpServerStart();
             intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
-        }
-
-        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        if (activityManager == null) {
-            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-        } else {
-            activityManager.getMemoryInfo(mi);
-
-            if (mi.totalMem > BUFFER_COMP) {
-                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-            } else {
-                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-            }
         }
 
         String url = megaApi.httpServerGetLocalLink(node);

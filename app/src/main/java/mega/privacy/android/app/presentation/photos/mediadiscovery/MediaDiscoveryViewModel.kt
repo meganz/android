@@ -38,8 +38,6 @@ import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.usecase.CopyNodeListUseCase
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
-import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
-import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -55,7 +53,6 @@ import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
@@ -82,7 +79,6 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
-    private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -477,7 +473,6 @@ class MediaDiscoveryViewModel @Inject constructor(
      *
      * @param handle node handle
      * @param name node name
-     * @param isNeedsMoreBufferSize true is that sets 32MB, otherwise is false
      * @param intent Intent
      * @param isFolderLink true is from folder link, otherwise is false
      * @return updated intent
@@ -485,7 +480,6 @@ class MediaDiscoveryViewModel @Inject constructor(
     suspend fun updateIntent(
         handle: Long,
         name: String,
-        isNeedsMoreBufferSize: Boolean,
         intent: Intent,
         isFolderLink: Boolean = false,
     ): Intent {
@@ -493,14 +487,6 @@ class MediaDiscoveryViewModel @Inject constructor(
             megaApiHttpServerStartUseCase()
             intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
-
-        megaApiHttpServerSetMaxBufferSizeUseCase(
-            if (isNeedsMoreBufferSize) {
-                MAX_BUFFER_32MB
-            } else {
-                MAX_BUFFER_16MB
-            }
-        )
 
         if (isFolderLink) {
             getLocalFolderLinkFromMegaApiUseCase(handle)

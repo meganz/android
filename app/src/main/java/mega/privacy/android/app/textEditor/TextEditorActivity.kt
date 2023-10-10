@@ -159,11 +159,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         if (savedInstanceState == null) {
-            val mi = ActivityManager.MemoryInfo()
-            (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
             viewModel.setInitialValues(
                 intent,
-                mi,
                 PreferenceManager.getDefaultSharedPreferences(this)
             )
         } else if (viewModel.thereIsErrorSettingContent()) {

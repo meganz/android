@@ -134,9 +134,6 @@ class MegaNodeUtilFacade @Inject constructor() : MegaNodeUtilWrapper {
 
     override fun getNodeLabelColor(nodeLabel: Int) = MegaNodeUtil.getNodeLabelColor(nodeLabel)
 
-    override fun setupStreamingServer(api: MegaApiAndroid, context: Context) =
-        MegaNodeUtil.setupStreamingServer(api, context)
-
     override fun stopStreamingServerIfNeeded(shouldStopServer: Boolean, megaApi: MegaApiAndroid) {
         MegaNodeUtil.stopStreamingServerIfNeeded(shouldStopServer, megaApi)
     }

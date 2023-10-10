@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.mapper
 
 import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import mega.privacy.android.app.MimeTypeList
@@ -79,7 +77,7 @@ class GetIntentFromFileLinkToOpenFileMapper @Inject constructor(
                     putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
                 }
 
-                startHttpServer(mediaIntent, activity)
+                startHttpServer(mediaIntent)
                 val path = getFileUrlByPublicLinkUseCase(url) ?: throw UrlDownloadException()
                 mediaIntent.setDataAndType(Uri.parse(path), mimeType)
 
@@ -104,7 +102,7 @@ class GetIntentFromFileLinkToOpenFileMapper @Inject constructor(
                     putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
                     putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
                 }
-                startHttpServer(pdfIntent, activity)
+                startHttpServer(pdfIntent)
                 val path = getFileUrlByPublicLinkUseCase(url) ?: throw UrlDownloadException()
                 pdfIntent.setDataAndType(Uri.parse(path), mimeType)
                 pdfIntent
@@ -130,26 +128,14 @@ class GetIntentFromFileLinkToOpenFileMapper @Inject constructor(
      * Start the server if not started
      * also setMax buffer size based on available buffer size
      * @param intent [Intent]
-     * @param context [Context]
      *
      * @return intent
      */
-    private suspend fun startHttpServer(intent: Intent, context: Context): Intent {
+    private suspend fun startHttpServer(intent: Intent): Intent {
         if (httpServerIsRunning() == 0) {
             httpServerStart()
             intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
-        val memoryInfo = ActivityManager.MemoryInfo()
-        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-            .getMemoryInfo(memoryInfo)
-
-        httpServerSetMaxBufferSize(
-            if (memoryInfo.totalMem > Constants.BUFFER_COMP) {
-                Constants.MAX_BUFFER_32MB
-            } else {
-                Constants.MAX_BUFFER_16MB
-            }
-        )
         return intent
     }
 }

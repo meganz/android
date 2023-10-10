@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.backups
 
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -599,17 +597,6 @@ class BackupsFragment : RotatableFragment() {
                     megaApi.httpServerStart()
                     mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
                 }
-                val memoryInfo = ActivityManager.MemoryInfo()
-                val activityManager =
-                    requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                activityManager.getMemoryInfo(memoryInfo)
-                if (memoryInfo.totalMem > Constants.BUFFER_COMP) {
-                    Timber.d("Total memory: %d allocate 32 MB", memoryInfo.totalMem)
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-                } else {
-                    Timber.d("Total memory: %d allocate 16 MB", memoryInfo.totalMem)
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-                }
                 val url = megaApi.httpServerGetLocalLink(node)
                 mediaIntent.setDataAndType(Uri.parse(url), mimeType)
             }
@@ -669,17 +656,6 @@ class BackupsFragment : RotatableFragment() {
                 if (megaApi.httpServerIsRunning() == 0) {
                     megaApi.httpServerStart()
                     pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
-                }
-                val mi = ActivityManager.MemoryInfo()
-                val activityManager =
-                    requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                activityManager.getMemoryInfo(mi)
-                if (mi.totalMem > Constants.BUFFER_COMP) {
-                    Timber.d("Total memory: %d allocate 32 MB", mi.totalMem)
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-                } else {
-                    Timber.d("Total memory: %d allocate 16 MB", mi.totalMem)
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
                 }
                 val url = megaApi.httpServerGetLocalLink(node)
                 pdfIntent.setDataAndType(Uri.parse(url), mimeType)

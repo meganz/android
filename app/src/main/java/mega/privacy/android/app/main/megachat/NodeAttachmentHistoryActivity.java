@@ -8,14 +8,11 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.FORWARD_ONLY_OPTION;
 import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
 import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
 import static mega.privacy.android.app.utils.Constants.SELECTED_CHATS;
@@ -29,7 +26,6 @@ import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimat
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -49,7 +45,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -563,18 +558,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                         Timber.w("ERROR: HTTP server already running");
                                     }
 
-                                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                                    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                                    activityManager.getMemoryInfo(mi);
-
-                                    if (mi.totalMem > BUFFER_COMP) {
-                                        Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
-                                        megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                                    } else {
-                                        Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
-                                        megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                                    }
-
                                     String url = megaApi.httpServerGetLocalLink(node);
                                     if (url != null) {
                                         Uri parsedUri = Uri.parse(url);
@@ -649,16 +632,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                         pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
                                     } else {
                                         Timber.w("ERROR: HTTP server already running");
-                                    }
-                                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                                    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                                    activityManager.getMemoryInfo(mi);
-                                    if (mi.totalMem > BUFFER_COMP) {
-                                        Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
-                                        megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                                    } else {
-                                        Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
-                                        megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                                     }
                                     String url = megaApi.httpServerGetLocalLink(node);
                                     if (url != null) {

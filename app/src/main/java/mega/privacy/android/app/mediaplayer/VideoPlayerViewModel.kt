@@ -1,7 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -187,11 +186,9 @@ class VideoPlayerViewModel @Inject constructor(
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimesUseCase,
     private val savePlaybackTimesUseCase: SavePlaybackTimesUseCase,
     private val deletePlaybackInformationUseCase: DeletePlaybackInformationUseCase,
-    private val megaApiFolderHttpServerSetMaxBufferSizeUseCase: MegaApiFolderHttpServerSetMaxBufferSizeUseCase,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
     private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
     private val megaApiFolderHttpServerStopUseCase: MegaApiFolderHttpServerStopUseCase,
-    private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerStop: MegaApiHttpServerStopUseCase,
@@ -1819,32 +1816,16 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     private suspend fun setupStreamingServer(type: Int): Boolean {
-        val memoryInfo = ActivityManager.MemoryInfo()
-        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        activityManager.getMemoryInfo(memoryInfo)
-
         if (isMegaApiFolder(type)) {
             if (megaApiFolderHttpServerIsRunningUseCase() != 0) {
                 return false
             }
             megaApiFolderHttpServerStartUseCase()
-            megaApiFolderHttpServerSetMaxBufferSizeUseCase(
-                bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
-                    Constants.MAX_BUFFER_32MB
-                else
-                    Constants.MAX_BUFFER_16MB
-            )
         } else {
             if (megaApiHttpServerIsRunningUseCase() != 0) {
                 return false
             }
             megaApiHttpServerStartUseCase()
-            megaApiHttpServerSetMaxBufferSizeUseCase(
-                bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
-                    Constants.MAX_BUFFER_32MB
-                else
-                    Constants.MAX_BUFFER_16MB
-            )
         }
 
         return true

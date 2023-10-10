@@ -643,7 +643,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
                         }
                         mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     } else {
-                        setupStreamingServer(megaApi, this)
+                        setupStreamingServer(megaApi)
                         val url = megaApi.httpServerGetLocalLink(vNode)
                         if (url != null) {
                             val parsedUri = Uri.parse(url)
@@ -713,7 +713,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
                         }
                         pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     } else {
-                        setupStreamingServer(megaApi, this)
+                        setupStreamingServer(megaApi)
                         val url = megaApi.httpServerGetLocalLink(vNode)
                         if (url != null) {
                             val parsedUri = Uri.parse(url)

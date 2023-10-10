@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer.service
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -36,7 +35,6 @@ import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
 import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
@@ -114,11 +112,9 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MonitorAudioBackgroundPlayEnabledUseCase
@@ -148,11 +144,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val playlistItemMapper: PlaylistItemMapper,
-    private val megaApiFolderHttpServerSetMaxBufferSizeUseCase: MegaApiFolderHttpServerSetMaxBufferSizeUseCase,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
     private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
     private val megaApiFolderHttpServerStopUseCase: MegaApiFolderHttpServerStopUseCase,
-    private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerStop: MegaApiHttpServerStopUseCase,
@@ -1412,32 +1406,16 @@ class AudioPlayerServiceViewModel @Inject constructor(
     }
 
     private suspend fun setupStreamingServer(type: Int): Boolean {
-        val memoryInfo = ActivityManager.MemoryInfo()
-        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        activityManager.getMemoryInfo(memoryInfo)
-
         if (isMegaApiFolder(type)) {
             if (megaApiFolderHttpServerIsRunningUseCase() != 0) {
                 return false
             }
             megaApiFolderHttpServerStartUseCase()
-            megaApiFolderHttpServerSetMaxBufferSizeUseCase(
-                bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
-                    Constants.MAX_BUFFER_32MB
-                else
-                    Constants.MAX_BUFFER_16MB
-            )
         } else {
             if (megaApiHttpServerIsRunningUseCase() != 0) {
                 return false
             }
             megaApiHttpServerStartUseCase()
-            megaApiHttpServerSetMaxBufferSizeUseCase(
-                bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
-                    Constants.MAX_BUFFER_32MB
-                else
-                    Constants.MAX_BUFFER_16MB
-            )
         }
 
         return true

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.mapper
 
 import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
@@ -55,7 +53,6 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
     private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
-    private val megaApiFolderHttpServerSetMaxBufferSizeUseCase: MegaApiFolderHttpServerSetMaxBufferSizeUseCase,
     private val httpServerStart: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
     private val httpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSizeUseCase,
@@ -114,7 +111,7 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } ?: run {
                 setStreamingIntentParams(
-                    activity, pdfIntent, hasDbCredentials, fileNode.id.longValue, mimeType
+                    pdfIntent, hasDbCredentials, fileNode.id.longValue, mimeType
                 )
             }
             pdfIntent
@@ -174,7 +171,6 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
                 intentInternalIntentPair.first.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } ?: run {
                 setStreamingIntentParams(
-                    activity,
                     intentInternalIntentPair.first,
                     hasDbCredentials,
                     fileNode.id.longValue,
@@ -205,57 +201,34 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
     }
 
     private suspend fun setStreamingIntentParams(
-        activity: Activity,
         intent: Intent,
         hasDbCredentials: Boolean,
         handle: Long,
         mimeType: String,
     ) {
         val path = if (hasDbCredentials) {
-            startMegaApiHttpServer(intent, activity)
+            startMegaApiHttpServer(intent)
             getLocalFolderLinkFromMegaApiUseCase(handle) ?: throw UrlDownloadException()
         } else {
-            startMegaApiFolderHttpServer(intent, activity)
+            startMegaApiFolderHttpServer(intent)
             getLocalFolderLinkFromMegaApiFolderUseCase(handle) ?: throw UrlDownloadException()
         }
         intent.setDataAndType(Uri.parse(path), mimeType)
     }
 
-    private suspend fun startMegaApiFolderHttpServer(intent: Intent, context: Context): Intent {
+    private suspend fun startMegaApiFolderHttpServer(intent: Intent): Intent {
         if (megaApiFolderHttpServerIsRunningUseCase() == 0) {
             megaApiFolderHttpServerStartUseCase()
             intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
-        val memoryInfo = ActivityManager.MemoryInfo()
-        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-            .getMemoryInfo(memoryInfo)
-
-        megaApiFolderHttpServerSetMaxBufferSizeUseCase(
-            if (memoryInfo.totalMem > Constants.BUFFER_COMP) {
-                Constants.MAX_BUFFER_32MB
-            } else {
-                Constants.MAX_BUFFER_16MB
-            }
-        )
         return intent
     }
 
-    private suspend fun startMegaApiHttpServer(intent: Intent, context: Context): Intent {
+    private suspend fun startMegaApiHttpServer(intent: Intent): Intent {
         if (httpServerIsRunning() == 0) {
             httpServerStart()
             intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
-        val memoryInfo = ActivityManager.MemoryInfo()
-        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-            .getMemoryInfo(memoryInfo)
-
-        httpServerSetMaxBufferSize(
-            if (memoryInfo.totalMem > Constants.BUFFER_COMP) {
-                Constants.MAX_BUFFER_32MB
-            } else {
-                Constants.MAX_BUFFER_16MB
-            }
-        )
         return intent
     }
 }

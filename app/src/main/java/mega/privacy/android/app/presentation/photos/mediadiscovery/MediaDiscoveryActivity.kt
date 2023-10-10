@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -332,13 +331,9 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                 }
                 intent
             } ?: let {
-                val memoryInfo = ActivityManager.MemoryInfo()
-                (this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-                    .getMemoryInfo(memoryInfo)
                 mediaDiscoveryViewModel.updateIntent(
                     handle = nodeHandle,
                     name = nodeName,
-                    isNeedsMoreBufferSize = memoryInfo.totalMem > Constants.BUFFER_COMP,
                     intent = intent,
                     isFolderLink = true
                 )

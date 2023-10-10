@@ -2,12 +2,9 @@ package mega.privacy.android.app.main;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CONTACT_FILE_LIST;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
@@ -19,8 +16,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveI
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -521,18 +516,6 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                             mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
                         }
 
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if (mi.totalMem > BUFFER_COMP) {
-                            Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
-                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                        } else {
-                            Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
-                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                        }
-
                         String url = megaApi.httpServerGetLocalLink(file);
                         mediaIntent.setDataAndType(Uri.parse(url), mimeType);
                     }
@@ -575,18 +558,6 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                         if (megaApi.httpServerIsRunning() == 0) {
                             megaApi.httpServerStart();
                             pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
-                        }
-
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if (mi.totalMem > BUFFER_COMP) {
-                            Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
-                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                        } else {
-                            Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
-                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                         }
 
                         String url = megaApi.httpServerGetLocalLink(file);

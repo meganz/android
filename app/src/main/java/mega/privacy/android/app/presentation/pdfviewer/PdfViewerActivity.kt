@@ -389,16 +389,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         if (httpServerIsRunning() == 0) {
             httpServerStart()
         }
-        val mi = ActivityManager.MemoryInfo()
-        val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        activityManager.getMemoryInfo(mi)
-        if (mi.totalMem > Constants.BUFFER_COMP) {
-            Timber.d("Total mem: %d allocate 32 MB", mi.totalMem)
-            httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-        } else {
-            Timber.d("Total mem: %d allocate 16 MB", mi.totalMem)
-            httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-        }
     }
 
     private fun setupView() = with(binding) {

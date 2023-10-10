@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.mapper
 
 import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
@@ -39,10 +37,8 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import timber.log.Timber
-import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
@@ -120,7 +116,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 }
                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } ?: run {
-                startHttpServer(pdfIntent, activity)
+                startHttpServer(pdfIntent)
                 val path =
                     getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
                         ?: throw UrlDownloadException()
@@ -135,7 +131,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     val urlFile = File(it.path)
                     FileReader(urlFile).buffered()
                 } ?: run {
-                    startHttpServer(intent, activity)
+                    startHttpServer(intent)
                     val path =
                         getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
                     withContext(ioDispatcher) {
@@ -218,7 +214,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 }
                 intentInternalIntentPair.first.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } ?: run {
-                startHttpServer(intentInternalIntentPair.first, activity)
+                startHttpServer(intentInternalIntentPair.first)
                 val path =
                     getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
                         ?: throw UrlDownloadException()
@@ -262,26 +258,14 @@ class GetIntentToOpenFileMapper @Inject constructor(
      * Start the server if not started
      * also setMax buffer size based on available buffer size
      * @param intent [Intent]
-     * @param context [Context]
      *
      * @return intent
      */
-    private suspend fun startHttpServer(intent: Intent, context: Context): Intent {
+    private suspend fun startHttpServer(intent: Intent): Intent {
         if (httpServerIsRunning() == 0) {
             httpServerStart()
             intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
-        val memoryInfo = ActivityManager.MemoryInfo()
-        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-            .getMemoryInfo(memoryInfo)
-
-        httpServerSetMaxBufferSize(
-            if (memoryInfo.totalMem > Constants.BUFFER_COMP) {
-                Constants.MAX_BUFFER_32MB
-            } else {
-                Constants.MAX_BUFFER_16MB
-            }
-        )
         return intent
     }
 }

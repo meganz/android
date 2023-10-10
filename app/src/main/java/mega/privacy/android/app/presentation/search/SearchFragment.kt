@@ -85,17 +85,12 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.mobile.analytics.event.SearchAudioFilterPressed
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
-import mega.privacy.mobile.analytics.event.SearchDocsFilterPressed
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
-import mega.privacy.mobile.analytics.event.SearchImageFilterPressed
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchItemSelected
 import mega.privacy.mobile.analytics.event.SearchItemSelectedEvent
-import mega.privacy.mobile.analytics.event.SearchResetFilterPressed
 import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
-import mega.privacy.mobile.analytics.event.SearchVideosFilterPressed
 import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -1005,19 +1000,6 @@ class SearchFragment : RotatableFragment() {
                     )
                 }
 
-                val mi = ActivityManager.MemoryInfo()
-                val activityManager =
-                    requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                activityManager.getMemoryInfo(mi)
-
-                if (mi.totalMem > Constants.BUFFER_COMP) {
-                    Timber.d("Total mem: ${mi.totalMem} allocate 32 MB")
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-                } else {
-                    Timber.d("Total mem: ${mi.totalMem} allocate 16 MB")
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-                }
-
                 val url = megaApi.httpServerGetLocalLink(node)
                 intentInternalIntentPair.first.setDataAndType(Uri.parse(url), mimeType)
             }
@@ -1088,18 +1070,6 @@ class SearchFragment : RotatableFragment() {
                         Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
                         true
                     )
-                }
-                val mi = ActivityManager.MemoryInfo()
-                val activityManager =
-                    requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                activityManager.getMemoryInfo(mi)
-
-                if (mi.totalMem > Constants.BUFFER_COMP) {
-                    Timber.d("Total mem: ${mi.totalMem} allocate 32 MB")
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-                } else {
-                    Timber.d("Total mem: ${mi.totalMem} allocate 16 MB")
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
                 }
 
                 val url = megaApi.httpServerGetLocalLink(node)

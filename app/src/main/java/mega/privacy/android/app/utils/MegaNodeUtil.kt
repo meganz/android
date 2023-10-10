@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils
 
+import mega.privacy.android.core.R as CoreUiR
 import android.app.Activity
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -25,7 +25,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -47,7 +46,6 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MO
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER
-import mega.privacy.android.app.utils.Constants.BUFFER_COMP
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -64,8 +62,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
-import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
-import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
 import mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
@@ -1069,23 +1065,12 @@ object MegaNodeUtil {
      * Setup SDK HTTP streaming server.
      *
      * @param api MegaApiAndroid instance to use
-     * @param context Android context
      * @return whether this function call really starts SDK HTTP streaming server
      */
     @JvmStatic
-    fun setupStreamingServer(api: MegaApiAndroid, context: Context): Boolean {
+    fun setupStreamingServer(api: MegaApiAndroid): Boolean {
         if (api.httpServerIsRunning() == 0) {
             api.httpServerStart()
-
-            val memoryInfo = ActivityManager.MemoryInfo()
-            val activityManager =
-                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.getMemoryInfo(memoryInfo)
-
-            api.httpServerSetMaxBufferSize(
-                if (memoryInfo.totalMem > BUFFER_COMP) MAX_BUFFER_32MB
-                else MAX_BUFFER_16MB
-            )
 
             return true
         }
@@ -1713,7 +1698,7 @@ object MegaNodeUtil {
                 br = BufferedReader(FileReader(localFile))
             } else {
                 //Read streaming file
-                shouldStopServer = setupStreamingServer(megaApi, context)
+                shouldStopServer = setupStreamingServer(megaApi)
                 val uri = megaApi.httpServerGetLocalLink(node)
 
                 if (!uri.isNullOrEmpty()) {

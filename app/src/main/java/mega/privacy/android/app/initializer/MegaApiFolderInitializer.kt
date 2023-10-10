@@ -57,6 +57,7 @@ class MegaApiFolderInitializer : Initializer<Unit> {
             retrySSLerrors(true)
             downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
             uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
+            httpServerSetMaxBufferSize(megaApi.httpServerGetMaxBufferSize())
         }
     }
 

@@ -317,15 +317,6 @@ interface MegaNodeUtilWrapper {
     fun getNodeLabelColor(nodeLabel: Int): Int
 
     /**
-     * Setup SDK HTTP streaming server.
-     *
-     * @param api MegaApiAndroid instance to use
-     * @param context Android context
-     * @return whether this function call really starts SDK HTTP streaming server
-     */
-    fun setupStreamingServer(api: MegaApiAndroid, context: Context): Boolean
-
-    /**
      * Stop SDK HTTP streaming server.
      *
      * @param shouldStopServer True if should stop the server, false otherwise.

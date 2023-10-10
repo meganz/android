@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.importlink
 
 import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
@@ -24,7 +22,6 @@ import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import java.io.File
 import javax.inject.Inject
@@ -37,7 +34,6 @@ class AlbumImportPreviewProvider @Inject constructor(
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
-    private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getAlbumPhotoFileUrlByNodeIdUseCase: GetAlbumPhotoFileUrlByNodeIdUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
@@ -153,18 +149,12 @@ class AlbumImportPreviewProvider @Inject constructor(
                     }
                 }
                 intent
-            } ?: let {
-                val memoryInfo = ActivityManager.MemoryInfo()
-                (activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-                    .getMemoryInfo(memoryInfo)
-                updateIntent(
-                    handle = nodeHandle,
-                    name = nodeName,
-                    isNeedsMoreBufferSize = memoryInfo.totalMem > Constants.BUFFER_COMP,
-                    intent = intent,
-                    isAlbumSharing = true
-                )
-            }
+            } ?: updateIntent(
+                handle = nodeHandle,
+                name = nodeName,
+                intent = intent,
+                isAlbumSharing = true
+            )
         )
     }
 
@@ -214,18 +204,12 @@ class AlbumImportPreviewProvider @Inject constructor(
                     }
                 }
                 intent
-            } ?: let {
-                val memoryInfo = ActivityManager.MemoryInfo()
-                (activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-                    .getMemoryInfo(memoryInfo)
-                updateIntent(
-                    handle = nodeHandle,
-                    name = nodeName,
-                    isNeedsMoreBufferSize = memoryInfo.totalMem > Constants.BUFFER_COMP,
-                    intent = intent,
-                    isFolderLink = isFolderLink,
-                )
-            }
+            } ?: updateIntent(
+                handle = nodeHandle,
+                name = nodeName,
+                intent = intent,
+                isFolderLink = isFolderLink,
+            )
         )
     }
 
@@ -265,14 +249,12 @@ class AlbumImportPreviewProvider @Inject constructor(
      *
      * @param handle node handle
      * @param name node name
-     * @param isNeedsMoreBufferSize true is that sets 32MB, otherwise is false
      * @param intent Intent
      * @return updated intent
      */
     private suspend fun updateIntent(
         handle: Long,
         name: String,
-        isNeedsMoreBufferSize: Boolean,
         intent: Intent,
         isFolderLink: Boolean = false,
         isAlbumSharing: Boolean = false,
@@ -281,14 +263,6 @@ class AlbumImportPreviewProvider @Inject constructor(
             megaApiHttpServerStartUseCase()
             intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
-
-        megaApiHttpServerSetMaxBufferSizeUseCase(
-            if (isNeedsMoreBufferSize) {
-                Constants.MAX_BUFFER_32MB
-            } else {
-                Constants.MAX_BUFFER_16MB
-            }
-        )
 
         when {
             isAlbumSharing -> {

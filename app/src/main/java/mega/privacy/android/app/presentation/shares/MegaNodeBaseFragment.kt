@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.shares
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -441,19 +440,6 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                             Timber.w("ERROR:httpServerAlreadyRunning")
                         }
 
-                        val mi = ActivityManager.MemoryInfo()
-                        val activityManager =
-                            requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                        activityManager.getMemoryInfo(mi)
-
-                        if (mi.totalMem > Constants.BUFFER_COMP) {
-                            Timber.d("total mem: %d allocate 32 MB", mi.totalMem)
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-                        } else {
-                            Timber.d("total mem: %d allocate 16 MB", mi.totalMem)
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-                        }
-
                         val url = megaApi.httpServerGetLocalLink(node)
 
                         url?.let { Uri.parse(it) }?.let {
@@ -505,17 +491,6 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                         if (megaApi.httpServerIsRunning() == 0) {
                             megaApi.httpServerStart()
                             intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
-                        }
-                        val mi = ActivityManager.MemoryInfo()
-                        val activityManager =
-                            requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                        activityManager.getMemoryInfo(mi)
-                        if (mi.totalMem > Constants.BUFFER_COMP) {
-                            Timber.d("Total mem: %d allocate 32 MB", mi.totalMem)
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-                        } else {
-                            Timber.d("Total mem: %d allocate 16 MB", mi.totalMem)
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
                         }
                         val url = megaApi.httpServerGetLocalLink(node)
 

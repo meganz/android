@@ -23,7 +23,6 @@ import static mega.privacy.android.app.utils.ChatUtil.transformSecondsInString;
 import static mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY;
 import static mega.privacy.android.app.utils.Constants.AVATAR_PRIMARY_COLOR;
 import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.EMOJI_SIZE;
 import static mega.privacy.android.app.utils.Constants.EMOJI_SIZE_EXTRA_HIGH;
 import static mega.privacy.android.app.utils.Constants.EMOJI_SIZE_HIGH;
@@ -31,8 +30,6 @@ import static mega.privacy.android.app.utils.Constants.EMOJI_SIZE_MEDIUM;
 import static mega.privacy.android.app.utils.Constants.ERROR_VOICE_CLIP_TRANSFER;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.RICH_WARNING_CONFIRMATION;
 import static mega.privacy.android.app.utils.Constants.RICH_WARNING_FALSE;
 import static mega.privacy.android.app.utils.Constants.RICH_WARNING_TRUE;
@@ -81,7 +78,6 @@ import static nz.mega.sdk.MegaChatMessage.END_CALL_REASON_CANCELLED;
 import static nz.mega.sdk.MegaChatMessage.END_CALL_REASON_NO_ANSWER;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -4920,16 +4916,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else {
             if (megaApi.httpServerIsRunning() == 0) {
                 megaApi.httpServerStart();
-            }
-
-            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            activityManager.getMemoryInfo(mi);
-
-            if (mi.totalMem > BUFFER_COMP) {
-                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-            } else {
-                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
             }
 
             String url = megaApi.httpServerGetLocalLink(node);

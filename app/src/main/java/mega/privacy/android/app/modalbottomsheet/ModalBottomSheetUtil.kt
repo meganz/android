@@ -77,7 +77,7 @@ object ModalBottomSheetUtil {
             )
             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } else {
-            setupStreamingServer(megaApi, context)
+            setupStreamingServer(megaApi)
             val url = megaApi.httpServerGetLocalLink(node)
             if (url == null) {
                 Util.showSnackbar(

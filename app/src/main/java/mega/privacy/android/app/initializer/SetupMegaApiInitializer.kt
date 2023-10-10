@@ -1,5 +1,6 @@
 package mega.privacy.android.app.initializer
 
+import android.app.ActivityManager
 import android.content.Context
 import androidx.startup.Initializer
 import dagger.hilt.EntryPoint
@@ -54,33 +55,39 @@ class SetupMegaApiInitializer : Initializer<Unit> {
      */
     override fun create(context: Context) {
         val entryPoint =
-            EntryPointAccessors.fromApplication(context,
-                SetupMegaApiInitializerEntryPoint::class.java)
-        with(entryPoint) {
-            megaApi().apply {
-                Timber.d("ADD REQUEST LISTENER")
-                retrySSLerrors(true)
-                downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
-                uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
-                addRequestListener(entryPoint.requestListener())
-                addGlobalListener(entryPoint.globalListener())
-            }
-            setSDKLanguage(megaApi())
+            EntryPointAccessors.fromApplication(
+                context,
+                SetupMegaApiInitializerEntryPoint::class.java
+            )
+        val megaApi = entryPoint.megaApi()
+        megaApi.retrySSLerrors(true)
+        megaApi.downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
+        megaApi.uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
+        addListeners(megaApi, entryPoint)
+        setStreamingBufferSize(megaApi, context)
+        setSDKLanguage(megaApi)
+        setResourceLimit(megaApi)
+    }
 
-            // Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
-            val desirableRLimit = 20000 // SDK team recommended value
-            val currentLimit = megaApi().platformGetRLimitNumFile()
-            Timber.d("Current resource limit is set to %s", currentLimit)
-            if (currentLimit < desirableRLimit) {
-                Timber.d("Resource limit is under desirable value. Trying to increase the resource limit...")
-                if (!megaApi().platformSetRLimitNumFile(desirableRLimit)) {
-                    Timber.w("Error setting resource limit.")
-                }
+    private fun addListeners(
+        megaApiAndroid: MegaApiAndroid,
+        setupMegaApiInitializerEntryPoint: SetupMegaApiInitializerEntryPoint,
+    ) {
+        Timber.d("ADD REQUEST LISTENER")
+        megaApiAndroid.addRequestListener(setupMegaApiInitializerEntryPoint.requestListener())
+        megaApiAndroid.addGlobalListener(setupMegaApiInitializerEntryPoint.globalListener())
+    }
 
-                // Check new resource limit after set it in order to see if had been set successfully to the
-                // desired value or maybe to a lower value limited by the system.
-                Timber.d("Resource limit is set to ${megaApi().platformGetRLimitNumFile()}")
-            }
+    private fun setStreamingBufferSize(megaApiAndroid: MegaApiAndroid, context: Context) {
+        val memoryInfo = ActivityManager.MemoryInfo()
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        activityManager.getMemoryInfo(memoryInfo)
+        if (memoryInfo.totalMem > BUFFER_COMP) {
+            Timber.d("Total mem: %d allocate 32 MB", memoryInfo.totalMem)
+            megaApiAndroid.httpServerSetMaxBufferSize(MAX_BUFFER_32MB)
+        } else {
+            Timber.d("Total mem: %d allocate 16 MB", memoryInfo.totalMem)
+            megaApiAndroid.httpServerSetMaxBufferSize(MAX_BUFFER_16MB)
         }
     }
 
@@ -107,6 +114,23 @@ class SetupMegaApiInitializer : Initializer<Unit> {
         Timber.d("Result: $result Language: $langCode")
     }
 
+    private fun setResourceLimit(megaApi: MegaApiAndroid) {
+        // Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
+        val desirableRLimit = 20000 // SDK team recommended value
+        val currentLimit = megaApi.platformGetRLimitNumFile()
+        Timber.d("Current resource limit is set to %s", currentLimit)
+        if (currentLimit < desirableRLimit) {
+            Timber.d("Resource limit is under desirable value. Trying to increase the resource limit...")
+            if (!megaApi.platformSetRLimitNumFile(desirableRLimit)) {
+                Timber.w("Error setting resource limit.")
+            }
+
+            // Check new resource limit after set it in order to see if had been set successfully to the
+            // desired value or maybe to a lower value limited by the system.
+            Timber.d("Resource limit is set to ${megaApi.platformGetRLimitNumFile()}")
+        }
+    }
+
     /**
      * Dependencies
      *
@@ -114,4 +138,9 @@ class SetupMegaApiInitializer : Initializer<Unit> {
     override fun dependencies(): List<Class<out Initializer<*>>> =
         listOf(LoggerInitializer::class.java, WorkManagerInitializer::class.java)
 
+    companion object {
+        private const val BUFFER_COMP: Long = 1073741824 // 1 GB
+        private const val MAX_BUFFER_16MB = 16777216 // 16 MB
+        private const val MAX_BUFFER_32MB = 33554432 // 32 MB
+    }
 }

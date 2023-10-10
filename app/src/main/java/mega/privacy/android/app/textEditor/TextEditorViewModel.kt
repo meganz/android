@@ -1,7 +1,6 @@
 package mega.privacy.android.app.textEditor
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -38,7 +37,6 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
-import mega.privacy.android.app.utils.Constants.BUFFER_COMP
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -50,8 +48,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
-import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
 import mega.privacy.android.app.utils.Constants.MESSAGE_ID
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
@@ -287,7 +283,6 @@ class TextEditorViewModel @Inject constructor(
      */
     fun setInitialValues(
         intent: Intent,
-        mi: ActivityManager.MemoryInfo,
         preferences: SharedPreferences,
     ) {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
@@ -373,7 +368,7 @@ class TextEditorViewModel @Inject constructor(
 
         if (isViewMode() || isEditMode()) {
             needsReadContent = true
-            initializeReadParams(mi)
+            initializeReadParams()
         } else {
             pagination.value = Pagination()
         }
@@ -390,9 +385,8 @@ class TextEditorViewModel @Inject constructor(
      * Initializes the necessary params to read the file content.
      * If file is available locally, the local uri. If not, the streaming URL.
      *
-     * @param mi Current phone memory info in case is needed to read the file on streaming.
      */
-    private fun initializeReadParams(mi: ActivityManager.MemoryInfo) {
+    private fun initializeReadParams() {
         localFileUri =
             if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
             else getLocalFile(getNode())
@@ -404,11 +398,6 @@ class TextEditorViewModel @Inject constructor(
                 api.httpServerStart()
                 textEditorData.value?.needStopHttpServer = true
             }
-
-            api.httpServerSetMaxBufferSize(
-                if (mi.totalMem > BUFFER_COMP) MAX_BUFFER_32MB
-                else MAX_BUFFER_16MB
-            )
 
             val uri = api.httpServerGetLocalLink(getNode())
 

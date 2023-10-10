@@ -96,7 +96,6 @@ import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PRO
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.CHAT_LINK_EXTRA;
 import static mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_CHAT_LINK;
@@ -130,8 +129,6 @@ import static mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE;
 import static mega.privacy.android.app.utils.Constants.LINK_IS_FOR_MEETING;
 import static mega.privacy.android.app.utils.Constants.LOCATION_PERMISSION_REQUEST_CODE;
 import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.MAX_REACTIONS_PER_MESSAGE;
 import static mega.privacy.android.app.utils.Constants.MAX_REACTIONS_PER_USER;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
@@ -200,7 +197,6 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -389,9 +385,9 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
-import mega.privacy.android.app.usecase.LegacyGetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
+import mega.privacy.android.app.usecase.LegacyGetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallUseCase;
@@ -5632,11 +5628,6 @@ public class ChatActivity extends PasscodeActivity
                         Timber.w("ERROR:httpServerAlreadyRunning");
                     }
 
-                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                    activityManager.getMemoryInfo(mi);
-                    megaApi.httpServerSetMaxBufferSize(mi.totalMem > BUFFER_COMP ? MAX_BUFFER_32MB : MAX_BUFFER_16MB);
-
                     String url = megaApi.httpServerGetLocalLink(node);
                     if (url != null && Uri.parse(url) != null) {
                         mediaIntent.setDataAndType(Uri.parse(url), mimeType);
@@ -5698,10 +5689,6 @@ public class ChatActivity extends PasscodeActivity
                 } else {
                     Timber.e("ERROR:httpServerAlreadyRunning");
                 }
-                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                activityManager.getMemoryInfo(mi);
-                megaApi.httpServerSetMaxBufferSize(mi.totalMem > BUFFER_COMP ? MAX_BUFFER_32MB : MAX_BUFFER_16MB);
 
                 String url = megaApi.httpServerGetLocalLink(node);
                 if (url != null && Uri.parse(url) != null) {
