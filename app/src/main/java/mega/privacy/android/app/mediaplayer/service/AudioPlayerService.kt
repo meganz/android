@@ -2,14 +2,17 @@ package mega.privacy.android.app.mediaplayer.service
 
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ServiceInfo
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -251,7 +254,22 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 onNotificationPostedCallback = { notificationId, notification, ongoing ->
                     if (ongoing && isForeground) {
                         // Make sure the service will not get destroyed while playing media.
-                        startForeground(notificationId, notification)
+                        try {
+                            startForeground(
+                                notificationId, notification,
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                                } else {
+                                    0
+                                },
+                            )
+                        } catch (e: Exception) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                                && e is ForegroundServiceStartNotAllowedException
+                            ) {
+                                Timber.e("App not in a valid state to start foreground service: ${e.message}")
+                            }
+                        }
                         currentNotification = notification
                     } else {
                         // Make notification cancellable.
