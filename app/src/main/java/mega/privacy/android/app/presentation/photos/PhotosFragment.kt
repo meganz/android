@@ -546,6 +546,7 @@ class PhotosFragment : Fragment() {
 
             R.id.action_cu_status_warning -> {
                 timelineViewModel.setCameraUploadsLimitedAccess(true)
+                timelineViewModel.showCameraUploadsChangePermissionsMessage(true)
                 true
             }
 

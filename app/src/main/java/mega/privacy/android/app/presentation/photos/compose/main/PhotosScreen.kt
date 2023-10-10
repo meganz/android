@@ -149,9 +149,6 @@ fun PhotosScreen(
                             onLongPress = timelineViewModel::onLongPress,
                             isNewCUEnabled = isNewCUEnabled,
                             onEnableCameraUploads = onNavigateCameraUploadsSettings,
-                            onChangePermissionsCameraUploads = {
-                                timelineViewModel.showCameraUploadsChangePermissionsMessage(true)
-                            },
                             onCloseCameraUploadsLimitedAccess = {
                                 timelineViewModel.setCameraUploadsLimitedAccess(false)
                             }

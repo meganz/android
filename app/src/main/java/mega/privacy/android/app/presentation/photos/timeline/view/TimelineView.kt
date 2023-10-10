@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -59,7 +58,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
@@ -90,7 +88,6 @@ import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.core.ui.theme.yellow_100
 import mega.privacy.android.core.ui.theme.yellow_700
 import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Base Compose Timeline View
@@ -150,13 +147,7 @@ fun TimelineView(
             when (result) {
                 SnackbarResult.Dismissed -> {}
 
-                SnackbarResult.ActionPerformed -> {
-                    Toast.makeText(
-                        context,
-                        "What did the late tomato say to early tomato? I'll ketch up",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
+                SnackbarResult.ActionPerformed -> {}
             }
 
             clearCameraUploadsChangePermissionsMessage()
@@ -558,7 +549,6 @@ fun HandleCameraUploadStatusFab(
 @Composable
 fun CameraUploadsLimitedAccess(
     modifier: Modifier = Modifier,
-    onChangePermissions: () -> Unit,
     onClose: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -566,7 +556,6 @@ fun CameraUploadsLimitedAccess(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onChangePermissions() }
             .background(yellow_100.takeIf { isLight } ?: yellow_700_alpha_015),
         content = {
             Row(

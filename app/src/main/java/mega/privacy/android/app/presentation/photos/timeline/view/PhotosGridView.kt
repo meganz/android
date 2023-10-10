@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.photos.timeline.view
 
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
-import android.widget.Toast
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -52,10 +51,8 @@ fun PhotosGridView(
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
     onEnableCameraUploads: () -> Unit,
-    onChangePermissionsCameraUploads: () -> Unit,
     onCloseCameraUploadsLimitedAccess: () -> Unit,
 ) {
-    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val spanCount = remember(configuration.orientation, timelineViewState.currentZoomLevel) {
         if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -83,20 +80,12 @@ fun PhotosGridView(
                 span = { GridItemSpan(maxLineSpan) },
             ) {
                 CameraUploadsLimitedAccess(
-                    onChangePermissions = onChangePermissionsCameraUploads,
-                    onClose = {
-                        Toast.makeText(
-                            context,
-                            "What kind of tree fits in your hand? A palm tree!",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-                        onCloseCameraUploadsLimitedAccess()
-                    },
+                    onClose = onCloseCameraUploadsLimitedAccess,
                 )
             }
         }
 
-        if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0 && isNewCUEnabled) {
+        if (timelineViewState.enableCameraUploadButtonShowing && !timelineViewState.isCameraUploadsLimitedAccess && timelineViewState.selectedPhotoCount == 0 && isNewCUEnabled) {
             item(
                 key = "enable-camera-uploads-banner",
                 span = { GridItemSpan(maxLineSpan) },
