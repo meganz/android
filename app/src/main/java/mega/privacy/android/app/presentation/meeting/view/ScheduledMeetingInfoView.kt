@@ -133,7 +133,7 @@ fun ScheduledMeetingInfoView(
 
     val shouldShowWarningDialog =
         state.enabledAllowNonHostAddParticipantsOption && state.enabledWaitingRoomOption && state.isHost
-                && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled && managementState.isWaitingRoomFeatureFlagEnabled
+                && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -198,7 +198,6 @@ fun ScheduledMeetingInfoView(
                     ActionButton(
                         state = state,
                         action = button,
-                        isWaitingRoomFeatureFlagEnabled = managementState.isWaitingRoomFeatureFlagEnabled,
                         enabledMeetingLinkOption = managementState.enabledMeetingLinkOption,
                         isCallInProgress = managementState.isCallInProgress,
                         onButtonClicked = onButtonClicked
@@ -528,7 +527,6 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
 @Composable
 private fun ActionButton(
     state: ScheduledMeetingInfoState,
-    isWaitingRoomFeatureFlagEnabled: Boolean,
     enabledMeetingLinkOption: Boolean,
     isCallInProgress: Boolean,
     action: ScheduledMeetingInfoAction,
@@ -653,13 +651,13 @@ private fun ActionButton(
                 }
 
             ScheduledMeetingInfoAction.WaitingRoom -> {
-                if (state.isHost && isWaitingRoomFeatureFlagEnabled) {
+                if (state.isHost) {
                     ActionOption(
                         state = state,
                         action = action,
-                        isEnabled = !isCallInProgress,
                         isChecked = state.enabledWaitingRoomOption,
-                        hasSwitch = true
+                        hasSwitch = true,
+                        isEnabled = !isCallInProgress
                     )
 
                     action.description?.let { description ->
@@ -895,15 +893,16 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
  *
  * @param state         [ScheduledMeetingInfoState]
  * @param action        [ScheduledMeetingInfoAction]
- * @param isEnabled     True, if the option must be enabled. False if not
+ * @param isChecked     True, if the option is checked. False if not
  * @param hasSwitch     True, if the option has a switch. False if not
+ * @param isEnabled     True, if the option must be enabled. False if not
  */
 @Composable
 private fun ActionOption(
-    isChecked: Boolean,
-    hasSwitch: Boolean,
     state: ScheduledMeetingInfoState,
     action: ScheduledMeetingInfoAction,
+    isChecked: Boolean,
+    hasSwitch: Boolean,
     isEnabled: Boolean = true,
 ) {
     Row(
@@ -1303,7 +1302,6 @@ fun PreviewActionButton() {
             )
         ),
             action = ScheduledMeetingInfoAction.MeetingLink,
-            isWaitingRoomFeatureFlagEnabled = true,
             enabledMeetingLinkOption = true,
             isCallInProgress = false,
             onButtonClicked = {})
