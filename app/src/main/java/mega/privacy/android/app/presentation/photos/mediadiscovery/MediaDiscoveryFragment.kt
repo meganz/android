@@ -29,6 +29,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
+import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryView
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.settings.SettingsActivity
@@ -193,6 +194,7 @@ class MediaDiscoveryFragment : Fragment() {
                         }
 
                         handleSlidersMenuIconVisibility()
+                        handleGoBackLogic(state)
                     }
                 }
 
@@ -209,6 +211,11 @@ class MediaDiscoveryFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun handleGoBackLogic(state: MediaDiscoveryViewState) {
+        if (state.shouldGoBack)
+            managerActivity?.onBackPressedDispatcher?.onBackPressed()
     }
 
     private fun onOKButtonClicked() {

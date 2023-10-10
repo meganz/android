@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property isConnectedToNetwork
  * @property hasDbCredentials
  * @property loadPhotosDone
+ * @property shouldGoBack when current folder is deleted, should automatic go back
  */
 data class MediaDiscoveryViewState(
     val currentFolderId: Long? = null,
@@ -60,4 +61,5 @@ data class MediaDiscoveryViewState(
     val isConnectedToNetwork: Boolean = true,
     val hasDbCredentials: Boolean = true,
     val loadPhotosDone: Boolean = false,
+    val shouldGoBack: Boolean = false,
 )

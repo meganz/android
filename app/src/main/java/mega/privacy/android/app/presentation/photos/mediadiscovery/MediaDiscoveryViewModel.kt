@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.HasCredentials
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -91,6 +92,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
+    private val isNodeInRubbish: IsNodeInRubbish,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -201,10 +203,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         )
             .catch { Timber.e(it) }
             .collectLatest { sourcePhotos ->
-                handlePhotoItems(
-                    sortedPhotos = sortAndFilterPhotos(sourcePhotos),
-                    sourcePhotos = sourcePhotos
-                )
+                handleFolderPhotosAndLogic(sourcePhotos)
             }
     }
 
@@ -214,12 +213,29 @@ class MediaDiscoveryViewModel @Inject constructor(
             recursive = isRecursive
         ).catch { Timber.e(it) }
             .collectLatest { sourcePhotos ->
-                handlePhotoItems(
-                    sortedPhotos = sortAndFilterPhotos(sourcePhotos),
-                    sourcePhotos = sourcePhotos
-                )
+                handleFolderPhotosAndLogic(sourcePhotos)
             }
     }
+
+    private suspend fun handleFolderPhotosAndLogic(
+        sourcePhotos: List<Photo>,
+    ) {
+        if (isMDFolderInRubbish(sourcePhotos)) {
+            _state.update {
+                it.copy(shouldGoBack = true)
+            }
+        } else {
+            handlePhotoItems(
+                sortedPhotos = sortAndFilterPhotos(sourcePhotos),
+                sourcePhotos = sourcePhotos
+            )
+        }
+    }
+
+    private suspend fun isMDFolderInRubbish(sourcePhotos: List<Photo>) =
+        _state.value.currentFolderId?.let { currentFolderId ->
+            sourcePhotos.isEmpty() && isNodeInRubbish(currentFolderId)
+        } ?: false
 
     internal fun sortAndFilterPhotos(sourcePhotos: List<Photo>): List<Photo> {
         val filteredPhotos = when (_state.value.currentMediaType) {
