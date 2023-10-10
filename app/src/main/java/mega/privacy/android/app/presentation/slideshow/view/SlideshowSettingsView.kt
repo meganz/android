@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
 import mega.privacy.android.core.ui.controls.controlssliders.LabelledSwitch
@@ -51,6 +52,14 @@ import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
+import mega.privacy.mobile.analytics.event.SlideshowSettingOrderNewestButtonEvent
+import mega.privacy.mobile.analytics.event.SlideshowSettingOrderOldestButtonEvent
+import mega.privacy.mobile.analytics.event.SlideshowSettingOrderShuffleButtonEvent
+import mega.privacy.mobile.analytics.event.SlideshowSettingRepeatOffButtonEvent
+import mega.privacy.mobile.analytics.event.SlideshowSettingRepeatOnButtonEvent
+import mega.privacy.mobile.analytics.event.SlideshowSettingSpeedFastButtonEvent
+import mega.privacy.mobile.analytics.event.SlideshowSettingSpeedNormalButtonEvent
+import mega.privacy.mobile.analytics.event.SlideshowSettingSpeedSlowButtonEvent
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -125,7 +134,10 @@ fun SlideshowSettingsView(
             LabelledSwitch(
                 label = stringResource(R.string.slideshow_setting_repeat),
                 checked = state.repeat,
-                onCheckChanged = { slideshowSettingViewModel.saveRepeatSetting(!state.repeat) },
+                onCheckChanged = {
+                    slideshowRepeatAnalytics(!state.repeat)
+                    slideshowSettingViewModel.saveRepeatSetting(!state.repeat)
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
             )
@@ -139,6 +151,7 @@ fun SlideshowSettingsView(
                 options = SlideshowSpeed.values(),
                 selectedOption = state.speed ?: SlideshowSpeed.Normal,
             ) {
+                slideshowSpeedAnalytics(it)
                 slideshowSettingViewModel.saveSpeedSetting(it)
             }
         }
@@ -149,6 +162,7 @@ fun SlideshowSettingsView(
                 options = SlideshowOrder.values(),
                 selectedOption = state.order ?: SlideshowOrder.Shuffle,
             ) {
+                slideshowOrderAnalytics(it)
                 slideshowSettingViewModel.saveOrderSetting(it)
             }
         }
@@ -307,4 +321,41 @@ fun PreviewSlideshowSettingsView() {
             SlideshowSettingsView(viewModel())
         }
     }
+}
+
+private fun slideshowSpeedAnalytics(speed: SlideshowSpeed) {
+    when (speed) {
+        SlideshowSpeed.Slow -> Analytics.tracker.trackEvent(
+            SlideshowSettingSpeedSlowButtonEvent
+        )
+
+        SlideshowSpeed.Normal -> Analytics.tracker.trackEvent(
+            SlideshowSettingSpeedNormalButtonEvent
+        )
+
+        SlideshowSpeed.Fast -> Analytics.tracker.trackEvent(
+            SlideshowSettingSpeedFastButtonEvent
+        )
+    }
+}
+
+private fun slideshowOrderAnalytics(order: SlideshowOrder) {
+    when (order) {
+        SlideshowOrder.Newest -> Analytics.tracker.trackEvent(
+            SlideshowSettingOrderNewestButtonEvent
+        )
+
+        SlideshowOrder.Oldest -> Analytics.tracker.trackEvent(
+            SlideshowSettingOrderOldestButtonEvent
+        )
+
+        SlideshowOrder.Shuffle -> Analytics.tracker.trackEvent(
+            SlideshowSettingOrderShuffleButtonEvent
+        )
+    }
+}
+
+private fun slideshowRepeatAnalytics(repeat: Boolean) {
+    if (repeat) Analytics.tracker.trackEvent(SlideshowSettingRepeatOnButtonEvent)
+    else Analytics.tracker.trackEvent(SlideshowSettingRepeatOffButtonEvent)
 }

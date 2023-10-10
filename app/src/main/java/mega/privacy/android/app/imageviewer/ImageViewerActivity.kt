@@ -24,6 +24,7 @@ import androidx.navigation.ui.navigateUp
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.attacher.MegaAttacher
@@ -78,6 +79,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -638,6 +640,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
             R.id.action_slideshow -> {
                 lifecycleScope.launch {
+                    Analytics.tracker.trackEvent(PlaySlideshowMenuToolbarEvent)
                     val enabled = getFeatureFlagUseCase(AppFeatures.SlideShowCompose)
                     if (enabled)
                         getNavController().navigate(ImageViewerFragmentDirections.actionViewerToNewSlideshow())
