@@ -358,7 +358,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
     /**
      * Sets showDenyParticipantDialog as consumed.
      */
-    private fun setShowDenyParticipantDialogConsumed() = _state.update { state ->
+    fun setShowDenyParticipantDialogConsumed() = _state.update { state ->
         state.copy(showDenyParticipantDialog = false)
     }
 

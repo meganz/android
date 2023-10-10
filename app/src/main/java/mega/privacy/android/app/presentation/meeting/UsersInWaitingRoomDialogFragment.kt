@@ -92,6 +92,10 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
                         onCancelDenyEntryClick = {
                             viewModel.cancelDenyEntryClick()
                         },
+                        onDismiss = {
+                            viewModel.setShowDenyParticipantDialogConsumed()
+                            dismissAllowingStateLoss()
+                        },
                     )
                 }
             }

@@ -13,13 +13,15 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  * Show the dialog to deny a user entry to the call.
  *
  * @param onDenyEntryClick                          To be triggered when positive button is pressed
- * @param onCancelDenyEntryClick                    To be triggered when deny participant dialog is hidden
+ * @param onCancelDenyEntryClick                    To be triggered when negative button is pressed
+ * @param onDismiss                                 To be triggered when deny participant dialog is hidden
  */
 @Composable
 fun DenyEntryToCallDialog(
     state: WaitingRoomManagementState,
     onDenyEntryClick: () -> Unit = {},
     onCancelDenyEntryClick: () -> Unit = {},
+    onDismiss: () -> Unit,
 ) {
     if (state.usersInWaitingRoomIDs.isNotEmpty() && !state.showParticipantsInWaitingRoomDialog && state.showDenyParticipantDialog) {
         var name = state.nameOfTheFirstUserInTheWaitingRoom
@@ -36,7 +38,7 @@ fun DenyEntryToCallDialog(
         MegaAlertDialog(
             title = null,
             text = message,
-            dismissOnClickOutside = false,
+            dismissOnClickOutside = true,
             dismissOnBackPress = false,
             confirmButtonText = stringResource(
                 id = R.string.meetings_waiting_room_deny_user_to_call_dialog_button
@@ -46,7 +48,7 @@ fun DenyEntryToCallDialog(
                 id = R.string.meetings_waiting_room_do_not_deny_user_to_call_dialog_button
             ),
             onCancel = onCancelDenyEntryClick,
-            onDismiss = onCancelDenyEntryClick,
+            onDismiss = onDismiss,
         )
     }
 }
@@ -65,7 +67,8 @@ fun PreviewDenyEntryToCallDialog() {
                 showParticipantsInWaitingRoomDialog = true
             ),
             onDenyEntryClick = {},
-            onCancelDenyEntryClick = {}
+            onCancelDenyEntryClick = {},
+            onDismiss = {}
         )
     }
 }

@@ -382,7 +382,8 @@ class ScheduledMeetingInfoViewTest {
                 onDenyUsersInWaitingRoomClicked = {},
                 onSeeWaitingRoomClicked = {},
                 onDismissWaitingRoomDialog = {},
-                onCancelDenyEntryClick = {}
+                onCancelDenyEntryClick = {},
+                onDismissDenyEntryDialog = {}
             )
         }
     }
@@ -415,7 +416,8 @@ class ScheduledMeetingInfoViewTest {
                 onDenyUsersInWaitingRoomClicked = {},
                 onSeeWaitingRoomClicked = {},
                 onDismissWaitingRoomDialog = {},
-                onCancelDenyEntryClick = {}
+                onCancelDenyEntryClick = {},
+                onDismissDenyEntryDialog = {}
             )
         }
     }

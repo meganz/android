@@ -556,6 +556,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                         onCancelDenyEntryClick = {
                             waitingRoomManagementViewModel.cancelDenyEntryClick()
                         },
+                        onDismiss = {
+                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
+                        },
                     )
                 }
             }

@@ -105,18 +105,14 @@ fun ScheduledMeetingInfoView(
     state: ScheduledMeetingInfoState,
     managementState: ScheduledMeetingManagementState,
     waitingRoomManagementState: WaitingRoomManagementState,
-    onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
     onSeeMoreOrLessClicked: () -> Unit,
     onLeaveGroupClicked: () -> Unit,
-    onParticipantClicked: (ChatParticipant) -> Unit = {},
-    onScrollChange: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
     onDismiss: () -> Unit,
     onLeaveGroupDialog: () -> Unit,
     onInviteParticipantsDialog: () -> Unit,
-    onResetStateSnackbarMessage: () -> Unit = {},
     onCloseWarningClicked: () -> Unit,
     onAdmitUsersInWaitingRoomClicked: () -> Unit,
     onDenyUsersInWaitingRoomClicked: () -> Unit,
@@ -124,6 +120,11 @@ fun ScheduledMeetingInfoView(
     onSeeWaitingRoomClicked: () -> Unit,
     onDismissWaitingRoomDialog: () -> Unit,
     onCancelDenyEntryClick: () -> Unit,
+    onDismissDenyEntryDialog: () -> Unit,
+    onResetStateSnackbarMessage: () -> Unit = {},
+    onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
+    onParticipantClicked: (ChatParticipant) -> Unit = {},
+    onScrollChange: (Boolean) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
@@ -175,7 +176,8 @@ fun ScheduledMeetingInfoView(
         DenyEntryToCallDialog(
             state = waitingRoomManagementState,
             onDenyEntryClick = { onDenyEntryInWaitingRoomClicked() },
-            onCancelDenyEntryClick = { onCancelDenyEntryClick() })
+            onCancelDenyEntryClick = { onCancelDenyEntryClick() },
+            onDismiss = { onDismissDenyEntryDialog() })
 
         Column {
             if (shouldShowWarningDialog) {
@@ -898,11 +900,11 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
  */
 @Composable
 private fun ActionOption(
+    isChecked: Boolean,
+    hasSwitch: Boolean,
     state: ScheduledMeetingInfoState,
     action: ScheduledMeetingInfoAction,
-    isChecked: Boolean,
     isEnabled: Boolean = true,
-    hasSwitch: Boolean,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -1384,7 +1386,8 @@ fun PreviewScheduledMeetingInfoView() {
             onDenyEntryInWaitingRoomClicked = {},
             onSeeWaitingRoomClicked = {},
             onDismissWaitingRoomDialog = {},
-            onCancelDenyEntryClick = {}
+            onCancelDenyEntryClick = {},
+            onDismissDenyEntryDialog = {}
         )
     }
 }

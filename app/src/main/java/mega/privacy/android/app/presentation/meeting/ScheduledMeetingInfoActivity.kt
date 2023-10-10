@@ -504,9 +504,9 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 onDenyEntryInWaitingRoomClicked = { waitingRoomManagementViewModel.denyEntryClick() },
                 onDismissWaitingRoomDialog = { waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed() },
                 onCancelDenyEntryClick = {
-
                     waitingRoomManagementViewModel.cancelDenyEntryClick()
-                }
+                },
+                onDismissDenyEntryDialog = { waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed() },
             )
         }
     }

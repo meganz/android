@@ -219,6 +219,9 @@ class MeetingActivity : PasscodeActivity() {
                         onCancelDenyEntryClick = {
                             waitingRoomManagementViewModel.cancelDenyEntryClick()
                         },
+                        onDismiss = {
+                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
+                        },
                     )
                 }
             }

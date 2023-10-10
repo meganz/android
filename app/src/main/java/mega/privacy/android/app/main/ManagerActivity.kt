@@ -1102,6 +1102,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         onCancelDenyEntryClick = {
                             waitingRoomManagementViewModel.cancelDenyEntryClick()
                         },
+                        onDismiss = {
+                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
+                        },
                     )
                 }
             }
