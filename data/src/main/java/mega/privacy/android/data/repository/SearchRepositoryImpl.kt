@@ -15,7 +15,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -51,9 +50,7 @@ internal class SearchRepositoryImpl @Inject constructor(
         order: SortOrder,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         nodeId?.let {
-            if ((query.isEmpty() || it.longValue != MegaApiJava.INVALID_HANDLE) &&
-                searchCategory == SearchCategory.ALL
-            ) {
+            if (query.isEmpty() && searchCategory == SearchCategory.ALL) {
                 getNodeChildren(it, order)
             } else {
                 val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()

@@ -13,6 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -22,7 +23,7 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
-import mega.privacy.android.app.presentation.search.model.SearchActivityViewModel
+import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -30,8 +31,14 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
+import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
+import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
+import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
+import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -118,7 +125,10 @@ class SearchActivity : AppCompatActivity() {
                     onMenuClick = ::showOptionsMenuForItem,
                     onDisputeTakeDownClicked = ::navigateToLink,
                     onLinkClicked = ::navigateToLink,
-                    onErrorShown = viewModel::errorMessageShown
+                    onErrorShown = viewModel::errorMessageShown,
+                    updateFilter = viewModel::updateFilter,
+                    trackAnalytics = ::trackAnalytics,
+                    updateSearchQuery = viewModel::updateSearchQuery,
                 )
             }
             openFileClicked(uiState.currentFileNode)
@@ -224,5 +234,20 @@ class SearchActivity : AppCompatActivity() {
             supportFragmentManager,
             bottomSheetDialogFragment.tag
         )
+    }
+
+    private fun trackAnalytics(selectedFilter: SearchFilter?) {
+        val event = if (viewModel.state.value.selectedFilter?.filter == selectedFilter?.filter) {
+            SearchResetFilterPressedEvent
+        } else {
+            when (selectedFilter?.filter) {
+                SearchCategory.IMAGES -> SearchImageFilterPressedEvent
+                SearchCategory.DOCUMENTS -> SearchDocsFilterPressedEvent
+                SearchCategory.AUDIO -> SearchAudioFilterPressedEvent
+                SearchCategory.VIDEO -> SearchVideosFilterPressedEvent
+                else -> SearchResetFilterPressedEvent
+            }
+        }
+        Analytics.tracker.trackEvent(event)
     }
 }

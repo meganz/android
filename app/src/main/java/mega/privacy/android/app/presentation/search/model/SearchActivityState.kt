@@ -7,14 +7,13 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchType
 
 /**
  * State for SearchActivity
  * @property searchItemList list of search items in [TypedNode]
- * @property searchType search filter it could be anything from [SearchCategory]
  * @property parentHandle Handle of search parent handle where query needed to be searched
- * @property isInProgress to show loading or not
+ * @property isSearching to show loading or not
  * @property sortOrder [SortOrder] to display nodes
  * @property currentViewType current [ViewType]
  * @property searchQuery current typed search query in search activity
@@ -27,12 +26,15 @@ import mega.privacy.android.domain.entity.search.SearchCategory
  * @property optionsItemInfo options info needed to be displayed on toolbar when any nodes are selected
  * @property currentFolderClickedHandle current handle of folder clicked
  * @property errorMessageId error message id to be shown on UI
+ * @property filters search filter categories
+ * @property selectedFilter selected filter which is enabled on chips
+ * @property searchType
+ * @property emptyState
  */
 data class SearchActivityState(
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
-    val searchType: SearchCategory = SearchCategory.ALL,
     val parentHandle: Long = -1,
-    val isInProgress: Boolean = false,
+    val isSearching: Boolean = false,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val currentViewType: ViewType = ViewType.LIST,
     val searchQuery: String = "",
@@ -44,5 +46,9 @@ data class SearchActivityState(
     val selectedNodeHandles: List<Long> = emptyList(),
     val optionsItemInfo: OptionsItemInfo? = null,
     val currentFolderClickedHandle: Long? = null,
-    @StringRes val errorMessageId: Int? = null
+    @StringRes val errorMessageId: Int? = null,
+    val filters: List<SearchFilter> = emptyList(),
+    val selectedFilter: SearchFilter? = null,
+    val emptyState: Pair<Int, String>? = null,
+    val searchType: SearchType = SearchType.OTHER,
 )

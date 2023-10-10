@@ -8,10 +8,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -24,8 +20,12 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
  * Search toolbar used in search activity
  */
 @Composable
-fun SearchToolBar(selectionMode: Boolean, selectionCount: Int) {
-    var searchQuery by remember { mutableStateOf("") }
+fun SearchToolBar(
+    selectionMode: Boolean,
+    selectionCount: Int,
+    searchQuery: String,
+    updateSearchQuery: (String) -> Unit,
+) {
     if (selectionMode) {
         TopAppBar(
             title = {
@@ -54,8 +54,8 @@ fun SearchToolBar(selectionMode: Boolean, selectionCount: Int) {
         ExpandedSearchAppBar(
             text = searchQuery,
             hintId = R.string.hint_action_search,
-            onSearchTextChange = { searchQuery = it },
-            onCloseClicked = { searchQuery = "" },
+            onSearchTextChange = { updateSearchQuery(it) },
+            onCloseClicked = { updateSearchQuery("") },
             elevation = false
         )
     }
@@ -66,5 +66,10 @@ fun SearchToolBar(selectionMode: Boolean, selectionCount: Int) {
 private fun PreviewSearchToolbar(
     @PreviewParameter(BooleanProvider::class) selectionMode: Boolean,
 ) {
-    SearchToolBar(selectionMode = selectionMode, selectionCount = 10)
+    SearchToolBar(
+        selectionMode = selectionMode,
+        selectionCount = 10,
+        searchQuery = "searchQuery",
+        updateSearchQuery = {}
+    )
 }

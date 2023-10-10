@@ -1,10 +1,13 @@
-package mega.privacy.android.app.presentation.search.model
+package mega.privacy.android.app.presentation.search
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -12,7 +15,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.search.SearchActivity
+import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
+import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
+import mega.privacy.android.app.presentation.search.model.SearchActivityState
+import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
@@ -20,18 +26,14 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
-import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.search.IncomingSharesTabSearchUseCase
-import mega.privacy.android.domain.usecase.search.LinkSharesTabSearchUseCase
-import mega.privacy.android.domain.usecase.search.OutgoingSharesTabSearchUseCase
-import mega.privacy.android.domain.usecase.search.SearchInNodesUseCase
+import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
+import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -41,29 +43,25 @@ import javax.inject.Inject
 /**
  * SearchActivity View Model
  * @property monitorNodeUpdates [MonitorNodeUpdates]
- * @property incomingSharesTabSearchUseCase [IncomingSharesTabSearchUseCase]
- * @property outgoingSharesTabSearchUseCase [OutgoingSharesTabSearchUseCase]
- * @property searchInNodesUseCase [SearchInNodesUseCase]
- * @property getRootNodeUseCase [GetRootNodeUseCase]
- * @property getNodeByHandleUseCase [GetNodeByHandleUseCase]
- * @property getRubbishNodeUseCase [GetRubbishNodeUseCase]
- * @property getBackupsNodeUseCase [GetBackupsNodeUseCase]
+ * @property searchNodesUseCase [SearchNodesUseCase]
  * @property getParentNodeHandle [GetParentNodeHandle]
  * @property setViewType [SetViewType]
+ * @property isAvailableOfflineUseCase [IsAvailableOfflineUseCase]
+ * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
+ * @property searchFilterMapper [SearchFilterMapper]
+ * @property emptySearchViewMapper [EmptySearchViewMapper]
+ * @property cancelCancelTokenUseCase [CancelCancelTokenUseCase]
  */
 @HiltViewModel
 class SearchActivityViewModel @Inject constructor(
     private val monitorNodeUpdates: MonitorNodeUpdates,
-    private val incomingSharesTabSearchUseCase: IncomingSharesTabSearchUseCase,
-    private val outgoingSharesTabSearchUseCase: OutgoingSharesTabSearchUseCase,
-    private val linkSharesTabSearchUseCase: LinkSharesTabSearchUseCase,
-    private val searchInNodesUseCase: SearchInNodesUseCase,
-    private val getRootNodeUseCase: GetRootNodeUseCase,
-    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
-    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
-    private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
+    private val searchNodesUseCase: SearchNodesUseCase,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
+    private val searchFilterMapper: SearchFilterMapper,
+    private val emptySearchViewMapper: EmptySearchViewMapper,
+    private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
@@ -80,6 +78,11 @@ class SearchActivityViewModel @Inject constructor(
      */
     val state: StateFlow<SearchActivityState> = _state
 
+    /**
+     * Search job
+     */
+    private var searchJob: Job? = null
+
     private val isFirstLevel = stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL) ?: false
     private val searchType =
         stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE) ?: SearchType.OTHER
@@ -93,24 +96,29 @@ class SearchActivityViewModel @Inject constructor(
     }
 
     private fun initializeSearch() {
-        performSearch(
-            isFirstLevel = isFirstLevel,
-            query = state.value.searchQuery,
-            searchType = searchType,
-            parentHandle = parentHandle
-        )
+        _state.update { it.copy(searchType = searchType) }
+        runCatching {
+            getSearchCategoriesUseCase().map { searchFilterMapper(it) }
+                .filterNot { it.filter == SearchCategory.ALL }
+        }.onSuccess { filters ->
+            _state.update {
+                it.copy(
+                    filters = filters,
+                    selectedFilter = null,
+                )
+            }
+        }.onFailure {
+            Timber.e("Get search categories failed $it")
+        }
+        performSearch()
     }
+
 
     private fun monitorNodeUpdatesForSearch() {
         viewModelScope.launch {
             monitorNodeUpdates().collect { nodeUpdate ->
                 if (nodeUpdate.changes.keys.find { state.value.parentHandle == it.parentId.longValue } != null)
-                    performSearch(
-                        isFirstLevel = isFirstLevel,
-                        query = state.value.searchQuery,
-                        searchType = searchType,
-                        parentHandle = parentHandle
-                    )
+                    performSearch()
             }
         }
     }
@@ -118,103 +126,103 @@ class SearchActivityViewModel @Inject constructor(
     /**
      * Perform search by entering query or change in search type
      */
-    private fun performSearch(
-        query: String,
-        isFirstLevel: Boolean = false,
-        searchType: SearchType,
-        parentHandle: Long,
-    ) {
-        viewModelScope.launch {
+    private fun performSearch() {
+        _state.update {
+            it.copy(isSearching = true, searchItemList = emptyList())
+        }
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             runCatching {
-                _state.update {
-                    it.copy(isInProgress = true)
-                }
-                val node = getSearchParentNode(searchType = searchType, parentHandle = parentHandle)
-
-                val searchList = getSearchResults(
-                    query = query,
+                cancelCancelTokenUseCase()
+                searchNodesUseCase(
+                    query = state.value.searchQuery,
+                    parentHandle = parentHandle,
+                    searchType = searchType,
                     isFirstLevel = isFirstLevel,
-                    node = node,
-                    searchType = searchType
+                    searchCategory = state.value.selectedFilter?.filter ?: SearchCategory.ALL
                 )
-                _state.update {
-                    it.copy(
-                        searchItemList = getNodeUiItems(searchList),
-                        isInProgress = false,
-                        sortOrder = getCloudSortOrder()
-                    )
-                }
+            }.onSuccess {
+                onSearchSuccess(it)
             }.onFailure { ex ->
-                Timber.e(ex)
-                _state.update {
-                    it.copy(searchItemList = emptyList(), isInProgress = false)
-                }
+                onSearchFailure(ex)
             }
         }
     }
 
-    /**
-     * This method Returns [Node] for respective selected [SearchType]
-     * @param parentHandle parent handle
-     * @return [Node]
-     */
-    private suspend fun getSearchParentNode(searchType: SearchType, parentHandle: Long?): Node? =
-        if (parentHandle == null || parentHandle == -1L) {
-            when (searchType) {
-                SearchType.CLOUD_DRIVE -> getRootNodeUseCase()
-                SearchType.RUBBISH_BIN -> getRubbishNodeUseCase()
-                SearchType.BACKUPS -> getBackupsNodeUseCase()
-                else -> null
+    private fun onSearchFailure(ex: Throwable) {
+        Timber.e(ex)
+        _state.update {
+            it.copy(
+                searchItemList = emptyList(),
+                isSearching = false,
+                emptyState = getEmptySearchState()
+            )
+        }
+    }
+
+    private suspend fun onSearchSuccess(searchResults: List<TypedNode>?) =
+        coroutineScope {
+            if (searchResults.isNullOrEmpty()) {
+                _state.update {
+                    it.copy(isSearching = false, emptyState = getEmptySearchState())
+                }
+            } else {
+                val nodeUIItems = searchResults.map { typedNode ->
+                    NodeUIItem(node = typedNode, isSelected = false)
+                }
+                _state.update { state ->
+                    state.copy(
+                        searchItemList = nodeUIItems,
+                        isSearching = false,
+                        sortOrder = getCloudSortOrder()
+                    )
+                }
+                updateNodeUiItemWithOfflineInfo()
             }
-        } else {
-            getNodeByHandleUseCase(parentHandle)
         }
 
-    /**
-     * This method returns list of search items
-     * @param searchType current tab
-     * @param query query to be searched
-     * @param isFirstLevel is first level
-     * @param node Node
-     * @return list of TypedNode
-     */
-    private suspend fun getSearchResults(
-        searchType: SearchType,
-        query: String,
-        isFirstLevel: Boolean,
-        node: Node?,
-    ) =
-        when (searchType) {
-            SearchType.INCOMING_SHARES -> incomingSharesTabSearchUseCase(query = query)
-            SearchType.OUTGOING_SHARES -> outgoingSharesTabSearchUseCase(query = query)
-            SearchType.LINKS -> linkSharesTabSearchUseCase(
-                query = query,
-                isFirstLevel = isFirstLevel
-            )
-
-            else -> searchInNodesUseCase(
-                nodeId = node?.id,
-                query = query,
-                searchCategory = state.value.searchType
-            )
-        }
+    private fun getEmptySearchState() = emptySearchViewMapper(
+        isSearchChipEnabled = true,
+        category = state.value.selectedFilter?.filter,
+        searchQuery = state.value.searchQuery
+    )
 
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private suspend fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
-        return nodeList.map {
-            val fileDuration = if (it is FileNode) {
-                fileDurationMapper(it.type)?.let { TimeUtils.getVideoDuration(it) } ?: run { null }
+    private suspend fun updateNodeUiItemWithOfflineInfo() = coroutineScope {
+        val nodeUiList = state.value.searchItemList.map { item ->
+            ensureActive()
+            val fileDuration = if (item.node is FileNode) {
+                fileDurationMapper(item.node.type)?.let { TimeUtils.getVideoDuration(it) }
+                    ?: run { null }
             } else null
-            NodeUIItem(
-                node = it,
-                isSelected = false,
-                isInvisible = false,
-                isAvailableOffline = isAvailableOfflineUseCase(it),
+            item.copy(
+                isAvailableOffline = isAvailableOfflineUseCase(item.node),
                 fileDuration = fileDuration
             )
         }
+        _state.update { it.copy(searchItemList = nodeUiList) }
+    }
+
+    /**
+     * Update search filter on selection
+     *
+     * @param selectedChip
+     */
+    fun updateFilter(selectedChip: SearchFilter?) {
+        _state.update { it.copy(selectedFilter = selectedChip.takeIf { selectedChip?.filter != state.value.selectedFilter?.filter }) }
+        viewModelScope.launch { performSearch() }
+    }
+
+    /**
+     * Update search query on typing
+     *
+     * @param query search text
+     */
+    fun updateSearchQuery(query: String) {
+        _state.update { it.copy(searchQuery = query) }
+        viewModelScope.launch { performSearch() }
     }
 
     /**
@@ -347,12 +355,7 @@ class SearchActivityViewModel @Inject constructor(
      * When we change sort order from UI
      */
     fun onSortOrderChanged() {
-        performSearch(
-            isFirstLevel = isFirstLevel,
-            query = state.value.searchQuery,
-            searchType = searchType,
-            parentHandle = parentHandle
-        )
+        performSearch()
     }
 
     /**
