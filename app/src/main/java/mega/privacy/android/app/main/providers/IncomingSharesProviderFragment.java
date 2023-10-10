@@ -248,8 +248,8 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
         emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);
 
         if (context instanceof FileProviderActivity) {
-            parentHandle = ((FileProviderActivity) context).getIncParentHandle();
-            deepBrowserTree = ((FileProviderActivity) context).getIncomingDeepBrowserTree();
+            parentHandle = ((FileProviderActivity) context).incParentHandle;
+            deepBrowserTree = ((FileProviderActivity) context).incomingDeepBrowserTree;
             Timber.d("The parent handle is: %s", parentHandle);
             Timber.d("The browser tree deep is: %s", deepBrowserTree);
         }
@@ -295,7 +295,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
 
         deepBrowserTree = 0;
         if (context instanceof FileProviderActivity) {
-            ((FileProviderActivity) context).setIncomingDeepBrowserTree(deepBrowserTree);
+            ((FileProviderActivity) context).incomingDeepBrowserTree = deepBrowserTree;
             Timber.d("The browser tree change to: %s", deepBrowserTree);
         }
         ArrayList<MegaUser> contacts = megaApi.getContacts();
@@ -356,7 +356,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
                 deepBrowserTree = deepBrowserTree + 1;
                 if (context instanceof FileProviderActivity) {
                     ((FileProviderActivity) context).hideTabs(true, INCOMING_TAB);
-                    ((FileProviderActivity) context).setIncomingDeepBrowserTree(deepBrowserTree);
+                    ((FileProviderActivity) context).incomingDeepBrowserTree = deepBrowserTree;
                     Timber.d("The browser tree change to: %s", deepBrowserTree);
                 }
 
@@ -378,7 +378,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
 
                 parentHandle = nodes.get(position).getHandle();
                 if (context instanceof FileProviderActivity) {
-                    ((FileProviderActivity) context).setIncParentHandle(parentHandle);
+                    ((FileProviderActivity) context).incParentHandle = parentHandle;
                     Timber.d("The parent handle change to: %s", parentHandle);
                 }
                 adapter.setParentHandle(parentHandle);
@@ -398,7 +398,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
         Timber.d("deepBrowserTree: %s", deepBrowserTree);
         deepBrowserTree = deepBrowserTree - 1;
         if (context instanceof FileProviderActivity) {
-            ((FileProviderActivity) context).setIncomingDeepBrowserTree(deepBrowserTree);
+            ((FileProviderActivity) context).incomingDeepBrowserTree = deepBrowserTree;
             Timber.d("The browser tree change to: %s", deepBrowserTree);
         }
 
@@ -406,7 +406,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
             parentHandle = INVALID_HANDLE;
 
             if (context instanceof FileProviderActivity) {
-                ((FileProviderActivity) context).setIncParentHandle(parentHandle);
+                ((FileProviderActivity) context).incParentHandle = parentHandle;
                 ((FileProviderActivity) context).hideTabs(false, INCOMING_TAB);
                 Timber.d("The parent handle change to: %s", parentHandle);
             }
@@ -431,7 +431,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
         } else if (deepBrowserTree > 0) {
             parentHandle = adapter.getParentHandle();
             if (context instanceof FileProviderActivity) {
-                ((FileProviderActivity) context).setIncParentHandle(parentHandle);
+                ((FileProviderActivity) context).incParentHandle = parentHandle;
                 Timber.d("The parent handle change to: %s", parentHandle);
             }
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
@@ -445,7 +445,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
 
                 parentHandle = parentNode.getHandle();
                 if (context instanceof FileProviderActivity) {
-                    ((FileProviderActivity) context).setIncParentHandle(parentHandle);
+                    ((FileProviderActivity) context).incParentHandle = parentHandle;
                     Timber.d("The parent handle change to: %s", parentHandle);
                 }
                 nodes = megaApi.getChildren(parentNode);
@@ -471,7 +471,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
             emptyTextViewFirst.setVisibility(View.GONE);
             deepBrowserTree = 0;
             if (context instanceof FileProviderActivity) {
-                ((FileProviderActivity) context).setIncomingDeepBrowserTree(deepBrowserTree);
+                ((FileProviderActivity) context).incomingDeepBrowserTree = deepBrowserTree;
                 Timber.d("The browser tree change to: %s", deepBrowserTree);
             }
             return 0;
@@ -486,7 +486,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
         Timber.d("setParentHandle");
         this.parentHandle = parentHandle;
         if (context instanceof FileProviderActivity) {
-            ((FileProviderActivity) context).setIncParentHandle(parentHandle);
+            ((FileProviderActivity) context).incParentHandle = parentHandle;
             Timber.d("The parent handle change to: %s", parentHandle);
         }
         if (adapter != null) {
