@@ -2,8 +2,10 @@ package mega.privacy.android.domain.usecase.passcode
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
 import mega.privacy.android.domain.exception.security.NoPasscodeSetException
 import mega.privacy.android.domain.repository.security.PasscodeRepository
+import mega.privacy.android.domain.testutils.hotFlow
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -26,6 +28,7 @@ class SetPasscodeEnabledUseCaseTest {
     internal fun `test that passcode is enabled if a pin has been set`() = runTest {
         passcodeRepository.stub {
             onBlocking { getPasscode() }.thenReturn("1234")
+            on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.Immediate))
         }
 
         underTest(true)
@@ -61,9 +64,21 @@ class SetPasscodeEnabledUseCaseTest {
     }
 
     @Test
-    internal fun `test that passcode type is cleared if disabled`() = runTest{
+    internal fun `test that passcode type is cleared if disabled`() = runTest {
         underTest(false)
 
         verify(passcodeRepository).setPasscodeType(null)
+    }
+
+    @Test
+    fun `test that timeout is defaulted to 30 seconds if not set`() = runTest {
+        passcodeRepository.stub {
+            onBlocking { getPasscode() }.thenReturn("1234")
+            on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(null))
+        }
+
+        underTest(true)
+
+        verify(passcodeRepository).setPasscodeTimeOut(PasscodeTimeout.TimeSpan(30 * 1000))
     }
 }
