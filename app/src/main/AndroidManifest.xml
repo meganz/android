@@ -235,7 +235,6 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Viewer"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-
         <activity
             android:name=".main.ContactFileListActivity"
             android:label="@string/contact_properties_activity"
@@ -733,6 +732,12 @@
             android:name="mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity"
             android:launchMode="singleTop" />
 
+        <activity
+            android:name="mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity"
+            android:label=""
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Mega.FullScreen.Viewer"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
     </application>
 
 </manifest>

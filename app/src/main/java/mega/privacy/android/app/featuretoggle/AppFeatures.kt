@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables new Image Preview flag
+     */
+    ImagePreview(
+        "Enables new Image Preview flag",
+        false,
+    ),
+
+    /**
      * Enables revamp CU interface
      */
     NewCU(
