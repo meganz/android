@@ -905,6 +905,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     override fun onStop() {
         super.onStop()
         videoViewModel.savePlaybackTimes()
+        mediaPlayerGateway.setPlayWhenReady(false)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
