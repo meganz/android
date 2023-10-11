@@ -45,7 +45,7 @@ class LoginWith2FAUseCase @Inject constructor(
                 .collectLatest { loginStatus ->
                     if (loginStatus == LoginStatus.LoginSucceed) {
                         saveAccountCredentialsUseCase()
-                        loginMutex.unlock()
+                        runCatching { loginMutex.unlock() }
                     }
 
                     trySend(loginStatus)
@@ -58,12 +58,12 @@ class LoginWith2FAUseCase @Inject constructor(
                 resetChatSettingsUseCase()
             }
 
-            loginMutex.unlock()
+            runCatching { loginMutex.unlock() }
             throw it
         }
 
         awaitClose {
-            loginMutex.unlock()
+            runCatching { loginMutex.unlock() }
         }
     }
 }

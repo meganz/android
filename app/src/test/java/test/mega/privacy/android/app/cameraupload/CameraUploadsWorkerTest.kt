@@ -23,7 +23,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
-import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
@@ -89,9 +88,9 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPr
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
@@ -199,7 +198,6 @@ class CameraUploadsWorkerTest {
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper =
         mock()
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
-    private val applicationWrapper: ApplicationWrapper = mock()
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper = mock()
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase =
         mock()
@@ -310,12 +308,12 @@ class CameraUploadsWorkerTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper,
-            applicationWrapper = applicationWrapper,
             cookieEnabledCheckWrapper = cookieEnabledCheckWrapper,
             broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase,
             startTracePerformanceUseCase = startTracePerformanceUseCase,
             stopTracePerformanceUseCase = stopTracePerformanceUseCase,
-            isConnectedToInternetUseCase = isConnectedToInternetUseCase
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            loginMutex = mock()
         )
     }
 

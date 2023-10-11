@@ -48,7 +48,7 @@ class LoginUseCase @Inject constructor(
                     }
                     is ChatNotInitializedUnknownStatus -> {
                         trySend(LoginStatus.LoginCannotStart)
-                        loginMutex.unlock()
+                        runCatching { loginMutex.unlock() }
                         return@callbackFlow
                     }
                 }
@@ -59,7 +59,7 @@ class LoginUseCase @Inject constructor(
             loginRepository.login(email, password).collectLatest { loginStatus ->
                 if (loginStatus == LoginStatus.LoginSucceed) {
                     saveAccountCredentialsUseCase()
-                    loginMutex.unlock()
+                    runCatching { loginMutex.unlock() }
                 }
 
                 trySend(loginStatus)
@@ -72,12 +72,12 @@ class LoginUseCase @Inject constructor(
                 resetChatSettingsUseCase()
             }
 
-            loginMutex.unlock()
+            runCatching { loginMutex.unlock() }
             throw it
         }
 
         awaitClose {
-            loginMutex.unlock()
+            runCatching { loginMutex.unlock() }
         }
     }
 }

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -115,6 +117,7 @@ class LoginViewModel @Inject constructor(
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
+    @LoginMutex private val loginMutex: Mutex
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -240,7 +243,6 @@ class LoginViewModel @Inject constructor(
      */
     fun setForceReloadAccountAsPendingAction() {
         pendingAction = ACTION_FORCE_RELOAD_ACCOUNT
-        MegaApplication.isLoggingIn = true
         _state.update { state ->
             state.copy(
                 intentState = LoginIntentState.AlreadySet,
@@ -293,7 +295,6 @@ class LoginViewModel @Inject constructor(
                 Timber.w("Exception in local logout.", it)
             }
             _state.update { it.copy(isLocalLogoutInProgress = false) }
-            MegaApplication.isLoggingIn = false
         }
     }
 
@@ -495,12 +496,11 @@ class LoginViewModel @Inject constructor(
      * Login.
      */
     private fun performLogin(typedEmail: String? = null, typedPassword: String? = null) {
-        if (MegaApplication.isLoggingIn) {
+        if (loginMutex.isLocked) {
             return
         }
 
         LoginActivity.isBackFromLoginPage = false
-        MegaApplication.isLoggingIn = true
 
         _state.update {
             if (typedEmail != null && typedPassword != null) {
@@ -535,7 +535,6 @@ class LoginViewModel @Inject constructor(
                         DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
                     ).collectLatest { status -> status.checkStatus() }
                 }.onFailure { exception ->
-                    MegaApplication.isLoggingIn = false
                     if (exception !is LoginException) return@onFailure
 
                     if (exception is LoginMultiFactorAuthRequired) {
@@ -560,12 +559,11 @@ class LoginViewModel @Inject constructor(
      * Login with 2FA.
      */
     private fun performLoginWith2FA(pin2FA: String) {
-        if (MegaApplication.isLoggingIn) {
+        if (loginMutex.isLocked) {
             return
         }
 
         viewModelScope.launch {
-            MegaApplication.isLoggingIn = true
             _state.update { state -> state.copy(multiFactorAuthState = MultiFactorAuthState.Checking) }
 
             with(state.value) {
@@ -579,7 +577,6 @@ class LoginViewModel @Inject constructor(
                         status.checkStatus()
                     }
                 }.onFailure { exception ->
-                    MegaApplication.isLoggingIn = false
                     if (exception !is LoginException) return@onFailure
 
                     if (exception is LoginWrongMultiFactorAuth) {
@@ -615,7 +612,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
 
-            if (MegaApplication.isLoggingIn) {
+            if (loginMutex.isLocked) {
                 Timber.w("Another login is processing")
                 pendingAction = ACTION_OPEN_APP
                 return@launch
@@ -626,7 +623,6 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun performFastLogin(refreshChatUrl: Boolean) = viewModelScope.launch {
-        MegaApplication.isLoggingIn = true
         runCatching {
             fastLoginUseCase(
                 state.value.accountSession?.session ?: return@launch,
@@ -634,7 +630,6 @@ class LoginViewModel @Inject constructor(
                 DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
             ).collectLatest { status -> status.checkStatus(true) }
         }.onFailure { exception ->
-            MegaApplication.isLoggingIn = false
             if (exception !is LoginException) return@onFailure
             exception.loginFailed()
         }
@@ -663,6 +658,7 @@ class LoginViewModel @Inject constructor(
 
         LoginStatus.LoginSucceed -> {
             //If fast login, state already updated.
+            Timber.d("Login finished")
             if (!isFastLogin) {
                 _state.update {
                     it.copy(
@@ -679,6 +675,7 @@ class LoginViewModel @Inject constructor(
         }
 
         LoginStatus.LoginCannotStart -> {
+            Timber.d("Login cannot start")
             _state.update {
                 it.copy(
                     isLoginInProgress = false,
@@ -700,10 +697,10 @@ class LoginViewModel @Inject constructor(
             MegaApplication.getInstance().checkEnabledCookies()
 
             if (isRefreshSession) {
-                MegaApplication.isLoggingIn = true
                 _state.update { it.copy(fetchNodesUpdate = cleanFetchNodesUpdate) }
             }
 
+            Timber.d("fetch nodes started")
             performFetchNodes()
         }
     }
@@ -712,9 +709,9 @@ class LoginViewModel @Inject constructor(
         runCatching {
             fetchNodesUseCase().collectLatest { update ->
                 if (update.progress?.floatValue == 1F) {
+                    Timber.d("fetch nodes finished")
                     prefetchTimeline()
 
-                    MegaApplication.isLoggingIn = false
                     _state.update {
                         it.copy(
                             intentState = LoginIntentState.ReadyForFinalSetup,
@@ -728,11 +725,11 @@ class LoginViewModel @Inject constructor(
                         startDownloadWorkerUseCase()
                     }
                 } else {
+                    Timber.d("fetch nodes update")
                     _state.update { it.copy(fetchNodesUpdate = update) }
                 }
             }
         }.onFailure { exception ->
-            MegaApplication.isLoggingIn = false
             if (exception !is FetchNodesException) return@launch
 
             _state.update { state ->

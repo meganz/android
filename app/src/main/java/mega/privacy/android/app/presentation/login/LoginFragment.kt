@@ -27,9 +27,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
-import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
 import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
@@ -62,6 +62,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -77,6 +78,10 @@ class LoginFragment : Fragment() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    @LoginMutex
+    lateinit var loginMutex: Mutex
 
     private val viewModel: LoginViewModel by activityViewModels()
 
@@ -786,7 +791,7 @@ class LoginFragment : Fragment() {
             return
         }
 
-        if (isLoggingIn || uiState.isLoginInProgress || uiState.is2FARequired || uiState.multiFactorAuthState != null) {
+        if (loginMutex.isLocked || uiState.isLoginInProgress || uiState.is2FARequired || uiState.multiFactorAuthState != null) {
             showConfirmLogoutDialog()
         } else {
             LoginActivity.isBackFromLoginPage = true

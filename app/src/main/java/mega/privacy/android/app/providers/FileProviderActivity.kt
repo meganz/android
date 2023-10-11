@@ -36,15 +36,17 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.BaseActivity.Companion.showSimpleSnackbar
 import mega.privacy.android.app.DownloadService
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -74,6 +76,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.qualifier.LoginMutex
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -100,6 +103,7 @@ import javax.inject.Inject
 /**
  * This activity is launched by 3rd apps, for example, when compose email pick attachments from MEGA.
  *
+ * @property loginMutex
  * @property megaApi
  * @property megaApiFolder
  * @property megaChatApi
@@ -113,6 +117,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListenerInterface,
     MegaGlobalListenerInterface, MegaTransferListenerInterface {
+
+    @Inject
+    @LoginMutex
+    lateinit var loginMutex: Mutex
 
     @Inject
     @MegaApi
@@ -230,7 +238,9 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                     }
                 }
             } else {
-                MegaApplication.isLoggingIn = false
+                runCatching { loginMutex.unlock() }
+                    .onFailure { Timber.w("Exception unlocking login mutex", it) }
+
                 finish()
             }
         }
@@ -286,8 +296,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                 Timber.d("megaApi.getRootNode() == null")
                 lastEmail = credentials.email
                 val gSession = credentials.session
-                if (!MegaApplication.isLoggingIn) {
-                    MegaApplication.isLoggingIn = true
+                if (!loginMutex.isLocked) {
                     loginLayout?.visibility = View.GONE
                     loginCreateAccount?.visibility = View.GONE
                     queryingSignupLinkText?.visibility = View.GONE
@@ -301,8 +310,11 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                     if (serversBusyText != null) {
                         serversBusyText?.visibility = View.GONE
                     }
-                    ChatUtil.initMegaChatApi(gSession)
-                    megaApi.fastLogin(gSession, this@FileProviderActivity)
+                    lifecycleScope.launch {
+                        loginMutex.lock()
+                        ChatUtil.initMegaChatApi(gSession)
+                        megaApi.fastLogin(gSession, this@FileProviderActivity)
+                    }
                 }
             } else {
                 setContentView(R.layout.activity_file_provider)
@@ -1212,8 +1224,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
             )
             return
         }
-        if (!MegaApplication.isLoggingIn) {
-            MegaApplication.isLoggingIn = true
+        if (!loginMutex.isLocked) {
             loggingInText?.visibility = View.VISIBLE
             fetchingNodesText?.visibility = View.GONE
             prepareNodesText?.visibility = View.GONE
@@ -1226,7 +1237,10 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
             Timber.d("Result of init ---> %s", ret)
             if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
                 Timber.d("Start fastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION")
-                megaApi.login(lastEmail, lastPassword, this@FileProviderActivity)
+                lifecycleScope.launch {
+                    loginMutex.lock()
+                    megaApi.login(lastEmail, lastPassword, this@FileProviderActivity)
+                }
             } else {
                 Timber.e("ERROR INIT CHAT: %s", ret)
                 megaChatApi.logout()
@@ -1271,7 +1285,9 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
             Timber.d("REQUEST LOGIN")
             statusDialog?.dismiss()
             if (e.errorCode != MegaError.API_OK) {
-                MegaApplication.isLoggingIn = false
+                runCatching { loginMutex.unlock() }
+                    .onFailure { Timber.w("Exception unlocking login mutex", it) }
+
                 val errorMessage = when (e.errorCode) {
                     MegaError.API_ENOENT -> {
                         getString(R.string.error_incorrect_email_or_password)
@@ -1380,7 +1396,9 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                 dbH.saveCredentials(credentials)
                 setContentView(R.layout.activity_file_provider)
                 tabShown = CLOUD_TAB
-                MegaApplication.isLoggingIn = false
+                runCatching { loginMutex.unlock() }
+                    .onFailure { Timber.w("Exception unlocking login mutex", it) }
+
                 afterFetchNodes()
             }
         }

@@ -126,7 +126,8 @@ class PushMessageWorkerTest {
             getChatRoom = getChatRoom,
             fileDurationMapper = fileDurationMapper,
             getChatMessageNotificationDataUseCase = getChatMessageNotificationDataUseCase,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
+            loginMutex = mock()
         )
 
         whenever(notificationManager.notify(any(), any())).then(mock())

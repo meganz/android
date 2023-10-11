@@ -7,8 +7,10 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendMediaUploadsBackupHeartBeatUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -25,6 +27,7 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val sendCameraUploadsBackupHeartBeatUseCase: SendCameraUploadsBackupHeartBeatUseCase,
     private val sendMediaUploadsBackupHeartBeatUseCase: SendMediaUploadsBackupHeartBeatUseCase,
+    @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -33,16 +36,14 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
         return try {
             // arbitrary retry value
             var retry = 3
-            while (applicationWrapper.isLoggingIn() && retry > 0) {
+            while (loginMutex.isLocked && retry > 0) {
                 Timber.d("Wait for the isLoggingIn lock to be available")
                 delay(1000)
                 retry--
             }
-            if (!applicationWrapper.isLoggingIn()) {
-                applicationWrapper.setLoggingIn(true)
+            if (!loginMutex.isLocked) {
                 backgroundFastLoginUseCase()
                 Timber.d("backgroundFastLogin successful")
-                applicationWrapper.setLoggingIn(false)
                 applicationWrapper.setHeartBeatAlive(true)
                 sendCameraUploadsBackupHeartBeatUseCase(
                     heartbeatStatus = HeartbeatStatus.UP_TO_DATE,

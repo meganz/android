@@ -137,6 +137,7 @@ internal class LoginViewModelTest {
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             startDownloadWorkerUseCase = startDownloadWorkerUseCase,
+            loginMutex = mock()
         )
     }
 

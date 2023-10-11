@@ -11,7 +11,6 @@ import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.feature.sync.data.service.ApplicationLoggingInSetter
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -40,9 +39,6 @@ object TestAppModule {
     @Provides
     fun provideGetThemeModePreference(): GetThemeMode =
         mock { on { invoke() }.thenReturn(emptyFlow()) }
-
-    @Provides
-    fun provideApplicationLoggingInSetter(): ApplicationLoggingInSetter = mock()
 
     @Provides
     fun provideAppNavigator(): MegaNavigator = mock()

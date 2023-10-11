@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
@@ -232,6 +234,10 @@ internal class DownloadService : LifecycleService() {
 
     @Inject
     lateinit var broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
+
+    @Inject
+    @LoginMutex
+    lateinit var loginMutex: Mutex
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -587,7 +593,7 @@ internal class DownloadService : LifecycleService() {
              A login is already in progress, but we don't have a way to know if it started
              from this service or from other place, so we need to listen for fetch nodes finish.
              */
-            MegaApplication.isLoggingIn -> {
+            loginMutex.isLocked -> {
                 pendingIntents.add(intent)
                 Timber.w("Another login is processing")
                 false
@@ -601,7 +607,6 @@ internal class DownloadService : LifecycleService() {
             //User is logged in, but needs to check if a fast login is required
             else -> {
                 pendingIntents.add(intent)
-                MegaApplication.isLoggingIn = true
                 val result = runCatching {
                     completeFastLoginUseCase(accountSession)
                 }.onSuccess {
@@ -609,7 +614,6 @@ internal class DownloadService : LifecycleService() {
                 }.onFailure {
                     Timber.e("ERROR: $it")
                 }
-                MegaApplication.isLoggingIn = false
                 result.isSuccess
             }
         }

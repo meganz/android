@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.qr.CheckUploadedQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -169,6 +171,10 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
+
+    @Inject
+    @LoginMutex
+    lateinit var loginMutex: Mutex
 
     private val intentFlow = MutableSharedFlow<Intent>()
 
@@ -413,11 +419,9 @@ internal class UploadService : LifecycleService() {
     }
 
     private suspend fun doHandleIntent(intent: Intent, filePath: String) {
-        if (!MegaApplication.isLoggingIn) {
+        if (!loginMutex.isLocked) {
             // attempt to fast login if need, ignore the result
-            MegaApplication.isLoggingIn = true
             runCatching { backgroundFastLoginUseCase() }
-            MegaApplication.isLoggingIn = false
         }
         val file = File(filePath)
         Timber.d("File to manage: ${file.absolutePath}")

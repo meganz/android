@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
@@ -12,6 +13,7 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERI
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
@@ -60,7 +62,8 @@ class BackgroundRequestListener @Inject constructor(
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val initializeBackupsUseCase: InitializeBackupsUseCase,
-    private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
+    private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
+    @LoginMutex private val loginMutex: Mutex,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -162,8 +165,12 @@ class BackgroundRequestListener @Inject constructor(
 
     private fun handleFetchNodeRequest(e: MegaError) {
         Timber.d("TYPE_FETCH_NODES")
-        MegaApplication.isLoggingIn = false
-        applicationScope.launch { broadcastFetchNodesFinishUseCase() }
+        applicationScope.launch {
+            runCatching { loginMutex.unlock() }
+                .onFailure { Timber.w("Exception unlocking login mutex", it) }
+
+            broadcastFetchNodesFinishUseCase()
+        }
 
         if (e.errorCode == MegaError.API_OK) {
             askForFullAccountInfo()

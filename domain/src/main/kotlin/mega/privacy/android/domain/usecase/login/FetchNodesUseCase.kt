@@ -36,7 +36,7 @@ class FetchNodesUseCase @Inject constructor(
                 .map { update ->
                     if (update.progress?.floatValue == 1F) {
                         establishCameraUploadsSyncHandlesUseCase()
-                        loginMutex.unlock()
+                        runCatching { loginMutex.unlock() }
                     }
                     update
                 }
@@ -48,12 +48,12 @@ class FetchNodesUseCase @Inject constructor(
                 resetChatSettingsUseCase()
             }
 
-            loginMutex.unlock()
+            runCatching { loginMutex.unlock() }
             throw it
         }
 
         awaitClose {
-            loginMutex.unlock()
+            runCatching { loginMutex.unlock() }
         }
     }
 }

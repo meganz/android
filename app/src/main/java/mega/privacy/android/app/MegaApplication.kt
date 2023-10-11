@@ -514,17 +514,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         const val APP_KEY = "6tioyn8ka5l6hty"
 
         /**
-         * Is logging in
-         */
-        @JvmStatic
-        @Volatile
-        var isLoggingIn = false
-            set(loggingIn) {
-                field = loggingIn
-                isLoggingOut = false
-            }
-
-        /**
          * Is logging out
          */
         @JvmStatic

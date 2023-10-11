@@ -50,7 +50,6 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
-import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
@@ -72,6 +71,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
@@ -229,12 +229,12 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
-    private val applicationWrapper: ApplicationWrapper,
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
     private val startTracePerformanceUseCase: StartTracePerformanceUseCase,
     private val stopTracePerformanceUseCase: StopTracePerformanceUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -1011,28 +1011,26 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         // arbitrary retry value
         var retry = 3
-        while (applicationWrapper.isLoggingIn() && retry > 0) {
+        while (loginMutex.isLocked && retry > 0) {
             Timber.d("Wait for the isLoggingIn lock to be available")
             delay(1000)
             retry--
         }
 
-        if (!applicationWrapper.isLoggingIn()) {
+        return if (!loginMutex.isLocked) {
             // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
             // app that a Login Procedure is occurring
-            applicationWrapper.setLoggingIn(true)
             val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
                 Timber.e(it, "performCompleteFastLogin exception")
             }
-            applicationWrapper.setLoggingIn(false)
             if (result.isSuccess) {
                 Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
                 cookieEnabledCheckWrapper.checkEnabledCookies()
             }
-            return result.isSuccess
+            result.isSuccess
         } else {
             Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
-            return false
+            false
         }
     }
 

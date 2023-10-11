@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.pdfviewer
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
@@ -42,7 +41,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -1554,7 +1552,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         if (request.type == MegaRequest.TYPE_LOGIN) {
             if (e.errorCode != MegaError.API_OK) {
                 Timber.w("Login failed with error code: ${e.errorCode}")
-                isLoggingIn = false
             } else {
                 //LOGIN OK
                 gSession = megaApi.dumpSession()
@@ -1583,7 +1580,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     credentials = this
                     dbH.saveCredentials(this)
                 }
-                isLoggingIn = false
                 download()
             }
         }

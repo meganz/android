@@ -8,7 +8,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -31,7 +33,8 @@ internal class SyncBackgroundService : LifecycleService() {
     internal lateinit var backgroundFastLoginUseCase: BackgroundFastLoginUseCase
 
     @Inject
-    internal lateinit var applicationLoggingInSetter: ApplicationLoggingInSetter
+    @LoginMutex
+    internal lateinit var loginMutex: Mutex
 
     @Inject
     internal lateinit var monitorConnectivityUseCase: MonitorConnectivityUseCase
@@ -54,11 +57,9 @@ internal class SyncBackgroundService : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
         Timber.d("SyncBackgroundService started")
 
-        if (!applicationLoggingInSetter.isLoggingIn()) {
+        if (!loginMutex.isLocked) {
             lifecycleScope.launch {
-                applicationLoggingInSetter.setLoggingIn(true)
                 runCatching { backgroundFastLoginUseCase() }.getOrElse(Timber::e)
-                applicationLoggingInSetter.setLoggingIn(false)
             }
         }
 

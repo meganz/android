@@ -41,7 +41,6 @@ import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.feature.sync.data.service.ApplicationLoggingInSetter
 import org.webrtc.Camera1Enumerator
 import org.webrtc.CameraEnumerator
 
@@ -196,28 +195,9 @@ abstract class UtilWrapperModule {
         @Provides
         fun provideApplicationWrapper() =
             object : ApplicationWrapper {
-                override fun setLoggingIn(isLoggingIn: Boolean) {
-                    MegaApplication.isLoggingIn = isLoggingIn
-                }
-
-                override fun isLoggingIn() = MegaApplication.isLoggingIn
-
                 override fun setHeartBeatAlive(isAlive: Boolean) {
                     MegaApplication.setHeartBeatAlive(isAlive)
                 }
-            }
-
-        /**
-         * Provides the [ApplicationLoggingInSetter]
-         */
-        @Provides
-        fun provideApplicationLoggingInSetter(): ApplicationLoggingInSetter =
-            object : ApplicationLoggingInSetter {
-                override fun setLoggingIn(loggingIn: Boolean) {
-                    MegaApplication.isLoggingIn = loggingIn
-                }
-
-                override fun isLoggingIn(): Boolean = MegaApplication.isLoggingIn
             }
 
         /**

@@ -29,8 +29,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -100,6 +100,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.qualifier.LoginMutex
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
@@ -119,7 +120,6 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -165,6 +165,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     @Inject
     lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
+
+    @Inject
+    @LoginMutex
+    lateinit var loginMutex: Mutex
 
     private val viewModel by viewModels<FileExplorerViewModel>()
 
@@ -571,8 +575,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
         if (megaApi.rootNode == null) {
             Timber.d("hide action bar")
-            if (!isLoggingIn) {
-                isLoggingIn = true
+            if (!loginMutex.isLocked) {
                 (supportActionBar ?: return).hide()
                 with(binding) {
                     slidingTabsFileExplorer.isVisible = false
@@ -588,8 +591,11 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 }
 
                 gSession = credentials?.session
-                ChatUtil.initMegaChatApi(gSession, this)
-                megaApi.fastLogin(gSession, this)
+                lifecycleScope.launch {
+                    loginMutex.lock()
+                    ChatUtil.initMegaChatApi(gSession, this@FileExplorerActivity)
+                    megaApi.fastLogin(gSession, this@FileExplorerActivity)
+                }
             } else {
                 megaApi.addRequestListener(this)
                 megaChatApi.addChatRequestListener(this)
@@ -2074,7 +2080,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         if (request.type == MegaRequest.TYPE_LOGIN) {
             if (error.errorCode != MegaError.API_OK) {
                 Timber.w("Login failed with error code: %s", error.errorCode)
-                isLoggingIn = false
+                runCatching { loginMutex.unlock() }
+                    .onFailure { Timber.w("Exception unlocking login mutex", it) }
             } else {
                 with(binding) {
                     fileLoginProgressBar.isVisible = true
@@ -2110,7 +2117,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 dbH.saveCredentials(credentials ?: return)
                 binding.fileLoggingInLayout.isVisible = false
                 afterLoginAndFetch()
-                isLoggingIn = false
+                runCatching { loginMutex.unlock() }
+                    .onFailure { Timber.w("Exception unlocking login mutex", it) }
             }
         }
     }
