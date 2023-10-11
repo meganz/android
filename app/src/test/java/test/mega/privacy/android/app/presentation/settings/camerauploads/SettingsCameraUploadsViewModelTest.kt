@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -16,10 +17,13 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Upload
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -30,6 +34,7 @@ import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpi
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
@@ -128,6 +133,8 @@ class SettingsCameraUploadsViewModelTest {
         mock()
     private val broadcastBusinessAccountExpiredUseCase =
         mock<BroadcastBusinessAccountExpiredUseCase>()
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
+    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
 
     @Before
     fun setUp() {
@@ -193,6 +200,8 @@ class SettingsCameraUploadsViewModelTest {
             setupOrUpdateMediaUploadsBackupUseCase = setupOrUpdateMediaUploadsBackupUseCase,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
             monitorCameraUploadsFolderDestinationUseCase = mock(),
+            getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
         )
     }
 
@@ -218,6 +227,8 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.videoCompressionSizeLimit).isEqualTo(0)
             assertThat(state.videoQuality).isNull()
             assertThat(state.shouldShowError).isFalse()
+            assertThat(state.primaryUploadSyncHandle).isNull()
+            assertThat(state.primaryFolderName).isEmpty()
         }
     }
 
@@ -775,5 +786,23 @@ class SettingsCameraUploadsViewModelTest {
                 localFolder = mediaUploadsFolderPath,
                 targetNode = null
             )
+        }
+
+    @Test
+    fun `test that camera upload node and name is updated when updatePrimaryUploadNode is invoked`() =
+        runTest(StandardTestDispatcher()) {
+            setupUnderTest()
+            val nodeId = NodeId(1L)
+            testScheduler.advanceUntilIdle()
+            val cameraUploadsNode = mock<TypedFolderNode>() {
+                on { id }.thenReturn(nodeId)
+                on { name }.thenReturn("Camera Uploads")
+            }
+            whenever(getNodeByIdUseCase(nodeId)).thenReturn(cameraUploadsNode)
+            underTest.updatePrimaryUploadNode(nodeId.longValue)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.primaryFolderName).isEqualTo("Camera Uploads")
+            }
         }
 }

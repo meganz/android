@@ -71,7 +71,6 @@ import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.displayNotificationPermissionRationale
@@ -89,7 +88,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAct
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -116,8 +114,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private var megaSecondaryFolder: Preference? = null
     private var businessCameraUploadsAlertDialog: AlertDialog? = null
     private var secondaryUpload = false
-    private var camSyncHandle: Long? = null
-    private var camSyncMegaNode: MegaNode? = null
     private var camSyncMegaPath = ""
     private var compressionQueueSizeDialog: AlertDialog? = null
     private var queueSizeInput: EditText? = null
@@ -270,23 +266,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
 
         megaSecondaryFolder = findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER)
         megaSecondaryFolder?.onPreferenceClickListener = this
-
-        val tempHandle = prefs?.camSyncHandle
-        if (tempHandle != null) {
-            camSyncHandle = tempHandle.toLongOrNull()
-            if (camSyncHandle != MegaApiJava.INVALID_HANDLE) {
-                camSyncMegaNode = camSyncHandle?.let { megaApi.getNodeByHandle(it) }
-                if (camSyncMegaNode != null) {
-                    camSyncMegaPath = camSyncMegaNode?.name ?: ""
-                } else {
-                    nodeForCameraSyncDoesNotExist()
-                }
-            } else {
-                camSyncMegaPath = getString(R.string.section_photo_sync)
-            }
-        } else {
-            nodeForCameraSyncDoesNotExist()
-        }
 
         // Setting up the Secondary Folder path
         if (prefs?.secondaryMediaFolderEnabled == null) {
@@ -587,6 +566,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 setOnlineOptions(isConnected)
             }
             collectFlow(viewModel.state) {
+                Timber.d("SettingsCameraUploadsState $it")
                 handleIsCameraUploadsEnabled(
                     isCameraUploadsEnabled = it.isCameraUploadsEnabled
                 )
@@ -631,6 +611,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     primaryFolderPath = it.primaryFolderPath,
                 )
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
+                handlePrimaryFolderName(it.primaryFolderName)
                 handleTriggerCameraUploads(it.shouldTriggerCameraUploads)
                 handleMediaPermissionsRationale(it.shouldShowMediaPermissionsRationale)
                 handleNotificationPermissionRationale(it.shouldShowNotificationPermissionRationale)
@@ -652,6 +633,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 setCameraUploadsDestinationFolder(it)
             }
         }
+    }
+
+    /**
+     * Display primary upload folder's name
+     */
+    private fun handlePrimaryFolderName(primaryFolderName: String) {
+        camSyncMegaPath =
+            primaryFolderName.takeIf { it.isNotEmpty() } ?: getString(R.string.section_photo_sync)
+        megaCameraFolder?.summary = camSyncMegaPath
     }
 
     /**
@@ -1135,15 +1125,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     }
 
     /**
-     * Method to control the changes needed when the node for CameraSync doesn't exist.
-     */
-    private fun nodeForCameraSyncDoesNotExist() {
-        viewModel.setInvalidCameraUploadsHandle()
-        camSyncHandle = Constants.INVALID_NON_NULL_VALUE.toLong()
-        camSyncMegaPath = getString(R.string.section_photo_sync)
-    }
-
-    /**
      * Setup the Destination Folder of either Primary or Secondary Uploads
      *
      * @param destination CameraUploadsFolderDestinationUpdate
@@ -1151,25 +1132,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private fun setCameraUploadsDestinationFolder(destination: CameraUploadsFolderDestinationUpdate) {
         when (destination.cameraUploadFolderType) {
             CameraUploadFolderType.Primary -> {
-                val targetNode = megaApi.getNodeByHandle(destination.nodeHandle) ?: return
-                camSyncHandle = destination.nodeHandle
-                camSyncMegaNode = targetNode
-                camSyncMegaPath = camSyncMegaNode?.name.orEmpty()
-                megaCameraFolder?.summary = camSyncMegaPath
+                viewModel.updatePrimaryUploadNode(destination.nodeHandle)
             }
 
             CameraUploadFolderType.Secondary -> checkSecondaryMediaFolder()
         }
-    }
-
-    /**
-     * Setup the Primary Cloud Folder
-     */
-    private fun setupPrimaryCloudFolder() {
-        if (camSyncHandle == null || camSyncHandle == MegaApiJava.INVALID_HANDLE) {
-            camSyncMegaPath = getString(R.string.section_photo_sync)
-        }
-        megaCameraFolder?.summary = camSyncMegaPath
     }
 
     /**
@@ -1389,9 +1356,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         }
 
         viewModel.onCameraUploadsEnabled(prefs?.secondaryMediaFolderEnabled == null)
-
-        // Cloud Primary Folder
-        setupPrimaryCloudFolder()
 
         // Secondary Uploads
         setupSecondaryUpload()

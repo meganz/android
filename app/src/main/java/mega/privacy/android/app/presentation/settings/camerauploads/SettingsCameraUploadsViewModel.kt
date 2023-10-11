@@ -17,10 +17,13 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Upload
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -32,6 +35,7 @@ import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpi
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
@@ -157,7 +161,9 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase,
     private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
-    private val monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
+    monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -561,6 +567,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             val primaryFolderPath = async { getPrimaryFolderPathUseCase() }
             val videoCompressionSizeLimit = async { getVideoCompressionSizeLimitUseCase() }
             val videoQuality = async { getUploadVideoQualityUseCase() }
+            val primaryUploadNode = async { getPrimaryFolderNode() }
             _state.update {
                 it.copy(
                     isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
@@ -572,9 +579,43 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     uploadOption = getUploadOption.await(),
                     videoCompressionSizeLimit = videoCompressionSizeLimit.await(),
                     videoQuality = videoQuality.await(),
+                    primaryUploadSyncHandle = primaryUploadNode.await()?.id?.longValue,
+                    primaryFolderName = primaryUploadNode.await()?.name ?: "",
                 )
             }
         }
+    }
+
+    private suspend fun getPrimaryFolderNode(nodeHandle: Long? = null): TypedNode? =
+        runCatching {
+            val id = nodeHandle ?: getPrimarySyncHandleUseCase()
+            if (id == -1L) {
+                return@runCatching null
+            }
+            return@runCatching getNodeByIdUseCase(NodeId(id)).also {
+                if (it == null) {
+                    setInvalidCameraUploadsHandle()
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+        }.getOrNull()
+
+
+    /**
+     * Update Primary Upload Node Handle and Name
+     */
+    fun updatePrimaryUploadNode(nodeHandle: Long) {
+        viewModelScope.launch {
+            val node = getPrimaryFolderNode(nodeHandle)
+            _state.update {
+                it.copy(
+                    primaryUploadSyncHandle = nodeHandle,
+                    primaryFolderName = node?.name ?: ""
+                )
+            }
+        }
+
     }
 
     /**
@@ -687,7 +728,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Set Invalid Camera Uploads Sync Handle
      */
-    fun setInvalidCameraUploadsHandle() {
+    private fun setInvalidCameraUploadsHandle() {
         viewModelScope.launch {
             setupCameraUploadsSyncHandleUseCase(handle = -1L)
         }
