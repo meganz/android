@@ -39,8 +39,19 @@ class MegaDatabaseCallback(
     }
 
     override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        Timber.d("onUpgrade oldVersion: $oldVersion newVersion: $newVersion")
-        legacyDatabaseMigration.onUpgrade(db, oldVersion, newVersion)
-        delegate.onUpgrade(db, oldVersion, newVersion)
+        try {
+            Timber.d("onUpgrade oldVersion: $oldVersion newVersion: $newVersion")
+            legacyDatabaseMigration.onUpgrade(db, oldVersion, newVersion)
+            delegate.onUpgrade(db, oldVersion, newVersion)
+        } catch (e: Exception) {
+            if (oldVersion < 75) {
+                // try to run the migration again before we apply room in version 67
+                // and the conflict can happen before we migrate to room open helper version 75
+                Timber.e(e)
+                delegate.onUpgrade(db, 1, 66)
+            } else {
+                throw e
+            }
+        }
     }
 }
