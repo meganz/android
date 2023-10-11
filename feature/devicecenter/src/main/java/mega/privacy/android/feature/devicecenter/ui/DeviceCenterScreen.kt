@@ -111,7 +111,7 @@ internal fun DeviceCenterScreen(
             )
         },
         content = { paddingValues ->
-            if (uiState.isInitialLoadingOngoing) {
+            if (!uiState.isInitialLoadingFinished) {
                 DeviceCenterLoadingScreen()
             } else {
                 DeviceCenterContent(
@@ -230,10 +230,9 @@ private fun DeviceCenterContent(
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterInInitialLoading() {
-    val uiState = DeviceCenterState(isInitialLoadingOngoing = true)
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
-            uiState = uiState,
+            uiState = DeviceCenterState(),
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
             onRenameDeviceClicked = {},
@@ -257,6 +256,7 @@ private fun PreviewDeviceCenterInDeviceView() {
             otherDeviceUINodeTwo,
             otherDeviceUINodeThree,
         ),
+        isInitialLoadingFinished = true,
     )
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
@@ -279,6 +279,7 @@ private fun PreviewDeviceCenterInDeviceView() {
 private fun PreviewDeviceCenterInFolderView() {
     val uiState = DeviceCenterState(
         devices = listOf(ownDeviceUINodeTwo),
+        isInitialLoadingFinished = true,
         selectedDevice = ownDeviceUINodeTwo,
     )
     AndroidTheme(isDark = isSystemInDarkTheme()) {

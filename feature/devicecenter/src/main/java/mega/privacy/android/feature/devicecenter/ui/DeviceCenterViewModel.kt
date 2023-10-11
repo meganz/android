@@ -5,9 +5,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -17,6 +21,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -40,31 +45,54 @@ internal class DeviceCenterViewModel @Inject constructor(
      */
     val state: StateFlow<DeviceCenterState> = _state.asStateFlow()
 
-    init {
-        retrieveBackupInfo()
-    }
+    /**
+     * A Shared Flow prompting Observers to periodically retrieve the User's Backup Information
+     * at a specific interval determined by [GET_DEVICES_REFRESH_INTERVAL]
+     */
+    val refreshBackupInfoPromptFlow = flow {
+        while (true) {
+            emit(Unit)
+            delay(TimeUnit.SECONDS.toMillis(GET_DEVICES_REFRESH_INTERVAL))
+        }
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
-     * Retrieves the User's Backup Information
+     * Gets the User's Backup Information
      */
-    private fun retrieveBackupInfo() = viewModelScope.launch {
-        _state.update { state -> state.copy(isInitialLoadingOngoing = true) }
-
+    fun getBackupInfo() = viewModelScope.launch {
         runCatching {
             val isCameraUploadsEnabled = isCameraUploadsEnabledUseCase()
-            val backupDevices = getDevicesUseCase(isCameraUploadsEnabled = isCameraUploadsEnabled)
+            val devices = deviceUINodeListMapper(
+                getDevicesUseCase(isCameraUploadsEnabled = isCameraUploadsEnabled)
+            )
+            val selectedDevice = getSelectedDevice(devices)
             _state.update {
                 it.copy(
-                    devices = deviceUINodeListMapper(backupDevices),
+                    devices = devices,
+                    selectedDevice = selectedDevice,
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
-                    isInitialLoadingOngoing = false,
+                    isInitialLoadingFinished = true,
                 )
             }
         }.onFailure {
             Timber.w(it)
-            _state.update { state -> state.copy(isInitialLoadingOngoing = false) }
+            _state.update { state -> state.copy(isInitialLoadingFinished = true) }
         }
     }
+
+    /**
+     * Whenever the User's Backup Information is periodically retrieved, this retrieves the selected
+     * Device from the updated Device List, so that in Folder View, the list of Folders are updated
+     *
+     * The selected Device is automatically null if:
+     * 1. The User has not selected any Device, or
+     * 2. The User's selected Device no longer exists in the updated Device List
+     *
+     * @param devices The list of Devices
+     * @return the selected Device, or null if any of the conditions above are met
+     */
+    private fun getSelectedDevice(devices: List<DeviceUINode>): DeviceUINode? =
+        devices.firstOrNull { it.id == _state.value.selectedDevice?.id }
 
     /**
      * Shows the Device Folders of a [DeviceUINode]
@@ -120,4 +148,11 @@ internal class DeviceCenterViewModel @Inject constructor(
      * Resets the value of [DeviceCenterState.deviceToRename] back to null
      */
     fun resetDeviceToRename() = _state.update { it.copy(deviceToRename = null) }
+
+    companion object {
+        /**
+         * Specifies the refresh interval to update the User's Backup Information
+         */
+        private const val GET_DEVICES_REFRESH_INTERVAL = 30L
+    }
 }

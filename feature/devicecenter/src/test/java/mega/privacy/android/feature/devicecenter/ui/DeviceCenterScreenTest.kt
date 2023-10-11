@@ -36,7 +36,10 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(devices = listOf(ownDeviceUINode))
+        val uiState = DeviceCenterState(
+            devices = listOf(ownDeviceUINode),
+            isInitialLoadingFinished = true,
+        )
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
@@ -53,9 +56,10 @@ internal class DeviceCenterScreenTest {
 
     @Test
     fun `test that nothing is displayed if the user backup information is empty`() {
+        val uiState = DeviceCenterState(isInitialLoadingFinished = true)
         composeTestRule.setContent {
             DeviceCenterScreen(
-                uiState = DeviceCenterState(),
+                uiState = uiState,
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
                 onRenameDeviceClicked = {},
@@ -81,6 +85,7 @@ internal class DeviceCenterScreenTest {
         )
         val uiState = DeviceCenterState(
             devices = listOf(ownDeviceUINode),
+            isInitialLoadingFinished = true,
             menuIconClickedNode = ownDeviceUINode,
         )
         composeTestRule.setContent {
@@ -106,7 +111,10 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(devices = listOf(ownDeviceUINode))
+        val uiState = DeviceCenterState(
+            devices = listOf(ownDeviceUINode),
+            isInitialLoadingFinished = true,
+        )
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
@@ -131,7 +139,10 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(devices = listOf(otherDeviceUINode))
+        val uiState = DeviceCenterState(
+            devices = listOf(otherDeviceUINode),
+            isInitialLoadingFinished = true,
+        )
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
@@ -163,7 +174,10 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(devices = listOf(ownDeviceUINode, otherDeviceUINode))
+        val uiState = DeviceCenterState(
+            devices = listOf(ownDeviceUINode, otherDeviceUINode),
+            isInitialLoadingFinished = true,
+        )
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
@@ -196,6 +210,7 @@ internal class DeviceCenterScreenTest {
         )
         val uiState = DeviceCenterState(
             devices = listOf(ownDeviceUINode),
+            isInitialLoadingFinished = true,
             selectedDevice = ownDeviceUINode,
         )
         composeTestRule.setContent {
@@ -215,10 +230,9 @@ internal class DeviceCenterScreenTest {
 
     @Test
     fun `test that the loading screen is shown`() {
-        val uiState = DeviceCenterState(isInitialLoadingOngoing = true)
         composeTestRule.setContent {
             DeviceCenterScreen(
-                uiState = uiState,
+                uiState = DeviceCenterState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
                 onRenameDeviceClicked = {},

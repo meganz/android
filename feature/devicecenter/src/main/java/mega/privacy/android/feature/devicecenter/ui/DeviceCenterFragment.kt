@@ -10,12 +10,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -33,6 +38,9 @@ class DeviceCenterFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * Allows navigation to specific features in the monolith :app
+     */
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
@@ -65,6 +73,21 @@ class DeviceCenterFragment : Fragment() {
                         onBackPressHandled = viewModel::handleBackPress,
                         onFeatureExited = viewModel::resetExitFeature,
                     )
+                }
+            }
+        }
+    }
+
+    /**
+     * Setup Lifecycle-aware Observers
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Only refresh the User's Backup Information when the app is in the Foreground
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.refreshBackupInfoPromptFlow.collect {
+                    Timber.d("Refreshing the User's Backup Information")
+                    viewModel.getBackupInfo()
                 }
             }
         }
