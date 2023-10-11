@@ -61,7 +61,7 @@
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">CHIAKHOAPHUCHOI-MEGA</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">Không tìm thấy thư mục secondary media, xin chọn một thư mục mới</string>
+    <string name="secondary_media_service_error_local_folder">Không tìm thấy thư&#160;mục phương&#160;tiện số hai, xin chọn một thư&#160;mục mới</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Không phát hiện bộ lưu trữ ngoài</string>
     <!-- Button where the user can sign off or logout -->
@@ -589,9 +589,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Tự tải lên khi</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Bật đăng tải thư mục Secondary Media</string>
+    <string name="settings_secondary_upload_on">Bật đăng tải thư&#160;mục phương&#160;tiện số hai</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Tắt đăng tải thư mục Secondary Media</string>
+    <string name="settings_secondary_upload_off">Tắt đăng tải thư&#160;mục phương&#160;tiện số hai</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Chọn thư mục</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -618,9 +618,9 @@
     <!-- The location of where the user photos or videos are stored in MEGA. -->
     <string name="settings_mega_camera_upload_folder">Thư mục Đăng Tải Camêra trên MEGA</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">Thư&#160;mục secondary cục&#160;bộ</string>
+    <string name="settings_local_secondary_folder">Thư&#160;mục số hai cục&#160;bộ</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
-    <string name="settings_mega_secondary_folder">Thư mục Secondary trên MEGA</string>
+    <string name="settings_mega_secondary_folder">Thư&#160;mục số hai trên MEGA</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_photos">Chỉ chọn ảnh</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -628,11 +628,11 @@
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_photos_and_videos">Ảnh và video</string>
     <!-- Settings of the Passcode -->
-    <string name="settings_passcode_lock_switch">Khóa bằng Mật Mã</string>
+    <string name="settings_passcode_lock_switch">Khóa bằng mã số</string>
     <!-- Settings option to change Passcode. -->
-    <string name="settings_change_passcode">Đổi mật mã</string>
+    <string name="settings_change_passcode">Đổi mã số</string>
     <!-- Settings option screen to change Passcode. -->
-    <string name="title_change_passcode">Đổi khóa mật mã</string>
+    <string name="title_change_passcode">Đổi khóa mã số</string>
     <!-- Settings option to set the timer to ask for passcode. -->
     <string name="settings_require_passcode">Yêu cầu mã số</string>
     <!-- Option available to choose in some context to make an action immediately. -->
@@ -641,20 +641,20 @@
     <string name="pin_lock_enter">Nhập</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="other">%1$d lần thử mật mã bị sai</item>
+        <item quantity="other">%1$d lần thử mã số bị sai</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">Tài khoản sẽ đăng xuất và tất cả tệp tin lưu về ngoại tuyến sẽ xóa khỏi máy sau 10 lần nhập sai mã</string>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Các mật&#160;mã mới nhập không khớp. Thử lại.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="unlock_pin_title">Nhập mật mã của bạn</string>
+    <string name="unlock_pin_title">Nhập mã số của bạn</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="unlock_pin_title_2">Nhập lại mật mã</string>
+    <string name="unlock_pin_title_2">Nhập lại mã số</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="reset_pin_title">Nhập mật mã mới</string>
+    <string name="reset_pin_title">Nhập mã số mới</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="reset_pin_title_2">Nhập lại mật mã mới</string>
+    <string name="reset_pin_title_2">Nhập lại mã số mới</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">Thông Tin</string>
     <!-- Preference screen item action button -->
@@ -1353,7 +1353,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Bạn có chắc muốn chuyển thư mục này vào Thùng Rác? Thao tác ngày sẽ tắt Đăng Tải Camêra.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Bạn có chắc muốn chuyển thư mục này vào Thùng Rác? Thao tác ngày sẽ ngưng tính năng đăng tải thư mục Secondary Media.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Bạn có chắc muốn chuyển thư&#160;mục này vào Thùng&#160;Rác? Thao&#160;tác ngày sẽ ngưng tính&#160;năng đăng tải thư&#160;mục phương&#160;tiện số hai.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Bỏ vào Thùng Rác?</string>
     <!-- confirmation message before removing a file -->
@@ -2930,7 +2930,7 @@
     <!-- Preferences screen item title for Cookie Policy -->
     <string name="settings_about_cookie_policy">Chính Sách Cookie</string>
     <!-- Preferences screen item title for cookie settings -->
-    <string name="settings_about_cookie_settings">Cài Đặt Cookie</string>
+    <string name="settings_about_cookie_settings">Thiết đặt cookie</string>
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Quyền riêng tư của bạn</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
@@ -3268,7 +3268,7 @@
     <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
     <string name="title_unlock_fingerprint">Mở khóa với dấu vân tay cua bạn</string>
     <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
-    <string name="action_use_passcode">Dùng mật mã</string>
+    <string name="action_use_passcode">Dùng mã số</string>
     <!-- Message informing the fingerprint was enabled successfully -->
     <string name="confirmation_fingerprint_enabled">Dấu vân tay của bạn đã được xác nhận</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
@@ -3462,7 +3462,7 @@
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">Ưa Thích</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
-    <string name="settings_passcode_forgot_passcode_button">Quên mất mật mã?</string>
+    <string name="settings_passcode_forgot_passcode_button">Quên mất mã số?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Nhập mật khẩu</string>
     <!-- Resume to paused transfers snack bar description text -->
@@ -4943,7 +4943,7 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Xem tất&#160;cả</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Không từ&#160;chối</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">Đăng tải camêra đã được cập&#160;nhật</string>
     <string name="camera_uploads_paused_due_to_no_internet">Tải lên bị tạm dừng do không có kết&#160;nối internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -4953,7 +4953,7 @@
         <item quantity="other">Đăng tải camêra hoàn tất, %1$d tệp tin đã được tải lên</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA có quyền truy&#160;cập bị hạn&#160;chế vào thư&#160;viện ảnh và không thể sao lưu tất cả ảnh của bạn.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">Chạm để đổi quyền&#160;hạn.</string>
 </resources>

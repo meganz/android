@@ -2511,7 +2511,7 @@
     <!-- Title of the layout to join a group call from the chat screen. -->
     <string name="join_call_layout_in_group_call">Antippen, um der laufenden Konferenz beizutreten.</string>
     <!-- Title of the layout to return to a call -->
-    <string name="call_in_progress_layout">Zum Gespräch zurückkehren</string>
+    <string name="call_in_progress_layout">Antippen, um zum Gespräch zurückkehren</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] ist dem Gruppenchat beigetreten.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
@@ -5174,7 +5174,7 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Alle anzeigen</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Nicht abweisen</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">Kamera-Uploads aktualisiert</string>
     <string name="camera_uploads_paused_due_to_no_internet">Upload-Pause wegen fehlender Internetverbindung</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -5186,7 +5186,7 @@
         <item quantity="other">Kamera-Uploads abgeschlossen, %1$d Dateien hochgeladen</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
 </resources>

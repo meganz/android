@@ -4953,7 +4953,7 @@
         <item quantity="other">カメラアップロードが完了しました。%1$d個のファイルがアップロードされました。</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGAはフォトライブラリへのアクセスが制限されているため、すべての写真をバックアップすることはできません。</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">タップして権限を変更します。</string>
 </resources>

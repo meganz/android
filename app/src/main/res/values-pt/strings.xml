@@ -5419,7 +5419,7 @@
         <item quantity="other">Uploads da câmera concluídos, foi feito o upload de %1$d arquivos</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">O MEGA tem acesso limitado à biblioteca de fotos e não pode fazer backup de todas as suas fotos.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">Pressione para alterar as permissões.</string>
 </resources>

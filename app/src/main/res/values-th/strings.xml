@@ -589,9 +589,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">อัปโหลดอย่างไร</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">เปิดใช้งานการอัปโหลดมีเดียสำรอง</string>
+    <string name="settings_secondary_upload_on">เปิดใช้งานการอัปโหลดสื่อสำรอง</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">ปิดใช้งานการอัปโหลดมีเดียสำรอง</string>
+    <string name="settings_secondary_upload_off">ปิดใช้งานการอัปโหลดสื่อสำรอง</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">เลือกโฟลเดอร์</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -3806,7 +3806,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">มุมมองการค้นพบสื่อจะเปิดโฟลเดอร์ที่มีเฉพาะรูปภาพและวิดีโอโดยอัตโนมัติ ซึ่งช่วยให้คุณดูสื่อในโหมดแกลเลอรีและกรองตามวันที่ได้</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">เนื่องจากโฟลเดอร์นี้มีเฉพาะรูปภาพและวิดีโอ เราจึงตั้งค่าประเภทการดูเป็นมุมมองการค้นพบสื่อโดยอัตโนมัติ คุณสามารถเพลิดเพลินกับเนื้อหาภาพของคุณด้วยเลย์เอาต์ที่สมจริงยิ่งขึ้น คุณสามารถปิดการใช้งานนี้ในการตั้งค่าได้</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">ตั้งค่า</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4914,7 +4914,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">ให้โฟลเดอร์ย่อยแสดงในการค้นพบสื่อด้วย</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in media discovery view.</string>
+    <string name="settings_media_discovery_sub_folder_context">รูปภาพและวิดีโอจากโฟลเดอร์ย่อยจะรวมอยู่ในมุมมองการค้นพบสื่อด้วย</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">ไม่พบรายการค้นหา</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4942,20 +4942,18 @@
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">ดูทั้งหมด</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
-    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">ไม่ต้องปฏิเสธ</string>
+    <string name="camera_uploads_up_to_date">การอัปโหลดจากกล้องได้อัปเดตล่าสุดแล้ว</string>
+    <string name="camera_uploads_paused_due_to_no_internet">การอัปโหลดถูกหยุดชั่วคราวเนื่องจากการเชื่อมต่ออินเทอร์เน็ตขาดหายไป</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
-        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+        <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>
     </plurals>
     <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
-        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+        <item quantity="other">การอัปโหลดจากกล้องเสร็จสมบูรณ์ มี %1$d ไฟล์ที่อัปโหลดแล้ว</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA ถูกจำกัดการเข้าถึงไลบรารีรูปภาพของคุณและไม่สามารถสำรองรูปภาพทั้งหมดของคุณได้</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">แตะเพื่อเปลี่ยนการอนุญาต</string>
 </resources>

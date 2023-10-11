@@ -4953,7 +4953,7 @@
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
 </resources>
