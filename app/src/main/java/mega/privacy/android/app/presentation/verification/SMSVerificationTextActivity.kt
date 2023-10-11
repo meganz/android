@@ -440,32 +440,32 @@ class SMSVerificationTextActivity : PasscodeActivity(),
     override fun onFocusChange(v: View, hasFocus: Boolean) {
         Timber.d("onFocusChange")
         when (v.id) {
-            R.id.pass_first -> {
+            R.id.verify_account_input_code_first -> {
                 if (hasFocus) {
                     firstPin.setText("")
                 }
             }
-            R.id.pass_second -> {
+            R.id.verify_account_input_code_second -> {
                 if (hasFocus) {
                     secondPin.setText("")
                 }
             }
-            R.id.pass_third -> {
+            R.id.verify_account_input_code_third -> {
                 if (hasFocus) {
                     thirdPin.setText("")
                 }
             }
-            R.id.pass_fourth -> {
+            R.id.verify_account_input_code_fourth -> {
                 if (hasFocus) {
                     fourthPin.setText("")
                 }
             }
-            R.id.pass_fifth -> {
+            R.id.verify_account_input_code_fifth -> {
                 if (hasFocus) {
                     fifthPin.setText("")
                 }
             }
-            R.id.pass_sixth -> {
+            R.id.verify_account_input_code_sixth -> {
                 if (hasFocus) {
                     sixthPin.setText("")
                 }

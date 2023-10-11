@@ -107,14 +107,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * To switch to Two Factor Authentication compose
-     */
-    TwoFactorAuthenticationCompose(
-        "Enable compose implementation of Two Factor Authentication screen",
-        true
-    ),
-
-    /**
      * Shares compose
      */
     SharesCompose(

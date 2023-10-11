@@ -131,8 +131,6 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
         return getExportMasterKeyUseCase().also { key ->
             if (key.isNullOrBlank().not()) {
                 setMasterKeyExportedUseCase()
-            } else {
-                setIsRkExportSuccessfullyEvent(false)
             }
         }
     }
