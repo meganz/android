@@ -3806,7 +3806,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">在媒体发现视图中自动打开只包含图片和视频的文件夹。这让您可以在图库模式下看到媒体，并按日期过滤。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">由于此文件夹仅包含图像和视频，我们已自动在媒体发现视图中将其打开。您可以通过更身临其境的布局欣赏您的视觉内容。您可以在设置中禁用此功能。</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">设置</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4943,7 +4943,7 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">查看全部</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">不要拒绝</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">相机上传已更新</string>
     <string name="camera_uploads_paused_due_to_no_internet">由于没有互联网连接，上传已暂停</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -4953,7 +4953,7 @@
         <item quantity="other">相机上传完成，%1$d个文件已上传</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA对照片库的访问权限有限，无法备份您的所有照片。</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">点按以更改权限。</string>
 </resources>

@@ -5405,7 +5405,7 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Afficher tous les participants</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Ne pas refuser</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">Les téléversements de l’appareil photo sont à jour</string>
     <string name="camera_uploads_paused_due_to_no_internet">Les téléversements ont été mis en pause, car il n’y a pas de connexion à Internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -5419,7 +5419,7 @@
         <item quantity="other">Téléversements de l’appareil photo terminés, %1$d&#160;fichiers téléversés</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA a un accès limité à la photothèque et ne peut pas sauvegarder toutes vos photos.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">Toucher pour changer les autorisations.</string>
 </resources>

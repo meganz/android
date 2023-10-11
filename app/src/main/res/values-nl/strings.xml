@@ -5174,7 +5174,7 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Alles weergeven</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Niet weigeren</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">Camerauploads zijn bijgewerkt</string>
     <string name="camera_uploads_paused_due_to_no_internet">Upload onderbroken omdat er geen internetverbinding is</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -5186,7 +5186,7 @@
         <item quantity="other">Camera uploads voltooid, %1$d bestanden geüpload</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA heeft beperkte toegang tot de fotobibliotheek en kan geen back-up maken van al uw foto\’s.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">Tik om de toestemmingen te wijzigen.</string>
 </resources>

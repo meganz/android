@@ -4953,7 +4953,7 @@
         <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA對相簿的存取權限有限，無法備份您的所有照片。</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">點選以更改權限。</string>
 </resources>

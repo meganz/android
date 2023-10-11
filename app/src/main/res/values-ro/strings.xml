@@ -4006,7 +4006,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Deschideți automat folderele care conțin numai imagini și videoclipuri în vizualizarea de descoperire media. Acest lucru vă permite să vedeți fișierele media în modul galerie și să filtrați după dată.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Deoarece acest folder conține doar imagini și videoclipuri, l-am deschis automat în vizualizarea de descoperire media. Vă puteți bucura de conținutul dvs. vizual cu un aspect mai captivant. Puteți dezactiva acest lucru în Setări.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Setări</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5405,19 +5405,21 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Vezi toți</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Nu refuza</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
-    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <string name="camera_uploads_up_to_date">Încărcări camere au fost actualizate</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Încărcarea întreruptă din cauza lipsei conexiunii la internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
-        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+        <item quantity="one">Încărcări cameră în desfășurare, %1$d&#160;fișier în așteptare</item>
+        <item quantity="few">Încărcări cameră în desfășurare, %1$d&#160;fișiere în așteptare</item>
+        <item quantity="other">Încărcări cameră în desfășurare, %1$d de fișiere în așteptare</item>
     </plurals>
     <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
-        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+        <item quantity="one">Încărcări cameră complete, %1$d&#160;fișier încărcat</item>
+        <item quantity="few">Încărcări cameră complete, %1$d&#160;fișiere încărcate</item>
+        <item quantity="other">Încărcări cameră complete, %1$d de fișiere încărcate</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access"></string>
+    <string name="camera_uploads_limited_access">MEGA are acces limitat la biblioteca foto și nu poate face backup la toate fotografiile dvs.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions"></string>
+    <string name="camera_uploads_change_permissions">Atinge pentru a modifica permisiunile.</string>
 </resources>
