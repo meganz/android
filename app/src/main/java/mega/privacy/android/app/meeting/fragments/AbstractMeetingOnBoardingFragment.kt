@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -34,6 +35,7 @@ import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.OnSingleClickListener.Companion.setOnSingleClickListener
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.mobile.analytics.event.ScheduledMeetingJoinGuestButtonEvent
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 
@@ -202,6 +204,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         binding = MeetingOnBoardingFragmentBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
         binding.btnStartJoinMeeting.setOnSingleClickListener {
+            Analytics.tracker.trackEvent(ScheduledMeetingJoinGuestButtonEvent)
             permissionsRequester = permissionsBuilder(
                 arrayOf(Manifest.permission.RECORD_AUDIO)
             )
