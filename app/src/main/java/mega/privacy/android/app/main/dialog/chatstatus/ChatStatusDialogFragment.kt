@@ -17,7 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationWithRadioButtonsDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.UserStatus
@@ -48,7 +48,7 @@ internal class ChatStatusDialogFragment : DialogFragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
-                    ConfirmationWithRadioButtonsDialog(
+                    ConfirmationDialogWithRadioButtons(
                         radioOptions = listOf(
                             UserStatus.Online,
                             UserStatus.Away,

@@ -7,7 +7,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationWithRadioButtonsDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -31,7 +31,7 @@ internal fun ExtraActionDialog(
     }
 
     is FileInfoExtraAction.ChangePermission -> {
-        ConfirmationWithRadioButtonsDialog(
+        ConfirmationDialogWithRadioButtons(
             radioOptions = listOf(
                 AccessPermission.READ,
                 AccessPermission.READWRITE,
@@ -39,7 +39,7 @@ internal fun ExtraActionDialog(
             ),
             initialSelectedOption = action.selected,
             titleText = stringResource(id = R.string.file_properties_shared_folder_permissions),
-            buttonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = R.string.general_cancel),
             onOptionSelected = {
                 onPermissionSelected(it, action.emails)
             },

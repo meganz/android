@@ -66,7 +66,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationWithRadioButtonsDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.core.ui.controls.textfields.GenericDescriptionTextField
@@ -78,8 +78,8 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
-import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -699,9 +699,9 @@ private fun RecurringMeetingDialog(
     onDiscard: () -> Unit,
 ) {
     if (state.recurringMeetingDialog) {
-        ConfirmationWithRadioButtonsDialog(
+        ConfirmationDialogWithRadioButtons(
             titleText = stringResource(id = R.string.meetings_schedule_meeting_recurrence_label),
-            buttonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = R.string.general_cancel),
             radioOptions = state.getRecurrenceDialogOptionList(),
             initialSelectedOption = state.getRecurrenceDialogOptionSelected(),
             onOptionSelected = onOptionSelected,

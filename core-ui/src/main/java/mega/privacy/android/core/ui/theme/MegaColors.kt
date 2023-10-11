@@ -1,6 +1,7 @@
 package mega.privacy.android.core.ui.theme
 
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
@@ -30,5 +31,13 @@ internal data class MegaColors(
             contentColor = text.inverse,
             disabledBackgroundColor = button.disabled,
             disabledContentColor = text.disabled,
+        )
+
+    val radioColors
+        @Composable
+        get() = RadioButtonDefaults.colors(
+            selectedColor = MegaTheme.colors.border.strongSelected,
+            unselectedColor = MegaTheme.colors.icon.primary,
+            disabledColor = MegaTheme.colors.border.disabled,
         )
 }
