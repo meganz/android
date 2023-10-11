@@ -21,13 +21,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
+import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.databinding.FragmentFavouritesBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
@@ -98,14 +98,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      */
     private var isOnLine: Boolean = false
 
-    private val fabChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        if (it && !isActionMode) {
-            showFabButton()
-        } else {
-            hideFabButton()
-        }
-    }
-
     /**
      * onCreateView
      */
@@ -124,8 +116,16 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         listLayoutManager = LinearLayoutManager(requireContext())
         setupAdapter()
 
-        LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
-            .observeForever(fabChangeObserver)
+        binding.fastscroll.setUpScrollListener(object : FastScrollerScrollListener{
+            override fun onScrolled() {
+                hideFabButton()
+            }
+
+            override fun onScrolledToTop() {
+                showFabButton()
+            }
+
+        })
         return binding.root
     }
 
@@ -145,8 +145,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.exitSearch()
-        LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
-            .removeObserver(fabChangeObserver)
     }
 
     /**

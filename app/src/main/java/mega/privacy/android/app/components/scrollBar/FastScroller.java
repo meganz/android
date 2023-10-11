@@ -1,7 +1,5 @@
 package mega.privacy.android.app.components.scrollBar;
 
-import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -14,14 +12,12 @@ import android.widget.TextView;
 import androidx.core.widget.TextViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.viewprovider.DefaultScrollerViewProvider;
 import mega.privacy.android.app.components.scrollBar.viewprovider.ScrollerViewProvider;
 
 /**
- * Credit: https://github.com/FutureMind/recycler-fast-scroll
+ * Credit: <a href="Github">https://github.com/FutureMind/recycler-fast-scroll</a>
  */
 public class FastScroller extends LinearLayout {
 
@@ -44,6 +40,8 @@ public class FastScroller extends LinearLayout {
 
     private ScrollerViewProvider viewProvider;
     private SectionTitleProvider titleProvider;
+
+    private FastScrollerScrollListener fastScrollerScrollListener;
 
     public FastScroller(Context context) {
         this(context, null);
@@ -231,13 +229,24 @@ public class FastScroller extends LinearLayout {
      * Restore FAB when the scroller disappeared / user stop scrolling.
      */
     public void showFabButton() {
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).post(true);
+        if (fastScrollerScrollListener != null) {
+            fastScrollerScrollListener.onScrolledToTop();
+        }
     }
 
     /**
      * Hide FAB when the user is scrolling scroller
      */
     public void hideFabButton() {
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).post(false);
+        if (fastScrollerScrollListener != null) {
+            fastScrollerScrollListener.onScrolled();
+        }
+    }
+
+    /**
+     * Set up fast scroller listener
+     */
+    public void setUpScrollListener(FastScrollerScrollListener fastScrollerScrollListener) {
+        this.fastScrollerScrollListener = fastScrollerScrollListener;
     }
 }

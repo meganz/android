@@ -7,7 +7,6 @@ import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_DEVICE;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
-import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID;
@@ -80,7 +79,6 @@ import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -90,7 +88,6 @@ import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -113,6 +110,7 @@ import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.main.adapters.AddContactsAdapter;
@@ -311,13 +309,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private boolean isWarningMessageShown;
 
-    private final Observer<Boolean> fabChangeObserver = isShow -> {
-        if (isShow) {
-            showFabButton();
-        } else {
-            hideFabButton();
-        }
-    };
 
     /**
      * Shows the fabButton
@@ -333,18 +324,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (fabButton != null) {
             fabButton.hide();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
     }
 
     @Override
@@ -3297,6 +3276,17 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 }
             }
         }
+        fastScroller.setUpScrollListener(new FastScrollerScrollListener() {
+            @Override
+            public void onScrolled() {
+                hideFabButton();
+            }
+
+            @Override
+            public void onScrolledToTop() {
+                showFabButton();
+            }
+        });
     }
 
     private void showHeader(boolean isVisible) {

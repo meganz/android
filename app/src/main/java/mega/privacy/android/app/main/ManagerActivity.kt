@@ -599,21 +599,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var navController: NavController? = null
     private var mHomepageSearchable: HomepageSearchable? = null
     private var initFabButtonShow = false
-    private val fabChangeObserver = Observer { isShow: Boolean ->
-        if (drawerItem === DrawerItem.HOMEPAGE) {
-            controlFabInHomepage(isShow)
-        } else if (isInMDMode) {
-            hideFabButton()
-        } else {
-            if (initFabButtonShow) {
-                if (isShow) {
-                    showFabButtonAfterScrolling()
-                } else {
-                    hideFabButtonWhenScrolling()
-                }
-            }
-        }
-    }
+
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var psaViewHolder: PsaViewHolder? = null
 
@@ -2261,8 +2247,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         checkScrollElevation()
         checkTransferOverQuotaOnResume()
-        LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
-            .observeForever(fabChangeObserver)
         checkForInAppUpdateInstallStatus()
     }
 
@@ -2704,8 +2688,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         megaApi.removeRequestListener(this)
         composite.clear()
         unregisterReceiver(contactUpdateReceiver)
-        LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
-            .removeObserver(fabChangeObserver)
         cancelSearch()
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
@@ -7986,39 +7968,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun getPermissionsFragment(): PermissionsFragment? {
         return (supportFragmentManager.findFragmentByTag(FragmentTag.PERMISSIONS.tag) as? PermissionsFragment).also {
             permissionsFragment = it
-        }
-    }
-
-    /**
-     * Checks whether the current screen is the main of Homepage or Documents.
-     * Video / Audio / Photos do not need Fab button
-     *
-     * @param isShow True if Fab button should be display, False if Fab button should be hidden
-     */
-    private fun controlFabInHomepage(isShow: Boolean) {
-        if (homepageScreen === HomepageScreen.HOMEPAGE) {
-            // Control the Fab in homepage
-            val fragment =
-                getFragmentByType(HomepageFragment::class.java)
-            if (fragment != null) {
-                if (isShow) {
-                    fragment.showFabButton()
-                } else {
-                    fragment.hideFabButton()
-                }
-            }
-        } else if (homepageScreen === HomepageScreen.DOCUMENTS) {
-            // Control the Fab in documents
-            val docFragment = getFragmentByType(
-                DocumentsFragment::class.java
-            )
-            if (docFragment != null) {
-                if (isShow) {
-                    docFragment.showFabButton()
-                } else {
-                    docFragment.hideFabButton()
-                }
-            }
         }
     }
 

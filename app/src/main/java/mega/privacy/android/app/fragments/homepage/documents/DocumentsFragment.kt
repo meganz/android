@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
@@ -46,7 +45,6 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.SEARCH_MODE
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
-import mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
@@ -65,6 +63,7 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -103,14 +102,6 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
     private var openingNodeHandle = INVALID_HANDLE
 
-    private val fabChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        if (it && actionModeViewModel.selectedNodes.value.isNullOrEmpty()) {
-            showFabButton()
-        } else {
-            hideFabButton()
-        }
-    }
-
     /**
      * onCreateView
      */
@@ -123,10 +114,6 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             viewModel = this@DocumentsFragment.viewModel
             sortByHeaderViewModel = this@DocumentsFragment.sortByHeaderViewModel
         }
-
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
-            .observeForever(fabChangeObserver)
-
         return binding.root
     }
 
@@ -196,8 +183,6 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.cancelSearch()
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
-            .removeObserver(fabChangeObserver)
     }
 
     /**
@@ -500,7 +485,18 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     /**
      * Setup fast scroller for the [RecyclerView]
      */
-    private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
+    private fun setupFastScroller() {
+        binding.scroller.setRecyclerView(listView)
+        binding.scroller.setUpScrollListener(object : FastScrollerScrollListener{
+            override fun onScrolled() {
+                hideFabButton()
+            }
+
+            override fun onScrolledToTop() {
+                showFabButton()
+            }
+        })
+    }
 
     /**
      * Setup the List Adapter

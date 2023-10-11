@@ -8,7 +8,6 @@ import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCam
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
 import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_BASE_URL;
-import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
 import static mega.privacy.android.app.utils.Constants.OPEN_SCAN_QR;
 import static mega.privacy.android.app.utils.Constants.PHONE_NUMBER_REGEX;
 import static mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS;
@@ -60,14 +59,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -82,6 +79,7 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ContactInfoListDialog;
 import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener;
 import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
@@ -152,13 +150,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private InvitationContactInfo currentSelected;
 
-    private final Observer<Boolean> fabChangeObserver = isShow -> {
-        if (isShow) {
-            showFabButton();
-        } else {
-            hideFabButton();
-        }
-    };
 
     //work around for android bug - https://issuetracker.google.com/issues/37007605#c10
     static class LinearLayoutManagerWrapper extends LinearLayoutManager {
@@ -254,6 +245,18 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
         progressBar = findViewById(R.id.invite_contact_progress_bar);
         refreshInviteContactButton();
+        fastScroller.setUpScrollListener(new FastScrollerScrollListener() {
+            @Override
+            public void onScrolled() {
+                hideFabButton();
+            }
+
+            @Override
+            public void onScrolledToTop() {
+                showFabButton();
+            }
+        });
+
         //orientation changes
         if (savedInstanceState != null) {
             isGetContactCompleted = savedInstanceState.getBoolean(KEY_IS_GET_CONTACT_COMPLETED, false);
@@ -334,19 +337,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         };
         megaApi.contactLinkCreate(false, getContactLinkCallback);
     }
-
-    @Override
-    protected void onPause() {
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Timber.d("onCreateOptionsMenu");

@@ -27,7 +27,9 @@ import mega.privacy.android.app.components.TopSnappedStickyLayoutManager
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
+import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.databinding.FragmentRecentActionsBinding
+import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -75,6 +77,7 @@ class RecentActionsFragment : Fragment() {
 
     private val viewModel: RecentActionsViewModel by activityViewModels()
 
+    private var homepageFragment: HomepageFragment? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -105,6 +108,7 @@ class RecentActionsFragment : Fragment() {
     }
 
     private fun setupView() {
+        homepageFragment = parentFragment as? HomepageFragment
         emptyLayout = binding.emptyStateRecents
         emptyText = binding.emptyTextRecents
         showActivityButton = binding.showActivityButton
@@ -122,6 +126,15 @@ class RecentActionsFragment : Fragment() {
         listView = binding.listViewRecents
         fastScroller = binding.fastscroll
 
+        fastScroller.setUpScrollListener(object : FastScrollerScrollListener{
+            override fun onScrolled() {
+                homepageFragment?.hideFabButton()
+            }
+
+            override fun onScrolledToTop() {
+                homepageFragment?.showFabButton()
+            }
+        })
         initAdapter()
     }
 
