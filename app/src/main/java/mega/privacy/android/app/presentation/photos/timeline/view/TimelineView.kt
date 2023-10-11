@@ -496,7 +496,20 @@ fun HandleCameraUploadStatusFab(
 ) {
     when (cameraUploadsStatus) {
         CameraUploadsStatus.None -> {}
-        CameraUploadsStatus.Sync -> CameraUploadsStatusSync()
+        CameraUploadsStatus.Sync -> {
+            val snackBarMessage =
+                stringResource(id = R.string.settings_camera_notif_initializing_title)
+            CameraUploadsStatusSync(
+                onClick = {
+                    coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = snackBarMessage,
+                        )
+                    }
+                }
+            )
+        }
+
         CameraUploadsStatus.Uploading -> {
             val snackBarMessage = pluralStringResource(
                 id = R.plurals.camera_uploads_in_progress_pending_files,

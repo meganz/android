@@ -72,7 +72,7 @@ fun CameraUploadsStatusCompleted(
         progress = 1f,
         statusIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_cu_status_completed),
+                painter = painterResource(id = R.drawable.ic_cu_fab_status_completed),
                 contentDescription = "Camera uploads status completed",
                 modifier = Modifier.size(24.dp),
                 tint = Color.Unspecified,
