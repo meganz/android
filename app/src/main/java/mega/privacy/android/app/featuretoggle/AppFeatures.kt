@@ -204,7 +204,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new QRCode compose screen with Google code scanner
      */
-    QRCodeCompose("Enable compose for QRCode with google code scanner", true)
+    QRCodeCompose("Enable compose for QRCode with google code scanner", true),
+
+    /**
+     * To switch into new chat activity
+     */
+    NewChatActivity("Enable new chat activity", false)
     ;
 
     companion object : FeatureFlagValueProvider {
