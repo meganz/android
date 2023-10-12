@@ -14,7 +14,6 @@
         android:icon="@drawable/ic_cu_status"
         android:orderInCategory="80"
         android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item
