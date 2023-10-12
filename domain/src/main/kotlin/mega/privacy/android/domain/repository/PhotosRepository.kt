@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -113,4 +114,9 @@ interface PhotosRepository {
      * Set the preferences for Timeline Filter
      */
     suspend fun setTimelineFilterPreferences(preferences: Map<String, String>): String?
+
+    /**
+     * Monitor timeline nodes
+     */
+    fun monitorTimelineNodes(): Flow<List<ImageNode>>
 }

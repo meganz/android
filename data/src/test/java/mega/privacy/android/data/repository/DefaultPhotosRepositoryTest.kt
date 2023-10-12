@@ -250,6 +250,7 @@ class DefaultPhotosRepositoryTest {
         megaChatApiGateway = megaChatApiGateway,
         timelineFilterPreferencesJSONMapper = timelineFilterPreferencesJSONMapper,
         contentConsumptionMegaStringMapMapper = contentConsumptionMegaStringMapMapper,
+        imageNodeMapper = mock(),
     )
 
     private fun createMegaNode(

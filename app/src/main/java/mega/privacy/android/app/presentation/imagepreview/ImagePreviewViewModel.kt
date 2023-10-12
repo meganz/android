@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -16,8 +17,11 @@ import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuO
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
+import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,6 +30,8 @@ class ImagePreviewViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val imageNodeFetchers: Map<@JvmSuppressWildcards ImagePreviewFetcherSource, @JvmSuppressWildcards ImageNodeFetcher>,
     private val imagePreviewMenuOptionsMap: Map<@JvmSuppressWildcards ImagePreviewMenuSource, @JvmSuppressWildcards ImagePreviewMenuOptions>,
+    private val addImageTypeUseCase: AddImageTypeUseCase,
+    private val getImageUseCase: GetImageUseCase,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -101,6 +107,15 @@ class ImagePreviewViewModel @Inject constructor(
             ?.isForwardOptionVisible(imageNode)
             ?: false
 
+    suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
+        val typedNode = addImageTypeUseCase(imageNode)
+        return getImageUseCase(
+            node = typedNode,
+            fullSize = true,
+            highPriority = true,
+            resetDownloads = {}, // I don't know what is this for, lol.
+        )
+    }
 
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"

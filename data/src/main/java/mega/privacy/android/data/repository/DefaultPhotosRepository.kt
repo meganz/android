@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.conflate
@@ -34,6 +35,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
@@ -43,6 +45,7 @@ import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
@@ -89,6 +92,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper,
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper,
+    private val imageNodeMapper: ImageNodeMapper,
 ) : PhotosRepository {
     private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
@@ -99,6 +103,8 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val refreshPhotosStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
     private val photosStateFlow: MutableStateFlow<List<Photo>?> = MutableStateFlow(null)
+
+    private val timelineNodesFlow: MutableStateFlow<List<ImageNode>> = MutableStateFlow(emptyList())
 
     private val photosRefreshRules = listOf(
         NodeChanges.New,
@@ -138,14 +144,42 @@ internal class DefaultPhotosRepository @Inject constructor(
             .filter { it }
             .conflate()
             .onEach {
-                val photos = searchMegaPhotos()
-                for (photo in photos) {
-                    photosCache[NodeId(photo.id)] = photo
-                }
+                val (imageNodes, videoNodes) = fetchPhotosNodes()
 
-                photosStateFlow.update { photos }
-                refreshPhotosStateFlow.value = false
+                updatePhotosNodes(imageNodes, videoNodes)
+                updateTimelineNodes(imageNodes, videoNodes)
             }.launchIn(appScope)
+    }
+
+    private fun updatePhotosNodes(
+        imageNodes: List<MegaNode>,
+        videoNodes: List<MegaNode>,
+    ) = appScope.launch {
+        val photos = awaitAll(
+            async { imageNodes.map { mapMegaNodeToImage(it) } },
+            async { videoNodes.map { mapMegaNodeToVideo(it) } },
+        ).flatten()
+
+        for (photo in photos) {
+            photosCache[NodeId(photo.id)] = photo
+        }
+
+        photosStateFlow.update { photos }
+        refreshPhotosStateFlow.value = false
+    }
+
+    private fun updateTimelineNodes(
+        imageNodes: List<MegaNode>,
+        videoNodes: List<MegaNode>,
+    ) = appScope.launch {
+        val nodes = (imageNodes + videoNodes).map { node ->
+            imageNodeMapper(
+                megaNode = node,
+                hasVersion = megaApiFacade::hasVersion,
+                requireSerializedData = true,
+            )
+        }
+        timelineNodesFlow.update { nodes }
     }
 
     override fun monitorPhotos(): Flow<List<Photo>> {
@@ -180,10 +214,23 @@ internal class DefaultPhotosRepository @Inject constructor(
         getMediaUploadFolderId
     }
 
-    private suspend fun searchMegaPhotos(): List<Photo> = withContext(ioDispatcher) {
-        val images = async { mapPhotoNodesToImages(searchImages()) }
-        val videos = async { mapPhotoNodesToVideos(searchVideos()) }
-        images.await() + videos.await()
+    private suspend fun fetchPhotosNodes(): List<List<MegaNode>> = withContext(ioDispatcher) {
+        awaitAll(
+            async { fetchImageNodes() },
+            async { fetchVideoNodes() },
+        )
+    }
+
+    private suspend fun fetchImageNodes(): List<MegaNode> = withContext(ioDispatcher) {
+        searchImages().filter {
+            fileTypeInfoMapper(it) !is SvgFileTypeInfo && it.isValidPhotoNode()
+        }
+    }
+
+    private suspend fun fetchVideoNodes(): List<MegaNode> = withContext(ioDispatcher) {
+        searchVideos().filter {
+            it.isValidPhotoNode() && fileTypeInfoMapper(it) is VideoFileTypeInfo
+        }
     }
 
     override suspend fun getPhotoFromNodeID(nodeId: NodeId, albumPhotoId: AlbumPhotoId?): Photo? {
@@ -639,4 +686,6 @@ internal class DefaultPhotosRepository @Inject constructor(
                 photosCache[NodeId(node.handle)] = it
             }
     }
+
+    override fun monitorTimelineNodes(): Flow<List<ImageNode>> = timelineNodesFlow
 }
