@@ -41,7 +41,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FavouriteFolderFragment : Fragment() {
     private val viewModel by viewModels<FavouriteFolderViewModel>()
-    private val thumbnailViewModel by viewModels<ThumbnailViewModel>()
     private lateinit var binding: FragmentFavouriteFolderBinding
     private lateinit var adapter: FavouritesAdapter
 
@@ -100,7 +99,6 @@ class FavouriteFolderFragment : Fragment() {
                 }
             },
             onThreeDotsClicked = viewModel::threeDotsClicked,
-            getThumbnail = thumbnailViewModel::getThumbnail
         )
         binding.fileListViewBrowser.adapter = adapter
         binding.fileListViewBrowser.itemAnimator = SelectAnimator()

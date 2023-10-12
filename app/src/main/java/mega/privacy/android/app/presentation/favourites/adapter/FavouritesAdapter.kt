@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.favourites.adapter
 
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,16 +13,21 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
+import mega.privacy.android.app.fetcher.ThumbnailRequest
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteHeaderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ITEM_VIEW_TYPE
-import java.io.File
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * The adapter regarding favourites
@@ -38,7 +42,6 @@ class FavouritesAdapter(
     private val onItemClicked: (info: Favourite) -> Unit,
     private val onLongClicked: (info: Favourite) -> Boolean = { _ -> false },
     private val onThreeDotsClicked: (info: Favourite) -> Unit,
-    private val getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
 ) : ListAdapter<FavouriteItem, FavouritesViewHolder>(FavouritesDiffCallback) {
 
     override fun getItemViewType(position: Int): Int = getItem(position).type
@@ -69,7 +72,6 @@ class FavouritesAdapter(
             onItemClicked = onItemClicked,
             onThreeDotsClicked = onThreeDotsClicked,
             onLongClicked = onLongClicked,
-            getThumbnail = getThumbnail
         )
     }
 
@@ -98,30 +100,20 @@ class FavouritesViewHolder(
         onItemClicked: (info: Favourite) -> Unit,
         onThreeDotsClicked: (info: Favourite) -> Unit,
         onLongClicked: (info: Favourite) -> Boolean,
-        getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
     ) {
         with(binding) {
             when (this) {
                 is ItemFavouriteBinding -> {
                     item.favourite?.let { favourite: Favourite ->
-                        favourite.thumbnailPath?.let { thumbnailPath ->
-                            File(thumbnailPath).let { file ->
-                                if (file.exists()) {
-                                    itemThumbnail.setImageURI(Uri.fromFile(file))
-                                } else {
-                                    getThumbnail(favourite.typedNode.id.longValue) { thumbnail ->
-                                        thumbnail?.let { fileByGetThumbnail ->
-                                            itemThumbnail.setImageURI(
-                                                Uri.fromFile(
-                                                    fileByGetThumbnail
-                                                )
-                                            )
-                                        }
-                                    }
-                                    itemThumbnail.setImageResource(favourite.icon)
-                                }
-                            }
-                        } ?: itemThumbnail.setImageResource(favourite.icon)
+                        itemThumbnail.load(ThumbnailRequest(NodeId(favourite.node.handle))) {
+                            transformations(
+                                RoundedCornersTransformation(
+                                    Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
+                                )
+                            )
+                            placeholder(favourite.icon)
+                            error(favourite.icon)
+                        }
                         textViewSettings(textView = itemFilename, favourite = favourite)
                         itemImgLabel.setImageDrawable(
                             ResourcesCompat.getDrawable(

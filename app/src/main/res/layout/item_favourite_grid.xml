@@ -89,7 +89,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.facebook.drawee.view.SimpleDraweeView
+        <ImageView
             android:id="@+id/itemThumbnail"
             android:layout_width="match_parent"
             android:layout_height="@dimen/grid_node_item_width"
@@ -97,7 +97,7 @@
             android:paddingLeft="1dp"
             android:paddingTop="1dp"
             android:paddingRight="1dp"
-            app:actualImageScaleType="fitCenter" />
+            android:scaleType="fitCenter" />
 
         <!-- For Video only, video icon and duration -->
         <FrameLayout

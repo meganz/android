@@ -68,7 +68,6 @@ import javax.inject.Inject
 class FavouritesFragment : Fragment(), HomepageSearchable {
     private val viewModel by viewModels<FavouritesViewModel>()
     private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
-    private val thumbnailViewMode by viewModels<ThumbnailViewModel>()
     private lateinit var binding: FragmentFavouritesBinding
     private lateinit var listAdapter: FavouritesAdapter
     private lateinit var gridAdapter: FavouritesGridAdapter
@@ -188,7 +187,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             onItemClicked = ::itemClicked,
             onThreeDotsClicked = ::threeDotsClicked,
             onLongClicked = ::itemLongClicked,
-            getThumbnail = thumbnailViewMode::getThumbnail
         )
 
         gridAdapter = FavouritesGridAdapter(
@@ -196,7 +194,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             onItemClicked = ::itemClicked,
             onThreeDotsClicked = ::threeDotsClicked,
             onLongClicked = ::itemLongClicked,
-            getThumbnail = thumbnailViewMode::getThumbnail
         )
     }
 
