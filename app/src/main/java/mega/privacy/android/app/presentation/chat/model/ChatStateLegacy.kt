@@ -30,7 +30,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property openWaitingRoomScreen                      Should open waiting Room screen.
  * @property enabledFeatureFlags                        Set of enabled feature flags
  */
-data class ChatState(
+data class ChatStateLegacy(
     val chatId: Long = -1L,
     val error: Int? = null,
     val isCallAnswered: Boolean = false,

@@ -21,11 +21,10 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.chat.model.ChatState
+import mega.privacy.android.app.presentation.chat.model.ChatStateLegacy
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isPast
@@ -142,11 +141,11 @@ class ChatViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ChatState())
+    private val _state = MutableStateFlow(ChatStateLegacy())
 
     /**
      * UI State Chat
-     * Flow of [ChatState]
+     * Flow of [ChatStateLegacy]
      */
     val state = _state.asStateFlow()
 
