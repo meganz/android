@@ -25,6 +25,7 @@ import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
+import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.Offline
@@ -90,6 +91,7 @@ class NodeRepositoryImplTest {
     private val nodeUpdateMapper: NodeUpdateMapper = mock()
     private val folderNode: TypedFolderNode = mock()
     private val accessPermissionMapper: AccessPermissionMapper = mock()
+    private val accessPermissionIntMapper: AccessPermissionIntMapper = AccessPermissionIntMapper()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
     private val fetChildrenMapper = mock<FetchChildrenMapper>()
 
@@ -128,6 +130,7 @@ class NodeRepositoryImplTest {
             nodeUpdateMapper = nodeUpdateMapper,
             accessPermissionMapper = accessPermissionMapper,
             nodeShareKeyResultMapper = nodeShareKeyResultMapper,
+            accessPermissionIntMapper = accessPermissionIntMapper,
         )
     }
 
@@ -649,6 +652,39 @@ class NodeRepositoryImplTest {
             assertThrows<MegaException> {
                 underTest.exportNode(node, expireTime)
             }
+        }
+
+    @Test
+    fun `test that checkIfNodeHasTheRequiredAccessLevelPermission when the method execute successfully`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val megaNode = mock<MegaNode>()
+            val permission = AccessPermission.FULL
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            whenever(
+                megaApiGateway.checkAccessErrorExtended(
+                    node = megaNode,
+                    level = accessPermissionIntMapper(accessPermission = permission)
+                )
+            ).thenReturn(error)
+            val response =
+                underTest.checkIfNodeHasTheRequiredAccessLevelPermission(nodeId, permission)
+            assertThat(response).isTrue()
+        }
+
+    @Test
+    fun `test that checkIfNodeHasTheRequiredAccessLevelPermission return false when getMegaNode returns null`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val permission = AccessPermission.FULL
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
+            whenever(megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
+            val response =
+                underTest.checkIfNodeHasTheRequiredAccessLevelPermission(nodeId, permission)
+            assertThat(response).isFalse()
         }
 
     companion object {

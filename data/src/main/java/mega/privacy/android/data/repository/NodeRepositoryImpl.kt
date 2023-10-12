@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
+import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -48,7 +49,6 @@ import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -96,6 +96,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeUpdateMapper: NodeUpdateMapper,
     private val accessPermissionMapper: AccessPermissionMapper,
     private val nodeShareKeyResultMapper: NodeShareKeyResultMapper,
+    private val accessPermissionIntMapper: AccessPermissionIntMapper,
 ) : NodeRepository {
 
 
@@ -708,4 +709,14 @@ internal class NodeRepositoryImpl @Inject constructor(
                 megaApiGateway.getUserFromInShare(it, true)?.email
             }
         }
+
+    override suspend fun checkIfNodeHasTheRequiredAccessLevelPermission(
+        nodeId: NodeId,
+        level: AccessPermission,
+    ): Boolean = withContext(ioDispatcher) {
+        val accessLevel = accessPermissionIntMapper(level)
+        getMegaNodeByHandle(nodeId, true)?.let {
+            megaApiGateway.checkAccessErrorExtended(it, accessLevel).errorCode == MegaError.API_OK
+        } ?: false
+    }
 }

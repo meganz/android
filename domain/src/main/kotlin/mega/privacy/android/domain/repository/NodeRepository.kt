@@ -509,4 +509,22 @@ interface NodeRepository {
      * @return null if the node is not found
      */
     suspend fun getIncomingShareParentUserEmail(nodeId: NodeId): String?
+
+    /**
+     * Check if a node has an access level
+     *
+     * @param nodeId  Node to check
+     * @param level Access level to check
+     *              Valid values for this parameter are:
+     *              - AccessPermission.READ
+     *              - AccessPermission.READWRITE
+     *              - AccessPermission.FUL
+     *              - AccessPermission.OWNER
+     * @return true if node has the required access
+     *         false if node does not have the required access permission
+     */
+    suspend fun checkIfNodeHasTheRequiredAccessLevelPermission(
+        nodeId: NodeId,
+        level: AccessPermission,
+    ): Boolean
 }
