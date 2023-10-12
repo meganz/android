@@ -30,7 +30,7 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
@@ -3030,7 +3030,7 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override suspend fun getOfflineInformation(handle: Long): OfflineInformation? {
+    override suspend fun getOfflineInformation(handle: Long): Offline? {
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_HANDLE = '${encrypt(handle.toString())}'"
         try {
@@ -3044,7 +3044,7 @@ class SqliteDatabaseHandler @Inject constructor(
                     val type = decrypt(cursor.getString(5))
                     val incoming = cursor.getInt(6)
                     val handleIncoming = decrypt(cursor.getString(7))
-                    return OfflineInformation(
+                    return Offline(
                         id = id,
                         handle = nodeHandle.toString(),
                         path = path.toString(),
@@ -3062,22 +3062,22 @@ class SqliteDatabaseHandler @Inject constructor(
         return null
     }
 
-    override suspend fun saveOfflineInformation(offlineInformation: OfflineInformation): Long {
+    override suspend fun saveOfflineInformation(offline: Offline): Long {
         val values = ContentValues()
-        values.put(KEY_OFF_HANDLE, encrypt(offlineInformation.handle))
-        values.put(KEY_OFF_PATH, encrypt(offlineInformation.path))
-        values.put(KEY_OFF_NAME, encrypt(offlineInformation.name))
-        values.put(KEY_OFF_PARENT, offlineInformation.parentId)
-        values.put(KEY_OFF_TYPE, encrypt(offlineInformation.type))
-        values.put(KEY_OFF_INCOMING, offlineInformation.origin)
-        values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offlineInformation.handleIncoming))
+        values.put(KEY_OFF_HANDLE, encrypt(offline.handle))
+        values.put(KEY_OFF_PATH, encrypt(offline.path))
+        values.put(KEY_OFF_NAME, encrypt(offline.name))
+        values.put(KEY_OFF_PARENT, offline.parentId)
+        values.put(KEY_OFF_TYPE, encrypt(offline.type))
+        values.put(KEY_OFF_INCOMING, offline.origin)
+        values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.handleIncoming))
         return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
     }
 
     override suspend fun getOfflineInformationList(
         nodePath: String,
         searchQuery: String?,
-    ): List<OfflineInformation> {
+    ): List<Offline> {
         return if (!searchQuery.isNullOrEmpty()) {
             searchOfflineInformationByQuery(nodePath, searchQuery)
         } else {
@@ -3086,13 +3086,13 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     /**
-     * Search [OfflineInformation] by path
+     * Search [Offline] by path
      *
      * @param nodePath
-     * @return list of [OfflineInformation]
+     * @return list of [Offline]
      */
-    private fun searchOfflineInformationByPath(nodePath: String): List<OfflineInformation> {
-        val offlineInformationList = mutableListOf<OfflineInformation>()
+    private fun searchOfflineInformationByPath(nodePath: String): List<Offline> {
+        val offlineList = mutableListOf<Offline>()
         //Get the foreign key of the node
         val selectQuery =
             "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PATH = '${encrypt(nodePath)}'"
@@ -3108,8 +3108,8 @@ class SqliteDatabaseHandler @Inject constructor(
                         val type = decrypt(cursor.getString(5))
                         val incoming = cursor.getInt(6)
                         val handleIncoming = decrypt(cursor.getString(7))
-                        offlineInformationList.add(
-                            OfflineInformation(
+                        offlineList.add(
+                            Offline(
                                 id,
                                 handle.toString(),
                                 path.toString(),
@@ -3126,25 +3126,25 @@ class SqliteDatabaseHandler @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
         }
-        return offlineInformationList
+        return offlineList
     }
 
     /**
-     * Search [OfflineInformation] by query
+     * Search [Offline] by query
      *
      * @param path
      * @param searchQuery
-     * @return list of [OfflineInformation]
+     * @return list of [Offline]
      */
     private fun searchOfflineInformationByQuery(
         path: String,
         searchQuery: String,
-    ): List<OfflineInformation> {
-        val offlineInformationList = mutableListOf<OfflineInformation>()
+    ): List<Offline> {
+        val offlineList = mutableListOf<Offline>()
         val nodes = findByPath(path)
         for (node in nodes) {
             if (node.isFolder) {
-                offlineInformationList.addAll(
+                offlineList.addAll(
                     searchOfflineInformationByQuery(
                         getChildPath(node),
                         searchQuery
@@ -3160,8 +3160,8 @@ class SqliteDatabaseHandler @Inject constructor(
                     )
                 )
             ) {
-                offlineInformationList.add(
-                    OfflineInformation(
+                offlineList.add(
+                    Offline(
                         node.id,
                         node.handle,
                         node.path,
@@ -3174,7 +3174,7 @@ class SqliteDatabaseHandler @Inject constructor(
                 )
             }
         }
-        return offlineInformationList
+        return offlineList
     }
 
     /**

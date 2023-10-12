@@ -4,7 +4,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -278,8 +278,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getOfflineInformation(nodeHandle: Long) =
         dbHandler.getOfflineInformation(nodeHandle)
 
-    override suspend fun saveOfflineInformation(offlineInformation: OfflineInformation) {
-        dbHandler.saveOfflineInformation(offlineInformation)
+    override suspend fun saveOfflineInformation(offline: Offline) {
+        dbHandler.saveOfflineInformation(offline)
     }
 
     override suspend fun saveMyFirstName(firstName: String) =
@@ -329,7 +329,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun loadOfflineNodes(
         path: String,
         searchQuery: String?,
-    ): List<OfflineInformation> = dbHandler.getOfflineInformationList(path, searchQuery)
+    ): List<Offline> = dbHandler.getOfflineInformationList(path, searchQuery)
 
     override suspend fun findPendingMessagesNotSent(chatId: Long) =
         dbHandler.findPendingMessagesNotSent(chatId)

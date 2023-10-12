@@ -4,7 +4,7 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
@@ -245,28 +245,28 @@ interface DatabaseHandler {
      * @param handle
      * @return Offline information if available
      */
-    suspend fun getOfflineInformation(handle: Long): OfflineInformation?
+    suspend fun getOfflineInformation(handle: Long): Offline?
 
     /**
      * Save offline information
      *
-     * @param offlineInformation [OfflineInformation]
+     * @param offline [Offline]
      * @return the id of the inserted row
      */
-    suspend fun saveOfflineInformation(offlineInformation: OfflineInformation): Long
+    suspend fun saveOfflineInformation(offline: Offline): Long
 
     /**
-     * Get list of [OfflineInformation]
+     * Get list of [Offline]
      *
      * @param nodePath
      * @param searchQuery
      *
-     * @return List of [OfflineInformation]
+     * @return List of [Offline]
      */
     suspend fun getOfflineInformationList(
         nodePath: String,
         searchQuery: String?,
-    ): List<OfflineInformation>
+    ): List<Offline>
 
     /**
      * Gets pending messages.

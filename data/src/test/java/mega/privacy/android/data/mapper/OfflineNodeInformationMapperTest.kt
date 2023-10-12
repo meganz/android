@@ -1,9 +1,9 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.data.model.node.OfflineInformation
-import mega.privacy.android.data.model.node.OfflineInformation.Companion.FILE
-import mega.privacy.android.data.model.node.OfflineInformation.Companion.FOLDER
+import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.Offline.Companion.FILE
+import mega.privacy.android.domain.entity.Offline.Companion.FOLDER
 import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
@@ -22,7 +22,7 @@ internal class OfflineNodeInformationMapperTest {
     @ParameterizedTest(name = "folder node: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that incoming offline node contains correct values`(isFolderNode: Boolean) {
-        val origin = OfflineInformation.INCOMING
+        val origin = Offline.INCOMING
         val input = getInput(origin, isFolderNode)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
@@ -41,7 +41,7 @@ internal class OfflineNodeInformationMapperTest {
     fun `test that the backups offline node is the correct type and contains correct values`(
         isFolderNode: Boolean,
     ) {
-        val origin = OfflineInformation.BACKUPS
+        val origin = Offline.BACKUPS
         val input = getInput(origin, isFolderNode)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
@@ -58,7 +58,7 @@ internal class OfflineNodeInformationMapperTest {
     @ParameterizedTest(name = "folder node: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that a node with source OTHER returns the correct information`(isFolderNode: Boolean) {
-        val origin = OfflineInformation.OTHER
+        val origin = Offline.OTHER
         val input = getInput(origin, isFolderNode)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
@@ -71,7 +71,7 @@ internal class OfflineNodeInformationMapperTest {
         )
     }
 
-    private fun getInput(origin: Int, isFolderNode: Boolean) = OfflineInformation(
+    private fun getInput(origin: Int, isFolderNode: Boolean) = Offline(
         id = 1,
         handle = "handle",
         path = expectedPath,

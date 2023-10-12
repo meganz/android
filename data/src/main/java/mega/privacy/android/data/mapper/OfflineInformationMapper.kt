@@ -1,8 +1,8 @@
 package mega.privacy.android.data.mapper
 
-import mega.privacy.android.data.model.node.OfflineInformation
-import mega.privacy.android.data.model.node.OfflineInformation.Companion.FILE
-import mega.privacy.android.data.model.node.OfflineInformation.Companion.FOLDER
+import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.Offline.Companion.FILE
+import mega.privacy.android.domain.entity.Offline.Companion.FOLDER
 import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
@@ -13,7 +13,7 @@ internal class OfflineInformationMapper @Inject constructor() {
     internal operator fun invoke(
         offlineNode: OfflineNodeInformation,
         parentId: Int?,
-    ): OfflineInformation = OfflineInformation(
+    ): Offline = Offline(
         id = -1, // id is not known at this point will be generated when inserted to db
         handle = offlineNode.handle,
         path = offlineNode.path,
@@ -26,9 +26,9 @@ internal class OfflineInformationMapper @Inject constructor() {
 
     private fun OfflineNodeInformation.getOrigin() =
         when (this) {
-            is IncomingShareOfflineNodeInformation -> OfflineInformation.INCOMING
-            is BackupsOfflineNodeInformation -> OfflineInformation.BACKUPS
-            else -> OfflineInformation.OTHER
+            is IncomingShareOfflineNodeInformation -> Offline.INCOMING
+            is BackupsOfflineNodeInformation -> Offline.BACKUPS
+            else -> Offline.OTHER
         }
 
     private fun OfflineNodeInformation.getIncomingHandle() =

@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -28,7 +27,7 @@ import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
-import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
@@ -40,8 +39,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
@@ -400,8 +397,8 @@ class NodeRepositoryImplTest {
             val parenId = 1
             val parenNodeId = NodeId(2L)
             val offlineNodeInformation = mock<OtherOfflineNodeInformation>()
-            val mapped = mock<OfflineInformation>()
-            val offlineParentInformation = mock<OfflineInformation> {
+            val mapped = mock<Offline>()
+            val offlineParentInformation = mock<Offline> {
                 on { id }.thenReturn(parenId)
             }
             whenever(megaLocalStorageGateway.getOfflineInformation(parenNodeId.longValue))

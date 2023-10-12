@@ -1,9 +1,9 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.data.model.node.OfflineInformation
-import mega.privacy.android.data.model.node.OfflineInformation.Companion.FILE
-import mega.privacy.android.data.model.node.OfflineInformation.Companion.FOLDER
+import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.Offline.Companion.FILE
+import mega.privacy.android.domain.entity.Offline.Companion.FOLDER
 import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class OfflineInformationMapperTest {
+internal class OfflineMapperTest {
 
     private val expectedPath = "path"
     private val expectedName = "name"
@@ -32,20 +32,20 @@ internal class OfflineInformationMapperTest {
     fun `test mapping`() =
         listOf(true, false).flatMap { isFolderNode ->
             listOf(
-                OfflineInformation.INCOMING to IncomingShareOfflineNodeInformation(
+                Offline.INCOMING to IncomingShareOfflineNodeInformation(
                     path = expectedPath,
                     name = expectedName,
                     handle = expectedHandle,
                     incomingHandle = expectedIncomingHandle,
                     isFolder = isFolderNode,
                 ),
-                OfflineInformation.BACKUPS to BackupsOfflineNodeInformation(
+                Offline.BACKUPS to BackupsOfflineNodeInformation(
                     path = expectedPath,
                     name = expectedName,
                     handle = expectedHandle,
                     isFolder = isFolderNode,
                 ),
-                OfflineInformation.OTHER to OtherOfflineNodeInformation(
+                Offline.OTHER to OtherOfflineNodeInformation(
                     path = expectedPath,
                     name = expectedName,
                     handle = expectedHandle,
@@ -63,7 +63,7 @@ internal class OfflineInformationMapperTest {
             }
         }
 
-    private fun getExpected(origin: Int, isFolderNode: Boolean) = OfflineInformation(
+    private fun getExpected(origin: Int, isFolderNode: Boolean) = Offline(
         id = -1,
         handle = "handle",
         path = expectedPath,
@@ -71,6 +71,6 @@ internal class OfflineInformationMapperTest {
         parentId = parentId,
         type = if (isFolderNode) FOLDER else FILE,
         origin = origin,
-        handleIncoming = if (origin == OfflineInformation.INCOMING) expectedIncomingHandle else ""
+        handleIncoming = if (origin == Offline.INCOMING) expectedIncomingHandle else ""
     )
 }

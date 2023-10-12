@@ -3,7 +3,7 @@ package mega.privacy.android.data.gateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -486,14 +486,14 @@ interface MegaLocalStorageGateway {
      * @param nodeHandle
      * @return OfflineInformation if available, else null
      */
-    suspend fun getOfflineInformation(nodeHandle: Long): OfflineInformation?
+    suspend fun getOfflineInformation(nodeHandle: Long): Offline?
 
     /**
      * Save offline information
      *
-     * @param offlineInformation [OfflineInformation]
+     * @param offline [Offline]
      */
-    suspend fun saveOfflineInformation(offlineInformation: OfflineInformation)
+    suspend fun saveOfflineInformation(offline: Offline)
 
     /**
      * Save first name
@@ -600,12 +600,12 @@ interface MegaLocalStorageGateway {
      *
      * @param path
      * @param searchQuery
-     * @return List of [OfflineInformation]
+     * @return List of [Offline]
      */
     suspend fun loadOfflineNodes(
         path: String,
         searchQuery: String?,
-    ): List<OfflineInformation>
+    ): List<Offline>
 
     /**
      * Gets pending messages.

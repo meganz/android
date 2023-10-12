@@ -1,4 +1,4 @@
-package mega.privacy.android.data.model.node
+package mega.privacy.android.domain.entity
 
 
 /**
@@ -13,7 +13,7 @@ package mega.privacy.android.data.model.node
  * @property origin
  * @property handleIncoming
  */
-data class OfflineInformation(
+data class Offline(
     val id: Int,
     val handle: String,
     val path: String,

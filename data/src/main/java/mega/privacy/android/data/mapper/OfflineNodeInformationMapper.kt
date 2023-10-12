@@ -1,16 +1,16 @@
 package mega.privacy.android.data.mapper
 
-import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 
-internal typealias OfflineNodeInformationMapper = (@JvmSuppressWildcards OfflineInformation) -> @JvmSuppressWildcards OfflineNodeInformation
+internal typealias OfflineNodeInformationMapper = (@JvmSuppressWildcards Offline) -> @JvmSuppressWildcards OfflineNodeInformation
 
-internal fun toOfflineNodeInformation(offline: OfflineInformation): OfflineNodeInformation {
+internal fun toOfflineNodeInformation(offline: Offline): OfflineNodeInformation {
     return when (offline.origin) {
-        OfflineInformation.INCOMING -> IncomingShareOfflineNodeInformation(
+        Offline.INCOMING -> IncomingShareOfflineNodeInformation(
             path = offline.path,
             name = offline.name,
             handle = offline.handle,
@@ -18,7 +18,7 @@ internal fun toOfflineNodeInformation(offline: OfflineInformation): OfflineNodeI
             isFolder = offline.isFolder,
         )
 
-        OfflineInformation.BACKUPS -> BackupsOfflineNodeInformation(
+        Offline.BACKUPS -> BackupsOfflineNodeInformation(
             path = offline.path,
             name = offline.name,
             handle = offline.handle,
