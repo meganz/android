@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 75
+    const val DATABASE_VERSION = 76
 
     /**
      * Database Name
@@ -49,4 +49,9 @@ object MegaDatabaseConstant {
      * Table Camera Uploads Records
      */
     const val TABLE_CAMERA_UPLOADS_RECORDS = "camerauploadsrecords"
+
+    /**
+     * Table Offline
+     */
+    const val TABLE_OFFLINE = "offline"
 }

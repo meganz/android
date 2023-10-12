@@ -9,12 +9,14 @@ import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
+import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
@@ -27,6 +29,7 @@ import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
         SyncRecordEntity::class,
         SdTransferEntity::class,
         BackupEntity::class,
+        OfflineEntity::class
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -48,6 +51,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun sdTransferDao(): SdTransferDao
 
     abstract fun backupDao(): BackupDao
+
+    abstract fun offlineDao(): OfflineDao
 
     companion object {
         private val MIGRATION_67_68 = object : Migration(67, 68) {
@@ -106,12 +111,19 @@ internal abstract class MegaDatabase : RoomDatabase() {
                 }
             }
         }
+
+        private val MIGRATION_75_76 = object : Migration(75, 76) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
             MIGRATION_70_71,
             MIGRATION_71_72,
-            MIGRATION_74_75
+            MIGRATION_74_75,
+            MIGRATION_75_76
         )
     }
 }

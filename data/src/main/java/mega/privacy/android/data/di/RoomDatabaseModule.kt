@@ -18,6 +18,7 @@ import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import javax.inject.Named
@@ -87,4 +88,9 @@ internal object RoomDatabaseModule {
         val key = Settings.Secure.ANDROID_ID + "fkvn8 w4y*(NC\$G*(G($*GR*(#)*huio4h389\$G"
         return key.toByteArray().copyOfRange(0, 32)
     }
+
+    @Provides
+    @Singleton
+    internal fun provideOfflineDao(database: MegaDatabase): OfflineDao =
+        database.offlineDao()
 }

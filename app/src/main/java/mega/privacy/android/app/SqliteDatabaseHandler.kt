@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.LegacyDatabaseMigration
+import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_OFFLINE
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_SD_TRANSFERS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
@@ -3204,7 +3205,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val TABLE_PREFERENCES = "preferences"
         const val TABLE_CREDENTIALS = "credentials"
         const val TABLE_ATTRIBUTES = "attributes"
-        const val TABLE_OFFLINE = "offline"
         const val TABLE_CHAT_ITEMS = "chat"
         const val TABLE_NON_CONTACTS = "noncontacts"
         const val TABLE_CHAT_SETTINGS = "chatsettings"

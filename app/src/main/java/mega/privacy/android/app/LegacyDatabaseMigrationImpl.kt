@@ -29,7 +29,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
     override fun onCreate(db: SupportSQLiteDatabase) {
         Timber.d("onCreate")
         val CREATE_OFFLINE_TABLE =
-            "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_OFFLINE}(" +
+            "CREATE TABLE IF NOT EXISTS ${MegaDatabaseConstant.TABLE_OFFLINE}(" +
                     "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY, " +
                     "${SqliteDatabaseHandler.KEY_OFF_HANDLE} TEXT," +
                     "${SqliteDatabaseHandler.KEY_OFF_PATH} TEXT," +
@@ -247,9 +247,9 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
         //Used to identify when the Preferences table has been already recreated
         var preferencesAlreadyUpdated = false
         if (oldVersion <= 7) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_OFFLINE} ADD COLUMN ${SqliteDatabaseHandler.KEY_OFF_INCOMING} INTEGER;")
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_OFFLINE} ADD COLUMN ${SqliteDatabaseHandler.KEY_OFF_HANDLE_INCOMING} INTEGER;")
-            db.execSQL("UPDATE ${SqliteDatabaseHandler.TABLE_OFFLINE} SET ${SqliteDatabaseHandler.KEY_OFF_INCOMING} = '0';")
+            db.execSQL("ALTER TABLE ${MegaDatabaseConstant.TABLE_OFFLINE} ADD COLUMN ${SqliteDatabaseHandler.KEY_OFF_INCOMING} INTEGER;")
+            db.execSQL("ALTER TABLE ${MegaDatabaseConstant.TABLE_OFFLINE} ADD COLUMN ${SqliteDatabaseHandler.KEY_OFF_HANDLE_INCOMING} INTEGER;")
+            db.execSQL("UPDATE ${MegaDatabaseConstant.TABLE_OFFLINE} SET ${SqliteDatabaseHandler.KEY_OFF_INCOMING} = '0';")
         }
         if (oldVersion <= 8) {
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_LAST_UPLOAD_FOLDER} TEXT;")
@@ -883,7 +883,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
 
     private fun getOfflineFilesOld(db: SupportSQLiteDatabase): ArrayList<MegaOffline> {
         val listOffline = ArrayList<MegaOffline>()
-        val selectQuery = "SELECT * FROM ${SqliteDatabaseHandler.TABLE_OFFLINE}"
+        val selectQuery = "SELECT * FROM ${MegaDatabaseConstant.TABLE_OFFLINE}"
         try {
             db.query(selectQuery)?.use { cursor ->
                 if (cursor.moveToFirst()) {
@@ -1304,7 +1304,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 SqliteDatabaseHandler.encrypt(offline.handleIncoming)
             )
             return db.insert(
-                SqliteDatabaseHandler.TABLE_OFFLINE,
+                MegaDatabaseConstant.TABLE_OFFLINE,
                 SQLiteDatabase.CONFLICT_NONE,
                 values
             )
@@ -1325,7 +1325,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             values.put(SqliteDatabaseHandler.KEY_OFF_INCOMING, offline.origin)
             values.put(SqliteDatabaseHandler.KEY_OFF_HANDLE_INCOMING, offline.handleIncoming)
             return db.insert(
-                SqliteDatabaseHandler.TABLE_OFFLINE,
+                MegaDatabaseConstant.TABLE_OFFLINE,
                 SQLiteDatabase.CONFLICT_NONE,
                 values
             )
@@ -1341,7 +1341,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
     fun findByHandle(db: SupportSQLiteDatabase, handle: String?): MegaOffline? {
         //Get the foreign key of the node
         val selectQuery =
-            "SELECT * FROM ${SqliteDatabaseHandler.TABLE_OFFLINE} WHERE ${SqliteDatabaseHandler.KEY_OFF_HANDLE} = '${
+            "SELECT * FROM ${MegaDatabaseConstant.TABLE_OFFLINE} WHERE ${SqliteDatabaseHandler.KEY_OFF_HANDLE} = '${
                 SqliteDatabaseHandler.encrypt(
                     handle
                 )
@@ -1376,7 +1376,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
     }
 
     private fun clearOffline(db: SupportSQLiteDatabase) {
-        db.execSQL("DROP TABLE IF EXISTS ${SqliteDatabaseHandler.TABLE_OFFLINE}")
+        db.execSQL("DROP TABLE IF EXISTS ${MegaDatabaseConstant.TABLE_OFFLINE}")
         onCreate(db)
     }
 
