@@ -1476,25 +1476,24 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param throwable Throwable to check.
      * @return True if the Throwable has been managed, false otherwise.
      */
-    protected open fun manageCopyMoveException(throwable: Throwable?): Boolean =
-        when (throwable) {
-            is ForeignNodeException -> {
-                launchForeignNodeError()
-                true
-            }
-
-            is QuotaExceededMegaException -> {
-                launchOverQuota()
-                true
-            }
-
-            is NotEnoughQuotaMegaException -> {
-                launchPreOverQuota()
-                true
-            }
-
-            else -> false
+    protected open fun manageCopyMoveException(throwable: Throwable?): Boolean = when (throwable) {
+        is ForeignNodeException -> {
+            launchForeignNodeError()
+            true
         }
+
+        is QuotaExceededMegaException, is mega.privacy.android.domain.exception.QuotaExceededMegaException -> {
+            launchOverQuota()
+            true
+        }
+
+        is NotEnoughQuotaMegaException, is mega.privacy.android.domain.exception.NotEnoughQuotaMegaException -> {
+            launchPreOverQuota()
+            true
+        }
+
+        else -> false
+    }
 
     /**
      * Launches ManagerActivity intent to show over quota warning.

@@ -14,11 +14,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -56,6 +53,8 @@ import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import org.junit.jupiter.api.AfterAll
@@ -107,9 +106,8 @@ class ContactInfoViewModelTest {
     private var isChatConnectedToInitiateCallUseCase: IsChatConnectedToInitiateCallUseCase = mock()
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private var createShareKey: CreateShareKey = mock()
-    private var checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
-    private var legacyCopyNodeUseCase: LegacyCopyNodeUseCase = mock()
-    private var copyRequestMessageMapper: CopyRequestMessageMapper = mock()
+    private var checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
+    private val copyNodesUseCase: CopyNodesUseCase = mock()
     private var openOrStartCall: OpenOrStartCall = mock()
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
@@ -181,14 +179,13 @@ class ContactInfoViewModelTest {
             applicationScope = testScope,
             createShareKey = createShareKey,
             monitorNodeUpdates = monitorNodeUpdates,
-            checkNameCollisionUseCase = checkNameCollisionUseCase,
-            legacyCopyNodeUseCase = legacyCopyNodeUseCase,
-            copyRequestMessageMapper = copyRequestMessageMapper,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             monitorChatPresenceLastGreenUpdatesUseCase = monitorChatPresenceLastGreenUpdatesUseCase,
             isChatConnectedToInitiateCallUseCase = isChatConnectedToInitiateCallUseCase,
-            openOrStartCall = openOrStartCall
+            openOrStartCall = openOrStartCall,
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            copyNodesUseCase = copyNodesUseCase,
         )
     }
 
@@ -433,17 +430,6 @@ class ContactInfoViewModelTest {
             monitorNodeUpdates.emit(nodeUpdate)
             val newState = awaitItem()
             assertThat(newState.isNodeUpdated).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that when onConsumeIsTransferComplete is triggered state is updated`() = runTest {
-        initContactInfoOpenedFromContact()
-        verifyInitialData()
-        underTest.onConsumeIsTransferComplete()
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isTransferComplete).isFalse()
         }
     }
 

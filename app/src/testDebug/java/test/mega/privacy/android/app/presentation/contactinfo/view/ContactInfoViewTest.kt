@@ -78,7 +78,6 @@ class ContactInfoViewTest {
         isStorageOverQuota = false,
         isNodeUpdated = false,
         isCopyInProgress = false,
-        isTransferComplete = false,
         nameCollisions = emptyList(),
         copyError = null,
         inShares = emptyList(),
@@ -109,7 +108,8 @@ class ContactInfoViewTest {
         composeRule.onNodeWithText(fromId(R.string.title_properties_chat_share_contact))
             .assertExists()
         //VerifyCredentialsView
-        composeRule.onNodeWithText(fromId(R.string.contact_approve_credentials_toolbar_title)).assertExists()
+        composeRule.onNodeWithText(fromId(R.string.contact_approve_credentials_toolbar_title))
+            .assertExists()
         //SharedFilesView
         composeRule.onNodeWithText(fromId(R.string.title_chat_shared_files_info)).assertExists()
         //ManageChatHistoryView
@@ -134,7 +134,8 @@ class ContactInfoViewTest {
         composeRule.onNodeWithText(fromId(R.string.title_properties_chat_share_contact))
             .assertExists()
         //VerifyCredentialsView
-        composeRule.onNodeWithText(fromId(R.string.contact_approve_credentials_toolbar_title)).assertExists()
+        composeRule.onNodeWithText(fromId(R.string.contact_approve_credentials_toolbar_title))
+            .assertExists()
         //SharedFilesView
         composeRule.onNodeWithText(fromId(R.string.title_chat_shared_files_info))
             .assertDoesNotExist()
@@ -158,7 +159,8 @@ class ContactInfoViewTest {
     @Test
     fun `test that the unverified icon is shown when the credentials are verified`() {
         setupRule(ContactInfoState(contactItem = contactItem))
-        composeRule.onNodeWithText(R.string.contact_verify_credentials_not_verified_text).assertExists()
+        composeRule.onNodeWithText(R.string.contact_verify_credentials_not_verified_text)
+            .assertExists()
     }
 
     @Test

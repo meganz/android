@@ -1,11 +1,8 @@
 package mega.privacy.android.app.presentation.contactinfo
 
-import android.annotation.SuppressLint
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,20 +15,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.domain.entity.StorageState
@@ -39,13 +30,13 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.OnHold
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.Status
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.TermCodeType
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -70,6 +61,8 @@ import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import nz.mega.sdk.MegaNode
@@ -122,17 +115,16 @@ class ContactInfoViewModel @Inject constructor(
     private val createChatRoomUseCase: CreateChatRoomUseCase,
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val createShareKey: CreateShareKey,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
-    private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
     private val monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase,
     private val isChatConnectedToInitiateCallUseCase: IsChatConnectedToInitiateCallUseCase,
     private val openOrStartCall: OpenOrStartCall,
+    private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
+    private val copyNodesUseCase: CopyNodesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(ContactInfoState())
 
@@ -541,15 +533,6 @@ class ContactInfoViewModel @Inject constructor(
     }
 
     /**
-     * on Consume is transfer complete
-     */
-    fun onConsumeIsTransferComplete() {
-        viewModelScope.launch {
-            _state.update { it.copy(isTransferComplete = false) }
-        }
-    }
-
-    /**
      * on Consume copy exception
      */
     fun onConsumeCopyException() {
@@ -694,57 +677,44 @@ class ContactInfoViewModel @Inject constructor(
      * Verifies duplicate name is available in target folder
      * @param handles results from copy result launcher
      */
-    @SuppressLint("CheckResult")
-    fun checkCopyNameCollision(handles: Pair<LongArray, Long>?) {
+    fun checkCopyNameCollision(handles: Pair<LongArray, Long>?) = viewModelScope.launch {
         if (!isOnline()) {
             _state.update { it.copy(snackBarMessage = R.string.error_server_connection_problem) }
-            return
+            return@launch
         }
         val copyHandles = handles?.first
         val toHandle = handles?.second
-        if (copyHandles == null || toHandle == null) return
+        if (copyHandles == null || toHandle == null) return@launch
         _state.update { it.copy(isCopyInProgress = true) }
-        checkNameCollisionUseCase.checkHandleList(
-            copyHandles,
-            toHandle,
-            NameCollisionType.COPY,
-        ).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray> ->
-                    if (collisions.isNotEmpty()) {
-                        _state.update {
-                            it.copy(
-                                isCopyInProgress = false,
-                                nameCollisions = collisions,
-                            )
-                        }
-                    }
-                    if (handlesWithoutCollision.isNotEmpty()) {
-                        copyNodes(handlesWithoutCollision, toHandle)
-                    }
-                },
-                { throwable: Throwable -> Timber.e(throwable) }
+        runCatching {
+            checkNodesNameCollisionUseCase(
+                nodes = copyHandles.associateWith { toHandle },
+                type = NodeNameCollisionType.COPY
             )
-            .addTo(composite)
+        }.onSuccess { result ->
+            val collisions = result.conflictNodes.values.map {
+                NameCollision.Copy.getCopyCollision(it)
+            }
+            _state.update {
+                it.copy(isCopyInProgress = false, nameCollisions = collisions)
+            }
+            if (result.noConflictNodes.isNotEmpty()) {
+                copyNodes(result.noConflictNodes)
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
-    @SuppressLint("CheckResult")
-    private fun copyNodes(handlesWithoutCollision: LongArray, toHandle: Long) {
-        legacyCopyNodeUseCase.copy(handlesWithoutCollision, toHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { copyResult: CopyRequestResult?, copyThrowable: Throwable? ->
-                _state.update { it.copy(isCopyInProgress = false, isTransferComplete = true) }
-                if (copyThrowable == null) {
-                    _state.update {
-                        it.copy(snackBarMessageString = copyRequestMessageMapper(copyResult))
-                    }
-                } else {
-                    _state.update { it.copy(copyError = copyThrowable) }
-                }
-            }
-            .addTo(composite)
+    private suspend fun copyNodes(nodes: Map<Long, Long>) {
+        val result = runCatching {
+            copyNodesUseCase(nodes)
+        }.onFailure { error ->
+            Timber.e(error)
+        }
+        _state.update {
+            it.copy(moveRequestResult = result)
+        }
     }
 
     /**
@@ -754,6 +724,22 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun updateNickNameDialogVisibility(shouldShow: Boolean) {
         _state.update { it.copy(showUpdateAliasDialog = shouldShow) }
+    }
+
+    /**
+     * Mark handle node name collision result
+     *
+     */
+    fun markHandleNodeNameCollisionResult() {
+        _state.update { it.copy(nameCollisions = emptyList()) }
+    }
+
+    /**
+     * Mark handle move request result
+     *
+     */
+    fun markHandleMoveRequestResult() {
+        _state.update { it.copy(moveRequestResult = null) }
     }
 
     companion object {

@@ -6,6 +6,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.UnTypedNode
 
 /**
@@ -31,7 +32,6 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property isNodeUpdated                              Checks if incoming shares are updated
  * @property isCopyInProgress                           Checks if folder copy in progress
  * @property nameCollisions                             Checks if copy has name collisions
- * @property isTransferComplete                         checks if file transfer complete
  * @property copyError                                  Copy node error
  * @property shouldInitiateCall                         Initiates call with the contact
  * @property currentCallChatId                          Chat id of the call.
@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property enableCallLayout                           call button is enabled and disabled based on this
  * @property hasAlias                                   checks if user has nick name
  * @property showUpdateAliasDialog                      True, shows update nick name dialog to the user
+ * @property moveRequestResult
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -60,7 +61,6 @@ data class ContactInfoState(
     val isStorageOverQuota: Boolean = false,
     val isNodeUpdated: Boolean = false,
     val isCopyInProgress: Boolean = false,
-    val isTransferComplete: Boolean = false,
     val nameCollisions: List<NameCollision> = emptyList(),
     val copyError: Throwable? = null,
     val inShares: List<UnTypedNode> = emptyList(),
@@ -70,6 +70,7 @@ data class ContactInfoState(
     val currentCallVideoStatus: Boolean = false,
     val enableCallLayout: Boolean = true,
     val showUpdateAliasDialog: Boolean = false,
+    val moveRequestResult: Result<MoveRequestResult>? = null,
 ) {
 
     /**

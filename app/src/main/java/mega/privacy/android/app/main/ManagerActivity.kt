@@ -114,7 +114,6 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
-import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
@@ -247,8 +246,6 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
-import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -302,6 +299,8 @@ import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -5868,25 +5867,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    override fun manageCopyMoveException(throwable: Throwable?): Boolean {
-        return when (throwable) {
-            is ForeignNodeException -> {
-                launchForeignNodeError()
-                true
-            }
-
-            is QuotaExceededMegaException -> {
-                showOverQuotaAlert(false)
-                true
-            }
-
-            is NotEnoughQuotaMegaException -> {
-                showOverQuotaAlert(true)
-                true
-            }
-
-            else -> false
+    override fun manageCopyMoveException(throwable: Throwable?): Boolean = when (throwable) {
+        is ForeignNodeException -> {
+            launchForeignNodeError()
+            true
         }
+
+        is QuotaExceededMegaException -> {
+            showOverQuotaAlert(false)
+            true
+        }
+
+        is NotEnoughQuotaMegaException -> {
+            showOverQuotaAlert(true)
+            true
+        }
+
+        else -> false
     }
 
     @SuppressLint("CheckResult")

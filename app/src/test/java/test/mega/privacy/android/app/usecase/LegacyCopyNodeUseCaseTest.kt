@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
-import mega.privacy.android.app.usecase.CopyNodeListByHandleUseCase
 import mega.privacy.android.app.usecase.CopyNodeListUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
@@ -47,7 +46,6 @@ internal class LegacyCopyNodeUseCaseTest {
     private lateinit var megaApiFolderGateway: MegaApiFolderGateway
     private lateinit var getChatMessageUseCase: GetChatMessageUseCase
     private lateinit var copyNodeListUseCase: CopyNodeListUseCase
-    private lateinit var copyNodeListByHandleUseCase: CopyNodeListByHandleUseCase
     private lateinit var getNodeByHandle: GetNodeByHandle
     private lateinit var moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle
     private lateinit var accountRepository: AccountRepository
@@ -64,7 +62,6 @@ internal class LegacyCopyNodeUseCaseTest {
         megaApiFolderGateway = mock()
         getChatMessageUseCase = mock()
         copyNodeListUseCase = mock()
-        copyNodeListByHandleUseCase = mock()
         getNodeByHandle = mock()
         moveNodeToRubbishByHandle = mock()
         accountRepository = mock()
@@ -74,7 +71,6 @@ internal class LegacyCopyNodeUseCaseTest {
             megaApiFolderGateway = megaApiFolderGateway,
             getChatMessageUseCase = getChatMessageUseCase,
             copyNodeListUseCase = copyNodeListUseCase,
-            copyNodeListByHandleUseCase = copyNodeListByHandleUseCase,
             ioDispatcher = UnconfinedTestDispatcher(),
             moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
             accountRepository = accountRepository

@@ -33,7 +33,6 @@ import javax.inject.Inject
  * @property megaApiGateway             MegaApiGateway instance to copy nodes.
  * @property getChatMessageUseCase      Required for getting chat [MegaNode]s.
  * @property copyNodeListUseCase        copy list of mega nodes
- * @property copyNodeListByHandleUseCase
  * @property moveNodeToRubbishByHandle
  * @property ioDispatcher
  */
@@ -42,7 +41,6 @@ class LegacyCopyNodeUseCase @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val copyNodeListUseCase: CopyNodeListUseCase,
-    private val copyNodeListByHandleUseCase: CopyNodeListByHandleUseCase,
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
     private val accountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -222,16 +220,6 @@ class LegacyCopyNodeUseCase @Inject constructor(
             errorCount = errorCount
         ).also { resetAccountDetailsIfNeeded(it) }
     }
-
-    /**
-     * Copies nodes.
-     *
-     * @param handles           List of MegaNode handles to copy.
-     * @param newParentHandle   Parent MegaNode handle in which the nodes have to be copied.
-     * @return Single with the [CopyRequestResult].
-     */
-    fun copy(handles: LongArray, newParentHandle: Long): Single<CopyRequestResult> =
-        rxSingle { copyNodeListByHandleUseCase(handles.asList(), newParentHandle) }
 
     /**
      * Copies nodes.

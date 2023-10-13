@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.contactinfo
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -71,6 +70,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
@@ -82,6 +82,8 @@ import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -101,6 +103,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiJava
@@ -124,8 +127,17 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
+    /**
+     * Get theme mode
+     */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Move request message mapper
+     */
+    @Inject
+    lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
 
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
@@ -381,10 +393,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         configureFolderToCopyLauncher()
     }
 
-    @SuppressLint("CheckResult")
     private fun configureFolderToCopyLauncher() {
         selectFolderToCopyLauncher =
             registerForActivityResult(SelectFolderToCopyActivityContract()) { result ->
+                actionConfirmed()
                 viewModel.checkCopyNameCollision(handles = result)
             }
     }
@@ -928,15 +940,13 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             } else {
                 statusDialog?.dismiss()
             }
-
-            contactInfoState.copyError?.let {
-                manageCopyMoveException(contactInfoState.copyError)
-                viewModel.onConsumeCopyException()
-            }
-
             if (contactInfoState.nameCollisions.isNotEmpty()) {
-                nameCollisionActivityContract?.launch(ArrayList(contactInfoState.nameCollisions))
-                viewModel.onConsumeNameCollisions()
+                handleNodesNameCollisionResult(contactInfoState.nameCollisions)
+                viewModel.markHandleNodeNameCollisionResult()
+            }
+            if (contactInfoState.moveRequestResult != null) {
+                handleMovementResult(contactInfoState.moveRequestResult)
+                viewModel.markHandleMoveRequestResult()
             }
 
             if (contactInfoState.shouldInitiateCall) {
@@ -971,12 +981,33 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
+    private fun handleMovementResult(moveRequestResult: Result<MoveRequestResult>) {
+        AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
+        if (moveRequestResult.isSuccess) {
+            val data = moveRequestResult.getOrThrow()
+            showSnackbar(
+                Constants.SNACKBAR_TYPE,
+                moveRequestMessageMapper(data),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+        } else {
+            manageCopyMoveException(moveRequestResult.exceptionOrNull())
+        }
+    }
+
+    private fun handleNodesNameCollisionResult(conflictNodes: List<NameCollision>) {
+        if (conflictNodes.isNotEmpty()) {
+            statusDialog?.dismiss()
+            nameCollisionActivityContract?.launch(ArrayList(conflictNodes))
+        }
+    }
+
     /**
      * Open meeting
      */
     private fun launchCallScreen() {
         val chatId = waitingRoomManagementViewModel.state.value.chatId
-        MegaApplication.getInstance().openCallService(chatId);
+        MegaApplication.getInstance().openCallService(chatId)
         passcodeManagement.showPasscodeScreen = true
 
         val intent = Intent(this, MeetingActivity::class.java).apply {
@@ -1042,16 +1073,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     )
                 }
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
-            }
-
-            contactInfoState.isTransferComplete -> {
-                sharedFoldersFragment?.apply {
-                    if (isVisible) {
-                        clearSelections()
-                        hideMultipleSelect()
-                    }
-                }
-                viewModel.onConsumeIsTransferComplete()
             }
 
             contactInfoState.isNodeUpdated -> {
@@ -1431,11 +1452,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         moveToRubbish = false
         val intent = Intent(this, FileExplorerActivity::class.java)
         intent.action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-        val longArray = LongArray(handleList.size)
-        for (i in handleList.indices) {
-            longArray[i] = handleList[i]
-        }
-        intent.putExtra("MOVE_FROM", longArray)
+        intent.putExtra("MOVE_FROM", handleList.toLongArray())
         moveFolderIntentResultLauncher.launch(intent)
     }
 
@@ -1453,11 +1470,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Method responsible for copying files
      */
     fun showCopy(handleList: ArrayList<Long>) {
-        val longArray = LongArray(handleList.size)
-        for (i in handleList.indices) {
-            longArray[i] = handleList[i]
-        }
-        selectFolderToCopyLauncher.launch(longArray)
+        selectFolderToCopyLauncher.launch(handleList.toLongArray())
     }
 
     private fun setFoldersButtonText(nodes: List<UnTypedNode>) {
