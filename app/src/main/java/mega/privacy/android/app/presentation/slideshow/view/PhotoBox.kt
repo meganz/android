@@ -26,7 +26,7 @@ fun PhotoBox(
     enabled: Boolean = true,
     contentAlignment: Alignment = Alignment.Center,
     propagateMinConstraints: Boolean = false,
-    onTap: ((Offset) -> Unit),
+    onTap: ((Offset) -> Unit) = {},
     content: @Composable BoxScope.() -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()

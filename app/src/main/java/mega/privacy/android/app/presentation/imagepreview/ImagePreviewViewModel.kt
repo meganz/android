@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.imagepreview
 
+import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -17,11 +18,13 @@ import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuO
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
+import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,12 +42,15 @@ class ImagePreviewViewModel @Inject constructor(
     private val params: Bundle
         get() = savedStateHandle[FETCHER_PARAMS] ?: Bundle()
 
+    private val currentImageNodeId: Long
+        get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_ID] ?: 0L
+
     private val imagePreviewMenuSource: ImagePreviewMenuSource
         get() = savedStateHandle[IMAGE_PREVIEW_MENU_OPTIONS] ?: ImagePreviewMenuSource.TIMELINE
 
     private val _state = MutableStateFlow(
         ImagePreviewState(
-            currentPreviewPhotoId = NodeId(savedStateHandle[PARAMS_CURRENT_PREVIEW_ITEM_ID] ?: 0L),
+            currentImageNodeId = NodeId(currentImageNodeId),
         )
     )
 
@@ -113,14 +119,39 @@ class ImagePreviewViewModel @Inject constructor(
             node = typedNode,
             fullSize = true,
             highPriority = true,
-            resetDownloads = {}, // I don't know what is this for, lol.
-        )
+            resetDownloads = {},
+        ).catch { Timber.e("Failed to load image: $it") }
+    }
+
+    fun switchFullScreenMode() {
+        val inFullScreenMode = _state.value.inFullScreenMode
+        _state.update {
+            it.copy(
+                inFullScreenMode = !inFullScreenMode
+            )
+        }
+    }
+
+    fun setCurrentImageNodeId(nodeId: NodeId) {
+        _state.update {
+            it.copy(
+                currentImageNodeId = nodeId
+            )
+        }
+    }
+
+    fun getInfoText(
+        imageNode: ImageNode,
+        context: Context,
+    ): String {
+        val megaNode = MegaNode.unserialize(imageNode.serializedData)
+        return megaNode.getInfoText(context)
     }
 
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
         const val IMAGE_PREVIEW_MENU_OPTIONS = "image_preview_menu_options"
         const val FETCHER_PARAMS = "fetcher_params"
-        const val PARAMS_CURRENT_PREVIEW_ITEM_ID = "currentPreviewItemId"
+        const val PARAMS_CURRENT_IMAGE_NODE_ID = "currentImageNodeId"
     }
 }

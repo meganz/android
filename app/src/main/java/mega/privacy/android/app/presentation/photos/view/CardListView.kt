@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.view
 
+import mega.privacy.android.core.R as CoreUiR
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,9 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.DateCardCount
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 
 @Composable
@@ -48,9 +49,9 @@ fun CardListView(
 ) {
     val spanCount =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            DateCard.DateCardCount.Grid.portrait
+            DateCardCount.Grid.portrait
         } else {
-            DateCard.DateCardCount.Grid.landscape
+            DateCardCount.Grid.landscape
         }
 
     LazyVerticalGrid(

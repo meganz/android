@@ -49,7 +49,6 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
-import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_PREVIEW_ITEM_ID
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
@@ -660,9 +659,7 @@ class PhotosFragment : Fragment() {
                 val intent = ImagePreviewActivity.createIntent(
                     context = requireContext(),
                     imageSource = ImagePreviewFetcherSource.TIMELINE,
-                    params = mapOf(
-                        Pair(PARAMS_CURRENT_PREVIEW_ITEM_ID, photo.id)
-                    )
+                    currentImageNodeId = photo.id
                 )
                 startActivity(intent)
             } else {

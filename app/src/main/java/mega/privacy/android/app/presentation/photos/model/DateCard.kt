@@ -32,8 +32,8 @@ sealed class DateCard(
         override val key: String
             get() = date
     }
+}
 
-    enum class DateCardCount(val portrait: Int, val landscape: Int) {
-        Grid(1, 2)
-    }
+enum class DateCardCount(val portrait: Int, val landscape: Int) {
+    Grid(1, 2)
 }
