@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.domain.usecase.GetSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
@@ -27,6 +28,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val resumeSyncUseCase: ResumeSyncUseCase,
     private val pauseSyncUseCase: PauseSyncUseCase,
+    private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncFoldersState(emptyList()))
@@ -36,6 +38,12 @@ internal class SyncFoldersViewModel @Inject constructor(
         viewModelScope.launch {
             monitorSyncsUseCase()
                 .map(syncUiItemMapper::invoke)
+                .map { syncs ->
+                    val stalledIssues = getSyncStalledIssuesUseCase()
+                    syncs.map { sync ->
+                        sync.copy(hasStalledIssues = stalledIssues.any { it.localPath.contains(sync.deviceStoragePath) })
+                    }
+                }
                 .collectLatest { syncs ->
                     _state.update {
                         SyncFoldersState(syncs)

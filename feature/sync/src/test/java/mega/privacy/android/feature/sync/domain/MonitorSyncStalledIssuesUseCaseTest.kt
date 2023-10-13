@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
+import mega.privacy.android.feature.sync.domain.usecase.GetSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -30,8 +31,10 @@ import org.mockito.kotlin.whenever
 internal class MonitorSyncStalledIssuesUseCaseTest {
 
     private val syncRepository: SyncRepository = mock()
+    private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase = mock()
 
     private val underTest = MonitorSyncStalledIssuesUseCase(
+        getSyncStalledIssuesUseCase,
         syncRepository
     )
 
@@ -54,13 +57,14 @@ internal class MonitorSyncStalledIssuesUseCaseTest {
     fun resetAndTearDown() {
         Dispatchers.resetMain()
         reset(
+            getSyncStalledIssuesUseCase,
             syncRepository,
         )
     }
 
     @Test
     fun `test that syncs are refetched every time syncs change`() = runTest {
-        whenever(syncRepository.getSyncStalledIssues()).thenReturn(stalledIssues)
+        whenever(getSyncStalledIssuesUseCase()).thenReturn(stalledIssues)
         whenever(syncRepository.monitorSyncChanges()).thenReturn(
             flow {
                 emit(Unit)
@@ -70,12 +74,12 @@ internal class MonitorSyncStalledIssuesUseCaseTest {
 
         underTest().test { cancelAndIgnoreRemainingEvents() }
 
-        verify(syncRepository, times(3)).getSyncStalledIssues()
+        verify(getSyncStalledIssuesUseCase, times(3)).invoke()
     }
 
     @Test
     fun `test that correct stalled issues are returned`() = runTest {
-        whenever(syncRepository.getSyncStalledIssues()).thenReturn(stalledIssues)
+        whenever(getSyncStalledIssuesUseCase()).thenReturn(stalledIssues)
         whenever(syncRepository.monitorSyncChanges()).thenReturn(
             flow {
                 awaitCancellation()

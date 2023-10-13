@@ -8,12 +8,13 @@ import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import javax.inject.Inject
 
 internal class MonitorSyncStalledIssuesUseCase @Inject constructor(
+    private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase,
     private val syncRepository: SyncRepository,
 ) {
 
     suspend operator fun invoke(): Flow<List<StalledIssue>> =
         syncRepository
             .monitorSyncChanges()
-            .map { syncRepository.getSyncStalledIssues() }
-            .onStart { emit(syncRepository.getSyncStalledIssues()) }
+            .map { getSyncStalledIssuesUseCase() }
+            .onStart { emit(getSyncStalledIssuesUseCase()) }
 }

@@ -40,6 +40,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 internal fun SyncCard(
     folderPairName: String,
     status: SyncStatus,
+    hasStalledIssues: Boolean,
     deviceStoragePath: String,
     megaStoragePath: String,
     method: String,
@@ -67,7 +68,8 @@ internal fun SyncCard(
         SyncCardHeader(
             folderPairName,
             status,
-            expanded,
+            hasStalledIssues = hasStalledIssues,
+            expanded = expanded,
             expandClicked
         )
 
@@ -82,7 +84,7 @@ internal fun SyncCard(
                 SyncStatus.SYNCING,
                 SyncStatus.SYNCED
             ),
-            isError = status == SyncStatus.ERROR,
+            isError = hasStalledIssues,
             pauseRunClicked,
             removeFolderClicked
         )
@@ -93,6 +95,7 @@ internal fun SyncCard(
 private fun SyncCardHeader(
     folderPairName: String,
     status: SyncStatus,
+    hasStalledIssues: Boolean,
     expanded: Boolean,
     expandClicked: () -> Unit,
 ) {
@@ -123,10 +126,10 @@ private fun SyncCardHeader(
                         .height(20.dp)
                 ) {
                     Image(
-                        painter = when (status) {
-                            SyncStatus.SYNCING -> painterResource(R.drawable.ic_sync_02)
-                            SyncStatus.PAUSED -> painterResource(R.drawable.ic_pause)
-                            SyncStatus.ERROR -> painterResource(R.drawable.ic_alert_circle)
+                        painter = when {
+                            hasStalledIssues -> painterResource(R.drawable.ic_alert_circle)
+                            status == SyncStatus.SYNCING -> painterResource(R.drawable.ic_sync_02)
+                            status == SyncStatus.PAUSED -> painterResource(R.drawable.ic_pause)
                             else -> painterResource(R.drawable.ic_check_circle)
                         },
                         contentDescription = null,
@@ -134,22 +137,22 @@ private fun SyncCardHeader(
                             .padding(end = 8.dp)
                             .align(Alignment.CenterVertically)
                             .size(16.dp),
-                        colorFilter = if (status == SyncStatus.ERROR) {
+                        colorFilter = if (hasStalledIssues) {
                             ColorFilter.tint(MaterialTheme.colors.error)
                         } else {
                             ColorFilter.tint(MaterialTheme.colors.textColorPrimary)
                         },
                     )
                     Text(
-                        text = when (status) {
-                            SyncStatus.SYNCING -> "Syncing..."
-                            SyncStatus.PAUSED -> "Paused"
-                            SyncStatus.ERROR -> "Failed"
+                        text = when {
+                            hasStalledIssues -> "Failed"
+                            status == SyncStatus.SYNCING -> "Syncing..."
+                            status == SyncStatus.PAUSED -> "Paused"
                             else -> "Synced"
                         },
                         Modifier.align(Alignment.CenterVertically),
                         style = MaterialTheme.typography.body2.copy(
-                            color = if (status == SyncStatus.ERROR) {
+                            color = if (hasStalledIssues) {
                                 MaterialTheme.colors.error
                             } else {
                                 MaterialTheme.colors.textColorPrimary
@@ -306,6 +309,7 @@ private fun SyncCardExpandedPreview() {
         SyncCard(
             folderPairName = "Competitors documentation",
             status = SyncStatus.SYNCING,
+            hasStalledIssues = false,
             deviceStoragePath = "/storage/emulated/0/Download",
             megaStoragePath = "/Root/Competitors documentation",
             method = "Two-way",
@@ -324,6 +328,7 @@ private fun SyncCardCollapsedPreview() {
         SyncCard(
             folderPairName = "Competitors documentation",
             status = SyncStatus.SYNCING,
+            hasStalledIssues = false,
             deviceStoragePath = "/storage/emulated/0/Download",
             megaStoragePath = "/Root/Competitors documentation",
             method = "Two-way",

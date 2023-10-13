@@ -14,6 +14,7 @@ internal class SyncUiItemMapper @Inject constructor() {
             folderPair.id,
             folderPair.pairName,
             folderPair.syncStatus,
+            hasStalledIssues = false,
             folderPair.localFolderPath,
             folderPair.remoteFolder.name,
             "Two-way sync",

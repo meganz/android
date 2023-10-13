@@ -12,5 +12,4 @@ enum class SyncStatus {
     SYNCING,
     SYNCED,
     PAUSED,
-    ERROR
 }

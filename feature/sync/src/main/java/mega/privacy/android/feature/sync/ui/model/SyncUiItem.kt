@@ -6,6 +6,7 @@ internal data class SyncUiItem(
     val id: Long,
     val folderPairName: String,
     val status: SyncStatus,
+    val hasStalledIssues: Boolean,
     val deviceStoragePath: String,
     val megaStoragePath: String,
     val method: String,

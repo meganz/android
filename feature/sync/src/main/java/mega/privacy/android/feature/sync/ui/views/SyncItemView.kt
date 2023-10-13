@@ -18,6 +18,7 @@ internal fun SyncItemView(
         modifier = modifier,
         folderPairName = sync.folderPairName,
         status = sync.status,
+        hasStalledIssues = sync.hasStalledIssues,
         deviceStoragePath = sync.deviceStoragePath,
         megaStoragePath = sync.megaStoragePath,
         method = sync.method,

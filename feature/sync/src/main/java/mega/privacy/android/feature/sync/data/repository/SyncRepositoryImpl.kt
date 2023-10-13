@@ -1,15 +1,19 @@
 package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
@@ -28,6 +32,7 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val folderPairMapper: FolderPairMapper,
     private val stalledIssuesMapper: StalledIssuesMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncRepository {
 
     override suspend fun setupFolderPair(
@@ -87,6 +92,7 @@ internal class SyncRepositoryImpl @Inject constructor(
             syncGateway.monitorOnSyncStateChanged()
         ).map { Unit }
             .flowOn(ioDispatcher)
+            .shareIn(appScope, SharingStarted.WhileSubscribed())
 
     private fun getOnGlobalSyncStateChangedFlow(): Flow<GlobalUpdate.OnGlobalSyncStateChanged> =
         megaApiGateway
