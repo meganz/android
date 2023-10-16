@@ -192,9 +192,15 @@ private fun ImagePreviewContent(
                 )
             }
 
+            val imageThumbnailPath by produceState<String?>(initialValue = null) {
+                downloadImage(currentImageNode).collectLatest { imageResult ->
+                    value = imageResult.getLowestResolutionAvailableUri()
+                }
+            }
+
             ImagePreviewBottomSheet(
                 modalSheetState = modalSheetState,
-                imageThumbnailPath = currentImageNode.thumbnailPath,
+                imageThumbnailPath = imageThumbnailPath,
                 imageName = currentImageNode.name,
                 imageInfo = currentImageNodeInfo,
             ) {
@@ -236,8 +242,7 @@ private fun ImageContent(
 ) {
     val imageState by produceState<String?>(initialValue = null) {
         downloadImage(imageNode).collectLatest { imageResult ->
-            value = imageResult.fullSizeUri ?: imageResult.previewUri
-                    ?: imageResult.thumbnailUri
+            value = imageResult.getHighestResolutionAvailableUri()
         }
     }
 
