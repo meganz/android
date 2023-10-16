@@ -34,8 +34,10 @@ internal class ChatFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.state.collectAsStateWithLifecycle()
+
             AndroidTheme(isDark = mode.isDarkMode()) {
-                ChatView()
+                ChatView(uiState)
             }
         }
     }
