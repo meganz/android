@@ -55,7 +55,6 @@ import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.ContactController
-import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment
@@ -1268,34 +1267,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     /**
-     * Shows dialog to confirm create a chat link
-     */
-    fun showConfirmationCreateChatLinkDialog() {
-        Timber.d("showConfirmationCreateChatLinkDialog")
-        val dialogBuilder = MaterialAlertDialogBuilder(this)
-        val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.dialog_chat_link_options, null)
-        dialogBuilder.setView(dialogView)
-        val actionButton = dialogView.findViewById<Button>(R.id.chat_link_button_action)
-        actionButton.text = getString(R.string.get_chat_link_option)
-        val title = dialogView.findViewById<TextView>(R.id.chat_link_title)
-        title.text = getString(R.string.get_chat_link_option)
-        val firstText = dialogView.findViewById<TextView>(R.id.text_chat_link)
-        firstText.text = getString(R.string.context_create_chat_link_warning_text)
-        val params = firstText.layoutParams as LinearLayout.LayoutParams
-        params.bottomMargin = Util.scaleHeightPx(12, outMetrics)
-        firstText.layoutParams = params
-        chatLinkDialog = dialogBuilder.create()
-
-        actionButton.setOnClickListener {
-            chatLinkDialog?.dismiss()
-            createPublicGroupAndGetLink()
-        }
-
-        chatLinkDialog?.show()
-    }
-
-    /**
      * Start conversation with participant
      *
      * @param handle The user handle.
@@ -1313,46 +1284,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
             intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
             this.startActivity(intentOpenChat)
-        }
-    }
-
-    private fun createPublicGroupAndGetLink() = chat?.let { chatRoom ->
-        val participantsCount = chatRoom.peerCount
-        val peers = MegaChatPeerList.createInstance()
-
-        for (i in 0 until participantsCount) {
-            Timber.d(
-                "Add participant: %d, privilege: %d",
-                chatRoom.getPeerHandle(i),
-                chatRoom.getPeerPrivilege(
-                    i
-                )
-            )
-            peers.addPeer(chatRoom.getPeerHandle(i), chatRoom.getPeerPrivilege(i))
-        }
-        val listener = CreateGroupChatWithPublicLink(this, ChatUtil.getTitleChat(chatRoom))
-        megaChatApi.createPublicChat(peers, ChatUtil.getTitleChat(chatRoom), listener)
-    }
-
-    /**
-     * Shows the new chat created or an error if it was not possible to create it
-     *
-     * @param errorCode Error code of the request.
-     * @param chatHandle The chat Id.
-     * @param publicLink Link of the chat.
-     */
-    fun onRequestFinishCreateChat(errorCode: Int, chatHandle: Long, publicLink: Boolean) {
-        if (errorCode == MegaChatError.ERROR_OK) {
-            val intent = Intent(this, ChatActivity::class.java)
-            intent.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            intent.putExtra(Constants.CHAT_ID, chatHandle)
-            if (publicLink) {
-                intent.putExtra("PUBLIC_LINK", errorCode)
-            }
-            this.startActivity(intent)
-        } else {
-            Timber.e("ERROR WHEN CREATING CHAT %s", errorCode)
-            showSnackbar(getString(R.string.create_chat_error))
         }
     }
 

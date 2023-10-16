@@ -17,7 +17,6 @@ import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -67,8 +66,6 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                     ((FileExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode());
                 } else if (context instanceof ChatExplorerActivity) {
                     ((ChatExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
-                } else if (context instanceof GroupChatInfoActivity) {
-                    ((GroupChatInfoActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
                 }
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
@@ -90,8 +87,6 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                         ((FileExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode());
                     } else if (context instanceof ChatExplorerActivity) {
                         ((ChatExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
-                    } else if (context instanceof GroupChatInfoActivity) {
-                        ((GroupChatInfoActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
                     }
                 }
             }
