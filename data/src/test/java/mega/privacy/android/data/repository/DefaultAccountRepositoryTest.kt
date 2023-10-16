@@ -886,7 +886,7 @@ class DefaultAccountRepositoryTest {
             verify(localStorageGateway).clearCredentials()
             verify(localStorageGateway).clearPreferences()
             verify(localStorageGateway).setFirstTime(false)
-            verify(localStorageGateway).clearOffline()
+            verify(megaLocalRoomGateway).clearOffline()
             verify(localStorageGateway).clearContacts()
             verify(localStorageGateway).clearNonContacts()
             verify(localStorageGateway).clearChatItems()

@@ -240,22 +240,6 @@ interface DatabaseHandler {
     fun findContactByEmail(mail: String?): Contact?
 
     /**
-     * Get offline information
-     *
-     * @param handle
-     * @return Offline information if available
-     */
-    suspend fun getOfflineInformation(handle: Long): Offline?
-
-    /**
-     * Save offline information
-     *
-     * @param offline [Offline]
-     * @return the id of the inserted row
-     */
-    suspend fun saveOfflineInformation(offline: Offline): Long
-
-    /**
      * Get list of [Offline]
      *
      * @param nodePath

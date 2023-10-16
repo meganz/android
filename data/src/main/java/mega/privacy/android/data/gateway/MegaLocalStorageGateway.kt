@@ -473,29 +473,6 @@ interface MegaLocalStorageGateway {
     suspend fun getChatFilesFolderHandle(): Long?
 
     /**
-     * Is offline information available
-     *
-     * @param nodeHandle
-     * @return true if available, else false
-     */
-    suspend fun isOfflineInformationAvailable(nodeHandle: Long): Boolean
-
-    /**
-     * Get offline information
-     *
-     * @param nodeHandle
-     * @return OfflineInformation if available, else null
-     */
-    suspend fun getOfflineInformation(nodeHandle: Long): Offline?
-
-    /**
-     * Save offline information
-     *
-     * @param offline [Offline]
-     */
-    suspend fun saveOfflineInformation(offline: Offline)
-
-    /**
      * Save first name
      * @param firstName first name
      */
@@ -564,11 +541,6 @@ interface MegaLocalStorageGateway {
      * Get first time
      */
     suspend fun getFirstTime(): Boolean?
-
-    /**
-     * Clears offline files.
-     */
-    suspend fun clearOffline()
 
     /**
      * Clears contacts.

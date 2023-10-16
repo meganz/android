@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -449,4 +450,32 @@ interface MegaLocalRoomGateway {
      * Delete All backups from the backups table
      */
     suspend fun deleteAllBackups()
+
+    /**
+     * Is offline information available
+     *
+     * @param nodeHandle
+     * @return true if available, else false
+     */
+    suspend fun isOfflineInformationAvailable(nodeHandle: Long): Boolean
+
+    /**
+     * Get offline information
+     *
+     * @param nodeHandle
+     * @return OfflineInformation if available, else null
+     */
+    suspend fun getOfflineInformation(nodeHandle: Long): Offline?
+
+    /**
+     * Save offline information
+     *
+     * @param offline [Offline]
+     */
+    suspend fun saveOfflineInformation(offline: Offline)
+
+    /**
+     * Clears offline files.
+     */
+    suspend fun clearOffline()
 }

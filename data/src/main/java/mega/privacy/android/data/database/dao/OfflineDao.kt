@@ -20,4 +20,13 @@ internal interface OfflineDao {
 
     @Query("DELETE FROM offline")
     suspend fun deleteAllOffline()
+
+    @Query("SELECT * FROM offline where path = :path")
+    fun getOfflineByPath(path: String): Flow<List<OfflineEntity>>
+
+    @Query("SELECT * FROM offline where name = :name")
+    fun getOfflineByName(name: String): Flow<List<OfflineEntity>>
+
+    @Query("SELECT * FROM offline where path = :path AND name = :name")
+    fun getOfflineByNameAndPath(path: String, name: String): Flow<List<OfflineEntity>>
 }

@@ -1188,6 +1188,7 @@ class SqliteDatabaseHandler @Inject constructor(
             values.put(KEY_OFF_TYPE, encrypt(offline.type))
             values.put(KEY_OFF_INCOMING, offline.origin)
             values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.handleIncoming))
+            values.put(KEY_OFF_LAST_MODIFIED_TIME, System.currentTimeMillis())
             return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
         }
         return -1
@@ -3028,53 +3029,6 @@ class SqliteDatabaseHandler @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
         }
-    }
-
-    override suspend fun getOfflineInformation(handle: Long): Offline? {
-        val selectQuery =
-            "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_HANDLE = '${encrypt(handle.toString())}'"
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val id = cursor.getString(0).toInt()
-                    val nodeHandle = decrypt(cursor.getString(1))
-                    val path = decrypt(cursor.getString(2))
-                    val name = decrypt(cursor.getString(3))
-                    val parent = cursor.getInt(4)
-                    val type = decrypt(cursor.getString(5))
-                    val incoming = cursor.getInt(6)
-                    val handleIncoming = decrypt(cursor.getString(7))
-                    val lastModifiedTime = cursor.getLong(8)
-                    return Offline(
-                        id = id,
-                        handle = nodeHandle.toString(),
-                        path = path.toString(),
-                        name = name.toString(),
-                        parentId = parent,
-                        type = type,
-                        origin = incoming,
-                        handleIncoming = handleIncoming.toString(),
-                        lastModifiedTime = lastModifiedTime
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
-    }
-
-    override suspend fun saveOfflineInformation(offline: Offline): Long {
-        val values = ContentValues()
-        values.put(KEY_OFF_HANDLE, encrypt(offline.handle))
-        values.put(KEY_OFF_PATH, encrypt(offline.path))
-        values.put(KEY_OFF_NAME, encrypt(offline.name))
-        values.put(KEY_OFF_PARENT, offline.parentId)
-        values.put(KEY_OFF_TYPE, encrypt(offline.type))
-        values.put(KEY_OFF_INCOMING, offline.origin)
-        values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.handleIncoming))
-        values.put(KEY_OFF_LAST_MODIFIED_TIME, System.currentTimeMillis())
-        return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
     }
 
     override suspend fun getOfflineInformationList(

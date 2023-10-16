@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -94,6 +95,7 @@ class NodeRepositoryImplTest {
     private val accessPermissionIntMapper: AccessPermissionIntMapper = AccessPermissionIntMapper()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
     private val fetChildrenMapper = mock<FetchChildrenMapper>()
+    private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
 
     private val nodeMapper: NodeMapper = NodeMapper(
         fileNodeMapper = FileNodeMapper(
@@ -131,6 +133,7 @@ class NodeRepositoryImplTest {
             accessPermissionMapper = accessPermissionMapper,
             nodeShareKeyResultMapper = nodeShareKeyResultMapper,
             accessPermissionIntMapper = accessPermissionIntMapper,
+            megaLocalRoomGateway = megaLocalRoomGateway
         )
     }
 
@@ -404,13 +407,13 @@ class NodeRepositoryImplTest {
             val offlineParentInformation = mock<Offline> {
                 on { id }.thenReturn(parenId)
             }
-            whenever(megaLocalStorageGateway.getOfflineInformation(parenNodeId.longValue))
+            whenever(megaLocalRoomGateway.getOfflineInformation(parenNodeId.longValue))
                 .thenReturn(offlineParentInformation)
             whenever(offlineInformationMapper(offlineNodeInformation, parenId)).thenReturn(mapped)
 
             underTest.saveOfflineNodeInformation(offlineNodeInformation, parenNodeId)
 
-            verify(megaLocalStorageGateway).saveOfflineInformation(mapped)
+            verify(megaLocalRoomGateway).saveOfflineInformation(mapped)
         }
 
     @Test
@@ -419,7 +422,7 @@ class NodeRepositoryImplTest {
             val parenNodeId = NodeId(2L)
             val offlineNodeInformation = mock<OtherOfflineNodeInformation>()
 
-            whenever(megaLocalStorageGateway.getOfflineInformation(parenNodeId.longValue))
+            whenever(megaLocalRoomGateway.getOfflineInformation(parenNodeId.longValue))
                 .thenReturn(null)
 
             assertThrows<IllegalArgumentException> {

@@ -22,6 +22,7 @@ internal class OfflineInformationMapper @Inject constructor() {
         type = if (offlineNode.isFolder) FOLDER else FILE,
         origin = offlineNode.getOrigin(),
         handleIncoming = offlineNode.getIncomingHandle(),
+        lastModifiedTime = offlineNode.lastModifiedTime ?: System.currentTimeMillis()
     )
 
     private fun OfflineNodeInformation.getOrigin() =

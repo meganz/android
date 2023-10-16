@@ -8,6 +8,7 @@ import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -20,12 +21,15 @@ import mega.privacy.android.data.mapper.camerauploads.SyncRecordModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
+import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -63,6 +67,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
     private val encryptData: EncryptData,
     private val decryptData: DecryptData,
+    private val offlineDao: OfflineDao,
+    private val offlineModelMapper: OfflineModelMapper,
+    private val offlineEntityMapper: OfflineEntityMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.insertOrUpdateContact(contactEntityMapper(contact))
@@ -429,6 +436,20 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteAllBackups() {
         backupDao.deleteAllBackups()
     }
+
+    override suspend fun isOfflineInformationAvailable(nodeHandle: Long) =
+        offlineDao.getOfflineByHandle("${encryptData("$nodeHandle")}") != null
+
+    override suspend fun getOfflineInformation(nodeHandle: Long) =
+        offlineDao.getOfflineByHandle("${encryptData("$nodeHandle")}")?.let {
+            offlineModelMapper(it)
+        }
+
+    override suspend fun saveOfflineInformation(offline: Offline) {
+        offlineEntityMapper(offline).let { offlineDao.insertOrUpdateOffline(it) }
+    }
+
+    override suspend fun clearOffline() = offlineDao.deleteAllOffline()
 
     companion object {
         private const val MAX_COMPLETED_TRANSFER_ROWS = 100

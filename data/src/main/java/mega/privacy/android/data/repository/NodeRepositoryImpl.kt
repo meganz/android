@@ -14,6 +14,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -97,6 +98,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val accessPermissionMapper: AccessPermissionMapper,
     private val nodeShareKeyResultMapper: NodeShareKeyResultMapper,
     private val accessPermissionIntMapper: AccessPermissionIntMapper,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway
 ) : NodeRepository {
 
 
@@ -290,7 +292,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getOfflineNodeInformation(nodeId: NodeId) =
         withContext(ioDispatcher) {
-            megaLocalStorageGateway.getOfflineInformation(nodeId.longValue)
+            megaLocalRoomGateway.getOfflineInformation(nodeId.longValue)
                 ?.let { offlineNodeInformationMapper(it) }
         }
 
@@ -299,10 +301,10 @@ internal class NodeRepositoryImpl @Inject constructor(
         parentNodeId: NodeId?,
     ) = withContext(ioDispatcher) {
         val parent = parentNodeId?.let { parentId ->
-            megaLocalStorageGateway.getOfflineInformation(parentId.longValue)
+            megaLocalRoomGateway.getOfflineInformation(parentId.longValue)
                 ?: throw IllegalArgumentException("Parent offline information must have been previously saved in order to have a consistent hierarchy. ParentId: ${parentId.longValue}")
         }
-        megaLocalStorageGateway.saveOfflineInformation(
+        megaLocalRoomGateway.saveOfflineInformation(
             offlineInformationMapper(offlineNodeInformation, parent?.id)
         )
     }
@@ -313,7 +315,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getOfflineNodeInformation(nodeHandle: Long) =
         withContext(ioDispatcher) {
-            megaLocalStorageGateway.getOfflineInformation(nodeHandle)
+            megaLocalRoomGateway.getOfflineInformation(nodeHandle)
                 ?.let { offlineNodeInformationMapper(it) }
         }
 

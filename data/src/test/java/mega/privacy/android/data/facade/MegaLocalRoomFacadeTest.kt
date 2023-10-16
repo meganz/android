@@ -11,6 +11,7 @@ import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.entity.BackupEntity
@@ -26,6 +27,8 @@ import mega.privacy.android.data.mapper.camerauploads.SyncRecordModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
+import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
@@ -81,6 +84,9 @@ internal class MegaLocalRoomFacadeTest {
     private val backupEntityMapper = mock<BackupEntityMapper>()
     private val backupModelMapper = mock<BackupModelMapper>()
     private val backupInfoTypeIntMapper = mock<BackupInfoTypeIntMapper>()
+    private val offlineDao: OfflineDao = mock()
+    private val offlineModelMapper: OfflineModelMapper = mock()
+    private val offlineEntityMapper: OfflineEntityMapper = mock()
 
     @BeforeAll
     fun setUp() {
@@ -107,6 +113,9 @@ internal class MegaLocalRoomFacadeTest {
             backupEntityMapper = backupEntityMapper,
             backupModelMapper = backupModelMapper,
             backupInfoTypeIntMapper = backupInfoTypeIntMapper,
+            offlineDao = offlineDao,
+            offlineEntityMapper = offlineEntityMapper,
+            offlineModelMapper = offlineModelMapper
         )
     }
 
