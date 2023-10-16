@@ -24,7 +24,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,7 +35,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -273,9 +271,6 @@ class FileBrowserComposeFragment : Fragment() {
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             fileBrowserViewModel.refreshNodes()
         })
-
-        LiveEventBus.get(EventConstants.EVENT_SHOW_MEDIA_DISCOVERY, Boolean::class.java)
-            .observe(this) { isFromFolderLink -> if (!isFromFolderLink) showMediaDiscovery(true) }
     }
 
     /**
