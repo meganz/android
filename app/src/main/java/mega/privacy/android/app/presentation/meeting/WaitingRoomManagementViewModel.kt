@@ -109,18 +109,16 @@ class WaitingRoomManagementViewModel @Inject constructor(
                         )
                     }
 
-                    if (!state.value.isDialogClosed) {
-                        peers?.let { peersInWaitingRoom ->
-                            val peersNonHost = peersInWaitingRoom.filterNot {
-                                call.moderators?.contains(it) ?: false
-                            }
-
-                            setTemporaryUsersList(users = peersNonHost)
-                            checkWaitingRoomParticipants(
-                                chatId = call.chatId,
-                                shouldDialogBeShown = true
-                            )
+                    peers?.let { peersInWaitingRoom ->
+                        val peersNonHost = peersInWaitingRoom.filterNot {
+                            call.moderators?.contains(it) ?: false
                         }
+
+                        setTemporaryUsersList(users = peersNonHost)
+                        checkWaitingRoomParticipants(
+                            chatId = call.chatId,
+                            shouldDialogBeShown = !state.value.isDialogClosed,
+                        )
                     }
                 }
             }
@@ -406,7 +404,8 @@ class WaitingRoomManagementViewModel @Inject constructor(
         setShowParticipantsInWaitingRoomDialogConsumed()
         setShowDenyParticipantDialogConsumed()
 
-        if (state.value.usersInWaitingRoomIDs.isEmpty()) return
+        if (state.value.usersInWaitingRoomIDs.isEmpty())
+            return
 
         viewModelScope.launch {
             val list = if (chatParticipant == null) state.value.usersInWaitingRoomIDs else listOf(
