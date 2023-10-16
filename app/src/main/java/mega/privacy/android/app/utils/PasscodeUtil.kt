@@ -23,6 +23,7 @@ import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivi
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.passcode.view.PasscodeView
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -46,6 +47,7 @@ class PasscodeUtil @Inject constructor(
     private val monitorPasscodeLockStateUseCase: MonitorPasscodeLockStateUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getThemeMode: GetThemeMode,
+    private val passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
 ) {
 
     companion object {
@@ -370,14 +372,14 @@ class PasscodeUtil @Inject constructor(
             val themeMode = getThemeMode().first()
             val view = ComposeView(activity)
                 .apply {
-                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
                     setContent {
                         val locked: Boolean by monitorPasscodeLockStateUseCase().collectAsStateWithLifecycle(
                             initialValue = true
                         )
                         if (locked) {
                             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                                PasscodeView()
+                                PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory)
                             }
                         }
                     }

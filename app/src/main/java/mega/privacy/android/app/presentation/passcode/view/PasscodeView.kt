@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.passcode.view
 
+import android.app.Activity
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.AuthenticationCallback
+import androidx.biometric.BiometricPrompt.CryptoObject
 import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -46,6 +48,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.findFragmentActivity
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
@@ -60,6 +63,7 @@ import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
 import mega.privacy.mobile.analytics.event.PasscodeLogoutButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeUnlockDialogEvent
+import timber.log.Timber
 
 /**
  * Passcode dialog
@@ -75,43 +79,75 @@ internal fun PasscodeView(
         onError: () -> Unit,
         onFail: () -> Unit,
         context: Context,
+        promptInfo: BiometricPrompt.PromptInfo,
+        cryptObject: CryptoObject,
     ) -> Unit = ::launchBiometricPrompt,
+    cryptObjectFactory: PasscodeCryptObjectFactory,
 ) {
+    Timber.d("Passcode main UI composed")
     val uiState by passcodeUnlockViewModel.state.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
-    var showBiometricPrompt: Boolean by rememberSaveable {
-        mutableStateOf(biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable(context))
+    val activity = (LocalContext.current as? Activity)
+    BackHandler {
+        activity?.finishAffinity()
     }
 
-    if (showBiometricPrompt) {
-        LaunchedEffect(key1 = Unit) {
-            Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
-            showBiometricAuth(
-                passcodeUnlockViewModel::unlockWithBiometrics,
-                { showBiometricPrompt = false },
-                passcodeUnlockViewModel::onBiometricAuthFailed,
-                context
-            )
-        }
-
-    } else {
-        LaunchedEffect(key1 = showBiometricPrompt) {
-            Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
-        }
+    Surface(modifier = Modifier.fillMaxSize()) {
         when (val currentState = uiState) {
             PasscodeUnlockState.Loading -> {}
             is PasscodeUnlockState.Data -> {
-                PasscodeContent(
-                    onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
-                    onPasscodeEntered = { passcode ->
-                        Analytics.tracker.trackEvent(PasscodeEnteredEvent)
-                        passcodeUnlockViewModel.unlockWithPasscode(passcode)
-                    },
-                    failedAttemptCount = currentState.failedAttempts,
-                    showLogoutWarning = currentState.logoutWarning,
-                    passcodeType = currentState.passcodeType,
-                )
+                val context = LocalContext.current
+                var showBiometricPrompt: Boolean by rememberSaveable {
+                    mutableStateOf(
+                        biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable(
+                            context
+                        )
+                    )
+                }
+
+                Timber.d("Value of showBiometricPrompt is $showBiometricPrompt")
+
+                if (showBiometricPrompt) {
+                    Timber.d("Show biometrics UI composed")
+                    val title = stringResource(id = R.string.title_unlock_fingerprint)
+                    val negativeButton = stringResource(R.string.action_use_passcode)
+                    val promptInfo = remember {
+                        BiometricPrompt.PromptInfo.Builder()
+                            .setTitle(title)
+                            .setNegativeButtonText(negativeButton)
+                            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                            .build()
+                    }
+
+                    LaunchedEffect(key1 = Unit) {
+                        Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
+                        showBiometricAuth(
+                            passcodeUnlockViewModel::unlockWithBiometrics,
+                            { showBiometricPrompt = false },
+                            passcodeUnlockViewModel::onBiometricAuthFailed,
+                            context,
+                            promptInfo,
+                            cryptObjectFactory()
+                        )
+                    }
+
+                } else {
+                    LaunchedEffect(key1 = showBiometricPrompt) {
+                        Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
+                    }
+                    PasscodeContent(
+                        onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
+                        onPasscodeEntered = { passcode ->
+                            Analytics.tracker.trackEvent(PasscodeEnteredEvent)
+                            passcodeUnlockViewModel.unlockWithPasscode(passcode)
+                        },
+                        failedAttemptCount = currentState.failedAttempts,
+                        showLogoutWarning = currentState.logoutWarning,
+                        passcodeType = currentState.passcodeType,
+                    )
+
+
+                }
             }
         }
     }
@@ -122,9 +158,13 @@ private fun launchBiometricPrompt(
     onError: () -> Unit,
     onFail: () -> Unit,
     context: Context,
+    promptInfo: BiometricPrompt.PromptInfo,
+    cryptObject: CryptoObject,
 ) {
     val activity = context.findFragmentActivity()
     if (activity == null) onError()
+
+
     val callback = object : AuthenticationCallback() {
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
@@ -143,7 +183,7 @@ private fun launchBiometricPrompt(
             onSuccess()
         }
     }
-    activity?.let { BiometricPrompt(it, callback) }
+    activity?.let { BiometricPrompt(it, callback).authenticate(promptInfo, cryptObject) }
 }
 
 private fun biometricPreferenceIsEnabled(uiState: PasscodeUnlockState) =
@@ -158,97 +198,97 @@ private fun PasscodeContent(
     passcodeType: PasscodeUIType,
     usePasswordField: Boolean = false,
 ) {
+    Timber.d("Passcode content UI composed")
     var logoutDialog by rememberSaveable { mutableStateOf(false) }
     var usePassword by rememberSaveable { mutableStateOf(usePasswordField) }
 
     BackHandler(usePassword) {
         usePassword = false
     }
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.height(40.dp))
-            Text(
-                text = if (usePassword) {
-                    stringResource(
-                        id = R.string.settings_passcode_enter_password_title
-                    )
-                } else {
-                    stringResource(
-                        id = R.string.unlock_pin_title
-                    )
-                },
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            if (usePassword) {
-                ShowPasswordField(onPasswordEntered)
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(modifier = Modifier.height(40.dp))
+        Text(
+            text = if (usePassword) {
+                stringResource(
+                    id = R.string.settings_passcode_enter_password_title
+                )
             } else {
-                if (passcodeType is PasscodeUIType.Alphanumeric) {
-                    ShowPasswordField(onPasscodeEntered, "")
-                } else if (passcodeType is PasscodeUIType.Pin) {
-                    PasscodeField(
-                        onComplete = onPasscodeEntered,
-                        modifier = Modifier
-                            .testTag(PASSCODE_FIELD_TAG)
-                            .semantics(
-                                mergeDescendants = true,
-                                properties = {
-                                    setText {
-                                        onPasscodeEntered(it.text)
-                                        true
-                                    }
+                stringResource(
+                    id = R.string.unlock_pin_title
+                )
+            },
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        if (usePassword) {
+            ShowPasswordField(onPasswordEntered)
+        } else {
+            if (passcodeType is PasscodeUIType.Alphanumeric) {
+                ShowPasswordField(onPasscodeEntered, "")
+            } else if (passcodeType is PasscodeUIType.Pin) {
+                PasscodeField(
+                    onComplete = onPasscodeEntered,
+                    modifier = Modifier
+                        .testTag(PASSCODE_FIELD_TAG)
+                        .semantics(
+                            mergeDescendants = true,
+                            properties = {
+                                setText {
+                                    onPasscodeEntered(it.text)
+                                    true
                                 }
-                            ),
-                        numberOfCharacters = passcodeType.digits
-                    )
-                }
-            }
-            if (failedAttemptCount > 0) {
-                Spacer(modifier = Modifier.height(20.dp))
-                FailedAttemptsView(
-                    failedAttempts = failedAttemptCount,
-                    modifier = Modifier.testTag(FAILED_ATTEMPTS_TAG)
-                )
-            }
-            if (showLogoutWarning) {
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = stringResource(id = R.string.pin_lock_alert),
-                    modifier = Modifier.padding(
-                        horizontal = 40.dp
-                    ),
-                    textAlign = TextAlign.Center
-                )
-            }
-            if (failedAttemptCount > 0 && !usePassword) {
-                Spacer(modifier = Modifier.height(20.dp))
-                OutlinedMegaButton(
-                    onClick = {
-                        Analytics.tracker.trackEvent(PasscodeLogoutButtonPressedEvent)
-                        logoutDialog = true
-                    },
-                    textId = R.string.action_logout,
-                    modifier = Modifier.testTag(LOGOUT_BUTTON_TAG),
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                TextMegaButton(
-                    onClick = {
-                        Analytics.tracker.trackEvent(ForgotPasscodeButtonPressedEvent)
-                        usePassword = true
-                    },
-                    textId = R.string.settings_passcode_forgot_passcode_button,
-                    modifier = Modifier.testTag(FORGOT_PASSCODE_BUTTON_TAG),
+                            }
+                        ),
+                    numberOfCharacters = passcodeType.digits
                 )
             }
         }
-        if (logoutDialog) {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.grey_100_alpha_060_dark_grey,
-            ){}
-            LogoutConfirmationDialog(
-                onDismissed = { logoutDialog = false }
+        if (failedAttemptCount > 0) {
+            Spacer(modifier = Modifier.height(20.dp))
+            FailedAttemptsView(
+                failedAttempts = failedAttemptCount,
+                modifier = Modifier.testTag(FAILED_ATTEMPTS_TAG)
             )
         }
+        if (showLogoutWarning) {
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = stringResource(id = R.string.pin_lock_alert),
+                modifier = Modifier.padding(
+                    horizontal = 40.dp
+                ),
+                textAlign = TextAlign.Center
+            )
+        }
+        if (failedAttemptCount > 0 && !usePassword) {
+            Spacer(modifier = Modifier.height(20.dp))
+            OutlinedMegaButton(
+                onClick = {
+                    Analytics.tracker.trackEvent(PasscodeLogoutButtonPressedEvent)
+                    logoutDialog = true
+                },
+                textId = R.string.action_logout,
+                modifier = Modifier.testTag(LOGOUT_BUTTON_TAG),
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            TextMegaButton(
+                onClick = {
+                    Analytics.tracker.trackEvent(ForgotPasscodeButtonPressedEvent)
+                    usePassword = true
+                },
+                textId = R.string.settings_passcode_forgot_passcode_button,
+                modifier = Modifier.testTag(FORGOT_PASSCODE_BUTTON_TAG),
+            )
+        }
+    }
+    if (logoutDialog) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.grey_100_alpha_060_dark_grey,
+        ) {}
+        LogoutConfirmationDialog(
+            onDismissed = { logoutDialog = false }
+        )
     }
 }
 

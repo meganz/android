@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
@@ -22,6 +23,7 @@ class PasscodeContainerTest {
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val passcodeCheckViewModel = mock<PasscodeCheckViewModel>()
+    private val passcodeCryptObjectFactory = mock<PasscodeCryptObjectFactory>()
 
     @Test
     fun `test that content is shown if passcode is not locked`() {
@@ -34,7 +36,8 @@ class PasscodeContainerTest {
             PasscodeContainer(
                 passcodeUI = {},
                 viewModel = passcodeCheckViewModel,
-                content = { Text(expected) }
+                content = { Text(expected) },
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             )
         }
 
@@ -51,7 +54,8 @@ class PasscodeContainerTest {
         composeTestRule.setContent {
             PasscodeContainer(
                 passcodeUI = {},
-                viewModel = passcodeCheckViewModel
+                viewModel = passcodeCheckViewModel,
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             ) {
                 Text(notExpected)
             }
@@ -71,7 +75,8 @@ class PasscodeContainerTest {
         composeTestRule.setContent {
             PasscodeContainer(
                 passcodeUI = { Text(expected) },
-                viewModel = passcodeCheckViewModel
+                viewModel = passcodeCheckViewModel,
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             ) {}
         }
 
@@ -89,7 +94,8 @@ class PasscodeContainerTest {
         composeTestRule.setContent {
             PasscodeContainer(
                 passcodeUI = { Text(notExpected) },
-                viewModel = passcodeCheckViewModel
+                viewModel = passcodeCheckViewModel,
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             ) {}
         }
 
@@ -107,7 +113,8 @@ class PasscodeContainerTest {
             PasscodeContainer(
                 passcodeUI = {},
                 viewModel = passcodeCheckViewModel,
-                loading = { Text(expected) }
+                loading = { Text(expected) },
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             )
         }
 
@@ -125,7 +132,8 @@ class PasscodeContainerTest {
             PasscodeContainer(
                 passcodeUI = {},
                 viewModel = passcodeCheckViewModel,
-                content = { Text(expected) }
+                content = { Text(expected) },
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             )
         }
 

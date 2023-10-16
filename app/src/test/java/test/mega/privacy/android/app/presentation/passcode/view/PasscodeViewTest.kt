@@ -2,6 +2,8 @@ package test.mega.privacy.android.app.presentation.passcode.view
 
 import android.content.Context
 import androidx.activity.ComponentActivity
+import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricPrompt.CryptoObject
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasImeAction
@@ -57,7 +59,7 @@ internal class PasscodeViewTest {
     private val biometricAuthIsAvailable = mock<(Context) -> Boolean>()
 
     private val showBiometricAuth =
-        mock<(onSuccess: () -> Unit, onError: () -> Unit, onFail: () -> Unit, context: Context) -> Unit>()
+        mock<(onSuccess: () -> Unit, onError: () -> Unit, onFail: () -> Unit, context: Context, promptInfo: BiometricPrompt.PromptInfo, cryptoObject: CryptoObject) -> Unit>()
 
     @Before
     internal fun setUp() {
@@ -259,7 +261,7 @@ internal class PasscodeViewTest {
             )
         )
 
-        verify(showBiometricAuth).invoke(any(), any(), any(), any())
+        verify(showBiometricAuth).invoke(any(), any(), any(), any(), any(), any())
 
     }
 
@@ -279,7 +281,7 @@ internal class PasscodeViewTest {
 
         val onError = argumentCaptor<() -> Unit>()
 
-        verify(showBiometricAuth).invoke(any(), onError.capture(), any(), any())
+        verify(showBiometricAuth).invoke(any(), onError.capture(), any(), any(), any(), any())
 
         composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
             .assertDoesNotExist()
@@ -322,7 +324,7 @@ internal class PasscodeViewTest {
             )
         )
 
-        verify(showBiometricAuth).invoke(any(), any(), any(), any())
+        verify(showBiometricAuth).invoke(any(), any(), any(), any(), any(), any())
 
         assertThat(analyticsRule.events).contains(PasscodeBiometricUnlockDialogEvent)
     }
@@ -415,11 +417,17 @@ internal class PasscodeViewTest {
             )
         }
 
+        val cryptoObject = mock<CryptoObject>()
         composeTestRule.setContent {
             PasscodeView(
                 passcodeUnlockViewModel = passcodeUnlockViewModel,
                 biometricAuthIsAvailable = biometricAuthIsAvailable,
                 showBiometricAuth = showBiometricAuth,
+                cryptObjectFactory = mock {
+                    on { invoke() }.thenReturn(
+                        cryptoObject
+                    )
+                }
             )
         }
     }
