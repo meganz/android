@@ -168,6 +168,7 @@ class WaitingRoomViewModel @Inject constructor(
                 !chatLink.isNullOrBlank() -> {
                     if (isValidWaitingRoom(chatLink)) {
                         retrieveChatLinkDetails()
+                        retrieveMeetingDetails()
                         if (userLoggedIn) {
                             joinCurrentCall()
                         }
