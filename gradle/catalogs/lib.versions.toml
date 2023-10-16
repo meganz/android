@@ -41,7 +41,7 @@ coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-androi
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
-documentscanner = 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.11'
+documentscanner = 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.12'
 facebook-inferannotation = "com.facebook.infer.annotation:infer-annotation:0.18.0"
 fresco = { module = "com.facebook.fresco:fresco", version.ref = "fresco" }
 fresco-gif = { module = "com.facebook.fresco:animated-gif", version.ref = "fresco" }
