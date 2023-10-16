@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerViewModel
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -49,6 +50,7 @@ internal class PdfViewerViewModelTest {
     private lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
     private lateinit var getNodeByHandle: GetNodeByHandle
     private lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
+    private lateinit var getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase
 
     @BeforeAll
     fun initialise() {
@@ -71,6 +73,7 @@ internal class PdfViewerViewModelTest {
             getNodeByHandle = getNodeByHandle,
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
+            getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase
         )
     }
 

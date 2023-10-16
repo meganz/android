@@ -41,6 +41,7 @@ import mega.privacy.android.data.repository.FileLinkRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
 import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.HttpConnectionRepositoryImpl
 import mega.privacy.android.data.repository.ImageRepositoryImpl
 import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -81,6 +82,7 @@ import mega.privacy.android.domain.repository.FileLinkRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
+import mega.privacy.android.domain.repository.HttpConnectionRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.InAppUpdateRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -298,5 +300,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPsaRepository(implementation: PsaRepositoryImpl): PsaRepository
+
+    @Binds
+    abstract fun bindHttpConnectionRepository(implementation: HttpConnectionRepositoryImpl): HttpConnectionRepository
 
 }

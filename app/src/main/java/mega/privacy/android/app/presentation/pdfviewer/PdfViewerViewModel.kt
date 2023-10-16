@@ -20,10 +20,12 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.net.URL
 import javax.inject.Inject
 
 /**
@@ -39,6 +41,7 @@ class PdfViewerViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
 ) : BaseRxViewModel() {
 
     private val _state = MutableStateFlow(PdfViewerState())
@@ -213,6 +216,19 @@ class PdfViewerViewModel @Inject constructor(
 
                 else -> Timber.e(it)
             }
+        }
+    }
+
+    /**
+     * Load pdf stream data from url
+     */
+    fun loadPdfStream(uri: String) {
+        viewModelScope.launch {
+            runCatching {
+                getDataBytesFromUrlUseCase(URL(uri))
+            }.onSuccess { data ->
+                _state.update { it.copy(pdfStreamData = data) }
+            }.onFailure { Timber.e("Exception loading PDF as stream", it) }
         }
     }
 

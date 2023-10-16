@@ -11,7 +11,6 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -92,12 +91,7 @@ import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
-import java.io.BufferedInputStream
 import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import javax.inject.Inject
 
 /**
@@ -368,6 +362,25 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     dismissAlertDialogIfExists(statusDialog)
                     nameCollisionActivityContract?.launch(arrayListOf(nameCollision))
                 }
+                if (pdfStreamData != null) {
+                    try {
+                        binding.pdfView.fromBytes(pdfStreamData)
+                            .defaultPage(currentPage - 1)
+                            .onPageChange(this@PdfViewerActivity)
+                            .enableAnnotationRendering(true)
+                            .onLoad(this@PdfViewerActivity)
+                            .scrollHandle(defaultScrollHandle)
+                            .spacing(10) // in dp
+                            .onPageError(this@PdfViewerActivity)
+                            .password(password)
+                            .load()
+                    } catch (e: Exception) {
+                        Timber.w("Exception loading PDF as stream", e)
+                    }
+                    if (loading && !transfersManagement.isOnTransferOverQuota()) {
+                        binding.pdfViewerProgressBar.isVisible = true
+                    }
+                }
             }
         }
     }
@@ -632,45 +645,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         //No action needed
     }
 
-    private inner class LoadPDFStream : AsyncTask<String?, Void?, InputStream?>() {
-
-        override fun doInBackground(vararg params: String?): InputStream? {
-            var inputStream: InputStream? = null
-            try {
-                val url = URL(params[0])
-                val httpURLConnection = url.openConnection() as HttpURLConnection
-                if (httpURLConnection.responseCode == 200) {
-                    inputStream = BufferedInputStream(httpURLConnection.inputStream)
-                }
-            } catch (e: IOException) {
-                Timber.w("Exception loading PDF as stream", e)
-                return null
-            }
-            return inputStream
-        }
-
-        override fun onPostExecute(inputStream: InputStream?) {
-            Timber.d("onPostExecute")
-            try {
-                binding.pdfView.fromStream(inputStream, handle.toString())
-                    .defaultPage(currentPage - 1)
-                    .onPageChange(this@PdfViewerActivity)
-                    .enableAnnotationRendering(true)
-                    .onLoad(this@PdfViewerActivity)
-                    .scrollHandle(defaultScrollHandle)
-                    .spacing(10) // in dp
-                    .onPageError(this@PdfViewerActivity)
-                    .password(password)
-                    .load()
-            } catch (e: Exception) {
-                Timber.w("Exception loading PDF as stream", e)
-            }
-            if (loading && !transfersManagement.isOnTransferOverQuota()) {
-                binding.pdfViewerProgressBar.isVisible = true
-            }
-        }
-    }
-
     /**
      * Reload view with password.
      */
@@ -687,7 +661,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     private fun loadStreamPDF() {
         Timber.d("loading: $loading")
-        LoadPDFStream().execute(uri.toString())
+        viewModel.loadPdfStream(uri.toString())
     }
 
     private fun loadLocalPDF() {

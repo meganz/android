@@ -17,4 +17,5 @@ data class PdfViewerState(
     val nodeCopyError: Throwable? = null,
     val shouldFinishActivity: Boolean = false,
     val nameCollision: NameCollision? = null,
+    val pdfStreamData: ByteArray? = null,
 )
