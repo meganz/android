@@ -50,6 +50,7 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, FOLDER_LINK_REGEX) -> FOLDER_LINK
             isUrlMatchesRegexUseCase(url, CHAT_LINK_REGEX) -> CHAT_LINK
             isUrlMatchesRegexUseCase(url, PASSWORD_LINK_REGEX) -> PASSWORD_LINK
+            isUrlMatchesRegexUseCase(url, ALBUM_LINK_REGEX) -> ALBUM_LINK
             isUrlMatchesRegexUseCase(url, ACCOUNT_INVITATION_LINK_REGEX) -> ACCOUNT_INVITATION_LINK
             isUrlMatchesRegexUseCase(url, EXPORT_MASTER_KEY_LINK_REGEX) -> EXPORT_MASTER_KEY_LINK
             isUrlMatchesRegexUseCase(url, NEW_MESSAGE_CHAT_LINK_REGEX) -> NEW_MESSAGE_CHAT_LINK
@@ -69,7 +70,6 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, EMAIL_VERIFY_LINK_REGEX) -> EMAIL_VERIFY_LINK
             isUrlMatchesRegexUseCase(url, WEB_SESSION_LINK_REGEX) -> WEB_SESSION_LINK
             isUrlMatchesRegexUseCase(url, BUSINESS_INVITE_LINK_REGEX) -> BUSINESS_INVITE_LINK
-            isUrlMatchesRegexUseCase(url, ALBUM_LINK_REGEX) -> ALBUM_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_PAGE_LINK_REGEX) -> UPGRADE_PAGE_LINK
             else -> RESTRICTED
         }

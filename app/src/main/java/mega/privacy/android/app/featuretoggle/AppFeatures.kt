@@ -119,7 +119,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     AlbumSharing(
         "Enable album sharing feature",
-        false
+        true
     ),
 
     /**
