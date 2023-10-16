@@ -12,6 +12,7 @@ package mega.privacy.android.domain.entity
  * @property type
  * @property origin
  * @property handleIncoming
+ * @property lastModifiedTime
  */
 data class Offline(
     val id: Int,
@@ -22,6 +23,7 @@ data class Offline(
     val type: String?,
     val origin: Int,
     val handleIncoming: String,
+    val lastModifiedTime: Long = 0
 ) {
 
     /**

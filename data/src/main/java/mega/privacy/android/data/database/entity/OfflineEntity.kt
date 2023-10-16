@@ -8,23 +8,25 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
 /**
  * Offline entity
  * @property id
- * @property handle
- * @property path
- * @property name
+ * @property encryptedHandle
+ * @property encryptedPath
+ * @property encryptedName
  * @property parentId
- * @property type
+ * @property encryptedType
  * @property incoming
- * @property incomingHandle
+ * @property lastModifiedTime
+ * @property lastModifiedTime
  */
 @Entity(MegaDatabaseConstant.TABLE_OFFLINE)
-internal class OfflineEntity(
+internal data class OfflineEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id") val id: Int? = null,
-    @ColumnInfo(name = "handle") val handle: String?,
-    @ColumnInfo(name = "path") val path: String?,
-    @ColumnInfo(name = "name") val name: String?,
+    @ColumnInfo(name = "handle") val encryptedHandle: String?,
+    @ColumnInfo(name = "path") val encryptedPath: String?,
+    @ColumnInfo(name = "name") val encryptedName: String?,
     @ColumnInfo(name = "parentId") val parentId: Int?,
-    @ColumnInfo(name = "type") val type: Int?,
+    @ColumnInfo(name = "type") val encryptedType: String?,
     @ColumnInfo(name = "incoming") val incoming: Int?,
-    @ColumnInfo(name = "incomingHandle") val incomingHandle: Int?
+    @ColumnInfo(name = "incomingHandle") val encryptedIncomingHandle: String?,
+    @ColumnInfo(name = "lastModifiedTime") val lastModifiedTime: Long?
 )

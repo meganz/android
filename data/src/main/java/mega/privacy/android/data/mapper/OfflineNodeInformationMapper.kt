@@ -16,6 +16,7 @@ internal fun toOfflineNodeInformation(offline: Offline): OfflineNodeInformation 
             handle = offline.handle,
             incomingHandle = offline.handleIncoming,
             isFolder = offline.isFolder,
+            lastModifiedTime = offline.lastModifiedTime
         )
 
         Offline.BACKUPS -> BackupsOfflineNodeInformation(
@@ -23,6 +24,7 @@ internal fun toOfflineNodeInformation(offline: Offline): OfflineNodeInformation 
             name = offline.name,
             handle = offline.handle,
             isFolder = offline.isFolder,
+            lastModifiedTime = offline.lastModifiedTime
         )
 
         else -> OtherOfflineNodeInformation(
@@ -30,6 +32,7 @@ internal fun toOfflineNodeInformation(offline: Offline): OfflineNodeInformation 
             name = offline.name,
             handle = offline.handle,
             isFolder = offline.isFolder,
+            lastModifiedTime = offline.lastModifiedTime
         )
     }
 }

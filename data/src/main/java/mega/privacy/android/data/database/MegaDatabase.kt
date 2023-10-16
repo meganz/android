@@ -117,13 +117,30 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_76_77 = object : Migration(76, 77) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Migrate Type and Rename column backups.delete_empty_subolders and backups.exclude_subolders and backups.outdated from BOOLEAN to TEXT type
+                database.beginTransaction()
+                try {
+                    database.execSQL("ALTER TABLE offline RENAME TO offline_old")
+                    database.execSQL("CREATE TABLE IF NOT EXISTS offline (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `handle` TEXT, `path` TEXT, `name` TEXT, `parentId` INTEGER, `type` TEXT, `incoming` INTEGER, `incomingHandle` TEXT, `lastModifiedTime` INTEGER)")
+                    database.execSQL("INSERT INTO offline (id, handle, path, name, parentId, type, incoming, incomingHandle) SELECT id, handle, path, name, parentId, type, incoming, incomingHandle FROM offline_old")
+                    database.execSQL("DROP TABLE offline_old")
+                    database.setTransactionSuccessful()
+                } finally {
+                    database.endTransaction()
+                }
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
             MIGRATION_70_71,
             MIGRATION_71_72,
             MIGRATION_74_75,
-            MIGRATION_75_76
+            MIGRATION_75_76,
+            MIGRATION_76_77
         )
     }
 }

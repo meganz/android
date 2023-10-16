@@ -32,6 +32,7 @@ internal class OfflineNodeInformationMapperTest {
                 handle = expectedHandle,
                 incomingHandle = expectedIncomingHandle,
                 isFolder = isFolderNode,
+                lastModifiedTime = 0
             )
         )
     }
@@ -50,6 +51,7 @@ internal class OfflineNodeInformationMapperTest {
                 name = expectedName,
                 handle = expectedHandle,
                 isFolder = isFolderNode,
+                lastModifiedTime = 0
             )
         )
     }
@@ -67,6 +69,7 @@ internal class OfflineNodeInformationMapperTest {
                 name = expectedName,
                 handle = expectedHandle,
                 isFolder = isFolderNode,
+                lastModifiedTime = 0
             )
         )
     }

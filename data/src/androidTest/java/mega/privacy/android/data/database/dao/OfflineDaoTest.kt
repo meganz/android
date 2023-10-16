@@ -39,18 +39,19 @@ class OfflineDaoTest {
     @Throws(Exception::class)
     fun `test_that_getByHandle_returns_correctly_when_add_new_offline`() = runTest {
         val offline = OfflineEntity(
-            handle = "handle",
-            path = "Some path",
-            name = "Rohit",
+            encryptedHandle = "handle",
+            encryptedPath = "Some path",
+            encryptedName = "Rohit",
             parentId = -1,
-            type = 1,
+            encryptedType = "1",
             incoming = -1,
-            incomingHandle = -1,
+            encryptedIncomingHandle = "-1",
+            lastModifiedTime = 0
         )
         offlineDao.insertOrUpdateOffline(offline)
         val actual = offlineDao.getOfflineByHandle("handle")
-        Truth.assertThat(actual?.handle).isEqualTo(offline.handle)
-        Truth.assertThat(actual?.name).isEqualTo(offline.name)
+        Truth.assertThat(actual?.encryptedHandle).isEqualTo(offline.encryptedHandle)
+        Truth.assertThat(actual?.encryptedName).isEqualTo(offline.encryptedName)
     }
 
     @Test
@@ -58,20 +59,21 @@ class OfflineDaoTest {
     fun `test_that_getAll_returns_correctly_when_add_list_of_contact`() = runTest {
         val contacts = (1..10).map {
             val offline = OfflineEntity(
-                handle = "handle${it}",
-                path = "Some path${it}",
-                name = "Rohit${it}",
+                encryptedHandle = "handle${it}",
+                encryptedPath = "Some path${it}",
+                encryptedName = "Rohit${it}",
                 parentId = -1,
-                type = it,
+                encryptedType = "$it",
                 incoming = -1,
-                incomingHandle = -1,
+                encryptedIncomingHandle = "$it",
+                lastModifiedTime = 0
             )
             offlineDao.insertOrUpdateOffline(offline)
             offline
         }
         offlineDao.getAllOffline().first().forEachIndexed { i, entity ->
-            Truth.assertThat(entity.handle).isEqualTo(contacts[i].handle)
-            Truth.assertThat(entity.name).isEqualTo(contacts[i].name)
+            Truth.assertThat(entity.encryptedHandle).isEqualTo(contacts[i].encryptedHandle)
+            Truth.assertThat(entity.encryptedName).isEqualTo(contacts[i].encryptedName)
         }
     }
 
@@ -80,13 +82,14 @@ class OfflineDaoTest {
     fun `test_that_table_empty_when_call_deleteAll`() = runTest {
         (1..10).forEach {
             val offline = OfflineEntity(
-                handle = "handle${it}",
-                path = "Some path${it}",
-                name = "Rohit${it}",
+                encryptedHandle = "handle${it}",
+                encryptedPath = "Some path${it}",
+                encryptedName = "Rohit${it}",
                 parentId = -1,
-                type = it,
+                encryptedType = "$it",
                 incoming = -1,
-                incomingHandle = -1,
+                encryptedIncomingHandle = "$it",
+                lastModifiedTime = 0
             )
             offlineDao.insertOrUpdateOffline(offline)
         }

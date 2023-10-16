@@ -3044,6 +3044,7 @@ class SqliteDatabaseHandler @Inject constructor(
                     val type = decrypt(cursor.getString(5))
                     val incoming = cursor.getInt(6)
                     val handleIncoming = decrypt(cursor.getString(7))
+                    val lastModifiedTime = cursor.getLong(8)
                     return Offline(
                         id = id,
                         handle = nodeHandle.toString(),
@@ -3053,6 +3054,7 @@ class SqliteDatabaseHandler @Inject constructor(
                         type = type,
                         origin = incoming,
                         handleIncoming = handleIncoming.toString(),
+                        lastModifiedTime = lastModifiedTime
                     )
                 }
             }
@@ -3071,6 +3073,7 @@ class SqliteDatabaseHandler @Inject constructor(
         values.put(KEY_OFF_TYPE, encrypt(offline.type))
         values.put(KEY_OFF_INCOMING, offline.origin)
         values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.handleIncoming))
+        values.put(KEY_OFF_LAST_MODIFIED_TIME, System.currentTimeMillis())
         return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
     }
 
@@ -3258,6 +3261,7 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_OFF_TYPE = "type"
         const val KEY_OFF_INCOMING = "incoming"
         const val KEY_OFF_HANDLE_INCOMING = "incomingHandle"
+        const val KEY_OFF_LAST_MODIFIED_TIME = "lastModifiedTime"
         const val KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp"
         const val KEY_SEC_VIDEO_SYNC_TIMESTAMP = "secondaryVideoSyncTimeStamp"
         const val KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices"

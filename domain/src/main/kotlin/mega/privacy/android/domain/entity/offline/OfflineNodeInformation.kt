@@ -23,6 +23,11 @@ sealed interface OfflineNodeInformation {
      * Is folder
      */
     val isFolder: Boolean
+
+    /**
+     * last modified time
+     */
+    val lastModifiedTime: Long?
 }
 
 /**
@@ -36,6 +41,7 @@ data class OtherOfflineNodeInformation(
     override val name: String,
     override val handle: String,
     override val isFolder: Boolean,
+    override val lastModifiedTime: Long?
 ) : OfflineNodeInformation
 
 /**
@@ -49,6 +55,7 @@ data class BackupsOfflineNodeInformation(
     override val name: String,
     override val handle: String,
     override val isFolder: Boolean,
+    override val lastModifiedTime: Long?
 ) : OfflineNodeInformation
 
 /**
@@ -63,5 +70,6 @@ data class IncomingShareOfflineNodeInformation(
     override val name: String,
     override val handle: String,
     override val isFolder: Boolean,
+    override val lastModifiedTime: Long?,
     val incomingHandle: String,
 ) : OfflineNodeInformation

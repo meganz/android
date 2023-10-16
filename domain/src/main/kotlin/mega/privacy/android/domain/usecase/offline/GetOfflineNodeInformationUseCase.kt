@@ -53,6 +53,7 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
                     name = node.name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
+                    lastModifiedTime = System.currentTimeMillis()
                 )
             }
 
@@ -62,7 +63,8 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
                     name = node.name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
-                    incomingHandle = isIncomingShareId.longValue.toString()
+                    incomingHandle = isIncomingShareId.longValue.toString(),
+                    lastModifiedTime = System.currentTimeMillis()
                 )
             }
 
@@ -72,6 +74,7 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
                     name = node.name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
+                    lastModifiedTime = System.currentTimeMillis()
                 )
         }
     }
