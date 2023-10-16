@@ -320,7 +320,7 @@ class WaitingRoomViewModel @Inject constructor(
     private fun retrieveUserAvatar() {
         viewModelScope.launch {
             runCatching {
-                if (!isUserLoggedIn() || isEphemeralPlusPlusUseCase()) return@launch
+                if (state.value.guestMode) return@launch
 
                 val avatar = async { getMyAvatarFileUseCase(false)?.absolutePath }
                 val color = async { getMyAvatarColorUseCase() }
@@ -541,6 +541,7 @@ class WaitingRoomViewModel @Inject constructor(
                 setChatVideoDevice()
                 retrieveMeetingDetails()
                 retrieveCallDetails()
+                retrieveUserAvatar()
             }.onFailure { exception ->
                 Timber.e(exception)
                 if (guestMode) _state.update { it.copy(guestMode = true) }
