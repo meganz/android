@@ -75,7 +75,7 @@ internal class DeviceCenterViewModel @Inject constructor(
                 )
             }
         }.onFailure {
-            Timber.w(it)
+            Timber.e(it)
             _state.update { state -> state.copy(isInitialLoadingFinished = true) }
         }
     }
@@ -148,6 +148,24 @@ internal class DeviceCenterViewModel @Inject constructor(
      * Resets the value of [DeviceCenterState.deviceToRename] back to null
      */
     fun resetDeviceToRename() = _state.update { it.copy(deviceToRename = null) }
+
+    /**
+     * Updates several State parameters when the User has successfully renamed a Device
+     */
+    fun handleRenameDeviceSuccess() {
+        _state.update {
+            it.copy(
+                deviceToRename = null,
+                renameDeviceSuccess = triggered
+            )
+        }
+    }
+
+    /**
+     * Notifies [DeviceCenterState.renameDeviceSuccess] that it has been consumed
+     */
+    fun resetRenameDeviceSuccessEvent() =
+        _state.update { it.copy(renameDeviceSuccess = consumed) }
 
     companion object {
         /**

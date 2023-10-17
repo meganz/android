@@ -17,6 +17,7 @@ import de.palm.composestateevents.consumed
  * Devices are shown if [selectedDevice] is null. Otherwise, the list of Device Folders of
  * [selectedDevice] are shown
  * @property exitFeature State Event that will cause the User to leave Device Center if it is triggered
+ * @property renameDeviceSuccess State Event which notifies that renaming the Device is successful
  */
 data class DeviceCenterState(
     val devices: List<DeviceCenterUINode> = emptyList(),
@@ -26,6 +27,7 @@ data class DeviceCenterState(
     val menuIconClickedNode: DeviceCenterUINode? = null,
     val deviceToRename: DeviceUINode? = null,
     val exitFeature: StateEvent = consumed,
+    val renameDeviceSuccess: StateEvent = consumed,
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
 }

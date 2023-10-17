@@ -9,16 +9,20 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.appbar.TopAppBar
 import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
+import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.R
@@ -50,13 +54,18 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
  * A [Composable] that serves as the main View for the Device Center
  *
  * @param uiState The UI State
+ * @param snackbarHostState The [SnackbarHostState]
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
  * @param onNodeMenuIconClicked Lambda that performs a specific action when the Node Menu Icon is
  * clicked
- * @param onRenameDeviceClicked Lambda that performs a specific action when the Rename Device feature
- * is clicked
- * @param onRenameDeviceCancelled Lambda that performs a specific action when the Rename Device
- * feature is cancelled
+ * @param onRenameDeviceOptionClicked Lambda that performs a specific action when the User clicks
+ * the "Rename" Bottom Dialog Option
+ * @param onRenameDeviceCancelled Lambda that performs a specific action when cancelling the Rename
+ * Device action
+ * @param onRenameDeviceSuccessful Lambda that performs a specific action when the Rename Device
+ * action is successful
+ * @param onRenameDeviceSuccessfulSnackbarShown Lambda that performs a specific action when the
+ * Rename Device success Snackbar has been displayed
  * @param onBackPressHandled Lambda that performs a specific action when the Composable handles the
  * Back Press
  * @param onFeatureExited Lambda that performs a specific action when the Device Center is exited
@@ -65,13 +74,17 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
 @Composable
 internal fun DeviceCenterScreen(
     uiState: DeviceCenterState,
+    snackbarHostState: SnackbarHostState,
     onDeviceClicked: (DeviceUINode) -> Unit,
     onNodeMenuIconClicked: (DeviceCenterUINode) -> Unit,
-    onRenameDeviceClicked: (DeviceUINode) -> Unit,
+    onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceCancelled: () -> Unit,
+    onRenameDeviceSuccessful: () -> Unit,
+    onRenameDeviceSuccessfulSnackbarShown: () -> Unit,
     onBackPressHandled: () -> Unit,
     onFeatureExited: () -> Unit,
 ) {
+    val context = LocalContext.current
     val selectedDevice = uiState.selectedDevice
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -85,6 +98,17 @@ internal fun DeviceCenterScreen(
         event = uiState.exitFeature,
         onConsumed = onFeatureExited,
         action = { onBackPressedDispatcher?.onBackPressed() },
+    )
+    EventEffect(
+        event = uiState.renameDeviceSuccess,
+        onConsumed = onRenameDeviceSuccessfulSnackbarShown,
+        action = {
+            snackbarHostState.showSnackbar(
+                context.resources.getString(
+                    R.string.device_center_snackbar_message_rename_device_successful
+                )
+            )
+        },
     )
     // Handle the Back Press if the Bottom Dialog is visible and the User is in Folder View
     BackHandler(enabled = modalSheetState.isVisible || selectedDevice != null) {
@@ -110,6 +134,11 @@ internal fun DeviceCenterScreen(
                 },
             )
         },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { snackbarData ->
+                MegaSnackbar(snackbarData = snackbarData)
+            }
+        },
         content = { paddingValues ->
             if (!uiState.isInitialLoadingFinished) {
                 DeviceCenterLoadingScreen()
@@ -132,7 +161,7 @@ internal fun DeviceCenterScreen(
                 selectedNode = uiState.menuIconClickedNode ?: return@Scaffold,
                 isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
                 onCameraUploadsClicked = {},
-                onRenameDeviceClicked = onRenameDeviceClicked,
+                onRenameDeviceClicked = onRenameDeviceOptionClicked,
                 onShowInBackupsClicked = {},
                 onShowInCloudDriveClicked = {},
                 onInfoClicked = {},
@@ -141,8 +170,9 @@ internal fun DeviceCenterScreen(
                 RenameDeviceDialog(
                     deviceId = nonNullDevice.id,
                     oldDeviceName = nonNullDevice.name,
-                    onRenameSuccessful = {},
-                    onRenameCancelled = { onRenameDeviceCancelled.invoke() },
+                    existingDeviceNames = uiState.devices.map { it.name },
+                    onRenameSuccessful = onRenameDeviceSuccessful,
+                    onRenameCancelled = onRenameDeviceCancelled,
                 )
             }
         },
@@ -233,10 +263,13 @@ private fun PreviewDeviceCenterInInitialLoading() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterState(),
+            snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
-            onRenameDeviceClicked = {},
+            onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
+            onRenameDeviceSuccessful = {},
+            onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
         )
@@ -261,10 +294,13 @@ private fun PreviewDeviceCenterInDeviceView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
+            snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
-            onRenameDeviceClicked = {},
+            onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
+            onRenameDeviceSuccessful = {},
+            onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
         )
@@ -285,10 +321,13 @@ private fun PreviewDeviceCenterInFolderView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
+            snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
-            onRenameDeviceClicked = {},
+            onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
+            onRenameDeviceSuccessful = {},
+            onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
         )

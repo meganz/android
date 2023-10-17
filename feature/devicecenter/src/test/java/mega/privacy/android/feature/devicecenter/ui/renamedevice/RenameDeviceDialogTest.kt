@@ -28,6 +28,7 @@ internal class RenameDeviceDialogTest {
     fun `test that the rename device dialog is shown`() {
         val deviceId = "12345-6789"
         val oldDeviceName = "Old Device Name"
+        val existingDeviceNames = listOf("New Device Name")
         val uiState = RenameDeviceState(
             renameSuccessfulEvent = consumed,
         )
@@ -39,6 +40,7 @@ internal class RenameDeviceDialogTest {
             RenameDeviceDialog(
                 deviceId = deviceId,
                 oldDeviceName = oldDeviceName,
+                existingDeviceNames = existingDeviceNames,
                 onRenameSuccessful = {},
                 onRenameCancelled = {},
                 renameDeviceViewModel = renameDeviceViewModel,

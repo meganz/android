@@ -5175,7 +5175,7 @@
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
     <string name="camera_uploads_up_to_date">Camera uploads updated</string>
-    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="one">Camera uploads in progress, %1$d file pending</item>

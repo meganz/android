@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -62,14 +64,21 @@ class DeviceCenterFragment : Fragment() {
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val snackbarHostState = remember { SnackbarHostState() }
 
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
                     DeviceCenterScreen(
                         uiState = uiState,
+                        snackbarHostState = snackbarHostState,
                         onDeviceClicked = viewModel::showDeviceFolders,
                         onNodeMenuIconClicked = viewModel::setMenuClickedNode,
-                        onRenameDeviceClicked = viewModel::setDeviceToRename,
+                        onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,
+                        onRenameDeviceSuccessful = {
+                            viewModel.handleRenameDeviceSuccess()
+                            viewModel.getBackupInfo()
+                        },
+                        onRenameDeviceSuccessfulSnackbarShown = viewModel::resetRenameDeviceSuccessEvent,
                         onBackPressHandled = viewModel::handleBackPress,
                         onFeatureExited = viewModel::resetExitFeature,
                     )

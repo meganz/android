@@ -63,7 +63,11 @@ internal class DeviceCenterViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getDevicesUseCase, isCameraUploadsEnabledUseCase, deviceUINodeListMapper)
+        reset(
+            getDevicesUseCase,
+            isCameraUploadsEnabledUseCase,
+            deviceUINodeListMapper,
+        )
         underTest = DeviceCenterViewModel(
             getDevicesUseCase = getDevicesUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
@@ -94,6 +98,7 @@ internal class DeviceCenterViewModelTest {
             assertThat(initialState.deviceToRename).isNull()
             assertThat(initialState.itemsToDisplay).isEmpty()
             assertThat(initialState.exitFeature).isEqualTo(consumed)
+            assertThat(initialState.renameDeviceSuccess).isEqualTo(consumed)
         }
     }
 
@@ -320,4 +325,25 @@ internal class DeviceCenterViewModelTest {
                 assertThat(state.exitFeature).isEqualTo(triggered)
             }
         }
+
+    @Test
+    fun `test that the user has successfully renamed a device`() = runTest {
+        underTest.handleRenameDeviceSuccess()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.deviceToRename).isNull()
+            assertThat(state.renameDeviceSuccess).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that the rename device success event is consumed`() = runTest {
+        underTest.resetRenameDeviceSuccessEvent()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.renameDeviceSuccess).isEqualTo(consumed)
+        }
+    }
 }

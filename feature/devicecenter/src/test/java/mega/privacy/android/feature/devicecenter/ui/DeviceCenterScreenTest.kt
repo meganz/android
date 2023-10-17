@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui
 
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -43,10 +44,13 @@ internal class DeviceCenterScreenTest {
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
+                snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
-                onRenameDeviceClicked = {},
+                onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
                 onBackPressHandled = {},
                 onFeatureExited = {},
             )
@@ -60,10 +64,13 @@ internal class DeviceCenterScreenTest {
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
+                snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
-                onRenameDeviceClicked = {},
+                onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
                 onBackPressHandled = {},
                 onFeatureExited = {},
             )
@@ -91,10 +98,13 @@ internal class DeviceCenterScreenTest {
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
+                snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
-                onRenameDeviceClicked = {},
+                onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
                 onBackPressHandled = {},
                 onFeatureExited = {},
             )
@@ -118,10 +128,13 @@ internal class DeviceCenterScreenTest {
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
+                snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
-                onRenameDeviceClicked = {},
+                onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
                 onBackPressHandled = {},
                 onFeatureExited = {},
             )
@@ -146,10 +159,13 @@ internal class DeviceCenterScreenTest {
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
+                snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
-                onRenameDeviceClicked = {},
+                onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
                 onBackPressHandled = {},
                 onFeatureExited = {},
             )
@@ -181,10 +197,13 @@ internal class DeviceCenterScreenTest {
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
+                snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
-                onRenameDeviceClicked = {},
+                onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
                 onBackPressHandled = {},
                 onFeatureExited = {},
             )
@@ -216,10 +235,13 @@ internal class DeviceCenterScreenTest {
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
+                snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
-                onRenameDeviceClicked = {},
+                onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
                 onBackPressHandled = {},
                 onFeatureExited = {},
             )
@@ -233,10 +255,13 @@ internal class DeviceCenterScreenTest {
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = DeviceCenterState(),
+                snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onNodeMenuIconClicked = {},
-                onRenameDeviceClicked = {},
+                onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
                 onBackPressHandled = {},
                 onFeatureExited = {},
             )
