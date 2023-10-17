@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
@@ -115,6 +116,11 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
         get() = isConnectedToInternetUseCase()
 
     init {
+        viewModelScope.launch {
+            getFeatureFlagValue(AppFeatures.WaitingRoomSettings).let { flag ->
+                _state.update { it.copy(isWaitingRoomFeatureFlagEnabled = flag) }
+            }
+        }
         checkWaitingRoomWarning()
     }
 

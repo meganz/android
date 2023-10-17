@@ -36,6 +36,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -255,6 +256,12 @@ class MeetingActivityViewModel @Inject constructor(
     ).post(isVisible)
 
     init {
+        viewModelScope.launch {
+            getFeatureFlagValue(AppFeatures.WaitingRoomSettings).let { flag ->
+                _state.update { it.copy(isWaitingRoomFeatureFlagEnabled = flag) }
+            }
+        }
+
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
 

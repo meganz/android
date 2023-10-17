@@ -128,7 +128,7 @@ internal fun CreateScheduledMeetingView(
 
     val shouldShowWarningDialog =
         state.enabledWaitingRoomOption && state.enabledAllowAddParticipantsOption &&
-                managementState.waitingRoomReminder == WaitingRoomReminders.Enabled
+                managementState.waitingRoomReminder == WaitingRoomReminders.Enabled && managementState.isWaitingRoomFeatureFlagEnabled
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -196,6 +196,7 @@ internal fun CreateScheduledMeetingView(
                 items(state.buttons) { button ->
                     ActionButton(
                         state = state,
+                        isWaitingRoomFeatureFlagEnabled = managementState.isWaitingRoomFeatureFlagEnabled,
                         isCallInProgress = managementState.isCallInProgress,
                         action = button,
                         onButtonClicked = onButtonClicked
@@ -370,78 +371,91 @@ private fun AddDescriptionButton(
 @Composable
 private fun ActionButton(
     state: CreateScheduledMeetingState,
+    isWaitingRoomFeatureFlagEnabled: Boolean,
     isCallInProgress: Boolean,
     action: ScheduleMeetingAction,
     onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
 ) {
-    Column(modifier = Modifier
-        .testTag(ACTION_BUTTON_TAG)
-        .fillMaxWidth()
-        .clickable {
-            if (action != ScheduleMeetingAction.WaitingRoom || !isCallInProgress) {
-                onButtonClicked(action)
+    if (action != ScheduleMeetingAction.WaitingRoom || isWaitingRoomFeatureFlagEnabled) {
+        Column(modifier = Modifier
+            .testTag(ACTION_BUTTON_TAG)
+            .fillMaxWidth()
+            .clickable {
+                if (action != ScheduleMeetingAction.WaitingRoom || !isCallInProgress) {
+                    onButtonClicked(action)
+                }
             }
-        }) {
-        if ((action != ScheduleMeetingAction.AddDescription || (!state.isEditingDescription && state.descriptionText.isEmpty())) && (action != ScheduleMeetingAction.EndRecurrence || state.rulesSelected.freq != OccurrenceFrequencyType.Invalid)) {
-            ActionOption(
-                state = state,
-                action = action,
-                isEnabled = action != ScheduleMeetingAction.WaitingRoom || !isCallInProgress,
-                isChecked = when (action) {
-                    ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
-                    ScheduleMeetingAction.AllowNonHostAddParticipants -> state.enabledAllowAddParticipantsOption
-                    ScheduleMeetingAction.SendCalendarInvite -> state.enabledSendCalendarInviteOption
-                    ScheduleMeetingAction.WaitingRoom -> state.enabledWaitingRoomOption
-                    else -> true
-                },
-                hasSwitch = when (action) {
-                    ScheduleMeetingAction.Recurrence,
-                    ScheduleMeetingAction.EndRecurrence,
-                    ScheduleMeetingAction.AddParticipants,
-                    ScheduleMeetingAction.AddDescription,
-                    -> false
+        ) {
+            if ((action != ScheduleMeetingAction.AddDescription || (!state.isEditingDescription && state.descriptionText.isEmpty()))
+                && (action != ScheduleMeetingAction.EndRecurrence || state.rulesSelected.freq != OccurrenceFrequencyType.Invalid)
+            ) {
+                ActionOption(
+                    state = state,
+                    action = action,
+                    isEnabled = action != ScheduleMeetingAction.WaitingRoom || !isCallInProgress,
+                    isChecked = when (action) {
+                        ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
+                        ScheduleMeetingAction.AllowNonHostAddParticipants -> state.enabledAllowAddParticipantsOption
+                        ScheduleMeetingAction.SendCalendarInvite -> state.enabledSendCalendarInviteOption
+                        ScheduleMeetingAction.WaitingRoom -> state.enabledWaitingRoomOption
+                        else -> true
+                    },
+                    hasSwitch = when (action) {
+                        ScheduleMeetingAction.Recurrence,
+                        ScheduleMeetingAction.EndRecurrence,
+                        ScheduleMeetingAction.AddParticipants,
+                        ScheduleMeetingAction.AddDescription,
+                        -> false
 
-                    else -> true
-                }
-            )
-
-            CustomDivider(
-                withStartPadding = when (action) {
-                    ScheduleMeetingAction.Recurrence,
-                    ScheduleMeetingAction.EndRecurrence,
-                    ScheduleMeetingAction.AddParticipants,
-                    ScheduleMeetingAction.SendCalendarInvite,
-                    ScheduleMeetingAction.WaitingRoom,
-                    -> true
-
-                    else -> false
-                }
-            )
-
-            if (action == ScheduleMeetingAction.Recurrence && state.showMonthlyRecurrenceWarning) {
-                state.rulesSelected.monthDayList?.let { list ->
-                    list.first().let { day ->
-                        Text(
-                            modifier = Modifier.padding(
-                                start = 72.dp, end = 16.dp, top = 8.dp, bottom = 8.dp
-                            ),
-                            style = MaterialTheme.typography.subtitle2.copy(
-                                color = MaterialTheme.colors.textColorSecondary,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Normal,
-                            ),
-                            text = pluralStringResource(
-                                R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
-                                day,
-                                day
-                            ),
-                        )
-                        CustomDivider(withStartPadding = true)
+                        else -> true
                     }
+                )
+
+                CustomDivider(
+                    withStartPadding = when (action) {
+                        ScheduleMeetingAction.Recurrence,
+                        ScheduleMeetingAction.EndRecurrence,
+                        ScheduleMeetingAction.AddParticipants,
+                        ScheduleMeetingAction.SendCalendarInvite,
+                        ScheduleMeetingAction.WaitingRoom,
+                        -> true
+
+                        else -> false
+                    }
+                )
+
+                if (action == ScheduleMeetingAction.Recurrence && state.showMonthlyRecurrenceWarning) {
+                    state.rulesSelected.monthDayList?.let { list ->
+                        list.first().let { day ->
+                            Text(
+                                modifier = Modifier
+                                    .padding(
+                                        start = 72.dp,
+                                        end = 16.dp,
+                                        top = 8.dp,
+                                        bottom = 8.dp
+                                    ),
+                                style = MaterialTheme.typography.subtitle2.copy(
+                                    color = MaterialTheme.colors.textColorSecondary,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Normal,
+                                ),
+                                text = pluralStringResource(
+                                    R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
+                                    day,
+                                    day
+                                ),
+                            )
+                            CustomDivider(withStartPadding = true)
+                        }
+
+                    }
+
                 }
             }
         }
     }
+
 }
 
 /**

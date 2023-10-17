@@ -31,6 +31,7 @@ import java.time.ZonedDateTime
  * @property editedOccurrenceDate               [ZonedDateTime]
  * @property chatRoomItem                       Selected [ChatRoomItem]
  * @property waitingRoomReminder                [WaitingRoomReminders]
+ * @property isWaitingRoomFeatureFlagEnabled    True, if waiting room feature flag is enabled. False, if not.
  * @property isCallInProgress                   True, if there is a call in progress. False, if not.
  * @constructor Create empty Scheduled meeting management state
  */
@@ -51,6 +52,7 @@ data class ScheduledMeetingManagementState constructor(
     val editedOccurrence: ChatScheduledMeetingOccurr? = null,
     val editedOccurrenceDate: ZonedDateTime? = null,
     val waitingRoomReminder: WaitingRoomReminders = WaitingRoomReminders.Enabled,
+    val isWaitingRoomFeatureFlagEnabled: Boolean = false,
     val isCallInProgress: Boolean = false,
 ) {
 
