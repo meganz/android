@@ -186,26 +186,6 @@ class MeetingActivityRepository @Inject constructor(
     }
 
     /**
-     * Method for creating a chat link
-     *
-     * @param chatId chat ID
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun createChatLink(chatId: Long, listener: MegaChatRequestListenerInterface) {
-        megaChatApi.createChatLink(chatId, listener)
-    }
-
-    /**
-     * Method for creating a chat link
-     *
-     * @param chatId chat ID
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun queryChatLink(chatId: Long, listener: MegaChatRequestListenerInterface) {
-        megaChatApi.queryChatLink(chatId, listener)
-    }
-
-    /**
      * Get a specific MegaChatRoom
      *
      * @param chatId chat ID

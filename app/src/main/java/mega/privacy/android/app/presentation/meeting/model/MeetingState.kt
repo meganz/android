@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.chat.ChatParticipant
@@ -28,7 +30,15 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property shouldNotInCallListBeShown                 True if not in call list must be shown or False otherwise (hidden).
  * @property isBottomPanelExpanded                      True if bottom panel is expanded or False otherwise (collapsed).
  * @property isGuest                                    True if it's guest. False, if not.
- * @property sendMeetingLink                            True, should send the meeting link. False, if not.
+ * @property meetingLink                                Meeting link.
+ * @property shouldShareMeetingLink                     True, if should share link. False if not.
+ * @property title                                      Title
+ * @property chatParticipantSelected                    [ChatParticipant] selected
+ * @property isSpeakerMode                              True, if it's speaker mode on. False, if not.
+ * @property selectParticipantEvent                     Select [ChatParticipant] event.
+ * @property removeParticipantDialog                    True, if should show remove participant dialog. False, if not.
+ * @property shouldPinToSpeakerView                     True, if should change to speaker view. False, if not.
+ * @property chatIdToOpen                               Chat Id of the chat that should be opened.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -51,7 +61,15 @@ data class MeetingState(
     val shouldNotInCallListBeShown: Boolean = false,
     val isBottomPanelExpanded: Boolean = false,
     val isGuest: Boolean = false,
-    val sendMeetingLink: Boolean = false,
+    val meetingLink: String = "",
+    val shouldShareMeetingLink: Boolean = false,
+    val title: String = "",
+    val chatParticipantSelected: ChatParticipant? = null,
+    val isSpeakerMode: Boolean = false,
+    val selectParticipantEvent: StateEvent = consumed,
+    val removeParticipantDialog: Boolean = false,
+    val shouldPinToSpeakerView: Boolean = false,
+    val chatIdToOpen: Long = -1L,
 ) {
     /**
      * Check if waiting room is opened

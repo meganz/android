@@ -1061,7 +1061,7 @@ private fun ParticipantItemView(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         val contactName =
                             participant.data.alias ?: participant.data.fullName
-                            ?: participant.email
+                            ?: participant.email ?: ""
 
                         Text(
                             text = if (participant.isMe) stringResource(

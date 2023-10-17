@@ -13,9 +13,8 @@ interface BottomFloatingPanelListener {
     fun onEndMeeting()
 
     /**
-     * Listener for share, invite button & allow add participants option
+     * Listener for invite button
      */
-    fun onShareLink(sendLink: Boolean)
     fun onInviteParticipants()
 
     /**

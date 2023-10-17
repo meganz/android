@@ -28,6 +28,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.fragments.CreateMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
@@ -36,6 +37,8 @@ import mega.privacy.android.app.meeting.fragments.JoinMeetingFragment
 import mega.privacy.android.app.meeting.fragments.MakeModeratorFragment
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
@@ -46,6 +49,7 @@ import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDial
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -266,12 +270,43 @@ class MeetingActivity : PasscodeActivity() {
                             meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
                         },
                         onShareMeetingLink = {
-                            meetingViewModel.sendMeetingLink()
-                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
-                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
-                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+                            meetingViewModel.queryMeetingLink(shouldShareMeetingLink = true)
                         },
-                        onParticipantMoreOptionsClicked = {
+                        onParticipantMoreOptionsClicked = { chatParticipant ->
+                            meetingViewModel.onParticipantMoreOptionsClick(chatParticipant)
+                        },
+                        onConsumeSelectParticipantEvent = { meetingViewModel.onConsumeSelectParticipantEvent() },
+                        onBottomPanelHiddenClicked = {
+                            meetingViewModel.onParticipantMoreOptionsClick(
+                                null
+                            )
+                        },
+                        onAddContactClicked = { meetingViewModel.onAddContactClick() },
+                        onEditProfileClicked = { editProfile() },
+                        onContactInfoClicked = { email -> openContactInfo(email) },
+                        onMakeHostClicked = {
+                            meetingViewModel.updateParticipantPermissions(
+                                ChatRoomPermission.Moderator
+                            )
+                        },
+                        onRemoveAsHostClicked = {
+                            meetingViewModel.updateParticipantPermissions(
+                                ChatRoomPermission.Standard
+                            )
+                        },
+                        onRemoveParticipant = {
+                            meetingViewModel.removeParticipantFromChat()
+                        },
+                        onRemoveParticipantClicked = {
+                            meetingViewModel.showOrHideRemoveParticipantDialog(true)
+                        },
+                        onDismissRemoveParticipantDialog = {
+                            meetingViewModel.showOrHideRemoveParticipantDialog(false)
+                        },
+                        onSendMessageClicked = { meetingViewModel.sendMessageToChat() },
+                        onDisplayInMainViewClicked = {
+                            meetingViewModel.onPinToSpeakerView(true)
+                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
                             meetingViewModel.onConsumeShouldInCallListBeShownEvent()
                             meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
                         }
@@ -316,6 +351,22 @@ class MeetingActivity : PasscodeActivity() {
                 waitingRoomManagementViewModel.setChatIdCallOpened(state.chatId)
             }
             waitingRoomManagementViewModel.setWaitingRoomSectionOpened(state.isWaitingRoomOpened())
+
+            if (state.shouldShareMeetingLink && state.meetingLink.isNotEmpty()) {
+                meetingViewModel.onConsumeShouldShareMeetingLinkEvent()
+                shareLink(state.meetingLink, state.title)
+            }
+
+            if (state.chatIdToOpen != -1L) {
+                startActivity(
+                    Intent(
+                        this,
+                        ChatActivity::class.java
+                    ).setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
+                        .putExtra(Constants.CHAT_ID, state.chatIdToOpen)
+                )
+                meetingViewModel.onConsumeNavigateToChatEvent()
+            }
         }
 
         collectFlow(waitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
@@ -594,6 +645,22 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     /**
+     * Method for sharing the link
+     *
+     * @param link      link
+     * @param title     title
+     */
+    fun shareLink(link: String, title: String) {
+        Timber.d("Share the link")
+        startActivity(Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, link)
+            putExtra(Intent.EXTRA_SUBJECT, title)
+            type = "text/plain"
+        })
+    }
+
+    /**
      * Method to remove the RTC Audio Manager when the call has not been finally established
      */
     private fun removeRTCAudioManager() {
@@ -620,5 +687,26 @@ class MeetingActivity : PasscodeActivity() {
 
             else -> super.dispatchKeyEvent(event)
         }
+    }
+
+    /**
+     * Open edit profile page
+     */
+    private fun editProfile() {
+        startActivity(Intent(this, MyAccountActivity::class.java))
+    }
+
+    /**
+     * Open Contact info
+     *
+     * @param email        User email
+     */
+    private fun openContactInfo(email: String?) {
+        startActivity(Intent(this, ContactInfoActivity::class.java).apply {
+            putExtra(
+                Constants.NAME,
+                email
+            )
+        })
     }
 }

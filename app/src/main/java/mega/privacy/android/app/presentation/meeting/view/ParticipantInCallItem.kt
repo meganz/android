@@ -79,14 +79,26 @@ fun ParticipantInCallItem(
                         .padding(end = 16.dp)
                         .align(Alignment.CenterVertically)
                 ) {
-                    ChatAvatarView(
-                        avatarUri = participant.data.avatarUri,
-                        avatarPlaceholder = participant.getAvatarFirstLetter(),
-                        avatarColor = participant.defaultAvatarColor,
-                        avatarTimestamp = participant.avatarUpdateTimestamp,
-                        modifier = Modifier
-                            .size(40.dp)
-                    )
+                    Box {
+                        ChatAvatarView(
+                            avatarUri = participant.data.avatarUri,
+                            avatarPlaceholder = participant.getAvatarFirstLetter(),
+                            avatarColor = participant.defaultAvatarColor,
+                            avatarTimestamp = participant.avatarUpdateTimestamp,
+                            modifier = Modifier
+                                .size(40.dp)
+                        )
+
+                        if (participant.areCredentialsVerified) {
+                            Image(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(10.dp),
+                                painter = painterResource(id = R.drawable.ic_verified),
+                                contentDescription = "Verified user"
+                            )
+                        }
+                    }
                 }
                 Column(
                     modifier = Modifier
@@ -95,7 +107,7 @@ fun ParticipantInCallItem(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         val contactName =
                             participant.data.alias ?: participant.data.fullName
-                            ?: participant.email
+                            ?: participant.email ?: ""
 
                         Text(
                             text = if (participant.isMe) stringResource(
@@ -107,7 +119,7 @@ fun ParticipantInCallItem(
                             overflow = TextOverflow.Ellipsis
                         )
 
-                        if (section == ParticipantsSection.InCallSection && participant.privilege == ChatRoomPermission.Moderator) {
+                        if ((section == ParticipantsSection.InCallSection || section == ParticipantsSection.NotInCallSection) && participant.privilege == ChatRoomPermission.Moderator) {
                             Image(
                                 modifier = Modifier.padding(start = 5.dp),
                                 imageVector = ImageVector.vectorResource(id = R.drawable.host_icon),

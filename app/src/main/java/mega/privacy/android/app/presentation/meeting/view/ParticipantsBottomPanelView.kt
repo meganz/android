@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -186,8 +187,9 @@ fun ParticipantsBottomPanelView(
                                             state.chatParticipantsInCall.size
                                         )
 
-                                        ParticipantsSection.NotInCallSection -> stringResource(
-                                            id = R.string.participants_number,
+                                        ParticipantsSection.NotInCallSection -> pluralStringResource(
+                                            id = R.plurals.meetings_bottom_panel_number_of_participants_not_in_call_label,
+                                            count = state.chatParticipantsNotInCall.size,
                                             state.chatParticipantsNotInCall.size
                                         )
 
@@ -281,6 +283,9 @@ fun ParticipantsBottomPanelView(
                 }
 
                 item(key = "See all") {
+                    SeeAllParticipantsButton(
+                        onSeeAllClicked = onSeeAllClick
+                    )
                     if (
                         (state.participantsSection == ParticipantsSection.WaitingRoomSection && shouldWaitingRoomSectionBeShown && state.chatParticipantsInWaitingRoom.size > maxNumParticipantsNoSeeAllOption) ||
                         (state.participantsSection == ParticipantsSection.InCallSection && state.chatParticipantsInCall.size > maxNumParticipantsNoSeeAllOption) ||

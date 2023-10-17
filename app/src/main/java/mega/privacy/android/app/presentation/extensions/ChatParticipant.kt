@@ -8,4 +8,4 @@ import mega.privacy.android.domain.entity.chat.ChatParticipant
  * @return The first letter of the string to be painted in the default avatar.
  */
 fun ChatParticipant.getAvatarFirstLetter(): String =
-    getAvatarFirstLetter(data.alias ?: data.fullName ?: email)
+    getAvatarFirstLetter(data.alias ?: data.fullName ?: email ?: "")

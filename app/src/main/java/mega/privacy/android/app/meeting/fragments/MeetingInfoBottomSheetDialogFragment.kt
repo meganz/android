@@ -28,6 +28,7 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.listenAction
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
@@ -77,22 +78,6 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             binding.meetingName.text = it
         }
 
-        shareViewModel.meetingLinkLiveData.observe(this) { link ->
-            if (link.isNotEmpty()) {
-                binding.copyLink.isVisible = true
-                binding.copyLink.text = link
-                chatLink = link
-                binding.copyLink.setOnClickListener { copyLink() }
-            }
-        }
-
-        shareViewModel.currentChatId.observe(this) {
-            updateView()
-            if (chatLink.isEmpty()) {
-                (parentFragment as InMeetingFragment).onShareLink(false)
-            }
-        }
-
         viewLifecycleOwner.collectFlow(inMeetingViewModel.updateModeratorsName) { moderatorsName ->
             binding.moderatorName.text = moderatorsName
             binding.moderatorName.isVisible = moderatorsName.isNotEmpty()
@@ -107,6 +92,14 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 )
         }
 
+        collectFlow(shareViewModel.state) { state: MeetingState ->
+            if (state.meetingLink.isNotEmpty()) {
+                binding.copyLink.isVisible = true
+                binding.copyLink.text = state.meetingLink
+                chatLink = state.meetingLink
+                binding.copyLink.setOnClickListener { copyLink() }
+            }
+        }
         initAction()
     }
 
@@ -122,10 +115,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
     /**
      * Init the click listener for buttons
      */
-    fun initAction() {
-        listenAction(binding.shareLink) {
-            (parentFragment as InMeetingFragment).onShareLink(true)
-        }
+    private fun initAction() {
         listenAction(binding.invite) { (parentFragment as InMeetingFragment).onInviteParticipants() }
         listenAction(binding.copyLink) { copyLink() }
         listenAction(binding.edit) { showRenameGroupDialog() }

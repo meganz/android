@@ -177,23 +177,11 @@
         app:layout_constraintStart_toStartOf="@id/fab_end"
         app:layout_constraintTop_toBottomOf="@id/fab_end" />
 
-    <Button
-        android:id="@+id/guest_share_link"
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="13dp"
-        android:drawableStart="@drawable/ic_social_share_white"
-        android:text="@string/context_get_link"
-        app:drawableTint="?attr/colorSecondary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toBottomOf="@id/fab_mic_label" />
-
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/participants_compose_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guest_share_link"/>
+        app:layout_constraintTop_toBottomOf="@id/fab_end_label"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

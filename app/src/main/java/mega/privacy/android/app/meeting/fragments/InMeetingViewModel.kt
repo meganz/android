@@ -19,9 +19,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -37,8 +35,6 @@ import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
-import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
@@ -59,10 +55,11 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
-import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -95,7 +92,6 @@ import javax.inject.Inject
  * @property endCallUseCase                 [EndCallUseCase]
  * @property getParticipantsChangesUseCase  [GetParticipantsChangesUseCase]
  * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
- * @property setOpenInvite                  [SetOpenInvite]
  * @property setChatVideoInDeviceUseCase    [SetChatVideoInDeviceUseCase]
  * @property megaChatApiGateway             [MegaChatApiGateway]
  * @property passcodeManagement             [PasscodeManagement]
@@ -146,8 +142,6 @@ class InMeetingViewModel @Inject constructor(
         TYPE_NO_CALL, TYPE_IN_PROGRESS, TYPE_ON_HOLD
     }
 
-    var status = InMeetingFragment.NOT_TYPE
-
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
     var previousState: Int = CALL_STATUS_INITIAL
 
@@ -184,17 +178,24 @@ class InMeetingViewModel @Inject constructor(
     private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
     val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
 
-    private val isConnected =
-        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
     /**
      * Participant in carousel clicked
      *
-     * @param item Participant clicked
+     * @param participant Participant clicked
      */
-    fun onItemClick(item: Participant) {
-        _pinItemEvent.value = Event(item)
+    fun onItemClick(participant: Participant) {
+        _pinItemEvent.value = Event(participant)
     }
+
+    /**
+     * Chat participant select to be in speaker view
+     *
+     * @param chatParticipant [ChatParticipant]
+     */
+    fun onItemClick(chatParticipant: ChatParticipant) =
+        participants.value?.find { it.peerId == chatParticipant.handle }?.let {
+            onItemClick(participant = it)
+        }
 
     private var waitingForMeetingLink: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
@@ -398,20 +399,20 @@ class InMeetingViewModel @Inject constructor(
                     getParticipantFullName(list[0])
                 )
             }
+
             2 -> { context: Context ->
                 context.getString(
                     if (type == TYPE_JOIN)
                         R.string.meeting_call_screen_two_participants_joined_call
                     else
                         R.string.meeting_call_screen_two_participants_left_call,
-                    getParticipantFullName(list[0]),
-                    getParticipantFullName(list[1])
+                    getParticipantFullName(list[0]), getParticipantFullName(list[1])
                 )
             }
+
             else -> { context: Context ->
                 context.resources.getQuantityString(
-                    if (type == TYPE_JOIN)
-                        R.plurals.meeting_call_screen_more_than_two_participants_joined_call
+                    if (type == TYPE_JOIN) R.plurals.meeting_call_screen_more_than_two_participants_joined_call
                     else
                         R.plurals.meeting_call_screen_more_than_two_participants_left_call,
                     numParticipants,
@@ -436,6 +437,7 @@ class InMeetingViewModel @Inject constructor(
                 _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
                 _showCallDuration.value = false
             }
+
             CALL_STATUS_IN_PROGRESS, CALL_STATUS_JOINING -> {
                 getChat()?.let { chat ->
                     if (!chat.isMeeting && isRequestSent() && isOutgoingCall) {
@@ -844,7 +846,7 @@ class InMeetingViewModel @Inject constructor(
         _callLiveData.value?.let { call ->
             if (isOneToOneCall()) {
                 val session = inMeetingRepository.getSessionOneToOneCall(call)
-                session?.let { it ->
+                session?.let {
                     return it.isOnHold
                 }
             }
@@ -960,6 +962,7 @@ class InMeetingViewModel @Inject constructor(
                         listWithChanges.add(participant)
                         participant.copy(avatar = getAvatarBitmap(peerId))
                     }
+
                     else -> participant
                 }
             }?.toMutableList()
@@ -999,6 +1002,7 @@ class InMeetingViewModel @Inject constructor(
                         listWithChanges.add(participant)
                         participant.copy(isModerator = isParticipantModerator(participant.peerId))
                     }
+
                     else -> participant
                 }
             }?.toMutableList()
@@ -1377,7 +1381,7 @@ class InMeetingViewModel @Inject constructor(
             val isModerator = isParticipantModerator(session.peerid)
             val name = getParticipantName(session.peerid)
             val isContact = isMyContact(session.peerid)
-            val hasHiRes = needHiRes(status)
+            val hasHiRes = needHiRes()
             val avatar = inMeetingRepository.getAvatarBitmap(session.peerid)
             val email = inMeetingRepository.getEmailParticipant(
                 session.peerid,
@@ -1556,11 +1560,10 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method for know if the resolution of a participant's video should be high
      *
-     * @param status if it's grid view or speaker view
      * @return True, if should be high. False, otherwise
      */
-    private fun needHiRes(status: String): Boolean =
-        participants.value?.let { status != TYPE_IN_SPEAKER_VIEW } ?: false
+    private fun needHiRes(): Boolean =
+        participants.value?.let { state.value.callUIStatus != CallUIStatusType.SpeakerView } ?: false
 
     /**
      * Method to know if the session has video on and is not on hold
@@ -1669,6 +1672,7 @@ class InMeetingViewModel @Inject constructor(
                     hasChanged = true
                     participant.copy(isVideoOn = session.hasVideo())
                 }
+
                 else -> participant
             }
         }?.toMutableList()
@@ -1679,6 +1683,7 @@ class InMeetingViewModel @Inject constructor(
                     hasChanged = true
                     participant.copy(isVideoOn = session.hasVideo())
                 }
+
                 else -> participant
             }
         }?.toMutableList()
@@ -1700,6 +1705,7 @@ class InMeetingViewModel @Inject constructor(
                     hasChanged = true
                     participant.copy(isAudioOn = session.hasAudio())
                 }
+
                 else -> participant
             }
         }?.toMutableList()
@@ -1951,7 +1957,7 @@ class InMeetingViewModel @Inject constructor(
             val iterator = listParticipants.iterator()
             iterator.forEach { participant ->
                 getSession(participant.clientId)?.let {
-                    if (status == TYPE_IN_SPEAKER_VIEW && participant.hasHiRes) {
+                    if (state.value.callUIStatus == CallUIStatusType.SpeakerView && participant.hasHiRes) {
                         Timber.d("Change to low resolution, clientID ${participant.clientId}")
                         participant.videoListener?.let {
                             removeResolutionAndListener(participant, it)
@@ -1959,7 +1965,7 @@ class InMeetingViewModel @Inject constructor(
 
                         participant.videoListener = null
                         participant.hasHiRes = false
-                    } else if (status == TYPE_IN_GRID_VIEW && !participant.hasHiRes) {
+                    } else if (state.value.callUIStatus == CallUIStatusType.GridView && !participant.hasHiRes) {
                         Timber.d("Change to high resolution, clientID ${participant.clientId}")
                         participant.videoListener?.let {
                             removeResolutionAndListener(participant, it)
@@ -2201,24 +2207,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Determine if should hide or show the link button
-     *
-     * @return True, if the link should be visible. False, if not.
-     */
-    fun isGuestLinkVisible(): Boolean = (isChatRoomPublic() && !isModerator() && !isOpenInvite())
-
-    /**
-     * Method to update the link button depending on the participant's permissions
-     *
-     * @return The appropriate text of the button
-     */
-    fun getGuestLinkTitle(context: Context): String = if (isModeratorOfPrivateRoom()) {
-        context.getString(R.string.invite_participants)
-    } else {
-        context.getString(R.string.context_get_link)
-    }
-
-    /**
      * Method to check if I am a chat moderator
      *
      * @return True, if I'm moderator. False, if not.
@@ -2298,6 +2286,7 @@ class InMeetingViewModel @Inject constructor(
                     handler -> {
                         participant.copy(isGuest = false)
                     }
+
                     else -> participant
                 }
             }?.toMutableList()
@@ -2459,7 +2448,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param participant The participant who is chosen as speaker
      */
-    fun addSpeaker(participant: Participant) {
+    private fun addSpeaker(participant: Participant) {
         if (speakerParticipants.value.isNullOrEmpty()) {
             createSpeaker(participant)
         } else {
@@ -2635,9 +2624,8 @@ class InMeetingViewModel @Inject constructor(
                     _showAssignModeratorBottomPanel.value = false
                     _showEndMeetingAsModeratorBottomPanel.value = true
                 }
-                else -> {
-                    hangCall()
-                }
+
+                else -> hangCall()
             }
         }
     }
@@ -2662,5 +2650,14 @@ class InMeetingViewModel @Inject constructor(
     fun hideBottomPanels() {
         _showEndMeetingAsModeratorBottomPanel.value = false
         _showAssignModeratorBottomPanel.value = false
+    }
+
+    /**
+     * Set call UI status
+     *
+     * @param newStatus [CallUIStatusType]
+     */
+    fun setStatus(newStatus: CallUIStatusType) {
+        _state.update { it.copy(callUIStatus = newStatus) }
     }
 }

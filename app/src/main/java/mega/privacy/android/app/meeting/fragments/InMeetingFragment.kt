@@ -86,6 +86,7 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
+import mega.privacy.android.app.presentation.meeting.model.InMeetingState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.utils.CallUtil
@@ -117,6 +118,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -183,7 +185,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var micIsEnable = false
     private var camIsEnable = false
     private var speakerIsEnable = false
-    private var meetingLink: String = ""
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
     private var isWaitingForMakeModerator = false
@@ -287,7 +288,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         }
 
                         inMeetingViewModel.updateOwnPrivileges(requireContext())
-                        bottomFloatingPanelViewHolder?.updateShareAndInviteButton()
                     }
 
                     if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
@@ -606,7 +606,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         // Get meeting link from the arguments supplied when the fragment was instantiated
-        meetingLink = args.meetingLink
+        sharedModel.updateMeetingLink(args.meetingLink)
 
         initLiveEventBus()
         takeActionByArgs()
@@ -665,7 +665,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     onSuccess = { _, _, _ ->
                                         Timber.d("Action guest. Create ephemeral Account, done")
                                         inMeetingViewModel.openChatPreview(
-                                            meetingLink,
+                                            sharedModel.state.value.meetingLink,
                                             SimpleChatRequestListener(
                                                 MegaChatRequest.TYPE_LOAD_PREVIEW,
                                                 onSuccess = { _, request, _ ->
@@ -904,36 +904,50 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
     }
 
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingState ->
+            if (state.error != null) {
+                sharedModel.showSnackBar(getString(state.error))
+            }
+
+            sharedModel.setSpeakerView(isSpeakerMode = state.callUIStatus == CallUIStatusType.SpeakerView)
+        }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
+            if (state.shouldPinToSpeakerView) {
+                state.chatParticipantSelected?.let {
+                    inMeetingViewModel.onItemClick(it)
+                    sharedModel.onPinToSpeakerView(false)
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(sharedWaitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
+            if (state.usersAdmitted) {
+                sharedWaitingRoomManagementViewModel.onConsumeUsersAdmittedEvent()
+                collapsePanel()
+            }
+            if (state.shouldWaitingRoomBeShown) {
+                sharedWaitingRoomManagementViewModel.onConsumeShouldWaitingRoomBeShownEvent()
+                sharedModel.updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
+                if (bottomFloatingPanelViewHolder?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomFloatingPanelViewHolder?.expand()
+                }
+            }
+        }
+    }
+
     /**
      * Init View Models
      */
     private fun initViewModel() {
-        collectFlow(inMeetingViewModel.state) { inMeetingState ->
-            if (inMeetingState.error != null) {
-                sharedModel.showSnackBar(getString(inMeetingState.error))
-            } else if (inMeetingState.resultSetOpenInvite != null) {
-                bottomFloatingPanelViewHolder?.updateShareAndInviteButton()
-            }
-        }
+        collectFlows()
 
         sharedModel.currentChatId.observe(viewLifecycleOwner) {
             it?.let {
                 Timber.d("Chat has changed")
                 inMeetingViewModel.setChatId(it, requireContext())
                 chatManagement.openChatRoom(it)
-            }
-        }
-
-        sharedModel.meetingLinkLiveData.observe(viewLifecycleOwner) {
-            if (!it.isNullOrEmpty()) {
-                Timber.d("Link has changed")
-                meetingLink = it
-                inMeetingViewModel.getCall()?.let {
-                    if (inMeetingViewModel.isWaitingForLink()) {
-                        inMeetingViewModel.setWaitingForLink(false)
-                        shareLink()
-                    }
-                }
             }
         }
 
@@ -1274,27 +1288,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
             }
         }
-
-        viewLifecycleOwner.collectFlow(sharedWaitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
-            if (state.usersAdmitted) {
-                sharedWaitingRoomManagementViewModel.onConsumeUsersAdmittedEvent()
-                collapsePanel()
-            }
-            if (state.shouldWaitingRoomBeShown) {
-                sharedWaitingRoomManagementViewModel.onConsumeShouldWaitingRoomBeShownEvent()
-                sharedModel.updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
-                if (bottomFloatingPanelViewHolder?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomFloatingPanelViewHolder?.expand()
-                }
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(sharedModel.state){ state: MeetingState ->
-            if(state.sendMeetingLink) {
-                sharedModel.onConsumeSendMeetingLinkEvent()
-                onShareLink(true)
-            }
-        }
     }
 
     /**
@@ -1603,11 +1596,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Show reconnecting UI
      */
     private fun reconnecting() {
-        Timber.d("Show reconnecting UI, the current status is ${inMeetingViewModel.status}")
-        if (inMeetingViewModel.status == NOT_TYPE)
+        Timber.d("Show reconnecting UI, the current status is ${inMeetingViewModel.state.value.callUIStatus}")
+        if (inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.None)
             return
 
-        inMeetingViewModel.status = NOT_TYPE
+        inMeetingViewModel.setStatus(newStatus = CallUIStatusType.None)
 
         removeListenersAndFragments()
         binding.reconnecting.isVisible = true
@@ -1617,11 +1610,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Remove fragments
      */
     fun removeUI() {
-        Timber.d("Removing call UI, the current status is ${inMeetingViewModel.status}")
-        if (inMeetingViewModel.status == NOT_TYPE)
+        Timber.d("Removing call UI, the current status is ${inMeetingViewModel.state.value.callUIStatus}")
+        if (inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.None)
             return
 
-        inMeetingViewModel.status = NOT_TYPE
+        inMeetingViewModel.setStatus(newStatus = CallUIStatusType.None)
 
         removeListenersAndFragments()
     }
@@ -1658,7 +1651,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Show one to one call UI
      */
     private fun initOneToOneCall() {
-        if (inMeetingViewModel.status == TYPE_IN_ONE_TO_ONE) return
+        if (inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.OneToOne) return
 
         removeListenersAndFragments()
 
@@ -1667,7 +1660,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             val session = inMeetingViewModel.getSessionOneToOneCall(currentCall)
             session?.let { userSession ->
                 Timber.d("Show one to one call UI")
-                inMeetingViewModel.status = TYPE_IN_ONE_TO_ONE
+                inMeetingViewModel.setStatus(newStatus = CallUIStatusType.OneToOne)
 
                 Timber.d("Create fragment")
                 individualCallFragment = IndividualCallFragment.newInstance(
@@ -1695,10 +1688,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param chatId ID of chat
      */
     private fun waitingForConnection(chatId: Long) {
-        if (inMeetingViewModel.status == TYPE_WAITING_CONNECTION) return
+        if (inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.WaitingConnection) return
 
         Timber.d("Show waiting for connection call UI")
-        inMeetingViewModel.status = TYPE_WAITING_CONNECTION
+        inMeetingViewModel.setStatus(newStatus = CallUIStatusType.WaitingConnection)
 
         removeListenersAndFragments()
 
@@ -1763,10 +1756,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to display the speaker view UI
      */
     private fun initSpeakerViewMode() {
-        if (inMeetingViewModel.status == TYPE_IN_SPEAKER_VIEW) return
+        if (inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.SpeakerView) return
 
         Timber.d("Show group call - Speaker View UI")
-        inMeetingViewModel.status = TYPE_IN_SPEAKER_VIEW
+        inMeetingViewModel.setStatus(newStatus =  CallUIStatusType.SpeakerView)
         inMeetingViewModel.removeAllParticipantVisible()
 
         gridViewCallFragment?.let {
@@ -1802,10 +1795,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to display the grid view UI
      */
     private fun initGridViewMode() {
-        if (inMeetingViewModel.status == TYPE_IN_GRID_VIEW) return
+        if (inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.GridView) return
 
         Timber.d("Show group call - Grid View UI")
-        inMeetingViewModel.status = TYPE_IN_GRID_VIEW
+        inMeetingViewModel.setStatus(newStatus = CallUIStatusType.GridView)
 
         inMeetingViewModel.removeAllParticipantVisible()
 
@@ -1844,7 +1837,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param chatId the chat ID
      */
     private fun initGroupCall(chatId: Long) {
-        if (inMeetingViewModel.status != TYPE_IN_GRID_VIEW && inMeetingViewModel.status != TYPE_IN_SPEAKER_VIEW) {
+        if (inMeetingViewModel.state.value.callUIStatus != CallUIStatusType.GridView && inMeetingViewModel.state.value.callUIStatus != CallUIStatusType.SpeakerView) {
             individualCallFragment?.let {
                 if (it.isAdded) {
                     it.removeChatVideoListener()
@@ -1868,7 +1861,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            inMeetingViewModel.status == TYPE_IN_SPEAKER_VIEW -> {
+            inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.SpeakerView -> {
                 Timber.d("Manual mode - Speaker view")
                 initSpeakerViewMode()
             }
@@ -1956,8 +1949,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        when (inMeetingViewModel.status) {
-            TYPE_IN_GRID_VIEW -> {
+        when (inMeetingViewModel.state.value.callUIStatus) {
+            CallUIStatusType.GridView -> {
                 gridViewMenuItem?.let {
                     it.isVisible = false
                 }
@@ -1966,7 +1959,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            TYPE_IN_SPEAKER_VIEW -> {
+            CallUIStatusType.SpeakerView -> {
                 gridViewMenuItem?.let {
                     it.isVisible = true
                 }
@@ -2552,44 +2545,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Send share link
-     *
-     * @param sendLink The link of the meeting
-     */
-    override fun onShareLink(sendLink: Boolean) {
-        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic() || inMeetingViewModel.isWaitingForLink()) {
-            Timber.e("Error getting the link, it is a private chat")
-            return
-        }
-
-        if (meetingLink.isEmpty()) {
-            inMeetingViewModel.setWaitingForLink(sendLink)
-            sharedModel.createChatLink(
-                inMeetingViewModel.getChatId(),
-                inMeetingViewModel.isModerator()
-            )
-            Timber.e("Error, the link doesn't exist")
-            return
-        }
-
-        if (sendLink)
-            shareLink()
-    }
-
-    /**
-     * Method for sharing the meeting link
-     */
-    fun shareLink() {
-        Timber.d("Share the link")
-        meetingActivity.startActivity(Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, meetingLink)
-            putExtra(Intent.EXTRA_SUBJECT, inMeetingViewModel.chatTitle.value)
-            type = "text/plain"
-        })
-    }
-
-    /**
      * Open invite participant page
      */
     @Suppress("deprecation")
@@ -2630,7 +2585,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MeetingParticipantBottomSheetDialogFragment.newInstance(
                 inMeetingViewModel.amIAGuest(),
                 inMeetingViewModel.isModerator(),
-                inMeetingViewModel.status == TYPE_IN_SPEAKER_VIEW,
+                inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.SpeakerView,
                 participant
             )
         participantBottomSheet.show(childFragmentManager, participantBottomSheet.tag)
@@ -2644,12 +2599,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         const val TOOLBAR_DY = 300f
 
         const val FLOATING_BOTTOM_SHEET_DY = 400f
-
-        const val NOT_TYPE = "NOT_TYPE"
-        const val TYPE_WAITING_CONNECTION = "TYPE_WAITING_CONNECTION"
-        const val TYPE_IN_ONE_TO_ONE = "TYPE_IN_ONE_TO_ONE"
-        const val TYPE_IN_GRID_VIEW = "TYPE_IN_GRID_VIEW"
-        const val TYPE_IN_SPEAKER_VIEW = "TYPE_IN_SPEAKER_VIEW"
 
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
 

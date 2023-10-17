@@ -88,7 +88,6 @@ class BottomFloatingPanelViewHolder(
         setupBottomSheet()
         listenButtons()
         setupRecyclerView()
-        updateShareAndInviteButton()
         updatePanel()
         initTipsAndRatio()
 
@@ -197,7 +196,6 @@ class BottomFloatingPanelViewHolder(
         }
 
         floatingPanelView.indicator.isVisible = !inMeetingViewModel.isOneToOneCall()
-        updateShareAndInviteButton()
     }
 
 
@@ -223,22 +221,6 @@ class BottomFloatingPanelViewHolder(
         val insetLayer2 = InsetDrawable(round2, 0, 0, 0, 0)
 
         return LayerDrawable(arrayOf(roundRect, insetLayer2))
-    }
-
-    /**
-     * Init the visibility of `ShareLink` & `Invite` Button
-     */
-    fun updateShareAndInviteButton() {
-        floatingPanelView.guestShareLink.apply {
-            isVisible = inMeetingViewModel.isGuestLinkVisible()
-            text = inMeetingViewModel.getGuestLinkTitle(context)
-            setCompoundDrawablesRelativeWithIntrinsicBounds(
-                if (inMeetingViewModel.isModeratorOfPrivateRoom()) R.drawable.ic_invite_contact else R.drawable.ic_social_share_white,
-                0,
-                0,
-                0
-            )
-        }
     }
 
     /**
@@ -381,14 +363,6 @@ class BottomFloatingPanelViewHolder(
             fabEnd.setOnClickListener {
                 listener.onEndMeeting()
             }
-
-            guestShareLink.setOnClickListener {
-                if (inMeetingViewModel.isModeratorOfPrivateRoom()) {
-                    listener.onInviteParticipants()
-                } else {
-                    listener.onShareLink(true)
-                }
-            }
         }
     }
 
@@ -495,7 +469,11 @@ class BottomFloatingPanelViewHolder(
                             }
                         },
                         onInviteParticipantsClick = { listener.onInviteParticipants() },
-                        onShareMeetingLinkClick = { listener.onShareLink(true) },
+                        onShareMeetingLinkClick = {
+                            meetingViewModel.queryMeetingLink(
+                                shouldShareMeetingLink = true
+                            )
+                        },
                         onAllowAddParticipantsClick = {
                             meetingViewModel.allowAddParticipantsClick()
                         },

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
-import android.util.Pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -13,6 +12,8 @@ import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -33,15 +34,14 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
+
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -49,6 +49,8 @@ import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
+import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.usecase.call.GetCallUseCase
@@ -60,22 +62,32 @@ import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_M
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
+import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.QueryChatLink
+import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -103,13 +115,21 @@ import javax.inject.Inject
  * @property logoutUseCase                  [LogoutUseCase]
  * @property monitorFinishActivityUseCase   [MonitorFinishActivityUseCase]
  * @property monitorChatCallUpdates         [MonitorChatCallUpdates]
- * @property getChatRoomUseCase             [GetChatRoomUseCase]
+ * @property getChatRoomByChatIdUseCase     [GetChatRoom]
  * @property getChatCall                    [GetChatCall]
  * @property getFeatureFlagValue            [GetFeatureFlagValueUseCase]
  * @property setOpenInvite                  [MonitorChatRoomUpdates]
  * @property chatParticipantMapper          [ChatParticipantMapper]
  * @property monitorChatRoomUpdates         [MonitorChatCallUpdates]
+ * @property queryChatLink                  [QueryChatLink]
  * @property isEphemeralPlusPlusUseCase     [IsEphemeralPlusPlusUseCase]
+ * @property createChatLink                 [CreateChatLink]
+ * @property inviteContactUseCase           [InviteContactUseCase]
+ * @property updateChatPermissionsUseCase   [UpdateChatPermissions]
+ * @property removeFromChaUseCase           [RemoveFromChat]
+ * @property startConversationUseCase       [StartConversationUseCase]
+ * @property isConnectedToInternetUseCase   [IsConnectedToInternetUseCase]
+ * @property monitorStorageStateEventUseCase [MonitorStorageStateEventUseCase]
  * @property state                      Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -127,18 +147,39 @@ class MeetingActivityViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
-    private val getChatRoomUseCase: GetChatRoom,
+    private val getChatRoomByChatIdUseCase: GetChatRoom,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
-    @ApplicationContext private val context: Context,
+    private val queryChatLink: QueryChatLink,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val setOpenInvite: SetOpenInvite,
     private val chatParticipantMapper: ChatParticipantMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
+    private val createChatLink: CreateChatLink,
+    private val inviteContactUseCase: InviteContactUseCase,
+    private val updateChatPermissionsUseCase: UpdateChatPermissions,
+    private val removeFromChaUseCase: RemoveFromChat,
+    private val startConversationUseCase: StartConversationUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
     private val _state = MutableStateFlow(MeetingState())
     val state: StateFlow<MeetingState> = _state
+
+    /**
+     * Check if is online (connected to Internet)
+     *
+     * @return True if it is only or False otherwise.
+     */
+    fun isOnline(): Boolean = isConnectedToInternetUseCase()
+
+    /**
+     * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.
+     * @return the latest [StorageState]
+     */
+    fun getStorageState(): StorageState = monitorStorageStateEventUseCase.getState()
 
     // Avatar
     private val _avatarLiveData = MutableLiveData<Bitmap>()
@@ -186,10 +227,6 @@ class MeetingActivityViewModel @Inject constructor(
     private val _meetingNameLiveData: MutableLiveData<String> = MutableLiveData<String>()
     val meetingNameLiveData: LiveData<String> = _meetingNameLiveData
 
-    // Link of meeting
-    private val _meetingLinkLiveData: MutableLiveData<String> = MutableLiveData<String>()
-    val meetingLinkLiveData: LiveData<String> = _meetingLinkLiveData
-
     // Show snack bar
     private val _snackBarLiveData = MutableLiveData("")
     val snackBarLiveData: LiveData<String> = _snackBarLiveData
@@ -220,20 +257,6 @@ class MeetingActivityViewModel @Inject constructor(
         Observer<Long> {
             updateChatRoomId(it)
             MegaApplication.isWaitingForCall = true
-            createChatLink(it)
-        }
-
-    private val linkRecoveredObserver =
-        Observer<Pair<Long, String>> { chatAndLink ->
-            _currentChatId.value?.let {
-                if (chatAndLink.first == it) {
-                    if (!chatAndLink.second.isNullOrEmpty()) {
-                        _meetingLinkLiveData.value = chatAndLink.second
-                    } else {
-                        _snackBarLiveData.value = context.getString(R.string.no_chat_link_available)
-                    }
-                }
-            }
         }
 
     private val titleMeetingChangeObserver =
@@ -288,9 +311,6 @@ class MeetingActivityViewModel @Inject constructor(
             )
             .addTo(composite)
 
-        LiveEventBus.get<Pair<Long, String>>(EVENT_LINK_RECOVERED)
-            .observeForever(linkRecoveredObserver)
-
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
@@ -323,7 +343,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun getChatRoom() = viewModelScope.launch {
         runCatching {
-            getChatRoomUseCase(_state.value.chatId)
+            getChatRoomByChatIdUseCase(_state.value.chatId)
         }.onSuccess { chatRoom ->
             chatRoom?.apply {
                 _state.update {
@@ -331,9 +351,12 @@ class MeetingActivityViewModel @Inject constructor(
                         hasHostPermission = ownPrivilege == ChatRoomPermission.Moderator,
                         isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                         enabledAllowNonHostAddParticipantsOption = isOpenInvite,
-                        hasWaitingRoom = isWaitingRoom
+                        hasWaitingRoom = isWaitingRoom,
+                        title = title
                     )
                 }
+
+                queryMeetingLink(shouldShareMeetingLink = false)
             }
 
         }.onFailure { exception ->
@@ -498,26 +521,6 @@ class MeetingActivityViewModel @Inject constructor(
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Method for creating a chat link
-     *
-     * @param chatId chat ID
-     */
-    fun createChatLink(chatId: Long, isModerator: Boolean = true) {
-        //The chat doesn't exist
-        if (isModerator) {
-            meetingActivityRepository.createChatLink(
-                chatId,
-                CreateGroupChatWithPublicLink()
-            )
-        } else {
-            meetingActivityRepository.queryChatLink(
-                chatId,
-                CreateGroupChatWithPublicLink()
-            )
         }
     }
 
@@ -799,9 +802,6 @@ class MeetingActivityViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .removeObserver(meetingCreatedObserver)
-
-        LiveEventBus.get<Pair<Long, String>>(EVENT_LINK_RECOVERED)
-            .removeObserver(linkRecoveredObserver)
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -989,11 +989,19 @@ class MeetingActivityViewModel @Inject constructor(
                             hasWaitingRoom
                         }
 
+                        val titleValue = if (chat.hasChanged(ChatRoomChange.Title)) {
+                            Timber.d("Changes in title")
+                            chat.title
+                        } else {
+                            title
+                        }
+
                         copy(
                             hasHostPermission = hostValue,
                             isOpenInvite = openInviteValue,
                             enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite,
-                            hasWaitingRoom = waitingRoomValue
+                            hasWaitingRoom = waitingRoomValue,
+                            title = titleValue
                         )
                     }
                 }
@@ -1013,19 +1021,90 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
     /**
-     * Send meeting link
+     * More options button clicked
+     *
+     * @param chatParticipant   [ChatParticipant]
      */
-    fun sendMeetingLink() = _state.update { state ->
+    fun onParticipantMoreOptionsClick(chatParticipant: ChatParticipant?) = _state.update { state ->
         state.copy(
-            sendMeetingLink = true
+            chatParticipantSelected = chatParticipant,
+            selectParticipantEvent = triggered
         )
     }
 
     /**
-     * Sets sendMeetingLink as consumed.
+     * Consume select participant event
      */
-    fun onConsumeSendMeetingLinkEvent() = _state.update { state ->
-        state.copy(sendMeetingLink = false)
+    fun onConsumeSelectParticipantEvent() =
+        _state.update { state -> state.copy(selectParticipantEvent = consumed) }
+
+    /**
+     * Query meeting link
+     *
+     * @param shouldShareMeetingLink   True, if link doesn't exist, create it to share it. False, otherwise.
+     */
+    fun queryMeetingLink(shouldShareMeetingLink: Boolean) {
+        if (state.value.meetingLink.isNotEmpty()) {
+            _state.update { state ->
+                state.copy(
+                    shouldShareMeetingLink = shouldShareMeetingLink,
+                )
+            }
+        } else {
+            _state.value.chatId.let { id ->
+                viewModelScope.launch {
+                    runCatching {
+                        queryChatLink(id)
+                    }.onFailure {
+                        if (state.value.hasHostPermission && shouldShareMeetingLink) {
+                            createChatLink()
+                        }
+                    }.onSuccess { request ->
+                        Timber.d("Query chat link successfully")
+                        updateMeetingLink(request.text ?: "")
+                        _state.update { state ->
+                            state.copy(
+                                shouldShareMeetingLink = shouldShareMeetingLink,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Create chat link
+     */
+    private fun createChatLink() {
+        _state.value.chatId.let { id ->
+            viewModelScope.launch {
+                runCatching {
+                    createChatLink(id)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess { request ->
+                    Timber.d("Query chat link successfully")
+                    updateMeetingLink(request.text ?: "")
+                    _state.update { state ->
+                        state.copy(
+                            shouldShareMeetingLink = true,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Update meeting link
+     *
+     * @param link  New meeting link
+     */
+    fun updateMeetingLink(link: String) = _state.update { state ->
+        state.copy(
+            meetingLink = link
+        )
     }
 
     /**
@@ -1058,6 +1137,13 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun onConsumeShouldNotInCallListBeShownEvent() = _state.update { state ->
         state.copy(shouldNotInCallListBeShown = false)
+    }
+
+    /**
+     * Sets shouldShareMeetingLink as consumed.
+     */
+    fun onConsumeShouldShareMeetingLinkEvent() = _state.update { state ->
+        state.copy(shouldShareMeetingLink = false)
     }
 
     /**
@@ -1171,5 +1257,149 @@ class MeetingActivityViewModel @Inject constructor(
         val newSelection =
             if (state.value.usersInWaitingRoomIDs.isEmpty() && state.value.participantsSection == ParticipantsSection.WaitingRoomSection) ParticipantsSection.InCallSection else state.value.participantsSection
         updateParticipantsSection(newSelection)
+    }
+
+    /**
+     * Add contact
+     */
+    fun onAddContactClick() {
+        state.value.chatParticipantSelected?.let { participant ->
+            viewModelScope.launch {
+                runCatching {
+                    inviteContactUseCase(
+                        participant.email ?: "",
+                        participant.handle ?: -1,
+                        null
+                    )
+                }.onSuccess { sentInviteResult ->
+                    val text = when (sentInviteResult) {
+                        InviteContactRequest.Sent -> context.getString(
+                            R.string.context_contact_request_sent,
+                            participant.email
+                        )
+
+                        InviteContactRequest.Resent -> context.getString(R.string.context_contact_invitation_resent)
+                        InviteContactRequest.Deleted -> context.getString(R.string.context_contact_invitation_deleted)
+                        InviteContactRequest.AlreadySent -> context.getString(
+                            R.string.invite_not_sent_already_sent,
+                            participant.email
+                        )
+
+                        InviteContactRequest.AlreadyContact -> context.getString(
+                            R.string.context_contact_already_exists,
+                            participant.email
+                        )
+
+                        InviteContactRequest.InvalidEmail -> context.getString(R.string.error_own_email_as_contact)
+                        InviteContactRequest.InvalidStatus -> context.getString(R.string.general_error)
+                    }
+
+                    showSnackBar(text)
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Pin to speaker view
+     */
+    fun onPinToSpeakerView(shouldPinToSpeakerView: Boolean) =
+        _state.update { state ->
+            state.copy(
+                shouldPinToSpeakerView = shouldPinToSpeakerView,
+            )
+        }
+
+    /**
+     * Show or hide remove participant dialog
+     */
+    fun showOrHideRemoveParticipantDialog(shouldShowDialog:Boolean) =
+        _state.update { state ->
+            state.copy(
+                removeParticipantDialog = shouldShowDialog,
+            )
+        }
+
+    /**
+     * Update participant permissions
+     *
+     * @param permission [ChatRoomPermission]
+     */
+    fun updateParticipantPermissions(permission: ChatRoomPermission) =
+        _state.value.chatParticipantSelected?.let { participant ->
+            viewModelScope.launch {
+                runCatching {
+                    updateChatPermissionsUseCase(state.value.chatId, participant.handle, permission)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess {}
+            }
+        }
+
+    /**
+     * Remove participant from chat
+     */
+    fun removeParticipantFromChat() =
+        _state.value.chatParticipantSelected?.let { participant ->
+            viewModelScope.launch {
+                runCatching {
+                    removeFromChaUseCase(state.value.chatId, participant.handle)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess {}
+            }
+        }
+
+    /**
+     * Set if it's speaker mode
+     *
+     * @param isSpeakerMode True, it's speaker view. False, it's grid view.
+     */
+    fun setSpeakerView(isSpeakerMode: Boolean) =
+        _state.update { it.copy(isSpeakerMode = isSpeakerMode) }
+
+    /**
+     * Method handles sent message to chat click from UI
+     *
+     * returns if user is not online
+     * updates [ContactInfoState.isStorageOverQuota] if storage state is [StorageState.PayWall]
+     * creates chatroom exists else returns existing chat room
+     * updates [ContactInfoState.shouldNavigateToChat] to true
+     */
+    fun sendMessageToChat() = viewModelScope.launch {
+        if (!isOnline()) return@launch
+        if (getStorageState() != StorageState.PayWall) {
+            startConversation()
+        }
+    }
+
+    /**
+     * Start conversation with participant selected
+     */
+    private suspend fun startConversation() {
+        _state.value.chatParticipantSelected?.let { participant ->
+            runCatching {
+                startConversationUseCase(isGroup = false, userHandles = listOf(participant.handle))
+            }.onSuccess {
+                _state.update { state ->
+                    state.copy(chatIdToOpen = it)
+                }
+            }.onFailure {
+                showSnackBar(context.getString(R.string.create_chat_error))
+            }
+        }
+    }
+
+    /**
+     * on Consume navigate to chat activity event
+     */
+    fun onConsumeNavigateToChatEvent() =
+        _state.update { it.copy(chatIdToOpen = INVALID_CHAT_HANDLE) }
+
+    companion object {
+        private const val INVALID_CHAT_HANDLE = -1L
     }
 }

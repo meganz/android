@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,19 +9,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -30,9 +35,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.dialog.view.CallParticipantBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
@@ -45,16 +54,29 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 /**
  * Participant list view
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ParticipantsFullListView(
     state: MeetingState,
     onAdmitAllClicked: () -> Unit,
     onShareMeetingLink: () -> Unit,
     onBackPressed: () -> Unit,
+    onConsumeSelectParticipantEvent: () -> Unit,
     onScrollChange: (Boolean) -> Unit,
-    onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
-    onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
-    onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
+    onAdmitParticipantClicked: (ChatParticipant) -> Unit,
+    onDenyParticipantClicked: (ChatParticipant) -> Unit,
+    onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit,
+    onAddContactClicked: () -> Unit,
+    onContactInfoClicked: (String) -> Unit,
+    onEditProfileClicked: () -> Unit,
+    onSendMessageClicked: () -> Unit,
+    onMakeHostClicked: () -> Unit,
+    onRemoveAsHostClicked: () -> Unit,
+    onDisplayInMainViewClicked: () -> Unit,
+    onRemoveParticipantClicked: () -> Unit,
+    onBottomPanelHiddenClicked: () -> Unit,
+    onRemoveParticipant: () -> Unit,
+    onDismissRemoveParticipantDialog: () -> Unit,
 ) {
     if ((state.participantsSection == ParticipantsSection.WaitingRoomSection &&
                 state.shouldWaitingRoomListBeShown &&
@@ -69,6 +91,26 @@ fun ParticipantsFullListView(
         val listState = rememberLazyListState()
         val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
         val scaffoldState = rememberScaffoldState()
+        val coroutineScope = rememberCoroutineScope()
+        val modalSheetState = rememberModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden,
+            confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
+            skipHalfExpanded = true,
+        )
+
+        BackHandler(enabled = modalSheetState.isVisible) {
+            coroutineScope.launch {
+                modalSheetState.hide()
+                onBottomPanelHiddenClicked()
+            }
+        }
+
+        EventEffect(
+            event = state.selectParticipantEvent,
+            onConsumed = onConsumeSelectParticipantEvent,
+            action = { modalSheetState.show() }
+        )
+
         Scaffold(
             modifier = Modifier.padding(top = 34.dp),
             scaffoldState = scaffoldState,
@@ -85,6 +127,15 @@ fun ParticipantsFullListView(
                 )
             }
         ) { paddingValues ->
+
+            state.chatParticipantSelected?.apply {
+                RemoveParticipantAlertDialog(
+                    shouldShowDialog = state.removeParticipantDialog,
+                    participantName = data.fullName ?: email ?: "",
+                    onDismiss = { onDismissRemoveParticipantDialog() },
+                    onRemove = { onRemoveParticipant() })
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -175,9 +226,48 @@ fun ParticipantsFullListView(
         }
 
         onScrollChange(!firstItemVisible)
+
+        CallParticipantBottomSheetView(
+            modalSheetState = modalSheetState,
+            coroutineScope = coroutineScope,
+            state = state,
+            onAddContactClick = onAddContactClicked,
+            onContactInfoClick = onContactInfoClicked,
+            onEditProfileClick = onEditProfileClicked,
+            onSendMessageClick = onSendMessageClicked,
+            onMakeHostClick = onMakeHostClicked,
+            onRemoveAsHostClick = onRemoveAsHostClicked,
+            onDisplayInMainViewClick = onDisplayInMainViewClicked,
+            onRemoveParticipantClick = onRemoveParticipantClicked,
+        )
     }
 }
 
+/**
+ * Remove participant Alert Dialog
+ *
+ * @param shouldShowDialog          True, show dialog. False, hide dialog.
+ * @param participantName           Name of participant selected.
+ * @param onDismiss                 When dismiss the alert dialog.
+ * @param onRemove                  When remove a participant.
+ */
+@Composable
+private fun RemoveParticipantAlertDialog(
+    shouldShowDialog: Boolean,
+    participantName: String,
+    onDismiss: () -> Unit,
+    onRemove: () -> Unit,
+) {
+    if (shouldShowDialog) {
+        MegaAlertDialog(
+            text = stringResource(id = R.string.confirmation_remove_chat_contact, participantName),
+            confirmButtonText = stringResource(id = R.string.general_remove),
+            cancelButtonText = stringResource(id = R.string.general_cancel),
+            onConfirm = onRemove,
+            onDismiss = onDismiss,
+        )
+    }
+}
 
 /**
  * App bar view
@@ -214,7 +304,11 @@ private fun ParticipantsFullListAppBar(
                 }
                 Text(
                     text = pluralStringResource(
-                        id = R.plurals.subtitle_of_group_chat,
+                        id = when (section) {
+                            ParticipantsSection.WaitingRoomSection -> R.plurals.subtitle_of_group_chat
+                            ParticipantsSection.InCallSection -> R.plurals.subtitle_of_group_chat
+                            ParticipantsSection.NotInCallSection -> R.plurals.meetings_meeting_not_in_call_section_subtitle
+                        },
                         count = participantsSize,
                         participantsSize
                     ),
@@ -255,9 +349,24 @@ fun PreviewUsersListViewWaitingRoom() {
             hasWaitingRoom = true
         ),
             onBackPressed = {},
-            onScrollChange = {},
             onShareMeetingLink = {},
-            onAdmitAllClicked = {})
+            onScrollChange = {},
+            onAdmitAllClicked = {},
+            onConsumeSelectParticipantEvent = {},
+            onRemoveParticipantClicked = {},
+            onRemoveAsHostClicked = {},
+            onMakeHostClicked = {},
+            onContactInfoClicked = {},
+            onEditProfileClicked = {},
+            onParticipantMoreOptionsClicked = {},
+            onDenyParticipantClicked = {},
+            onAdmitParticipantClicked = {},
+            onAddContactClicked = {},
+            onBottomPanelHiddenClicked = {},
+            onDismissRemoveParticipantDialog = {},
+            onDisplayInMainViewClicked = {},
+            onRemoveParticipant = {},
+            onSendMessageClicked = {})
     }
 }
 
@@ -274,9 +383,24 @@ fun PreviewUsersListViewInCall() {
             hasWaitingRoom = true
         ),
             onBackPressed = {},
-            onScrollChange = {},
             onShareMeetingLink = {},
-            onAdmitAllClicked = {})
+            onScrollChange = {},
+            onAdmitAllClicked = {},
+            onConsumeSelectParticipantEvent = {},
+            onRemoveParticipantClicked = {},
+            onRemoveAsHostClicked = {},
+            onMakeHostClicked = {},
+            onContactInfoClicked = {},
+            onEditProfileClicked = {},
+            onParticipantMoreOptionsClicked = {},
+            onDenyParticipantClicked = {},
+            onAdmitParticipantClicked = {},
+            onAddContactClicked = {},
+            onBottomPanelHiddenClicked = {},
+            onDismissRemoveParticipantDialog = {},
+            onDisplayInMainViewClicked = {},
+            onRemoveParticipant = {},
+            onSendMessageClicked = {})
     }
 }
 
@@ -295,8 +419,24 @@ fun PreviewUsersListViewNotInCall() {
             onBackPressed = {},
             onShareMeetingLink = {},
             onScrollChange = {},
-            onAdmitAllClicked = {})
+            onAdmitAllClicked = {},
+            onConsumeSelectParticipantEvent = {},
+            onRemoveParticipantClicked = {},
+            onRemoveAsHostClicked = {},
+            onMakeHostClicked = {},
+            onContactInfoClicked = {},
+            onEditProfileClicked = {},
+            onParticipantMoreOptionsClicked = {},
+            onDenyParticipantClicked = {},
+            onAdmitParticipantClicked = {},
+            onAddContactClicked = {},
+            onBottomPanelHiddenClicked = {},
+            onDismissRemoveParticipantDialog = {},
+            onDisplayInMainViewClicked = {},
+            onRemoveParticipant = {},
+            onSendMessageClicked = {})
     }
+
 }
 
 private fun getParticipants(): List<ChatParticipant> {

@@ -20,11 +20,12 @@ import mega.privacy.android.domain.entity.meeting.CallParticipantData
  * @property lastSeen                   User last seen.
  * @property avatarUpdateTimestamp      Timestamp for last avatar file update
  * @property privilegesUpdated          Check if privilege are updated.
+ * @property isContact                  True, if it's my contact. False, if not.
  */
 data class ChatParticipant(
     val handle: Long,
     val data: ContactData,
-    val email: String,
+    val email: String? = null,
     val isMe: Boolean,
     val privilege: ChatRoomPermission,
     val defaultAvatarColor: Int,
@@ -34,4 +35,5 @@ data class ChatParticipant(
     val avatarUpdateTimestamp: Long? = null,
     val privilegesUpdated: Boolean = false,
     val callParticipantData: CallParticipantData = CallParticipantData(),
+    val isContact: Boolean = false,
 )

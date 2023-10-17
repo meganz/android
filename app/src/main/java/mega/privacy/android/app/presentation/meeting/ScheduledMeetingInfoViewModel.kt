@@ -714,62 +714,64 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun onInviteContactTap() =
         _state.value.selected?.let { participant ->
-            viewModelScope.launch {
-                runCatching {
-                    inviteContact(participant.email)
-                }.onFailure { exception ->
-                    Timber.e(exception)
-                    triggerSnackbarMessage(
-                        getStringFromStringResMapper(
-                            R.string.general_error
-                        )
-                    )
-                }.onSuccess { request ->
-                    when (request) {
-                        InviteContactRequest.Sent -> triggerSnackbarMessage(
-                            getStringFromStringResMapper(
-                                R.string.context_contact_request_sent,
-                                participant.email
-                            )
-                        )
-
-                        InviteContactRequest.Resent -> triggerSnackbarMessage(
-                            getStringFromStringResMapper(
-                                R.string.context_contact_invitation_resent
-                            )
-                        )
-
-                        InviteContactRequest.Deleted -> triggerSnackbarMessage(
-                            getStringFromStringResMapper(
-                                R.string.context_contact_invitation_deleted
-                            )
-                        )
-
-                        InviteContactRequest.AlreadySent -> triggerSnackbarMessage(
-                            getStringFromStringResMapper(
-                                R.string.invite_not_sent_already_sent,
-                                participant.email
-                            )
-                        )
-
-                        InviteContactRequest.AlreadyContact -> triggerSnackbarMessage(
-                            getStringFromStringResMapper(
-                                R.string.context_contact_already_exists,
-                                participant.email
-                            )
-                        )
-
-                        InviteContactRequest.InvalidEmail -> triggerSnackbarMessage(
-                            getStringFromStringResMapper(
-                                R.string.error_own_email_as_contact
-                            )
-                        )
-
-                        else -> triggerSnackbarMessage(
+            participant.email?.let { email ->
+                viewModelScope.launch {
+                    runCatching {
+                        inviteContact(email)
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                        triggerSnackbarMessage(
                             getStringFromStringResMapper(
                                 R.string.general_error
                             )
                         )
+                    }.onSuccess { request ->
+                        when (request) {
+                            InviteContactRequest.Sent -> triggerSnackbarMessage(
+                                getStringFromStringResMapper(
+                                    R.string.context_contact_request_sent,
+                                    email
+                                )
+                            )
+
+                            InviteContactRequest.Resent -> triggerSnackbarMessage(
+                                getStringFromStringResMapper(
+                                    R.string.context_contact_invitation_resent
+                                )
+                            )
+
+                            InviteContactRequest.Deleted -> triggerSnackbarMessage(
+                                getStringFromStringResMapper(
+                                    R.string.context_contact_invitation_deleted
+                                )
+                            )
+
+                            InviteContactRequest.AlreadySent -> triggerSnackbarMessage(
+                                getStringFromStringResMapper(
+                                    R.string.invite_not_sent_already_sent,
+                                    email
+                                )
+                            )
+
+                            InviteContactRequest.AlreadyContact -> triggerSnackbarMessage(
+                                getStringFromStringResMapper(
+                                    R.string.context_contact_already_exists,
+                                    email
+                                )
+                            )
+
+                            InviteContactRequest.InvalidEmail -> triggerSnackbarMessage(
+                                getStringFromStringResMapper(
+                                    R.string.error_own_email_as_contact
+                                )
+                            )
+
+                            else -> triggerSnackbarMessage(
+                                getStringFromStringResMapper(
+                                    R.string.general_error
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -838,7 +840,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }.onSuccess { result ->
                 Timber.d("Chat left ")
                 if (result.userHandle == MegaApiJava.INVALID_HANDLE) {
-                    result.chatHandle?.let { chatHandle ->
+                    result.chatHandle.let { chatHandle ->
                         chatManagement.removeLeavingChatId(chatHandle)
                     }
                 }

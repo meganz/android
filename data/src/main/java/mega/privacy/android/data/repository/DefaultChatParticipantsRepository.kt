@@ -118,7 +118,6 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                         val alias = async { megaChatApiGateway.getUserAliasFromCache(handle) }
                         val fullName = async {
                             getContactFullNameUseCase(handle)
-
                         }
                         val email = async { getContactEmail(handle) }
                         val privilege = async { chatPermissionsMapper(participantPrivilege) }
@@ -210,14 +209,17 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             return status
         }
 
-        megaApiGateway.getContact(participant.email)?.let {
-            val status = userStatus[megaChatApiGateway.getUserOnlineStatus(it.handle)]
-                ?: UserStatus.Invalid
-            if (status != UserStatus.Online) {
-                requestLastGreen(it.handle)
+        participant.email?.let { email ->
+            megaApiGateway.getContact(email)?.let {
+                val status = userStatus[megaChatApiGateway.getUserOnlineStatus(it.handle)]
+                    ?: UserStatus.Invalid
+                if (status != UserStatus.Online) {
+                    requestLastGreen(it.handle)
+                }
+
+                return status
             }
 
-            return status
         }
 
         return UserStatus.Invalid
@@ -242,17 +244,20 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             if (participant.isMe) {
                 getMyAvatarFileUseCase(false)
             } else {
-                if (participant.email.isNotBlank()) {
-                    getAvatarFileFromEmailUseCase(
-                        userEmail = participant.email,
-                        skipCache = skipCache
-                    )
-                } else {
-                    getAvatarFileFromHandleUseCase(
-                        userHandle = participant.handle,
-                        skipCache = skipCache
-                    )
+                participant.email?.let { email ->
+                    if (email.isNotBlank()) {
+                        getAvatarFileFromEmailUseCase(
+                            userEmail = email,
+                            skipCache = skipCache
+                        )
+                    } else {
+                        getAvatarFileFromHandleUseCase(
+                            userHandle = participant.handle,
+                            skipCache = skipCache
+                        )
+                    }
                 }
+
             }
         }.getOrNull()?.takeIf { it.exists() && it.length() > 0 }
 
@@ -296,11 +301,17 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             megaChatApiGateway.getUserEmailFromCache(userHandle)
         }
 
-    override suspend fun areCredentialsVerified(participant: ChatParticipant): Boolean =
-        runCatching { areCredentialsVerifiedUseCase(participant.email) }.fold(
-            onSuccess = { cred -> cred },
-            onFailure = { false }
-        )
+    override suspend fun areCredentialsVerified(participant: ChatParticipant): Boolean {
+        val email = participant.email
+        if (email == null) {
+            return false
+        } else {
+            runCatching { areCredentialsVerifiedUseCase(email) }.fold(
+                onSuccess = { cred -> return cred },
+                onFailure = { return false }
+            )
+        }
+    }
 
     override suspend fun setOnlineStatus(status: UserStatus) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
