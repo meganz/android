@@ -10,7 +10,7 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -26,7 +26,7 @@ internal class PasscodeDatastoreMigrationTest {
     internal fun setUp() {
         underTest = PasscodeDatastoreMigration(
             databaseHandler = databaseHandler,
-            passcodeDataStoreFactory = mock { on { invoke(any()) }.thenReturn(passcodeDataStore) },
+            passcodeDataStoreFactory = mock { on { invoke(anyOrNull()) }.thenReturn(passcodeDataStore) },
         )
     }
 

@@ -20,7 +20,8 @@ internal class PasscodeDatastoreMigration @Inject constructor(
     }
 
     override suspend fun migrate(currentData: Preferences): Preferences {
-        val store = passcodeDataStoreFactory(currentData)
+        val newPreferences = currentData.toMutablePreferences()
+        val store = passcodeDataStoreFactory(newPreferences)
 
         val oldPreferences = databaseHandler.preferences
         if (oldPreferences == null) {
@@ -29,7 +30,7 @@ internal class PasscodeDatastoreMigration @Inject constructor(
             setExistingValues(store, oldPreferences)
         }
 
-        return currentData
+        return newPreferences
     }
 
     private suspend fun setDefaults(store: PasscodeDataStore) {

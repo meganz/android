@@ -39,12 +39,12 @@ internal class PasscodeDataStore(
     )
 
     constructor(
-        preferences: Preferences,
+        preferences: MutablePreferences,
         encryptData: EncryptData,
         decryptData: DecryptData,
     ) : this(
         getPreferenceFlow = { flowOf(preferences) },
-        editPreferences = { preferences.toMutablePreferences().apply { it(this) } },
+        editPreferences = { preferences.apply { it(this) } },
         encryptData = encryptData,
         decryptData = decryptData,
     )
