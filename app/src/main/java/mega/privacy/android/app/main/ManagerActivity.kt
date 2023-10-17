@@ -136,7 +136,6 @@ import mega.privacy.android.app.main.dialog.connect.ConfirmConnectDialogFragment
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogFragment
-import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
@@ -326,7 +325,6 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
-import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
@@ -338,7 +336,6 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -5453,23 +5450,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         megaApi.createFolder(folderName, parentNode, this)
     }
 
-    fun chooseAddContactDialog() {
-        Timber.d("chooseAddContactDialog")
-        if (megaApi.rootNode != null) {
-            startActivityForResult(
-                StartConversationActivity.getChatIntent(this),
-                Constants.REQUEST_CREATE_CHAT
-            )
-        } else {
-            Timber.w("Online but not megaApi")
-            showSnackbar(
-                Constants.SNACKBAR_TYPE,
-                getString(R.string.error_server_connection_problem),
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-            )
-        }
-    }
-
     override fun onJoinMeeting() {
         if (CallUtil.participatingInACall()) {
             CallUtil.showConfirmationInACall(
@@ -6148,38 +6128,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         chatId = chatId,
                         action = Constants.ACTION_CHAT_SHOW_MESSAGES
                     )
-                    return
-                }
-                val contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
-                val isGroup = intent.getBooleanExtra(AddContactActivity.EXTRA_GROUP_CHAT, false)
-                if (contactsData != null) {
-                    if (!isGroup) {
-                        Timber.d("Create one to one chat")
-                        val user = megaApi.getContact(contactsData[0])
-                        if (user != null) {
-                            Timber.d("Chat with contact: %s", contactsData.size)
-                            startOneToOneChat(user)
-                        }
-                    } else {
-                        Timber.d("Create GROUP chat")
-                        val peers: MegaChatPeerList = MegaChatPeerList.createInstance()
-                        for (i in contactsData.indices) {
-                            val user = megaApi.getContact(contactsData[i])
-                            if (user != null) {
-                                peers.addPeer(user.handle, MegaChatPeerList.PRIV_STANDARD)
-                            }
-                        }
-                        val chatTitle = intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE)
-                        val isEKR = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false)
-                        var chatLink = false
-                        if (!isEKR) {
-                            chatLink =
-                                intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false)
-                        }
-                        val allowAddParticipants =
-                            intent.getBooleanExtra(AddContactActivity.ALLOW_ADD_PARTICIPANTS, false)
-                        createGroupChat(peers, chatTitle, chatLink, isEKR, allowAddParticipants)
-                    }
                 }
             }
 
@@ -6307,62 +6255,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 { Timber.d("Upload started") },
                 { t: Throwable? -> Timber.e(t) })
             .addTo(composite)
-    }
-
-    fun createGroupChat(
-        peers: MegaChatPeerList,
-        chatTitle: String?,
-        chatLink: Boolean,
-        isEKR: Boolean,
-        allowAddParticipants: Boolean,
-    ) {
-        Timber.d("Create group chat with participants: %s", peers.size())
-        if (isEKR) {
-            megaChatApi.createGroupChat(peers, chatTitle, false, false, allowAddParticipants, this)
-        } else {
-            if (chatLink) {
-                if (chatTitle != null && chatTitle.isNotEmpty()) {
-                    val listener = CreateGroupChatWithPublicLink(this, chatTitle)
-                    megaChatApi.createPublicChat(
-                        peers,
-                        chatTitle,
-                        false,
-                        false,
-                        allowAddParticipants,
-                        listener
-                    )
-                } else {
-                    Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null)
-                }
-            } else {
-                megaChatApi.createPublicChat(
-                    peers,
-                    chatTitle,
-                    false,
-                    false,
-                    allowAddParticipants,
-                    this
-                )
-            }
-        }
-    }
-
-    fun startOneToOneChat(user: MegaUser?) {
-        Timber.d("User Handle: %s", user?.handle)
-        val chat = user?.let { megaChatApi.getChatRoomByUser(it.handle) }
-        val peers: MegaChatPeerList = MegaChatPeerList.createInstance()
-        if (chat == null) {
-            Timber.d("No chat, create it!")
-            user?.handle?.let { peers.addPeer(it, MegaChatPeerList.PRIV_STANDARD) }
-            megaChatApi.createChat(false, peers, this)
-        } else {
-            Timber.d("There is already a chat, open it!")
-            navigator.openChat(
-                context = this,
-                chatId = chat.chatId,
-                action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            )
-        }
     }
 
     private fun disableNavigationViewMenu(menu: Menu) {
@@ -6852,10 +6744,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun onRequestUpdate(api: MegaChatApiJava, request: MegaChatRequest) {}
     override fun onRequestFinish(api: MegaChatApiJava, request: MegaChatRequest, e: MegaChatError) {
         Timber.d("onRequestFinish(CHAT): %s_%d", request.requestString, e.errorCode)
-        if (request.type == MegaChatRequest.TYPE_CREATE_CHATROOM) {
-            Timber.d("Create chat request finish")
-            onRequestFinishCreateChat(e.errorCode, request.chatHandle)
-        } else if (request.type == MegaChatRequest.TYPE_DISCONNECT) {
+        if (request.type == MegaChatRequest.TYPE_DISCONNECT) {
             if (e.errorCode == MegaChatError.ERROR_OK) {
                 Timber.d("DISConnected from chat!")
             } else {
@@ -6927,22 +6816,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         request: MegaChatRequest,
         e: MegaChatError,
     ) {
-    }
-
-    fun onRequestFinishCreateChat(errorCode: Int, chatHandle: Long) {
-        if (errorCode == MegaChatError.ERROR_OK) {
-            Timber.d("Chat CREATED.")
-            //Update chat view
-            Timber.d("Open new chat: %s", chatHandle)
-            navigator.openChat(
-                context = this,
-                chatId = chatHandle,
-                action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            )
-        } else {
-            Timber.e("ERROR WHEN CREATING CHAT %d", errorCode)
-            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.create_chat_error), -1)
-        }
     }
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
