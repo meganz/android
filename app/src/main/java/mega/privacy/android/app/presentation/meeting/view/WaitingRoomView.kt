@@ -59,6 +59,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.analytics.Analytics
@@ -294,6 +295,7 @@ internal fun WaitingRoomView(
     }
 
     LaunchedEffect(state.guestMode) {
+        delay(200)
         if (state.guestMode) {
             focusRequester.requestFocus()
         }
