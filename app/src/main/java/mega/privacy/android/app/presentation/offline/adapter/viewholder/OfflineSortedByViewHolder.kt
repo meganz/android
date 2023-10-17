@@ -17,7 +17,6 @@ class OfflineSortedByViewHolder(
             this.orderNameStringId =
                 SortByHeaderViewModel.orderNameMap[sortByViewModel.order.third]!!
             this.sortByHeaderViewModel = sortByViewModel
-            this.enterMediaDiscovery.isVisible = false
         }
     }
 }

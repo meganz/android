@@ -844,7 +844,6 @@ class MegaExplorerAdapter(
             }]?.let {
                 binding.orderNameStringId = it
             }
-            binding.enterMediaDiscovery.isVisible = false
         }
     }
 

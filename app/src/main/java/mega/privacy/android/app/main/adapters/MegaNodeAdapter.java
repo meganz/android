@@ -1,10 +1,10 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.CONTACT_SHARED_FOLDER_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
@@ -85,8 +85,8 @@ import mega.privacy.android.app.main.ContactFileListFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.backups.BackupsFragment;
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
 import mega.privacy.android.app.presentation.shares.links.LinksFragment;
@@ -237,30 +237,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             if (type == FOLDER_LINK_ADAPTER) {
                 binding.sortByLayout.setVisibility(View.GONE);
-                setFolderLinkMediaDiscoveryVisibility(binding);
             } else {
                 binding.sortByLayout.setVisibility(View.VISIBLE);
-                setMediaDiscoveryVisibility(binding);
             }
 
             binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
                     ? View.GONE
                     : View.VISIBLE);
         }
-    }
-
-    private void setFolderLinkMediaDiscoveryVisibility(SortByHeaderBinding binding) {
-        boolean isInFolderLink = type == FOLDER_LINK_ADAPTER;
-        boolean hasMediaFile = MegaNodeUtil.containsMediaFile(nodes);
-        binding.enterMediaDiscovery.setVisibility(isInFolderLink && hasMediaFile ? View.VISIBLE : View.GONE);
-    }
-
-    private void setMediaDiscoveryVisibility(SortByHeaderBinding binding) {
-        long currentHandle = ((ManagerActivity) context).getParentHandleBrowser();
-        boolean isInFileBrowser = type == FILE_BROWSER_ADAPTER;
-        boolean hasMediaFile = MegaNodeUtil.containsMediaFile(nodes);
-        boolean isNotRoot = currentHandle != megaApi.getRootNode().getHandle();
-        binding.enterMediaDiscovery.setVisibility(isInFileBrowser && hasMediaFile && isNotRoot ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -1541,6 +1525,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     /**
      * Sets contact verification value
+     *
      * @param isContactVerificationOn boolean value of contact verification info
      */
     public void setContactVerificationOn(boolean isContactVerificationOn) {

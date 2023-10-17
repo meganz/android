@@ -184,7 +184,6 @@ class FavouritesGridViewHolder(
                 is SortByHeaderBinding -> {
                     orderNameStringId =
                         (item as FavouriteHeaderItem).orderStringId ?: R.string.sortby_name
-                    enterMediaDiscovery.isVisible = false
                     this.sortByHeaderViewModel = sortByHeaderViewModel
                 }
                 else -> {}

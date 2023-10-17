@@ -21,7 +21,6 @@ class FolderContentHeaderHolder(
             orderNameStringId =
                 SortByHeaderViewModel.orderNameMap[sortByViewModel.order.third]!!
             sortByHeaderViewModel = sortByViewModel
-            enterMediaDiscovery.isVisible = false
         }
     }
 }

@@ -235,13 +235,6 @@ class SortByHeaderViewModel @Inject constructor(
     }
 
     /**
-     * Enter media discovery view.
-     */
-    fun enterMediaDiscovery(isFromFolderLink: Boolean) {
-        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Boolean::class.java).post(isFromFolderLink)
-    }
-
-    /**
      * onCleared()
      */
     override fun onCleared() {
