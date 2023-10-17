@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 
-import mega.privacy.android.app.main.adapters.LastContactsAdapter;
 import mega.privacy.android.app.main.adapters.MegaContactsAdapter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiJava;
@@ -59,8 +58,6 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                                 ((MegaContactsAdapter.ViewHolderContactsGrid) holder).imageView.setImageBitmap(bitmap);
                             } else if (holder instanceof MegaContactsAdapter.ViewHolderContactsList) {
                                 ((MegaContactsAdapter.ViewHolderContactsList) holder).imageView.setImageBitmap(bitmap);
-                            } else if (holder instanceof LastContactsAdapter.ViewHolder) {
-                                ((LastContactsAdapter.ViewHolder) holder).avatarImage.setImageBitmap(bitmap);
                             }
                         }
                     }
