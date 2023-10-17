@@ -283,9 +283,6 @@ fun ParticipantsBottomPanelView(
                 }
 
                 item(key = "See all") {
-                    SeeAllParticipantsButton(
-                        onSeeAllClicked = onSeeAllClick
-                    )
                     if (
                         (state.participantsSection == ParticipantsSection.WaitingRoomSection && shouldWaitingRoomSectionBeShown && state.chatParticipantsInWaitingRoom.size > maxNumParticipantsNoSeeAllOption) ||
                         (state.participantsSection == ParticipantsSection.InCallSection && state.chatParticipantsInCall.size > maxNumParticipantsNoSeeAllOption) ||
