@@ -71,7 +71,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -412,10 +411,13 @@ class SettingsCameraUploadsViewModelTest {
 
     private fun testUploadOption(uploadOption: UploadOption) = runTest {
         setupUnderTest()
-
         whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
 
         underTest.changeUploadOption(uploadOption)
+
+        verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
+        verify(clearCacheDirectory).invoke()
+        verify(rescheduleCameraUploadUseCase).invoke()
         underTest.state.test {
             assertThat(awaitItem().uploadOption).isEqualTo(uploadOption)
         }
@@ -556,6 +558,13 @@ class SettingsCameraUploadsViewModelTest {
             newFolderPath = testPath,
             isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
         )
+        verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
+        verify(clearCacheDirectory).invoke()
+        verify(rescheduleCameraUploadUseCase).invoke()
+        verify(setupOrUpdateCameraUploadsBackupUseCase).invoke(
+            localFolder = testPath,
+            targetNode = null
+        )
         underTest.state.test {
             assertThat(awaitItem().primaryFolderPath).isEqualTo(testPath)
         }
@@ -628,19 +637,6 @@ class SettingsCameraUploadsViewModelTest {
             underTest.setupSecondaryCameraUploadFolder(testHandle)
 
             verify(setupSecondaryFolderUseCase).invoke(testHandle)
-        }
-
-    @Test
-    fun `test that resetCameraUploadTimeStamps and clearCacheDirectory are invoked in order when calling resetTimestampsAndCacheDirectory`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.resetTimestampsAndCacheDirectory()
-
-            with(inOrder(clearCacheDirectory, resetCameraUploadTimeStamps)) {
-                verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
-                verify(clearCacheDirectory).invoke()
-            }
         }
 
     @Test
@@ -759,18 +755,6 @@ class SettingsCameraUploadsViewModelTest {
             verify(setupDefaultSecondaryFolderUseCase).invoke()
             verify(restoreSecondaryTimestamps).invoke()
             verify(setupMediaUploadsSettingUseCase).invoke(true)
-        }
-
-    @Test
-    fun `test that camera uploads backup is updated when updateCameraUploadsLocalFolder is invoked`() =
-        runTest {
-            setupUnderTest()
-            val cameraUploadsFolderPath = "/path/to/camera uploads"
-            underTest.updateCameraUploadsBackup(cameraUploadsFolderPath)
-            verify(setupOrUpdateCameraUploadsBackupUseCase).invoke(
-                localFolder = cameraUploadsFolderPath,
-                targetNode = null
-            )
         }
 
     @Test

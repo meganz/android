@@ -370,15 +370,9 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Resets all Timestamps and cleans the Cache Directory
      */
-    fun resetTimestampsAndCacheDirectory() {
-        viewModelScope.launch {
-            runCatching {
-                resetCameraUploadTimeStamps(clearCamSyncRecords = true)
-                clearCacheDirectory()
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
+    private suspend fun resetTimestampsAndCacheDirectory() {
+        resetCameraUploadTimeStamps(clearCamSyncRecords = true)
+        clearCacheDirectory()
     }
 
     private suspend fun resetAndDisableMediaUploads() {
@@ -420,9 +414,16 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @param wifiOnly If true, Camera Uploads will only run through Wi-Fi
      * If false, Camera Uploads can run through either Wi-Fi or Mobile Data
      */
-    fun changeUploadConnectionType(wifiOnly: Boolean) = viewModelScope.launch {
-        setCameraUploadsByWifiUseCase(wifiOnly)
-        refreshUploadConnectionType()
+    fun changeUploadConnectionType(wifiOnly: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setCameraUploadsByWifiUseCase(wifiOnly)
+                refreshUploadConnectionType()
+                rescheduleCameraUploadUseCase()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     /**
@@ -430,9 +431,17 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      *
      * @param uploadOption The new [UploadOption]
      */
-    fun changeUploadOption(uploadOption: UploadOption) = viewModelScope.launch {
-        setUploadOptionUseCase(uploadOption)
-        refreshUploadOption()
+    fun changeUploadOption(uploadOption: UploadOption) {
+        viewModelScope.launch {
+            runCatching {
+                setUploadOptionUseCase(uploadOption)
+                refreshUploadOption()
+                resetTimestampsAndCacheDirectory()
+                rescheduleCameraUploadUseCase()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     /**
@@ -452,17 +461,24 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      *
      * @param value The new Video Quality, represented as an Integer from the list
      */
-    fun changeUploadVideoQuality(value: Int) = viewModelScope.launch {
-        VideoQuality.values().find { it.value == value }?.let { videoQuality ->
-            setUploadVideoQualityUseCase(videoQuality)
-            setUploadVideoSyncStatusUseCase(
-                if (videoQuality == VideoQuality.ORIGINAL) {
-                    SyncStatus.STATUS_PENDING
-                } else {
-                    SyncStatus.STATUS_TO_COMPRESS
+    fun changeUploadVideoQuality(value: Int) {
+        viewModelScope.launch {
+            runCatching {
+                VideoQuality.values().find { it.value == value }?.let { videoQuality ->
+                    setUploadVideoQualityUseCase(videoQuality)
+                    setUploadVideoSyncStatusUseCase(
+                        if (videoQuality == VideoQuality.ORIGINAL) {
+                            SyncStatus.STATUS_PENDING
+                        } else {
+                            SyncStatus.STATUS_TO_COMPRESS
+                        }
+                    )
+                    refreshUploadVideoQuality()
+                    rescheduleCameraUploadUseCase()
                 }
-            )
-            refreshUploadVideoQuality()
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
@@ -505,20 +521,31 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @param isFolderInSDCard true if the local Folder is now located in the SD Card, and
      * false if otherwise
      */
-    fun changePrimaryFolderPath(newPath: String?, isFolderInSDCard: Boolean) =
+    fun changePrimaryFolderPath(newPath: String?, isFolderInSDCard: Boolean) {
         viewModelScope.launch {
-            if (isPrimaryFolderPathValidUseCase(newPath)) {
-                newPath?.let {
-                    setPrimaryFolderPathUseCase(
-                        newFolderPath = it,
-                        isPrimaryFolderInSDCard = isFolderInSDCard,
+            runCatching {
+                if (isPrimaryFolderPathValidUseCase(newPath)) {
+                    newPath?.let {
+                        setPrimaryFolderPathUseCase(
+                            newFolderPath = it,
+                            isPrimaryFolderInSDCard = isFolderInSDCard,
+                        )
+                    }
+                    resetTimestampsAndCacheDirectory()
+                    rescheduleCameraUpload()
+                    refreshPrimaryFolderPath()
+                    setupOrUpdateCameraUploadsBackupUseCase(
+                        localFolder = newPath,
+                        targetNode = null
                     )
+                } else {
+                    setInvalidFolderSelectedPromptShown(true)
                 }
-                refreshPrimaryFolderPath()
-            } else {
-                setInvalidFolderSelectedPromptShown(true)
+            }.onFailure {
+                Timber.e(it)
             }
         }
+    }
 
     /**
      * Shows / hides the Invalid Folder Selected prompt by updating the
@@ -729,23 +756,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             )
         }.onFailure {
             Timber.e(it)
-        }
-    }
-
-    /**
-     * update Camera Uploads Backup
-     * @param cameraUploadsFolderPath
-     */
-    fun updateCameraUploadsBackup(cameraUploadsFolderPath: String?) {
-        viewModelScope.launch {
-            runCatching {
-                setupOrUpdateCameraUploadsBackupUseCase(
-                    localFolder = cameraUploadsFolderPath,
-                    targetNode = null
-                )
-            }.onFailure {
-                Timber.e(it)
-            }
         }
     }
 

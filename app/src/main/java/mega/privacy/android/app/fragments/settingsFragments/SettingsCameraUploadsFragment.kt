@@ -389,7 +389,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                         viewModel.changeUploadConnectionType(wifiOnly = false)
                     }
                 }
-                viewModel.rescheduleCameraUpload()
             }
 
             KEY_CAMERA_UPLOAD_WHAT_TO -> {
@@ -406,13 +405,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                         viewModel.changeUploadOption(UploadOption.PHOTOS_AND_VIDEOS)
                     }
                 }
-                viewModel.resetTimestampsAndCacheDirectory()
-                viewModel.rescheduleCameraUpload()
             }
 
             KEY_CAMERA_UPLOAD_VIDEO_QUALITY -> {
                 viewModel.changeUploadVideoQuality(value)
-                viewModel.rescheduleCameraUpload()
             }
         }
         return true
@@ -430,24 +426,17 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 val newPrimaryFolderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
                 val isFolderInSDCard =
                     intent.getBooleanExtra(FileStorageActivity.EXTRA_IS_FOLDER_IN_SD_CARD, false)
-
-                with(viewModel) {
-                    changePrimaryFolderPath(
-                        newPath = newPrimaryFolderPath,
-                        isFolderInSDCard = isFolderInSDCard,
-                    )
-                    resetTimestampsAndCacheDirectory()
-                    rescheduleCameraUpload()
-                }
-                // Update Sync when the Primary Local Folder has changed
-                viewModel.updateCameraUploadsBackup(newPrimaryFolderPath)
+                viewModel.changePrimaryFolderPath(
+                    newPath = newPrimaryFolderPath,
+                    isFolderInSDCard = isFolderInSDCard,
+                )
             }
 
             REQUEST_MEGA_CAMERA_FOLDER -> {
                 // Primary Folder to Sync
                 val handle = intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!isNewSettingValid(
-                        primaryPath = prefs?.camSyncLocalPath,
+                        primaryPath = viewModel.state.value.primaryFolderPath,
                         secondaryPath = prefs?.localPathSecondaryFolder,
                         primaryHandle = handle.toString(),
                         secondaryHandle = prefs?.megaHandleSecondaryFolder,
@@ -475,7 +464,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 val isFolderInSDCard =
                     intent.getBooleanExtra(FileStorageActivity.EXTRA_IS_FOLDER_IN_SD_CARD, false)
                 if (!isNewSettingValid(
-                        primaryPath = prefs?.camSyncLocalPath,
+                        primaryPath = viewModel.state.value.primaryFolderPath,
                         secondaryPath = secondaryPath,
                         primaryHandle = prefs?.camSyncHandle,
                         secondaryHandle = prefs?.megaHandleSecondaryFolder,
@@ -503,7 +492,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 val secondaryHandle =
                     intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!isNewSettingValid(
-                        primaryPath = prefs?.camSyncLocalPath,
+                        primaryPath = viewModel.state.value.primaryFolderPath,
                         secondaryPath = prefs?.localPathSecondaryFolder,
                         primaryHandle = prefs?.camSyncHandle,
                         secondaryHandle = secondaryHandle.toString(),
