@@ -30,7 +30,6 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_IN
@@ -56,11 +55,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_CREATED
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
@@ -81,7 +81,8 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
-
+    @Inject
+    lateinit var navigator: MegaNavigator
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
 
@@ -350,10 +351,11 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * @param chatId Chat id.
      */
     private fun openChatRoom(chatId: Long) {
-        val intentOpenChat = Intent(this@ScheduledMeetingInfoActivity, ChatActivity::class.java)
-        intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-        intentOpenChat.putExtra(CHAT_ID, chatId)
-        this.startActivity(intentOpenChat)
+        navigator.openChat(
+            context = this,
+            chatId = chatId,
+            action = Constants.ACTION_CHAT_SHOW_MESSAGES
+        )
     }
 
     /**

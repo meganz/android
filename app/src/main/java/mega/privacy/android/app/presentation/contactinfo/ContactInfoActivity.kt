@@ -63,7 +63,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -106,6 +105,7 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -138,6 +138,12 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     @Inject
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
+
+    /**
+     * Navigator
+     */
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
@@ -213,13 +219,12 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun navigateToChatActivity(handle: Long) {
-        val intent = Intent(this@ContactInfoActivity, ChatActivity::class.java)
-            .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
-            .putExtra(Constants.CHAT_ID, handle)
-        if (!viewModel.isFromContacts) {
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        this@ContactInfoActivity.startActivity(intent)
+        navigator.openChat(
+            context = this,
+            chatId = handle,
+            action = Constants.ACTION_CHAT_SHOW_MESSAGES,
+            flags = if (!viewModel.isFromContacts) Intent.FLAG_ACTIVITY_CLEAR_TOP else 0
+        )
         finish()
     }
 

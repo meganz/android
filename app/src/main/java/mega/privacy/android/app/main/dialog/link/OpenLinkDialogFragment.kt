@@ -21,7 +21,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -40,6 +39,7 @@ import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,6 +59,9 @@ internal class OpenLinkDialogFragment : DialogFragment() {
 
     @Inject
     lateinit var openLinkPositiveTextMapper: OpenLinkPositiveTextMapper
+
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     private val viewModel: OpenLinkViewModel by viewModels()
     override fun onCreateView(
@@ -253,10 +256,11 @@ internal class OpenLinkDialogFragment : DialogFragment() {
 
     fun showChatLink(link: String?) {
         Timber.d("showChatLink: %s", link)
-        startActivity(Intent(requireContext(), ChatActivity::class.java).apply {
+        navigator.openChat(
+            context = requireContext(),
+            link = link,
             action = Constants.ACTION_OPEN_CHAT_LINK
-            data = Uri.parse(link)
-        })
+        )
     }
 
     companion object {

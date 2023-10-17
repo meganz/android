@@ -25,29 +25,24 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.meeting.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
@@ -62,7 +57,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.ChatScreenEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
@@ -76,7 +71,8 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ChatTabsFragment : Fragment() {
-
+    @Inject
+    lateinit var navigator: MegaNavigator
     companion object {
         private const val EXTRA_SHOW_MEETING_TAB = "EXTRA_SHOW_MEETING_TAB"
 
@@ -100,9 +96,6 @@ class ChatTabsFragment : Fragment() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val showMeetingTab by lazy {
         arguments?.getBoolean(EXTRA_SHOW_MEETING_TAB, false) ?: false
@@ -295,22 +288,11 @@ class ChatTabsFragment : Fragment() {
     private fun onItemClick(chatId: Long) {
         viewModel.signalChatPresence()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val isNewChatEnabled = getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)
-            if (isNewChatEnabled) {
-                val intent = Intent(context, ChatHostActivity::class.java).apply {
-                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                    putExtra(Constants.CHAT_ID, chatId)
-                }
-                startActivity(intent)
-            } else {
-                val intent = Intent(context, ChatActivity::class.java).apply {
-                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                    putExtra(Constants.CHAT_ID, chatId)
-                }
-                startActivity(intent)
-            }
-        }
+        navigator.openChat(
+            context = requireActivity(),
+            chatId = chatId,
+            action = Constants.ACTION_CHAT_SHOW_MESSAGES
+        )
     }
 
 
@@ -403,10 +385,10 @@ class ChatTabsFragment : Fragment() {
      * @param chatId    Chat id
      */
     private fun launchChatScreen(chatId: Long) {
-        startActivity(
-            Intent(requireContext(), ChatActivity::class.java)
-                .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
-                .putExtra(Constants.CHAT_ID, chatId)
+        navigator.openChat(
+            context = requireActivity(),
+            chatId = chatId,
+            action = Constants.ACTION_CHAT_SHOW_MESSAGES
         )
     }
 

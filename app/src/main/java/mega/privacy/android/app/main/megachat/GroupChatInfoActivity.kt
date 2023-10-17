@@ -83,6 +83,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -134,6 +135,9 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     @Inject
     lateinit var chatManagement: ChatManagement
+
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     lateinit var binding: ActivityGroupChatPropertiesBinding
     private val viewModel by viewModels<GroupChatInfoViewModel>()
@@ -977,10 +981,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 Timber.d("Create chat request finish!!!")
                 if (e.errorCode == MegaChatError.ERROR_OK) {
                     Timber.d("Open new chat")
-                    val intent = Intent(this, ChatActivity::class.java)
-                    intent.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                    intent.putExtra(Constants.CHAT_ID, request.chatHandle)
-                    this.startActivity(intent)
+                    navigator.openChat(
+                        context = this,
+                        chatId = request.chatHandle,
+                        action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                    )
                 } else {
                     Timber.e("ERROR WHEN CREATING CHAT %s", e.errorString)
                     showSnackbar(getString(R.string.create_chat_error))
@@ -1280,10 +1285,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD)
             megaChatApi.createChat(false, peers, this)
         } else {
-            val intentOpenChat = Intent(this, ChatActivity::class.java)
-            intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
-            this.startActivity(intentOpenChat)
+            navigator.openChat(
+                context = this,
+                chatId = chat.chatId,
+                action = Constants.ACTION_CHAT_SHOW_MESSAGES
+            )
         }
     }
 

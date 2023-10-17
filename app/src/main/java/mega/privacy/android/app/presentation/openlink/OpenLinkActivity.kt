@@ -27,7 +27,6 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
@@ -91,6 +90,7 @@ import mega.privacy.android.app.utils.isURLSanitized
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -108,7 +108,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     LoadPreviewListener.OnPreviewLoadedCallback {
-
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     /**
      * QuerySignupLinkUseCase injection
@@ -530,11 +531,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Navigate to ChatActivity
      */
     private fun goToChatActivity() {
-        startActivity(
-            Intent(this, ChatActivity::class.java)
-                .setAction(ACTION_OPEN_CHAT_LINK)
-                .setData(Uri.parse(url))
-        )
+        navigator.openChat(context = this, action = ACTION_OPEN_CHAT_LINK, link = url)
         finish()
     }
 

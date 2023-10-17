@@ -3,7 +3,11 @@ package mega.privacy.android.app.contacts.list
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -11,7 +15,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
@@ -19,7 +22,6 @@ import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.main.InviteContactActivity
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.ContactUtil
@@ -27,13 +29,16 @@ import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import mega.privacy.android.navigation.MegaNavigator
+import javax.inject.Inject
 
 /**
  * Fragment that represents the UI showing the list of contacts for the current user.
  */
 @AndroidEntryPoint
 class ContactListFragment : Fragment() {
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     private lateinit var binding: FragmentContactListBinding
 
@@ -126,11 +131,11 @@ class ContactListFragment : Fragment() {
 
     private fun onContactClick(userHandle: Long) {
         viewModel.getChatRoomId(userHandle).observe(viewLifecycleOwner) { chatId ->
-            val intent = Intent(requireContext(), ChatActivity::class.java).apply {
+            navigator.openChat(
+                context = requireActivity(),
+                chatId = chatId,
                 action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                putExtra(Constants.CHAT_ID, chatId)
-            }
-            startActivity(intent)
+            )
         }
     }
 

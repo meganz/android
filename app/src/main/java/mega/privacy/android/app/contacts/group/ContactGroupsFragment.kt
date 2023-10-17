@@ -25,20 +25,23 @@ import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Fragment that represents the UI showing the list of contact groups for the current user.
  */
 @AndroidEntryPoint
 class ContactGroupsFragment : Fragment() {
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     private lateinit var binding: FragmentContactGroupsBinding
 
@@ -183,9 +186,10 @@ class ContactGroupsFragment : Fragment() {
      * @param groupId   Group Id to be opened
      */
     private fun openGroupChatScreen(groupId: Long) {
-        startActivity(Intent(context, ChatActivity::class.java).apply {
+        navigator.openChat(
+            context = requireActivity(),
+            chatId = groupId,
             action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            putExtra(Constants.CHAT_ID, groupId)
-        })
+        )
     }
 }

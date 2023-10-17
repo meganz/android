@@ -16,14 +16,19 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listenAction
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.*
+import javax.inject.Inject
 
 /**
  * The fragment shows options for different roles when click the three dots
  */
 @AndroidEntryPoint
 class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+    @Inject
+    lateinit var navigator: MegaNavigator
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel: MeetingActivityViewModel by activityViewModels()
     private val inMeetingViewModel: InMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
@@ -105,7 +110,14 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.sendMessage) {
             // Open chat page
-            bottomViewModel.sendMessage(requireActivity())
+            val chatId = bottomViewModel.sendMessage()
+            if (chatId > 0L) {
+                navigator.openChat(
+                    context = requireActivity(),
+                    chatId = chatId,
+                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                )
+            }
         }
 
         listenAction(binding.pingToSpeaker) {

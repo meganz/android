@@ -142,7 +142,6 @@ import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDia
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.main.mapper.ManagerRedirectIntentMapper
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -310,6 +309,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
@@ -439,9 +439,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     @Inject
     lateinit var inAppUpdateHandler: InAppUpdateHandler
 
-
     @Inject
     lateinit var searchTypeMapper: SearchTypeMapper
+
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
@@ -2655,12 +2657,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (chatId != -1L) {
             val chat = megaChatApi.getChatRoom(chatId)
             if (chat != null) {
+                navigator.openChat(
+                    context = this,
+                    chatId = chatId,
+                    action = Constants.ACTION_CHAT_SHOW_MESSAGES,
+                    text = text
+                )
                 Timber.d("Open chat with id: %s", chatId)
-                val intentToChat = Intent(this, ChatActivity::class.java)
-                intentToChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                intentToChat.putExtra(Constants.CHAT_ID, chatId)
-                intentToChat.putExtra(Constants.SHOW_SNACKBAR, text)
-                this.startActivity(intentToChat)
             } else {
                 Timber.e("Error, chat is NULL")
             }
@@ -4105,10 +4108,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     override fun moveToChatSection(chatId: Long) {
         if (chatId != -1L) {
-            val chatIntent = Intent(this, ChatActivity::class.java)
-            chatIntent.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            chatIntent.putExtra(Constants.CHAT_ID, chatId)
-            this.startActivity(chatIntent)
+            navigator.openChat(
+                context = this,
+                chatId = chatId,
+                action = Constants.ACTION_CHAT_SHOW_MESSAGES
+            )
         }
         drawerItem = DrawerItem.CHAT
         selectDrawerItem(drawerItem, chatId)
@@ -5276,15 +5280,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun showChatLink(link: String?) {
         Timber.d("Link: %s", link)
-        val openChatLinkIntent = Intent(this, ChatActivity::class.java)
-        if (joiningToChatLink) {
-            openChatLinkIntent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
+        val action = if (joiningToChatLink) {
             resetJoiningChatLink()
+            Constants.ACTION_JOIN_OPEN_CHAT_LINK
         } else {
-            openChatLinkIntent.action = Constants.ACTION_OPEN_CHAT_LINK
+            Constants.ACTION_OPEN_CHAT_LINK
         }
-        openChatLinkIntent.data = Uri.parse(link)
-        startActivity(openChatLinkIntent)
+        navigator.openChat(context = this, action = action, link = link)
         if (drawerItem != DrawerItem.CHAT) {
             drawerItem = DrawerItem.CHAT
             selectDrawerItem(drawerItem)
@@ -6141,10 +6143,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
                 if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                    startActivity(
-                        Intent(this, ChatActivity::class.java)
-                            .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
-                            .putExtra(Constants.CHAT_ID, chatId)
+                    navigator.openChat(
+                        context = this,
+                        chatId = chatId,
+                        action = Constants.ACTION_CHAT_SHOW_MESSAGES
                     )
                     return
                 }
@@ -6355,10 +6357,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             megaChatApi.createChat(false, peers, this)
         } else {
             Timber.d("There is already a chat, open it!")
-            val intentOpenChat = Intent(this, ChatActivity::class.java)
-            intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
-            this.startActivity(intentOpenChat)
+            navigator.openChat(
+                context = this,
+                chatId = chat.chatId,
+                action = Constants.ACTION_CHAT_SHOW_MESSAGES
+            )
         }
     }
 
@@ -6929,13 +6932,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun onRequestFinishCreateChat(errorCode: Int, chatHandle: Long) {
         if (errorCode == MegaChatError.ERROR_OK) {
             Timber.d("Chat CREATED.")
-
             //Update chat view
             Timber.d("Open new chat: %s", chatHandle)
-            val chatIntent = Intent(this, ChatActivity::class.java)
-            chatIntent.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            chatIntent.putExtra(Constants.CHAT_ID, chatHandle)
-            this.startActivity(chatIntent)
+            navigator.openChat(
+                context = this,
+                chatId = chatHandle,
+                action = Constants.ACTION_CHAT_SHOW_MESSAGES
+            )
         } else {
             Timber.e("ERROR WHEN CREATING CHAT %d", errorCode)
             showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.create_chat_error), -1)

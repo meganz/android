@@ -8,10 +8,8 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatPeerList
 import javax.inject.Inject
@@ -205,9 +203,8 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
     /**
      * Open sending message page
      *
-     * @param activity the current activity
      */
-    fun sendMessage(activity: Activity) {
+    fun sendMessage() : Long {
         participant?.peerId?.let {
             val chat = megaChatApi.getChatRoomByUser(it)
             val peers = MegaChatPeerList.createInstance()
@@ -216,11 +213,9 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
                 peers.addPeer(it, MegaChatPeerList.PRIV_STANDARD)
                 megaChatApi.createChat(false, peers, null)
             } else {
-                val intentOpenChat = Intent(activity, ChatActivity::class.java)
-                intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
-                activity.startActivity(intentOpenChat)
+                return chat.chatId
             }
         }
+        return -1L
     }
 }

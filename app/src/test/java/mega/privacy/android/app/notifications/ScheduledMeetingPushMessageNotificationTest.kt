@@ -13,7 +13,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.entity.pushes.PushMessage
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -34,6 +36,9 @@ class ScheduledMeetingPushMessageNotificationTest {
 
     private lateinit var context: Context
     private val notificationManagerCompat: NotificationManagerCompat = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock {
+        onBlocking { invoke(AppFeatures.NewChatActivity) }.thenReturn(false)
+    }
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @get:Rule(order = 0)
@@ -44,7 +49,10 @@ class ScheduledMeetingPushMessageNotificationTest {
         Dispatchers.setMain(testDispatcher)
 
         context = ApplicationProvider.getApplicationContext()
-        underTest = ScheduledMeetingPushMessageNotification(notificationManagerCompat)
+        underTest = ScheduledMeetingPushMessageNotification(
+            notificationManagerCompat,
+            getFeatureFlagValueUseCase
+        )
         hiltRule.inject()
     }
 

@@ -72,6 +72,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfe
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -146,6 +147,9 @@ class ChatUploadService : LifecycleService() {
 
     @Inject
     lateinit var broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
+
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     private var isForeground = false
     private var canceled = false
@@ -1310,12 +1314,14 @@ class ChatUploadService : LifecycleService() {
 
                 if (pendMsg.chatId == openChatId) {
                     Timber.w("Error update activity")
-                    val intent = Intent(this, ChatActivity::class.java)
-                    intent.action = Constants.ACTION_UPDATE_ATTACHMENT
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.putExtra("ID_MSG", pendMsg.id)
-                    intent.putExtra("IS_OVERQUOTA", isOverQuota)
-                    startActivity(intent)
+                    navigator.openChat(
+                        context = this,
+                        chatId = pendMsg.chatId,
+                        action = Constants.ACTION_UPDATE_ATTACHMENT,
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK,
+                        messageId = pendMsg.id,
+                        isOverQuota = isOverQuota
+                    )
                 }
             }
         }
