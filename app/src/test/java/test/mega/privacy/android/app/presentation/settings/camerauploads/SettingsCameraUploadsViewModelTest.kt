@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -60,6 +61,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -68,7 +70,6 @@ import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -135,6 +136,8 @@ class SettingsCameraUploadsViewModelTest {
         mock<BroadcastBusinessAccountExpiredUseCase>()
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
+    private val isSecondaryFolderEnabledUseCase: IsSecondaryFolderEnabled = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
 
     @Before
     fun setUp() {
@@ -191,7 +194,7 @@ class SettingsCameraUploadsViewModelTest {
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
-            isConnectedToInternetUseCase = mock(),
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
             setupMediaUploadsSettingUseCase = setupMediaUploadsSettingUseCase,
             setupCameraUploadsSyncHandleUseCase = setupCameraUploadsSyncHandleUseCase,
@@ -202,6 +205,7 @@ class SettingsCameraUploadsViewModelTest {
             monitorCameraUploadsFolderDestinationUseCase = mock(),
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            isSecondaryFolderEnabledUseCase = isSecondaryFolderEnabledUseCase,
         )
     }
 
@@ -603,16 +607,6 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that restoreSecondaryTimestamps is invoked when calling restoreSecondaryTimestampsAndSyncRecordProcess`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.restoreSecondaryTimestampsAndSyncRecordProcess()
-
-            verify(restoreSecondaryTimestamps).invoke()
-        }
-
-    @Test
     fun `test that setupPrimaryFolder is invoked when calling setupPrimaryCameraUploadFolder`() =
         runTest {
             setupUnderTest()
@@ -650,14 +644,17 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that media uploads are disabled when calling disableMediaUploads`() = runTest {
-        setupUnderTest()
-
-        underTest.disableMediaUploads()
-
-        verify(resetMediaUploadTimeStamps).invoke()
-        verify(disableMediaUploadSettings).invoke()
-    }
+    fun `test that media uploads are disabled when calling onEnableOrDisableMediaUpload`() =
+        runTest() {
+            setupUnderTest()
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            // enable media upload
+            underTest.onEnableOrDisableMediaUpload()
+            // disable media upload
+            underTest.onEnableOrDisableMediaUpload()
+            verify(resetMediaUploadTimeStamps).invoke()
+            verify(disableMediaUploadSettings).invoke()
+        }
 
     @Test
     fun `test that when startCameraUpload is called, startCameraUploadUseCase is called`() =
@@ -729,14 +726,14 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that shouldDisplayError is true when an exception occurs while setting up the default secondary folder`() =
-        runTest {
+        runTest(StandardTestDispatcher()) {
+            whenever(isSecondaryFolderEnabledUseCase()).thenReturn(true)
             setupUnderTest()
-
-            whenever(setupDefaultSecondaryFolderUseCase(any())).thenThrow(RuntimeException())
-
-            underTest.state.map { it.shouldShowError }.distinctUntilChanged().test {
-                assertThat(awaitItem()).isFalse()
-                underTest.onMediaUploadsEnabled(anyString())
+            testScheduler.advanceUntilIdle()
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            whenever(setupDefaultSecondaryFolderUseCase()).thenThrow(RuntimeException())
+            underTest.onEnableOrDisableMediaUpload()
+            underTest.state.map { it.shouldShowError }.test {
                 assertThat(awaitItem()).isTrue()
             }
         }
@@ -754,12 +751,12 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that media uploads is enabled when onMediaUploadsEnabled is invoked`() =
-        runTest {
+    fun `test that media uploads is enabled when onEnableOrDisableMediaUpload is invoked`() =
+        runTest(StandardTestDispatcher()) {
             setupUnderTest()
-            val mediaUploadsName = "Media Uploads"
-            underTest.onMediaUploadsEnabled(mediaUploadsName)
-            verify(setupDefaultSecondaryFolderUseCase).invoke(mediaUploadsName)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            underTest.onEnableOrDisableMediaUpload()
+            verify(setupDefaultSecondaryFolderUseCase).invoke()
             verify(restoreSecondaryTimestamps).invoke()
             verify(setupMediaUploadsSettingUseCase).invoke(true)
         }
@@ -781,11 +778,13 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
             val mediaUploadsFolderPath = "/path/to/media uploads"
-            underTest.updateMediaUploadsBackup(mediaUploadsFolderPath)
+            underTest.updateMediaUploadsLocalFolder(mediaUploadsFolderPath)
             verify(setupOrUpdateMediaUploadsBackupUseCase).invoke(
                 localFolder = mediaUploadsFolderPath,
                 targetNode = null
             )
+            verify(restoreSecondaryTimestamps).invoke()
+            verify(rescheduleCameraUploadUseCase).invoke()
         }
 
     @Test

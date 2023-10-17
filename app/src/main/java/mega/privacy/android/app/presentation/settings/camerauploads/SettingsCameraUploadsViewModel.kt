@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -164,6 +165,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val isSecondaryFolderEnabledUseCase: IsSecondaryFolderEnabled,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -282,35 +284,27 @@ class SettingsCameraUploadsViewModel @Inject constructor(
 
     /**
      * on Enable MediaUpload
-     * @param mediaUploadsName
      */
-    fun onMediaUploadsEnabled(mediaUploadsName: String) {
-        viewModelScope.launch {
-            runCatching {
-                // Sets up a Secondary Folder with a Media Uploads folder name
-                setupDefaultSecondaryFolderUseCase(mediaUploadsName)
-                //If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
-                //if not clean the sync record from previous primary folder
-                restoreSecondaryTimestamps()
-                setupMediaUploadsSettingUseCase(isEnabled = true)
-            }.onFailure {
-                Timber.e(it)
-                setErrorState(shouldShow = true)
-            }
+    private suspend fun enableMediaUploads() {
+        runCatching {
+            // Sets up a Secondary Folder with a Media Uploads folder name
+            setupDefaultSecondaryFolderUseCase()
+            //If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
+            //if not clean the sync record from previous primary folder
+            restoreSecondaryTimestamps()
+            setupMediaUploadsSettingUseCase(isEnabled = true)
+        }.onFailure {
+            Timber.e(it)
+            setErrorState(shouldShow = true)
         }
     }
 
-    /**
-     * If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
-     * if not clean the sync record from previous primary folder
-     */
-    fun restoreSecondaryTimestampsAndSyncRecordProcess() {
-        viewModelScope.launch {
-            runCatching {
-                restoreSecondaryTimestamps()
-            }.onFailure {
-                Timber.e(it)
-            }
+    private suspend fun disableMediaUploads() {
+        runCatching {
+            resetAndDisableMediaUploads()
+        }.onFailure {
+            Timber.e(it)
+            setErrorState(shouldShow = true)
         }
     }
 
@@ -384,19 +378,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it)
             }
-        }
-    }
-
-    /**
-     * Call several Use Cases to disable Media Uploads
-     */
-    fun disableMediaUploads() {
-        runCatching {
-            viewModelScope.launch {
-                resetAndDisableMediaUploads()
-            }
-        }.onFailure {
-            Timber.e(it)
         }
     }
 
@@ -568,9 +549,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             val videoCompressionSizeLimit = async { getVideoCompressionSizeLimitUseCase() }
             val videoQuality = async { getUploadVideoQualityUseCase() }
             val primaryUploadNode = async { getPrimaryFolderNode() }
+            val isMediaUploadEnabled = async { isSecondaryFolderEnabledUseCase() }
             _state.update {
                 it.copy(
                     isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
+                    isMediaUploadsEnabled = isMediaUploadEnabled.await(),
                     areLocationTagsIncluded = areLocationTagsIncluded.await(),
                     areUploadFileNamesKept = areUploadFileNamesKept.await(),
                     isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression.await(),
@@ -738,16 +721,14 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * update Media Uploads Backup
      * @param mediaUploadsFolderPath
      */
-    fun updateMediaUploadsBackup(mediaUploadsFolderPath: String?) {
-        viewModelScope.launch {
-            runCatching {
-                setupOrUpdateMediaUploadsBackupUseCase(
-                    localFolder = mediaUploadsFolderPath,
-                    targetNode = null
-                )
-            }.onFailure {
-                Timber.e(it)
-            }
+    private suspend fun updateMediaUploadsBackup(mediaUploadsFolderPath: String?) {
+        runCatching {
+            setupOrUpdateMediaUploadsBackupUseCase(
+                localFolder = mediaUploadsFolderPath,
+                targetNode = null
+            )
+        }.onFailure {
+            Timber.e(it)
         }
     }
 
@@ -762,6 +743,45 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     localFolder = cameraUploadsFolderPath,
                     targetNode = null
                 )
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * on Enable or Disable MediaUpload
+     */
+    fun onEnableOrDisableMediaUpload() {
+        viewModelScope.launch {
+            if (isConnected.not()) return@launch
+            if (_state.value.isMediaUploadsEnabled) {
+                // we need to disable media upload
+                disableMediaUploads()
+            } else {
+                enableMediaUploads()
+            }
+            rescheduleCameraUpload()
+            _state.update {
+                it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
+            }
+        }
+    }
+
+    /**
+     * updateMediaUploadsLocalFolder
+     * @param mediaUploadPath
+     */
+    fun updateMediaUploadsLocalFolder(mediaUploadPath: String?) {
+        viewModelScope.launch {
+            runCatching {
+                _state.update {
+                    it.copy(secondaryFolderPath = mediaUploadPath.orEmpty())
+                }
+                restoreSecondaryTimestamps()
+                // Update Sync when the Secondary Local Folder has changed
+                updateMediaUploadsBackup(mediaUploadPath)
+                rescheduleCameraUpload()
             }.onFailure {
                 Timber.e(it)
             }

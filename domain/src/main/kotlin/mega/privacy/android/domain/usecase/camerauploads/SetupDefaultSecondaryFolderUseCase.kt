@@ -2,9 +2,6 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import javax.inject.Inject
 
@@ -21,14 +18,13 @@ class SetupDefaultSecondaryFolderUseCase @Inject constructor(
 
     /**
      *  Invoke
-     *
-     *  @param secondaryFolderName
      */
-    suspend operator fun invoke(secondaryFolderName: String) {
+    suspend operator fun invoke() {
         // If there is any possible secondary folder, set it as the default one
         val secondaryFolderHandle =
             getUploadFolderHandleUseCase(cameraUploadFolderType = CameraUploadFolderType.Secondary)
-        val defaultNodeHandle = getDefaultNodeHandleUseCase(secondaryFolderName)
+        val defaultNodeHandle =
+            getDefaultNodeHandleUseCase(cameraUploadRepository.getMediaUploadsName())
         if ((secondaryFolderHandle == cameraUploadRepository.getInvalidHandle()
                     || isNodeInRubbishOrDeletedUseCase(secondaryFolderHandle))
             && defaultNodeHandle != cameraUploadRepository.getInvalidHandle()

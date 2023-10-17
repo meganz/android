@@ -113,7 +113,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private var localSecondaryFolder: Preference? = null
     private var megaSecondaryFolder: Preference? = null
     private var businessCameraUploadsAlertDialog: AlertDialog? = null
-    private var secondaryUpload = false
     private var camSyncMegaPath = ""
     private var compressionQueueSizeDialog: AlertDialog? = null
     private var queueSizeInput: EditText? = null
@@ -267,15 +266,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         megaSecondaryFolder = findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER)
         megaSecondaryFolder?.onPreferenceClickListener = this
 
-        // Setting up the Secondary Folder path
-        if (prefs?.secondaryMediaFolderEnabled == null) {
-            viewModel.disableMediaUploads()
-            secondaryUpload = false
-        } else {
-            secondaryUpload = prefs?.secondaryMediaFolderEnabled.toBoolean()
-            Timber.d("Secondary is: %s", secondaryUpload)
-        }
-
         if (savedInstanceState != null) {
             val isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false)
             if (isShowingQueueDialog) {
@@ -353,23 +343,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             }
 
             KEY_SECONDARY_MEDIA_FOLDER_ON -> {
-                if (viewModel.isConnected.not()) return false
-                secondaryUpload = !secondaryUpload
-                if (secondaryUpload) {
-                    Timber.d("Enable Media Uploads.")
-                    // If there is any possible secondary folder, set it as the default one
-                    viewModel.onMediaUploadsEnabled(getString(R.string.section_secondary_media_uploads))
-
-                    // To prevent user switch on/off rapidly. After set backup, will be re-enabled.
-                    secondaryMediaFolderOn?.isEnabled = false
-                    localSecondaryFolder?.isEnabled = false
-                    megaSecondaryFolder?.isEnabled = false
-                } else {
-                    Timber.d("Disable Media Uploads.")
-                    viewModel.disableMediaUploads()
-                }
-                checkSecondaryMediaFolder()
-                viewModel.rescheduleCameraUpload()
+                viewModel.onEnableOrDisableMediaUpload()
             }
 
             KEY_LOCAL_SECONDARY_MEDIA_FOLDER -> {
@@ -521,12 +495,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     dbH.setSecondaryFolderPath(this)
                     dbH.uriMediaExternalSdCard = this
                 }
-                checkSecondaryMediaFolder()
-                viewModel.restoreSecondaryTimestampsAndSyncRecordProcess()
-                viewModel.rescheduleCameraUpload()
-
-                // Update Sync when the Secondary Local Folder has changed
-                viewModel.updateMediaUploadsBackup(secondaryPath)
+                viewModel.updateMediaUploadsLocalFolder(secondaryPath)
             }
 
             REQUEST_MEGA_SECONDARY_MEDIA_FOLDER -> {
@@ -570,6 +539,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 handleIsCameraUploadsEnabled(
                     isCameraUploadsEnabled = it.isCameraUploadsEnabled
                 )
+                checkSecondaryMediaFolder(it.isMediaUploadsEnabled)
                 handleFileUpload(
                     isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     uploadOption = it.uploadOption,
@@ -621,7 +591,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             }
             collectFlow(viewModel.monitorCameraUploadsSettingsActions) {
                 when (it) {
-                    CameraUploadsSettingsAction.DisableMediaUploads -> disableMediaUploadUIProcess()
+                    CameraUploadsSettingsAction.DisableMediaUploads -> viewModel.onEnableOrDisableMediaUpload()
                     CameraUploadsSettingsAction.RefreshSettings -> refreshCameraUploadsSettings()
                 }
             }
@@ -669,8 +639,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 it.summary = camSyncMegaPath
                 preferenceScreen.addPreference(it)
             }
-
-            checkSecondaryMediaFolder()
         } else {
             Timber.d("Camera Uploads Off")
             cameraUploadOnOff?.isChecked = false
@@ -1088,8 +1056,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     /**
      * Checks the Secondary Folder
      */
-    private fun checkSecondaryMediaFolder() {
-        if (secondaryUpload) {
+    private fun checkSecondaryMediaFolder(isMediaUploadEnabled: Boolean) {
+        if (isMediaUploadEnabled) {
             secondaryMediaFolderOn?.title = getString(R.string.settings_secondary_upload_off)
             with(prefs) {
                 // Check if the node exists in MEGA
@@ -1118,9 +1086,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 }
             }
         } else {
-            secondaryMediaFolderOn?.title = getString(R.string.settings_secondary_upload_on)
-            megaSecondaryFolder?.let { preferenceScreen.removePreference(it) }
-            localSecondaryFolder?.let { preferenceScreen.removePreference(it) }
+            disableMediaUploadUIProcess()
         }
     }
 
@@ -1135,7 +1101,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 viewModel.updatePrimaryUploadNode(destination.nodeHandle)
             }
 
-            CameraUploadFolderType.Secondary -> checkSecondaryMediaFolder()
+            CameraUploadFolderType.Secondary -> checkSecondaryMediaFolder(viewModel.state.value.isMediaUploadsEnabled)
         }
     }
 
@@ -1357,9 +1323,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
 
         viewModel.onCameraUploadsEnabled(prefs?.secondaryMediaFolderEnabled == null)
 
-        // Secondary Uploads
-        setupSecondaryUpload()
-
         cameraUploadOnOff?.isChecked = true
 
         // Configured to prevent Camera Uploads from rapidly being switched on/off.
@@ -1374,7 +1337,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      */
     private fun disableMediaUploadUIProcess() {
         Timber.d("Changes applied to Secondary Folder Only")
-        secondaryUpload = false
         secondaryMediaFolderOn?.title =
             getString(R.string.settings_secondary_upload_on)
 
@@ -1398,17 +1360,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     }
 
     /**
-     * Setup Secondary Uploads
-     */
-    private fun setupSecondaryUpload() {
-        secondaryUpload = if (prefs?.secondaryMediaFolderEnabled == null) {
-            false
-        } else {
-            prefs?.secondaryMediaFolderEnabled.toBoolean()
-        }
-    }
-
-    /**
      * Is New Settings Valid
      *
      * @param primaryPath Defines the Primary Folder path
@@ -1422,7 +1373,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         primaryHandle: String?,
         secondaryHandle: String?,
     ): Boolean {
-        return if (!secondaryUpload || primaryPath == null || primaryHandle == null
+        return if (!viewModel.state.value.isMediaUploadsEnabled || primaryPath == null || primaryHandle == null
             || secondaryPath == null || secondaryHandle == null
         ) {
             true

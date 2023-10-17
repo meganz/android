@@ -23,7 +23,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
     private lateinit var underTest: SetupDefaultSecondaryFolderUseCase
     private val invalidHandle = -1L
     private val validHandle = 69L
-    private val folderName = "CU"
+    private val folderName = "Media Uploads"
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val getUploadFolderHandleUseCase = mock<GetUploadFolderHandleUseCase>()
@@ -59,9 +59,10 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 validHandle
             )
+            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
-            underTest(folderName)
+            underTest()
             verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
@@ -71,9 +72,10 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 validHandle
             )
+            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
-            underTest(folderName)
+            underTest()
             verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
@@ -84,9 +86,10 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 invalidHandle
             )
+            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
-            underTest(folderName)
+            underTest()
             verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
@@ -97,9 +100,10 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 validHandle
             )
+            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
-            underTest(folderName)
+            underTest()
             verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
@@ -109,9 +113,10 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 invalidHandle
             )
+            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
-            underTest(folderName)
+            underTest()
             verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
@@ -121,9 +126,10 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 validHandle
             )
+            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
-            underTest(folderName)
+            underTest()
             verify(setupSecondaryFolderUseCase, times(1)).invoke(validHandle)
         }
 
@@ -134,9 +140,10 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 invalidHandle
             )
+            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
-            underTest(folderName)
+            underTest()
             verify(setupSecondaryFolderUseCase, times(1)).invoke(validHandle)
         }
 
@@ -146,9 +153,10 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 invalidHandle
             )
+            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
-            underTest(folderName)
+            underTest()
             verify(setupSecondaryFolderUseCase, times(1)).invoke(validHandle)
         }
 }
