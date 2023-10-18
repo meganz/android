@@ -30,7 +30,7 @@ class AdsBannerViewTest {
             AdsBannerView(
                 uiState = AdsUIState(adsBannerUrl = url, showAdsView = true),
                 onAdClicked = {},
-                onAdsViewVisibilityUpdated = { showAdsView -> true },
+                onAdsWebpageLoaded = {},
                 onAdDismissed = {})
         }
         composeRule.onNodeWithTag(WEB_VIEW_TEST_TAG).assertExists()
@@ -44,7 +44,7 @@ class AdsBannerViewTest {
             AdsBannerView(
                 uiState = AdsUIState(adsBannerUrl = "", showAdsView = false),
                 onAdClicked = {},
-                onAdsViewVisibilityUpdated = { showAdsView -> false },
+                onAdsWebpageLoaded = {},
                 onAdDismissed = {})
         }
         composeRule.onNodeWithTag(WEB_VIEW_TEST_TAG).assertDoesNotExist()

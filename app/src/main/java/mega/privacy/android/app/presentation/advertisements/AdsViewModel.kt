@@ -74,13 +74,10 @@ class AdsViewModel @Inject constructor(
     }
 
     /**
-     * hides the visibility of the Ads view
+     * Cancel fetching any ongoing ads job
      */
-    fun hideAdsView() {
+    fun cancelFetchingAds() {
         fetchAdUrlJob?.cancel()
-        _uiState.update { state ->
-            state.copy(showAdsView = false, adsBannerUrl = "")
-        }
     }
 
     /**

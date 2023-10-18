@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.advertisements.AdsViewModel
-import mega.privacy.android.domain.entity.advertisements.AdDetail
+import mega.privacy.android.domain.entity.advertisements.AdDetails
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.advertisements.FetchAdDetailUseCase
@@ -39,7 +39,7 @@ class AdsViewModelTest {
 
     private val slotId = "ANDFB"
     private val url = "https://megaad.nz/#z_xyz"
-    private val fetchedAdDetail = AdDetail(slotId, url)
+    private val fetchedAdDetail = AdDetails(slotId, url)
 
     @BeforeAll
     fun setup() {

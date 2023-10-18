@@ -47,6 +47,7 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -334,11 +335,13 @@ class PhotosFragment : Fragment() {
                 enterActionMode()
             }
             timelineActionMode?.title = state.selectedPhotoCount.toString()
+            managerActivity.hideAdsView()
             managerActivity.showHideBottomNavigationView(true)
         } else {
             timelineActionMode?.finish()
             timelineActionMode = null
             managerActivity.showHideBottomNavigationView(false)
+            managerActivity.handleShowingAds(TAB_PHOTOS_SLOT_ID)
         }
     }
 
@@ -366,11 +369,13 @@ class PhotosFragment : Fragment() {
                 enterAlbumsActionMode()
             }
             albumsActionMode?.title = state.selectedAlbumIds.size.toString()
+            managerActivity.hideAdsView()
             managerActivity.showHideBottomNavigationView(true)
         } else {
             albumsActionMode?.finish()
             albumsActionMode = null
             managerActivity.showHideBottomNavigationView(false)
+            managerActivity.handleShowingAds(TAB_PHOTOS_SLOT_ID)
         }
     }
 

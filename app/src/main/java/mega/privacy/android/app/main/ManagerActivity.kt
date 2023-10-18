@@ -986,7 +986,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         checkForInAppUpdate()
         if (this.isPortrait()) {
-            showAdsView()
+            setupAdsView()
         } else {
             hideAdsView()
         }
@@ -2225,7 +2225,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Checks for the screen orientation and handle showing the Ads view
      */
-    private fun handleShowingAds(slotId: String) {
+    fun handleShowingAds(slotId: String) {
         if (this.isPortrait()) {
             adsViewModel.fetchNewAd(slotId)
         } else {
@@ -2711,6 +2711,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         replaceFragment(fragment, FragmentTag.ALBUM_CONTENT.tag)
         isInAlbumContent = true
         viewModel.setIsFirstNavigationLevel(false)
+        hideAdsView()
         showHideBottomNavigationView(true)
     }
 
@@ -3216,7 +3217,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.HOMEPAGE -> {
                 setBottomNavigationMenuItemChecked(HOME_BNV)
-                handleShowingAds(TAB_HOME_SLOT_ID)
+                if (isInMainHomePage) {
+                    handleShowingAds(TAB_HOME_SLOT_ID)
+                }
+
             }
 
             DrawerItem.PHOTOS -> {
@@ -3465,6 +3469,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (bottomNavigationCurrentItem == HOME_BNV) {
                         appBarLayout.visibility = View.GONE
                     }
+                    handleShowingAds(TAB_HOME_SLOT_ID)
                     updateTransfersWidget()
                     setDrawerLockMode(false)
                     return@addOnDestinationChangedListener
@@ -3472,22 +3477,27 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 R.id.favouritesFragment -> {
                     homepageScreen = HomepageScreen.FAVOURITES
+                    hideAdsView()
                 }
 
                 R.id.documentsFragment -> {
                     homepageScreen = HomepageScreen.DOCUMENTS
+                    hideAdsView()
                 }
 
                 R.id.audioFragment -> {
                     homepageScreen = HomepageScreen.AUDIO
+                    hideAdsView()
                 }
 
                 R.id.videoFragment -> {
                     homepageScreen = HomepageScreen.VIDEO
+                    hideAdsView()
                 }
 
                 R.id.fullscreen_offline -> {
                     homepageScreen = HomepageScreen.FULLSCREEN_OFFLINE
+                    hideAdsView()
                 }
 
                 R.id.offline_file_info -> {
@@ -3495,6 +3505,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     updatePsaViewVisibility()
                     appBarLayout.visibility = View.GONE
                     showHideBottomNavigationView(true)
+                    hideAdsView()
                 }
 
                 R.id.recentBucketFragment -> {
@@ -3668,6 +3679,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     showBNVImmediate()
                     appBarLayout.visibility = View.GONE
                     showHideBottomNavigationView(false)
+                    handleShowingAds(TAB_HOME_SLOT_ID)
                 } else {
                     // For example, back from Rubbish Bin to Photos
                     setToolbarTitle()
@@ -8217,7 +8229,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun showAdsView() {
+    private fun setupAdsView() {
         adsComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
             setContent {
@@ -8226,7 +8238,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val uiState by adsViewModel.uiState.collectAsStateWithLifecycle()
                 AndroidTheme(isDark = isDark) {
                     AdsBannerView(uiState = uiState,
-                        onAdsViewVisibilityUpdated = ::onAdsViewVisibilityUpdated,
+                        onAdsWebpageLoaded = ::onAdsWebpageLoaded,
                         onAdClicked = { uri ->
                             uri?.let {
                                 val intent = Intent(Intent.ACTION_VIEW, it)
@@ -8239,6 +8251,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }, onAdDismissed = {
                             //To handle the close button behaviour in ticket: AP-658
                             hideAdsView()
+                            showBNVImmediate()
+                            showHideBottomNavigationView(hide = false)
                         }
                     )
                 }
@@ -8246,28 +8260,29 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun hideAdsView() {
-        adsViewModel.hideAdsView()
+    private fun showAdsView() {
+        adsComposeView.isVisible = true
+    }
+
+    fun hideAdsView() {
+        adsComposeView.isVisible = false
+        adsViewModel.cancelFetchingAds()
     }
 
     /**
-     * Check of the currently selected drawer item to update the bottom navigation bar position
+     * Checks if we can still show the Ad because loading the webpage takes
+     * time and the user could have navigated to another screen where the Ad shouldn't show
      */
-    private fun updateBottomNavOnAdsVisibilityChange() {
-        if (drawerItem == DrawerItem.HOMEPAGE
-            || drawerItem == DrawerItem.CHAT
-            || drawerItem == DrawerItem.SHARED_ITEMS
-            || drawerItem == DrawerItem.PHOTOS
-            || drawerItem == DrawerItem.CLOUD_DRIVE
+    private fun onAdsWebpageLoaded() {
+
+        if (drawerItem == DrawerItem.CLOUD_DRIVE || isInMainHomePage || isInPhotosPage
         ) {
+            showAdsView()
             showBNVImmediate()
             showHideBottomNavigationView(hide = false)
+        } else {
+            hideAdsView()
         }
-    }
-
-    private fun onAdsViewVisibilityUpdated(showAdsView: Boolean) {
-        adsComposeView.isVisible = showAdsView
-        updateBottomNavOnAdsVisibilityChange()
     }
 
     companion object {

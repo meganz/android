@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.advertisements
 
-import mega.privacy.android.domain.entity.advertisements.AdDetail
+import mega.privacy.android.domain.entity.advertisements.AdDetails
 import mega.privacy.android.domain.entity.advertisements.FetchAdDetailRequest
 import mega.privacy.android.domain.repository.AdsRepository
 import javax.inject.Inject
@@ -19,7 +19,7 @@ class FetchAdDetailUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         fetchAdDetailRequest: FetchAdDetailRequest,
-    ): AdDetail? =
+    ): AdDetails? =
         adsRepository.fetchAdDetails(
             listOf(fetchAdDetailRequest.slotId),
             fetchAdDetailRequest.linkHandle

@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
@@ -268,12 +269,14 @@ class MediaDiscoveryFragment : Fragment() {
             actionModeCallback
         )
         managerActivity?.showHideBottomNavigationView(true)
+        managerActivity?.hideAdsView()
     }
 
     private fun exitActionMode() {
         actionMode?.finish()
         actionMode = null
         managerActivity?.showHideBottomNavigationView(false)
+        managerActivity?.handleShowingAds(TAB_CLOUD_SLOT_ID)
     }
 
     private fun handleActionMode(photo: Photo) {

@@ -9,8 +9,8 @@ import mega.privacy.android.data.gateway.AdsGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MegaStringListMapper
-import mega.privacy.android.data.mapper.advertisements.AdDetailMapper
-import mega.privacy.android.domain.entity.advertisements.AdDetail
+import mega.privacy.android.data.mapper.advertisements.AdDetailsMapper
+import mega.privacy.android.domain.entity.advertisements.AdDetails
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AdsRepository
 import nz.mega.sdk.MegaApiJava
@@ -34,10 +34,10 @@ internal class AdsRepositoryImplTest {
     private val adsGateway: AdsGateway = mock()
     private val megaApiGateway: MegaApiGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    private val adDetailMapper: AdDetailMapper = mock()
+    private val adDetailsMapper: AdDetailsMapper = mock()
     private val megaStringListMapper: MegaStringListMapper = mock()
 
-    private val testAdDetailList = listOf(AdDetail("ANDFB", "https://megaad.nz/#z_xyz"))
+    private val testAdDetailsList = listOf(AdDetails("ANDFB", "https://megaad.nz/#z_xyz"))
     private val testAdSlotList = listOf("ANDFB")
 
     @BeforeAll
@@ -46,7 +46,7 @@ internal class AdsRepositoryImplTest {
             ioDispatcher = ioDispatcher,
             adsGateway = adsGateway,
             megaApiGateway = megaApiGateway,
-            adDetailMapper = adDetailMapper,
+            adDetailsMapper = adDetailsMapper,
             megaStringListMapper = megaStringListMapper,
         )
     }
@@ -55,7 +55,7 @@ internal class AdsRepositoryImplTest {
     fun resetMocks() {
         reset(
             adsGateway,
-            adDetailMapper,
+            adDetailsMapper,
             megaStringListMapper,
         )
     }
@@ -70,7 +70,7 @@ internal class AdsRepositoryImplTest {
             val error = mock<MegaError> {
                 on { errorCode }.thenReturn(MegaError.API_OK)
             }
-            whenever(adDetailMapper(any())).thenReturn(testAdDetailList)
+            whenever(adDetailsMapper(any())).thenReturn(testAdDetailsList)
             whenever(megaStringListMapper(testAdSlotList)).thenReturn(mock())
             whenever(adsGateway.fetchAds(any(), any(), any(), any())).thenAnswer {
                 (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -80,7 +80,7 @@ internal class AdsRepositoryImplTest {
                 )
             }
             val actual = underTest.fetchAdDetails(testAdSlotList, 0L)
-            assertThat(actual).isEqualTo(testAdDetailList)
+            assertThat(actual).isEqualTo(testAdDetailsList)
         }
 
 
@@ -95,7 +95,7 @@ internal class AdsRepositoryImplTest {
                 on { errorCode }.thenReturn(MegaError.API_OK + 1)
             }
 
-            whenever(adDetailMapper(any())).thenReturn(testAdDetailList)
+            whenever(adDetailsMapper(any())).thenReturn(testAdDetailsList)
             whenever(megaStringListMapper(testAdSlotList)).thenReturn(mock())
             whenever(adsGateway.fetchAds(any(), any(), any(), any())).thenAnswer {
                 (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(

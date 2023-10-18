@@ -6,7 +6,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -15,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
@@ -33,35 +33,42 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 internal fun AdsBannerView(
     uiState: AdsUIState,
     onAdClicked: (uri: Uri?) -> Unit,
-    onAdsViewVisibilityUpdated: (showAdsView: Boolean) -> Unit,
+    onAdsWebpageLoaded: () -> Unit,
     onAdDismissed: () -> Unit,
 ) {
     val url = uiState.adsBannerUrl
 
-    if (uiState.showAdsView && url.isNotEmpty()) {
+    if (uiState.showAdsView) {
         Box(
             modifier = Modifier
                 .testTag(WEB_VIEW_TEST_TAG)
-                .background(MaterialTheme.colors.surface)
         ) {
+            val webpageBackgroundColor = MaterialTheme.colors.surface.toArgb()
             AndroidView(modifier = Modifier
                 .align(Alignment.Center)
                 .padding(vertical = 20.dp)
                 .size(width = 320.dp, height = 50.dp),
                 factory = { context ->
                     WebView(context).apply {
+                        var initialLoad = true
+                        setBackgroundColor(webpageBackgroundColor)
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         webViewClient = object : WebViewClient() {
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
-                                onAdsViewVisibilityUpdated(uiState.showAdsView)
+                                initialLoad = true
+                                onAdsWebpageLoaded()
                             }
 
                             override fun shouldOverrideUrlLoading(
                                 view: WebView?,
                                 request: WebResourceRequest?,
                             ): Boolean {
+                                if (initialLoad) {
+                                    initialLoad = false
+                                    return false
+                                }
                                 onAdClicked(request?.url)
                                 return true
                             }
@@ -82,8 +89,6 @@ internal fun AdsBannerView(
                     .clickable { onAdDismissed() }
             )
         }
-    } else {
-        onAdsViewVisibilityUpdated(false)
     }
 }
 

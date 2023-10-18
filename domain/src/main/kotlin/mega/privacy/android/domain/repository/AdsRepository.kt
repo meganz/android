@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.repository
 
-import mega.privacy.android.domain.entity.advertisements.AdDetail
+import mega.privacy.android.domain.entity.advertisements.AdDetails
 
 /**
  * The repository interface regarding in-app ads
@@ -12,5 +12,5 @@ interface AdsRepository {
     suspend fun fetchAdDetails(
         adSlots: List<String>,
         linkHandle: Long?,
-    ): List<AdDetail>
+    ): List<AdDetails>
 }

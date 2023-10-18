@@ -43,6 +43,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
+import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -352,6 +353,7 @@ class FileBrowserComposeFragment : Fragment() {
             (requireActivity() as ManagerActivity).let {
                 it.hideFabButton()
                 it.showHideBottomNavigationView(true)
+                it.hideAdsView()
             }
             return true
         }
@@ -383,6 +385,7 @@ class FileBrowserComposeFragment : Fragment() {
             (activity as? ManagerActivity)?.let {
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
+                it.handleShowingAds(TAB_CLOUD_SLOT_ID)
                 actionMode = null
             }
         }
