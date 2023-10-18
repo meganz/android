@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -44,6 +43,10 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
  * Because native TopAppBar doesn't support subtitle, we have to create our own.
  */
 @Composable
+@Deprecated(
+    message = "This component doesn't follow our design system correctly",
+    replaceWith = ReplaceWith("MegaAppBar")
+)
 fun SimpleTopAppBarWithSubtitle(
     modifier: Modifier = Modifier,
     title: String,

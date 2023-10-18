@@ -18,6 +18,10 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 @Composable
+@Deprecated(
+    message = "This component doesn't follow our design system correctly",
+    replaceWith = ReplaceWith("MegaAppBar")
+)
 fun SimpleNoTitleTopAppBar(
     modifier: Modifier = Modifier,
     elevation: Boolean,

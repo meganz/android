@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -59,11 +58,10 @@ import mega.privacy.android.app.mediaplayer.Constants.SELECTED_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.mediaplayer.Constants.SUBTITLE_FILES_TEST_TAG
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
-import mega.privacy.android.core.ui.controls.appbar.SearchAppBar
+import mega.privacy.android.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import timber.log.Timber
 
@@ -174,7 +172,7 @@ internal fun SelectSubtitleView(
                         onBackPressed()
                     }
 
-                else -> SearchAppBar(
+                else -> LegacySearchAppBar(
                     searchWidgetState = searchState,
                     typedSearch = query ?: "",
                     onSearchTextChange = onSearchTextChange,

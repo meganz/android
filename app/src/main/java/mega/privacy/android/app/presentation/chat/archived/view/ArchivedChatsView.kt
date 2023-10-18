@@ -27,7 +27,7 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.chat.archived.model.ArchivedChatsState
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.chat.list.view.ChatListView
-import mega.privacy.android.core.ui.controls.appbar.SearchAppBar
+import mega.privacy.android.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -87,7 +87,7 @@ fun ArchivedChatsView(
                 }
             },
             topBar = {
-                SearchAppBar(
+                LegacySearchAppBar(
                     searchWidgetState = searchState,
                     typedSearch = searchQuery,
                     onSearchTextChange = { searchQuery = it },

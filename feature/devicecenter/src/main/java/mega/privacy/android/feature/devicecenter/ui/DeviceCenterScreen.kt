@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.ui.controls.appbar.TopAppBar
+import mega.privacy.android.core.ui.controls.appbar.LegacyTopAppBar
 import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -120,7 +120,7 @@ internal fun DeviceCenterScreen(
     }
     Scaffold(
         topBar = {
-            TopAppBar(
+            LegacyTopAppBar(
                 modifier = Modifier.testTag(DEVICE_CENTER_TOOLBAR),
                 title = selectedDevice?.name
                     ?: stringResource(R.string.device_center_top_app_bar_title),

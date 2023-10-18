@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.search.view.EmptySearchView
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
-import mega.privacy.android.core.ui.controls.appbar.SearchAppBar
+import mega.privacy.android.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -88,7 +88,7 @@ fun StartConversationView(
                     elevation = !firstItemVisible,
                     onBackPressed = onBackPressed)
             } else {
-                SearchAppBar(
+                LegacySearchAppBar(
                     searchWidgetState = state.searchWidgetState,
                     typedSearch = state.typedSearch,
                     onSearchTextChange = { typedSearch -> onSearchTextChange(typedSearch) },

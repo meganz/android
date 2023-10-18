@@ -79,9 +79,9 @@ internal fun FileInfoTopBar(
         actions = {
             FileInfoMenuActions(
                 actions = actions,
-                tint = tintColor,
                 onActionClick = onActionClick,
                 enabled = enabled,
+                tint = tintColor
             )
         },
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = backgroundAlpha),

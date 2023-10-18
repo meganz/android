@@ -42,3 +42,9 @@ val Typography.body3: TextStyle
  */
 val Typography.body4: TextStyle
     get() = body2.copy(fontSize = 11.sp, lineHeight = 14.sp, letterSpacing = 0.01.sp)
+
+/**
+ * Badge
+ */
+val Typography.badge: TextStyle
+    get() = body2.copy(fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 10.sp)

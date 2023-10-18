@@ -44,7 +44,12 @@ import mega.privacy.android.core.ui.model.SearchWidgetState
  * The compose view for search app bar
  */
 @Composable
-fun SearchAppBar(
+@Deprecated(
+    message = "This component doesn't follow our design system correctly. " +
+            "Create a new SearchAppBar following the correct approach.",
+    replaceWith = ReplaceWith("SearchAppBar")
+)
+fun LegacySearchAppBar(
     searchWidgetState: SearchWidgetState,
     typedSearch: String,
     onSearchTextChange: (String) -> Unit,
@@ -64,6 +69,7 @@ fun SearchAppBar(
                 elevation = elevation, titleId = titleId
             )
         }
+
         SearchWidgetState.EXPANDED -> {
             ExpandedSearchAppBar(
                 text = typedSearch,

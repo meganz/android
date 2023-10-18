@@ -12,8 +12,12 @@ import androidx.compose.ui.Modifier
  * @param isEnabled if true, enables the Back Button. Otherwise, it is disabled
  * @param onBackPressed Lambda that performs a specific action when a Back Press event is detected
  */
+@Deprecated(
+    message = "This component doesn't follow our design system correctly",
+    replaceWith = ReplaceWith("MegaAppBar")
+)
 @Composable
-fun TopAppBar(
+fun LegacyTopAppBar(
     title: String,
     elevation: Boolean,
     modifier: Modifier = Modifier,

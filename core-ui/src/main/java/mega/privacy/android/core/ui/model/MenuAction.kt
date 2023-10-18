@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -29,6 +28,12 @@ interface MenuAction {
      */
     val orderInCategory: Int
         get() = 100
+
+    /**
+     * True if the action should be enabled, false otherwise.
+     */
+    val enabled: Boolean
+        get() = true
 }
 
 /**
@@ -73,7 +78,6 @@ abstract class MenuActionString(
  * @param descriptionRes the plural resource to be used to generate the description of this action
  * @param amount the amount to be used in [descriptionRes] plural
  */
-@OptIn(ExperimentalComposeUiApi::class)
 abstract class MenuActionPlural(
     @DrawableRes val iconRes: Int,
     @PluralsRes val descriptionRes: Int,

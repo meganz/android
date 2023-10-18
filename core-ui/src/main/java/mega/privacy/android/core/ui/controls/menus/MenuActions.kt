@@ -23,12 +23,14 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.google.android.material.R
+import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 
 /**
@@ -43,10 +45,10 @@ import mega.privacy.android.core.ui.model.MenuActionWithIcon
 fun MenuActions(
     actions: List<MenuAction>,
     maxActionsToShow: Int,
-    dropDownIcon: Painter,
-    tint: Color,
     onActionClick: (MenuAction) -> Unit,
     enabled: Boolean = true,
+    selectMode: Boolean = false,
+    tint: Color? = null,
 ) {
     val sortedActions = actions.sortedBy { it.orderInCategory }
     val visible = sortedActions
@@ -55,18 +57,19 @@ fun MenuActions(
     visible.forEach {
         IconButtonForAction(
             menuAction = it,
-            tint = tint,
             onActionClick = onActionClick,
             enabled = enabled,
+            selectMode = selectMode,
+            tint = tint,
         )
     }
     sortedActions.filterNot { visible.contains(it) }.takeIf { it.isNotEmpty() }?.let { notVisible ->
         DropDown(
             actions = notVisible,
-            tint = tint,
-            painter = dropDownIcon,
             onActionClick = onActionClick,
             enabled = enabled,
+            selectMode = selectMode,
+            tint = tint,
         )
     }
 
@@ -75,38 +78,41 @@ fun MenuActions(
 @Composable
 private fun IconButtonForAction(
     menuAction: MenuActionWithIcon,
-    tint: Color,
     onActionClick: (MenuAction) -> Unit,
     enabled: Boolean = true,
+    selectMode: Boolean = false,
+    tint: Color? = null,
 ) {
     IconButtonWithTooltip(
         iconPainter = menuAction.getIconPainter(),
         description = menuAction.getDescription(),
-        tint = tint,
         onClick = { onActionClick(menuAction) },
         modifier = Modifier.testTag(menuAction.getDescription()),
         enabled = enabled,
+        selectMode = selectMode,
+        tint = tint,
     )
 }
 
 @Composable
 private fun DropDown(
     actions: List<MenuAction>,
-    tint: Color,
-    painter: Painter,
     onActionClick: (MenuAction) -> Unit,
     enabled: Boolean = true,
+    selectMode: Boolean = false,
+    tint: Color? = null,
 ) {
     var showMoreMenu by remember {
         mutableStateOf(false)
     }
     IconButtonWithTooltip(
-        iconPainter = painter,
-        description = stringResource(id = R.string.abc_action_menu_overflow_description),
-        tint = tint,
+        iconPainter = painterResource(id = R.drawable.ic_more),
+        description = stringResource(id = com.google.android.material.R.string.abc_action_menu_overflow_description),
         onClick = { showMoreMenu = !showMoreMenu },
         modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
         enabled = enabled,
+        selectMode = selectMode,
+        tint = tint,
     )
 
     DropdownMenu(
@@ -133,10 +139,11 @@ private fun DropDown(
 private fun IconButtonWithTooltip(
     iconPainter: Painter,
     description: String,
-    tint: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    selectMode: Boolean = false,
+    tint: Color? = null,
 ) {
     Box(modifier = modifier) {
         val showTooltip = remember { mutableStateOf(false) }
@@ -160,7 +167,8 @@ private fun IconButtonWithTooltip(
             Icon(
                 painter = iconPainter,
                 contentDescription = description,
-                tint = tint,
+                tint = if (selectMode) MegaTheme.colors.icon.accent
+                else tint ?: MegaTheme.colors.icon.primary,
             )
         }
         Tooltip(showTooltip) {

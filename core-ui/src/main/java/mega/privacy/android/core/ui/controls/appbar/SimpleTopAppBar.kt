@@ -57,6 +57,10 @@ fun SimpleTopAppBar(
  * @param onBackPressed Lambda that performs a specific action when a Back Press event is detected
  */
 @Composable
+@Deprecated(
+    message = "This component doesn't follow our design system correctly",
+    replaceWith = ReplaceWith("MegaAppBar")
+)
 fun SimpleTopAppBar(
     title: String,
     elevation: Boolean,

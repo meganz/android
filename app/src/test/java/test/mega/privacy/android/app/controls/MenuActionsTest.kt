@@ -88,10 +88,10 @@ class MenuActionsTest {
         MenuActions(
             actions,
             defaultAmount,
-            painterResource(id = R.drawable.ic_menu_more),
-            Color.Black,
             {},
             enabled = true,
+            selectMode = false,
+            Color.Black,
         )
 
     private class MenuActionWithIconForTest(val title: String) : MenuActionWithIcon {
