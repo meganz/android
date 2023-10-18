@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
@@ -95,8 +94,6 @@ internal class TimberLoggingRepository @Inject constructor(
     override fun resetSdkLogging() {
         MegaApiAndroid.removeLoggerObject(megaSdkLogger)
         MegaApiAndroid.addLoggerObject(megaSdkLogger)
-        MegaChatApiAndroid.setLoggerObject(null)
-        MegaChatApiAndroid.setLoggerObject(megaChatLogger)
     }
 
     override fun getSdkLoggingFlow(): Flow<LogEntry> = sdkLogFlowTree.logFlow.onSubscription {
@@ -159,13 +156,7 @@ internal class TimberLoggingRepository @Inject constructor(
     }
 
     override fun isChatLoggingEnabled(): Flow<Boolean> =
-        loggingPreferencesGateway.isChatLoggingPreferenceEnabled().onEach { enabled ->
-            if (enabled) {
-                MegaChatApiAndroid.setLoggerObject(null)
-            } else {
-                MegaChatApiAndroid.setLoggerObject(megaChatLogger)
-            }
-        }
+        loggingPreferencesGateway.isChatLoggingPreferenceEnabled()
 
     override suspend fun setChatLoggingEnabled(enabled: Boolean) {
         loggingPreferencesGateway.setChatLoggingEnabledPreference(enabled)
