@@ -994,10 +994,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun checkForInAppUpdate() {
         lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.InAppUpdate)) {
-                runCatching {
-                    inAppUpdateHandler.checkForAppUpdates()
-                }
+            runCatching {
+                inAppUpdateHandler.checkForAppUpdates()
             }
         }
     }
@@ -2250,10 +2248,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun checkForInAppUpdateInstallStatus() {
         lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.InAppUpdate)) {
-                runCatching {
-                    inAppUpdateHandler.checkForInAppUpdateInstallStatus()
-                }
+            runCatching {
+                inAppUpdateHandler.checkForInAppUpdateInstallStatus()
             }
         }
     }

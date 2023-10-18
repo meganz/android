@@ -65,6 +65,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
     private val incrementalPromptStopCount = 4 // This will stop prompts after x + 3n
     private val initialMessageDuration = 5000
     private val reminderMessageDuration = 1500
+    private val isIncrementalPromptEnabled = false
 
     private var availableVersionCode = 0
 
@@ -208,8 +209,6 @@ class InAppUpdateHandlerImpl @Inject constructor(
      * Control the frequency at which user is prompted
      */
     private suspend fun shouldPromptUserForUpdate(): Boolean {
-        val isIncrementalPromptEnabled =
-            getFeatureFlagValueUseCase(AppFeatures.InAppUpdateIncrementalPrompt)
         return shouldPromptUserForUpdateUseCase(
             noOfDaysBeforePrompt,
             isIncrementalPromptEnabled,
