@@ -1382,7 +1382,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         .collect {
                             when (it) {
                                 is VideoCompressionState.Failed -> {
-                                    onCompressFailed(fullList.first { record -> record.id == it.id })
+                                    onCompressFailed(fullList.first { record -> record.id.toLong() == it.id })
                                 }
 
                                 VideoCompressionState.Finished -> {
@@ -1410,7 +1410,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                                 }
 
                                 is VideoCompressionState.Successful -> {
-                                    onCompressSuccessful(fullList.first { record -> record.id == it.id })
+                                    onCompressSuccessful(fullList.first { record -> record.id.toLong() == it.id })
                                 }
                             }
                         }

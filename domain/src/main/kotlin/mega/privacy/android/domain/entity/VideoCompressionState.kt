@@ -45,7 +45,7 @@ sealed interface VideoCompressionState {
         /**
          * record
          */
-        val id: Int?,
+        val id: Long?,
     ) : VideoCompressionState
 
     /**
@@ -55,7 +55,7 @@ sealed interface VideoCompressionState {
         /**
          * record
          */
-        val id: Int? = null,
+        val id: Long? = null,
     ) : VideoCompressionState
 
     /**
