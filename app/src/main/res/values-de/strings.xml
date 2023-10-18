@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Kein externes Speichermedium gefunden</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Abmelden</string>
+    <string name="action_logout">Ausloggen</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Hochladen</string>
     <!-- Menu item -->
@@ -105,7 +105,7 @@
     <!-- error message when the subscription has not been canceled successfully -->
     <string name="cancel_subscription_error">Wir konnten Ihr Abonnement nicht stornieren. Bitte setzen Sie sich mit support&#64;mega.nz in Verbindung.</string>
     <!-- Menu item to kill all opened sessions -->
-    <string name="action_kill_all_sessions">Alle anderen Logins ausloggen</string>
+    <string name="action_kill_all_sessions">Alle anderen Sitzungen ausloggen</string>
     <!-- Message after kill all opened sessions -->
     <string name="success_kill_all_sessions">Die verbleibenden Login-Sitzungen wurden geschlossen</string>
     <!-- Message after kill all opened sessions -->
@@ -228,9 +228,9 @@
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">Kamera-Uploads</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
-    <string name="tab_incoming_shares">Von anderen</string>
+    <string name="tab_incoming_shares">Erhaltene</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
-    <string name="tab_outgoing_shares">An andere</string>
+    <string name="tab_outgoing_shares">Eigene</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Links</string>
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
@@ -1052,7 +1052,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibration</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Abmelden[/A], um zu einem anderen MEGA-Account zu wechseln</string>
+    <string name="sms_logout">[A]Ausloggen[/A], um zu einem anderen MEGA-Account zu wechseln</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Sind Sie sicher, dass Sie sich ausloggen möchten?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1230,7 +1230,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">Das Transvervolumen Ihrer IP-Adresse wurde überschritten. Bitte warten Sie %s oder wechseln Sie auf Pro, um Ihren Download fortzusetzen.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">Verfügbare Pro-Stufen</string>
+    <string name="plans_depleted_transfer_overquota">Pakete ansehen</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">Ohne Registrierung weitermachen</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
@@ -2785,7 +2785,7 @@
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Nicht verifiziert</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Bestätigt</string>
+    <string name="label_verified">Verifiziert</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authentizitätsinformationen</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3329,7 +3329,7 @@
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Hauptansicht</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
-    <string name="offline_warning">Beim Abmelden werden Ihre Offline-Inhalte gelöscht.</string>
+    <string name="offline_warning">Beim Ausloggen werden Ihre Offline-Inhalte gelöscht.</string>
     <!-- Settings category which contains all preferences related to user interface. -->
     <string name="user_interface_setting">Benutzeroberfläche</string>
     <!-- Setting which allows to choose the start screen. -->
@@ -3935,7 +3935,7 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Nicht entschlüsselter Ordner]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">Damit Sie auf den freigegebenen Ordner zugreifen können, muss die freigebende Person Sie ebenfalls verifizieren.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Damit Sie auf den freigegebenen Ordner zugreifen können, sollte die freigebende Person Sie ebenfalls verifizieren.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">%s verifizieren</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
@@ -5076,7 +5076,7 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Zugriff auf Audiodateien zulassen</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Bestätigt</string>
+    <string name="contact_approve_credentials_approved_text">Verifiziert</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
     <string name="contact_approve_credentials_not_approved_text">Nicht verifiziert</string>
     <!-- Photos action menu zoom in -->
@@ -5161,7 +5161,7 @@
     <!-- Button text from verify credentials screen when contact is not verified -->
     <string name="contact_verify_credentials_mark_as_verified_text">Als verifiziert markieren</string>
     <!-- Description text from contact info screen when contact is verified -->
-    <string name="contact_verify_credentials_verified_text">Bestätigt</string>
+    <string name="contact_verify_credentials_verified_text">Verifiziert</string>
     <!-- Description text from contact info screen when contact is not verified -->
     <string name="contact_verify_credentials_not_verified_text">Nicht verifiziert</string>
     <!-- Option to show the list of participants in the call in the meeting screen -->
@@ -5186,7 +5186,17 @@
         <item quantity="other">Kamera-Uploads abgeschlossen, %1$d Dateien hochgeladen</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA hat nur eingeschränkten Zugriff auf die Fotobibliothek und kann nicht alle Ihre Fotos sichern.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
+    <string name="camera_uploads_change_permissions">Antippen, um die Berechtigungen zu ändern.</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="one">Invitee (%d)</item>
+        <item quantity="other">Invitees (%d)</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="one">%d eingeladene Person</item>
+        <item quantity="other">%d eingeladene Personen</item>
+    </plurals>
 </resources>

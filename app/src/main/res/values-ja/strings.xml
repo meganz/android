@@ -4956,4 +4956,12 @@
     <string name="camera_uploads_limited_access">MEGAはフォトライブラリへのアクセスが制限されているため、すべての写真をバックアップすることはできません。</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">タップして権限を変更します。</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="other">被招待者（%d）</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="other">%d人の被招待者</item>
+    </plurals>
 </resources>

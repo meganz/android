@@ -4956,4 +4956,12 @@
     <string name="camera_uploads_limited_access">MEGA对照片库的访问权限有限，无法备份您的所有照片。</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">点按以更改权限。</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="other">受邀者(%d)</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="other">%d位受邀请者</item>
+    </plurals>
 </resources>

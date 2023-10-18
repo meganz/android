@@ -3888,7 +3888,7 @@
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
     <string name="text_editor_creation_error">Não foi possível salvar o arquivo na Nuvem de arquivos. Tente novamente.</string>
     <!-- Action label to start images slideshow -->
-    <string name="action_slideshow">Slideshow</string>
+    <string name="action_slideshow">Apresentação de slides</string>
     <!-- Filter page: Prompt to choose media type -->
     <string name="filter_prompt_media_type">Escolher o tipo de arquivo</string>
     <!-- Filter page: Button text for all media type -->
@@ -5356,7 +5356,7 @@
     <!-- Success message when participants was added to the call from waiting room -->
     <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
         <item quantity="one">%1$d participante entrou na chamada</item>
-        <item quantity="many">%1$d de participantes entraram da chamada</item>
+        <item quantity="many">%1$d de participantes entraram na chamada</item>
         <item quantity="other">%1$d participantes entraram na chamada</item>
     </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
@@ -5422,4 +5422,16 @@
     <string name="camera_uploads_limited_access">O MEGA tem acesso limitado à biblioteca de fotos e não pode fazer backup de todas as suas fotos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Pressione para alterar as permissões.</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="one">Convidado (%d)</item>
+        <item quantity="many">Convidados (%d)</item>
+        <item quantity="other">Convidados (%d)</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="one">%d convidado</item>
+        <item quantity="many">%d de convidados</item>
+        <item quantity="other">%d convidados</item>
+    </plurals>
 </resources>

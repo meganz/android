@@ -4944,7 +4944,7 @@
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">ไม่ต้องปฏิเสธ</string>
     <string name="camera_uploads_up_to_date">การอัปโหลดจากกล้องได้อัปเดตล่าสุดแล้ว</string>
-    <string name="camera_uploads_paused_due_to_no_internet">การอัปโหลดถูกหยุดชั่วคราวเนื่องจากการเชื่อมต่ออินเทอร์เน็ตขาดหายไป</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>
@@ -4956,4 +4956,13 @@
     <string name="camera_uploads_limited_access">MEGA ถูกจำกัดการเข้าถึงไลบรารีรูปภาพของคุณและไม่สามารถสำรองรูปภาพทั้งหมดของคุณได้</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">แตะเพื่อเปลี่ยนการอนุญาต</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="one">Invitee (%d)</item>
+        <item quantity="other">Invitees (%d)</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="other">มีผู้รับเชิญอยู่ %d คน</item>
+    </plurals>
 </resources>

@@ -4943,7 +4943,7 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">모두 보기</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">거부하지 않기</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">카메라 업로드 업데이트됨</string>
     <string name="camera_uploads_paused_due_to_no_internet">인터넷 연결이 없어서 업로드가 일시정지 되었습니다</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -4953,7 +4953,16 @@
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA가 당신의 사진 라이브러리에 제한된 접근 권한을 가지고 있어서 모든 사진을 백업할 수 없습니다.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
+    <string name="camera_uploads_change_permissions">권한을 변경하려면 탭하세요.</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="one">Invitee (%d)</item>
+        <item quantity="other">Invitees (%d)</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="other">초대 받은 사람 %d명</item>
+    </plurals>
 </resources>

@@ -760,7 +760,7 @@
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">Nu</string>
     <!-- Button in the Login screen to reset the password -->
-    <string name="forgot_pass">Ți-ai uitat parola?</string>
+    <string name="forgot_pass">Ați uitat parola dvs.?</string>
     <!-- Hint of the text when the user can write his master key -->
     <string name="edit_text_insert_mk">Cheia de recuperare se introduce aici</string>
     <!-- Hint of the text where the user can write his password -->
@@ -5422,4 +5422,16 @@
     <string name="camera_uploads_limited_access">MEGA are acces limitat la biblioteca foto și nu poate face backup la toate fotografiile dvs.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Atinge pentru a modifica permisiunile.</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="one">Invitat (%d)</item>
+        <item quantity="few">Invitați (%d)</item>
+        <item quantity="other">Invitați (%d)</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="one">%d invitat</item>
+        <item quantity="few">%d invitați</item>
+        <item quantity="other">%d de invitați</item>
+    </plurals>
 </resources>

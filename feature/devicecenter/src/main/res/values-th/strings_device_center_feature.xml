@@ -138,4 +138,12 @@
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">ไม่สามารถซิงค์โฟลเดอร์นี้ได้เนื่องจากอยู่ในโฟลเดอร์ที่มีการซิงค์อยู่แล้ว</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">การอัปโหลดจากกล้องปิดใช้งานอยู่</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
+    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Enter a device name.</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
+    <string name="device_center_rename_device_dialog_error_message_name_already_exists">A device with this name already exist. Enter a different name.</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name with invalid characters -->
+    <string name="device_center_rename_device_dialog_error_message_invalid_characters">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: %1$s</string>
+    <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
+    <string name="device_center_snackbar_message_rename_device_successful">Device renamed</string>
 </resources>

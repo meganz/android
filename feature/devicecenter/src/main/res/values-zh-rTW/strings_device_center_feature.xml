@@ -138,4 +138,12 @@
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">由於資料夾已位於同步的資料夾中，因此無進行同步。</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">相機上傳已停用</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
+    <string name="device_center_rename_device_dialog_error_message_empty_device_name">輸入裝置名稱。</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
+    <string name="device_center_rename_device_dialog_error_message_name_already_exists">具有此名稱的裝置已存在。請輸入另一個名稱。</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name with invalid characters -->
+    <string name="device_center_rename_device_dialog_error_message_invalid_characters">不允許使用以下字元：%1$s</string>
+    <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
+    <string name="device_center_snackbar_message_rename_device_successful">裝置已重新命名</string>
 </resources>

@@ -5637,7 +5637,7 @@
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
     <string name="camera_uploads_up_to_date">Camera uploads updated</string>
-    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="one">Camera uploads in progress, %1$d file pending</item>
@@ -5651,4 +5651,14 @@
     <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="one">Invitee (%d)</item>
+        <item quantity="other">Invitees (%d)</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="one">%d invitee</item>
+        <item quantity="other">%d invitees</item>
+    </plurals>
 </resources>

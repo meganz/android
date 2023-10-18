@@ -5511,7 +5511,7 @@
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Подтвердите учётные данные</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_label">Зал ожидания</string>
+    <string name="meetings_schedule_meeting_waiting_room_label">Комната ожидания</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_description">К встрече могут присоединиться только участники, допущенные организатором.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
@@ -5554,7 +5554,7 @@
     <!--Admit button to admit several users to the waiting room in the user admission dialog for a meeting waiting room -->
     <string name="meetings_waiting_room_admit_users_to_call_dialog_admit_button">Пустить всех</string>
     <!-- Deny button in admit users to waiting room dialog in a meeting -->
-    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Отказать</string>
+    <string name="meetings_waiting_room_admit_users_to_call_dialog_deny_button">Не пускать</string>
     <!-- Description text in the dialog to admit one participant to the call. The placeholder indicates the name of the participant who is in the waiting room. -->
     <string name="meetings_waiting_room_admit_user_to_call_dialog_message">%1$s ждёт подключения к звонку.</string>
     <!-- See waiting room button in admit users to waiting room dialog in a meeting -->
@@ -5635,20 +5635,38 @@
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Посмотреть всех</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
-    <string name="camera_uploads_paused_due_to_no_internet">Upload paused due to no internet connection</string>
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Пустить</string>
+    <string name="camera_uploads_up_to_date">Загрузки из камеры обновлены</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Загрузка приостановлена из-за отсутствия подключения к Интернету</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
-        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+        <item quantity="one">Выполняется загрузка из камеры, %1$d файл ожидает обработки</item>
+        <item quantity="few">Выполняется загрузка из камеры, %1$d файла ожидает обработки</item>
+        <item quantity="many">Выполняется загрузка из камеры, %1$d файлов ожидает обработки</item>
+        <item quantity="other">Выполняется загрузка из камеры, %1$d файла ожидает обработки</item>
     </plurals>
     <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
-        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+        <item quantity="one">Загрузка из камеры завершена, загружен %1$d файл</item>
+        <item quantity="few">Загрузка из камеры завершена, загружено %1$d файла</item>
+        <item quantity="many">Загрузка из камеры завершена, загружено %1$d файлов</item>
+        <item quantity="other">Загрузка из камеры завершена, загружено %1$d файла</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA имеет ограниченный доступ к библиотеке фотографий и не может создавать резервные копии всех ваших фотографий.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
+    <string name="camera_uploads_change_permissions">Нажмите, чтобы изменить разрешения.</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="one">Приглашённый (%d)</item>
+        <item quantity="few">Приглашённые (%d)</item>
+        <item quantity="many">Приглашённые (%d)</item>
+        <item quantity="other">Приглашённые (%d)</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="one">%d приглашённый</item>
+        <item quantity="few">%d приглашённых</item>
+        <item quantity="many">%d приглашённых</item>
+        <item quantity="other">%d приглашённых</item>
+    </plurals>
 </resources>

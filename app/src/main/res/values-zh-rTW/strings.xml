@@ -2400,13 +2400,13 @@
     <!-- Action delete all file versions -->
     <string name="delete_versions">刪除以前的版本</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
-    <string name="title_delete_version_history">要刪除以前的版本嗎？</string>
+    <string name="title_delete_version_history">要刪除先前的版本嗎？</string>
     <!-- Text of the dialog shown when it wants to delete the version history of a file -->
     <string name="text_delete_version_history">請注意，當前的檔案將不會被刪除。</string>
     <!-- Alert shown when the version history was deleted correctly -->
-    <string name="version_history_deleted">以前的版本已刪除。</string>
+    <string name="version_history_deleted">先前的版本已刪除。</string>
     <!-- Alert shown when the version history was deleted erroneously -->
-    <string name="version_history_deleted_erroneously">以前的版本未刪除。</string>
+    <string name="version_history_deleted_erroneously">先前的版本未刪除。</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
         <item quantity="other">已刪除%d個版本</item>
@@ -3780,7 +3780,7 @@
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">已存在相同名稱的相簿。請輸入不同的名稱。</string>
+    <string name="photos_create_album_error_message_duplicate">具有此名稱的相簿已存在。請輸入不同的名稱。</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">新增項目到「%s」</string>
     <!-- Message after photos are successfully added in album -->
@@ -4956,4 +4956,12 @@
     <string name="camera_uploads_limited_access">MEGA對相簿的存取權限有限，無法備份您的所有照片。</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">點選以更改權限。</string>
+    <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
+    <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
+        <item quantity="other">受邀者（%d）</item>
+    </plurals>
+    <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
+    <plurals name="meetings_meeting_not_in_call_section_subtitle">
+        <item quantity="other">%d名受邀者</item>
+    </plurals>
 </resources>
