@@ -58,7 +58,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
 
     Context context;
     int positionClicked;
-    ArrayList<Contact> contacts;
+    List<Contact> contacts;
     RecyclerView listFragment;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -125,7 +125,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
 
     }
 
-    public MegaContactsAttachedAdapter(Context _context, ArrayList<Contact> _contacts, RecyclerView _listView) {
+    public MegaContactsAttachedAdapter(Context _context, List<Contact> _contacts, RecyclerView _listView) {
         this.context = _context;
         this.positionClicked = -1;
         this.contacts = _contacts;
