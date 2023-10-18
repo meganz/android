@@ -37,7 +37,10 @@ internal class ChatFragment : Fragment() {
             val uiState by viewModel.state.collectAsStateWithLifecycle()
 
             AndroidTheme(isDark = mode.isDarkMode()) {
-                ChatView(uiState)
+                ChatView(
+                    uiState = uiState,
+                    onBackPressed = { activity?.finish() }
+                )
             }
         }
     }
