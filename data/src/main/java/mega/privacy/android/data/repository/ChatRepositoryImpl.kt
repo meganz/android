@@ -246,18 +246,6 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun leaveChat(chatId: Long): ChatRequest =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.leaveChat(
-                    chatId,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCompleted(continuation)
-                    )
-                )
-            }
-        }
-
     override suspend fun setChatTitle(chatId: Long, title: String) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaChatRequestListenerInterface(
@@ -543,26 +531,41 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun removeFromChat(chatId: Long, handle: Long): ChatRequest =
-        withContext(ioDispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = OptionalMegaChatRequestListenerInterface(
-                    onRequestFinish = onRequestCompleted(continuation)
-                )
+    override suspend fun removeFromChat(
+        chatId: Long, handle: Long
+    ): ChatRequest = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = continuation.getChatRequestListener(
+                methodName = "removeFromChat",
+                chatRequestMapper::invoke
+            )
 
-                megaChatApiGateway.removeFromChat(
-                    chatId,
-                    handle,
-                    listener
-                )
+            megaChatApiGateway.removeFromChat(
+                chatId,
+                handle,
+                callback
+            )
 
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        listener
-                    )
-                }
-            }
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
+    }
+
+    override suspend fun leaveChat(
+        chatId: Long
+    ): ChatRequest = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = continuation.getChatRequestListener(
+                methodName = "leaveChat",
+                chatRequestMapper::invoke
+            )
+            megaChatApiGateway.leaveChat(
+                chatId,
+                callback
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+        }
+    }
 
     override fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom> =
         megaChatApiGateway.getChatRoomUpdates(chatId)

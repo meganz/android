@@ -50,10 +50,10 @@ import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
@@ -98,13 +98,14 @@ import javax.inject.Inject
  * @property monitorUpdatePushNotificationSettingsUseCase   monitors push notification settings update
  * @property deviceGateway                                  [DeviceGateway]
  * @property getChatRoom                                    [GetChatRoom]
+ * @property getFeatureFlagValueUseCase                     [GetFeatureFlagValueUseCase]
  * @property monitorChatArchivedUseCase                     [MonitorChatArchivedUseCase]
  * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
  * @property monitorJoinedSuccessfullyUseCase               [MonitorJoinedSuccessfullyUseCase]
  * @property monitorLeaveChatUseCase                        [MonitorLeaveChatUseCase]
  * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
  * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
- * @property leaveChat                                      [LeaveChat]
+ * @property leaveChatUseCase                               [LeaveChatUseCase]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -131,7 +132,7 @@ class ChatViewModel @Inject constructor(
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
     private val monitorJoinedSuccessfullyUseCase: MonitorJoinedSuccessfullyUseCase,
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
-    private val leaveChat: LeaveChat,
+    private val leaveChatUseCase: LeaveChatUseCase,
     private val getContactLinkUseCase: GetContactLinkUseCase,
     private val isContactRequestSentUseCase: IsContactRequestSentUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -223,15 +224,21 @@ class ChatViewModel @Inject constructor(
      *
      * @param chatId    [Long] ID of the chat to leave.
      */
-    private fun performLeaveChat(chatId: Long) = viewModelScope.launch {
-        runCatching { leaveChat(chatId) }
-            .onSuccess { setIsJoiningOrLeaving(false, null) }
-            .onFailure {
-                if (it is MegaException) {
-                    _state.update { state -> state.copy(snackbarMessage = it.getErrorStringId()) }
+    private fun performLeaveChat(chatId: Long) =
+        viewModelScope.launch {
+            runCatching {
+                chatManagement.addLeavingChatId(chatId)
+                leaveChatUseCase(chatId)
+            }.onFailure { exception ->
+                chatManagement.removeLeavingChatId(chatId)
+                if (exception is MegaException) {
+                    _state.update { state -> state.copy(snackbarMessage = exception.getErrorStringId()) }
                 }
+            }.onSuccess {
+                chatManagement.removeLeavingChatId(chatId)
+                setIsJoiningOrLeaving(false, null)
             }
-    }
+        }
 
     /**
      * Sets snackbarMessage in state as consumed.

@@ -17,7 +17,6 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
-import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
@@ -122,13 +121,6 @@ abstract class ChatModule {
         @Provides
         fun provideInviteToChat(chatRepository: ChatRepository): InviteToChat =
             InviteToChat(chatRepository::inviteToChat)
-
-        /**
-         * Provides the Use Case [LeaveChat]
-         */
-        @Provides
-        fun provideLeaveChat(chatRepository: ChatRepository): LeaveChat =
-            LeaveChat(chatRepository::leaveChat)
 
         /**
          * Provides the Use Case [SetPublicChatToPrivate]

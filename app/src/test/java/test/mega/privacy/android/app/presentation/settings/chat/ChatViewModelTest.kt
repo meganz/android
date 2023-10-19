@@ -20,10 +20,10 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
@@ -98,7 +98,7 @@ class ChatViewModelTest {
         onBlocking { invoke(any()) }.thenReturn(flowOf())
     }
     private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
-    private val leaveChat = mock<LeaveChat>()
+    private val leaveChatUseCase = mock<LeaveChatUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val loadPendingMessagesUseCase = mock<LoadPendingMessagesUseCase> {
         onBlocking { invoke(any()) }.thenReturn(flowOf())
@@ -130,7 +130,7 @@ class ChatViewModelTest {
             broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
             monitorJoinedSuccessfullyUseCase = monitorJoinedSuccessfullyUseCase,
             monitorLeaveChatUseCase = monitorLeaveChatUseCase,
-            leaveChat = leaveChat,
+            leaveChatUseCase = leaveChatUseCase,
             getContactLinkUseCase = getContactLinkUseCase,
             isContactRequestSentUseCase = isContactRequestSentUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
@@ -213,7 +213,7 @@ class ChatViewModelTest {
     fun `test that the state is updated when leaving a chat`() =
         runTest {
             testScheduler.advanceUntilIdle()
-            verify(leaveChat).invoke(1234L)
+            verify(leaveChatUseCase).invoke(1234L)
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.isJoiningOrLeaving).isFalse()

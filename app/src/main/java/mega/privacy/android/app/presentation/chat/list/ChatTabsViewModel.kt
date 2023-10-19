@@ -33,7 +33,6 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -42,6 +41,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
+import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCancel
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -58,7 +59,7 @@ import javax.inject.Inject
  * Chat tabs view model
  *
  * @property archiveChatUseCase                         [ArchiveChatUseCase]
- * @property leaveChatUseCase                           [LeaveChat]
+ * @property leaveChatUseCase                           [LeaveChatUseCase]
  * @property signalChatPresenceUseCase                  [SignalChatPresenceActivity]
  * @property getChatsUseCase                            [GetChatsUseCase]
  * @property getLastMessageUseCase                      [GetLastMessageUseCase]
@@ -83,7 +84,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatTabsViewModel @Inject constructor(
     private val archiveChatUseCase: ArchiveChatUseCase,
-    private val leaveChatUseCase: LeaveChat,
+    private val leaveChatUseCase: LeaveChatUseCase,
     private val signalChatPresenceUseCase: SignalChatPresenceActivity,
     private val getChatsUseCase: GetChatsUseCase,
     private val getLastMessageUseCase: GetLastMessageUseCase,
@@ -352,15 +353,19 @@ class ChatTabsViewModel @Inject constructor(
      *
      * @param chatId    Chat id to leave
      */
-    fun leaveChat(chatId: Long) {
+    fun leaveChat(chatId: Long) =
         viewModelScope.launch {
             runCatching {
+                chatManagement.addLeavingChatId(chatId)
                 leaveChatUseCase(chatId)
             }.onFailure { exception ->
+                chatManagement.removeLeavingChatId(chatId)
                 Timber.e(exception)
+            }.onSuccess {
+                Timber.d("Chat left ")
+                chatManagement.removeLeavingChatId(chatId)
             }
         }
-    }
 
     /**
      * Leave chats

@@ -19,7 +19,6 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
@@ -67,10 +66,6 @@ class MegaChatRequestHandler @Inject constructor(
      */
     override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest) {
         Timber.d("onRequestStart (CHAT): %s", request.requestString)
-
-        if (request.type == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM) {
-            chatManagement.addLeavingChatId(request.chatHandle)
-        }
     }
 
     /**
@@ -153,10 +148,6 @@ class MegaChatRequestHandler @Inject constructor(
             chatManagement.removeJoiningChatId(request.chatHandle)
             chatManagement.removeJoiningChatId(request.userHandle)
             chatManagement.broadcastJoinedSuccessfully()
-        } else if (request.type == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
-            && request.userHandle == MegaApiJava.INVALID_HANDLE
-        ) {
-            chatManagement.removeLeavingChatId(request.chatHandle)
         }
     }
 

@@ -15,7 +15,6 @@ import mega.privacy.android.app.presentation.chat.list.ChatTabsViewModel
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUnreadStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
+import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
@@ -49,7 +49,7 @@ import org.mockito.kotlin.whenever
 internal class ChatTabsViewModelTest {
     private lateinit var underTest: ChatTabsViewModel
     private val archiveChatUseCase: ArchiveChatUseCase = mock()
-    private val leaveChatUseCase: LeaveChat = mock()
+    private val leaveChatUseCase: LeaveChatUseCase = mock()
     private val signalChatPresenceUseCase: SignalChatPresenceActivity = mock()
     private val getChatsUseCase: GetChatsUseCase = mock()
     private val getLastMessageUseCase: GetLastMessageUseCase = mock()

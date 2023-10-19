@@ -41,12 +41,12 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
-import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
@@ -67,7 +67,7 @@ import javax.inject.Inject
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
  * @property getVisibleContactsUseCase                      [GetVisibleContactsUseCase]
  * @property inviteToChat                                   [InviteToChat]
- * @property leaveChat                                      [LeaveChat]
+ * @property leaveChatUseCase                               [LeaveChatUseCase]
  * @property removeFromChat                                 [RemoveFromChat]
  * @property inviteContact                                  [InviteContact]
  * @property setOpenInvite                                  [SetOpenInvite]
@@ -96,7 +96,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val inviteToChat: InviteToChat,
-    private val leaveChat: LeaveChat,
+    private val leaveChatUseCase: LeaveChatUseCase,
     private val removeFromChat: RemoveFromChat,
     private val inviteContact: InviteContact,
     private val setOpenInvite: SetOpenInvite,
@@ -828,23 +828,20 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     fun leaveChat() =
         viewModelScope.launch {
             runCatching {
-                leaveChat(state.value.chatId)
+                chatManagement.addLeavingChatId(state.value.chatId)
+                leaveChatUseCase(state.value.chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
+                chatManagement.removeLeavingChatId(state.value.chatId)
                 dismissDialog()
                 triggerSnackbarMessage(
                     getStringFromStringResMapper(
                         R.string.general_error
                     )
                 )
-            }.onSuccess { result ->
+            }.onSuccess {
                 Timber.d("Chat left ")
-                if (result.userHandle == MegaApiJava.INVALID_HANDLE) {
-                    result.chatHandle.let { chatHandle ->
-                        chatManagement.removeLeavingChatId(chatHandle)
-                    }
-                }
-
+                chatManagement.removeLeavingChatId(state.value.chatId)
                 dismissDialog()
                 finishActivity()
             }
