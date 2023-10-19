@@ -260,6 +260,7 @@ internal abstract class GatewayModule {
     abstract fun bindEphemeralCredentialsGateway(implementation: EphemeralCredentialsDataStore): EphemeralCredentialsGateway
 
     @Binds
+    @Singleton
     abstract fun bindPasscodeStoreGateway(implementation: PasscodeDataStore): PasscodeStoreGateway
 
     @Binds

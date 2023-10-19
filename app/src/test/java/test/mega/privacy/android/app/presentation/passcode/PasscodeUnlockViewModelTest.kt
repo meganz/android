@@ -18,8 +18,8 @@ import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
 import mega.privacy.android.domain.entity.passcode.PasscodeType
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
 import mega.privacy.android.domain.exception.security.NoPasscodeTypeSetException
-import mega.privacy.android.domain.usecase.passcode.GetPasscodeTypeUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeAttemptsUseCase
+import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeTypeUseCase
 import mega.privacy.android.domain.usecase.passcode.UnlockPasscodeUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -40,7 +40,7 @@ internal class PasscodeUnlockViewModelTest {
     private lateinit var underTest: PasscodeUnlockViewModel
     private val unlockPasscodeUseCase = mock<UnlockPasscodeUseCase>()
     private val monitorPasscodeAttemptsUseCase = mock<MonitorPasscodeAttemptsUseCase>()
-    private val getPasscodeTypeUseCase = mock<GetPasscodeTypeUseCase>()
+    private val monitorPasscodeTypeUseCase = mock<MonitorPasscodeTypeUseCase>()
     private val passcodeTypeMapper = mock<PasscodeTypeMapper>()
 
     @BeforeAll
@@ -53,7 +53,7 @@ internal class PasscodeUnlockViewModelTest {
         Mockito.reset(
             unlockPasscodeUseCase,
             monitorPasscodeAttemptsUseCase,
-            getPasscodeTypeUseCase,
+            monitorPasscodeTypeUseCase,
             passcodeTypeMapper,
         )
     }
@@ -175,7 +175,7 @@ internal class PasscodeUnlockViewModelTest {
         withCoroutineExceptions {
             runTest {
                 initViewModel(
-                    getPasscodeTypeUseCaseStub = getPasscodeTypeUseCase.stub {
+                    monitorPasscodeTypeUseCaseStub = monitorPasscodeTypeUseCase.stub {
                         onBlocking { invoke() }.thenAnswer { throw NoPasscodeTypeSetException() }
                     }
                 )
@@ -203,9 +203,9 @@ internal class PasscodeUnlockViewModelTest {
                 on { invoke() }.thenReturn(0.asHotFlow())
             },
         unlockPasscodeUseCaseStub: UnlockPasscodeUseCase = unlockPasscodeUseCase,
-        getPasscodeTypeUseCaseStub: GetPasscodeTypeUseCase =
-            getPasscodeTypeUseCase.stub {
-                onBlocking { invoke() }.thenReturn(PasscodeType.Password)
+        monitorPasscodeTypeUseCaseStub: MonitorPasscodeTypeUseCase =
+            monitorPasscodeTypeUseCase.stub {
+                on { invoke() }.thenReturn(PasscodeType.Password.asHotFlow())
             },
         passcodeTypeMapperStub: PasscodeTypeMapper = passcodeTypeMapper.stub {
             on { invoke(any()) }.thenReturn(PasscodeUIType.Alphanumeric(false))
@@ -214,7 +214,7 @@ internal class PasscodeUnlockViewModelTest {
         underTest = PasscodeUnlockViewModel(
             monitorPasscodeAttemptsUseCase = monitorPasscodeAttemptsUseCaseStub,
             unlockPasscodeUseCase = unlockPasscodeUseCaseStub,
-            getPasscodeTypeUseCase = getPasscodeTypeUseCaseStub,
+            monitorPasscodeTypeUseCase = monitorPasscodeTypeUseCaseStub,
             passcodeTypeMapper = passcodeTypeMapperStub,
         )
     }
