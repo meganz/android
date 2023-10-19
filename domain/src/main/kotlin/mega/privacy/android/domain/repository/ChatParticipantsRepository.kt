@@ -2,7 +2,7 @@ package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import java.io.File
 
 /**
@@ -49,16 +49,16 @@ interface ChatParticipantsRepository {
      * Get status
      *
      * @param participant [ChatParticipant]
-     * @return [UserStatus]
+     * @return [UserChatStatus]
      */
-    suspend fun getStatus(participant: ChatParticipant): UserStatus
+    suspend fun getStatus(participant: ChatParticipant): UserChatStatus
 
     /**
      * Get current user status
      *
-     * @return  [UserStatus]
+     * @return  [UserChatStatus]
      */
-    suspend fun getCurrentStatus(): UserStatus
+    suspend fun getCurrentStatus(): UserChatStatus
 
     /**
      * Get alias
@@ -142,5 +142,5 @@ interface ChatParticipantsRepository {
      *
      * @param status
      */
-    suspend fun setOnlineStatus(status: UserStatus)
+    suspend fun setOnlineStatus(status: UserChatStatus)
 }

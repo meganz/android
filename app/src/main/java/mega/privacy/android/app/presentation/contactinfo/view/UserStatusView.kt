@@ -19,12 +19,12 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.white_alpha_087
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 @Composable
 internal fun UserStatusView(
     title: String,
-    userStatus: UserStatus,
+    userChatStatus: UserChatStatus,
     progress: Float,
     modifier: Modifier = Modifier,
 ) {
@@ -40,7 +40,7 @@ internal fun UserStatusView(
         TextWithTrailingIcon(
             text = title,
             iconAlpha = iconAlpha,
-            imageResource = userStatus.iconRes(MaterialTheme.colors.isLight),
+            imageResource = userChatStatus.iconRes(MaterialTheme.colors.isLight),
             maxLines = maxLines,
             overflow = TextOverflow.Ellipsis,
             textStyle = MaterialTheme.typography.h6.copy(
@@ -49,7 +49,7 @@ internal fun UserStatusView(
             )
         )
         Text(
-            text = stringResource(id = userStatus.text),
+            text = stringResource(id = userChatStatus.text),
             modifier = modifier,
             style = MaterialTheme.typography.body2.copy(
                 color = secondaryTextColor,
@@ -69,7 +69,7 @@ private fun PreviewUserStatusLight() {
             UserStatusView(
                 modifier = Modifier,
                 title = "Nick name :P two lien test strrijaskjkhklsdjhglj",
-                userStatus = UserStatus.Online,
+                userChatStatus = UserChatStatus.Online,
                 progress = 1f
             )
         }
@@ -84,7 +84,7 @@ private fun PreviewUserStatusDark() {
             UserStatusView(
                 modifier = Modifier,
                 title = "Nick name",
-                userStatus = UserStatus.Online,
+                userChatStatus = UserChatStatus.Online,
                 progress = 0.05f
             )
         }

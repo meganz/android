@@ -9,6 +9,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.data.mapper.chat.UserStatusToIntMapper
+import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -55,6 +56,7 @@ internal class DefaultChatParticipantsRepositoryTest {
     private val chatPermissionsMapper: ChatPermissionsMapper = mock()
     private val megaHandleListMapper: MegaHandleListMapper = mock()
     private val userStatusToIntMapper: UserStatusToIntMapper = mock()
+    private val userChatStatusMapper: UserChatStatusMapper = mock()
 
 
     @BeforeAll
@@ -76,7 +78,8 @@ internal class DefaultChatParticipantsRepositoryTest {
             areCredentialsVerifiedUseCase,
             getContactFullNameUseCase,
             getUserPrivilegeUseCase,
-            UnconfinedTestDispatcher()
+            UnconfinedTestDispatcher(),
+            userChatStatusMapper,
         )
     }
 

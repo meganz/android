@@ -91,7 +91,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -1073,15 +1073,15 @@ private fun ParticipantItemView(
                             overflow = TextOverflow.Ellipsis
                         )
 
-                        if (participant.status != UserStatus.Invalid) {
+                        if (participant.status != UserChatStatus.Invalid) {
                             ContactStatus(status = participant.status)
                         }
                     }
 
-                    if (participant.lastSeen != null || participant.status != UserStatus.Invalid) {
+                    if (participant.lastSeen != null || participant.status != UserChatStatus.Invalid) {
                         val statusText = stringResource(id = participant.status.text)
                         val secondLineText =
-                            if (participant.status == UserStatus.Online) {
+                            if (participant.status == UserChatStatus.Online) {
                                 statusText
                             } else {
                                 getLastSeenString(participant.lastSeen) ?: statusText

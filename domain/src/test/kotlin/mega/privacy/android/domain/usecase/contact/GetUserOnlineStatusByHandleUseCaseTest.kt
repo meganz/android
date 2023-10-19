@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.contact
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.repository.ContactsRepository
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -17,17 +17,17 @@ class GetUserOnlineStatusByHandleUseCaseTest {
 
     @Test
     fun `test that use case returns user status if valid handle is provided`() = runTest {
-        whenever(contactsRepository.getUserOnlineStatusByHandle(testHandle)).thenReturn(UserStatus.Online)
+        whenever(contactsRepository.getUserOnlineStatusByHandle(testHandle)).thenReturn(UserChatStatus.Online)
         val actual = underTest(testHandle)
-        val expected = UserStatus.Online
+        val expected = UserChatStatus.Online
         Truth.assertThat(actual).isEqualTo(expected)
     }
 
     @Test
     fun `test that use case returns invalid if invalid handle is given`() = runTest {
-        whenever(contactsRepository.getUserOnlineStatusByHandle(-1L)).thenReturn(UserStatus.Invalid)
+        whenever(contactsRepository.getUserOnlineStatusByHandle(-1L)).thenReturn(UserChatStatus.Invalid)
         val actual = underTest(-1L)
-        val expected = UserStatus.Invalid
+        val expected = UserChatStatus.Invalid
         Truth.assertThat(actual).isEqualTo(expected)
     }
 }

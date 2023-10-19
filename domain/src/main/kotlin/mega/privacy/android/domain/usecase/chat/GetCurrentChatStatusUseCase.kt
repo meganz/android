@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.merge
 import mega.privacy.android.domain.entity.ConnectivityState
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.entity.chat.ConnectionState
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -52,11 +52,11 @@ class GetCurrentChatStatusUseCase @Inject constructor(
             ChatStatus.NoNetworkConnection
         } else {
             when (chatParticipantsRepository.getCurrentStatus()) {
-                UserStatus.Offline -> ChatStatus.Offline
-                UserStatus.Away -> ChatStatus.Away
-                UserStatus.Online -> ChatStatus.Online
-                UserStatus.Busy -> ChatStatus.Busy
-                UserStatus.Invalid -> {
+                UserChatStatus.Offline -> ChatStatus.Offline
+                UserChatStatus.Away -> ChatStatus.Away
+                UserChatStatus.Online -> ChatStatus.Online
+                UserChatStatus.Busy -> ChatStatus.Busy
+                UserChatStatus.Invalid -> {
                     when (chatRepository.getConnectionState()) {
                         ConnectionState.Connecting -> ChatStatus.Connecting
                         ConnectionState.Connected -> ChatStatus.Online

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.chat.SetCurrentUserStatusUseCase
 import timber.log.Timber
@@ -31,7 +31,7 @@ internal data class ChatStatusViewModel @Inject constructor(
         }
     }
 
-    fun setUserStatus(status: UserStatus) {
+    fun setUserStatus(status: UserChatStatus) {
         viewModelScope.launch {
             val result = runCatching { setCurrentUserStatusUseCase(status) }
                 .onFailure { Timber.e(it) }
@@ -47,6 +47,6 @@ internal data class ChatStatusViewModel @Inject constructor(
  * @property result
  */
 data class ChatStatusUiState(
-    val status: UserStatus = UserStatus.Invalid,
+    val status: UserChatStatus = UserChatStatus.Invalid,
     val result: Result<Unit>? = null,
 )

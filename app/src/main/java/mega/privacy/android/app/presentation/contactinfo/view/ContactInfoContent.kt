@@ -26,7 +26,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -122,7 +122,7 @@ private fun PreviewContactInfoContent() {
                     visibility = UserVisibility.Visible,
                     timestamp = 123456789,
                     areCredentialsVerified = true,
-                    status = UserStatus.Online,
+                    status = UserChatStatus.Online,
                     lastSeen = 0,
                 )
             ),
@@ -184,7 +184,7 @@ private fun PreviewContactInfoContentWithChatRoom() {
                     visibility = UserVisibility.Visible,
                     timestamp = 123456789,
                     areCredentialsVerified = true,
-                    status = UserStatus.Online,
+                    status = UserChatStatus.Online,
                     lastSeen = 0,
                 ),
                 chatRoom = chatRoom,

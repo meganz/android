@@ -10,7 +10,7 @@ import mega.privacy.android.app.presentation.contactinfo.view.ContactInfoView
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +39,7 @@ class ContactInfoViewTest {
         visibility = UserVisibility.Visible,
         timestamp = 123456789,
         areCredentialsVerified = false,
-        status = UserStatus.Online,
+        status = UserChatStatus.Online,
         lastSeen = 0,
     )
     private val contactItemWithVerifiedCredentials = ContactItem(
@@ -50,7 +50,7 @@ class ContactInfoViewTest {
         visibility = UserVisibility.Visible,
         timestamp = 123456789,
         areCredentialsVerified = true,
-        status = UserStatus.Online,
+        status = UserChatStatus.Online,
         lastSeen = 0,
     )
     private val chatRoom = mock<ChatRoom> {
@@ -61,7 +61,7 @@ class ContactInfoViewTest {
 
     private val contactState = ContactInfoState(
         error = null,
-        userStatus = UserStatus.Online,
+        userChatStatus = UserChatStatus.Online,
         lastGreen = 0,
         isFromContacts = false,
         avatar = null,
@@ -123,7 +123,7 @@ class ContactInfoViewTest {
 
     @Test
     fun `test that contact info does not show shared files and manage history when chatRoom is not created`() {
-        setupRule(ContactInfoState(contactItem = contactItem, userStatus = UserStatus.Online))
+        setupRule(ContactInfoState(contactItem = contactItem, userChatStatus = UserChatStatus.Online))
         composeRule.onNodeWithText(fromId(R.string.online_status)).assertExists()
         //IncomingSharesView
         composeRule.onNodeWithText(fromId(R.string.title_incoming_shares_explorer)).assertExists()

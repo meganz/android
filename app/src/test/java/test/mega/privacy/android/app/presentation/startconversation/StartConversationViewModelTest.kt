@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
@@ -30,8 +30,8 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
-import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.After
 import org.junit.Before
@@ -62,7 +62,7 @@ class StartConversationViewModelTest {
         visibility = UserVisibility.Visible,
         timestamp = Random.nextLong(),
         areCredentialsVerified = false,
-        status = UserStatus.Online,
+        status = UserChatStatus.Online,
     )
     private val testContactList = mutableListOf<ContactItem>().apply {
         for (i in 0 until 10) {
@@ -75,7 +75,7 @@ class StartConversationViewModelTest {
                     visibility = UserVisibility.Visible,
                     timestamp = Random.nextLong(),
                     areCredentialsVerified = false,
-                    status = UserStatus.Online,
+                    status = UserChatStatus.Online,
                 )
             )
         }

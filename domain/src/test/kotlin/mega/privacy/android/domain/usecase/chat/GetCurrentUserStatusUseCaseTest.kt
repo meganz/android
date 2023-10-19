@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.chat
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -32,8 +32,8 @@ internal class GetCurrentUserStatusUseCaseTest {
     }
 
     @ParameterizedTest(name = "test that UseCase returns correctly when repository returns {0}")
-    @EnumSource(UserStatus::class)
-    fun `test that getCurrentStatus returns correctly`(status: UserStatus) = runTest {
+    @EnumSource(UserChatStatus::class)
+    fun `test that getCurrentStatus returns correctly`(status: UserChatStatus) = runTest {
         whenever(chatParticipantsRepository.getCurrentStatus()).thenReturn(status)
         Truth.assertThat(underTest()).isEqualTo(status)
     }

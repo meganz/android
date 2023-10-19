@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property visibility             [UserVisibility].
  * @property timestamp              Time when the user was included in the contact list.
  * @property areCredentialsVerified True if user credentials are verified, false otherwise.
- * @property status                 [UserStatus].
+ * @property status                 [UserChatStatus].
  * @property lastSeen               User last seen.
  */
 data class ContactItem(
@@ -23,6 +23,6 @@ data class ContactItem(
     val visibility: UserVisibility,
     val timestamp: Long,
     val areCredentialsVerified: Boolean,
-    val status: UserStatus,
+    val status: UserChatStatus,
     val lastSeen: Int? = null,
 )

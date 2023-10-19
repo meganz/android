@@ -28,7 +28,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingData
 import mega.privacy.android.domain.repository.ChatRepository
@@ -197,7 +197,7 @@ class GetChatsUseCase @Inject constructor(
             lastMessage = lastMessage.await(),
             lastTimestampFormatted = lastTimestampFormatted.await(),
             currentCall = currentCall.await(),
-            userStatus = userStatus.await(),
+            userChatStatus = userStatus.await(),
             peerEmail = peerEmail.await(),
         )
     }
@@ -361,7 +361,7 @@ class GetChatsUseCase @Inject constructor(
                     mutex.withLock {
                         get(chatId)?.let { currentItem ->
                             val updatedItem = currentItem.copyChatRoomItem(
-                                userStatus = update.status,
+                                userChatStatus = update.status,
                             )
 
                             if (currentItem != updatedItem) {
@@ -426,7 +426,7 @@ class GetChatsUseCase @Inject constructor(
     private suspend fun getParticipantsAvatar(chatId: Long): List<ChatAvatarItem>? =
         runCatching { getChatGroupAvatarUseCase(chatId) }.getOrNull()
 
-    private suspend fun ChatRoomItem.getUserOnlineStatus(): UserStatus? =
+    private suspend fun ChatRoomItem.getUserOnlineStatus(): UserChatStatus? =
         runCatching {
             if (this is IndividualChatRoomItem && peerHandle != null)
                 getUserOnlineStatusByHandleUseCase(peerHandle)

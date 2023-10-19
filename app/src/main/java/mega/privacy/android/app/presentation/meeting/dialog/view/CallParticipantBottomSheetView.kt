@@ -151,7 +151,7 @@ private fun BottomSheetContent(
 
                 if (!participant.isMe && participant.callParticipantData.isContact && !participant.callParticipantData.isGuest) {
                     ChatUserStatusView(
-                        userStatus = participant.status,
+                        userChatStatus = participant.status,
                         modifier = Modifier.constrainAs(statusIcon) {
                             start.linkTo(titleText.end, 4.dp)
                             top.linkTo(titleText.top)

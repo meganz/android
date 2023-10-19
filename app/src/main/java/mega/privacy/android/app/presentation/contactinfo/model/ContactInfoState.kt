@@ -5,7 +5,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.UnTypedNode
 
@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * Contact info UI state
  *
  * @property error                                      String resource id for showing an error.
- * @property userStatus                                 user status
+ * @property userChatStatus                             user status
  * @property lastGreen                                  last seen time gap in minutes
  * @property isFromContacts                             Checks if contact info launched from contacts screen
  * @property contactItem                                Contact item contains all the info about the user
@@ -44,7 +44,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  */
 data class ContactInfoState(
     val error: Int? = null,
-    val userStatus: UserStatus = UserStatus.Invalid,
+    val userChatStatus: UserChatStatus = UserChatStatus.Invalid,
     val lastGreen: Int = 0,
     val isFromContacts: Boolean = false,
     val avatar: Bitmap? = null,

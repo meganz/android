@@ -20,7 +20,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
 import javax.inject.Inject
@@ -50,10 +50,10 @@ internal class ChatStatusDialogFragment : DialogFragment() {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
                     ConfirmationDialogWithRadioButtons(
                         radioOptions = listOf(
-                            UserStatus.Online,
-                            UserStatus.Away,
-                            UserStatus.Busy,
-                            UserStatus.Offline,
+                            UserChatStatus.Online,
+                            UserChatStatus.Away,
+                            UserChatStatus.Busy,
+                            UserChatStatus.Offline,
                         ),
                         initialSelectedOption = uiState.status,
                         titleText = stringResource(id = R.string.status_label),

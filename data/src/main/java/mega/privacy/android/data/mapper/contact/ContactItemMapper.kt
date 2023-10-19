@@ -1,9 +1,7 @@
 package mega.privacy.android.data.mapper.contact
 
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
@@ -11,7 +9,9 @@ import javax.inject.Inject
 /**
  * Mapper for converting [MegaUser] into [ContactItem]
  */
-internal class ContactItemMapper @Inject constructor() {
+internal class ContactItemMapper @Inject constructor(
+    private val userChatStatusMapper: UserChatStatusMapper,
+) {
     /**
      * Invoke
      *
@@ -39,7 +39,7 @@ internal class ContactItemMapper @Inject constructor() {
         visibility = userVisibility[megaUser.visibility] ?: UserVisibility.Unknown,
         timestamp = megaUser.timestamp,
         areCredentialsVerified = areCredentialsVerified,
-        status = userStatus[status] ?: UserStatus.Invalid,
+        status = userChatStatusMapper(status),
         lastSeen = lastSeen
     )
 

@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -298,7 +298,7 @@ interface ContactsRepository {
      *
      * @param handle user handle id
      */
-    suspend fun getUserOnlineStatusByHandle(handle: Long): UserStatus
+    suspend fun getUserOnlineStatusByHandle(handle: Long): UserChatStatus
 
     /**
      * Get user email from chat id

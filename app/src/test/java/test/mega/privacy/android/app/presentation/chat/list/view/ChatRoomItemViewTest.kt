@@ -9,7 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.chat.list.view.ChatRoomItemView
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +29,7 @@ class ChatRoomItemViewTest {
         lastTimestampFormatted = "Yesterday",
         avatar = ChatAvatarItem("I", color = "#FEBC00".toColorInt()),
         isMuted = true,
-        userStatus = UserStatus.Online,
+        userChatStatus = UserChatStatus.Online,
     )
 
     private val onItemClick: (Long) -> Unit = mock()

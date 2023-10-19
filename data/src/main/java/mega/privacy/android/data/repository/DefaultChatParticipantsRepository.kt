@@ -11,13 +11,13 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.data.mapper.chat.UserStatusToIntMapper
+import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.exception.NullMegaHandleListException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -77,6 +77,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     private val getContactFullNameUseCase: GetContactFullNameUseCase,
     private val getUserPrivilegeUseCase: GetUserPrivilegeUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val userChatStatusMapper: UserChatStatusMapper,
 ) : ChatParticipantsRepository {
 
     override suspend fun getAllChatParticipants(
@@ -200,10 +201,10 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             return@withContext peerHandles
         }
 
-    override suspend fun getStatus(participant: ChatParticipant): UserStatus {
+    override suspend fun getStatus(participant: ChatParticipant): UserChatStatus {
         if (participant.isMe) {
             val status = getCurrentStatus()
-            if (status != UserStatus.Online) {
+            if (status != UserChatStatus.Online) {
                 requestLastGreen(participant.handle)
             }
             return status
@@ -211,9 +212,8 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
         participant.email?.let { email ->
             megaApiGateway.getContact(email)?.let {
-                val status = userStatus[megaChatApiGateway.getUserOnlineStatus(it.handle)]
-                    ?: UserStatus.Invalid
-                if (status != UserStatus.Online) {
+                val status = userChatStatusMapper(megaChatApiGateway.getUserOnlineStatus(it.handle))
+                if (status != UserChatStatus.Online) {
                     requestLastGreen(it.handle)
                 }
 
@@ -222,12 +222,11 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
         }
 
-        return UserStatus.Invalid
+        return UserChatStatus.Invalid
     }
 
-    override suspend fun getCurrentStatus(): UserStatus = withContext(ioDispatcher) {
-        runCatching { megaChatApiGateway.getOnlineStatus().let { userStatus[it] } }.getOrNull()
-            ?: UserStatus.Invalid
+    override suspend fun getCurrentStatus(): UserChatStatus = withContext(ioDispatcher) {
+        userChatStatusMapper(megaChatApiGateway.getOnlineStatus())
     }
 
     override suspend fun getAlias(participant: ChatParticipant): String? =
@@ -313,7 +312,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
         }
     }
 
-    override suspend fun setOnlineStatus(status: UserStatus) = withContext(ioDispatcher) {
+    override suspend fun setOnlineStatus(status: UserChatStatus) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = { _, error ->

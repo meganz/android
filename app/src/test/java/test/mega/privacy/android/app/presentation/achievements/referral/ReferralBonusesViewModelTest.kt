@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -44,7 +44,7 @@ class ReferralBonusesViewModelTest {
         visibility = UserVisibility.Visible,
         timestamp = 0,
         areCredentialsVerified = true,
-        status = UserStatus.Online
+        status = UserChatStatus.Online
     )
 
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock {
@@ -57,7 +57,7 @@ class ReferralBonusesViewModelTest {
                 visibility = UserVisibility.Visible,
                 timestamp = 0,
                 areCredentialsVerified = true,
-                status = UserStatus.Online
+                status = UserChatStatus.Online
             )
         )
     }

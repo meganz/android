@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
@@ -50,8 +50,8 @@ internal class ManagerDrawerViewModelTest {
     private lateinit var underTest: ManagerDrawerViewModel
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
-    private val getCurrentUserStatusUseCase: GetCurrentUserStatusUseCase = mock {
-        onBlocking { invoke() }.thenReturn(UserStatus.Invalid)
+    private val getCurrentUserChatStatusUseCase: GetCurrentUserStatusUseCase = mock {
+        onBlocking { invoke() }.thenReturn(UserChatStatus.Invalid)
     }
     private val hasBackupsChildren: HasBackupsChildren = mock()
     private val getBackupsNode: GetBackupsNode = mock()
@@ -105,8 +105,8 @@ internal class ManagerDrawerViewModelTest {
                 )
             )
         }
-        getCurrentUserStatusUseCase.stub {
-            onBlocking { invoke() }.thenReturn(UserStatus.Invalid)
+        getCurrentUserChatStatusUseCase.stub {
+            onBlocking { invoke() }.thenReturn(UserChatStatus.Invalid)
         }
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(any()) }.thenReturn(false)
@@ -117,7 +117,7 @@ internal class ManagerDrawerViewModelTest {
         underTest = ManagerDrawerViewModel(
             isConnectedToInternetUseCase,
             monitorStorageStateEventUseCase,
-            getCurrentUserStatusUseCase,
+            getCurrentUserChatStatusUseCase,
             hasBackupsChildren,
             getBackupsNode,
             monitorNodeUpdates,
@@ -156,22 +156,22 @@ internal class ManagerDrawerViewModelTest {
             }
         }
 
-    @ParameterizedTest(name = "with userStatus {0}")
-    @EnumSource(UserStatus::class)
-    fun `test that userStatus update correctly when call getCurrentUserStatus`(status: UserStatus) =
+    @ParameterizedTest(name = "with userChatStatus {0}")
+    @EnumSource(UserChatStatus::class)
+    fun `test that userStatus update correctly when call getCurrentUserStatus`(status: UserChatStatus) =
         runTest {
-            whenever(getCurrentUserStatusUseCase()).thenReturn(status)
+            whenever(getCurrentUserChatStatusUseCase()).thenReturn(status)
 
             initTestClass()
 
             underTest.state.test {
-                Truth.assertThat(awaitItem().userStatus).isEqualTo(status)
+                Truth.assertThat(awaitItem().userChatStatus).isEqualTo(status)
             }
         }
 
     @ParameterizedTest(name = "with monitorCurrentUserStatus emit {0}")
-    @EnumSource(UserStatus::class)
-    fun `test that userStatus update correctly when call monitorCurrentUserStatus emit`(status: UserStatus) =
+    @EnumSource(UserChatStatus::class)
+    fun `test that userStatus update correctly when call monitorCurrentUserStatus emit`(status: UserChatStatus) =
         runTest {
             whenever(monitorMyChatOnlineStatusUseCase()).thenReturn(
                 flow {
@@ -182,7 +182,7 @@ internal class ManagerDrawerViewModelTest {
             initTestClass()
 
             underTest.state.test {
-                Truth.assertThat(awaitItem().userStatus).isEqualTo(status)
+                Truth.assertThat(awaitItem().userChatStatus).isEqualTo(status)
             }
         }
 

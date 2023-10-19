@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.entity.contacts
 
 /**
- * Enum class defining the possible user statuses.
+ * Enum class defining the possible user chat statuses.
  */
-enum class UserStatus {
+enum class UserChatStatus {
 
     /**
      * Offline status.

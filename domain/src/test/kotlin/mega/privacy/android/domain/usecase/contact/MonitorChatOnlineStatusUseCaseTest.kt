@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.repository.ContactsRepository
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -21,14 +21,14 @@ class MonitorChatOnlineStatusUseCaseTest {
     fun `test that monitor last green updates returns flow of user last green`() = runTest {
         whenever(contactsRepository.monitorChatOnlineStatusUpdates()).thenReturn(
             flowOf(
-                OnlineStatus(userHandle = 123456L, status = UserStatus.Away, inProgress = false)
+                OnlineStatus(userHandle = 123456L, status = UserChatStatus.Away, inProgress = false)
             )
         )
 
         underTest().test {
             val actual = awaitItem()
             awaitComplete()
-            Truth.assertThat(actual.status).isEqualTo(UserStatus.Away)
+            Truth.assertThat(actual.status).isEqualTo(UserChatStatus.Away)
         }
     }
 }

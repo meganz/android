@@ -156,7 +156,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private fun monitorCurrentUserStatus() {
         viewModelScope.launch {
             monitorMyChatOnlineStatusUseCase().collect { onlineStatus ->
-                _state.update { it.copy(userStatus = onlineStatus.status) }
+                _state.update { it.copy(userChatStatus = onlineStatus.status) }
             }
         }
     }
@@ -166,7 +166,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
             runCatching {
                 getCurrentUserStatusUseCase()
             }.onSuccess { status ->
-                _state.update { it.copy(userStatus = status) }
+                _state.update { it.copy(userChatStatus = status) }
             }.onFailure {
                 Timber.e(it)
             }

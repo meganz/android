@@ -29,7 +29,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.OnHold
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.Status
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -148,8 +148,8 @@ class ContactInfoViewModel @Inject constructor(
     /**
      * User status
      */
-    val userStatus: UserStatus
-        get() = state.value.userStatus
+    val userChatStatus: UserChatStatus
+        get() = state.value.userChatStatus
 
     /**
      * User status
@@ -371,7 +371,7 @@ class ContactInfoViewModel @Inject constructor(
             if (status.isAwayOrOffline()) {
                 requestLastGreen(handle)
             }
-            _state.update { it.copy(userStatus = status) }
+            _state.update { it.copy(userChatStatus = status) }
         }
     }
 
@@ -388,7 +388,7 @@ class ContactInfoViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     lastGreen = lastGreen,
-                    userStatus = status,
+                    userChatStatus = status,
                 )
             }
         }
@@ -424,7 +424,7 @@ class ContactInfoViewModel @Inject constructor(
         _state.update {
             it.copy(
                 lastGreen = userInfo?.lastSeen ?: 0,
-                userStatus = userInfo?.status ?: UserStatus.Invalid,
+                userChatStatus = userInfo?.status ?: UserChatStatus.Invalid,
                 contactItem = userInfo,
                 chatRoom = chatRoom,
             )

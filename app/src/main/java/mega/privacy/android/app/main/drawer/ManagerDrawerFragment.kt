@@ -45,7 +45,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
@@ -151,7 +151,7 @@ internal class ManagerDrawerFragment : Fragment() {
             updateAccountDetailsVisibleInfo()
         }
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
-            setContactStatus(uiState.userStatus)
+            setContactStatus(uiState.userChatStatus)
             updateBackupsSectionVisibility(uiState.hasBackupsChildren)
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
@@ -299,14 +299,14 @@ internal class ManagerDrawerFragment : Fragment() {
         }
     }
 
-    private fun setContactStatus(status: UserStatus) {
+    private fun setContactStatus(status: UserChatStatus) {
         val isDarkTheme = Util.isDarkMode(requireContext())
         val resId = when (status) {
-            UserStatus.Offline -> if (isDarkTheme) R.drawable.ic_offline_dark_drawer else R.drawable.ic_offline_light
-            UserStatus.Away -> if (isDarkTheme) R.drawable.ic_away_dark_drawer else R.drawable.ic_away_light
-            UserStatus.Online -> if (isDarkTheme) R.drawable.ic_online_dark_drawer else R.drawable.ic_online_light
-            UserStatus.Busy -> if (isDarkTheme) R.drawable.ic_busy_dark_drawer else R.drawable.ic_busy_light
-            UserStatus.Invalid -> 0
+            UserChatStatus.Offline -> if (isDarkTheme) R.drawable.ic_offline_dark_drawer else R.drawable.ic_offline_light
+            UserChatStatus.Away -> if (isDarkTheme) R.drawable.ic_away_dark_drawer else R.drawable.ic_away_light
+            UserChatStatus.Online -> if (isDarkTheme) R.drawable.ic_online_dark_drawer else R.drawable.ic_online_light
+            UserChatStatus.Busy -> if (isDarkTheme) R.drawable.ic_busy_dark_drawer else R.drawable.ic_busy_light
+            UserChatStatus.Invalid -> 0
         }
         binding.contactState.isVisible = resId != 0
         if (resId != 0) {

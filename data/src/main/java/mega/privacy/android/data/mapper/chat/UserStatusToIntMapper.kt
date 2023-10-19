@@ -1,6 +1,6 @@
 package mega.privacy.android.data.mapper.chat
 
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import nz.mega.sdk.MegaChatApi
 import javax.inject.Inject
 
@@ -14,11 +14,11 @@ class UserStatusToIntMapper @Inject constructor() {
      *
      * @param status
      */
-    operator fun invoke(status: UserStatus) = when (status) {
-        UserStatus.Offline -> MegaChatApi.STATUS_OFFLINE
-        UserStatus.Away -> MegaChatApi.STATUS_AWAY
-        UserStatus.Online -> MegaChatApi.STATUS_ONLINE
-        UserStatus.Busy -> MegaChatApi.STATUS_BUSY
-        UserStatus.Invalid -> MegaChatApi.STATUS_INVALID
+    operator fun invoke(status: UserChatStatus) = when (status) {
+        UserChatStatus.Offline -> MegaChatApi.STATUS_OFFLINE
+        UserChatStatus.Away -> MegaChatApi.STATUS_AWAY
+        UserChatStatus.Online -> MegaChatApi.STATUS_ONLINE
+        UserChatStatus.Busy -> MegaChatApi.STATUS_BUSY
+        UserChatStatus.Invalid -> MegaChatApi.STATUS_INVALID
     }
 }

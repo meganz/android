@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -127,7 +127,7 @@ class ContactInfoViewModelTest {
         visibility = UserVisibility.Visible,
         timestamp = 123456789,
         areCredentialsVerified = true,
-        status = UserStatus.Online,
+        status = UserChatStatus.Online,
         lastSeen = 0,
     )
     private val chatRoom = mock<ChatRoom> {
@@ -202,10 +202,10 @@ class ContactInfoViewModelTest {
     fun `test that get user status and request last green does not trigger last green when user status is online`() =
         runTest {
             initUserInfo()
-            whenever(getUserOnlineStatusByHandleUseCase(testHandle)).thenReturn(UserStatus.Online)
+            whenever(getUserOnlineStatusByHandleUseCase(testHandle)).thenReturn(UserChatStatus.Online)
             underTest.getUserStatusAndRequestForLastGreen()
             underTest.state.test {
-                assertThat(awaitItem().userStatus).isEqualTo(UserStatus.Online)
+                assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Online)
                 verifyNoInteractions(requestLastGreen)
             }
         }
@@ -214,10 +214,10 @@ class ContactInfoViewModelTest {
     fun `test that get user status and request last green triggers last green when user status is away`() =
         runTest {
             initUserInfo()
-            whenever(getUserOnlineStatusByHandleUseCase(anyLong())).thenReturn(UserStatus.Away)
+            whenever(getUserOnlineStatusByHandleUseCase(anyLong())).thenReturn(UserChatStatus.Away)
             underTest.getUserStatusAndRequestForLastGreen()
             underTest.state.test {
-                assertThat(awaitItem().userStatus).isEqualTo(UserStatus.Away)
+                assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Away)
                 verify(requestLastGreen).invoke(userHandle = anyLong())
             }
         }
@@ -225,11 +225,11 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when update last green method is called state is updated with the last green value`() =
         runTest {
-            whenever(getUserOnlineStatusByHandleUseCase(testHandle)).thenReturn(UserStatus.Online)
+            whenever(getUserOnlineStatusByHandleUseCase(testHandle)).thenReturn(UserChatStatus.Online)
             underTest.updateLastGreen(testHandle, lastGreen = 5)
             underTest.state.test {
                 val nextState = awaitItem()
-                assertThat(nextState.userStatus).isEqualTo(UserStatus.Online)
+                assertThat(nextState.userChatStatus).isEqualTo(UserChatStatus.Online)
                 assertThat(nextState.lastGreen).isEqualTo(5)
             }
         }

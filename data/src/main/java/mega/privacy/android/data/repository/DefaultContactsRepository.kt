@@ -32,11 +32,11 @@ import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
+import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
@@ -46,7 +46,6 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -101,6 +100,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @ApplicationContext private val context: Context,
+    private val userChatStatusMapper: UserChatStatusMapper,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -731,7 +731,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private fun Long.toBase64Handle(): String = megaApiGateway.userHandleToBase64(this)
 
     override suspend fun getUserOnlineStatusByHandle(handle: Long) = withContext(ioDispatcher) {
-        userStatus[megaChatApiGateway.getUserOnlineStatus(handle)] ?: UserStatus.Invalid
+        userChatStatusMapper(megaChatApiGateway.getUserOnlineStatus(handle))
     }
 
     override suspend fun getUserEmailFromChat(handle: Long) =

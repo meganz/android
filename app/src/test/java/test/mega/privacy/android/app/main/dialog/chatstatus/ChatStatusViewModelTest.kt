@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusViewModel
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.chat.SetCurrentUserStatusUseCase
 import org.junit.jupiter.api.AfterAll
@@ -55,9 +55,9 @@ internal class ChatStatusViewModelTest {
     }
 
     @ParameterizedTest(name = "test that result getting update when calling setCurrentUserStatusUseCase {0} successfully")
-    @EnumSource(UserStatus::class)
+    @EnumSource(UserChatStatus::class)
     fun `test that result getting update when calling setCurrentUserStatusUseCase successfully`(
-        status: UserStatus,
+        status: UserChatStatus,
     ) = runTest {
         initTestClass()
         underTest.state.test {
@@ -71,9 +71,9 @@ internal class ChatStatusViewModelTest {
     }
 
     @ParameterizedTest(name = "test that result getting update when calling setCurrentUserStatusUseCase {0} failed")
-    @EnumSource(UserStatus::class)
+    @EnumSource(UserChatStatus::class)
     fun `test that result getting update when calling setCurrentUserStatusUseCase failed`(
-        status: UserStatus,
+        status: UserChatStatus,
     ) = runTest {
         initTestClass()
         underTest.state.test {
@@ -87,8 +87,8 @@ internal class ChatStatusViewModelTest {
     }
 
     @ParameterizedTest(name = "test that status update correctly when getCurrentUserStatusUseCase returns {0}")
-    @EnumSource(UserStatus::class)
-    fun `test that status update correctly when getCurrentUserStatusUseCase returns`(status: UserStatus) =
+    @EnumSource(UserChatStatus::class)
+    fun `test that status update correctly when getCurrentUserStatusUseCase returns`(status: UserChatStatus) =
         runTest {
             whenever(getCurrentUserStatusUseCase()).thenReturn(status)
             initTestClass()

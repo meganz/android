@@ -173,16 +173,16 @@ internal fun ChatRoomItemView(
         )
 
         if (!isLoading) {
-            val userStatus = if (item is IndividualChatRoomItem) item.userStatus else null
+            val userChatStatus = if (item is IndividualChatRoomItem) item.userChatStatus else null
             ChatUserStatusView(
-                userStatus = userStatus,
+                userChatStatus = userChatStatus,
                 modifier = Modifier
                     .testTag("chat_room_item:status_icon")
                     .constrainAs(statusIcon) {
                         start.linkTo(titleText.end, 4.dp)
                         top.linkTo(titleText.top)
                         bottom.linkTo(titleText.bottom)
-                        visibility = if (userStatus != null) Visibility.Visible else Visibility.Gone
+                        visibility = if (userChatStatus != null) Visibility.Visible else Visibility.Gone
                     },
             )
 

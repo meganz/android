@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactDataUseCase
@@ -216,7 +216,7 @@ class StartConversationViewModel @Inject constructor(
     private fun observeOnlineStatusUpdates() {
         viewModelScope.launch {
             monitorChatOnlineStatusUseCase().collectLatest { (userHandle, status) ->
-                if (status != UserStatus.Online) {
+                if (status != UserChatStatus.Online) {
                     requestLastGreen(userHandle)
                 }
 

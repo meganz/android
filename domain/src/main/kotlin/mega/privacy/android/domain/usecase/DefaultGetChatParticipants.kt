@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
@@ -123,7 +123,7 @@ class DefaultGetChatParticipants @Inject constructor(
                 apply {
                     val currentItemIndex = indexOfFirst { it.handle == update.userHandle }
                     val currentItem = get(currentItemIndex)
-                    if (update.status != UserStatus.Online) {
+                    if (update.status != UserChatStatus.Online) {
                         this@DefaultGetChatParticipants.requestLastGreen(update.userHandle)
                         set(currentItemIndex, currentItem.copy(status = update.status))
                     } else {

@@ -1,14 +1,15 @@
 package mega.privacy.android.data.mapper.chat
 
+import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
-import mega.privacy.android.domain.entity.contacts.UserStatus
-import nz.mega.sdk.MegaChatApi
 import javax.inject.Inject
 
 /**
  * Mapper to convert data into [OnlineStatus].
  */
-internal class OnlineStatusMapper @Inject constructor() {
+internal class OnlineStatusMapper @Inject constructor(
+    private val userChatStatusMapper: UserChatStatusMapper,
+) {
 
     /**
      * Invoke.
@@ -19,15 +20,5 @@ internal class OnlineStatusMapper @Inject constructor() {
      * @return [OnlineStatus]
      */
     operator fun invoke(userHandle: Long, status: Int, inProgress: Boolean) =
-        OnlineStatus(userHandle, userStatus[status] ?: UserStatus.Invalid, inProgress)
-
-    companion object {
-        val userStatus = mapOf(
-            MegaChatApi.STATUS_OFFLINE to UserStatus.Offline,
-            MegaChatApi.STATUS_AWAY to UserStatus.Away,
-            MegaChatApi.STATUS_ONLINE to UserStatus.Online,
-            MegaChatApi.STATUS_BUSY to UserStatus.Busy,
-            MegaChatApi.STATUS_INVALID to UserStatus.Invalid,
-        )
-    }
+        OnlineStatus(userHandle, userChatStatusMapper(status), inProgress)
 }

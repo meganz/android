@@ -37,7 +37,7 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.CallParticipantData
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
@@ -127,7 +127,7 @@ fun ParticipantInCallItem(
                             )
                         }
 
-                        if (section == ParticipantsSection.NotInCallSection && participant.status != UserStatus.Invalid && !isGuest) {
+                        if (section == ParticipantsSection.NotInCallSection && participant.status != UserChatStatus.Invalid && !isGuest) {
                             ContactStatus(status = participant.status)
                         }
                     }
@@ -351,7 +351,7 @@ fun PreviewParticipantNotInCallItem() {
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
                 defaultAvatarColor = 444,
-                status = UserStatus.Online
+                status = UserChatStatus.Online
             ),
             onAdmitParticipantClicked = {},
             onDenyParticipantClicked = {},
@@ -378,7 +378,7 @@ fun PreviewParticipantNotInCallItemNonHost() {
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
                 defaultAvatarColor = 444,
-                status = UserStatus.Online
+                status = UserChatStatus.Online
             ),
             onAdmitParticipantClicked = {},
             onDenyParticipantClicked = {},
@@ -405,7 +405,7 @@ fun PreviewGuestParticipantNotInCallItem() {
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
                 defaultAvatarColor = 555,
-                status = UserStatus.Online
+                status = UserChatStatus.Online
             ),
             onAdmitParticipantClicked = {},
             onDenyParticipantClicked = {},

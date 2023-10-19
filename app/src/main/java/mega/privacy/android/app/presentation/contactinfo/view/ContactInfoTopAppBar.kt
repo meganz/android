@@ -40,7 +40,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.grey_alpha_070
 import mega.privacy.android.core.ui.theme.white_alpha_087
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**
  * Collapsing top bar for contact info screen
@@ -51,7 +51,7 @@ fun ContactInfoTopAppBar(
     onBackPress: () -> Unit,
     avatar: Bitmap?,
     primaryDisplayName: String,
-    userStatus: UserStatus,
+    userChatStatus: UserChatStatus,
     defaultAvatarColor: String?,
     progress: Float,
     statusBarHeight: Float,
@@ -117,7 +117,7 @@ fun ContactInfoTopAppBar(
                 .layoutId(TITLE)
                 .wrapContentHeight(),
             title = primaryDisplayName,
-            userStatus = userStatus,
+            userChatStatus = userChatStatus,
             progress = progress
         )
 

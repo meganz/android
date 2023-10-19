@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -34,7 +34,7 @@ class ApplyContactUpdatesUseCaseTest {
         visibility = UserVisibility.Visible,
         timestamp = 123456789,
         areCredentialsVerified = true,
-        status = UserStatus.Online,
+        status = UserChatStatus.Online,
         lastSeen = 0,
     )
     private val underTest = ApplyContactUpdatesUseCase(repository)

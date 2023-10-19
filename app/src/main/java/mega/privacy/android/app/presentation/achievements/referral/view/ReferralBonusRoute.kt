@@ -47,7 +47,7 @@ import mega.privacy.android.core.ui.theme.red_800
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 
 internal object TestTags {
@@ -258,7 +258,7 @@ private fun ReferralBonusViewPreview() {
                             UserVisibility.Visible,
                             1231231,
                             true,
-                            UserStatus.Online,
+                            UserChatStatus.Online,
                             null
                         ),
                         expirationInDays = 1,

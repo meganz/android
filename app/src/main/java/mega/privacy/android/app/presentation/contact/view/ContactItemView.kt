@@ -45,7 +45,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -97,15 +97,15 @@ internal fun ContactItemView(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    if (contactItem.status != UserStatus.Invalid) {
+                    if (contactItem.status != UserChatStatus.Invalid) {
                         ContactStatus(status = contactItem.status)
                     }
                 }
 
                 val secondLineText = statusOverride
-                    ?: if (contactItem.lastSeen != null || contactItem.status != UserStatus.Invalid) {
+                    ?: if (contactItem.lastSeen != null || contactItem.status != UserChatStatus.Invalid) {
                         val statusText = stringResource(id = contactItem.status.text)
-                        if (contactItem.status == UserStatus.Online) {
+                        if (contactItem.status == UserChatStatus.Online) {
                             statusText
                         } else {
                             getLastSeenString(contactItem.lastSeen) ?: statusText
@@ -184,7 +184,7 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
 @Composable
 fun ContactStatus(
     modifier: Modifier = Modifier,
-    status: UserStatus,
+    status: UserChatStatus,
 ) {
     val statusIcon = status.iconRes(MaterialTheme.colors.isLight)
 
@@ -313,6 +313,6 @@ internal fun contactItemForPreviews(id: Int) = ContactItem(
     visibility = UserVisibility.Visible,
     timestamp = 2345262L,
     areCredentialsVerified = false,
-    status = UserStatus.Online,
+    status = UserChatStatus.Online,
     lastSeen = null
 )

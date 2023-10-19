@@ -101,7 +101,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -728,8 +728,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         nodeSaver.saveState(outState)
     }
 
-    private fun visibilityStateIcon(userStatus: UserStatus) {
-        if (stateToolbar == AppBarStateChangeListener.State.EXPANDED && userStatus.isValid()) {
+    private fun visibilityStateIcon(userChatStatus: UserChatStatus) {
+        if (stateToolbar == AppBarStateChangeListener.State.EXPANDED && userChatStatus.isValid()) {
             collapsingAppBar.firstLineToolbar.apply {
                 maxLines = 2
                 setTrailingIcon(contactStateIcon, contactStateIconPaddingLeft)
@@ -812,7 +812,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                             )
                         )
                         setColorFilter(isDark = false)
-                        visibilityStateIcon(viewModel.userStatus)
+                        visibilityStateIcon(viewModel.userChatStatus)
                     } else if (stateToolbar == State.COLLAPSED) {
                         firstLineToolbar.setTextColor(
                             ContextCompat.getColor(
@@ -827,7 +827,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                             )
                         )
                         setColorFilter(isDark = true)
-                        visibilityStateIcon(viewModel.userStatus)
+                        visibilityStateIcon(viewModel.userChatStatus)
                     }
                 }
             })
@@ -1105,15 +1105,15 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun updateUserStatusChanges(contactInfoState: ContactInfoState) {
         contactStateIcon =
-            contactInfoState.userStatus.iconRes(isLightTheme = !Util.isDarkMode(this))
+            contactInfoState.userChatStatus.iconRes(isLightTheme = !Util.isDarkMode(this))
         collapsingAppBar.secondLineToolbar.apply {
-            if (contactInfoState.userStatus.isValid()) {
+            if (contactInfoState.userChatStatus.isValid()) {
                 isVisible = true
-                text = getString(contactInfoState.userStatus.text)
+                text = getString(contactInfoState.userChatStatus.text)
             } else isVisible = false
         }
-        visibilityStateIcon(contactInfoState.userStatus)
-        if (contactInfoState.userStatus.isAwayOrOffline()) {
+        visibilityStateIcon(contactInfoState.userChatStatus)
+        if (contactInfoState.userChatStatus.isAwayOrOffline()) {
             val formattedDate = TimeUtils.lastGreenDate(this, contactInfoState.lastGreen)
             collapsingAppBar.secondLineToolbar.apply {
                 isVisible = true

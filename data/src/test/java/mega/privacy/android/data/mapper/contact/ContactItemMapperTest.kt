@@ -1,9 +1,7 @@
 package mega.privacy.android.data.mapper.contact
 
 import com.google.common.truth.Truth
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaUser
@@ -14,6 +12,8 @@ import org.mockito.kotlin.whenever
 
 class ContactItemMapperTest {
     private lateinit var underTest: ContactItemMapper
+
+    private var userChatStatusMapper = UserChatStatusMapper()
 
     private lateinit var user: MegaUser
     private val expectedFullName = "Clark Kent"
@@ -33,24 +33,45 @@ class ContactItemMapperTest {
             on { email }.thenReturn(userEmail)
             on { timestamp }.thenReturn(userTimestamp)
         }
-        underTest = ContactItemMapper()
+        underTest = ContactItemMapper(userChatStatusMapper)
     }
 
     @Test
     fun `test ContactItem handle is mapped from MegaUser handle`() {
-        val actual = underTest.invoke(user, expectedContactData, avatarColor, true, status, null)
+        val actual = underTest.invoke(
+            megaUser = user,
+            contactData = expectedContactData,
+            defaultAvatarColor = avatarColor,
+            areCredentialsVerified = true,
+            status = status,
+            lastSeen = null
+        )
         Truth.assertThat(actual.handle).isEqualTo(userHandle)
     }
 
     @Test
     fun `test ContactItem email is mapped from MegaUser email`() {
-        val actual = underTest.invoke(user, expectedContactData, avatarColor, true, status, null)
+        val actual = underTest.invoke(
+            megaUser = user,
+            contactData = expectedContactData,
+            defaultAvatarColor = avatarColor,
+            areCredentialsVerified = true,
+            status = status,
+            lastSeen = null
+        )
         Truth.assertThat(actual.email).isEqualTo(userEmail)
     }
 
     @Test
     fun `test ContactItem timestamp is mapped from MegaUser timestamp`() {
-        val actual = underTest.invoke(user, expectedContactData, avatarColor, true, status, null)
+        val actual = underTest.invoke(
+            megaUser = user,
+            contactData = expectedContactData,
+            defaultAvatarColor = avatarColor,
+            areCredentialsVerified = true,
+            status = status,
+            lastSeen = null
+        )
         Truth.assertThat(actual.timestamp).isEqualTo(userTimestamp)
     }
 
@@ -61,7 +82,14 @@ class ContactItemMapperTest {
                 ContactItemMapper.userVisibility.entries.find { it.value == visibility }?.key
             whenever(user.visibility).thenReturn(sdkValue)
             val actual =
-                underTest.invoke(user, expectedContactData, avatarColor, true, status, null)
+                underTest.invoke(
+                    megaUser = user,
+                    contactData = expectedContactData,
+                    defaultAvatarColor = avatarColor,
+                    areCredentialsVerified = true,
+                    status = status,
+                    lastSeen = null
+                )
             Truth.assertThat(actual.visibility).isEqualTo(visibility)
         }
     }
@@ -70,19 +98,37 @@ class ContactItemMapperTest {
     fun `test ContactItem visibility is mapped to unknown if MegaUser visibility is unknown`() {
         whenever(user.visibility).thenReturn(-55)
         val actual =
-            underTest.invoke(user, expectedContactData, avatarColor, true, status, null)
+            underTest.invoke(
+                megaUser = user,
+                contactData = expectedContactData,
+                defaultAvatarColor = avatarColor,
+                areCredentialsVerified = true,
+                status = status,
+                lastSeen = null
+            )
         Truth.assertThat(actual.visibility).isEqualTo(UserVisibility.Unknown)
     }
 
     @Test
     fun `test ContactItem status is mapped from status`() {
-        UserStatus.values().forEach { status ->
-            val sdkValue =
-                userStatus.entries.find { it.value == status }?.key
-                    ?: throw java.lang.AssertionError("status not found")
-            val actual =
-                underTest.invoke(user, expectedContactData, avatarColor, true, sdkValue, null)
-            Truth.assertThat(actual.status).isEqualTo(status)
+        listOf(
+            MegaChatApi.STATUS_OFFLINE,
+            MegaChatApi.STATUS_AWAY,
+            MegaChatApi.STATUS_ONLINE,
+            MegaChatApi.STATUS_BUSY,
+            MegaChatApi.STATUS_INVALID,
+        ).forEach { status ->
+            val actual = underTest.invoke(
+                megaUser = user,
+                contactData = expectedContactData,
+                defaultAvatarColor = avatarColor,
+                areCredentialsVerified = true,
+                status = status,
+                lastSeen = null
+            )
+            val expectedUserChatStatus = userChatStatusMapper(status)
+
+            Truth.assertThat(actual.status).isEqualTo(expectedUserChatStatus)
         }
 
     }

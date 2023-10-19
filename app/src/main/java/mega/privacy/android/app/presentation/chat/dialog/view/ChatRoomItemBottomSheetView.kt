@@ -44,7 +44,7 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import kotlin.random.Random
 
 /**
@@ -129,10 +129,10 @@ internal fun ChatRoomItemBottomSheetView(
                 }
             )
 
-            val userStatus = if (item is IndividualChatRoomItem) item.userStatus else null
+            val userStatus = if (item is IndividualChatRoomItem) item.userChatStatus else null
             if (userStatus != null) {
                 ChatUserStatusView(
-                    userStatus = userStatus,
+                    userChatStatus = userStatus,
                     modifier = Modifier.constrainAs(statusIcon) {
                         start.linkTo(titleText.end, 4.dp)
                         top.linkTo(titleText.top)
@@ -360,7 +360,7 @@ private fun PreviewIndividualChatRoomItemBottomSheetView() {
             chatId = Random.nextLong(),
             title = "Mieko Kawakami",
             peerEmail = "mieko@miekokawakami.jp",
-            userStatus = UserStatus.Online,
+            userChatStatus = UserChatStatus.Online,
             avatar = ChatAvatarItem("M"),
             lastTimestampFormatted = "1 May 2022 17:53",
             unreadCount = Random.nextInt(150),

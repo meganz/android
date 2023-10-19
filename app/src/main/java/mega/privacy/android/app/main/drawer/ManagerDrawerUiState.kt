@@ -1,12 +1,12 @@
 package mega.privacy.android.app.main.drawer
 
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**
  * Manager drawer ui state
  *
- * @property userStatus User status
+ * @property userChatStatus User status
  * @property backUpNodeHandle Back up node handle
  * @property hasBackupsChildren Has backups children
  * @property canVerifyPhoneNumber Can verify phone number
@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
  * @property enabledFlags Enabled flags
  */
 data class ManagerDrawerUiState(
-    val userStatus: UserStatus = UserStatus.Invalid,
+    val userChatStatus: UserChatStatus = UserChatStatus.Invalid,
     val backUpNodeHandle: Long = -1L,
     val hasBackupsChildren: Boolean = false,
     val canVerifyPhoneNumber: Boolean = false,

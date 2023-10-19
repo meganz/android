@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**
  * Chat room item
@@ -41,7 +41,7 @@ sealed class ChatRoomItem(
     /**
      * Individual chat room item
      *
-     * @property userStatus
+     * @property userChatStatus
      * @property avatar
      * @property peerHandle
      * @property peerEmail
@@ -62,7 +62,7 @@ sealed class ChatRoomItem(
      * @constructor Create empty Individual chat room item
      */
     data class IndividualChatRoomItem constructor(
-        val userStatus: UserStatus? = null,
+        val userChatStatus: UserChatStatus? = null,
         val avatar: ChatAvatarItem? = null,
         val peerHandle: Long? = null,
         val peerEmail: String? = null,
@@ -263,7 +263,7 @@ sealed class ChatRoomItem(
         highlight: Boolean = this.highlight,
         header: String? = this.header,
         isPublic: Boolean? = null,
-        userStatus: UserStatus? = null,
+        userChatStatus: UserChatStatus? = null,
         avatarItems: List<ChatAvatarItem>? = null,
         peerHandle: Long? = null,
         peerEmail: String? = null,
@@ -292,7 +292,7 @@ sealed class ChatRoomItem(
             lastTimestampFormatted = lastTimestampFormatted,
             highlight = highlight,
             header = header,
-            userStatus = userStatus ?: this.userStatus,
+            userChatStatus = userChatStatus ?: this.userChatStatus,
             avatar = avatarItems?.firstOrNull() ?: this.avatar,
             peerHandle = peerHandle ?: this.peerHandle,
             peerEmail = peerEmail ?: this.peerEmail,

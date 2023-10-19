@@ -23,25 +23,25 @@ import mega.privacy.android.core.ui.theme.orange_400
 import mega.privacy.android.core.ui.theme.salmon_300
 import mega.privacy.android.core.ui.theme.salmon_700
 import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**
  * Chat user status icon view
  *
  * @param modifier
- * @param userStatus    [UserStatus]
+ * @param userChatStatus    [UserChatStatus]
  */
 @Composable
 fun ChatUserStatusView(
     modifier: Modifier = Modifier,
-    userStatus: UserStatus?,
+    userChatStatus: UserChatStatus?,
 ) {
     val isLightMode = MaterialTheme.colors.isLight
     val borderColor = if (isLightMode) white else dark_grey
-    val statusColor = when (userStatus) {
-        UserStatus.Online -> if (isLightMode) lime_green_500 else lime_green_300
-        UserStatus.Away -> if (isLightMode) orange_400 else orange_300
-        UserStatus.Busy -> if (isLightMode) salmon_700 else salmon_300
+    val statusColor = when (userChatStatus) {
+        UserChatStatus.Online -> if (isLightMode) lime_green_500 else lime_green_300
+        UserChatStatus.Away -> if (isLightMode) orange_400 else orange_300
+        UserChatStatus.Busy -> if (isLightMode) salmon_700 else salmon_300
         else -> if (isLightMode) grey_700 else grey_300
     }
 
@@ -57,13 +57,13 @@ fun ChatUserStatusView(
 @CombinedThemePreviews
 @Composable
 private fun PreviewChatUserStatusView(
-    @PreviewParameter(UserStatusParameterProvider::class) userStatus: UserStatus,
+    @PreviewParameter(UserStatusParameterProvider::class) userChatStatus: UserChatStatus,
 ) {
     ChatUserStatusView(
-        userStatus = userStatus
+        userChatStatus = userChatStatus
     )
 }
 
-internal class UserStatusParameterProvider : PreviewParameterProvider<UserStatus> {
-    override val values = UserStatus.values().asSequence()
+internal class UserStatusParameterProvider : PreviewParameterProvider<UserChatStatus> {
+    override val values = UserChatStatus.values().asSequence()
 }

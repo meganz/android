@@ -26,6 +26,7 @@ import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
+import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
@@ -94,6 +95,7 @@ class DefaultContactsRepositoryTest {
     private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
     private val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val userChatStatusMapper: UserChatStatusMapper = mock()
 
     private val request = mock<MegaRequest> {
         on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
@@ -126,7 +128,8 @@ class DefaultContactsRepositoryTest {
             databaseHandler = databaseHandler,
             chatConnectionStateMapper = chatConnectionStateMapper,
             context = context,
-            megaLocalRoomGateway = megaLocalRoomGateway
+            megaLocalRoomGateway = megaLocalRoomGateway,
+            userChatStatusMapper = userChatStatusMapper
         )
 
         whenever(megaApiGateway.userHandleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
