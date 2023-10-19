@@ -316,7 +316,7 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
         callManager { manager ->
             manager.changeAppBarElevation(
                 !args.rootFolderOnly
-                        && (rv.canScrollVertically(SCROLLING_UP_DIRECTION) || viewModel.selecting || binding.offlineWarningLayout.isVisible)
+                        && (rv.canScrollVertically(SCROLLING_UP_DIRECTION) || viewModel.selecting || binding.offlineWarning.isVisible)
             )
         }
     }
@@ -454,12 +454,12 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
     private fun setupOfflineWarning() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        binding.offlineWarningLayout.isVisible =
+        binding.offlineWarning.isVisible =
             preferences.getBoolean(SHOW_OFFLINE_WARNING, true)
 
-        binding.offlineWarningClose.setOnClickListener {
+        binding.offlineWarning.onCloseClick = {
             preferences.edit().putBoolean(SHOW_OFFLINE_WARNING, false).apply()
-            binding.offlineWarningLayout.isVisible = false
+            binding.offlineWarning.isVisible = false
             checkScroll()
         }
     }

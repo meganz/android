@@ -1,5 +1,7 @@
 package mega.privacy.android.core.ui.controls.banners
 
+import android.content.Context
+import android.util.AttributeSet
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -13,19 +15,48 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.core.content.withStyledAttributes
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+
+class WarningBanner : AbstractComposeView {
+    var text by mutableStateOf("")
+    var onCloseClick by mutableStateOf({ })
+
+    constructor(context: Context) : this(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        context.withStyledAttributes(attrs, R.styleable.WarningBanner) {
+            text = getString(R.styleable.WarningBanner_warning_banner_text) ?: ""
+        }
+    }
+
+    @Composable
+    override fun Content() {
+        AndroidTheme(isDark = isSystemInDarkTheme()) {
+            WarningBanner(textString = text, onCloseClick = onCloseClick)
+        }
+    }
+}
 
 /**
  * Warning banner compose view
