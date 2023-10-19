@@ -79,6 +79,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_PUBLIC_CHAT_HANDLE = "public_chat_handle"
         const val MEETING_AUDIO_ENABLE = "audio_enable"
         const val MEETING_VIDEO_ENABLE = "video_enable"
+        const val MEETING_SPEAKER_ENABLE = "speaker_enable"
         const val MEETING_IS_GUEST = "is_guest"
         const val MEETING_GUEST_FIRST_NAME = "guest_first_name"
         const val MEETING_GUEST_LAST_NAME = "guest_last_name"
@@ -556,7 +557,12 @@ class MeetingActivity : PasscodeActivity() {
                     false
                 )
             )
-
+            bundle.putBoolean(
+                MEETING_SPEAKER_ENABLE, intent.getBooleanExtra(
+                    MEETING_SPEAKER_ENABLE,
+                    false
+                )
+            )
             bundle.putBoolean(
                 MEETING_IS_GUEST,
                 isGuest

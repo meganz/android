@@ -398,11 +398,11 @@ private fun ToggleControlsRow(
             modifier = Modifier
                 .weight(1f)
                 .testTag("waiting_room:button_speaker"),
-            checked = speakerEnabled,
+            checked = !speakerEnabled,
             title = stringResource(R.string.general_speaker),
             uncheckedIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_max,
             checkedIcon = mega.privacy.android.core.R.drawable.ic_universal_volume_off,
-            onCheckedChange = onSpeakerToggleChange,
+            onCheckedChange = { checked -> onSpeakerToggleChange(!checked) },
         )
     }
 }

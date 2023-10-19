@@ -74,6 +74,7 @@ import mega.privacy.android.app.meeting.OnDragTouchListener
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_IN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_REJOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
@@ -730,6 +731,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 updateMicAndCam()
                 controlWhenJoinedAChat(inMeetingViewModel.currentChatId)
             }
+
+            MEETING_ACTION_IN -> {
+                if (arguments?.getBoolean(MeetingActivity.MEETING_AUDIO_ENABLE, false) == true) {
+                    sharedModel.clickMic(micIsEnable)
+                }
+                if (arguments?.getBoolean(MeetingActivity.MEETING_VIDEO_ENABLE, false) == true) {
+                    sharedModel.clickCamera(camIsEnable)
+                }
+                if (arguments?.getBoolean(MeetingActivity.MEETING_SPEAKER_ENABLE, false) == true) {
+                    sharedModel.clickSpeaker()
+                }
+            }
         }
     }
 
@@ -1031,8 +1044,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) { allowed ->
-            sharedModel.lockMic()
-
             if (allowed) {
                 permissionsRequester = permissionsBuilder(
                     arrayOf(Manifest.permission.RECORD_AUDIO)
@@ -1056,7 +1067,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         viewLifecycleOwner.collectFlow(sharedModel.recordAudioGranted) { allowed ->
-            if (allowed && !sharedModel.micLocked) {
+            if (allowed) {
                 bottomFloatingPanelViewHolder?.updateMicPermissionWaring(true)
             }
         }

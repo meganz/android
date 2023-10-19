@@ -36,7 +36,7 @@ data class WaitingRoomState(
     val avatar: ChatAvatarItem? = null,
     val micEnabled: Boolean = false,
     val cameraEnabled: Boolean = false,
-    val speakerEnabled: Boolean = false,
+    val speakerEnabled: Boolean = true,
     val guestFirstName: String? = null,
     val guestLastName: String? = null,
     val denyAccessDialog: Boolean = false,

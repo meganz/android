@@ -62,6 +62,7 @@ class WaitingRoomActivity : AppCompatActivity() {
                         chatLink = uiState.chatLink,
                         micEnabled = uiState.micEnabled,
                         cameraEnabled = uiState.cameraEnabled,
+                        speakerEnabled = uiState.speakerEnabled,
                         guestFirstName = uiState.guestFirstName,
                         guestLastName = uiState.guestLastName,
                     )
@@ -110,6 +111,7 @@ class WaitingRoomActivity : AppCompatActivity() {
         chatLink: String?,
         micEnabled: Boolean,
         cameraEnabled: Boolean,
+        speakerEnabled: Boolean,
         guestFirstName: String?,
         guestLastName: String?,
     ) {
@@ -119,6 +121,7 @@ class WaitingRoomActivity : AppCompatActivity() {
             putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
             putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, micEnabled)
             putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, cameraEnabled)
+            putExtra(MeetingActivity.MEETING_SPEAKER_ENABLE, speakerEnabled)
             chatLink?.takeIf(String::isNotBlank)?.let { link ->
                 putExtra(MeetingActivity.MEETING_IS_GUEST, true)
                 putExtra(MeetingActivity.MEETING_GUEST_FIRST_NAME, guestFirstName)
