@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -62,7 +63,8 @@ fun FeatureFlagRow(
                         start = 10.dp,
                         top = 6.dp,
                     )
-                    .wrapContentWidth()
+                    .wrapContentWidth(),
+                color = MaterialTheme.colors.onSurface,
             )
             Switch(
                 checked = isEnabled,

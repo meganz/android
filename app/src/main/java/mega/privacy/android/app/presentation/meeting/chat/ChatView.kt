@@ -22,7 +22,7 @@ fun ChatView(
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
-                title = "",
+                title = uiState.title.orEmpty(),
                 onNavigationPressed = onBackPressed,
                 elevation = 0.dp
             )

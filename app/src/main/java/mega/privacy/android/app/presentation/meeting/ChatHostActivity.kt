@@ -15,7 +15,9 @@ class ChatHostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                replace(android.R.id.content, ChatFragment())
+                replace(android.R.id.content, ChatFragment().apply {
+                    arguments = intent.extras
+                })
             }
         }
     }
