@@ -13,6 +13,11 @@ internal fun SyncListRoute(
 
     SyncListScreen(
         stalledIssuesCount = state.stalledIssuesCount,
-        addFolderClicked = addFolderClicked
+        addFolderClicked = addFolderClicked,
+        actionSelected = { item, selectedAction ->
+            viewModel.handleAction(
+                SyncListAction.ResolveStalledIssue(item, selectedAction)
+            )
+        }
     )
 }

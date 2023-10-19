@@ -56,7 +56,8 @@ private fun PreviewEmptyScreen() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         SyncListScreen(
             stalledIssuesCount = 3,
-            addFolderClicked = {}
+            addFolderClicked = {},
+            actionSelected = { _, _ -> }
         )
     }
 }

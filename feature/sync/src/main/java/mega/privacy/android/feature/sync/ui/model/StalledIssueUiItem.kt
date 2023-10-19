@@ -10,4 +10,6 @@ internal data class StalledIssueUiItem(
     val conflictName: String,
     val nodeName: String,
     @DrawableRes val icon: Int,
+    val detailedInfo: StalledIssueDetailedInfo,
+    val actions: List<StalledIssueResolutionAction>,
 )

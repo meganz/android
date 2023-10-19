@@ -15,8 +15,9 @@ internal fun StalledIssuesScreen(
     modifier: Modifier = Modifier,
     stalledIssues: List<StalledIssueUiItem>,
     issueDetailsClicked: (StalledIssueUiItem) -> Unit,
+    moreClicked: (StalledIssueUiItem) -> Unit,
 ) {
-    StalledIssuesScreenContent(stalledIssues, modifier, issueDetailsClicked)
+    StalledIssuesScreenContent(stalledIssues, modifier, issueDetailsClicked, moreClicked)
 }
 
 @Composable
@@ -24,6 +25,7 @@ private fun StalledIssuesScreenContent(
     stalledIssues: List<StalledIssueUiItem>,
     modifier: Modifier,
     issueDetailsClicked: (StalledIssueUiItem) -> Unit,
+    moreClicked: (StalledIssueUiItem) -> Unit,
 ) {
     LazyColumn(state = LazyListState()) {
         val itemsCount = stalledIssues.size
@@ -45,7 +47,9 @@ private fun StalledIssuesScreenContent(
                     conflictName = issue.conflictName,
                     icon = issue.icon,
                     issueDetailsClicked = { issueDetailsClicked(stalledIssues[itemIndex]) },
-                    moreClicked = { }
+                    moreClicked = {
+                        moreClicked(stalledIssues[itemIndex])
+                    },
                 )
                 Divider(Modifier.padding(start = 72.dp))
             }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
@@ -30,23 +29,28 @@ import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
+import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
+import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
+import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
-import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesRoute
 import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
+import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun SyncListScreen(
     stalledIssuesCount: Int,
     addFolderClicked: () -> Unit,
+    actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    var sheetContent by remember { mutableStateOf<SyncModalSheetContent?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
@@ -60,10 +64,30 @@ internal fun SyncListScreen(
         modalSheetState = modalSheetState,
         scrimColor = Color.Black.copy(alpha = 0.32f),
         sheetBody = {
-            ConflictDetailsDialog(
-                getMockStalledIssueDetailedInfo().title,
-                getMockStalledIssueDetailedInfo().explanation
-            )
+            when (val content = sheetContent) {
+                is SyncModalSheetContent.DetailedInfo -> {
+                    ConflictDetailsDialog(
+                        content.stalledIssueUiItem.detailedInfo.title,
+                        content.stalledIssueUiItem.detailedInfo.explanation
+                    )
+                }
+
+                is SyncModalSheetContent.IssueResolutions -> {
+                    IssuesResolutionDialog(
+                        icon = content.stalledIssueUiItem.icon,
+                        conflictName = content.stalledIssueUiItem.conflictName,
+                        nodeName = content.stalledIssueUiItem.nodeName,
+                        actions = content.stalledIssueUiItem.actions,
+                        actionSelected = { action ->
+                            actionSelected(content.stalledIssueUiItem, action)
+                        }
+                    )
+                }
+
+                else -> {
+
+                }
+            }
         }
     ) {
         Scaffold(
@@ -82,7 +106,14 @@ internal fun SyncListScreen(
                     Modifier
                         .padding(paddingValues),
                     stalledIssuesCount,
-                    stalledIssuesDetailsClicked = {
+                    stalledIssuesDetailsClicked = { stalledIssueItem ->
+                        sheetContent = SyncModalSheetContent.DetailedInfo(stalledIssueItem)
+                        coroutineScope.launch {
+                            modalSheetState.show()
+                        }
+                    },
+                    moreClicked = { stalledIssueItem ->
+                        sheetContent = SyncModalSheetContent.IssueResolutions(stalledIssueItem)
                         coroutineScope.launch {
                             modalSheetState.show()
                         }
@@ -99,13 +130,14 @@ private fun SyncListScreenContent(
     modifier: Modifier,
     stalledIssuesCount: Int,
     stalledIssuesDetailsClicked: (StalledIssueUiItem) -> Unit,
+    moreClicked: (StalledIssueUiItem) -> Unit,
     addFolderClicked: () -> Unit,
 ) {
     var checkedChip by remember { mutableStateOf(SYNC_FOLDERS) }
 
     Column(modifier) {
         HeaderChips(checkedChip, stalledIssuesCount, { checkedChip = it })
-        SelectedChipScreen(addFolderClicked, stalledIssuesDetailsClicked, checkedChip)
+        SelectedChipScreen(addFolderClicked, stalledIssuesDetailsClicked, moreClicked, checkedChip)
     }
 }
 
@@ -144,6 +176,7 @@ private fun HeaderChips(
 private fun SelectedChipScreen(
     addFolderClicked: () -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
+    moreClicked: (StalledIssueUiItem) -> Unit,
     checkedChip: SyncChip,
 ) {
     when (checkedChip) {
@@ -152,7 +185,7 @@ private fun SelectedChipScreen(
         }
 
         STALLED_ISSUES -> {
-            SyncStalledIssuesRoute(stalledIssueDetailsClicked)
+            SyncStalledIssuesRoute(stalledIssueDetailsClicked, moreClicked)
         }
 
         SOLVED_ISSUES -> {
@@ -160,14 +193,6 @@ private fun SelectedChipScreen(
         }
     }
 }
-
-private fun getMockStalledIssueDetailedInfo(): StalledIssueDetailedInfo =
-    StalledIssueDetailedInfo(
-        "Conflict A", "This folders contain multiple names " +
-                "on one side, that would all become the same single name on the other side. This may" +
-                " be due to syncing to case sensitive local filesystem, or the effects os " +
-                "escaped characters."
-    )
 
 internal const val TAG_SYNC_LIST_SCREEN_NO_ITEMS = "sync_list_screen_no_items"
 
@@ -177,7 +202,8 @@ private fun PreviewSyncListScreen() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         SyncListScreen(
             stalledIssuesCount = 3,
-            addFolderClicked = {}
+            addFolderClicked = {},
+            actionSelected = { _, _ -> }
         )
     }
 }

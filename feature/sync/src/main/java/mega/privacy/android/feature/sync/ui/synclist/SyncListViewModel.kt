@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
+import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionAction
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,6 +32,14 @@ internal class SyncListViewModel @Inject constructor(
                 .collectLatest { stalledIssues ->
                     _state.update { SyncListState(stalledIssues.size) }
                 }
+        }
+    }
+
+    fun handleAction(action: SyncListAction) {
+        when (action) {
+            is SyncListAction.ResolveStalledIssue -> {
+                // implement issue resolution logic
+            }
         }
     }
 }

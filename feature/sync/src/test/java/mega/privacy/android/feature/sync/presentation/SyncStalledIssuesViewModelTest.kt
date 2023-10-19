@@ -17,6 +17,7 @@ import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
+import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -57,6 +57,8 @@ class SyncStalledIssuesViewModelTest {
             conflictName = "conflicting folder",
             nodeName = "Camera",
             icon = 0,
+            detailedInfo = StalledIssueDetailedInfo("", ""),
+            actions = emptyList()
         )
     )
 
