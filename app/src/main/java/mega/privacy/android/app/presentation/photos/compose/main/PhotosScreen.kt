@@ -158,8 +158,9 @@ fun PhotosScreen(
                 emptyView = {
                     EmptyState(
                         timelineViewState = timelineViewState,
-                        onFABClick = onNavigatePhotosFilter,
+                        isNewCUEnabled = isNewCUEnabled,
                         setEnableCUPage = timelineViewModel::shouldEnableCUPage,
+                        onEnableCameraUploads = onNavigateCameraUploadsSettings,
                     )
                 },
                 isNewCUEnabled = isNewCUEnabled,
