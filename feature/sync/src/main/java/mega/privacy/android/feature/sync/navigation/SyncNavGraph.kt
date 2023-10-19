@@ -19,7 +19,6 @@ private const val syncNewFolderRoute = "sync/new-folder"
 private const val syncMegaPicker = "sync/mega-picker"
 private const val syncList = "sync/list"
 
-@OptIn(ExperimentalAnimationApi::class)
 internal fun NavGraphBuilder.syncNavGraph(
     showOnboardingScreen: Boolean,
     navController: NavController,

@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.sheets
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -23,19 +24,23 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 
 /**
@@ -89,15 +94,40 @@ fun BottomSheet(
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
     content: (@Composable () -> Unit)? = null,
 ) {
-    val roundedCornerRadius = remember {
+    val roundedCornerRadius by animateDpAsState(
+        if (modalSheetState.currentValue == ModalBottomSheetValue.Expanded) 0.dp else 12.dp,
+        label = "rounded corner radius animation"
+    )
+
+    val navigationBarHeight = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
+    val statusBarColor = remember {
         derivedStateOf {
-            if (modalSheetState.currentValue == ModalBottomSheetValue.Expanded) 0.dp else 4.dp
+            val alpha = when (modalSheetState.targetValue) {
+                ModalBottomSheetValue.Hidden -> 1f - modalSheetState.progress
+                ModalBottomSheetValue.Expanded -> 1f
+                ModalBottomSheetValue.HalfExpanded -> {
+                    if (modalSheetState.currentValue == ModalBottomSheetValue.Hidden) {
+                        modalSheetState.progress
+                    } else {
+                        1f
+                    }
+                }
+            }
+            Color.Black.copy(alpha = 0.32f * alpha)
         }
     }
-    val navigationBarHeight = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setStatusBarColor(
+        statusBarColor.value,
+        MegaTheme.colors.isLight
+    )
+
     ModalBottomSheetLayout(
         modifier = modifier.padding(bottom = navigationBarHeight),
-        sheetShape = RoundedCornerShape(roundedCornerRadius.value),
+        sheetShape = RoundedCornerShape(
+            topStart = roundedCornerRadius,
+            topEnd = roundedCornerRadius
+        ),
         sheetState = modalSheetState,
         scrimColor = scrimColor,
         sheetContent = { sheetBody() },

@@ -3,6 +3,7 @@ package mega.privacy.android.core.ui.theme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,11 +39,12 @@ fun AndroidTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         val systemUiController = rememberSystemUiController()
-        SideEffect {
+        DisposableEffect(systemUiController, isDark) {
             systemUiController.setSystemBarsColor(
                 color = legacyColors.primary,
                 darkIcons = !isDark
             )
+            onDispose { }
         }
     }
     val colorPalette by remember(colors) {

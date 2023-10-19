@@ -14,9 +14,18 @@ import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
 internal fun StalledIssuesScreen(
     modifier: Modifier = Modifier,
     stalledIssues: List<StalledIssueUiItem>,
+    issueDetailsClicked: (StalledIssueUiItem) -> Unit,
 ) {
+    StalledIssuesScreenContent(stalledIssues, modifier, issueDetailsClicked)
+}
 
-    LazyColumn(state = LazyListState(), modifier = modifier) {
+@Composable
+private fun StalledIssuesScreenContent(
+    stalledIssues: List<StalledIssueUiItem>,
+    modifier: Modifier,
+    issueDetailsClicked: (StalledIssueUiItem) -> Unit,
+) {
+    LazyColumn(state = LazyListState()) {
         val itemsCount = stalledIssues.size
         if (itemsCount == 0) {
             item {
@@ -35,7 +44,7 @@ internal fun StalledIssuesScreen(
                     nodeName = issue.nodeName,
                     conflictName = issue.conflictName,
                     icon = issue.icon,
-                    issueDetailsClicked = { },
+                    issueDetailsClicked = { issueDetailsClicked(stalledIssues[itemIndex]) },
                     moreClicked = { }
                 )
                 Divider(Modifier.padding(start = 72.dp))
