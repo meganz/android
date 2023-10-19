@@ -97,15 +97,13 @@ internal fun PasscodeView(
             PasscodeUnlockState.Loading -> {}
             is PasscodeUnlockState.Data -> {
                 val context = LocalContext.current
-                var showBiometricPrompt: Boolean by rememberSaveable {
+                var showBiometricPrompt: Boolean by remember {
                     mutableStateOf(
                         biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable(
                             context
                         )
                     )
                 }
-
-                Timber.d("Value of showBiometricPrompt is $showBiometricPrompt")
 
                 if (showBiometricPrompt) {
                     Timber.d("Show biometrics UI composed")
@@ -145,8 +143,6 @@ internal fun PasscodeView(
                         showLogoutWarning = currentState.logoutWarning,
                         passcodeType = currentState.passcodeType,
                     )
-
-
                 }
             }
         }
