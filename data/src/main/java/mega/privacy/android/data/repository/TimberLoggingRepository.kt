@@ -81,13 +81,13 @@ internal class TimberLoggingRepository @Inject constructor(
         if (!Timber.forest().contains(chatLogFlowTree)) {
             Timber.plant(chatLogFlowTree)
         }
-        MegaChatApiAndroid.setLoggerObject(megaChatLogger)
-        MegaApiAndroid.addLoggerObject(megaSdkLogger)
     }
 
     override fun enableLogAllToConsole() {
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
         MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
+        MegaApiAndroid.addLoggerObject(megaSdkLogger)
+        MegaChatApiAndroid.setLoggerObject(megaChatLogger)
         Timber.plant(LineNumberDebugTree())
     }
 
@@ -105,10 +105,7 @@ internal class TimberLoggingRepository @Inject constructor(
 
     override fun getChatLoggingFlow(): Flow<LogEntry> =
         chatLogFlowTree.logFlow.onSubscription {
-            MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
             loggingConfig.resetLoggingConfiguration()
-        }.onCompletion {
-            MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR)
         }
 
     override suspend fun logToSdkFile(logMessage: LogEntry) =
