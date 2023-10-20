@@ -41,7 +41,7 @@ fun ChatView(
 
 @Composable
 private fun TitleIcons(uiState: ChatUiState) {
-    MuteIcon(uiState.isNotificationMute)
+    MuteIcon(uiState.isChatNotificationMute)
 }
 
 @Composable
@@ -62,7 +62,7 @@ fun ChatViewPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         val uiState = ChatUiState(
             title = "My Name",
-            isNotificationMute = true,
+            isChatNotificationMute = true,
         )
         ChatView(
             uiState = uiState,
@@ -71,4 +71,4 @@ fun ChatViewPreview() {
     }
 }
 
-const val TEST_TAG_NOTIFICATION_MUTE = "iconNotificationMute"
+const val TEST_TAG_NOTIFICATION_MUTE = "chat_view:icon_chat_notification_mute"

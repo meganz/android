@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -36,6 +37,8 @@ internal class ChatViewModelTest {
     private val savedStateHandle: SavedStateHandle = mock()
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase = mock()
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates = mock()
+    private val monitorUpdatePushNotificationSettingsUseCase
+            : MonitorUpdatePushNotificationSettingsUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -54,7 +57,8 @@ internal class ChatViewModelTest {
             getChatRoomUseCase,
             savedStateHandle,
             isChatNotificationMuteUseCase,
-            monitorChatRoomUpdates
+            monitorChatRoomUpdates,
+            monitorUpdatePushNotificationSettingsUseCase
         )
     }
 
@@ -63,6 +67,7 @@ internal class ChatViewModelTest {
             getChatRoomUseCase = getChatRoomUseCase,
             isChatNotificationMuteUseCase = isChatNotificationMuteUseCase,
             monitorChatRoomUpdates = monitorChatRoomUpdates,
+            monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             savedStateHandle = savedStateHandle
         )
     }
@@ -70,7 +75,7 @@ internal class ChatViewModelTest {
     @Test
     fun `test that title update when we passing the chatId`() = runTest {
         val chatId = 123L
-        val chatRoom = mock<ChatRoom>() {
+        val chatRoom = mock<ChatRoom> {
             on { title } doReturn "title"
         }
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -103,7 +108,7 @@ internal class ChatViewModelTest {
         whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(true)
         initTestClass()
         underTest.state.test {
-            assertThat(awaitItem().isNotificationMute).isEqualTo(true)
+            assertThat(awaitItem().isChatNotificationMute).isTrue()
         }
     }
 
@@ -114,14 +119,14 @@ internal class ChatViewModelTest {
         whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(false)
         initTestClass()
         underTest.state.test {
-            assertThat(awaitItem().isNotificationMute).isEqualTo(false)
+            assertThat(awaitItem().isChatNotificationMute).isFalse()
         }
     }
 
     @Test
     fun `test that title update when chat room update with title change`() = runTest {
         val chatId = 123L
-        val chatRoom = mock<ChatRoom>() {
+        val chatRoom = mock<ChatRoom> {
             on { title } doReturn "title"
         }
         val updateFlow = MutableSharedFlow<ChatRoom>()
@@ -142,4 +147,29 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().title).isEqualTo(newTitle)
         }
     }
+
+    @Test
+    fun `test that mute icon visibility updates when push notification setting updates`() =
+        runTest {
+            val chatId = 123L
+            val pushNotificationSettingFlow = MutableSharedFlow<Boolean>()
+            val chatRoomUpdate = MutableSharedFlow<ChatRoom>()
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(true)
+            whenever(monitorUpdatePushNotificationSettingsUseCase()).thenReturn(
+                pushNotificationSettingFlow
+            )
+            whenever(monitorChatRoomUpdates(chatId)).thenReturn(chatRoomUpdate)
+
+            initTestClass()
+            underTest.state.test {
+                assertThat(awaitItem().isChatNotificationMute).isTrue()
+            }
+
+            whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(false)
+            pushNotificationSettingFlow.emit(true)
+            underTest.state.test {
+                assertThat(awaitItem().isChatNotificationMute).isFalse()
+            }
+        }
 }

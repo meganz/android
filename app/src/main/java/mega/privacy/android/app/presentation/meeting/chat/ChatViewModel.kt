@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -21,6 +22,7 @@ class ChatViewModel @Inject constructor(
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase,
     private val getChatRoomUseCase: GetChatRoom,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
+    private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -33,6 +35,7 @@ class ChatViewModel @Inject constructor(
             getChatRoom(it)
             getNotificationMute(it)
             monitorChatRoom(it)
+            monitorNotificationMute(it)
         }
     }
 
@@ -51,7 +54,7 @@ class ChatViewModel @Inject constructor(
     private fun getNotificationMute(chatId: Long) {
         viewModelScope.launch {
             val isMute = isChatNotificationMuteUseCase(chatId)
-            _state.update { it.copy(isNotificationMute = isMute) }
+            _state.update { it.copy(isChatNotificationMute = isMute) }
         }
     }
 
@@ -65,6 +68,16 @@ class ChatViewModel @Inject constructor(
                         }
                     }
                 }
+        }
+    }
+
+    private fun monitorNotificationMute(chatId: Long) {
+        viewModelScope.launch {
+            monitorUpdatePushNotificationSettingsUseCase().collect { changed ->
+                if (changed) {
+                    getNotificationMute(chatId)
+                }
+            }
         }
     }
 }

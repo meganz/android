@@ -29,7 +29,7 @@ class ChatViewTest {
     @Test
     fun `test that mute icon is visible when chat notification is mute`() {
         initComposeRuleContent(
-            ChatUiState(isNotificationMute = true)
+            ChatUiState(isChatNotificationMute = true)
         )
         composeTestRule.onNodeWithTag(TEST_TAG_NOTIFICATION_MUTE).assertIsDisplayed()
     }
@@ -37,7 +37,7 @@ class ChatViewTest {
     @Test
     fun `test that mute icon is hidden when chat notification is mute`() {
         initComposeRuleContent(
-            ChatUiState(isNotificationMute = false)
+            ChatUiState(isChatNotificationMute = false)
         )
         composeTestRule.onNodeWithTag(TEST_TAG_NOTIFICATION_MUTE).assertDoesNotExist()
     }
