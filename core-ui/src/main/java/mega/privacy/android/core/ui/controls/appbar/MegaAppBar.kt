@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,9 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,7 +72,10 @@ fun MegaAppBar(
 ) = TopAppBar(
     title = {
         Column {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(
                     text = title,
                     maxLines = 1,
@@ -155,7 +162,31 @@ private fun MegaAppBarPreview() {
             appBarType = AppBarType.MENU,
             title = "App bar title",
             badgeCount = 3,
-            subtitle = "Subtitle"
+            subtitle = "Subtitle",
+            titleIcons = {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "",
+                )
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "",
+                )
+            }
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MegaAppBarPreviewWithoutSubtitle() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        MegaAppBar(
+            appBarType = AppBarType.MENU,
+            title = "App bar title",
+            badgeCount = 3,
         )
     }
 }

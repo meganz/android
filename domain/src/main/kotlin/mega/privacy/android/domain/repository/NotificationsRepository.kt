@@ -69,4 +69,13 @@ interface NotificationsRepository {
      * @param enabled   true to enable, false to disable
      */
     suspend fun setChatEnabled(chatId: Long, enabled: Boolean)
+
+    /**
+     * Returns whether Do-Not-Disturb mode for a chat is enabled or not
+     *
+     * @param chatId - handle of the node that identifies the chat room
+     * @return true if enabled, false otherwise
+     */
+    suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean
+
 }

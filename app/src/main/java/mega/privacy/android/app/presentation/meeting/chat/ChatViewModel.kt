@@ -12,22 +12,26 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase,
     private val getChatRoomUseCase: GetChatRoom,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
+
     private val chatId = savedStateHandle.get<Long>(Constants.CHAT_ID)
 
     init {
         chatId?.let {
             getChatRoom(it)
+            getNotificationMute(it)
             monitorChatRoom(it)
         }
     }
@@ -41,6 +45,13 @@ class ChatViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    private fun getNotificationMute(chatId: Long) {
+        viewModelScope.launch {
+            val isMute = isChatNotificationMuteUseCase(chatId)
+            _state.update { it.copy(isNotificationMute = isMute) }
         }
     }
 

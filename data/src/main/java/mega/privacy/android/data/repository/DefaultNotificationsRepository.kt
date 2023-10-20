@@ -185,6 +185,10 @@ internal class DefaultNotificationsRepository @Inject constructor(
         setPushNotificationSettings(updatedSettings)
     }
 
+    override suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean = withContext(dispatcher) {
+        getPushNotificationSettings().isChatDndEnabled(chatId)
+    }
+
     private suspend fun getPushNotificationSettings(): MegaPushNotificationSettings =
         withContext(dispatcher) {
             suspendCancellableCoroutine { continuation ->
