@@ -18,6 +18,6 @@ open class PasscodeFileProviderActivity: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        passcodeUtil.resume()
+        passcodeUtil.resume(false)
     }
 }

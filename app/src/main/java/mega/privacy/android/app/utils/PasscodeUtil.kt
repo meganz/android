@@ -319,29 +319,35 @@ class PasscodeUtil @Inject constructor(
      *
      * @return True if should lock the app, false otherwise.
      */
-    suspend fun shouldLock(): Boolean {
-        val enabled = passcodePreferenceWrapper.isPasscodeEnabled()
-        val code = passcodePreferenceWrapper.getPasscode()
-        val timeOut = passcodePreferenceWrapper.getPasscodeTimeOut()
-        return if (enabled
-            && code != null
-            && timeOut != REQUIRE_PASSCODE_INVALID
-        ) {
-            val currentTime = System.currentTimeMillis()
-            val lastPaused = passcodeManagement.lastPause
+    suspend fun shouldLock(isRotating: Boolean): Boolean {
+        val backendFlag = getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)
+        if (backendFlag) {
+            return monitorPasscodeLockStateUseCase().first()
+        } else {
+            if (isRotating) return false
+            val enabled = passcodePreferenceWrapper.isPasscodeEnabled()
+            val code = passcodePreferenceWrapper.getPasscode()
+            val timeOut = passcodePreferenceWrapper.getPasscodeTimeOut()
+            return if (enabled
+                && code != null
+                && timeOut != REQUIRE_PASSCODE_INVALID
+            ) {
+                val currentTime = System.currentTimeMillis()
+                val lastPaused = passcodeManagement.lastPause
 
-            Timber.d("Time: $currentTime lastPause: $lastPaused")
+                Timber.d("Passcode value: Time: $currentTime lastPause: $lastPaused")
 
-            currentTime - lastPaused > timeOut
-        } else false
+                currentTime - lastPaused > timeOut
+            } else false
+        }
     }
 
     /**
      * Called after resume some activity to check if should lock or not the app.
      */
-    fun resume() {
+    fun resume(isRotating: Boolean) {
         runBlocking {
-            if (shouldLock()) {
+            if (shouldLock(isRotating)) {
                 showLockScreen()
             }
         }

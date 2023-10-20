@@ -638,7 +638,7 @@ class MeetingActivity : PasscodeActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            isLockingEnabled = passcodeUtil.shouldLock()
+            isLockingEnabled = passcodeUtil.shouldLock(false)
         }
 
         @Suppress("DEPRECATION")

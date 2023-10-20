@@ -11,13 +11,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
 import dagger.hilt.android.qualifiers.ActivityContext
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.Util.setAppFontSize
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.security.InvalidParameterException
@@ -120,8 +120,9 @@ class PasscodeFacade @Inject constructor(
 
         if (isScreenRotation && !passcodeManagement.needsOpenAgain) {
             isScreenRotation = false
+            passcodeUtil.resume(true)
         } else if (passcodeManagement.showPasscodeScreen) {
-            passcodeUtil.resume()
+            passcodeUtil.resume(false)
         }
     }
 
