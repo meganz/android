@@ -425,16 +425,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.getAllCompletedTransfers(size)
             .flowOn(ioDispatcher)
 
-    @Deprecated(
-        "Mapping to CompletedTransfer should be done in the repository. Replace with addCompletedTransfer(transfer: Transfer, megaException: MegaException)",
-        replaceWith = ReplaceWith("addCompletedTransfer(transfer: Transfer, megaException: MegaException)")
-    )
-    override suspend fun addCompletedTransfer(transfer: CompletedTransfer) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.addCompletedTransfer(transfer)
-            appEventGateway.broadcastCompletedTransfer(transfer)
-        }
-
     override suspend fun addCompletedTransfer(transfer: Transfer, megaException: MegaException?) {
         withContext(ioDispatcher) {
             val completedTransfer = completedTransferMapper(transfer, megaException)

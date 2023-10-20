@@ -235,18 +235,6 @@ interface TransferRepository {
      *
      * @param transfer
      */
-    @Deprecated(
-        "Mapping to CompletedTransfer should be done in the repository. " +
-                "Replace with addCompletedTransfer(transfer: Transfer, megaException: MegaException)",
-        replaceWith = ReplaceWith("addCompletedTransfer(transfer: Transfer, megaException: MegaException)")
-    )
-    suspend fun addCompletedTransfer(transfer: CompletedTransfer)
-
-    /**
-     * Add a completed transfer to local storage
-     *
-     * @param transfer
-     */
     suspend fun addCompletedTransfer(transfer: Transfer, megaException: MegaException?)
 
     /**

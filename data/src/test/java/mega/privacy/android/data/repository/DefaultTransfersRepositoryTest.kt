@@ -533,15 +533,6 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    fun `test that addCompletedTransfer call local storage gateway addCompletedTransfer and app event gateway broadcastCompletedTransfer`() =
-        runTest {
-            val expected = mock<CompletedTransfer>()
-            underTest.addCompletedTransfer(expected)
-            verify(megaLocalRoomGateway).addCompletedTransfer(expected)
-            verify(appEventGateway).broadcastCompletedTransfer(expected)
-        }
-
-    @Test
     fun `test that addCompletedTransfer call local storage gateway addCompletedTransfer and app event gateway broadcastCompletedTransfer with the mapped transfer`() =
         runTest {
             val transfer = mock<Transfer>()

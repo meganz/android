@@ -57,7 +57,6 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
-import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.SdTransfer
@@ -171,9 +170,6 @@ internal class DownloadService : LifecycleService() {
 
     @Inject
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
-
-    @Inject
-    lateinit var completedTransferMapper: CompletedTransferMapper
 
     @Inject
     lateinit var cancelAllDownloadTransfersUseCase: CancelAllDownloadTransfersUseCase
@@ -1395,11 +1391,7 @@ internal class DownloadService : LifecycleService() {
         val targetPath = sdCardDownloadAppData?.targetPath
         if (!transfer.isFolderTransfer) {
             if (!isVoiceClip && !isBackgroundTransfer) {
-                var completedTransfer = completedTransferMapper(transfer, error)
-                if (!targetPath.isNullOrEmpty()) {
-                    completedTransfer = completedTransfer.copy(path = targetPath)
-                }
-                addCompletedTransferUseCase(completedTransfer)
+                addCompletedTransferUseCase(transfer, error)
             }
             if (transfer.state == TransferState.STATE_FAILED) {
                 transfersManagement.setAreFailedTransfers(true)

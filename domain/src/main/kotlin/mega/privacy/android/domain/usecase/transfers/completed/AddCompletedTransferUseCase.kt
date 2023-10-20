@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.completed
 
-import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
@@ -16,6 +17,6 @@ class AddCompletedTransferUseCase @Inject constructor(
     /**
      * Invoke.
      */
-    suspend operator fun invoke(transfer: CompletedTransfer) =
-        transferRepository.addCompletedTransfer(transfer)
+    suspend operator fun invoke(transfer: Transfer, error: MegaException?) =
+        transferRepository.addCompletedTransfer(transfer, error)
 }

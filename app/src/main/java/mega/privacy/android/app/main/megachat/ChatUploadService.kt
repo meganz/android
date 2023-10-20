@@ -42,7 +42,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
-import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
@@ -108,9 +107,6 @@ class ChatUploadService : LifecycleService() {
 
     @Inject
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
-
-    @Inject
-    lateinit var completedTransferMapper: CompletedTransferMapper
 
     @Inject
     lateinit var getTransferDataUseCase: GetTransferDataUseCase
@@ -1049,7 +1045,7 @@ class ChatUploadService : LifecycleService() {
             transfersCount--
             totalUploadsCompleted++
         }
-        addCompletedTransferUseCase(completedTransferMapper(transfer, error))
+        addCompletedTransferUseCase(transfer, error)
         mapProgressTransfers[tag] = transfer
 
         if (canceled) {

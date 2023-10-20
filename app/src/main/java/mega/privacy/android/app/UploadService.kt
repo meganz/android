@@ -46,7 +46,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -118,9 +117,6 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
-
-    @Inject
-    lateinit var completedTransferMapper: CompletedTransferMapper
 
     @Inject
     lateinit var getRootFolder: GetRootFolder
@@ -818,7 +814,7 @@ internal class UploadService : LifecycleService() {
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
 
         if (!isFolderTransfer) {
-            addCompletedTransferUseCase(completedTransferMapper(transfer, error))
+            addCompletedTransferUseCase(transfer, error)
             getTextFileUploadAppData()?.let {
                 val message =
                     getCreationOrEditorText(
