@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.node
 
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.node.DefaultFolderNode
@@ -19,6 +20,7 @@ internal class FolderNodeMapper @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val fetChildrenMapper: FetchChildrenMapper,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway
 ) {
     /**
      * Invoke
@@ -60,5 +62,6 @@ internal class FolderNodeMapper @Inject constructor(
         creationTime = megaNode.creationTime,
         fetchChildren = fetChildrenMapper(megaNode),
         serializedData = if (requireSerializedData) megaNode.serialize() else null,
+        isAvailableOffline = megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)
     )
 }

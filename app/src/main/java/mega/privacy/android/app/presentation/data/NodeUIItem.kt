@@ -8,13 +8,11 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @property node [Node]
  * @param isSelected Node is selected
  * @param isInvisible Node is invisible
- * @param isAvailableOffline Node is available offline or not
  * @param fileDuration Duration of file
  */
 data class NodeUIItem<T : TypedNode>(
     val node: T,
     var isSelected: Boolean,
     val isInvisible: Boolean = false,
-    val isAvailableOffline: Boolean = false,
     val fileDuration: String? = null
 ) : Node by node

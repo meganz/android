@@ -17,15 +17,18 @@ import javax.inject.Inject
 /**
  * File node mapper
  *
- * @property cacheFolderGateway
+ * @property cacheGateway
  * @property megaApiGateway
  * @property fileTypeInfoMapper
+ * @property megaLocalRoomGateway
+ * @property fileGateway
  * @constructor Create empty File node mapper
  */
 internal class FileNodeMapper @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val offlineAvailabilityMapper: OfflineAvailabilityMapper
 ) {
     /**
      * Invoke
@@ -72,6 +75,7 @@ internal class FileNodeMapper @Inject constructor(
         hasThumbnail = megaNode.hasThumbnail(),
         hasPreview = megaNode.hasPreview(),
         serializedData = if (requireSerializedData) megaNode.serialize() else null,
+        isAvailableOffline = offlineAvailabilityMapper(megaNode)
     )
 
     private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: File?): String? =

@@ -34,7 +34,6 @@ import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -59,7 +58,6 @@ import javax.inject.Inject
  * @param getBandWidthOverQuotaDelayUseCase [GetBandWidthOverQuotaDelayUseCase]
  * @param transfersManagement [TransfersManagement]
  * @param containsMediaItemUseCase [ContainsMediaItemUseCase]
- * @param isAvailableOfflineUseCase [IsAvailableOfflineUseCase]
  * @param fileDurationMapper [FileDurationMapper]
  */
 @HiltViewModel
@@ -78,7 +76,6 @@ class FileBrowserViewModel @Inject constructor(
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase,
     private val transfersManagement: TransfersManagement,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
-    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val fileDurationMapper: FileDurationMapper,
 ) : ViewModel() {
 
@@ -285,7 +282,7 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private suspend fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
+    private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
         val existingNodeList = state.value.nodesList
         return nodeList.mapIndexed { index, node ->
             val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
@@ -296,7 +293,6 @@ class FileBrowserViewModel @Inject constructor(
                 node = node,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
-                isAvailableOffline = isAvailableOfflineUseCase(node),
                 fileDuration = fileDuration
             )
         }

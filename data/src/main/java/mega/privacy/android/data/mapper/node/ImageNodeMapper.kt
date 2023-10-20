@@ -15,6 +15,7 @@ internal class ImageNodeMapper @Inject constructor(
     private val thumbnailFromServerMapper: ThumbnailFromServerMapper,
     private val previewFromServerMapper: PreviewFromServerMapper,
     private val fullImageFromServerMapper: FullImageFromServerMapper,
+    private val offlineAvailabilityMapper: OfflineAvailabilityMapper
 ) {
     suspend operator fun invoke(
         megaNode: MegaNode,
@@ -24,6 +25,7 @@ internal class ImageNodeMapper @Inject constructor(
         throw IllegalStateException("Node is a folder")
     } else {
         val hasVersion = hasVersion(megaNode)
+        val isAvailableOffline = offlineAvailabilityMapper(megaNode)
         object : ImageNode {
             override val id = NodeId(megaNode.handle)
             override val name = megaNode.name
@@ -55,6 +57,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val latitude = megaNode.latitude
             override val longitude = megaNode.longitude
             override val serializedData = if (requireSerializedData) megaNode.serialize() else null
+            override val isAvailableOffline: Boolean = isAvailableOffline
         }
     }
 }

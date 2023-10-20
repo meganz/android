@@ -50,7 +50,6 @@ class SearchActivityViewModelTest {
     private lateinit var underTest: SearchActivityViewModel
     private val monitorNodeUpdates: MonitorNodeUpdates = FakeMonitorUpdates()
     private val getParentNodeHandle: GetParentNodeHandle = mock()
-    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val searchNodesUseCase: SearchNodesUseCase = mock()
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase = mock()
@@ -73,7 +72,6 @@ class SearchActivityViewModelTest {
     fun resetMocks() {
         reset(
             getParentNodeHandle,
-            isAvailableOfflineUseCase,
             cancelCancelTokenUseCase,
             searchNodesUseCase,
             getSearchCategoriesUseCase,
@@ -91,7 +89,6 @@ class SearchActivityViewModelTest {
         underTest = SearchActivityViewModel(
             monitorNodeUpdates = monitorNodeUpdates,
             getParentNodeHandle = getParentNodeHandle,
-            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
             stateHandle = stateHandle,
@@ -255,7 +252,6 @@ class SearchActivityViewModelTest {
             whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
                 isFirstLevel
             )
-            whenever(isAvailableOfflineUseCase(any())).thenReturn(false)
             whenever(
                 searchNodesUseCase(
                     query = "",
@@ -297,7 +293,6 @@ class SearchActivityViewModelTest {
             whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
                 isFirstLevel
             )
-            whenever(isAvailableOfflineUseCase(any())).thenReturn(false)
             whenever(
                 searchNodesUseCase(
                     query = query,
@@ -330,7 +325,6 @@ class SearchActivityViewModelTest {
             whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
                 isFirstLevel
             )
-            whenever(isAvailableOfflineUseCase(any())).thenReturn(false)
             whenever(
                 searchNodesUseCase(
                     query = "",

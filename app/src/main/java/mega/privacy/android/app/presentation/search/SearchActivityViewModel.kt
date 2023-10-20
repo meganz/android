@@ -46,7 +46,6 @@ import javax.inject.Inject
  * @property searchNodesUseCase [SearchNodesUseCase]
  * @property getParentNodeHandle [GetParentNodeHandle]
  * @property setViewType [SetViewType]
- * @property isAvailableOfflineUseCase [IsAvailableOfflineUseCase]
  * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
  * @property searchFilterMapper [SearchFilterMapper]
  * @property emptySearchViewMapper [EmptySearchViewMapper]
@@ -57,7 +56,6 @@ class SearchActivityViewModel @Inject constructor(
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getParentNodeHandle: GetParentNodeHandle,
-    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
     private val searchFilterMapper: SearchFilterMapper,
     private val emptySearchViewMapper: EmptySearchViewMapper,
@@ -198,7 +196,6 @@ class SearchActivityViewModel @Inject constructor(
                     ?: run { null }
             } else null
             item.copy(
-                isAvailableOffline = isAvailableOfflineUseCase(item.node),
                 fileDuration = fileDuration
             )
         }

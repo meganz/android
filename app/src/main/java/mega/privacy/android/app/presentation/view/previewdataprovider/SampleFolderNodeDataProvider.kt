@@ -36,6 +36,7 @@ internal class SampleFolderNodeDataProvider :
             override val isNodeKeyDecrypted = false
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
+            override val isAvailableOffline: Boolean = false
         })
 
     private val nodeUIItem2 = NodeUIItem<TypedFolderNode>(
@@ -63,6 +64,7 @@ internal class SampleFolderNodeDataProvider :
             override val isNodeKeyDecrypted = false
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
+            override val isAvailableOffline: Boolean = false
         })
 
     private val nodeUIItem3 = NodeUIItem<TypedFolderNode>(
@@ -90,6 +92,7 @@ internal class SampleFolderNodeDataProvider :
             override val isNodeKeyDecrypted = false
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
+            override val isAvailableOffline: Boolean = false
         })
 
     override val values: Sequence<List<NodeUIItem<TypedFolderNode>>> = sequenceOf(

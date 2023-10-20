@@ -71,5 +71,10 @@ interface Node {
      * This value should be set only if required and not always for all the nodes
      */
     val serializedData: String?
+
+    /**
+     * offline available
+     */
+    val isAvailableOffline: Boolean
 }
 

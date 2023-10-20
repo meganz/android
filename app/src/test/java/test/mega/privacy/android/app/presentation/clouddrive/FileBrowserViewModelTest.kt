@@ -37,7 +37,6 @@ import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -74,9 +73,6 @@ class FileBrowserViewModelTest {
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase = mock()
     private val transfersManagement: TransfersManagement = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
-    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase = mock {
-        onBlocking { invoke(any()) }.thenReturn(false)
-    }
     private val fileDurationMapper: FileDurationMapper = mock {
         onBlocking { invoke(any()) }.thenReturn(null)
     }
@@ -106,7 +102,6 @@ class FileBrowserViewModelTest {
             getBandWidthOverQuotaDelayUseCase = getBandWidthOverQuotaDelayUseCase,
             transfersManagement = transfersManagement,
             containsMediaItemUseCase = containsMediaItemUseCase,
-            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             fileDurationMapper = fileDurationMapper,
         )
     }
@@ -411,25 +406,4 @@ class FileBrowserViewModelTest {
                 Truth.assertThat(awaitItem().shouldShowBannerVisibility).isFalse()
             }
         }
-
-    @Test
-    fun `test that when node is available offilne, it should be updated in node`() = runTest {
-        val nodesListItem1 = mock<TypedFileNode>()
-        val nodesListItem2 = mock<TypedFolderNode>()
-        whenever(nodesListItem1.id.longValue).thenReturn(1L)
-        whenever(nodesListItem2.id.longValue).thenReturn(2L)
-        whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
-            listOf(nodesListItem1, nodesListItem2)
-        )
-        whenever(isAvailableOfflineUseCase(nodesListItem1)).thenReturn(false)
-        whenever(isAvailableOfflineUseCase(nodesListItem2)).thenReturn(true)
-
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-        underTest.refreshNodes()
-        underTest.state.test {
-            val state = awaitItem()
-            Truth.assertThat(state.nodesList[0].isAvailableOffline).isFalse()
-            Truth.assertThat(state.nodesList[1].isAvailableOffline).isTrue()
-        }
-    }
 }

@@ -24,6 +24,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
+import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
@@ -96,17 +97,20 @@ class NodeRepositoryImplTest {
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
     private val fetChildrenMapper = mock<FetchChildrenMapper>()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
+    private val offlineAvailabilityMapper : OfflineAvailabilityMapper = mock()
 
     private val nodeMapper: NodeMapper = NodeMapper(
         fileNodeMapper = FileNodeMapper(
             cacheGateway = cacheGateway,
             megaApiGateway = megaApiGateway,
-            fileTypeInfoMapper = fileTypeInfoMapper
+            fileTypeInfoMapper = fileTypeInfoMapper,
+            offlineAvailabilityMapper = offlineAvailabilityMapper,
         ),
         folderNodeMapper = FolderNodeMapper(
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
-            fetChildrenMapper = fetChildrenMapper
+            fetChildrenMapper = fetChildrenMapper,
+            megaLocalRoomGateway = megaLocalRoomGateway
         )
     )
 
@@ -231,6 +235,7 @@ class NodeRepositoryImplTest {
             on { email }.thenReturn(testEmail)
         }
         val megaNode = mockMegaNodeForConversion()
+        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(true)
         val nodeList = listOf(megaNode)
         whenever(megaApiGateway.getContact(testEmail)).thenReturn(user)
         whenever(megaApiGateway.getInShares(user)).thenReturn(nodeList)
@@ -507,6 +512,7 @@ class NodeRepositoryImplTest {
     fun `test that getNodesByHandle invokes correct function`() = runTest {
         val handle = 1L
         val megaNode = mockMegaNodeForConversion()
+        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(false)
         whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
         assertThat(underTest.getNodeByHandle(handle)?.base64Id).isEqualTo("base64Handle")
     }

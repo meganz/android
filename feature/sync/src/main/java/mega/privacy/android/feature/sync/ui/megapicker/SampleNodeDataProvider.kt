@@ -35,6 +35,7 @@ internal class SampleNodeDataProvider {
             override val isNodeKeyDecrypted = false
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
+            override val isAvailableOffline = false
         }
 
         private val nodeUIItem2 = object : TypedFolderNode {
@@ -59,6 +60,7 @@ internal class SampleNodeDataProvider {
             override val isNodeKeyDecrypted = false
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
+            override val isAvailableOffline = false
         }
 
         private val nodeUIItem3 = object : TypedFolderNode {
@@ -83,6 +85,7 @@ internal class SampleNodeDataProvider {
             override val isNodeKeyDecrypted = false
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
+            override val isAvailableOffline = false
         }
 
         private val nodeUIItem4 = object : TypedFileNode {
@@ -112,6 +115,7 @@ internal class SampleNodeDataProvider {
             override val hasThumbnail: Boolean = true
             override val hasPreview: Boolean = true
             override val serializedData = null
+            override val isAvailableOffline = false
         }
 
         val values: List<TypedNode> =

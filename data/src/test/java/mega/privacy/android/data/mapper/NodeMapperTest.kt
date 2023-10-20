@@ -3,10 +3,12 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
+import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
@@ -22,6 +24,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NodeMapperTest {
@@ -53,18 +56,23 @@ class NodeMapperTest {
     private val expectedPublicLinkCreationTime = 456L
     private val expectedSerializedString = "serializedString"
 
+    private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
+    private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
+
     @BeforeEach
     internal fun setUp() {
         underTest = NodeMapper(
             fileNodeMapper = FileNodeMapper(
                 cacheGateway = mock(),
                 megaApiGateway = megaApiGateway,
-                fileTypeInfoMapper = { PdfFileTypeInfo }
+                fileTypeInfoMapper = { PdfFileTypeInfo },
+                offlineAvailabilityMapper = offlineAvailabilityMapper,
             ),
             folderNodeMapper = FolderNodeMapper(
                 megaApiGateway = megaApiGateway,
                 megaApiFolderGateway = megaApiFolderGateway,
-                fetChildrenMapper = mock { on { invoke(any(), any()) }.thenReturn { emptyList() } }
+                fetChildrenMapper = mock { on { invoke(any(), any()) }.thenReturn { emptyList() } },
+                megaLocalRoomGateway = megaLocalRoomGateway
             )
         )
     }
@@ -72,6 +80,8 @@ class NodeMapperTest {
     @Test
     fun `test that files are mapped if isFile is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
+        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(true)
+
         val actual =
             underTest(
                 megaNode = megaNode,
@@ -83,17 +93,18 @@ class NodeMapperTest {
     @Test
     fun `test that folders are mapped if isFile is false`() = runTest {
         val megaNode = getMockNode(isFile = false)
+        whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(false)
         val actual =
             underTest(
                 megaNode = megaNode,
             )
-
         assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
     }
 
     @Test
     fun `test that values returned by gateway are used`() = runTest {
         val node = getMockNode(isFile = false)
+        whenever(megaLocalRoomGateway.isOfflineInformationAvailable(node.handle)).thenReturn(false)
         val expectedHasVersion = true
         val expectedNumChildFolders = 2
         val expectedNumChildFiles = 3
@@ -104,7 +115,8 @@ class NodeMapperTest {
             onBlocking { isInRubbish(node) }.thenReturn(true)
             onBlocking { isPendingShare(node) }.thenReturn(true)
         }
-
+        whenever(megaLocalRoomGateway.getOfflineInformation(node.handle)).thenReturn(null)
+        whenever(megaLocalRoomGateway.isOfflineInformationAvailable(node.handle)).thenReturn(true)
         val actual = underTest(
             megaNode = node,
         )
@@ -126,6 +138,7 @@ class NodeMapperTest {
     @Test
     fun `test that serialized string is not null when requireSerializedString is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
+        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(false)
         val actual = underTest(megaNode, requireSerializedData = true)
         assertThat(actual.serializedData).isEqualTo(expectedSerializedString)
     }
@@ -133,6 +146,7 @@ class NodeMapperTest {
     @Test
     fun `test that serialized string is null when requireSerializedString is false`() = runTest {
         val megaNode = getMockNode(isFile = true)
+        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(true)
         val actual = underTest(megaNode, requireSerializedData = false)
         assertThat(actual.serializedData).isNull()
     }
@@ -147,6 +161,7 @@ class NodeMapperTest {
             exported: Boolean,
         ) = runTest {
             val megaNode = megaNode(exported)
+            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(false)
             val actual = mappedNode(megaNode)
             if (exported) {
                 assertThat(actual.exportedData).isNotNull()
@@ -158,6 +173,7 @@ class NodeMapperTest {
         @Test
         fun `test that exported public link is correct`() = runTest {
             val megaNode = megaNode(true)
+            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(false)
             val actual = mappedNode(megaNode)
             assertThat(actual.exportedData?.publicLink).isEqualTo(expectedPublicLink)
         }
@@ -165,6 +181,7 @@ class NodeMapperTest {
         @Test
         fun `test that exported public link creation time is correct`() = runTest {
             val megaNode = megaNode(true)
+            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(false)
             val actual = mappedNode(megaNode)
             assertThat(actual.exportedData?.publicLinkCreationTime).isEqualTo(
                 expectedPublicLinkCreationTime
