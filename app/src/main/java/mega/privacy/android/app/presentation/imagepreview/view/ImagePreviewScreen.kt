@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
+import com.google.android.exoplayer2.ui.R as RExoPlayer
 import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -28,6 +29,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberModalBottomSheetState
@@ -60,16 +63,25 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
+import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
+import mega.privacy.android.core.ui.theme.teal_200
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 
 @Composable
 fun ImagePreviewScreen(
     viewModel: ImagePreviewViewModel = viewModel(),
-    onBackClicked: () -> Unit,
-    onSaveToDeviceClicked: () -> Unit,
+    onClickBack: () -> Unit,
+    onClickSaveToDevice: (ImageNode) -> Unit,
+    onClickGetLink: (ImageNode) -> Unit,
+    onClickSendTo: (ImageNode) -> Unit,
+    onClickVideoPlay: (ImageNode) -> Unit,
+    onClickSlideshow: () -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val imageNodes = viewState.imageNodes
@@ -82,6 +94,7 @@ fun ImagePreviewScreen(
         }
         val inFullScreenMode = viewState.inFullScreenMode
         val scaffoldState = rememberScaffoldState()
+        val isLight = MaterialTheme.colors.isLight
         val photoState = rememberPhotoState()
         val pagerState = rememberPagerState(
             initialPage = initialPage,
@@ -101,8 +114,29 @@ fun ImagePreviewScreen(
                 imageNodes.getOrNull(page)?.id?.let { viewModel.setCurrentImageNodeId(it) }
             }
         }
+
+        if (viewState.transferMessage.isNotEmpty()) {
+            LaunchedEffect(Unit) {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = viewState.transferMessage,
+                )
+            }
+        }
         Scaffold(
             scaffoldState = scaffoldState,
+            snackbarHost = { snackBarHostState ->
+                SnackbarHost(
+                    hostState = snackBarHostState,
+                    snackbar = { snackBarData ->
+                        Snackbar(
+                            snackbarData = snackBarData,
+                            actionOnNewLine = true,
+                            backgroundColor = black.takeIf { isLight } ?: white,
+                            actionColor = teal_200.takeIf { isLight } ?: teal_300,
+                        )
+                    }
+                )
+            },
             content = { innerPadding ->
                 ImagePreviewContent(
                     innerPadding = innerPadding,
@@ -113,23 +147,27 @@ fun ImagePreviewScreen(
                     photoState = photoState,
                     downloadImage = viewModel::monitorImageResult,
                     onImageTap = { viewModel.switchFullScreenMode() },
-                    topAppBar = { _ ->
+                    onClickVideoPlay = onClickVideoPlay,
+                    topAppBar = { imageNode ->
                         AnimatedVisibility(
                             visible = !inFullScreenMode,
                             enter = fadeIn() + expandVertically(),
                             exit = fadeOut() + shrinkVertically()
                         ) {
                             ImagePreviewTopBar(
-                                showSlideshowMenu = true,
-                                showSaveToDeviceMenu = true,
-                                showLinkMenu = true,
-                                showForwardMenu = true,
-                                onBackClicked = onBackClicked,
-                                onSlideshowClicked = {},
-                                onSaveToDeviceClicked = onSaveToDeviceClicked,
-                                onLinkClicked = {},
-                                onForwardClicked = {},
-                                onMoreClicked = {
+                                showSlideshowMenu = viewState.showSlideshowOption
+                                        && viewModel.isSlideshowOptionVisible(imageNode),
+                                showSaveToDeviceMenu = viewModel.isSaveToDeviceOptionVisible(
+                                    imageNode
+                                ),
+                                showManageLinkMenu = viewModel.isGetLinkOptionVisible(imageNode),
+                                showSendToMenu = viewModel.isSendToOptionVisible(imageNode),
+                                onClickBack = onClickBack,
+                                onClickSlideshow = onClickSlideshow,
+                                onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
+                                onClickGetLink = { onClickGetLink(imageNode) },
+                                onClickSendTo = { onClickSendTo(imageNode) },
+                                onClickMore = {
                                     coroutineScope.launch {
                                         modalSheetState.show()
                                     }
@@ -174,6 +212,7 @@ private fun ImagePreviewContent(
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getInfoText: (ImageNode, Context) -> String,
     modalSheetState: ModalBottomSheetState,
+    onClickVideoPlay: (ImageNode) -> Unit,
 ) {
     val context = LocalContext.current
     Box(modifier = modifier.background(color = Color.Black)) {
@@ -192,26 +231,37 @@ private fun ImagePreviewContent(
                 )
             }
 
-            val imageThumbnailPath by produceState<String?>(initialValue = null) {
+            val imageResult by produceState<ImageResult?>(initialValue = null) {
                 downloadImage(currentImageNode).collectLatest { imageResult ->
-                    value = imageResult.getLowestResolutionAvailableUri()
+                    value = imageResult
                 }
             }
 
             ImagePreviewBottomSheet(
                 modalSheetState = modalSheetState,
-                imageThumbnailPath = imageThumbnailPath,
+                imageThumbnailPath = imageResult?.getLowestResolutionAvailableUri(),
                 imageName = currentImageNode.name,
                 imageInfo = currentImageNodeInfo,
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         ImageContent(
-                            imageNode = currentImageNode,
-                            downloadImage = downloadImage,
+                            fullSizePath = imageResult?.getHighestResolutionAvailableUri(),
                             photoState = photoState,
                             onImageTap = onImageTap
                         )
+                        if (currentImageNode.type is VideoFileTypeInfo) {
+                            IconButton(
+                                modifier = Modifier.align(Alignment.Center),
+                                onClick = { onClickVideoPlay(currentImageNode) }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = RExoPlayer.drawable.exo_icon_play),
+                                    contentDescription = "Image Preview play video",
+                                    tint = Color.White,
+                                )
+                            }
+                        }
                     }
                     Box(
                         modifier = Modifier
@@ -235,17 +285,10 @@ private fun ImagePreviewContent(
 
 @Composable
 private fun ImageContent(
-    imageNode: ImageNode,
-    downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
+    fullSizePath: String?,
     photoState: PhotoState,
     onImageTap: () -> Unit,
 ) {
-    val imageState by produceState<String?>(initialValue = null) {
-        downloadImage(imageNode).collectLatest { imageResult ->
-            value = imageResult.getHighestResolutionAvailableUri()
-        }
-    }
-
     PhotoBox(
         modifier = Modifier.fillMaxSize(),
         state = photoState,
@@ -255,7 +298,7 @@ private fun ImageContent(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(imageState)
+                .data(fullSizePath)
                 .crossfade(true)
                 .build(),
             contentDescription = null,
@@ -270,20 +313,20 @@ private fun ImagePreviewTopBar(
     modifier: Modifier = Modifier,
     showSlideshowMenu: Boolean,
     showSaveToDeviceMenu: Boolean,
-    showLinkMenu: Boolean,
-    showForwardMenu: Boolean,
-    onBackClicked: () -> Unit,
-    onSlideshowClicked: () -> Unit,
-    onSaveToDeviceClicked: () -> Unit,
-    onLinkClicked: () -> Unit,
-    onForwardClicked: () -> Unit,
-    onMoreClicked: () -> Unit,
+    showManageLinkMenu: Boolean,
+    showSendToMenu: Boolean,
+    onClickBack: () -> Unit,
+    onClickSlideshow: () -> Unit,
+    onClickSaveToDevice: () -> Unit,
+    onClickGetLink: () -> Unit,
+    onClickSendTo: () -> Unit,
+    onClickMore: () -> Unit,
 ) {
     TopAppBar(
         title = {},
         backgroundColor = MaterialTheme.colors.white_alpha_070_grey_alpha_070,
         navigationIcon = {
-            IconButton(onClick = onBackClicked) {
+            IconButton(onClick = onClickBack) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_back_white),
                     contentDescription = "Image Preview Back",
@@ -293,7 +336,7 @@ private fun ImagePreviewTopBar(
         },
         actions = {
             if (showSlideshowMenu) {
-                IconButton(onClick = onSlideshowClicked) {
+                IconButton(onClick = onClickSlideshow) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_slideshow),
                         contentDescription = null,
@@ -303,7 +346,7 @@ private fun ImagePreviewTopBar(
             }
 
             if (showSaveToDeviceMenu) {
-                IconButton(onClick = onSaveToDeviceClicked) {
+                IconButton(onClick = onClickSaveToDevice) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_download_white),
                         contentDescription = null,
@@ -312,8 +355,8 @@ private fun ImagePreviewTopBar(
                 }
             }
 
-            if (showLinkMenu) {
-                IconButton(onClick = onLinkClicked) {
+            if (showManageLinkMenu) {
+                IconButton(onClick = onClickGetLink) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_link),
                         contentDescription = null,
@@ -322,8 +365,8 @@ private fun ImagePreviewTopBar(
                 }
             }
 
-            if (showForwardMenu) {
-                IconButton(onClick = onForwardClicked) {
+            if (showSendToMenu) {
+                IconButton(onClick = onClickSendTo) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_send_to_contact),
                         contentDescription = null,
@@ -332,7 +375,7 @@ private fun ImagePreviewTopBar(
                 }
             }
 
-            IconButton(onClick = onMoreClicked) {
+            IconButton(onClick = onClickMore) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_dots_vertical_white),
                     contentDescription = null,

@@ -6,9 +6,11 @@ interface ImagePreviewMenuOptions {
 
     fun isSlideshowOptionVisible(imageNode: ImageNode): Boolean
 
-    fun isLinkOptionVisible(imageNode: ImageNode): Boolean
+    fun isGetLinkOptionVisible(imageNode: ImageNode): Boolean
 
-    fun isDownloadOptionVisible(imageNode: ImageNode): Boolean
+    fun isSaveToDeviceOptionVisible(imageNode: ImageNode): Boolean
 
     fun isForwardOptionVisible(imageNode: ImageNode): Boolean
+
+    fun isSendToOptionVisible(imageNode: ImageNode): Boolean
 }
