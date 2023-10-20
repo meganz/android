@@ -138,8 +138,6 @@
     <string name="password_text">Senha</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">Confirme a sua senha</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Novo no MEGA?</string>
     <!-- button that allows the user to create an account -->
@@ -1933,8 +1931,6 @@
     <string name="intent_not_available_2fa">Não há nenhum aplicativo disponível para ativar a autenticação de dois fatores no seu dispositivo</string>
     <!-- Text button -->
     <string name="general_close">Fechar</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Para concluir, exporte a sua chave de recuperação</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Aplicativo para autenticação de dois fatores</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2579,8 +2575,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] entrou no chat de grupo.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Se o link for eliminado, este chat já não poderá ser acessado usando-o.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">A rotação da chave de criptografia não permite que você obtenha um link do chat sem criar um novo chat em grupo.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Você quer criar um novo chat de grupo e obter um link do chat?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -5405,7 +5399,9 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Ver todos</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Não rejeitar</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">Uploads da câmera atualizados</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">O upload foi pausado por falta de conexão à Internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -5413,6 +5409,7 @@
         <item quantity="many">Uploads da câmera em andamento, %1$d de arquivos pendentes</item>
         <item quantity="other">Uploads da câmera em andamento, %1$d arquivos pendentes</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="one">Uploads da câmera concluídos, foi feito o upload de %1$d arquivo</item>
         <item quantity="many">Uploads da câmera concluídos, foi feito o upload de %1$d de arquivos</item>

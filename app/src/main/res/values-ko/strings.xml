@@ -134,8 +134,6 @@
     <string name="password_text">암호</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">암호 확인</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">MEGA가 처음이신가요?</string>
     <!-- button that allows the user to create an account -->
@@ -1847,8 +1845,6 @@
     <string name="intent_not_available_2fa">당신의 기기에 2단계 인증을 활성화할 수 있는 앱이 없습니다</string>
     <!-- Text button -->
     <string name="general_close">닫기</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">완료하려면 복구 키를 내보내세요</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">2단계 인증 앱</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2453,8 +2449,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A]님이[B] 단체 대화에 참여하였습니다.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">대화 링크가 삭제되면 그것을 통하여 이 대화에 참여할 수 없게 됩니다.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">암호화 키 순환은 새 단체 대화를 만드는 것 없이 대화 링크를 만드는 것을 허용하지 않습니다.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">새 단체 대화를 만들고 대화 링크를 생성할까요?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -4943,12 +4937,15 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">모두 보기</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">거부하지 않기</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">카메라 업로드 업데이트됨</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">인터넷 연결이 없어서 업로드가 일시정지 되었습니다</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
     </plurals>
@@ -4958,8 +4955,7 @@
     <string name="camera_uploads_change_permissions">권한을 변경하려면 탭하세요.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
     <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
-        <item quantity="one">Invitee (%d)</item>
-        <item quantity="other">Invitees (%d)</item>
+        <item quantity="other">초대 받은 사람 (%d)</item>
     </plurals>
     <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
     <plurals name="meetings_meeting_not_in_call_section_subtitle">

@@ -134,8 +134,6 @@
     <string name="password_text">รหัสผ่าน</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">ยืนยันรหัสผ่าน</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">เป็นผู้ใช้ MEGA ใหม่</string>
     <!-- button that allows the user to create an account -->
@@ -1847,8 +1845,6 @@
     <string name="intent_not_available_2fa">ไม่มีแอปพลิเคชันใด ๆ ที่สามารถเปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัยบนอุปกรณ์ของคุณ</string>
     <!-- Text button -->
     <string name="general_close">ปิด</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">ส่งออกคีย์การกู้คืนเพื่อเสร็จสิ้น</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">แอปรับรองความถูกต้องด้วยสองปัจจัย</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2453,8 +2449,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] ได้เข้าร่วมแชทกลุ่ม[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">การสนทนานี้จะไม่สามารถเข้าถึงผ่านลิงก์แชทเมื่อถูกลบออกแล้วได้อีกต่อไป</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">การสลับกุญแจเข้ารหัสไม่อนุญาตให้คุณรับลิงก์แชทโดยไม่ต้องสร้างแชทกลุ่มใหม่</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">คุณต้องการสร้างแชทกลุ่มใหม่และรับลิงก์แชทหรือไม่</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -4943,12 +4937,15 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">ดูทั้งหมด</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">ไม่ต้องปฏิเสธ</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">การอัปโหลดจากกล้องได้อัปเดตล่าสุดแล้ว</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="other">การอัปโหลดจากกล้องเสร็จสมบูรณ์ มี %1$d ไฟล์ที่อัปโหลดแล้ว</item>
     </plurals>

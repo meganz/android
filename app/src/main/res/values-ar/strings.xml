@@ -144,8 +144,6 @@
     <string name="password_text">كلمة المرور</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">تأكيد كلمة المرور</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">جديد في ميغا MEGA؟</string>
     <!-- button that allows the user to create an account -->
@@ -2062,8 +2060,6 @@
     <string name="intent_not_available_2fa">لا يوجد أي تطبيق متوفر لتفعيل المصادقة المزدوجة 2FA على جهازك</string>
     <!-- Text button -->
     <string name="general_close">إغلاق</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">قم بتصدير مفتاح الاستعادة الخاص بك للإنهاء</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">تطبيق المصادقة المزدوجة Two-Factor</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2768,8 +2764,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]انضم إلى المحادثة الجماعية.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">لن تتمكن من الوصول إلى هذه المحادثة بعد الآن من خلال رابط المحادثة بمجرد إزالتها.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">إن تدويرالمفتاح المشفر لا يسمح لك بالحصول على رابط محادثة دون إنشاء محادثة جماعية جديدة.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">هل ترغب في إنشاء محادثة جماعية جديدة والحصول على رابط محادثة؟</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -4155,13 +4149,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] قد تم تغييره للقراءة فقط من قبل [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to a standard participant by [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] تم تغييره إلى مشارك عادي من قبل [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] تم تغيير دوره إلى مُضيف من قبل [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s قد تم تغييره للقراءة فقط من قبل %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to a standard participant by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s تم تغييره إلى مشارك عادي من قبل %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s تم تغيير دوره إلى مُضيف من قبل %2$s</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -4306,7 +4300,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">افتح تلقائيًا المجلدات التي تحتوي فقط على الصور ومقاطع الفيديو في طريقة عرض اكتشاف الوسائط. يتيح لك ذلك رؤية الوسائط في وضع المعرض والفلترة حسب التاريخ.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">نظرًا لأن هذا المجلد يحتوي فقط على الصور ومقاطع الفيديو، فقد قمنا بفتحه تلقائيًا في عرض اكتشاف الوسائط. يمكنك الاستمتاع بالمحتوى المرئي الخاص بك بتصميم أكثر غامرة. يمكنك تعطيل هذا في الإعدادات.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">الإعدادات</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5967,7 +5961,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">غرفة الانتظار</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">يمكن فقط للمشاركين الذين تم قبولهم من قبل المضيف الانضمام إلى الاجتماع.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">لن يتم إرسال المشاركين الذين أضافهم غير المضيفين أثناء المكالمات إلى غرفة الانتظار.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -6017,8 +6011,12 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">انظر إلى غرفة الانتظار</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d participant is waiting to join the call.</item>
-        <item quantity="other">%1$d participants are waiting to join the call.</item>
+        <item quantity="zero">%1$d مشارك ينتظر الانضمام إلى المكالمة</item>
+        <item quantity="one">%1$d مشارك ينتظر الانضمام إلى المكالمة</item>
+        <item quantity="two">%1$d مشاركان ينتظران الانضمام إلى المكالمة</item>
+        <item quantity="few">%1$d مشاركون ينتظرون الانضمام إلى المكالمة</item>
+        <item quantity="many">%1$d مشاركاً ينتظرون الانضمام إلى المكالمة</item>
+        <item quantity="other">%1$d مشارك ينتظرون الانضمام إلى المكالمة</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">رفض دخول %1$s؟</string>
@@ -6065,7 +6063,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">اكتشاف الوسائط في المجلدات الفرعية</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in media discovery view.</string>
+    <string name="settings_media_discovery_sub_folder_context">سيتم أيضًا تضمين الصور ومقاطع الفيديو من المجلدات الفرعية في عرض اكتشاف الوسائط.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">لا يوجد نتائج</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -6085,38 +6083,57 @@
     <!-- Description text from contact info screen when contact is not verified -->
     <string name="contact_verify_credentials_not_verified_text">لم يتم التحقق</string>
     <!-- Option to show the list of participants in the call in the meeting screen -->
-    <string name="meetings_bottom_panel_participants_in_call_button">In call</string>
+    <string name="meetings_bottom_panel_participants_in_call_button">في المكالمة</string>
     <!-- Option to show the list of participants who are not on the call in the meeting screen -->
-    <string name="meetings_bottom_panel_participants_not_in_call_button">Not in call</string>
+    <string name="meetings_bottom_panel_participants_not_in_call_button">ليس في المكالمة</string>
     <!-- Label to show the number of participants in the waiting room-->
-    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Waiting (%d)</string>
+    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">بالانتظار (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">اظهار الكل</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
-    <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">لا ترفض</string>
+    <!--  -->
+    <string name="camera_uploads_up_to_date">تم تحديث ترفيعات الكاميرا</string>
+    <!--  -->
+    <string name="camera_uploads_paused_due_to_no_internet">توقف الترفيع مؤقتًا بسبب عدم وجود اتصال بالإنترنت</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
-        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+        <item quantity="zero">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
+        <item quantity="one">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
+        <item quantity="two">ترفيعات الكاميرا قيد الإنجاز، %1$d ملفان معلقان</item>
+        <item quantity="few">ترفيعات الكاميرا قيد الإنجاز %1$d ملفات معلقة</item>
+        <item quantity="many">ترفيعات الكاميرا قيد الإنجاز، %1$d ملفاً معلقاً</item>
+        <item quantity="other">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
-        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+        <item quantity="zero">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
+        <item quantity="one">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
+        <item quantity="two">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفين</item>
+        <item quantity="few">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفات</item>
+        <item quantity="many">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفاً</item>
+        <item quantity="other">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">لدى ميغا MEGA بوصول محدود إلى مكتبة الصور ولا يمكنها عمل نسخة احتياطية لجميع صورك.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
+    <string name="camera_uploads_change_permissions">انقر لتغيير الأذونات.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
     <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
-        <item quantity="one">Invitee (%d)</item>
-        <item quantity="other">Invitees (%d)</item>
+        <item quantity="zero">المدعوون (%d)</item>
+        <item quantity="one">المدعوون (%d)</item>
+        <item quantity="two">المدعوون (%d)</item>
+        <item quantity="few">المدعوون (%d)</item>
+        <item quantity="many">المدعوون (%d)</item>
+        <item quantity="other">المدعوون (%d)</item>
     </plurals>
     <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
     <plurals name="meetings_meeting_not_in_call_section_subtitle">
-        <item quantity="one">%d invitee</item>
-        <item quantity="other">%d invitees</item>
+        <item quantity="zero">%d مدعو</item>
+        <item quantity="one">%d مدعو</item>
+        <item quantity="two">%d مدعوان</item>
+        <item quantity="few">%d مدعوون</item>
+        <item quantity="many">%d مدعواً</item>
+        <item quantity="other">%d مدعو</item>
     </plurals>
 </resources>

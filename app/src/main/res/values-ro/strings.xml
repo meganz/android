@@ -138,8 +138,6 @@
     <string name="password_text">Parolă</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">Confirmă parola</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Ești utilizator nou pe MEGA?</string>
     <!-- button that allows the user to create an account -->
@@ -1933,8 +1931,6 @@
     <string name="intent_not_available_2fa">Nu există nicio aplicație disponibilă care să permită autentificarea cu doi factori pe dispozitiv</string>
     <!-- Text button -->
     <string name="general_close">Închide</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Exportă cheia de recuperare pentru a termina</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Aplicație de autentificare cu doi factori</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2579,8 +2575,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] s-a alăturat chatului de grup.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Această conversație nu va mai fi accesibilă prin linkul de chat după ce a fost eliminat.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">Rotația cheii criptate nu îți permite să obții un link de chat fără a crea un nou chat de grup.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Vrei să creezi un nou chat de grup și să obții un link al chatului?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -5405,7 +5399,9 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Vezi toți</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Nu refuza</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">Încărcări camere au fost actualizate</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">Încărcarea întreruptă din cauza lipsei conexiunii la internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -5413,6 +5409,7 @@
         <item quantity="few">Încărcări cameră în desfășurare, %1$d&#160;fișiere în așteptare</item>
         <item quantity="other">Încărcări cameră în desfășurare, %1$d de fișiere în așteptare</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="one">Încărcări cameră complete, %1$d&#160;fișier încărcat</item>
         <item quantity="few">Încărcări cameră complete, %1$d&#160;fișiere încărcate</item>

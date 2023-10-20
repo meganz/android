@@ -134,8 +134,6 @@
     <string name="password_text">Mật khẩu</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">Xác thực mật khẩu</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">XEM</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Mới đến MEGA?</string>
     <!-- button that allows the user to create an account -->
@@ -1847,8 +1845,6 @@
     <string name="intent_not_available_2fa">Hiện không có ứng&#160;dụng nào phù&#160;hợp để bật xác&#160;thực 2&#160;yếu&#160;tố cho thiết&#160;bị của bạn</string>
     <!-- Text button -->
     <string name="general_close">Đóng</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Xuất&#160;ra Chìa&#160;Khóa Phục&#160;Hồi để hoàn&#160;tất</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">App Xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2453,8 +2449,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] đã tham gia vào nhóm chát.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Cuộc trò truyện này sẽ không thể truy cập được nữa ngay sau khi xóa bỏ liên kết vào chat.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">Luân&#160;Phiên Chìa&#160;Khóa&#160;Mã sẽ không&#160;cho phép bạn đi vào liên&#160;kết tới cuộc&#160;chát mà bỏ&#160;qua việc tạo nhóm&#160;chát mới.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Bạn có muốn tạo ra phòng chát mới và lấy đường liên kết vào phòng chát hay không?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -4943,12 +4937,15 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Xem tất&#160;cả</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Không từ&#160;chối</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">Đăng tải camêra đã được cập&#160;nhật</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="other">Việc đăng&#160;tải camêra đang được thực hiện, %1$d tệp đang chờ</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="other">Đăng tải camêra hoàn tất, %1$d tệp tin đã được tải lên</item>
     </plurals>
