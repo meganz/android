@@ -23,6 +23,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor() {
             pausedFileTransfers = onlyFiles.count { it.isPaused },
             totalFinishedTransfers = list.count { it.isFinished },
             totalFinishedFileTransfers = onlyFiles.count { it.isFinished },
+            totalCompletedFileTransfers = onlyFiles.count { it.isFinished && transferredBytes[it.tag] == it.totalBytes },
             totalBytes = onlyFiles.sumOf { it.totalBytes },
             transferredBytes = onlyFiles.sumOf {
                 //if it's finished always totalBytes as it can be cancelled or failed

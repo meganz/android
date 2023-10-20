@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
@@ -46,6 +48,7 @@ import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.UUID
 import java.util.concurrent.Executor
@@ -71,6 +74,9 @@ class DownloadsWorkerTest {
     private val areNotificationsEnabledUseCase = mock<AreNotificationsEnabledUseCase>()
     private val correctActiveTransfersUseCase = mock<CorrectActiveTransfersUseCase>()
     private val overQuotaNotificationBuilder = mock<OverQuotaNotificationBuilder>()
+    private val clearActiveTransfersIfFinishedUseCase =
+        mock<ClearActiveTransfersIfFinishedUseCase>()
+    private val transfersFinishedNotificationMapper = mock<TransfersFinishedNotificationMapper>()
 
     @Before
     fun setup() {
@@ -115,6 +121,8 @@ class DownloadsWorkerTest {
             areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
             notificationManager = mock(),
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
+            clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
+            transfersFinishedNotificationMapper = transfersFinishedNotificationMapper
         )
     }
 
@@ -204,12 +212,55 @@ class DownloadsWorkerTest {
     }
 
     @Test
-    fun `test that overQuotaNotificationBuilder is invoked when`() = runTest {
-        val transferTotal = mockActiveTransferTotals(false)
-        commonStub(transferTotals = listOf(transferTotal), overQuota = true)
-        underTest.doWork()
-        verify(overQuotaNotificationBuilder).invoke()
-    }
+    fun `test that overQuotaNotificationBuilder is invoked when transfers finishes with incomplete transfers and over quota true`() =
+        runTest {
+            val transferTotal = mockActiveTransferTotals(false)
+            commonStub(transferTotals = listOf(transferTotal), overQuota = true)
+            underTest.doWork()
+            verify(overQuotaNotificationBuilder).invoke()
+            verifyNoInteractions(transfersFinishedNotificationMapper)
+        }
+
+    @Test
+    fun `test that transfersFinishedNotificationMapper is invoked when transfers finishes with incomplete transfers and over quota false`() =
+        runTest {
+            val transferTotal = mockActiveTransferTotals(false)
+            commonStub(transferTotals = listOf(transferTotal))
+            underTest.doWork()
+            verify(transfersFinishedNotificationMapper).invoke(transferTotal)
+            verifyNoInteractions(overQuotaNotificationBuilder)
+        }
+
+    @Test
+    fun `test that transfersFinishedNotificationMapper is invoked when transfer finishes with completed transfers`() =
+        runTest {
+            val transferTotal = mockActiveTransferTotals(true)
+            whenever(transferTotal.totalTransfers).thenReturn(1)
+            commonStub(transferTotals = listOf(transferTotal))
+            underTest.doWork()
+            verify(transfersFinishedNotificationMapper).invoke(transferTotal)
+            verifyNoInteractions(overQuotaNotificationBuilder)
+        }
+
+    @Test
+    fun `test that transfersFinishedNotificationMapper is not invoked when transfer finishes with no transfers`() =
+        runTest {
+            val transferTotal = mockActiveTransferTotals(true)
+            whenever(transferTotal.totalTransfers).thenReturn(0)
+            commonStub(transferTotals = listOf(transferTotal))
+            underTest.doWork()
+            verifyNoInteractions(transfersFinishedNotificationMapper)
+            verifyNoInteractions(overQuotaNotificationBuilder)
+        }
+
+    @Test
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when transfers finishes`() =
+        runTest {
+            val transferTotal = mockActiveTransferTotals(true)
+            commonStub(transferTotals = listOf(transferTotal))
+            underTest.doWork()
+            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
+        }
 
     private suspend fun commonStub(
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),

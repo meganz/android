@@ -6,8 +6,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.presentation.transfers.notification.DefaultDownloadNotificationMapper
 import mega.privacy.android.app.presentation.transfers.notification.DefaultOverQuotaNotificationBuilder
+import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 
 /**
  * Module for transfers
@@ -29,4 +31,10 @@ abstract class TransfersModule {
      */
     @Binds
     abstract fun bindOverQuotaNotificationBuilder(builder: DefaultOverQuotaNotificationBuilder): OverQuotaNotificationBuilder
+
+    /**
+     * Binds [TransfersFinishedNotificationMapper] to its default implementation [DefaultTransfersFinishedNotificationMapper]
+     */
+    @Binds
+    abstract fun bindTransfersFinishedNotificationMapper(builder: DefaultTransfersFinishedNotificationMapper): TransfersFinishedNotificationMapper
 }

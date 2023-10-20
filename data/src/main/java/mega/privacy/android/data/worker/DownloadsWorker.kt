@@ -26,10 +26,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
@@ -51,10 +54,12 @@ class DownloadsWorker @AssistedInject constructor(
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val downloadNotificationMapper: DownloadNotificationMapper,
+    private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
     private val notificationManager: NotificationManagerCompat,
     private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
     private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
+    private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork() = coroutineScope {
@@ -76,8 +81,12 @@ class DownloadsWorker @AssistedInject constructor(
                 }
                 .last().let { (lastActiveTransferTotals, _, overQuota) ->
                     stopService(monitorJob)
+                    clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
                     if (lastActiveTransferTotals.hasCompleted()) {
                         Timber.d("DownloadsWorker Finished Successful: $lastActiveTransferTotals")
+                        if (lastActiveTransferTotals.totalTransfers > 0) {
+                            showFinishNotification(lastActiveTransferTotals)
+                        }
                         Result.success()
                     } else {
                         if (overQuota
@@ -86,7 +95,9 @@ class DownloadsWorker @AssistedInject constructor(
                             )
                         ) {
                             //the over quota notification is shown if the app is in background (if not a full dialog will be shown in the app)
-                            finalNotification(overQuotaNotificationBuilder())
+                            showFinalNotification(overQuotaNotificationBuilder())
+                        } else {
+                            showFinishNotification(lastActiveTransferTotals)
                         }
                         Timber.d("DownloadsWorker finished Failure: $lastActiveTransferTotals")
                         Result.failure()//to retry in the future
@@ -128,8 +139,11 @@ class DownloadsWorker @AssistedInject constructor(
         )
     }
 
+    private suspend fun showFinishNotification(activeTransferTotals: ActiveTransferTotals) =
+        showFinalNotification(transfersFinishedNotificationMapper(activeTransferTotals))
+
     @SuppressLint("MissingPermission")
-    private fun finalNotification(notification: Notification) {
+    private fun showFinalNotification(notification: Notification) {
         notificationManager.notify(
             NOTIFICATION_DOWNLOAD_FINAL,
             notification,

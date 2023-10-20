@@ -9,6 +9,7 @@ package mega.privacy.android.domain.entity.transfer
  * @param pausedFileTransfers the total amount of paused file transfers of this type
  * @param totalFinishedTransfers the amount of current finished transfers
  * @param totalFinishedFileTransfers the amount of current finished file transfers
+ * @param totalCompletedFileTransfers the amount of current completed file transfers (finished without errors)
  * @param totalBytes total bytes of all transfers of this type
  * @param transferredBytes total bytes already transferred of active transfers of this type
  */
@@ -19,6 +20,7 @@ data class ActiveTransferTotals(
     val pausedFileTransfers: Int,
     val totalFinishedTransfers: Int,
     val totalFinishedFileTransfers: Int,
+    val totalCompletedFileTransfers: Int,
     val totalBytes: Long,
     val transferredBytes: Long,
 ) {
@@ -42,10 +44,17 @@ data class ActiveTransferTotals(
     /**
      * Represents the percentage (with base 100) of the already transferred bytes
      */
-    val progressPercent by lazy { if (totalBytes == 0L) 0 else ((transferredBytes * 100L) / totalBytes).toInt() }
+    val progressPercent =
+        if (totalBytes == 0L) 0 else ((transferredBytes * 100L) / totalBytes).toInt()
 
     /**
      * The total number of active file transfers of this specific type that are pending for download (not finished), whether paused or in progress.
      */
-    val pendingFileTransfers by lazy { totalFileTransfers - totalFinishedFileTransfers }
+    val pendingFileTransfers = totalFileTransfers - totalFinishedFileTransfers
+
+    /**
+     * The total number of finished not completed file transfers (transfers with errors)
+     */
+    val totalFinishedNotCompletedFileTransfers =
+        totalFinishedFileTransfers - totalCompletedFileTransfers
 }
