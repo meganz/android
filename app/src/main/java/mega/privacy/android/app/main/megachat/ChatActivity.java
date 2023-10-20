@@ -4479,17 +4479,25 @@ public class ChatActivity extends PasscodeActivity
                 return;
 
             MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
-            if (!checkIfCanJoinOneToOneCall(chatIdBanner)) {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
-                return;
-            }
 
-            if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
-                    callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
+            if (chatRoom != null && chatRoom.isActive() && !chatRoom.isArchived() && chatRoom.isMeeting() &&
+                    callBanner != null && callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                 startVideo = false;
-                checkCallInThisChat();
+                shouldCallRing = false;
+                startCall();
             } else {
-                returnCall(this, chatIdBanner, passcodeManagement);
+                if (!checkIfCanJoinOneToOneCall(chatIdBanner)) {
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
+                    return;
+                }
+
+                if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                        callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
+                    startVideo = false;
+                    checkCallInThisChat();
+                } else {
+                    returnCall(this, chatIdBanner, passcodeManagement);
+                }
             }
         } else if (id == R.id.expand_input_text_rl || id == R.id.expand_input_text_icon) {
             isInputTextExpanded = !isInputTextExpanded;
