@@ -157,7 +157,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         url = decodeURL(url)
-        isLoggedIn = dbH.credentials != null
+        isLoggedIn = megaApi.isLoggedIn != 0 && dbH.credentials != null
         needsRefreshSession = megaApi.rootNode == null
 
         collectFlows()
