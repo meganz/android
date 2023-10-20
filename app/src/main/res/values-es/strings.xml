@@ -138,8 +138,6 @@
     <string name="password_text">Contraseña</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">Confirmar contraseña</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">¿Nuevo en MEGA?</string>
     <!-- button that allows the user to create an account -->
@@ -1933,8 +1931,6 @@
     <string name="intent_not_available_2fa">No hay ninguna aplicación disponible para activar la Autenticación de dos factores en tu dispositivo</string>
     <!-- Text button -->
     <string name="general_close">Cerrar</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Exporta tu Clave de recuperación antes de finalizar el proceso</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">App de autenticación de dos factores</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2579,8 +2575,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] se ha unido al chat de grupo.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Al eliminar el enlace ya no tendrás acceso a esta conversación.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">La rotación de la clave de cifrado no te permite obtener un enlace del chat sin crear un nuevo chat de grupo.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">¿Quieres crear un nuevo chat de grupo y obtener un enlace del chat?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -5405,7 +5399,9 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Ver todo</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">No denegar</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">Subidas de la cámara actualizadas</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">La subida se ha detenido debido a la falta de conexión a Internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -5413,6 +5409,7 @@
         <item quantity="many">Subidas de la cámara en curso, %1$d de archivos pendientes</item>
         <item quantity="other">Subidas de la cámara en curso, %1$d archivos pendientes</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="one">Subidas de la cámara completadas, %1$d archivo subido</item>
         <item quantity="many">Subidas de la cámara completadas, %1$d de archivos subidos</item>
@@ -5424,12 +5421,14 @@
     <string name="camera_uploads_change_permissions">Pulsa para cambiar los permisos.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
     <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
-        <item quantity="one">Invitee (%d)</item>
-        <item quantity="other">Invitees (%d)</item>
+        <item quantity="one">Invitado (%d)</item>
+        <item quantity="many">Invitados (%d)</item>
+        <item quantity="other">Invitados (%d)</item>
     </plurals>
     <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
     <plurals name="meetings_meeting_not_in_call_section_subtitle">
-        <item quantity="one">%d invitee</item>
-        <item quantity="other">%d invitees</item>
+        <item quantity="one">%d invitado</item>
+        <item quantity="many">%d de invitados</item>
+        <item quantity="other">%d invitados</item>
     </plurals>
 </resources>

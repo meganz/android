@@ -134,8 +134,6 @@
     <string name="password_text">パスワード</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">パスワードの確認</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">MEGAは初めてですか？</string>
     <!-- button that allows the user to create an account -->
@@ -1847,8 +1845,6 @@
     <string name="intent_not_available_2fa">お使いの端末で二要素認証を有効にするアプリがありません</string>
     <!-- Text button -->
     <string name="general_close">閉じる</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">あなたの回復キーをエクスポートしてから終了します</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">二要素認証アプリ</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2453,8 +2449,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]さんがグループチャットに参加しました。[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">この会話は、チャットリンクを一度削除すると、そこからアクセスできなくなります。</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">暗号化されたキーローテーションでは、新規グループチャットを作成せずにチャットリンクを取得することはできません。</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">新規グループチャットを作成してチャットリンクを取得しますか？</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -4943,12 +4937,15 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">すべて表示</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">拒否しない</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">カメラアップロードが更新されました</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">インターネット接続がないためアップロードが一時停止されました</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="other">カメラアップロードが進行中です。%1$d個のファイルが保留中です。</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="other">カメラアップロードが完了しました。%1$d個のファイルがアップロードされました。</item>
     </plurals>

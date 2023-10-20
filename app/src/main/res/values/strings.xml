@@ -136,8 +136,6 @@
     <string name="password_text">Password</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">Confirm password</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">New to MEGA?</string>
     <!-- button that allows the user to create an account -->
@@ -1890,8 +1888,6 @@
     <string name="intent_not_available_2fa">There isn’t any available app to enable two-factor authentication on your device</string>
     <!-- Text button -->
     <string name="general_close">Close</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Export your Recovery key to finish</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Two-factor authentication app</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2516,8 +2512,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] joined the group chat.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">This conversation will no longer be accessible through the chat link once it has been removed.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">Encrypted Key Rotation does not allow you to get a chat link without creating a new group chat.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Do you want to create a new group chat and get a chat link?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -5174,13 +5168,16 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">See all</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="one">Camera uploads in progress, %1$d file pending</item>
         <item quantity="other">Camera uploads in progress, %1$d files pending</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
         <item quantity="other">Camera uploads complete, %1$d files uploaded</item>

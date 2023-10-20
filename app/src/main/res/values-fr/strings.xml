@@ -138,8 +138,6 @@
     <string name="password_text">Mot de passe</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">Confirmez le mot de passe</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Première fois sur MEGA ?</string>
     <!-- button that allows the user to create an account -->
@@ -1933,8 +1931,6 @@
     <string name="intent_not_available_2fa">Il n’y a aucune appli qui puisse gérer l’authentification à deux facteurs sur votre appareil</string>
     <!-- Text button -->
     <string name="general_close">Fermer</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Exportez votre clé de récupération pour terminer</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Appli d’authentification à deux facteurs</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2579,8 +2575,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] fait partie de la conversation de groupe.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Il ne sera plus possible d’accéder à cette conversation par le lien une fois qu’il sera supprimé.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">La rotation de la clé chiffrée ne vous permet pas d’obtenir de lien vers une conversation sans en créer une nouvelle.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Voulez-vous créer une nouvelle conversation de groupe et obtenir un lien vers celle-ci ?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -5405,7 +5399,9 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Afficher tous les participants</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Ne pas refuser</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">Les téléversements de l’appareil photo sont à jour</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">Le téléversement a été mis en pause, car il n’y a pas de connexion à Internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -5413,6 +5409,7 @@
         <item quantity="many">Téléversements de l’appareil photo en cours, %1$d de fichiers en attente</item>
         <item quantity="other">Téléversements de l’appareil photo en cours, %1$d&#160;fichiers en attente</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="one">Téléversements de l’appareil photo terminés, %1$d&#160;fichier téléversé</item>
         <item quantity="many">Téléversements de l’appareil photo terminés, %1$d de fichiers téléversés</item>

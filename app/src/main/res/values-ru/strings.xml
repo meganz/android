@@ -140,8 +140,6 @@
     <string name="password_text">Пароль</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">Подтвердите пароль</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">АБВ</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Впервые в MEGA?</string>
     <!-- button that allows the user to create an account -->
@@ -1976,8 +1974,6 @@
     <string name="intent_not_available_2fa">На устройстве нет доступного приложения для включения двухфакторной аутентификации</string>
     <!-- Text button -->
     <string name="general_close">Закрыть</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Экспортируйте ключ восстановления, чтобы завершить</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Приложение для двухфакторной аутентификации</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2642,8 +2638,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] вошёл в чат.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Разговор больше не будет доступен по ссылке на чат после удаления.</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">Чередование ключей шифрования не позволяет получить ссылку на чат без создания нового группового чата.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Хотите создать новый групповой чат и получить ссылку на него?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -5636,7 +5630,9 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Посмотреть всех</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Пустить</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">Загрузки из камеры обновлены</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">Загрузка приостановлена из-за отсутствия подключения к Интернету</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
@@ -5645,6 +5641,7 @@
         <item quantity="many">Выполняется загрузка из камеры, %1$d файлов ожидает обработки</item>
         <item quantity="other">Выполняется загрузка из камеры, %1$d файла ожидает обработки</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="one">Загрузка из камеры завершена, загружен %1$d файл</item>
         <item quantity="few">Загрузка из камеры завершена, загружено %1$d файла</item>

@@ -134,8 +134,6 @@
     <string name="password_text">密碼</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">確認密碼</string>
-    <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">還沒有MEGA帳戶？</string>
     <!-- button that allows the user to create an account -->
@@ -1847,8 +1845,6 @@
     <string name="intent_not_available_2fa">在您的裝置上，沒有任何可用的應用程式可以用來啟用雙重驗證</string>
     <!-- Text button -->
     <string name="general_close">關閉</string>
-    <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">匯出你的還原金鑰後就完成了</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">雙重驗證應用程式</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2268,7 +2264,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">還有%1$s和%2$d</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">在您產生對話連結之前，您需要先設定說明：</string>
+    <string name="message_error_set_title_get_link">在您生成對話連結之前，您需要先設定說明：</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">已複製連結到剪貼簿</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
@@ -2453,8 +2449,6 @@
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]已加入群組對話。[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">一旦它被刪除，將無法再透過此連結存取對話內容。</string>
-    <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">加密金鑰輪替功能不允許您在未建立新群組對話的情況下獲取對話連結。</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">您想建立一個新的群組對話並產出對話連結嗎？</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -4943,12 +4937,15 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">查看全部</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">不要拒絕</string>
+    <!--  -->
     <string name="camera_uploads_up_to_date">相機上傳已更新</string>
+    <!--  -->
     <string name="camera_uploads_paused_due_to_no_internet">由於沒有網路連線，上傳已暫停</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="other">相機上傳正在進行中，%1$d個檔案待處理</item>
     </plurals>
+    <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
         <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
     </plurals>
