@@ -737,11 +737,14 @@ class CameraUploadsWorker @AssistedInject constructor(
             val shouldBeSkipped = createTemporaryFileIfNeeded(record)
             if (shouldBeSkipped) continue
             if (record.isCopyOnly) {
-                updateToUploadCount(record)
                 uploadFileAsyncList.add(launch {
                     semaphore.acquire()
                     Timber.d("Copy from node, file timestamp is: ${record.timestamp}")
-                    updateToUploadCount(record)
+                    updateToUploadCount(
+                        filePath = record.localPath,
+                        folderType = if (record.isSecondary) CameraUploadFolderType.Secondary
+                        else CameraUploadFolderType.Primary,
+                    )
                     copyNode(
                         record = record,
                         parentNodeId = parentNodeId,
@@ -752,7 +755,12 @@ class CameraUploadsWorker @AssistedInject constructor(
                 uploadFileAsyncList.add(launch {
                     semaphore.acquire()
                     getFileToUpload(record, isCompressedVideo)?.let {
-                        updateToUploadCount(record)
+                        updateToUploadCount(
+                            filePath = record.newPath?.takeIf { path -> File(path).exists() }
+                                ?: record.localPath,
+                            folderType = if (record.isSecondary) CameraUploadFolderType.Secondary
+                            else CameraUploadFolderType.Primary,
+                        )
                         val lastModified = getLastModifiedTime(record)
                         startUploadUseCase(
                             localPath = it.path,
@@ -867,7 +875,13 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun onGlobalTransferUpdated(globalTransfer: TransferEvent, record: SyncRecord) {
         when (globalTransfer) {
             is TransferEvent.TransferFinishEvent -> onTransferFinished(globalTransfer, record)
-            is TransferEvent.TransferUpdateEvent -> onTransferUpdated(globalTransfer, record)
+            is TransferEvent.TransferUpdateEvent -> onTransferUpdated(
+                globalTransfer,
+                if (record.isSecondary) CameraUploadFolderType.Secondary
+                else CameraUploadFolderType.Primary,
+                record.id.toLong(),
+            )
+
             is TransferEvent.TransferTemporaryErrorEvent -> onTransferTemporaryError(globalTransfer)
             // No further action necessary for these Scenarios
             is TransferEvent.TransferStartEvent,
@@ -889,7 +903,13 @@ class CameraUploadsWorker @AssistedInject constructor(
         val transfer = globalTransfer.transfer
         val error = globalTransfer.error
         try {
-            updateUploadedCountAfterTransfer(record, transfer)
+            updateUploadedCountAfterTransfer(
+                folderType =
+                if (record.isSecondary) CameraUploadFolderType.Secondary
+                else CameraUploadFolderType.Primary,
+                id = record.id.toLong(),
+                transfer = transfer,
+            )
             transferFinished(transfer, error, record)
         } catch (th: Throwable) {
             Timber.e(th)
@@ -904,11 +924,16 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun onTransferUpdated(
         globalTransfer: TransferEvent.TransferUpdateEvent,
-        record: SyncRecord,
+        folderType: CameraUploadFolderType,
+        id: Long,
     ) {
         val transfer = globalTransfer.transfer
         runCatching {
-            updateUploadedCountAfterTransfer(record, transfer)
+            updateUploadedCountAfterTransfer(
+                folderType = folderType,
+                id = id,
+                transfer = transfer,
+            )
         }.onFailure {
             Timber.d("Cancelled Transfer Node: ${transfer.nodeHandle}")
             cancelPendingTransfer(transfer)
@@ -960,7 +985,14 @@ class CameraUploadsWorker @AssistedInject constructor(
                                 isSecondary = isSecondary,
                             )
                         }
-                        updateUploadedCountAfterCopy(record)
+                        updateUploadedCountAfterCopy(
+                            folderType =
+                            if (record.isSecondary) CameraUploadFolderType.Secondary
+                            else CameraUploadFolderType.Primary,
+                            filePath = record.localPath,
+                            id = record.id.toLong(),
+                            nodeId = nodeId,
+                        )
 
                         Timber.d("Copy node successful")
                     }
@@ -1270,16 +1302,16 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      *  Update total to upload count
      *
-     *  @param record the [SyncRecord] associated to the file to transfer
+     *  @param filePath
+     *  @param folderType
      */
     private suspend fun updateToUploadCount(
-        record: SyncRecord,
+        filePath: String,
+        folderType: CameraUploadFolderType,
     ) {
-        val bytes = File(record.localPath).length()
+        val bytes = File(filePath).length()
         increaseTotalToUpload(
-            cameraUploadFolderType =
-            if (record.isSecondary) CameraUploadFolderType.Secondary
-            else CameraUploadFolderType.Primary,
+            cameraUploadFolderType = folderType,
             bytesToUpload = bytes,
         )
         displayUploadProgress()
@@ -1288,40 +1320,44 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      *  Update total uploaded count after copying a node
      *
-     *  @param record the [SyncRecord] associated to the file to transfer
+     *  @param folderType
+     *  @param id
+     *  @param filePath
+     *  @param nodeId
      */
     private suspend fun updateUploadedCountAfterCopy(
-        record: SyncRecord,
+        folderType: CameraUploadFolderType,
+        id: Long,
+        filePath: String,
+        nodeId: NodeId,
     ) {
         updateUploadedCount(
-            cameraUploadFolderType =
-            if (record.isSecondary) CameraUploadFolderType.Secondary
-            else CameraUploadFolderType.Primary,
+            cameraUploadFolderType = folderType,
             isFinished = true,
-            nodeHandle = record.nodeHandle,
-            recordId = record.id,
-            bytesUploaded = File(record.localPath).length(),
+            nodeHandle = nodeId.longValue,
+            recordId = id,
+            bytesUploaded = File(filePath).length(),
         )
     }
 
     /**
      *  Update total uploaded count after a transfer update or finish
      *
-     *  @param record the [SyncRecord] associated to the file to transfer
+     *  @param folderType
+     *  @param id
      *  @param transfer the [Transfer] associated to the file to transfer.
      *                  The transfer can be ongoing or finished.
      */
     private suspend fun updateUploadedCountAfterTransfer(
-        record: SyncRecord,
+        folderType: CameraUploadFolderType,
+        id: Long,
         transfer: Transfer,
     ) {
         updateUploadedCount(
-            cameraUploadFolderType =
-            if (record.isSecondary) CameraUploadFolderType.Secondary
-            else CameraUploadFolderType.Primary,
+            cameraUploadFolderType = folderType,
             isFinished = transfer.isFinished,
             nodeHandle = transfer.nodeHandle,
-            recordId = record.id,
+            recordId = id,
             bytesUploaded = transfer.transferredBytes,
         )
     }
@@ -1340,7 +1376,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         cameraUploadFolderType: CameraUploadFolderType,
         isFinished: Boolean,
         nodeHandle: Long?,
-        recordId: Int,
+        recordId: Long,
         bytesUploaded: Long,
     ) {
         increaseTotalUploaded(
@@ -1723,7 +1759,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         isFinished: Boolean,
         bytesUploaded: Long,
         nodeHandle: Long?,
-        recordId: Int,
+        recordId: Long,
     ) = stateUpdateMutex.withLock {
         when (cameraUploadFolderType) {
             CameraUploadFolderType.Primary -> state.value.primaryCameraUploadsState
@@ -1782,9 +1818,9 @@ class CameraUploadsWorker @AssistedInject constructor(
         toUploadCount: Int? = null,
         uploadedCount: Int? = null,
         bytesToUploadCount: Long? = null,
-        recordId: Int? = null,
+        recordId: Long? = null,
         bytesUploaded: Long? = null,
-        bytesUploadedTable: Hashtable<Int, Long>? = null,
+        bytesUploadedTable: Hashtable<Long, Long>? = null,
         bytesFinishedUploadedCount: Long? = null,
     ) {
         when (cameraUploadFolderType) {

@@ -90,23 +90,23 @@ internal class CameraUploadsStateTest {
 
     @Test
     fun `test that totalBytesUploaded returns the sum of primaryBytesUploaded and secondaryBytesUploaded`() {
-        val fileA = 1 to 10000000L / 2
-        val fileB = 2 to 10000000L / 2
+        val fileA = 1L to 10000000L / 2
+        val fileB = 2L to 10000000L / 2
         val primaryBytesFinishedUploadedCount = 1000L
         val primaryBytesUploaded =
             primaryBytesFinishedUploadedCount + fileA.second + fileB.second
-        val fileC = 3 to 2000000L / 2
-        val fileD = 4 to 2000000L / 2
+        val fileC = 3L to 2000000L / 2
+        val fileD = 4L to 2000000L / 2
         val secondaryBytesFinishedUploadedCount = 2000L
         val secondaryBytesUploaded =
             secondaryBytesFinishedUploadedCount + fileC.second + fileD.second
         val expected = primaryBytesUploaded + secondaryBytesUploaded
 
-        val primaryBytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+        val primaryBytesInProgressUploadedTable = Hashtable<Long, Long>().apply {
             this[fileA.first] = fileA.second
             this[fileB.first] = fileB.second
         }
-        val secondaryBytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+        val secondaryBytesInProgressUploadedTable = Hashtable<Long, Long>().apply {
             this[fileC.first] = fileC.second
             this[fileD.first] = fileD.second
         }
@@ -147,13 +147,13 @@ internal class CameraUploadsStateTest {
     fun `test that progress returns the correct progress if totalUploadBytes is not 0L`() {
         val primaryBytesToUpload = 2000L
         val secondaryBytesToUpload = 2000L
-        val fileA = 1 to 500L / 2
-        val fileB = 2 to 500L / 2
+        val fileA = 1L to 500L / 2
+        val fileB = 2L to 500L / 2
         val primaryBytesFinishedUploadedCount = 1000L
         val primaryBytesUploaded =
             primaryBytesFinishedUploadedCount + fileA.second + fileB.second
-        val fileC = 3 to 500L / 2
-        val fileD = 4 to 500L / 2
+        val fileC = 3L to 500L / 2
+        val fileD = 4L to 500L / 2
         val secondaryBytesFinishedUploadedCount = 2000L
         val secondaryBytesUploaded =
             secondaryBytesFinishedUploadedCount + fileC.second + fileD.second
@@ -161,12 +161,12 @@ internal class CameraUploadsStateTest {
             (((primaryBytesUploaded + secondaryBytesUploaded).toDouble() / (primaryBytesToUpload + secondaryBytesToUpload)) * 100)
                 .roundToInt()
 
-        val primaryBytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+        val primaryBytesInProgressUploadedTable = Hashtable<Long, Long>().apply {
             this[fileA.first] = fileA.second
             this[fileB.first] = fileB.second
         }
 
-        val secondaryBytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+        val secondaryBytesInProgressUploadedTable = Hashtable<Long, Long>().apply {
             this[fileC.first] = fileC.second
             this[fileD.first] = fileD.second
         }

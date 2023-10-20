@@ -39,11 +39,11 @@ class CameraUploadsFolderStateTest {
 
     @Test
     fun `test that totalUploadedCount is equal to the sum of bytes transferred`() {
-        val fileA = 1 to 1000L
-        val fileB = 2 to 2000L
+        val fileA = 1L to 1000L
+        val fileB = 2L to 2000L
         val bytesFinishedUploadedCount = 100L
         val expected = bytesFinishedUploadedCount + fileA.second + fileB.second
-        val bytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+        val bytesInProgressUploadedTable = Hashtable<Long, Long>().apply {
             this[fileA.first] = fileA.second
             this[fileB.first] = fileB.second
         }
@@ -59,14 +59,14 @@ class CameraUploadsFolderStateTest {
     @Test
     fun `test that when bytesToUploadCount is not 0 then progress returns the current progress`() {
         val bytesToUploadCount = 1000L
-        val fileA = 1 to 250L
-        val fileB = 2 to 250L
+        val fileA = 1L to 250L
+        val fileB = 2L to 250L
         val bytesFinishedUploadedCount = 100L
 
         val expected =
             (((bytesFinishedUploadedCount + fileA.second + fileB.second).toDouble() / (bytesToUploadCount)) * 100).roundToInt()
 
-        val bytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+        val bytesInProgressUploadedTable = Hashtable<Long, Long>().apply {
             this[fileA.first] = fileA.second
             this[fileB.first] = fileB.second
         }

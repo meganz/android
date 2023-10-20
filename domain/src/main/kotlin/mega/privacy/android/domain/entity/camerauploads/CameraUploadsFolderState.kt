@@ -25,7 +25,7 @@ data class CameraUploadsFolderState(
     val uploadedCount: Int = 0,
     val bytesToUploadCount: Long = 0,
     val bytesFinishedUploadedCount: Long = 0,
-    val bytesInProgressUploadedTable: Hashtable<Int, Long> = Hashtable()
+    val bytesInProgressUploadedTable: Hashtable<Long, Long> = Hashtable()
 ) {
     val bytesUploadedCount: Long
         get() = bytesFinishedUploadedCount + bytesInProgressUploadedTable.values.sum()
