@@ -1337,7 +1337,9 @@ class MeetingActivityViewModel @Inject constructor(
                     removeFromChaUseCase(state.value.chatId, participant.handle)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                }.onSuccess {}
+                }.onSuccess {
+                    showOrHideRemoveParticipantDialog(shouldShowDialog = false)
+                }
             }
         }
 
