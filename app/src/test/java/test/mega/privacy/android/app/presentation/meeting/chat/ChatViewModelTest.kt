@@ -6,6 +6,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -14,8 +16,10 @@ import mega.privacy.android.app.presentation.meeting.chat.ChatViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.chat.GetUserChatStatusByChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -24,23 +28,30 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ChatViewModelTest {
     private lateinit var underTest: ChatViewModel
     private val getChatRoomUseCase: GetChatRoom = mock()
+    private val getUserChatStatusByChatUseCase: GetUserChatStatusByChatUseCase = mock()
     private val savedStateHandle: SavedStateHandle = mock()
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase = mock()
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates = mock()
     private val monitorUpdatePushNotificationSettingsUseCase
             : MonitorUpdatePushNotificationSettingsUseCase = mock()
+
+    private val chatId = 123L
 
     @BeforeAll
     fun setup() {
@@ -60,7 +71,8 @@ internal class ChatViewModelTest {
             savedStateHandle,
             isChatNotificationMuteUseCase,
             monitorChatRoomUpdates,
-            monitorUpdatePushNotificationSettingsUseCase
+            monitorUpdatePushNotificationSettingsUseCase,
+            getUserChatStatusByChatUseCase
         )
     }
 
@@ -70,13 +82,13 @@ internal class ChatViewModelTest {
             isChatNotificationMuteUseCase = isChatNotificationMuteUseCase,
             monitorChatRoomUpdates = monitorChatRoomUpdates,
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
+            getUserChatStatusByChatUseCase = getUserChatStatusByChatUseCase,
             savedStateHandle = savedStateHandle
         )
     }
 
     @Test
     fun `test that title update when we passing the chatId`() = runTest {
-        val chatId = 123L
         val chatRoom = mock<ChatRoom> {
             on { title } doReturn "title"
         }
@@ -93,7 +105,6 @@ internal class ChatViewModelTest {
     fun `test that is private chat updates correctly when call sdk returns chat room  and room is group chat`(
         isPublic: Boolean,
     ) = runTest {
-        val chatId = 123L
         val chatRoom = mock<ChatRoom> {
             on { this.isPublic } doReturn isPublic
             on { isGroup } doReturn true
@@ -129,6 +140,39 @@ internal class ChatViewModelTest {
     }
 
     @Test
+    fun `test that user chat status is not updated if get user chat status by chat returns null`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { isGroup } doReturn true
+            }
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            whenever(getUserChatStatusByChatUseCase(any())).thenReturn(null)
+            initTestClass()
+            underTest.state.test {
+                assertThat(awaitItem().userChatStatus).isEqualTo(null)
+            }
+        }
+
+    @ParameterizedTest(name = " is {0}")
+    @MethodSource("provideUserChatStatusParameters")
+    fun `test that user chat status is updated if get user chat status by chat`(
+        expectedUserChatStatus: UserChatStatus,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn false
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(getUserChatStatusByChatUseCase(chatRoom)).thenReturn(expectedUserChatStatus)
+        initTestClass()
+        testScheduler.advanceUntilIdle()
+        underTest.state.map { it.userChatStatus }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isEqualTo(expectedUserChatStatus)
+        }
+    }
+
+    @Test
     fun `test that notification mute icon is not updated when chatId is not passed`() =
         runTest {
             whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(null)
@@ -138,7 +182,6 @@ internal class ChatViewModelTest {
 
     @Test
     fun `test that notification mute icon is shown when mute is enabled`() = runTest {
-        val chatId = 123L
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(true)
         initTestClass()
@@ -149,7 +192,6 @@ internal class ChatViewModelTest {
 
     @Test
     fun `test that notification mute icon is hidden when mute is disabled`() = runTest {
-        val chatId = 123L
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(false)
         initTestClass()
@@ -160,7 +202,6 @@ internal class ChatViewModelTest {
 
     @Test
     fun `test that title update when chat room update with title change`() = runTest {
-        val chatId = 123L
         val chatRoom = mock<ChatRoom> {
             on { title } doReturn "title"
         }
@@ -186,7 +227,6 @@ internal class ChatViewModelTest {
     @Test
     fun `test that mute icon visibility updates when push notification setting updates`() =
         runTest {
-            val chatId = 123L
             val pushNotificationSettingFlow = MutableSharedFlow<Boolean>()
             val chatRoomUpdate = MutableSharedFlow<ChatRoom>()
             whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -207,4 +247,12 @@ internal class ChatViewModelTest {
                 assertThat(awaitItem().isChatNotificationMute).isFalse()
             }
         }
+
+    private fun provideUserChatStatusParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(UserChatStatus.Offline),
+        Arguments.of(UserChatStatus.Away),
+        Arguments.of(UserChatStatus.Online),
+        Arguments.of(UserChatStatus.Busy),
+        Arguments.of(UserChatStatus.Invalid),
+    )
 }

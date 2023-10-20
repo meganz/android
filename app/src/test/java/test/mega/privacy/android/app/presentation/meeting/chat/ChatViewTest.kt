@@ -9,6 +9,8 @@ import mega.privacy.android.app.presentation.meeting.chat.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.TEST_TAG_NOTIFICATION_MUTE
 import mega.privacy.android.app.presentation.meeting.chat.TEST_TAG_PRIVATE_ICON
+import mega.privacy.android.app.presentation.meeting.chat.TEST_TAG_USER_CHAT_STATE
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +27,30 @@ class ChatViewTest {
             ChatUiState(title = title)
         )
         composeTestRule.onNodeWithText(title).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that status icon is not visible when the user chat status is null`() {
+        initComposeRuleContent(
+            ChatUiState(userChatStatus = null)
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_USER_CHAT_STATE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that status icon is not visible when the user chat status is invalid`() {
+        initComposeRuleContent(
+            ChatUiState(userChatStatus = UserChatStatus.Invalid)
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_USER_CHAT_STATE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that status icon is visible when the user chat status is online`() {
+        initComposeRuleContent(
+            ChatUiState(userChatStatus = UserChatStatus.Online)
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_USER_CHAT_STATE).assertIsDisplayed()
     }
 
     @Test

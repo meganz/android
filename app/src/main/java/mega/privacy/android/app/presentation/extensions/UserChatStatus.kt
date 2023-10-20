@@ -21,6 +21,26 @@ internal val UserChatStatus.text: Int
     }
 
 @DrawableRes
+internal fun UserChatStatus.vectorRes(isLightTheme: Boolean) =
+    when (this) {
+        UserChatStatus.Online ->
+            if (isLightTheme) R.drawable.ic_online_user_chat_status_light
+            else R.drawable.ic_online_user_chat_status_dark
+
+        UserChatStatus.Away ->
+            if (isLightTheme) R.drawable.ic_away_user_chat_status_light
+            else R.drawable.ic_away_user_chat_status_dark
+
+        UserChatStatus.Busy ->
+            if (isLightTheme) R.drawable.ic_busy_user_chat_status_light
+            else R.drawable.ic_busy_user_chat_status_dark
+
+        else ->
+            if (isLightTheme) R.drawable.ic_offline_user_chat_status_light
+            else R.drawable.ic_offline_user_chat_status_dark
+    }
+
+@DrawableRes
 internal fun UserChatStatus.iconRes(isLightTheme: Boolean): Int =
     when (this) {
         UserChatStatus.Online ->
