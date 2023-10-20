@@ -21,12 +21,8 @@ class GetSecondaryFolderPathUseCase @Inject constructor(
      * @return The current Secondary Folder path
      */
     suspend operator fun invoke(): String {
-        with(cameraUploadRepository) {
-            val isInSDCard = isSecondaryFolderInSDCard()
-            val path =
-                if (isInSDCard) getSecondaryFolderSDCardUriPath() else getLocalPath()
-            return path.addSeparator()
-        }
+        val path = getLocalPath()
+        return path.addSeparator()
     }
 
     /**

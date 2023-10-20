@@ -36,6 +36,8 @@ import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
@@ -43,6 +45,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUs
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
@@ -50,6 +53,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForV
 import mega.privacy.android.domain.usecase.camerauploads.SetDefaultPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
@@ -59,6 +63,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSetti
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -137,6 +142,11 @@ class SettingsCameraUploadsViewModelTest {
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val isSecondaryFolderEnabledUseCase: IsSecondaryFolderEnabled = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock()
+    private val setupMediaUploadsSyncHandleUseCase: SetupMediaUploadsSyncHandleUseCase = mock()
+    private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase = mock()
+    private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
 
     @Before
     fun setUp() {
@@ -205,6 +215,11 @@ class SettingsCameraUploadsViewModelTest {
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             isSecondaryFolderEnabledUseCase = isSecondaryFolderEnabledUseCase,
+            getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
+            getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
+            setupMediaUploadsSyncHandleUseCase = setupMediaUploadsSyncHandleUseCase,
+            isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
+            setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
         )
     }
 
@@ -762,11 +777,13 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
             val mediaUploadsFolderPath = "/path/to/media uploads"
+            whenever(isSecondaryFolderPathValidUseCase(mediaUploadsFolderPath)).thenReturn(true)
             underTest.updateMediaUploadsLocalFolder(mediaUploadsFolderPath)
             verify(setupOrUpdateMediaUploadsBackupUseCase).invoke(
                 localFolder = mediaUploadsFolderPath,
                 targetNode = null
             )
+            verify(setSecondaryFolderLocalPathUseCase).invoke(mediaUploadsFolderPath)
             verify(restoreSecondaryTimestamps).invoke()
             verify(rescheduleCameraUploadUseCase).invoke()
         }
@@ -785,7 +802,27 @@ class SettingsCameraUploadsViewModelTest {
             underTest.updatePrimaryUploadNode(nodeId.longValue)
             underTest.state.test {
                 val state = awaitItem()
+                assertThat(state.primaryUploadSyncHandle).isEqualTo(nodeId.longValue)
                 assertThat(state.primaryFolderName).isEqualTo("Camera Uploads")
+            }
+        }
+
+    @Test
+    fun `test that media upload node and name is updated when updateSecondaryUploadNode is invoked`() =
+        runTest(StandardTestDispatcher()) {
+            setupUnderTest()
+            val nodeId = NodeId(1L)
+            testScheduler.advanceUntilIdle()
+            val cameraUploadsNode = mock<TypedFolderNode>() {
+                on { id }.thenReturn(nodeId)
+                on { name }.thenReturn("Media Uploads")
+            }
+            whenever(getNodeByIdUseCase(nodeId)).thenReturn(cameraUploadsNode)
+            underTest.updateSecondaryUploadNode(nodeId.longValue)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.secondaryUploadSyncHandle).isEqualTo(nodeId.longValue)
+                assertThat(state.secondaryFolderName).isEqualTo("Media Uploads")
             }
         }
 }

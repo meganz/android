@@ -613,29 +613,6 @@ class DefaultCameraUploadRepositoryTest {
                 assertThat(underTest.isSecondaryMediaFolderEnabled()).isEqualTo(enabled)
             }
 
-        @ParameterizedTest(name = "is in SD card: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the secondary folder could be located in the SD card`(isInSDCard: Boolean) =
-            runTest {
-                whenever(localStorageGateway.isSecondaryFolderInSDCard()).thenReturn(isInSDCard)
-                assertThat(underTest.isSecondaryFolderInSDCard()).isEqualTo(isInSDCard)
-            }
-
-        @Test
-        fun `test that the new secondary folder SD card path is set`() = runTest {
-            val testSDCardPath = "test/sd/card/path"
-
-            underTest.setSecondaryFolderSDCardUriPath(testSDCardPath)
-            verify(localStorageGateway).setSecondaryFolderSDCardUriPath(testSDCardPath)
-        }
-
-        @Test
-        fun `test that the secondary folder SD card URI path is retrieved`() = runTest {
-            val testPath = "test/sd/card/path"
-            whenever(localStorageGateway.getSecondaryFolderSDCardUriPath()).thenReturn(testPath)
-            assertThat(underTest.getSecondaryFolderSDCardUriPath()).isEqualTo(testPath)
-        }
-
         @Test
         fun `test that setup secondary folder returns success when api set camera upload folders returns API_OK`() =
             runTest {

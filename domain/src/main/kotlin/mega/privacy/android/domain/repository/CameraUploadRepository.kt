@@ -373,27 +373,6 @@ interface CameraUploadRepository {
     suspend fun isSecondaryMediaFolderEnabled(): Boolean
 
     /**
-     * Checks whether the Secondary Folder is located in an external SD Card or not
-     *
-     * @return true if the Secondary Folder is local in an external SD Card, and false if otherwise
-     */
-    suspend fun isSecondaryFolderInSDCard(): Boolean
-
-    /**
-     * Retrieves the Secondary Folder SD Card URI path
-     *
-     * @return A [String] that contains the Secondary Folder SD Card URI path
-     */
-    suspend fun getSecondaryFolderSDCardUriPath(): String
-
-    /**
-     * Sets the new Secondary Folder SD Card URI Path
-     *
-     * @param path the new Secondary Folder SD Card URI path
-     */
-    suspend fun setSecondaryFolderSDCardUriPath(path: String)
-
-    /**
      * Get maximum timestamp or null
      *
      * @return maximum timestamp

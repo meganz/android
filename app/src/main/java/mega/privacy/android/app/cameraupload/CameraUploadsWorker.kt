@@ -998,7 +998,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         resetMediaUploadTimeStamps()
         disableMediaUploadSettings()
         // setting an invalid path
-        setSecondaryFolderLocalPathUseCase("")
+        setSecondaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.DisableMediaUploads)
     }
 

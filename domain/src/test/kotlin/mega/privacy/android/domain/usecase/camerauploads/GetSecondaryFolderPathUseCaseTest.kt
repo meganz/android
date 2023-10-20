@@ -17,9 +17,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import java.util.stream.Stream
 
 /**
@@ -50,30 +48,10 @@ class GetSecondaryFolderPathUseCaseTest {
         )
     }
 
-    @ParameterizedTest(name = "is in SD card: {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that the secondary folder path could be located in the SD card`(isInSDCard: Boolean) =
-        runTest {
-            val testSDCardPath = "test/sd/card/path/"
-
-            cameraUploadRepository.stub {
-                onBlocking { isSecondaryFolderInSDCard() }.thenReturn(isInSDCard)
-                onBlocking { getSecondaryFolderSDCardUriPath() }.thenReturn(testSDCardPath)
-            }
-
-            if (isInSDCard) {
-                assertThat(underTest()).isEqualTo(testSDCardPath)
-                verifyNoInteractions(fileSystemRepository)
-            } else {
-                verify(cameraUploadRepository, times(0)).getPrimaryFolderSDCardUriPath()
-            }
-        }
-
     @ParameterizedTest(name = "path: {0}")
     @ValueSource(strings = ["", " ", "test/path/"])
     fun `test that the local secondary folder path is returned`(path: String) = runTest {
         cameraUploadRepository.stub {
-            onBlocking { isSecondaryFolderInSDCard() }.thenReturn(false)
             onBlocking { getSecondaryFolderLocalPath() }.thenReturn(path)
         }
         fileSystemRepository.stub {
@@ -89,7 +67,6 @@ class GetSecondaryFolderPathUseCaseTest {
             val testPath = "test/path/"
 
             cameraUploadRepository.stub {
-                onBlocking { isSecondaryFolderInSDCard() }.thenReturn(false)
                 onBlocking { getSecondaryFolderLocalPath() }.thenReturn(testPath)
             }
             fileSystemRepository.stub {
@@ -99,7 +76,7 @@ class GetSecondaryFolderPathUseCaseTest {
             val expected = underTest()
             assertThat(expected).isNotEqualTo(testPath)
             assertThat(expected).isEmpty()
-            verify(cameraUploadRepository, times(1)).setSecondaryFolderLocalPath("")
+            verify(cameraUploadRepository).setSecondaryFolderLocalPath("")
         }
 
     @ParameterizedTest(name = "when the original path is {0}, the new path becomes {1}")
@@ -109,8 +86,10 @@ class GetSecondaryFolderPathUseCaseTest {
         newPath: String,
     ) = runTest {
         cameraUploadRepository.stub {
-            onBlocking { isSecondaryFolderInSDCard() }.thenReturn(true)
-            onBlocking { getSecondaryFolderSDCardUriPath() }.thenReturn(originalPath)
+            onBlocking { getSecondaryFolderLocalPath() }.thenReturn(originalPath)
+        }
+        fileSystemRepository.stub {
+            onBlocking { doesFolderExists(any()) }.thenReturn(true)
         }
         val expectedPath = underTest()
         assertThat(expectedPath).isEqualTo(newPath)

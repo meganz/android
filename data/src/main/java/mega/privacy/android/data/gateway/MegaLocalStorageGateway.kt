@@ -3,8 +3,8 @@ package mega.privacy.android.data.gateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
 
@@ -275,28 +275,6 @@ interface MegaLocalStorageGateway {
      * Is secondary media folder enabled
      */
     suspend fun isSecondaryMediaFolderEnabled(): Boolean
-
-    /**
-     * Checks whether the Secondary Folder is located in an external SD Card or not
-     *
-     * @return true if the Secondary Folder is local in an external SD Card, and false if otherwise
-     */
-    suspend fun isSecondaryFolderInSDCard(): Boolean
-
-    /**
-     * Retrieves the Secondary Folder SD Card URI path
-     *
-     * @return A [String] that contains the Secondary Folder SD Card URI path, or an empty [String]
-     * if it does not exist
-     */
-    suspend fun getSecondaryFolderSDCardUriPath(): String
-
-    /**
-     * Sets the new Secondary Folder SD Card URI Path
-     *
-     * @param path the new Secondary Folder SD Card URI path
-     */
-    suspend fun setSecondaryFolderSDCardUriPath(path: String)
 
     /**
      * Should clear sync records

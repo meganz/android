@@ -37,6 +37,8 @@ import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
@@ -44,6 +46,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUs
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
@@ -52,6 +55,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForV
 import mega.privacy.android.domain.usecase.camerauploads.SetDefaultPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
@@ -61,6 +65,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSetti
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -166,6 +171,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val isSecondaryFolderEnabledUseCase: IsSecondaryFolderEnabled,
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
+    private val setupMediaUploadsSyncHandleUseCase: SetupMediaUploadsSyncHandleUseCase,
+    private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
+    private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -577,6 +587,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             val videoQuality = async { getUploadVideoQualityUseCase() }
             val primaryUploadNode = async { getPrimaryFolderNode() }
             val isMediaUploadEnabled = async { isSecondaryFolderEnabledUseCase() }
+            val secondaryUploadNode = async { getSecondaryFolderNode() }
+            val secondaryFolderPath = async { getSecondaryFolderPathUseCase() }
             _state.update {
                 it.copy(
                     isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
@@ -591,6 +603,9 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     videoQuality = videoQuality.await(),
                     primaryUploadSyncHandle = primaryUploadNode.await()?.id?.longValue,
                     primaryFolderName = primaryUploadNode.await()?.name ?: "",
+                    secondaryFolderName = secondaryUploadNode.await()?.name ?: "",
+                    secondaryUploadSyncHandle = secondaryUploadNode.await()?.id?.longValue,
+                    secondaryFolderPath = secondaryFolderPath.await()
                 )
             }
         }
@@ -611,6 +626,21 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             Timber.e(it)
         }.getOrNull()
 
+    private suspend fun getSecondaryFolderNode(nodeHandle: Long? = null): TypedNode? =
+        runCatching {
+            val id = nodeHandle ?: getSecondarySyncHandleUseCase()
+            if (id == -1L) {
+                return@runCatching null
+            }
+            return@runCatching getNodeByIdUseCase(NodeId(id)).also {
+                if (it == null) {
+                    setInvalidMediaUploadsHandle()
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+        }.getOrNull()
+
 
     /**
      * Update Primary Upload Node Handle and Name
@@ -625,7 +655,21 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 )
             }
         }
+    }
 
+    /**
+     * Update Secondary Upload Node Handle and Name
+     */
+    fun updateSecondaryUploadNode(nodeHandle: Long) {
+        viewModelScope.launch {
+            val node = getSecondaryFolderNode(nodeHandle)
+            _state.update {
+                it.copy(
+                    secondaryUploadSyncHandle = nodeHandle,
+                    secondaryFolderName = node?.name ?: ""
+                )
+            }
+        }
     }
 
     /**
@@ -738,10 +782,15 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Set Invalid Camera Uploads Sync Handle
      */
-    private fun setInvalidCameraUploadsHandle() {
-        viewModelScope.launch {
-            setupCameraUploadsSyncHandleUseCase(handle = -1L)
-        }
+    private suspend fun setInvalidCameraUploadsHandle() {
+        setupCameraUploadsSyncHandleUseCase(handle = -1L)
+    }
+
+    /**
+     * Set Invalid Camera Uploads Sync Handle
+     */
+    private suspend fun setInvalidMediaUploadsHandle() {
+        setupMediaUploadsSyncHandleUseCase(handle = -1L)
     }
 
     /**
@@ -781,17 +830,26 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * updateMediaUploadsLocalFolder
      * @param mediaUploadPath
+     * @param isFolderInSDCard
      */
     fun updateMediaUploadsLocalFolder(mediaUploadPath: String?) {
         viewModelScope.launch {
             runCatching {
-                _state.update {
-                    it.copy(secondaryFolderPath = mediaUploadPath.orEmpty())
+                if (isSecondaryFolderPathValidUseCase(mediaUploadPath)) {
+                    mediaUploadPath?.let {
+                        setSecondaryFolderLocalPathUseCase(mediaUploadPath)
+                    }
+                    restoreSecondaryTimestamps()
+                    // Update Sync when the Secondary Local Folder has changed
+                    updateMediaUploadsBackup(mediaUploadPath)
+                    rescheduleCameraUpload()
+                    _state.update {
+                        it.copy(secondaryFolderPath = mediaUploadPath.orEmpty())
+                    }
+                } else {
+                    setInvalidFolderSelectedPromptShown(showPrompt = true)
                 }
-                restoreSecondaryTimestamps()
-                // Update Sync when the Secondary Local Folder has changed
-                updateMediaUploadsBackup(mediaUploadPath)
-                rescheduleCameraUpload()
+
             }.onFailure {
                 Timber.e(it)
             }

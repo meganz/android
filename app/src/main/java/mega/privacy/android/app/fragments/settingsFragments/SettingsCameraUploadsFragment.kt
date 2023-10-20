@@ -71,7 +71,6 @@ import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.displayNotificationPermissionRationale
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
@@ -89,7 +88,6 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -113,7 +111,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private var localSecondaryFolder: Preference? = null
     private var megaSecondaryFolder: Preference? = null
     private var businessCameraUploadsAlertDialog: AlertDialog? = null
-    private var camSyncMegaPath = ""
     private var compressionQueueSizeDialog: AlertDialog? = null
     private var queueSizeInput: EditText? = null
     private var mediaPermissionsDialog: AlertDialog? = null
@@ -437,7 +434,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 val handle = intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!isNewSettingValid(
                         primaryPath = viewModel.state.value.primaryFolderPath,
-                        secondaryPath = prefs?.localPathSecondaryFolder,
+                        secondaryPath = viewModel.state.value.secondaryFolderPath,
                         primaryHandle = handle.toString(),
                         secondaryHandle = prefs?.megaHandleSecondaryFolder,
                     )
@@ -461,8 +458,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER -> {
                 // Secondary Folder to Sync
                 val secondaryPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                val isFolderInSDCard =
-                    intent.getBooleanExtra(FileStorageActivity.EXTRA_IS_FOLDER_IN_SD_CARD, false)
                 if (!isNewSettingValid(
                         primaryPath = viewModel.state.value.primaryFolderPath,
                         secondaryPath = secondaryPath,
@@ -477,13 +472,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     ).show()
                     return
                 }
-                with(isFolderInSDCard) {
-                    dbH.mediaFolderExternalSdCard = this
-                }
-                with(secondaryPath) {
-                    dbH.setSecondaryFolderPath(this)
-                    dbH.uriMediaExternalSdCard = this
-                }
                 viewModel.updateMediaUploadsLocalFolder(secondaryPath)
             }
 
@@ -493,7 +481,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!isNewSettingValid(
                         primaryPath = viewModel.state.value.primaryFolderPath,
-                        secondaryPath = prefs?.localPathSecondaryFolder,
+                        secondaryPath = viewModel.state.value.secondaryFolderPath,
                         primaryHandle = prefs?.camSyncHandle,
                         secondaryHandle = secondaryHandle.toString(),
                     )
@@ -528,7 +516,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 handleIsCameraUploadsEnabled(
                     isCameraUploadsEnabled = it.isCameraUploadsEnabled
                 )
-                checkSecondaryMediaFolder(it.isMediaUploadsEnabled)
+                checkSecondaryMediaFolder(
+                    isMediaUploadsEnabled = it.isMediaUploadsEnabled,
+                    secondaryFolderName = it.secondaryFolderName,
+                    secondaryFolderPath = it.secondaryFolderPath
+                )
                 handleFileUpload(
                     isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     uploadOption = it.uploadOption,
@@ -570,7 +562,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     primaryFolderPath = it.primaryFolderPath,
                 )
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
-                handlePrimaryFolderName(it.primaryFolderName)
+                if (it.isCameraUploadsEnabled) {
+                    handlePrimaryFolderName(it.primaryFolderName)
+                }
                 handleTriggerCameraUploads(it.shouldTriggerCameraUploads)
                 handleMediaPermissionsRationale(it.shouldShowMediaPermissionsRationale)
                 handleNotificationPermissionRationale(it.shouldShowNotificationPermissionRationale)
@@ -598,9 +592,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      * Display primary upload folder's name
      */
     private fun handlePrimaryFolderName(primaryFolderName: String) {
-        camSyncMegaPath =
-            primaryFolderName.takeIf { it.isNotEmpty() } ?: getString(R.string.section_photo_sync)
-        megaCameraFolder?.summary = camSyncMegaPath
+        megaCameraFolder?.let { preference ->
+            preference.summary = primaryFolderName.takeIf { it.isNotEmpty() }
+                ?: getString(R.string.section_photo_sync)
+            preferenceScreen.addPreference(preference)
+        }
     }
 
     /**
@@ -623,11 +619,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             Timber.d("Camera Uploads ON")
             cameraUploadOnOff?.isChecked = true
             secondaryMediaFolderOn?.let { preferenceScreen.addPreference(it) }
-
-            megaCameraFolder?.let {
-                it.summary = camSyncMegaPath
-                preferenceScreen.addPreference(it)
-            }
         } else {
             Timber.d("Camera Uploads Off")
             cameraUploadOnOff?.isChecked = false
@@ -1045,34 +1036,24 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     /**
      * Checks the Secondary Folder
      */
-    private fun checkSecondaryMediaFolder(isMediaUploadEnabled: Boolean) {
-        if (isMediaUploadEnabled) {
+    private fun checkSecondaryMediaFolder(
+        isMediaUploadsEnabled: Boolean,
+        secondaryFolderName: String,
+        secondaryFolderPath: String,
+    ) {
+        if (isMediaUploadsEnabled) {
             secondaryMediaFolderOn?.title = getString(R.string.settings_secondary_upload_off)
-            with(prefs) {
-                // Check if the node exists in MEGA
-                val node = this?.megaHandleSecondaryFolder?.toLongOrNull()?.let { handle ->
-                    megaApi.getNodeByHandle(handle)
-                }
-
-                megaSecondaryFolder?.let {
-                    it.summary = node?.name ?: getString(R.string.section_secondary_media_uploads)
-                    preferenceScreen.addPreference(it)
-                }
-
-                // Check if the local secondary folder exists
-                val path = this?.localPathSecondaryFolder?.let {
-                    if (!FileUtil.isFileAvailable(File(it))) {
-                        Timber.w("Secondary ON: invalid localSecondaryFolderPath")
-                        snackbarCallBack?.showSnackbar(getString(R.string.secondary_media_service_error_local_folder))
-                        dbH.setSecondaryFolderPath(null)
-                        null
-                    } else it
-                }
-
-                localSecondaryFolder?.let {
-                    it.summary = path ?: getString(R.string.settings_empty_folder)
-                    preferenceScreen.addPreference(it)
-                }
+            megaSecondaryFolder?.let { preference ->
+                preference.summary =
+                    secondaryFolderName.takeIf { it.isNotEmpty() }
+                        ?: getString(R.string.section_secondary_media_uploads)
+                preferenceScreen.addPreference(preference)
+            }
+            localSecondaryFolder?.let { preference ->
+                preference.summary =
+                    secondaryFolderPath.takeIf { it.isNotEmpty() }
+                        ?: getString(R.string.settings_empty_folder)
+                preferenceScreen.addPreference(preference)
             }
         } else {
             disableMediaUploadUIProcess()
@@ -1090,7 +1071,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 viewModel.updatePrimaryUploadNode(destination.nodeHandle)
             }
 
-            CameraUploadFolderType.Secondary -> checkSecondaryMediaFolder(viewModel.state.value.isMediaUploadsEnabled)
+            CameraUploadFolderType.Secondary -> {
+                viewModel.updateSecondaryUploadNode(destination.nodeHandle)
+            }
         }
     }
 

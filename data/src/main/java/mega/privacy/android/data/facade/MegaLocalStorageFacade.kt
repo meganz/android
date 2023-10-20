@@ -1,11 +1,7 @@
 package mega.privacy.android.data.facade
 
-import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
-import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Offline
@@ -177,15 +173,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun isSecondaryMediaFolderEnabled(): Boolean =
         dbHandler.preferences?.secondaryMediaFolderEnabled.toBoolean()
-
-    override suspend fun isSecondaryFolderInSDCard(): Boolean = dbHandler.mediaFolderExternalSdCard
-
-    override suspend fun getSecondaryFolderSDCardUriPath(): String =
-        dbHandler.uriMediaExternalSdCard ?: ""
-
-    override suspend fun setSecondaryFolderSDCardUriPath(path: String) {
-        dbHandler.uriMediaExternalSdCard = path
-    }
 
     override suspend fun shouldClearSyncRecords(): Boolean = dbHandler.shouldClearCamsyncRecords()
 
