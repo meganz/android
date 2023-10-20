@@ -255,14 +255,18 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     if (ongoing && isForeground) {
                         // Make sure the service will not get destroyed while playing media.
                         try {
-                            startForeground(
-                                notificationId, notification,
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-                                } else {
-                                    0
-                                },
-                            )
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                startForeground(
+                                    notificationId, notification,
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                                    } else {
+                                        0
+                                    },
+                                )
+                            } else {
+                                startForeground(notificationId, notification)
+                            }
                         } catch (e: Exception) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
                                 && e is ForegroundServiceStartNotAllowedException
@@ -287,7 +291,13 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         mainHandler.removeCallbacks(resumePlayRunnable)
-        when (intent?.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)) {
+        val command = intent?.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)
+        if (command == COMMAND_PAUSE || command == COMMAND_RESUME || command == COMMAND_STOP) {
+            currentNotification?.let {
+                startForeground(PLAYBACK_NOTIFICATION_ID, it)
+            }
+        }
+        when (command) {
             COMMAND_PAUSE -> {
                 if (playing()) {
                     setPlayWhenReady(false)
@@ -296,9 +306,6 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             }
 
             COMMAND_RESUME -> {
-                currentNotification?.let {
-                    startForeground(PLAYBACK_NOTIFICATION_ID, it)
-                }
                 audioClosable = false
                 requestAudioFocus()
                 mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
