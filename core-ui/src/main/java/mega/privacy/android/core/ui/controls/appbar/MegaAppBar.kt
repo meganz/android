@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -82,7 +85,12 @@ fun MegaAppBar(
                     color = MegaTheme.colors.text.primary,
                     style = MaterialTheme.typography.subtitle1
                 )
-                titleIcons?.let { it() }
+                CompositionLocalProvider(
+                    LocalContentColor provides MegaTheme.colors.icon.secondary,
+                    LocalContentAlpha provides 1f,
+                ) {
+                    titleIcons?.let { it() }
+                }
             }
             subtitle?.let {
                 Text(

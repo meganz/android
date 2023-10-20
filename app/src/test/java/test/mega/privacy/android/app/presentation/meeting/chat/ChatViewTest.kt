@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.chat.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.TEST_TAG_NOTIFICATION_MUTE
+import mega.privacy.android.app.presentation.meeting.chat.TEST_TAG_PRIVATE_ICON
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,6 +41,22 @@ class ChatViewTest {
             ChatUiState(isChatNotificationMute = false)
         )
         composeTestRule.onNodeWithTag(TEST_TAG_NOTIFICATION_MUTE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that private icon is visible when chat room is private`() {
+        initComposeRuleContent(
+            ChatUiState(isPrivateChat = true)
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_PRIVATE_ICON).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that private icon is hidden when chat room is public`() {
+        initComposeRuleContent(
+            ChatUiState(isPrivateChat = false)
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_PRIVATE_ICON).assertDoesNotExist()
     }
 
     private fun initComposeRuleContent(

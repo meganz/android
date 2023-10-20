@@ -44,7 +44,14 @@ class ChatViewModel @Inject constructor(
             runCatching {
                 getChatRoomUseCase(chatId)
             }.onSuccess { chatRoom ->
-                _state.update { state -> state.copy(title = chatRoom?.title) }
+                chatRoom?.let {
+                    _state.update { state ->
+                        state.copy(
+                            title = chatRoom.title,
+                            isPrivateChat = !chatRoom.isGroup || !chatRoom.isPublic
+                        )
+                    }
+                }
             }.onFailure {
                 Timber.e(it)
             }

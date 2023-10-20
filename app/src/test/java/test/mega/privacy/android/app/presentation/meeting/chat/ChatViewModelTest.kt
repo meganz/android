@@ -23,6 +23,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -85,6 +87,39 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().title).isEqualTo("title")
         }
     }
+
+    @ParameterizedTest(name = "with with isPublic {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is private chat updates correctly when call sdk returns chat room  and room is group chat`(
+        isPublic: Boolean,
+    ) = runTest {
+        val chatId = 123L
+        val chatRoom = mock<ChatRoom> {
+            on { this.isPublic } doReturn isPublic
+            on { isGroup } doReturn true
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isPrivateChat).isEqualTo(!isPublic)
+        }
+    }
+
+    @Test
+    fun `test that is private chat when call sdk returns chat room is not group chat`() = runTest {
+        val chatId = 123L
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn false
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isPrivateChat).isTrue()
+        }
+    }
+
 
     @Test
     fun `test that title not update when chatId is not passed`() = runTest {

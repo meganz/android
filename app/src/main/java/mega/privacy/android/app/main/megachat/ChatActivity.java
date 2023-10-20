@@ -2453,7 +2453,7 @@ public class ChatActivity extends PasscodeActivity
         setPreviewersView();
         setTitle(null);
         setChatSubtitle();
-        privateIconToolbar.setVisibility((!chatRoom.isGroup() || chatRoom.isPublic()) ? View.GONE : View.VISIBLE);
+        privateIconToolbar.setVisibility((!chatRoom.isGroup() || !chatRoom.isPublic()) ? View.VISIBLE : View.GONE);
         muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
         isOpeningChat = true;
 
