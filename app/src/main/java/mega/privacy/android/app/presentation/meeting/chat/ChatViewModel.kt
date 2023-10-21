@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
@@ -65,7 +66,7 @@ class ChatViewModel @Inject constructor(
                     _state.update { state ->
                         state.copy(
                             title = chatRoom.title,
-                            isPrivateChat = !chatRoom.isGroup || !chatRoom.isPublic
+                            isPrivateChat = chatRoom.isPrivateRoom
                         )
                     }
                     if (!it.isGroup) {
@@ -102,9 +103,11 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId)
                 .collect { chat ->
-                    with(chat) {
-                        if (changes?.contains(ChatRoomChange.Title) == true) {
-                            _state.update { state -> state.copy(title = title) }
+                    chat.changes?.forEach { change ->
+                        if (change == ChatRoomChange.Title) {
+                            _state.update { state -> state.copy(title = chat.title) }
+                        } else if (change == ChatRoomChange.ChatMode) {
+                            _state.update { state -> state.copy(isPrivateChat = !chat.isPublic) }
                         }
                     }
                 }
@@ -129,4 +132,7 @@ class ChatViewModel @Inject constructor(
                 }
         }
     }
+
+    private val ChatRoom.isPrivateRoom: Boolean
+        get() = !isGroup || !isPublic
 }

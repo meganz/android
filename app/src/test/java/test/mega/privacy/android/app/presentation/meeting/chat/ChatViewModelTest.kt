@@ -279,6 +279,32 @@ internal class ChatViewModelTest {
             }
         }
 
+    @Test
+    fun `test that private room update when chat room update with mode change`() = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { isPublic } doReturn true
+        }
+        val updateFlow = MutableSharedFlow<ChatRoom>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+        whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(false)
+        whenever(monitorUpdatePushNotificationSettingsUseCase()).thenReturn(emptyFlow())
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isPrivateChat).isFalse()
+        }
+        val newChatRoom = mock<ChatRoom> {
+            on { isPublic } doReturn false
+            on { changes } doReturn listOf(ChatRoomChange.ChatMode)
+        }
+        updateFlow.emit(newChatRoom)
+        underTest.state.test {
+            assertThat(awaitItem().isPrivateChat).isTrue()
+        }
+    }
+
     private fun provideUserChatStatusParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(UserChatStatus.Offline, UserChatStatus.Away),
         Arguments.of(UserChatStatus.Away, UserChatStatus.Online),
