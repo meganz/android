@@ -16,7 +16,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.presentation.meeting.ChatHostActivity
+import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHAT_ID_OF_INCOMING_CALL
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2

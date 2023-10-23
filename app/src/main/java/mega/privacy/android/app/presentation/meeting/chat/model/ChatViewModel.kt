@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat
+package mega.privacy.android.app.presentation.meeting.chat.model
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -14,9 +14,11 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,6 +43,8 @@ class ChatViewModel @Inject constructor(
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase,
+    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
+    private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -48,10 +52,15 @@ class ChatViewModel @Inject constructor(
 
     private val chatId = savedStateHandle.get<Long>(Constants.CHAT_ID)
 
+    private val ChatRoom.isPrivateRoom: Boolean
+        get() = !isGroup || !isPublic
+
     init {
+        checkIfIsParticipatingInACall()
         chatId?.let {
             getChatRoom(it)
             getNotificationMute(it)
+            checkIfIsParticipatingInACallInThisChat(it)
             monitorChatRoom(it)
             monitorNotificationMute(it)
         }
@@ -66,7 +75,9 @@ class ChatViewModel @Inject constructor(
                     _state.update { state ->
                         state.copy(
                             title = chatRoom.title,
-                            isPrivateChat = chatRoom.isPrivateRoom
+                            isPrivateChat = chatRoom.isPrivateRoom,
+                            myPermission = chatRoom.ownPrivilege,
+                            isPreviewMode = chatRoom.isPreview,
                         )
                     }
                     if (!it.isGroup) {
@@ -133,6 +144,32 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private val ChatRoom.isPrivateRoom: Boolean
-        get() = !isGroup || !isPublic
+    private fun checkIfIsParticipatingInACall() {
+        viewModelScope.launch {
+            runCatching { isParticipatingInChatCallUseCase() }
+                .onSuccess {
+                    _state.update { state -> state.copy(isParticipatingInACall = it) }
+                }.onFailure { Timber.e(it) }
+        }
+    }
+
+    private fun checkIfIsParticipatingInACallInThisChat(chatId: Long) {
+        viewModelScope.launch {
+            runCatching { hasACallInThisChatByChatIdUseCase(chatId) }
+                .onSuccess {
+                    _state.update { state -> state.copy(hasACallInThisChat = it) }
+                }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Handle action press
+     *
+     * @param action [ChatRoomMenuAction].
+     */
+    fun handleActionPress(action: ChatRoomMenuAction) {
+        when (action) {
+            is ChatRoomMenuAction.AudioCall -> {}
+        }
+    }
 }

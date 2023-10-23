@@ -356,7 +356,7 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name=".presentation.meeting.ChatHostActivity"
+            android:name=".presentation.meeting.chat.ChatHostActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity

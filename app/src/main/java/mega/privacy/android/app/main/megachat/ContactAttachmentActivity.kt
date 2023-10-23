@@ -7,10 +7,8 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
@@ -21,13 +19,11 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKN
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
 import mega.privacy.android.app.databinding.ActivityContactAttachmentChatBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaContactsAttachedAdapter
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.meeting.ChatHostActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.Util

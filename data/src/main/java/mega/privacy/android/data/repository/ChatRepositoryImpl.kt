@@ -919,4 +919,8 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
 
     override fun getChatInvalidHandle(): Long = megaChatApiGateway.getChatInvalidHandle()
+
+    override suspend fun hasCallInChatRoom(chatId: Long) = withContext(ioDispatcher) {
+        megaChatApiGateway.hasCallInChatRoom(chatId)
+    }
 }

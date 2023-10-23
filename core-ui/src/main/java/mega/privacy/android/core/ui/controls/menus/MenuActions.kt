@@ -59,7 +59,7 @@ fun MenuActions(
         IconButtonForAction(
             menuAction = it,
             onActionClick = onActionClick,
-            enabled = enabled,
+            enabled = enabled && it.enabled,
             selectMode = selectMode,
             tint = tint,
         )
@@ -88,7 +88,7 @@ private fun IconButtonForAction(
         iconPainter = menuAction.getIconPainter(),
         description = menuAction.getDescription(),
         onClick = { onActionClick(menuAction) },
-        modifier = Modifier.testTag(menuAction.getDescription()),
+        modifier = Modifier.testTag(menuAction.testTag),
         enabled = enabled,
         selectMode = selectMode,
         tint = tint,
@@ -171,7 +171,8 @@ private fun IconButtonWithTooltip(
                 painter = iconPainter,
                 contentDescription = description,
                 tint = if (selectMode) MegaTheme.colors.icon.accent
-                else tint ?: MegaTheme.colors.icon.primary,
+                else tint ?: if (enabled) MegaTheme.colors.icon.primary
+                else MegaTheme.colors.icon.disabled,
             )
         }
         Tooltip(showTooltip) {

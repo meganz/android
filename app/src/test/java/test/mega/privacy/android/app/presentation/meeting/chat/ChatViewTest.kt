@@ -4,19 +4,30 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.meeting.chat.ChatUiState
-import mega.privacy.android.app.presentation.meeting.chat.ChatView
-import mega.privacy.android.app.presentation.meeting.chat.TEST_TAG_NOTIFICATION_MUTE
-import mega.privacy.android.app.presentation.meeting.chat.TEST_TAG_PRIVATE_ICON
-import mega.privacy.android.app.presentation.meeting.chat.TEST_TAG_USER_CHAT_STATE
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_AUDIO_CALL_ACTION
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
+import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_NOTIFICATION_MUTE
+import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_PRIVATE_ICON
+import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_USER_CHAT_STATE
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 @RunWith(AndroidJUnit4::class)
 class ChatViewTest {
+
+    private val actionPressed = mock<(ChatRoomMenuAction) -> Unit>()
+
     @get:Rule
     var composeTestRule = createComposeRule()
 
@@ -85,13 +96,73 @@ class ChatViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_PRIVATE_ICON).assertDoesNotExist()
     }
 
-    private fun initComposeRuleContent(
-        state: ChatUiState,
-    ) {
+    @Test
+    fun `test that audio call is hidden when my permission is unknown`() {
+        initComposeRuleContent(ChatUiState())
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that audio call is hidden when my permission is removed`() {
+        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Removed))
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that audio call is hidden when my permission is read only`() {
+        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.ReadOnly))
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that audio call is hidden when is joining or leaving`() {
+        initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that audio call is hidden when is preview mode`() {
+        initComposeRuleContent(ChatUiState(isPreviewMode = true))
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that audio call is shown and enabled when my permission is standard`() {
+        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Standard))
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        verify(actionPressed).invoke(any())
+    }
+
+    @Test
+    fun `test that audio call is shown and enabled when my permission is moderator`() {
+        initComposeRuleContent(
+            ChatUiState(myPermission = ChatRoomPermission.Moderator)
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        verify(actionPressed).invoke(any())
+    }
+
+    @Test
+    fun `test that audio call is shown but disabled when my permission is moderator and I have a call in this chat`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Moderator,
+                hasACallInThisChat = true,
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        verifyNoInteractions(actionPressed)
+    }
+
+    private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(
                 uiState = state,
-                onBackPressed = {}
+                onBackPressed = {},
+                onMenuActionPressed = actionPressed
             )
         }
     }

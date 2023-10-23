@@ -678,4 +678,13 @@ interface ChatRepository {
      * it returns MEGACHAT_INVALID_HANDLE so don't need to be suspend
      */
     fun getChatInvalidHandle(): Long
+
+    /**
+     * Returns true if there is a call at chatroom with id chatId.
+     * Not it's not necessary that we participate in the call, but other participants do.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @return True if there is a call in a chatroom. False in other case
+     */
+    suspend fun hasCallInChatRoom(chatId: Long): Boolean
 }

@@ -675,4 +675,6 @@ internal class MegaChatApiFacade @Inject constructor(
         nodeHandle: Long,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.attachVoiceMessage(chatId, nodeHandle, listener)
+
+    override suspend fun hasCallInChatRoom(chatId: Long) = chatApi.hasCallInChatRoom(chatId)
 }

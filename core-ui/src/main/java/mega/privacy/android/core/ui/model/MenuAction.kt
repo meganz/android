@@ -34,6 +34,11 @@ interface MenuAction {
      */
     val enabled: Boolean
         get() = true
+
+    /**
+     * Tag for testing purposes.
+     */
+    val testTag: String
 }
 
 /**
@@ -50,8 +55,12 @@ interface MenuActionWithIcon : MenuAction {
 /**
  * Utility abstract class for actions without icon
  * @param descriptionRes the string resource to be used to generate the description of this action
+ * @param testTag tag for testing purposes.
  */
-abstract class MenuActionWithoutIcon(@StringRes val descriptionRes: Int) : MenuAction {
+abstract class MenuActionWithoutIcon(
+    @StringRes val descriptionRes: Int,
+    override val testTag: String,
+) : MenuAction {
     @Composable
     override fun getDescription() = stringResource(id = descriptionRes)
 }
@@ -60,10 +69,12 @@ abstract class MenuActionWithoutIcon(@StringRes val descriptionRes: Int) : MenuA
  * Utility abstract class for actions with description and icon from resources
  * @param iconRes the drawable resource to be used to generate the icon painter
  * @param descriptionRes the string resource to be used to generate the description of this action
+ * @param testTag tag for testing purposes.
  */
 abstract class MenuActionString(
     @DrawableRes val iconRes: Int,
     @StringRes val descriptionRes: Int,
+    override val testTag: String,
 ) : MenuActionWithIcon {
     @Composable
     override fun getDescription() = stringResource(id = descriptionRes)
@@ -77,11 +88,13 @@ abstract class MenuActionString(
  * @param iconRes the drawable resource to be used to generate the icon painter
  * @param descriptionRes the plural resource to be used to generate the description of this action
  * @param amount the amount to be used in [descriptionRes] plural
+ * @param testTag tag for testing purposes.
  */
 abstract class MenuActionPlural(
     @DrawableRes val iconRes: Int,
     @PluralsRes val descriptionRes: Int,
     val amount: Int,
+    override val testTag: String
 ) : MenuActionWithIcon {
     @Composable
     override fun getDescription() = pluralStringResource(id = descriptionRes, amount, amount)

@@ -69,22 +69,43 @@ class SelectModeAppBarTest {
     }
 
     private fun getSampleToolbarActions(): List<MenuAction> {
-        val item1 = object : MenuActionString(R.drawable.ic_down, R.string.cancel) {}
-        val item2 = object : MenuActionString(R.drawable.ic_menu, R.string.discard) {}
-        val item3 = object : MenuActionString(R.drawable.ic_chevron_up, R.string.cancel_long) {}
-        val item4 = object : MenuActionString(R.drawable.ic_alert_circle, R.string.action_long) {}
-        val item5 = object : MenuActionWithoutIcon(R.string.password_text) {}
+        val item1 = object : MenuActionString(
+            iconRes = R.drawable.ic_down,
+            descriptionRes = R.string.cancel,
+            testTag = context.getString(R.string.cancel)
+        ) {}
+        val item2 = object : MenuActionString(
+            iconRes = R.drawable.ic_menu,
+            descriptionRes = R.string.discard,
+            testTag = context.getString(R.string.discard)
+        ) {}
+        val item3 = object :
+            MenuActionString(
+                iconRes = R.drawable.ic_chevron_up,
+                descriptionRes = R.string.cancel_long,
+                testTag = context.getString(R.string.cancel_long)
+            ) {}
+        val item4 =
+            object : MenuActionString(
+                iconRes = R.drawable.ic_alert_circle,
+                descriptionRes = R.string.action_long,
+                testTag = context.getString(R.string.action_long)
+            ) {}
+        val item5 = object : MenuActionWithoutIcon(
+            descriptionRes = R.string.password_text,
+            testTag = context.getString(R.string.password_text)
+        ) {}
         return listOf(item1, item2, item3, item4, item5)
     }
 
     private fun getMoreThanFiveToolbarActions(): List<MenuAction> {
-        val item1 = object : MenuActionString(R.drawable.ic_down, R.string.cancel) {}
-        val item2 = object : MenuActionString(R.drawable.ic_menu, R.string.discard) {}
-        val item3 = object : MenuActionString(R.drawable.ic_chevron_up, R.string.cancel_long) {}
-        val item4 = object : MenuActionString(R.drawable.ic_alert_circle, R.string.action_long) {}
-        val item5 = object : MenuActionString(R.drawable.ic_favorite, R.string.dialog_title) {}
-        val item6 = object : MenuActionWithoutIcon(R.string.password_text) {}
-        return listOf(item1, item2, item3, item4, item5, item6)
+        return getSampleToolbarActions().toMutableList().apply {
+            add(object :
+                MenuActionString(
+                    iconRes = R.drawable.ic_favorite,
+                    descriptionRes = R.string.dialog_title,
+                    testTag = context.getString(R.string.dialog_title)
+                ) {})
+        }
     }
-
 }

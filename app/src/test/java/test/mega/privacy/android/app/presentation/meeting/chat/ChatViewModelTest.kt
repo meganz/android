@@ -11,16 +11,19 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.meeting.chat.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -50,6 +53,8 @@ internal class ChatViewModelTest {
             : MonitorUpdatePushNotificationSettingsUseCase = mock()
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase = mock()
+    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
+    private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase = mock()
 
     private val chatId = 123L
     private val userHandle = 321L
@@ -74,7 +79,9 @@ internal class ChatViewModelTest {
             monitorChatRoomUpdates,
             monitorUpdatePushNotificationSettingsUseCase,
             getUserOnlineStatusByHandleUseCase,
-            monitorUserChatStatusByHandleUseCase
+            monitorUserChatStatusByHandleUseCase,
+            isParticipatingInChatCallUseCase,
+            hasACallInThisChatByChatIdUseCase,
         )
     }
 
@@ -86,6 +93,8 @@ internal class ChatViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             monitorUserChatStatusByHandleUseCase = monitorUserChatStatusByHandleUseCase,
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
+            hasACallInThisChatByChatIdUseCase = hasACallInThisChatByChatIdUseCase,
             savedStateHandle = savedStateHandle
         )
     }
@@ -94,6 +103,7 @@ internal class ChatViewModelTest {
     fun `test that title update when we passing the chatId`() = runTest {
         val chatRoom = mock<ChatRoom> {
             on { title } doReturn "title"
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
         }
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
@@ -111,6 +121,7 @@ internal class ChatViewModelTest {
         val chatRoom = mock<ChatRoom> {
             on { this.isPublic } doReturn isPublic
             on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
         }
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
@@ -125,6 +136,7 @@ internal class ChatViewModelTest {
         val chatId = 123L
         val chatRoom = mock<ChatRoom> {
             on { isGroup } doReturn false
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
         }
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
@@ -162,6 +174,7 @@ internal class ChatViewModelTest {
         val chatRoom = mock<ChatRoom> {
             on { isGroup } doReturn false
             on { peerHandlesList } doReturn listOf(userHandle)
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
         }
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
@@ -182,6 +195,7 @@ internal class ChatViewModelTest {
         val chatRoom = mock<ChatRoom> {
             on { isGroup } doReturn false
             on { peerHandlesList } doReturn listOf(userHandle)
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
         }
         val updateFlow = MutableSharedFlow<UserChatStatus>()
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -235,6 +249,7 @@ internal class ChatViewModelTest {
     fun `test that title update when chat room update with title change`() = runTest {
         val chatRoom = mock<ChatRoom> {
             on { title } doReturn "title"
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
         }
         val updateFlow = MutableSharedFlow<ChatRoom>()
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -284,6 +299,7 @@ internal class ChatViewModelTest {
         val chatRoom = mock<ChatRoom> {
             on { isGroup } doReturn true
             on { isPublic } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
         }
         val updateFlow = MutableSharedFlow<ChatRoom>()
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -302,6 +318,33 @@ internal class ChatViewModelTest {
         updateFlow.emit(newChatRoom)
         underTest.state.test {
             assertThat(awaitItem().isPrivateChat).isTrue()
+        }
+    }
+
+    @ParameterizedTest(name = " returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is participating in a call has correct state if use case`(
+        isParticipatingInChatCall: Boolean,
+    ) = runTest {
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(isParticipatingInChatCall)
+        initTestClass()
+        testScheduler.advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().isParticipatingInACall).isEqualTo(isParticipatingInChatCall)
+        }
+    }
+
+    @ParameterizedTest(name = " returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that has a call in this chat has correct state if use case`(
+        hasACallInThisChat: Boolean,
+    ) = runTest {
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(hasACallInThisChatByChatIdUseCase(chatId)).thenReturn(hasACallInThisChat)
+        initTestClass()
+        testScheduler.advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().hasACallInThisChat).isEqualTo(hasACallInThisChat)
         }
     }
 

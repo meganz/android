@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat
+package mega.privacy.android.app.presentation.meeting.chat.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -18,9 +18,12 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.vectorRes
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**
@@ -28,11 +31,13 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  *
  * @param uiState [ChatUiState]
  * @param onBackPressed Action to perform for back button.
+ * @param onMenuActionPressed Action to perform for menu buttons.
  */
 @Composable
-fun ChatView(
-    uiState: ChatUiState = ChatUiState(),
+internal fun ChatView(
+    uiState: ChatUiState,
     onBackPressed: () -> Unit,
+    onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -41,6 +46,8 @@ fun ChatView(
                 title = uiState.title.orEmpty(),
                 onNavigationPressed = onBackPressed,
                 titleIcons = { TitleIcons(uiState) },
+                actions = getChatRoomActions(uiState),
+                onActionPressed = { (it as ChatRoomMenuAction).let(onMenuActionPressed) },
                 elevation = 0.dp
             )
         }
@@ -92,6 +99,20 @@ private fun PrivateChatIcon(isPrivateChat: Boolean?) {
     }
 }
 
+private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> {
+    val actions = mutableListOf<ChatRoomMenuAction>()
+
+    with(uiState) {
+        if ((myPermission == ChatRoomPermission.Moderator || myPermission == ChatRoomPermission.Standard)
+            && !isJoiningOrLeaving && !isPreviewMode
+        ) {
+            actions.add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat))
+        }
+    }
+
+    return actions
+}
+
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "ChatView")
 @Composable
@@ -101,11 +122,13 @@ private fun ChatViewPreview() {
             title = "My Name",
             userChatStatus = UserChatStatus.Away,
             isChatNotificationMute = true,
-            isPrivateChat = true
+            isPrivateChat = true,
+            myPermission = ChatRoomPermission.Standard,
         )
         ChatView(
             uiState = uiState,
-            onBackPressed = {}
+            onBackPressed = {},
+            onMenuActionPressed = {}
         )
     }
 }

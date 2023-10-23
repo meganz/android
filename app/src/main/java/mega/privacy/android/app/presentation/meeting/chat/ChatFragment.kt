@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting
+package mega.privacy.android.app.presentation.meeting.chat
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +12,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.meeting.chat.ChatView
-import mega.privacy.android.app.presentation.meeting.chat.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -39,7 +39,8 @@ internal class ChatFragment : Fragment() {
             AndroidTheme(isDark = mode.isDarkMode()) {
                 ChatView(
                     uiState = uiState,
-                    onBackPressed = { activity?.finish() }
+                    onBackPressed = { activity?.finish() },
+                    onMenuActionPressed = viewModel::handleActionPress,
                 )
             }
         }
