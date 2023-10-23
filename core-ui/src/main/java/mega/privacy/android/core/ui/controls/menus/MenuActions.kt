@@ -37,9 +37,10 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  * Utility function to generate actions for [TopAppBar]
  * @param actions the actions to be added
  * @param maxActionsToShow if there are more actions than that the extra actions will be shown in a drop down menu
- * @param dropDownIcon an icon for the drop down
- * @param tint the tint color for the icons, including [dropDownIcon]
- * @param onActionClick event to recieve clicks on actions, both in the toolbar or in the drop down menu
+ * @param tint the tint color for the icons
+ * @param enabled checks if option should be clickable
+ * @param selectMode enables tint color based on selection mode turned on or off
+ * @param onActionClick event to receive clicks on actions, both in the toolbar or in the drop down menu
  */
 @Composable
 fun MenuActions(
@@ -122,10 +123,12 @@ private fun DropDown(
         }
     ) {
         actions.forEach {
-            DropdownMenuItem(onClick = {
-                onActionClick(it)
-                showMoreMenu = false
-            }
+            DropdownMenuItem(
+                onClick = {
+                    onActionClick(it)
+                    showMoreMenu = false
+                },
+                modifier = Modifier.testTag(it.getDescription())
             ) {
                 Text(text = it.getDescription())
             }

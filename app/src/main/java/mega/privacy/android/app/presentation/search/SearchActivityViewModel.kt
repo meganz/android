@@ -31,7 +31,6 @@ import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
