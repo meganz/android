@@ -2,8 +2,6 @@ package mega.privacy.android.app.presentation.myaccount.view
 
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -11,14 +9,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -27,7 +23,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -35,7 +30,6 @@ import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -110,24 +104,24 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.amber_400
 import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.extensions.amber_700_amber_300
+import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.grey_020_black
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_700
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_900
 import mega.privacy.android.core.ui.theme.extensions.grey_100_alpha_060_grey_100
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.extensions.white_alpha_087_grey_alpha_087
-import mega.privacy.android.core.ui.theme.extensions.white_black
 import mega.privacy.android.core.ui.theme.extensions.white_grey_800
-import mega.privacy.android.core.ui.theme.red_400
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -147,28 +141,28 @@ internal object Constants {
     val HEADER_RIGHT_MARGIN = 40.dp
 
     // Test Tags
-    const val IMAGE_AVATAR = "image_avatar"
-    const val TEXT_AVATAR = "text_avatar"
-    const val NAME_TEXT = "name_text"
-    const val EMAIL_TEXT = "email_text"
-    const val PHONE_NUMBER_TEXT = "phone_number_text"
-    const val ACCOUNT_TYPE_SECTION = "account_type_section"
-    const val UPGRADE_BUTTON = "upgrade_button"
-    const val EXPIRED_BUSINESS_BANNER = "expired_business_banner"
-    const val EXPIRED_BUSINESS_BANNER_TEXT = "expired_business_banner_text"
-    const val PAYMENT_ALERT_INFO = "payment_alert_info"
-    const val USAGE_METER = "usage_meter"
-    const val USAGE_STORAGE_SECTION = "usage_storage_section"
-    const val USAGE_STORAGE_PROGRESS = "usage_storage_progress"
-    const val USAGE_STORAGE_IMAGE = "usage_storage_image"
-    const val USAGE_TRANSFER_SECTION = "usage_transfer_section"
-    const val USAGE_TRANSFER_PROGRESS = "usage_transfer_progress"
-    const val USAGE_TRANSFER_IMAGE = "usage_transfer_image"
-    const val ADD_PHONE_NUMBER = "add_phone_number"
-    const val BACKUP_RECOVERY_KEY = "backup_recovery_key"
-    const val CONTACTS = "contacts"
-    const val ACHIEVEMENTS = "achievements"
-    const val LAST_SESSION = "last_session"
+    const val IMAGE_AVATAR = "my_account_home_view:image_avatar"
+    const val TEXT_AVATAR = "my_account_home_view:text_avatar"
+    const val NAME_TEXT = "my_account_home_view:name_text"
+    const val EMAIL_TEXT = "my_account_home_view:email_text"
+    const val PHONE_NUMBER_TEXT = "my_account_home_view:phone_number_text"
+    const val ACCOUNT_TYPE_SECTION = "my_account_home_view:account_type_section"
+    const val UPGRADE_BUTTON = "my_account_home_view:upgrade_button"
+    const val EXPIRED_BUSINESS_BANNER = "my_account_home_view:expired_business_banner"
+    const val EXPIRED_BUSINESS_BANNER_TEXT = "my_account_home_view:expired_business_banner_text"
+    const val PAYMENT_ALERT_INFO = "my_account_home_view:payment_alert_info"
+    const val USAGE_METER = "my_account_home_view:usage_meter"
+    const val USAGE_STORAGE_SECTION = "my_account_home_view:usage_storage_section"
+    const val USAGE_STORAGE_PROGRESS = "my_account_home_view:usage_storage_progress"
+    const val USAGE_STORAGE_IMAGE = "my_account_home_view:usage_storage_image"
+    const val USAGE_TRANSFER_SECTION = "my_account_home_view:usage_transfer_section"
+    const val USAGE_TRANSFER_PROGRESS = "my_account_home_view:usage_transfer_progress"
+    const val USAGE_TRANSFER_IMAGE = "my_account_home_view:usage_transfer_image"
+    const val ADD_PHONE_NUMBER = "my_account_home_view:list_item:add_phone_number"
+    const val BACKUP_RECOVERY_KEY = "my_account_home_view:list_item:backup_recovery_key"
+    const val CONTACTS = "my_account_home_view:list_item:contacts"
+    const val ACHIEVEMENTS = "my_account_home_view:list_item:achievements"
+    const val LAST_SESSION = "my_account_home_view:list_item:last_session"
 }
 
 /**
@@ -228,7 +222,10 @@ fun MyAccountHomeView(
             MyAccountHeader(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = HEADER_TOP_PADDING)
+                    .padding(
+                        top = HEADER_TOP_PADDING,
+                        bottom = 30.dp
+                    )
                     .onGloballyPositioned { c ->
                         headerHeight = with(density) { c.size.height.toDp() }
                     },
@@ -241,70 +238,14 @@ fun MyAccountHomeView(
                 onEditProfile = uiActions::onEditProfile
             )
 
-            AccountTypeSection(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = ACCOUNT_TYPE_TOP_PADDING)
-                    .onGloballyPositioned { c ->
-                        accountTypeHeight = with(density) { c.size.height.toDp() }
-                    },
-                accountType = uiState.accountType,
-                showButton = (uiState.isBusinessAccount || uiState.accountType == AccountType.PRO_FLEXI).not(),
-                buttonText = stringResource(id = R.string.my_account_upgrade_pro),
-                onButtonClickListener = {
-                    if (uiState.isBusinessAccount.not()) {
-                        uiActions.onUpgradeAccount()
-                    }
-                }
-            )
-
-            if (shouldShowPaymentInfo(uiState)) {
-                val isExpiredOrGracePeriod =
-                    uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not()
-                val isPaymentAlertVisible =
-                    (uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive) || uiState.isBusinessAccount.not()
-                val isSubscriptionRenewableOrExpired =
-                    uiState.hasRenewableSubscription || uiState.hasExpireAbleSubscription
-
-                AnimatedVisibility(
-                    visible = isExpiredOrGracePeriod,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-                ) {
-                    ExpiredOrGraceBusinessInfo(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        businessStatus = uiState.businessStatus,
-                        backgroundColor = uiState.accountType.toAccountAttributes().background
-                    )
-                }
-
-                AnimatedVisibility(
-                    visible = isPaymentAlertVisible && isSubscriptionRenewableOrExpired,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-                ) {
-                    PaymentAlertSection(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        renewTime = uiState.subscriptionRenewTime,
-                        expirationTime = uiState.proExpirationTime,
-                        hasRenewableSubscription = uiState.hasRenewableSubscription,
-                        backgroundColor = uiState.accountType.toAccountAttributes().background
-                    )
-                }
-            }
-
             val accountTypeInfoHeight =
                 screenHeight.dp - headerHeight - accountTypeHeight - TOOLBAR_HEIGHT - HEADER_TOP_PADDING - ACCOUNT_TYPE_TOP_PADDING
 
             AccountInfoSection(
-                modifier = Modifier
-                    .defaultMinSize(minHeight = accountTypeInfoHeight),
                 uiState = uiState,
                 uiActions = uiActions,
+                modifier = Modifier
+                    .defaultMinSize(minHeight = accountTypeInfoHeight),
             )
         }
     }
@@ -312,7 +253,6 @@ fun MyAccountHomeView(
 
 @Composable
 internal fun MyAccountHeader(
-    modifier: Modifier = Modifier,
     avatar: File?,
     avatarColor: Int?,
     name: String?,
@@ -320,6 +260,7 @@ internal fun MyAccountHeader(
     verifiedPhoneNumber: String?,
     onClickUserAvatar: () -> Unit,
     onEditProfile: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     ConstraintLayout(modifier = modifier) {
         val (avatarIv, qr, nameTv, edit, emailTv, phoneTv) = createRefs()
@@ -454,96 +395,26 @@ internal fun MyAccountHeader(
 }
 
 @Composable
-internal fun AccountTypeSection(
-    modifier: Modifier = Modifier,
-    accountType: AccountType?,
-    showButton: Boolean,
-    buttonText: String,
-    onButtonClickListener: () -> Unit,
-) {
-    val attributes = accountType.toAccountAttributes()
-
-    ConstraintLayout(
-        modifier = modifier
-            .testTag(ACCOUNT_TYPE_SECTION)
-            .fillMaxWidth()
-            .height(46.dp)
-            .padding(horizontal = 22.dp)
-            .clip(shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-            .background(attributes.background)
-    ) {
-        val (iconIv, typeTv, upgradeBtn) = createRefs()
-
-        Icon(
-            modifier = Modifier
-                .size(24.dp)
-                .constrainAs(iconIv) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start, 10.dp)
-                },
-            painter = painterResource(id = attributes.icon),
-            contentDescription = stringResource(id = attributes.description),
-            tint = MaterialTheme.colors.white_black,
-        )
-
-        Text(
-            modifier = Modifier
-                .constrainAs(typeTv) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(iconIv.end, 9.dp)
-                },
-            text = stringResource(id = attributes.description),
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.white_black,
-        )
-
-        if (showButton) {
-            TextButton(
-                modifier = Modifier
-                    .testTag(UPGRADE_BUTTON)
-                    .constrainAs(upgradeBtn) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end)
-                    },
-                onClick = onButtonClickListener,
-            ) {
-                Text(
-                    text = buttonText,
-                    style = MaterialTheme.typography.button,
-                    color = MaterialTheme.colors.white_black,
-                )
-            }
-        }
-    }
-}
-
-@Composable
 internal fun ExpiredOrGraceBusinessInfo(
-    modifier: Modifier = Modifier,
     businessStatus: BusinessAccountStatus?,
-    backgroundColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .testTag(EXPIRED_BUSINESS_BANNER)
-            .padding(horizontal = 22.dp)
-            .background(backgroundColor)
+            .padding(start = 14.dp, bottom = 10.dp)
     ) {
         val businessExpiryText =
             if (businessStatus == BusinessAccountStatus.Expired) R.string.payment_overdue_label else R.string.payment_required_label
         val businessTextColor =
-            if (businessStatus == BusinessAccountStatus.Expired) red_400 else amber_400
+            if (businessStatus == BusinessAccountStatus.Expired) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.amber_700_amber_300
 
         Text(
             modifier = Modifier
                 .testTag(EXPIRED_BUSINESS_BANNER_TEXT)
-                .fillMaxWidth()
-                .padding(start = 12.dp, bottom = 10.dp),
+                .fillMaxWidth(),
             text = stringResource(id = businessExpiryText),
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.body1,
             color = businessTextColor
         )
     }
@@ -551,22 +422,19 @@ internal fun ExpiredOrGraceBusinessInfo(
 
 @Composable
 private fun PaymentAlertSection(
-    modifier: Modifier = Modifier,
     renewTime: Long,
     expirationTime: Long,
     hasRenewableSubscription: Boolean,
-    backgroundColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .testTag(PAYMENT_ALERT_INFO)
-            .padding(horizontal = 22.dp)
-            .background(backgroundColor)
+            .padding(start = 14.dp, bottom = 10.dp)
     ) {
         MegaSpannedText(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 12.dp, bottom = 10.dp),
+                .fillMaxWidth(),
             value = stringResource(
                 if (hasRenewableSubscription) R.string.account_info_renews_on else R.string.account_info_expires_on,
                 TimeUtils.formatDate(
@@ -575,15 +443,15 @@ private fun PaymentAlertSection(
                     LocalContext.current
                 )
             ),
-            baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.white_alpha_087_grey_alpha_087),
+            baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.black_white),
             styles = hashMapOf(
                 SpanIndicator('A') to SpanStyle(
-                    fontSize = 12.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Normal
                 ),
                 SpanIndicator('B') to SpanStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal
                 )
             )
         )
@@ -592,11 +460,17 @@ private fun PaymentAlertSection(
 
 @Composable
 private fun AccountInfoSection(
-    modifier: Modifier = Modifier,
     uiState: MyAccountHomeUIState,
     uiActions: MyAccountHomeViewActions,
+    modifier: Modifier = Modifier,
 ) {
     var lastSessionClick by remember { mutableStateOf(0) }
+    val isExpiredOrGracePeriod =
+        uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not()
+    val isPaymentAlertVisible =
+        (uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive) || uiState.isBusinessAccount.not()
+    val isSubscriptionRenewableOrExpired =
+        uiState.hasRenewableSubscription || uiState.hasExpireAbleSubscription
 
     Column(
         modifier = modifier
@@ -604,6 +478,20 @@ private fun AccountInfoSection(
             .clip(shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
             .background(MaterialTheme.colors.white_grey_800)
     ) {
+        AccountTypeSection(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
+            accountType = uiState.accountType,
+            showButton = (uiState.isBusinessAccount || uiState.accountType == AccountType.PRO_FLEXI).not(),
+            onButtonClickListener = {
+                if (uiState.isBusinessAccount.not()) {
+                    uiActions.onUpgradeAccount()
+                }
+            }
+        )
+
         UsageMeterSection(
             modifier = Modifier
                 .fillMaxWidth()
@@ -620,12 +508,41 @@ private fun AccountInfoSection(
             onUsageMeterClick = uiActions::onClickUsageMeter
         )
 
+        if (shouldShowPaymentInfo(uiState)) {
+            AnimatedVisibility(
+                visible = isExpiredOrGracePeriod,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                ExpiredOrGraceBusinessInfo(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    businessStatus = uiState.businessStatus,
+                )
+            }
+            AnimatedVisibility(
+                visible = isPaymentAlertVisible && isSubscriptionRenewableOrExpired,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                PaymentAlertSection(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    renewTime = uiState.subscriptionRenewTime,
+                    expirationTime = uiState.proExpirationTime,
+                    hasRenewableSubscription = uiState.hasRenewableSubscription,
+                )
+            }
+        }
+
         if (uiState.isBusinessAccount && uiState.isMasterBusinessAccount) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(top = 10.dp)
+                    .padding(top = 6.dp)
                     .background(MaterialTheme.colors.grey_050_grey_900)
             ) {
                 Text(
@@ -636,7 +553,7 @@ private fun AccountInfoSection(
         }
 
         if (uiState.canVerifyPhoneNumber && uiState.verifiedPhoneNumber == null) {
-            AccountInfoListItem(
+            ImageIconItem(
                 icon = R.drawable.ic_verify_phone_circle,
                 title = R.string.add_phone_label,
                 description = stringResource(R.string.sms_add_phone_number_dialog_msg_non_achievement_user),
@@ -652,38 +569,41 @@ private fun AccountInfoSection(
             )
         }
 
-        AccountInfoListItem(
+        ImageIconItem(
             icon = R.drawable.ic_recovery_key_circle,
             title = R.string.action_export_master_key,
             description = stringResource(id = R.string.backup_recovery_key_subtitle),
             isIconMode = false,
             onClickListener = uiActions::onBackupRecoveryKey,
-            testTag = BACKUP_RECOVERY_KEY
+            testTag = BACKUP_RECOVERY_KEY,
+            withDivider = true,
         )
 
-        AccountInfoListItem(
-            icon = R.drawable.ic_contacts_connections,
+        ImageIconItem(
+            icon = R.drawable.ic_contacts_connection,
             title = R.string.section_contacts,
             description = uiState.visibleContacts?.let {
                 pluralStringResource(id = R.plurals.my_account_connections, count = it, it)
             } ?: stringResource(id = R.string.recovering_info),
             isIconMode = true,
             onClickListener = uiActions::onClickContacts,
-            testTag = CONTACTS
+            testTag = CONTACTS,
+            withDivider = true,
         )
 
         if (uiState.isBusinessAccount.not()) {
-            AccountInfoListItem(
+            ImageIconItem(
                 icon = R.drawable.ic_achievement,
                 title = R.string.achievements_title,
                 description = stringResource(id = R.string.achievements_subtitle),
                 isIconMode = true,
                 onClickListener = uiActions::onClickAchievements,
-                testTag = ACHIEVEMENTS
+                testTag = ACHIEVEMENTS,
+                withDivider = true,
             )
         }
 
-        AccountInfoListItem(
+        ImageIconItem(
             icon = R.drawable.ic_last_session,
             title = R.string.my_account_last_session,
             description = uiState.lastSession?.let {
@@ -694,7 +614,6 @@ private fun AccountInfoSection(
                 )
             } ?: stringResource(id = R.string.recovering_info),
             isIconMode = true,
-            withDivider = false,
             onClickListener = {
                 lastSessionClick++
 
@@ -709,8 +628,79 @@ private fun AccountInfoSection(
 }
 
 @Composable
-internal fun UsageMeterSection(
+internal fun AccountTypeSection(
+    accountType: AccountType?,
+    showButton: Boolean,
+    onButtonClickListener: () -> Unit,
     modifier: Modifier = Modifier,
+) {
+    val attributes = accountType.toAccountAttributes()
+
+    ConstraintLayout(
+        modifier = modifier
+            .testTag(ACCOUNT_TYPE_SECTION)
+            .wrapContentHeight()
+            .border(1.dp, MaterialTheme.colors.grey_050_grey_700, RoundedCornerShape(4.dp))
+    ) {
+        val (iconIv, currentPlan, typeTv, upgradeBtn) = createRefs()
+        val planChain = createVerticalChain(currentPlan, typeTv, chainStyle = ChainStyle.Packed)
+
+        Icon(
+            modifier = Modifier
+                .constrainAs(iconIv) {
+                    top.linkTo(parent.top, 27.dp)
+                    bottom.linkTo(parent.bottom, 25.dp)
+                    start.linkTo(parent.start, 16.dp)
+                },
+            painter = painterResource(id = R.drawable.ic_account_type),
+            contentDescription = stringResource(id = attributes.description),
+        )
+
+        constrain(planChain) {
+            top.linkTo(parent.top)
+            bottom.linkTo(parent.bottom)
+        }
+
+        Text(
+            modifier = Modifier
+                .constrainAs(currentPlan) {
+                    start.linkTo(iconIv.end, 16.dp)
+                },
+            text = "Current plan",
+            style = MaterialTheme.typography.subtitle2,
+            color = MaterialTheme.colors.textColorPrimary,
+        )
+
+        Text(
+            modifier = Modifier
+                .constrainAs(typeTv) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(iconIv.end, 16.dp)
+                },
+            text = stringResource(id = attributes.description),
+            style = MaterialTheme.typography.body2medium,
+            color = MaterialTheme.colors.textColorSecondary,
+        )
+
+        if (showButton) {
+            RaisedDefaultMegaButton(
+                textId = R.string.my_account_upgrade_pro,
+                onClick = onButtonClickListener,
+                modifier = Modifier
+                    .testTag(UPGRADE_BUTTON)
+                    .constrainAs(upgradeBtn) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, 16.dp)
+                    }
+            )
+        }
+    }
+}
+
+@Composable
+internal fun UsageMeterSection(
     showTransfer: Boolean,
     showProgressBar: Boolean,
     usedStoragePercentage: Int,
@@ -720,6 +710,7 @@ internal fun UsageMeterSection(
     usedTransfer: Long,
     totalTransfer: Long,
     onUsageMeterClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val isStorageOverQuota = remember { usedStoragePercentage > 100 }
 
@@ -890,110 +881,6 @@ internal fun UsageMeterSection(
 }
 
 @Composable
-private fun AccountInfoListItem(
-    modifier: Modifier = Modifier,
-    @DrawableRes icon: Int,
-    @StringRes title: Int,
-    description: String,
-    isIconMode: Boolean,
-    withDivider: Boolean = true,
-    testTag: String = "",
-    onClickListener: () -> Unit = {},
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-
-    ConstraintLayout(
-        modifier = modifier
-            .testTag(testTag)
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable(
-                onClick = onClickListener,
-                interactionSource = interactionSource,
-                indication = null
-            )
-    ) {
-        val (iconImage, titleTv, subtitleTv, divider) = createRefs()
-        val topMargin = if (isIconMode) 14.dp else 10.dp
-
-        if (isIconMode) {
-            Icon(
-                modifier = Modifier.constrainAs(iconImage) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start, 20.dp)
-                },
-                painter = painterResource(id = icon),
-                tint = MaterialTheme.colors.textColorSecondary,
-                contentDescription = stringResource(id = title),
-            )
-        } else {
-            Image(
-                modifier = Modifier
-                    .size(40.dp)
-                    .constrainAs(iconImage) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(parent.start, 14.dp)
-                    },
-                painter = painterResource(id = icon),
-                contentDescription = stringResource(id = title)
-            )
-        }
-
-        Text(
-            modifier = Modifier.constrainAs(titleTv) {
-                top.linkTo(parent.top, topMargin)
-                linkTo(
-                    start = parent.start,
-                    end = parent.end,
-                    startMargin = 72.dp,
-                    endMargin = 18.dp,
-                    bias = 0f
-                )
-                width = Dimension.fillToConstraints
-            },
-            text = stringResource(id = title),
-            style = MaterialTheme.typography.subtitle2.copy(
-                fontWeight = FontWeight.Medium,
-                fontSize = if (isIconMode) 16.sp else 14.sp
-            ),
-            color = MaterialTheme.colors.onPrimary
-        )
-
-        Text(
-            modifier = Modifier
-                .testTag("${testTag}_description")
-                .constrainAs(subtitleTv) {
-                    top.linkTo(titleTv.bottom, 3.dp)
-                    linkTo(
-                        start = parent.start,
-                        end = parent.end,
-                        startMargin = 72.dp,
-                        endMargin = 18.dp,
-                        bias = 0f
-                    )
-                    width = Dimension.fillToConstraints
-                },
-            text = description,
-            style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.textColorSecondary
-        )
-
-        if (withDivider) {
-            Divider(
-                modifier = Modifier.constrainAs(divider) {
-                    top.linkTo(subtitleTv.bottom, topMargin)
-                    end.linkTo(parent.end)
-                    start.linkTo(parent.start, 144.dp)
-                },
-                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012
-            )
-        }
-    }
-}
-
-@Composable
 private fun formatSize(size: Long): String = Util.getSizeString(size, LocalContext.current)
 
 private fun shouldShowPaymentInfo(uiState: MyAccountHomeUIState): Boolean {
@@ -1013,7 +900,7 @@ internal fun MyAccountHomePreview() {
             uiState = MyAccountHomeUIState(
                 name = "QWERTY UIOP",
                 email = "qwerty@uiop.com",
-                verifiedPhoneNumber = "+6282141058000",
+                verifiedPhoneNumber = null,
                 avatarColor = R.color.dark_grey,
                 accountType = AccountType.BUSINESS,
                 usedTransfer = 100,
@@ -1026,7 +913,7 @@ internal fun MyAccountHomePreview() {
                 hasExpireAbleSubscription = true,
                 hasRenewableSubscription = true,
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = true,
+                isBusinessStatusActive = false,
                 subscriptionRenewTime = 1000000,
                 proExpirationTime = 150000,
                 businessStatus = BusinessAccountStatus.Expired

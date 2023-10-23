@@ -1,10 +1,10 @@
 package test.mega.privacy.android.app.presentation.myaccount
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -46,15 +46,6 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountHeader
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountHomeView
-import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.blue_300
-import mega.privacy.android.core.ui.theme.blue_400
-import mega.privacy.android.core.ui.theme.green_300
-import mega.privacy.android.core.ui.theme.green_400
-import mega.privacy.android.core.ui.theme.orange_300
-import mega.privacy.android.core.ui.theme.orange_600
-import mega.privacy.android.core.ui.theme.red_200
-import mega.privacy.android.core.ui.theme.red_300
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AccountType.*
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -64,7 +55,6 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import test.mega.privacy.android.app.fromId
 import test.mega.privacy.android.app.fromPluralId
-import test.mega.privacy.android.app.hasBackgroundColor
 import kotlin.random.Random
 
 @HiltAndroidTest
@@ -126,45 +116,38 @@ class MyAccountHomeViewTest {
     }
 
     @Test
-    fun `test that account type section render with correct attributes when account is FREE and dark theme`() {
-        verifyAccountTypeSectionColor(FREE, green_300, true)
+    fun `test that account type section render with correct attributes when account is FREE`() {
+        verifyAccountTypeSection(FREE, R.string.free_account)
     }
 
     @Test
-    fun `test that account type section render with correct attributes when account is PRO_LITE and dark theme`() {
-        verifyAccountTypeSectionColor(PRO_LITE, orange_300, true)
+    fun `test that account type section render with correct attributes when account is PRO_LITE`() {
+        verifyAccountTypeSection(PRO_LITE, R.string.prolite_account)
     }
 
     @Test
-    fun `test that account type section render with correct attributes when account is PRO and dark theme`() {
-        val proList = listOf(PRO_I, PRO_II, PRO_III, PRO_FLEXI)
-        verifyAccountTypeSectionColor(proList.random(), red_200, true)
+    fun `test that account type section render with correct attributes when account is PRO I`() {
+        verifyAccountTypeSection(PRO_I, R.string.pro1_account)
     }
 
     @Test
-    fun `test that account type section render with correct attributes when account is BUSINESS and dark theme`() {
-        verifyAccountTypeSectionColor(BUSINESS, blue_300, true)
+    fun `test that account type section render with correct attributes when account is PRO II`() {
+        verifyAccountTypeSection(PRO_II, R.string.pro2_account)
     }
 
     @Test
-    fun `test that account type section render with correct attributes when account is FREE and light theme`() {
-        verifyAccountTypeSectionColor(FREE, green_400, false)
+    fun `test that account type section render with correct attributes when account is PRO III`() {
+        verifyAccountTypeSection(PRO_III, R.string.pro3_account)
     }
 
     @Test
-    fun `test that account type section render with correct attributes when account is PRO_LITE and light theme`() {
-        verifyAccountTypeSectionColor(PRO_LITE, orange_600, false)
+    fun `test that account type section render with correct attributes when account is PRO Flexi`() {
+        verifyAccountTypeSection(PRO_FLEXI, R.string.pro_flexi_account)
     }
 
     @Test
-    fun `test that account type section render with correct attributes when account is PRO and light theme`() {
-        val proList = listOf(PRO_I, PRO_II, PRO_III, PRO_FLEXI)
-        verifyAccountTypeSectionColor(proList.random(), red_300, false)
-    }
-
-    @Test
-    fun `test that account type section render with correct attributes when account is BUSINESS and light theme`() {
-        verifyAccountTypeSectionColor(BUSINESS, blue_400, false)
+    fun `test that account type section render with correct attributes when account is Business`() {
+        verifyAccountTypeSection(BUSINESS, R.string.business_label)
     }
 
     @Test
@@ -468,7 +451,6 @@ class MyAccountHomeViewTest {
 
         composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER).assertIsDisplayed()
     }
-
     @Test
     fun `test that payment alert should not be shown when due is more than 7 days`() {
         val eightDaysInSeconds = 691200
@@ -522,24 +504,19 @@ class MyAccountHomeViewTest {
             .isAtMost(maxScreenWidth - CONTAINER_LEFT_MARGIN - AVATAR_SIZE.dp - HEADER_LEFT_MARGIN - HEADER_RIGHT_MARGIN)
     }
 
-    private fun verifyAccountTypeSectionColor(
+    private fun verifyAccountTypeSection(
         accountType: AccountType,
-        color: Color,
-        isDark: Boolean,
+        accountName: Int,
     ) {
         composeTestRule.setContent {
-            AndroidTheme(isDark = isDark) {
-                AccountTypeSection(
-                    accountType = accountType,
-                    showButton = true,
-                    buttonText = "test",
-                    onButtonClickListener = {}
-                )
-            }
+            AccountTypeSection(
+                accountType = accountType,
+                showButton = true,
+                onButtonClickListener = {}
+            )
         }
 
         composeTestRule.onNodeWithTag(ACCOUNT_TYPE_SECTION)
-            .assertIsDisplayed()
-            .assert(hasBackgroundColor(color))
+            .assertIsDisplayed().assert(hasAnyChild(hasText(fromId(accountName))))
     }
 }
