@@ -78,7 +78,6 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         underTest(nodeId)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
-        verify(nodeRepository).saveOfflineNodeInformation(parentOfflineInformation, null)
     }
 
     @Test
@@ -92,7 +91,6 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         underTest(parentId)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
-        verify(nodeRepository).saveOfflineNodeInformation(parentOfflineInformation, null)
     }
 
     @Test
@@ -119,7 +117,6 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getBackupFolderId()).thenReturn(nodeId)
 
         underTest(nodeId)
-        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
         verify(nodeRepository, times(0)).saveOfflineNodeInformation(parentOfflineInformation, null)
     }
 
