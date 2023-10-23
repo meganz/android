@@ -63,6 +63,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
     override fun start() = callbackFlow {
         try {
             with(config) {
+                isRunning = true
                 while (queue.isNotEmpty() && isRunning()) {
                     ensureActive()
                     val attachment = queue.poll()
@@ -117,13 +118,29 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             send(VideoCompressionState.Failed())
         }
         send(VideoCompressionState.Finished)
-        config.isRunning = false
+        resetConfig()
         channel.close()
     }.cancellable()
 
     override fun addItems(videoAttachments: List<VideoAttachment>) {
         config.queue.addAll(videoAttachments)
         config.total += videoAttachments.size
+    }
+
+    private fun resetConfig() {
+        config.apply {
+            isRunning = false
+            videoQuality = VideoQuality.ORIGINAL
+            width = 0
+            height = 0
+            resultWidth = 0
+            resultHeight = 0
+            outputRoot = null
+            currentFileIndex = 0
+            totalSizeProcessed = 0
+            total = 0
+            queue.clear()
+        }
     }
 
     /**
@@ -223,8 +240,9 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             outputSurface = OutputSurface()
             videoDecoder = createVideoDecoder(inputFormat, outputSurface.surface)
             audioExtractor = createExtractor(inputFile)
-            val audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor).takeIf { it >= 0 }
-                ?: throw RuntimeException("Audio information not found")
+            val audioInputTrack =
+                getAndSelectAudioTrackIndex(audioExtractor).takeIf { trackIndex -> trackIndex >= 0 }
+                    ?: throw RuntimeException("Audio information not found")
             val inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack)
             val outputAudioFormat = MediaFormat.createAudioFormat(
                 inputAudioFormat.getString(MediaFormat.KEY_MIME)
@@ -779,7 +797,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
      * @param queue [ConcurrentLinkedQueue] of [VideoAttachment] a queue to hold the videos to be processed one by one
      */
     inner class VideoCompressionConfig(
-        var isRunning: Boolean = true,
+        var isRunning: Boolean = false,
         var videoQuality: VideoQuality = VideoQuality.ORIGINAL,
         var width: Int = 0,
         var height: Int = 0,

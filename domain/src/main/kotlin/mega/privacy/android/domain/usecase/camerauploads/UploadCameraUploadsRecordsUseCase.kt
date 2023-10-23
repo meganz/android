@@ -7,12 +7,15 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.VideoCompressionState
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
@@ -31,6 +34,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoTh
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
+import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.TimeUnit
@@ -44,6 +48,10 @@ import javax.inject.Inject
  * - the node does not exists in the cloud : upload
  * - the node exists in another folder except rubbish bin : copy
  * - the node exists in the upload folder : do nothing
+ *
+ * It will also generate the temporary file to upload in case:
+ * - the user set the option to remove gps coordinates
+ * - the user set the option to compress the video
  *
  * The use case is also responsible of setting the upload status in the database.
  * It will return a flow of events representing the status progress for an individual record.
@@ -66,18 +74,27 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     private val createImageOrVideoPreviewUseCase: CreateImageOrVideoPreviewUseCase,
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase,
     private val deletePreviewUseCase: DeletePreviewUseCase,
+    private val compressVideoUseCase: CompressVideoUseCase,
+    private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
     private val fileSystemRepository: FileSystemRepository,
 ) {
 
     companion object {
         private const val CONCURRENT_UPLOADS_LIMIT = 16
+        private const val CONCURRENT_VIDEO_COMPRESSION_LIMIT = 1
     }
 
     /**
-     * In order to not overload the memory of the app,
-     * limit the number of concurrent uploads to [CONCURRENT_UPLOADS_LIMIT]
+     * Limit the number of concurrent uploads to [CONCURRENT_UPLOADS_LIMIT]
+     * to not overload the memory of the app,
      */
     private val semaphore = Semaphore(CONCURRENT_UPLOADS_LIMIT)
+
+    /**
+     * Limit the number of concurrent video compression to [CONCURRENT_VIDEO_COMPRESSION_LIMIT]
+     * to not overload the memory and cache size of the app
+     */
+    private val videoCompressionSemaphore = Semaphore(CONCURRENT_VIDEO_COMPRESSION_LIMIT)
 
     /**
      * Camera Uploads upload process
@@ -93,6 +110,9 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         secondaryUploadNodeId: NodeId,
         tempRoot: String,
     ) = channelFlow {
+        val videoQuality = getUploadVideoQualityUseCase() ?: VideoQuality.ORIGINAL
+        val locationTagsDisabled = !areLocationTagsEnabledUseCase()
+
         cameraUploadsRecords.map { record ->
             val parentNodeId = getParentNodeId(record, primaryUploadNodeId, secondaryUploadNodeId)
 
@@ -115,7 +135,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                     existingNodeId == null -> {
 
                         // create temporary file
-                        if (record.type == SyncRecordType.TYPE_PHOTO && !areLocationTagsEnabledUseCase()) {
+                        if (shouldRemoveLocationTags(record.type, locationTagsDisabled)) {
                             flow {
                                 emit(
                                     createTempFileAndRemoveCoordinatesUseCase(
@@ -153,6 +173,44 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                 }
                         }
 
+                        // Compress Video
+                        if (shouldCompressVideo(record.type, videoQuality)) {
+                            videoCompressionSemaphore.acquire()
+                            compressVideoUseCase(
+                                tempRoot,
+                                record.filePath,
+                                record.tempFilePath,
+                                videoQuality,
+                            ).catch { emit(VideoCompressionState.Finished) }
+                                .onCompletion { videoCompressionSemaphore.release() }
+                                .collect {
+                                    when (it) {
+                                        is VideoCompressionState.Progress,
+                                        is VideoCompressionState.Successful
+                                        -> {
+                                            trySend(
+                                                CameraUploadsTransferProgress.Compressing(
+                                                    record = record,
+                                                    compressionState = it,
+                                                )
+                                            )
+                                        }
+
+                                        is VideoCompressionState.InsufficientStorage,
+                                        -> {
+                                            trySend(
+                                                CameraUploadsTransferProgress.Compressing(
+                                                    record = record,
+                                                    compressionState = it,
+                                                )
+                                            )
+                                        }
+
+                                        else -> Unit
+                                    }
+                                }
+                        }
+
                         // generate fingerprint and save it
                         // This step is important to check if a file exist in the cloud drive,
                         // in case the original fingerprint cannot be assigned to the Node after the transfer finishes
@@ -166,11 +224,19 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                         }
 
                         // retrieve path of file to upload
-                        val path =
-                            if (record.type == SyncRecordType.TYPE_PHOTO && !areLocationTagsEnabledUseCase())
+                        val path = when {
+                            shouldRemoveLocationTags(record.type, locationTagsDisabled) -> {
                                 record.tempFilePath
-                            else
-                                record.filePath
+                            }
+
+                            shouldCompressVideo(record.type, videoQuality) -> {
+                                // Fallback to the original file if for some reason the compression failed
+                                record.tempFilePath.takeIf { fileSystemRepository.doesFileExist(it) }
+                                    ?: record.filePath
+                            }
+
+                            else -> record.filePath
+                        }
 
                         // upload
                         startUploadUseCase(
@@ -328,5 +394,14 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         CameraUploadFolderType.Secondary -> secondaryUploadNodeId
     }
 
+    private fun shouldRemoveLocationTags(
+        type: SyncRecordType,
+        locationTagsDisabled: Boolean,
+    ) = type == SyncRecordType.TYPE_PHOTO && locationTagsDisabled
+
+    private fun shouldCompressVideo(
+        type: SyncRecordType,
+        videoQuality: VideoQuality
+    ) = type == SyncRecordType.TYPE_VIDEO && videoQuality != VideoQuality.ORIGINAL
 }
 

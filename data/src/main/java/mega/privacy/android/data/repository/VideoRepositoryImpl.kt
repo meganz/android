@@ -10,8 +10,9 @@ import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.VideoRepository
+import javax.inject.Inject
 
-internal class VideoRepositoryImpl(
+internal class VideoRepositoryImpl @Inject constructor(
     private val videoCompressorGateway: VideoCompressorGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : VideoRepository {

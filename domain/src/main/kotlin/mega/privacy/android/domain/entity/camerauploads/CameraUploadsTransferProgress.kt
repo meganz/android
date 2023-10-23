@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.camerauploads
 
+import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 
@@ -62,5 +63,15 @@ sealed interface CameraUploadsTransferProgress {
         override val record: CameraUploadsRecord,
         val transferEvent: TransferEvent.TransferFinishEvent,
         val nodeId: NodeId,
+    ) : CameraUploadsTransferProgress
+
+    /**
+     * Represents a record associated to a video that is under compression
+     *
+     * @property compressionState the state of the compression
+     */
+    data class Compressing(
+        override val record: CameraUploadsRecord,
+        val compressionState: VideoCompressionState,
     ) : CameraUploadsTransferProgress
 }
