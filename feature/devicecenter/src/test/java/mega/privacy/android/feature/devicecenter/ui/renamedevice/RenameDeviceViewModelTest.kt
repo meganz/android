@@ -103,23 +103,24 @@ internal class RenameDeviceViewModelTest {
             }
         }
 
-    @Test
-    fun `test that renaming the device fails when the new device name already exists in the current list of devices`() =
-        runTest {
-            val deviceId = "12345-6789"
-            val newDeviceName = "Old Device Name"
-            val existingDeviceNames = listOf(newDeviceName)
+    @ParameterizedTest(name = "new device name: \"{0}\"")
+    @ValueSource(strings = ["Device", "Device ", " Device", " Device "])
+    fun `test that renaming the device fails when the new device name already exists in the current list of devices`(
+        newDeviceName: String,
+    ) = runTest {
+        val deviceId = "12345-6789"
+        val existingDeviceNames = listOf("Device")
 
-            underTest.renameDevice(
-                deviceId = deviceId,
-                newDeviceName = newDeviceName,
-                existingDeviceNames = existingDeviceNames,
-            )
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.errorMessage).isEqualTo(R.string.device_center_rename_device_dialog_error_message_name_already_exists)
-            }
+        underTest.renameDevice(
+            deviceId = deviceId,
+            newDeviceName = newDeviceName,
+            existingDeviceNames = existingDeviceNames,
+        )
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.errorMessage).isEqualTo(R.string.device_center_rename_device_dialog_error_message_name_already_exists)
         }
+    }
 
     @ParameterizedTest(name = "new device name: {0}")
     @ValueSource(

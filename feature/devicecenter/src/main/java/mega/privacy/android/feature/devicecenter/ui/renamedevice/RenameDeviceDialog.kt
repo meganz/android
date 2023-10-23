@@ -3,6 +3,9 @@ package mega.privacy.android.feature.devicecenter.ui.renamedevice
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -80,12 +83,16 @@ private fun RenameDeviceDialogBody(
     onRenameConfirmed: (String) -> Unit,
     onRenameCancelled: () -> Unit,
 ) {
+    // Saves the input across configuration changes
+    var initialInput by rememberSaveable { mutableStateOf(oldDeviceName) }
+
     InputDialog(
         modifier = Modifier.testTag(RENAME_DEVICE_DIALOG_TAG),
         title = stringResource(id = R.string.device_center_rename_device_dialog_title),
         confirmButtonText = stringResource(id = R.string.device_center_rename_device_dialog_positive_button),
         cancelButtonText = stringResource(id = R.string.device_center_rename_device_dialog_negative_button),
-        text = oldDeviceName,
+        text = initialInput,
+        onInputChange = { initialInput = it },
         error = uiState.errorMessage?.let { nonNullErrorMessage ->
             if (nonNullErrorMessage == R.string.device_center_rename_device_dialog_error_message_invalid_characters) {
                 stringResource(nonNullErrorMessage).replace(

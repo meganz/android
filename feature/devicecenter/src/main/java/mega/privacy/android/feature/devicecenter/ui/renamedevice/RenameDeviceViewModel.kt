@@ -45,26 +45,28 @@ class RenameDeviceViewModel @Inject constructor(
         newDeviceName: String,
         existingDeviceNames: List<String>,
     ) = viewModelScope.launch {
-        runCatching {
-            if (newDeviceName.isBlank()) {
-                _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_empty_device_name) }
-            } else if (newDeviceName in existingDeviceNames) {
-                _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists) }
-            } else if (INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(newDeviceName)) {
-                _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_invalid_characters) }
-            } else {
+        val trimmedName = newDeviceName.trim()
+        if (trimmedName.isBlank()) {
+            _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_empty_device_name) }
+        } else if (trimmedName in existingDeviceNames) {
+            _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists) }
+        } else if (INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName)) {
+            _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_invalid_characters) }
+        } else {
+            runCatching {
                 renameDeviceUseCase(
                     deviceId = deviceId,
-                    deviceName = newDeviceName,
+                    deviceName = trimmedName,
                 )
+            }.onSuccess {
                 _state.update {
                     it.copy(
                         errorMessage = null,
                         renameSuccessfulEvent = triggered,
                     )
                 }
-            }
-        }.onFailure { Timber.e(it) }
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     /**
