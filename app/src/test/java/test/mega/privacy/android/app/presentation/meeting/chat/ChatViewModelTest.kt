@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
@@ -331,6 +332,59 @@ internal class ChatViewModelTest {
         testScheduler.advanceUntilIdle()
         underTest.state.test {
             assertThat(awaitItem().isParticipatingInACall).isEqualTo(isParticipatingInChatCall)
+        }
+    }
+
+    @ParameterizedTest(name = " if chat is group property returns {0}")
+    @EnumSource(ChatRoomPermission::class)
+    fun `test that my permission is updated correctly in state`(
+        permission: ChatRoomPermission,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { peerHandlesList } doReturn listOf(userHandle)
+            on { ownPrivilege } doReturn permission
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().myPermission).isEqualTo(permission)
+        }
+    }
+
+    @ParameterizedTest(name = " if chat is preview property returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is preview has correct state`(
+        isPreviewResult: Boolean,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { peerHandlesList } doReturn listOf(userHandle)
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { isPreview } doReturn isPreviewResult
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isPreviewMode).isEqualTo(isPreviewResult)
+        }
+    }
+
+    @ParameterizedTest(name = " if chat is group property returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is group has correct state`(
+        isGroupResult: Boolean,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn isGroupResult
+            on { peerHandlesList } doReturn listOf(userHandle)
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isGroup).isEqualTo(isGroupResult)
         }
     }
 

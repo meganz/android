@@ -72,17 +72,20 @@ class ChatViewModel @Inject constructor(
                 getChatRoomUseCase(chatId)
             }.onSuccess { chatRoom ->
                 chatRoom?.let {
-                    _state.update { state ->
-                        state.copy(
-                            title = chatRoom.title,
-                            isPrivateChat = chatRoom.isPrivateRoom,
-                            myPermission = chatRoom.ownPrivilege,
-                            isPreviewMode = chatRoom.isPreview,
-                        )
-                    }
-                    if (!it.isGroup) {
-                        getUserChatStatus(it.peerHandlesList[0])
-                        monitorChatOnlineStatusUpdates(it.peerHandlesList[0])
+                    with(chatRoom) {
+                        _state.update { state ->
+                            state.copy(
+                                title = title,
+                                isPrivateChat = chatRoom.isPrivateRoom,
+                                myPermission = ownPrivilege,
+                                isPreviewMode = isPreview,
+                                isGroup = isGroup
+                            )
+                        }
+                        if (!isGroup) {
+                            getUserChatStatus(peerHandlesList[0])
+                            monitorChatOnlineStatusUpdates(peerHandlesList[0])
+                        }
                     }
                 }
             }.onFailure {
@@ -170,6 +173,7 @@ class ChatViewModel @Inject constructor(
     fun handleActionPress(action: ChatRoomMenuAction) {
         when (action) {
             is ChatRoomMenuAction.AudioCall -> {}
+            is ChatRoomMenuAction.VideoCall -> {}
         }
     }
 }

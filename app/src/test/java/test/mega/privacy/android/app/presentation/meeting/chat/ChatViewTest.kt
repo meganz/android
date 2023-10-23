@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_AUDIO_CALL_ACTION
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_VIDEO_CALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_NOTIFICATION_MUTE
@@ -136,23 +137,86 @@ class ChatViewTest {
 
     @Test
     fun `test that audio call is shown and enabled when my permission is moderator`() {
-        initComposeRuleContent(
-            ChatUiState(myPermission = ChatRoomPermission.Moderator)
-        )
+        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Moderator))
         composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
         verify(actionPressed).invoke(any())
     }
 
     @Test
-    fun `test that audio call is shown but disabled when my permission is moderator and I have a call in this chat`() {
+    fun `test that audio call is shown but disabled when my permission is moderator and this chat has a call`() {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Moderator,
-                hasACallInThisChat = true,
+                hasACallInThisChat = true
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        verifyNoInteractions(actionPressed)
+    }
+
+    @Test
+    fun `test that video call is hidden when my permission is unknown`() {
+        initComposeRuleContent(ChatUiState())
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that video call is hidden when my permission is removed`() {
+        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Removed))
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that video call is hidden when my permission is read only`() {
+        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.ReadOnly))
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that video call is hidden when is joining or leaving`() {
+        initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that video call is hidden when is preview mode`() {
+        initComposeRuleContent(ChatUiState(isPreviewMode = true))
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that video call is hidden when the chat is a group`() {
+        initComposeRuleContent(ChatUiState(isGroup = true))
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that video call is shown and enabled when my permission is standard`() {
+        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Standard))
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        verify(actionPressed).invoke(any())
+    }
+
+    @Test
+    fun `test that video call is shown and enabled when my permission is moderator`() {
+        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Moderator))
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        verify(actionPressed).invoke(any())
+    }
+
+    @Test
+    fun `test that video call is shown but disabled when my permission is moderator and this chat has a call`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Moderator,
+                hasACallInThisChat = true
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
         verifyNoInteractions(actionPressed)
     }

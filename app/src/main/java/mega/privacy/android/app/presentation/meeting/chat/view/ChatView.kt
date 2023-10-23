@@ -107,6 +107,10 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> {
             && !isJoiningOrLeaving && !isPreviewMode
         ) {
             actions.add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat))
+
+            if (!isGroup) {
+                actions.add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat))
+            }
         }
     }
 

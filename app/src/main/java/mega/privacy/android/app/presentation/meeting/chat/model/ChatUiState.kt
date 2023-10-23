@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property isJoiningOrLeaving True if the current logged in user is joining or leaving this chat, false otherwise.
  * @property isParticipatingInACall True if the current logged in user is participating in a call, false otherwise.
  * @property hasACallInThisChat True if the current logged in user has a call in this chat, false otherwise.
+ * @property isGroup True if is a chat group, false otherwise.
  */
 data class ChatUiState(
     val title: String? = null,
@@ -26,4 +27,5 @@ data class ChatUiState(
     val isJoiningOrLeaving: Boolean = false,
     val isParticipatingInACall: Boolean = false,
     val hasACallInThisChat: Boolean = false,
+    val isGroup: Boolean = false,
 )

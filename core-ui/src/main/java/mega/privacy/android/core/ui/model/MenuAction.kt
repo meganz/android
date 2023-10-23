@@ -94,7 +94,7 @@ abstract class MenuActionPlural(
     @DrawableRes val iconRes: Int,
     @PluralsRes val descriptionRes: Int,
     val amount: Int,
-    override val testTag: String
+    override val testTag: String,
 ) : MenuActionWithIcon {
     @Composable
     override fun getDescription() = pluralStringResource(id = descriptionRes, amount, amount)

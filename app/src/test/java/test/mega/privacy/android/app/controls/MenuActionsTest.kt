@@ -95,6 +95,7 @@ class MenuActionsTest {
         )
 
     private class MenuActionWithIconForTest(val title: String, override val testTag: String) :
+
         MenuActionWithIcon {
         @Composable
         override fun getIconPainter() = painterResource(id = R.drawable.ic_menu_add)

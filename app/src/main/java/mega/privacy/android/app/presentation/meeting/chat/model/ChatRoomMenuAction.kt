@@ -20,6 +20,14 @@ sealed interface ChatRoomMenuAction : MenuAction {
         override val orderInCategory = 100
     }
 
+    class VideoCall(override val enabled: Boolean) : MenuActionString(
+        iconRes = R.drawable.ic_video_action,
+        descriptionRes = R.string.video_button,
+        testTag = TEST_TAG_VIDEO_CALL_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory = 100
+    }
+
     /**
      * Selection mode action.
      * All the actions which may be available in select mode should be defined here.
@@ -30,5 +38,6 @@ sealed interface ChatRoomMenuAction : MenuAction {
 
     companion object {
         const val TEST_TAG_AUDIO_CALL_ACTION = "chat_view:action_chat_audio_call"
+        const val TEST_TAG_VIDEO_CALL_ACTION = "chat_view:action_chat_video_call"
     }
 }
