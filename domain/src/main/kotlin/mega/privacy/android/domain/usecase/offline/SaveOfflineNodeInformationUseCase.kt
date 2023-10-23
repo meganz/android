@@ -50,14 +50,12 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
         nodeId: NodeId,
         driveRootNodeId: NodeId,
         backupRootNodeId: NodeId,
-    ): Boolean {
+    ) {
         if (nodeId != driveRootNodeId && nodeRepository.getOfflineNodeInformation(nodeId) == null) {
             //only save offline information if not already saved and not the drive root node
             nodeRepository.getNodeById(nodeId)?.let { node ->
                 //we need to first save all parents recursively except explicitly skipped
-                val parentSaved = if (node.id == backupRootNodeId) {
-                    false
-                } else {
+                if (node.id != backupRootNodeId) {
                     saveNodeAndItsParentsRecursively(
                         nodeId = node.parentId,
                         driveRootNodeId = driveRootNodeId,
@@ -66,12 +64,10 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
                 }
                 nodeRepository.saveOfflineNodeInformation(
                     getOfflineNodeInformationUseCase(node),
-                    if (parentSaved) node.parentId else null
+                    if (node.parentId != driveRootNodeId) node.parentId else null
                 )
-                return true
             }
         }
-        return false
     }
 
     /**
