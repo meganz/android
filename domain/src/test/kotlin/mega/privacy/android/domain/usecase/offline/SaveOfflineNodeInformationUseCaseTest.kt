@@ -78,6 +78,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         underTest(nodeId)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
+        verify(nodeRepository).saveOfflineNodeInformation(parentOfflineInformation, parentParentId)
     }
 
     @Test
@@ -91,6 +92,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         underTest(parentId)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
+        verify(nodeRepository).saveOfflineNodeInformation(parentOfflineInformation, parentParentId)
     }
 
     @Test
@@ -117,7 +119,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getBackupFolderId()).thenReturn(nodeId)
 
         underTest(nodeId)
-        verify(nodeRepository, times(0)).saveOfflineNodeInformation(parentOfflineInformation, null)
+        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
     }
 
     private fun stubDriveNodeWithoutParent() = runTest {
@@ -134,6 +136,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(node.parentId).thenReturn(parentId)
         whenever(nodeRepository.getNodeById(parentId)).thenReturn(parent)
         whenever(parent.id).thenReturn(parentId)
+        whenever(parent.parentId).thenReturn(parentParentId)
         whenever(nodeRepository.getBackupFolderId()).thenReturn(invalidId)
     }
 
@@ -149,6 +152,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
     companion object {
         private val nodeId = NodeId(1L)
         private val parentId = NodeId(2L)
+        private val parentParentId = NodeId(3L)
         private val invalidId = NodeId(-1L)
     }
 }
