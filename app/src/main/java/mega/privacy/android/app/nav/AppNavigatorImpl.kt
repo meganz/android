@@ -8,7 +8,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.navigation.AppNavigator
 
 internal interface AppNavigatorImpl : AppNavigator {
-    override fun openSettingCameraUpload(activity: Activity) {
+    override fun openSettingsCameraUploads(activity: Activity) {
         activity.startActivity(
             Intent(
                 activity,

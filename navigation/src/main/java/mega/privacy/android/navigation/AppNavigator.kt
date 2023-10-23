@@ -9,11 +9,11 @@ import android.content.Context
  */
 interface AppNavigator {
     /**
-     * Open setting camera upload
+     * Navigates to the Settings Camera Uploads page
      *
-     * @param activity
+     * @param activity The Activity
      */
-    fun openSettingCameraUpload(activity: Activity)
+    fun openSettingsCameraUploads(activity: Activity)
 
     /**
      * Open backup

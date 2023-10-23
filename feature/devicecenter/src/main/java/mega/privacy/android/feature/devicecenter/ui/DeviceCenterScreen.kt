@@ -18,9 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.ui.controls.appbar.LegacyTopAppBar
+import mega.privacy.android.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -44,7 +46,7 @@ import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDia
 /**
  * Test tags for the Device Center Screen
  */
-internal const val DEVICE_CENTER_TOOLBAR = "device_center_screen:top_app_bar"
+internal const val DEVICE_CENTER_TOOLBAR = "device_center_screen:mega_app_bar"
 internal const val DEVICE_CENTER_THIS_DEVICE_HEADER =
     "device_center_content:menu_action_header_this_device"
 internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
@@ -58,6 +60,8 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
  * @param onNodeMenuIconClicked Lambda that performs a specific action when the Node Menu Icon is
  * clicked
+ * @param onCameraUploadsClicked Lambda that performs a specific action when the User clicks the
+ * "Camera uploads" Bottom Dialog Option
  * @param onRenameDeviceOptionClicked Lambda that performs a specific action when the User clicks
  * the "Rename" Bottom Dialog Option
  * @param onRenameDeviceCancelled Lambda that performs a specific action when cancelling the Rename
@@ -77,6 +81,7 @@ internal fun DeviceCenterScreen(
     snackbarHostState: SnackbarHostState,
     onDeviceClicked: (DeviceUINode) -> Unit,
     onNodeMenuIconClicked: (DeviceCenterUINode) -> Unit,
+    onCameraUploadsClicked: () -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceCancelled: () -> Unit,
     onRenameDeviceSuccessful: () -> Unit,
@@ -120,12 +125,14 @@ internal fun DeviceCenterScreen(
     }
     Scaffold(
         topBar = {
-            LegacyTopAppBar(
+            MegaAppBar(
                 modifier = Modifier.testTag(DEVICE_CENTER_TOOLBAR),
+                appBarType = AppBarType.BACK_NAVIGATION,
                 title = selectedDevice?.name
                     ?: stringResource(R.string.device_center_top_app_bar_title),
-                elevation = false,
-                onBackPressed = {
+                subtitle = null,
+                elevation = 0.dp,
+                onNavigationPressed = {
                     if (modalSheetState.isVisible) {
                         coroutineScope.launch { modalSheetState.hide() }
                     } else {
@@ -160,7 +167,7 @@ internal fun DeviceCenterScreen(
                 modalSheetState = modalSheetState,
                 selectedNode = uiState.menuIconClickedNode ?: return@Scaffold,
                 isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
-                onCameraUploadsClicked = {},
+                onCameraUploadsClicked = onCameraUploadsClicked,
                 onRenameDeviceClicked = onRenameDeviceOptionClicked,
                 onShowInBackupsClicked = {},
                 onShowInCloudDriveClicked = {},
@@ -266,6 +273,7 @@ private fun PreviewDeviceCenterInInitialLoading() {
             snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
+            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -297,6 +305,7 @@ private fun PreviewDeviceCenterInDeviceView() {
             snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
+            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -324,6 +333,7 @@ private fun PreviewDeviceCenterInFolderView() {
             snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
+            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},

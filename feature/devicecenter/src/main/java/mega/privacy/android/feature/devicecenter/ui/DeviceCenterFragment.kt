@@ -72,6 +72,9 @@ class DeviceCenterFragment : Fragment() {
                         snackbarHostState = snackbarHostState,
                         onDeviceClicked = viewModel::showDeviceFolders,
                         onNodeMenuIconClicked = viewModel::setMenuClickedNode,
+                        onCameraUploadsClicked = {
+                            megaNavigator.openSettingsCameraUploads(requireActivity())
+                        },
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,
                         onRenameDeviceSuccessful = {
