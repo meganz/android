@@ -200,7 +200,7 @@ fun ParticipantsFullListView(
                     }
                 }
 
-                if (state.participantsSection != ParticipantsSection.NotInCallSection) {
+                if (state.participantsSection != ParticipantsSection.NotInCallSection || !state.hasHostPermission) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
