@@ -11,7 +11,6 @@ import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class RubbishBinComposeFragmentTest {
@@ -30,7 +29,6 @@ class RubbishBinComposeFragmentTest {
                 onChangeViewTypeClick = {},
                 sortOrder = "Name",
                 emptyState = Pair(R.drawable.rubbish_bin_empty, R.string.context_empty_rubbish_bin),
-                thumbnailViewModel = mock(),
                 onLinkClicked = {},
                 onDisputeTakeDownClicked = {}
             )
