@@ -1,13 +1,17 @@
 package mega.privacy.android.domain.usecase.search
 
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import javax.inject.Inject
 
 /**
@@ -24,6 +28,8 @@ class SearchNodesUseCase @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
+    private val getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
+    private val getCloudSortOrder: GetCloudSortOrder,
     private val nodeRepository: NodeRepository,
 ) {
 
@@ -44,18 +50,28 @@ class SearchNodesUseCase @Inject constructor(
         searchType: SearchType,
         isFirstLevel: Boolean,
         searchCategory: SearchCategory = SearchCategory.ALL,
-    ) = when (searchType) {
-        SearchType.INCOMING_SHARES -> incomingSharesTabSearchUseCase(query = query)
-        SearchType.OUTGOING_SHARES -> outgoingSharesTabSearchUseCase(query = query)
-        SearchType.LINKS -> linkSharesTabSearchUseCase(query = query, isFirstLevel = isFirstLevel)
-
-        else -> {
-            val node = getSearchParentNode(searchType, parentHandle)
-            searchInNodesUseCase(
-                nodeId = node?.id,
+    ): List<TypedNode> {
+        val invalidNodeHandle = nodeRepository.getInvalidHandle()
+        if (query.isEmpty() && parentHandle != invalidNodeHandle) return getTypedChildrenNodeUseCase(
+            parentNodeId = NodeId(longValue = parentHandle),
+            order = getCloudSortOrder()
+        )
+        return when (searchType) {
+            SearchType.INCOMING_SHARES -> incomingSharesTabSearchUseCase(query = query)
+            SearchType.OUTGOING_SHARES -> outgoingSharesTabSearchUseCase(query = query)
+            SearchType.LINKS -> linkSharesTabSearchUseCase(
                 query = query,
-                searchCategory = searchCategory
+                isFirstLevel = isFirstLevel
             )
+
+            else -> {
+                val node = getSearchParentNode(searchType, parentHandle, invalidNodeHandle)
+                searchInNodesUseCase(
+                    nodeId = node?.id,
+                    query = query,
+                    searchCategory = searchCategory
+                )
+            }
         }
     }
 
@@ -66,15 +82,18 @@ class SearchNodesUseCase @Inject constructor(
      * @param parentHandle
      * @return [Node]
      */
-    private suspend fun getSearchParentNode(searchType: SearchType, parentHandle: Long): Node? =
-        if (parentHandle == nodeRepository.getInvalidHandle()) {
-            when (searchType) {
-                SearchType.CLOUD_DRIVE -> getRootNodeUseCase()
-                SearchType.RUBBISH_BIN -> getRubbishNodeUseCase()
-                SearchType.BACKUPS -> getBackupsNodeUseCase()
-                else -> null
-            }
-        } else {
-            getNodeByHandleUseCase(parentHandle)
+    private suspend fun getSearchParentNode(
+        searchType: SearchType,
+        parentHandle: Long,
+        invalidNodeHandle: Long,
+    ): Node? = if (parentHandle == invalidNodeHandle) {
+        when (searchType) {
+            SearchType.CLOUD_DRIVE -> getRootNodeUseCase()
+            SearchType.RUBBISH_BIN -> getRubbishNodeUseCase()
+            SearchType.BACKUPS -> getBackupsNodeUseCase()
+            else -> null
         }
+    } else {
+        getNodeByHandleUseCase(parentHandle)
+    }
 }

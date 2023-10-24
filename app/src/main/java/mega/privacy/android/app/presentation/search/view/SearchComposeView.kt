@@ -78,10 +78,9 @@ fun SearchComposeView(
     Scaffold(
         topBar = {
             SearchToolBar(
-                selectionMode = false,
-                selectionCount = 0,
+                selectionCount = state.selectedNodes.size,
                 searchQuery = state.searchQuery,
-                updateSearchQuery = updateSearchQuery
+                updateSearchQuery = updateSearchQuery,
             )
         },
         snackbarHost = {
@@ -153,6 +152,6 @@ private fun PreviewSearchComposeView() {
         onErrorShown = {},
         updateFilter = {},
         trackAnalytics = {},
-        updateSearchQuery = {}
+        updateSearchQuery = {},
     )
 }

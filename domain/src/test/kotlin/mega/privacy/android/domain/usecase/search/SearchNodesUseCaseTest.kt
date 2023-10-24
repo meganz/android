@@ -9,9 +9,11 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -31,6 +33,8 @@ class SearchNodesUseCaseTest {
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
     private val getBackupsNodeUseCase = mock<GetBackupsNodeUseCase>()
+    private val getTypedChildrenNodeUseCase = mock<GetTypedChildrenNodeUseCase>()
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val nodeRepository = mock<NodeRepository>()
     private val nodeHandles = listOf(1L, 2L)
     private val nodeName = listOf("abc", "xyz")
@@ -65,7 +69,9 @@ class SearchNodesUseCaseTest {
         getNodeByHandleUseCase = getNodeByHandleUseCase,
         getRubbishNodeUseCase = getRubbishNodeUseCase,
         getBackupsNodeUseCase = getBackupsNodeUseCase,
-        nodeRepository = nodeRepository
+        nodeRepository = nodeRepository,
+        getCloudSortOrder = getCloudSortOrder,
+        getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
     )
 
     @ParameterizedTest(name = "test that when search type is {0} search results are returned correctly")

@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -27,7 +28,6 @@ import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -110,6 +110,7 @@ class SearchActivityViewModelTest {
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             initViewModel()
             underTest.onSortOrderChanged()
             underTest.onLongItemClicked(
@@ -121,9 +122,8 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
-                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(1)
+                Truth.assertThat(state.selectedNodes.size).isEqualTo(1)
+                Truth.assertThat(state.selectedNodes.filter { it is FileNode }.size).isEqualTo(0)
             }
         }
 
@@ -135,6 +135,7 @@ class SearchActivityViewModelTest {
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             initViewModel()
             underTest.onSortOrderChanged()
             underTest.onItemClicked(
@@ -146,9 +147,7 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFolderNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(0)
+                Truth.assertThat(state.selectedNodes.size).isEqualTo(0)
             }
             underTest.onItemClicked(
                 NodeUIItem(
@@ -159,9 +158,7 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFolderNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(0)
+                Truth.assertThat(state.selectedNodes.size).isEqualTo(0)
             }
         }
 
@@ -173,6 +170,7 @@ class SearchActivityViewModelTest {
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             initViewModel()
             underTest.onSortOrderChanged()
             underTest.onLongItemClicked(
@@ -191,9 +189,8 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
-                Truth.assertThat(state.selectedFileNodes).isEqualTo(1)
-                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(2)
+                Truth.assertThat(state.selectedNodes.size).isEqualTo(2)
+                Truth.assertThat(state.selectedNodes.filter { it is FileNode }.size).isEqualTo(1)
             }
             underTest.onItemClicked(
                 NodeUIItem(
@@ -204,9 +201,8 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
-                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(1)
+                Truth.assertThat(state.selectedNodes.size).isEqualTo(1)
+                Truth.assertThat(state.selectedNodes.any { it is FileNode }).isFalse()
             }
         }
 
@@ -225,8 +221,7 @@ class SearchActivityViewModelTest {
             underTest.onItemPerformedClicked()
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.currentFileNode).isNull()
-                Truth.assertThat(state.itemIndex).isEqualTo(-1)
+                Truth.assertThat(state.lastSelectedNode).isNull()
             }
         }
 
@@ -357,6 +352,54 @@ class SearchActivityViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.errorMessageId).isNull()
+            }
+        }
+
+    @Test
+    fun `test that selected list updates when select all and clear selection performed`() =
+        runTest {
+            val query = "query"
+            val typedFolderNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(345L))
+                on { name }.thenReturn("folder node")
+            }
+            val typedFileNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(123L))
+                on { name }.thenReturn("file node")
+            }
+            val parentHandle = 123456L
+            val isFirstLevel = false
+            val searchType = SearchType.CLOUD_DRIVE
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
+            whenever(stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE)).thenReturn(searchType)
+            whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(parentHandle)
+            whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
+                isFirstLevel
+            )
+            whenever(
+                searchNodesUseCase(
+                    query = query,
+                    parentHandle = parentHandle,
+                    searchType = searchType,
+                    isFirstLevel = isFirstLevel,
+                )
+            ).thenReturn(listOf(typedFileNode, typedFolderNode))
+            initViewModel()
+            underTest.updateSearchQuery(query)
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.searchQuery).isEqualTo(query)
+                Truth.assertThat(state.searchItemList.size).isEqualTo(2)
+                Truth.assertThat(state.selectedNodes).isEmpty()
+                underTest.selectAll()
+                val selectAllState = awaitItem()
+                Truth.assertThat(selectAllState.selectedNodes).contains(typedFileNode)
+                Truth.assertThat(selectAllState.selectedNodes).contains(typedFolderNode)
+                Truth.assertThat(selectAllState.selectedNodes.size).isEqualTo(2)
+                underTest.clearSelection()
+                val clearedState = awaitItem()
+                Truth.assertThat(clearedState.selectedNodes.size).isEqualTo(0)
             }
         }
 

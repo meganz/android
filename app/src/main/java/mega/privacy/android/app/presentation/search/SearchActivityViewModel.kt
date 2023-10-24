@@ -22,12 +22,12 @@ import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.search.SearchType.OTHER
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -82,7 +82,7 @@ class SearchActivityViewModel @Inject constructor(
 
     private val isFirstLevel = stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL) ?: false
     private val searchType =
-        stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE) ?: SearchType.OTHER
+        stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE) ?: OTHER
     private val parentHandle =
         stateHandle.get<Long>(SearchActivity.PARENT_HANDLE) ?: MegaApiJava.INVALID_HANDLE
 
@@ -114,7 +114,7 @@ class SearchActivityViewModel @Inject constructor(
     private fun monitorNodeUpdatesForSearch() {
         viewModelScope.launch {
             monitorNodeUpdates().collect { nodeUpdate ->
-                if (nodeUpdate.changes.keys.find { state.value.parentHandle == it.parentId.longValue } != null)
+                if (nodeUpdate.changes.keys.find { parentHandle == it.parentId.longValue } != null)
                     performSearch()
             }
         }
@@ -231,24 +231,43 @@ class SearchActivityViewModel @Inject constructor(
     fun onItemClicked(nodeUIItem: NodeUIItem<TypedNode>) {
         val index =
             _state.value.searchItemList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
-        if (_state.value.isInSelection) {
+        if (_state.value.selectedNodes.isNotEmpty()) {
             updateNodeSelection(nodeUIItem = nodeUIItem, index = index)
         } else {
-            if (nodeUIItem.node is FileNode) {
-                _state.update {
-                    it.copy(
-                        itemIndex = index,
-                        currentFileNode = nodeUIItem.node
-                    )
-                }
+            _state.update { it.copy(lastSelectedNode = nodeUIItem.node) }
+        }
+    }
 
-            } else {
-                _state.update {
-                    it.copy(
-                        currentFolderClickedHandle = nodeUIItem.id.longValue
-                    )
-                }
-            }
+    /**
+     * Clear selection
+     */
+    fun clearSelection() {
+        val searchResultsUpdated = _state.value.searchItemList.asSequence().map {
+            it.copy(isSelected = false)
+        }
+        _state.update {
+            it.copy(
+                searchItemList = searchResultsUpdated.toList(),
+                selectedNodes = emptySet()
+            )
+        }
+    }
+
+    /**
+     * Select ALl
+     */
+    fun selectAll() = viewModelScope.launch {
+        val searchResultsUpdated = _state.value.searchItemList.asSequence().map {
+            it.copy(isSelected = true)
+        }
+        val selectedNodes = _state.value.searchItemList.asSequence().map {
+            it.node
+        }.toSet()
+        _state.update {
+            it.copy(
+                searchItemList = searchResultsUpdated.toList(),
+                selectedNodes = selectedNodes,
+            )
         }
     }
 
@@ -257,49 +276,25 @@ class SearchActivityViewModel @Inject constructor(
      * @param nodeUIItem [NodeUIItem] to be updated
      * @param index Index of [NodeUIItem] in [state]
      */
-    private fun updateNodeSelection(nodeUIItem: NodeUIItem<TypedNode>, index: Int) {
-        nodeUIItem.isSelected = !nodeUIItem.isSelected
-        val selectedNodeHandleList = state.value.selectedNodeHandles.toMutableList()
-        selectedNodeHandleList.apply {
-            if (nodeUIItem.isSelected) add(nodeUIItem.node.id.longValue) else remove(nodeUIItem.node.id.longValue)
+    private fun updateNodeSelection(nodeUIItem: NodeUIItem<TypedNode>, index: Int) =
+        viewModelScope.launch {
+            nodeUIItem.isSelected = !nodeUIItem.isSelected
+            val selectedNod = state.value.selectedNodes.toMutableSet()
+            if (state.value.selectedNodes.contains(nodeUIItem.node)) {
+                selectedNod.remove(nodeUIItem.node)
+            } else {
+                selectedNod.add(nodeUIItem.node)
+            }
+            val newNodesList =
+                _state.value.searchItemList.updateItemAt(index = index, item = nodeUIItem)
+            _state.update {
+                it.copy(
+                    searchItemList = newNodesList,
+                    optionsItemInfo = null,
+                    selectedNodes = selectedNod,
+                )
+            }
         }
-        val pair = selectUnSelectNode(nodeUIItem = nodeUIItem, nodeSelected = nodeUIItem.isSelected)
-        selectUnSelectNode(nodeUIItem = nodeUIItem, nodeSelected = nodeUIItem.isSelected)
-        val newNodesList =
-            _state.value.searchItemList.updateItemAt(index = index, item = nodeUIItem)
-        _state.update {
-            it.copy(
-                selectedFileNodes = pair.first,
-                selectedFolderNodes = pair.second,
-                searchItemList = newNodesList,
-                isInSelection = pair.first > 0 || pair.second > 0,
-                selectedNodeHandles = selectedNodeHandleList,
-                optionsItemInfo = null
-            )
-        }
-    }
-
-    /**
-     * select a node
-     * @param nodeUIItem
-     * @param nodeSelected if node is selected or removed selection
-     * @return Pair of count of Selected File Node and Selected Folder Node
-     */
-    private fun selectUnSelectNode(
-        nodeUIItem: NodeUIItem<TypedNode>,
-        nodeSelected: Boolean,
-    ): Pair<Int, Int> {
-        var totalSelectedFileNode = state.value.selectedFileNodes
-        var totalSelectedFolderNode = state.value.selectedFolderNodes
-        if (nodeUIItem.node is FolderNode) {
-            totalSelectedFolderNode =
-                if (nodeSelected) _state.value.selectedFolderNodes + 1 else _state.value.selectedFolderNodes - 1
-        } else if (nodeUIItem.node is FileNode) {
-            totalSelectedFileNode = if (nodeSelected) _state.value.selectedFileNodes + 1 else
-                _state.value.selectedFileNodes - 1
-        }
-        return Pair(totalSelectedFileNode, totalSelectedFolderNode)
-    }
 
     /**
      * This method will handle Long click on a NodesView and check the selected item
@@ -329,10 +324,7 @@ class SearchActivityViewModel @Inject constructor(
      */
     fun onItemPerformedClicked() {
         _state.update {
-            it.copy(
-                currentFileNode = null,
-                itemIndex = -1,
-            )
+            it.copy(lastSelectedNode = null)
         }
     }
 
@@ -350,29 +342,19 @@ class SearchActivityViewModel @Inject constructor(
     /**
      * When we change sort order from UI
      */
-    fun onSortOrderChanged() {
-        performSearch()
-    }
+    fun onSortOrderChanged() = performSearch()
 
     /**
      * Show error message on UI
      */
     fun showShowErrorMessage(@StringRes errorMessageResId: Int) {
-        _state.update {
-            it.copy(
-                errorMessageId = errorMessageResId
-            )
-        }
+        _state.update { it.copy(errorMessageId = errorMessageResId) }
     }
 
     /**
      * Remove error message
      */
     fun errorMessageShown() {
-        _state.update {
-            it.copy(
-                errorMessageId = null
-            )
-        }
+        _state.update { it.copy(errorMessageId = null) }
     }
 }

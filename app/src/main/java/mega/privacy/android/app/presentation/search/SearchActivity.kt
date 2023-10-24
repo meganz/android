@@ -30,6 +30,7 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
@@ -130,13 +131,20 @@ class SearchActivity : AppCompatActivity() {
                     trackAnalytics = ::trackAnalytics,
                     updateSearchQuery = viewModel::updateSearchQuery,
                 )
+                handleClick(uiState.lastSelectedNode)
             }
-            openFileClicked(uiState.currentFileNode)
-            openFolderClicked(uiState.currentFolderClickedHandle)
         }
 
         sortByHeaderViewModel.orderChangeEvent.observe(this) {
             viewModel.onSortOrderChanged()
+        }
+    }
+
+    private fun handleClick(node: TypedNode?) = node?.let {
+        when (it) {
+            is FileNode -> openFileClicked(it)
+            is FolderNode -> openFolderClicked(it.id.longValue)
+            else -> Timber.e("Unsupported click")
         }
     }
 
