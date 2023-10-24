@@ -5,6 +5,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
 /**
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property removeParticipantDialog                    True, if should show remove participant dialog. False, if not.
  * @property shouldPinToSpeakerView                     True, if should change to speaker view. False, if not.
  * @property chatIdToOpen                               Chat Id of the chat that should be opened.
+ * @property callType                                   [CallType]
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -70,6 +72,7 @@ data class MeetingState(
     val removeParticipantDialog: Boolean = false,
     val shouldPinToSpeakerView: Boolean = false,
     val chatIdToOpen: Long = -1L,
+    val callType: CallType = CallType.OneToOne,
 ) {
     /**
      * Check if waiting room is opened

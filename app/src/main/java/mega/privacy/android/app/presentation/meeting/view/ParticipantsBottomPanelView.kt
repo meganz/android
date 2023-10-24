@@ -41,6 +41,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
 
@@ -295,7 +296,6 @@ fun ParticipantsBottomPanelView(
                 }
             }
         }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -305,7 +305,7 @@ fun ParticipantsBottomPanelView(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp)
                     .fillMaxWidth(),
-                textId = R.string.meetings_scheduled_meeting_info_share_meeting_link_label,
+                textId = if (state.callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button,
                 onClick = {
                     Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
                     onShareMeetingLinkClick()

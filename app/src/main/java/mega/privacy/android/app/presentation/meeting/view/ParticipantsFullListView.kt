@@ -49,6 +49,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.meeting.CallParticipantData
+import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
 /**
@@ -213,7 +214,7 @@ fun ParticipantsFullListView(
                                 .fillMaxWidth(),
                             textId = when (state.participantsSection) {
                                 ParticipantsSection.WaitingRoomSection -> R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button
-                                else -> R.string.meetings_scheduled_meeting_info_share_meeting_link_label
+                                else -> if (state.callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button
                             },
                             onClick = when (state.participantsSection) {
                                 ParticipantsSection.WaitingRoomSection -> onAdmitAllClicked

@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -65,6 +64,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
@@ -350,7 +350,12 @@ class MeetingActivityViewModel @Inject constructor(
                         isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                         enabledAllowNonHostAddParticipantsOption = isOpenInvite,
                         hasWaitingRoom = isWaitingRoom,
-                        title = title
+                        title = title,
+                        callType = when {
+                            isMeeting -> CallType.Meeting
+                            !isMeeting && isGroup -> CallType.Group
+                            else -> CallType.OneToOne
+                        }
                     )
                 }
 
@@ -989,7 +994,12 @@ class MeetingActivityViewModel @Inject constructor(
                             isOpenInvite = openInviteValue,
                             enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite,
                             hasWaitingRoom = waitingRoomValue,
-                            title = titleValue
+                            title = titleValue,
+                            callType = when {
+                                chat.isMeeting -> CallType.Meeting
+                                !chat.isMeeting && chat.isGroup -> CallType.Group
+                                else -> CallType.OneToOne
+                            }
                         )
                     }
                 }
