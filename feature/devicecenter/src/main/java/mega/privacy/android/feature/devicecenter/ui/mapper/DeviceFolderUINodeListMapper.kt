@@ -36,6 +36,7 @@ internal class DeviceFolderUINodeListMapper @Inject constructor(
                         isDevice = false,
                         status = folder.status,
                     ),
+                    rootHandle = folder.rootHandle,
                 )
             } else {
                 NonBackupDeviceFolderUINode(
@@ -46,6 +47,7 @@ internal class DeviceFolderUINodeListMapper @Inject constructor(
                         isDevice = false,
                         status = folder.status,
                     ),
+                    rootHandle = folder.rootHandle,
                 )
             }
         }

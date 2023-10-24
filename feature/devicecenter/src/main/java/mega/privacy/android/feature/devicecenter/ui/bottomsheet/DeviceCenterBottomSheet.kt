@@ -9,6 +9,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +68,7 @@ internal fun DeviceCenterBottomSheet(
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
     onShowInBackupsClicked: () -> Unit,
-    onShowInCloudDriveClicked: () -> Unit,
+    onShowInCloudDriveClicked: (Long) -> Unit,
     onInfoClicked: () -> Unit,
 ) {
     BottomSheet(
@@ -136,7 +137,7 @@ internal fun DeviceCenterBottomSheet(
                     NonBackupFolderBottomSheetBody(
                         onShowInCloudDriveClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
-                            onShowInCloudDriveClicked.invoke()
+                            onShowInCloudDriveClicked.invoke(selectedNode.rootHandle)
                         },
                         onInfoClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
@@ -219,6 +220,7 @@ private fun PreviewDeviceCenterBottomSheet() {
             modalSheetState = ModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.Expanded,
                 isSkipHalfExpanded = false,
+                density = LocalDensity.current,
             ),
             selectedNode = ownDeviceUINode,
             isCameraUploadsEnabled = true,

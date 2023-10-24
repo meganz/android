@@ -75,6 +75,12 @@ class DeviceCenterFragment : Fragment() {
                         onCameraUploadsClicked = {
                             megaNavigator.openSettingsCameraUploads(requireActivity())
                         },
+                        onShowInCloudDriveClicked = { nodeHandle ->
+                            megaNavigator.openNodeInCloudDrive(
+                                activity = requireActivity(),
+                                nodeHandle = nodeHandle,
+                            )
+                        },
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,
                         onRenameDeviceSuccessful = {

@@ -23,9 +23,12 @@ internal interface AppNavigatorImpl : AppNavigator {
         }
     }
 
-    override fun openFileCloudDrive(activity: Activity) {
+    override fun openNodeInCloudDrive(activity: Activity, nodeHandle: Long) {
         if (activity is ManagerActivity) {
-            activity.selectDrawerItem(DrawerItem.CLOUD_DRIVE)
+            activity.selectDrawerItem(
+                item = DrawerItem.CLOUD_DRIVE,
+                cloudDriveNodeHandle = nodeHandle,
+            )
         }
     }
 }

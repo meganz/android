@@ -47,6 +47,7 @@ internal class DeviceCenterViewModelTest {
         name = "Camera uploads",
         icon = FolderIconType.CameraUploads,
         status = DeviceCenterUINodeStatus.UpToDate,
+        rootHandle = 789012L,
     )
     private val ownDeviceUINode = OwnDeviceUINode(
         id = "1234-5678",

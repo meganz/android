@@ -3550,10 +3550,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param chatId    If the drawer item is the chat drawer item and it is selected when opening a
      *                  chat room, it is possible to pass here the chat ID to determine whether it
      *                  is a chat or a meeting and select the corresponding tab as the initial tab.
+     * @param cloudDriveNodeHandle The Node Handle used to access the Cloud Drive feature. It is
+     * set to -1 by default
      */
     @SuppressLint("NewApi")
     @JvmOverloads
-    fun selectDrawerItem(item: DrawerItem?, chatId: Long? = null) {
+    fun selectDrawerItem(
+        item: DrawerItem?,
+        chatId: Long? = null,
+        cloudDriveNodeHandle: Long = -1L,
+    ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
             Timber.d("ManagerActivity doesn't call setContentView")
@@ -3585,6 +3591,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         transfersManagement.isOnTransfersSection = item === DrawerItem.TRANSFERS
         when (item) {
             DrawerItem.CLOUD_DRIVE -> {
+                if (cloudDriveNodeHandle != -1L) {
+                    // If there is a Node to immediately open, set the browser parent handle
+                    // to the ViewModel. The FileBrowserComposeFragment can immediately access this
+                    // value, since it retrieves this ViewModel through activityViewModels
+                    fileBrowserViewModel.setBrowserParentHandle(cloudDriveNodeHandle)
+                }
                 if (!isInMDMode) {
                     selectDrawerItemCloudDrive()
                 } else {

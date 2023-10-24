@@ -13,10 +13,12 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  * @property name The Folder Name
  * @property icon The Folder Icon
  * @property status The Folder Status
+ * @property rootHandle The Folder Root Handle
  */
 data class NonBackupDeviceFolderUINode(
     override val id: String,
     override val name: String,
     override val icon: DeviceCenterUINodeIcon,
     override val status: DeviceCenterUINodeStatus,
+    val rootHandle: Long,
 ) : DeviceFolderUINode

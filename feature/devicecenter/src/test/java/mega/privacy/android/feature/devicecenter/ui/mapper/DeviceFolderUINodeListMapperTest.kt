@@ -49,11 +49,13 @@ internal class DeviceFolderUINodeListMapperTest {
         val folderStatus = DeviceCenterNodeStatus.UpToDate
         val folderType = BackupInfoType.BACKUP_UPLOAD
         val folderUserAgent = BackupInfoUserAgent.WINDOWS
+        val folderRootHandle = 789012L
         val folderList = listOf(
             DeviceFolderNode(
                 id = folderId,
                 name = folderName,
                 status = folderStatus,
+                rootHandle = folderRootHandle,
                 type = folderType,
                 userAgent = folderUserAgent,
             )
@@ -76,6 +78,7 @@ internal class DeviceFolderUINodeListMapperTest {
                     name = folderName,
                     icon = expectedFolderUINodeIcon,
                     status = expectedUINodeStatus,
+                    rootHandle = folderRootHandle,
                 )
             )
         )
@@ -93,11 +96,13 @@ internal class DeviceFolderUINodeListMapperTest {
         val folderName = "Backup Folder One"
         val folderStatus = DeviceCenterNodeStatus.UpToDate
         val folderUserAgent = BackupInfoUserAgent.WINDOWS
+        val folderRootHandle = 789012L
         val folderList = listOf(
             DeviceFolderNode(
                 id = folderId,
                 name = folderName,
                 status = folderStatus,
+                rootHandle = folderRootHandle,
                 type = folderType,
                 userAgent = folderUserAgent,
             )
@@ -120,6 +125,7 @@ internal class DeviceFolderUINodeListMapperTest {
                     name = folderName,
                     icon = expectedFolderUINodeIcon,
                     status = expectedUINodeStatus,
+                    rootHandle = folderRootHandle,
                 )
             )
         )

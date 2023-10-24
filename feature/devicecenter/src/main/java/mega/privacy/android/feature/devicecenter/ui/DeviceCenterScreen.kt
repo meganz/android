@@ -62,6 +62,8 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
  * clicked
  * @param onCameraUploadsClicked Lambda that performs a specific action when the User clicks the
  * "Camera uploads" Bottom Dialog Option
+ * @param onShowInCloudDriveClicked Lambda that performs a specific action when the User clicks the
+ * "Show in Cloud Drive" Bottom Dialog Option
  * @param onRenameDeviceOptionClicked Lambda that performs a specific action when the User clicks
  * the "Rename" Bottom Dialog Option
  * @param onRenameDeviceCancelled Lambda that performs a specific action when cancelling the Rename
@@ -82,6 +84,7 @@ internal fun DeviceCenterScreen(
     onDeviceClicked: (DeviceUINode) -> Unit,
     onNodeMenuIconClicked: (DeviceCenterUINode) -> Unit,
     onCameraUploadsClicked: () -> Unit,
+    onShowInCloudDriveClicked: (Long) -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceCancelled: () -> Unit,
     onRenameDeviceSuccessful: () -> Unit,
@@ -170,7 +173,7 @@ internal fun DeviceCenterScreen(
                 onCameraUploadsClicked = onCameraUploadsClicked,
                 onRenameDeviceClicked = onRenameDeviceOptionClicked,
                 onShowInBackupsClicked = {},
-                onShowInCloudDriveClicked = {},
+                onShowInCloudDriveClicked = onShowInCloudDriveClicked,
                 onInfoClicked = {},
             )
             uiState.deviceToRename?.let { nonNullDevice ->
@@ -274,6 +277,7 @@ private fun PreviewDeviceCenterInInitialLoading() {
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
             onCameraUploadsClicked = {},
+            onShowInCloudDriveClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -306,6 +310,7 @@ private fun PreviewDeviceCenterInDeviceView() {
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
             onCameraUploadsClicked = {},
+            onShowInCloudDriveClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -334,6 +339,7 @@ private fun PreviewDeviceCenterInFolderView() {
             onDeviceClicked = {},
             onNodeMenuIconClicked = {},
             onCameraUploadsClicked = {},
+            onShowInCloudDriveClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -398,7 +404,8 @@ private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
     id = "ABCD-EFGH",
     name = "Camera uploads",
     icon = FolderIconType.CameraUploads,
-    status = DeviceCenterUINodeStatus.UpToDate
+    status = DeviceCenterUINodeStatus.UpToDate,
+    rootHandle = 789012L,
 )
 
 private val ownDeviceFolderUINodeTwo = NonBackupDeviceFolderUINode(
@@ -406,6 +413,7 @@ private val ownDeviceFolderUINodeTwo = NonBackupDeviceFolderUINode(
     name = "Media uploads",
     icon = FolderIconType.CameraUploads,
     status = DeviceCenterUINodeStatus.UpToDate,
+    rootHandle = 789012L,
 )
 
 private val ownDeviceUINode = OwnDeviceUINode(

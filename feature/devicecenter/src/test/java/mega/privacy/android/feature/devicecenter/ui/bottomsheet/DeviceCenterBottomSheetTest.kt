@@ -4,6 +4,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -48,6 +49,7 @@ internal class DeviceCenterBottomSheetTest {
                 modalSheetState = ModalBottomSheetState(
                     initialValue = ModalBottomSheetValue.Expanded,
                     isSkipHalfExpanded = false,
+                    density = LocalDensity.current,
                 ),
                 selectedNode = ownDeviceUINode,
                 isCameraUploadsEnabled = true,
@@ -78,6 +80,7 @@ internal class DeviceCenterBottomSheetTest {
                 modalSheetState = ModalBottomSheetState(
                     initialValue = ModalBottomSheetValue.Expanded,
                     isSkipHalfExpanded = false,
+                    density = LocalDensity.current,
                 ),
                 selectedNode = otherDeviceUINode,
                 isCameraUploadsEnabled = true,
@@ -100,6 +103,7 @@ internal class DeviceCenterBottomSheetTest {
             name = "PC Backup Folder",
             icon = FolderIconType.Backup,
             status = DeviceCenterUINodeStatus.UpToDate,
+            rootHandle = 789012L,
         )
         composeTestRule.setContent {
             DeviceCenterBottomSheet(
@@ -107,6 +111,7 @@ internal class DeviceCenterBottomSheetTest {
                 modalSheetState = ModalBottomSheetState(
                     initialValue = ModalBottomSheetValue.Expanded,
                     isSkipHalfExpanded = false,
+                    density = LocalDensity.current,
                 ),
                 selectedNode = backupDeviceFolderUINode,
                 isCameraUploadsEnabled = true,
@@ -129,6 +134,7 @@ internal class DeviceCenterBottomSheetTest {
             name = "Camera Uploads Primary Folder",
             icon = FolderIconType.CameraUploads,
             status = DeviceCenterUINodeStatus.UpToDate,
+            rootHandle = 789012L,
         )
         composeTestRule.setContent {
             DeviceCenterBottomSheet(
@@ -136,6 +142,7 @@ internal class DeviceCenterBottomSheetTest {
                 modalSheetState = ModalBottomSheetState(
                     initialValue = ModalBottomSheetValue.Expanded,
                     isSkipHalfExpanded = false,
+                    density = LocalDensity.current,
                 ),
                 selectedNode = nonBackupDeviceFolderUINode,
                 isCameraUploadsEnabled = true,

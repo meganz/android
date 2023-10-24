@@ -23,11 +23,13 @@ interface AppNavigator {
     fun openBackup(activity: Activity)
 
     /**
-     * Open file cloud drive
+     * Navigates to the Cloud Drive page to view the selected Node
      *
-     * @param activity
+     * @param activity the Activity
+     * @param nodeHandle The Node Handle to view the selected Node. The Root Node will be accessed
+     * if no Node Handle is specified
      */
-    fun openFileCloudDrive(activity: Activity)
+    fun openNodeInCloudDrive(activity: Activity, nodeHandle: Long = -1L)
 
     /**
      * Open chat
