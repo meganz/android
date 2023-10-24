@@ -24,6 +24,14 @@ internal data class MegaColors(
             disabledBackgroundColor = Color.Transparent,
             disabledContentColor = text.disabled,
         )
+    val snackBarButtonColors
+        @Composable
+        get() = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Transparent,
+            contentColor = text.inverse,
+            disabledBackgroundColor = Color.Transparent,
+            disabledContentColor = text.disabled,
+        )
     val raisedButtonColors
         @Composable
         get() = ButtonDefaults.buttonColors(

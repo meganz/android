@@ -1,19 +1,24 @@
 package mega.privacy.android.core.ui.controls.snackbars
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarData
 import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white
-import mega.privacy.android.core.ui.theme.extensions.teal_200_teal_300
+import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.utils.composeLet
 
 
 internal const val SNACKBAR_TEST_TAG = "mega_snackbar:snackbar_body"
@@ -27,12 +32,41 @@ fun MegaSnackbar(
     modifier: Modifier = Modifier,
     actionOnNewLine: Boolean = false,
 ) = Snackbar(
-    modifier = modifier.testTag(SNACKBAR_TEST_TAG),
-    snackbarData = snackbarData,
+    modifier = modifier
+        .testTag(SNACKBAR_TEST_TAG)
+        .padding(12.dp),
+    content = { SnackBarText(snackbarData.message) },
+    action = snackbarData.actionLabel?.composeLet {
+        SnackbarButton(text = it, onClick = { snackbarData.performAction() })
+    },
     actionOnNewLine = actionOnNewLine,
-    backgroundColor = MaterialTheme.colors.grey_alpha_087_white,
-    actionColor = MaterialTheme.colors.teal_200_teal_300,
+    shape = MaterialTheme.shapes.small,
+    backgroundColor = MegaTheme.colors.components.toastBackground,
+    contentColor = MegaTheme.colors.text.inverse,
+    elevation = 8.dp
 )
+
+@Composable
+private fun SnackBarText(text: String) = Text(
+    text = text,
+    color = MegaTheme.colors.text.inverse,
+    style = MaterialTheme.typography.subtitle2,
+)
+
+@Composable
+private fun SnackbarButton(
+    text: String,
+    onClick: () -> Unit,
+) = TextButton(
+    onClick = onClick,
+    colors = MegaTheme.colors.snackBarButtonColors,
+    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.button
+    )
+}
 
 @CombinedThemePreviews
 @Composable
