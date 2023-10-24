@@ -6,6 +6,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -20,17 +21,29 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class SelectModeAppBarTest {
+class MegaAppBarTest {
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
 
-    private fun setTopBarScreen(title: String, actions: List<MenuAction> = emptyList()) {
+    private fun setTopBarScreen(
+        title: String,
+        subtitle: String? = null,
+        badgeCount: Int? = null,
+        appBarType: AppBarType = AppBarType.BACK_NAVIGATION,
+        actions: List<MenuAction> = emptyList(),
+    ) {
         composeTestRule.setContent {
             Scaffold(topBar = {
-                SelectModeAppBar(title = title, actions = actions)
+                MegaAppBar(
+                    appBarType = appBarType,
+                    title = title,
+                    badgeCount = badgeCount,
+                    actions = actions,
+                    subtitle = subtitle
+                )
             }) { padding ->
                 Text(text = "Empty screen", modifier = Modifier.padding(padding))
             }
@@ -38,7 +51,7 @@ class SelectModeAppBarTest {
     }
 
     @Test
-    fun `test back arrow and title is displayed when select mode app bar is shown`() {
+    fun `test back arrow and title is displayed when app bar is shown`() {
         val title = "sample"
         setTopBarScreen(title = title)
         composeTestRule.onNodeWithText(title).assertIsDisplayed()
@@ -46,8 +59,32 @@ class SelectModeAppBarTest {
             .assertIsDisplayed()
     }
 
+    fun `test subtitle is displayed when app bar is shown with subtitle`() {
+        val title = "sample"
+        val subtitle = "subtitle"
+        setTopBarScreen(title = title, subtitle = subtitle)
+        composeTestRule.onNodeWithText(subtitle).assertIsDisplayed()
+    }
+
+    fun `test badge is displayed when app bar is shown with badge count`() {
+        val title = "sample"
+        val badgeCount = 33
+        setTopBarScreen(title = title, badgeCount = badgeCount)
+        composeTestRule.onNodeWithTag(APP_BAR_BADGE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(APP_BAR_BADGE).assertTextEquals(badgeCount.toString())
+    }
+
     @Test
-    fun `test that icons are displayed when select mode app bar is shown`() {
+    fun `test back arrow is not displayed when app bar type is none`() {
+        val title = "sample"
+        setTopBarScreen(title = title, appBarType = AppBarType.NONE)
+        composeTestRule.onNodeWithText(title).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(APP_BAR_BACK_BUTTON_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that icons are displayed when app bar is shown`() {
         val title = "sample"
         setTopBarScreen(title = title, actions = getSampleToolbarActions())
         composeTestRule.onNodeWithTag(context.getString(R.string.cancel)).assertIsDisplayed()
@@ -57,7 +94,7 @@ class SelectModeAppBarTest {
     }
 
     @Test
-    fun `test that maximum 4 icons are displayed when select mode app bar is shown`() {
+    fun `test that maximum 4 icons are displayed when app bar is shown`() {
         val title = "sample"
         setTopBarScreen(title = title, actions = getMoreThanFiveToolbarActions())
         composeTestRule.onNodeWithTag(context.getString(R.string.cancel)).assertIsDisplayed()

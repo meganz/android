@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -28,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarTint
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -37,9 +37,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  * Utility function to generate actions for [TopAppBar]
  * @param actions the actions to be added
  * @param maxActionsToShow if there are more actions than that the extra actions will be shown in a drop down menu
- * @param tint the tint color for the icons
- * @param enabled checks if option should be clickable
- * @param selectMode enables tint color based on selection mode turned on or off
+ * @param enabled if false, all actions will be disabled, if true each [MenuAction.enabled] will be used to check if the action is enabled or not
  * @param onActionClick event to receive clicks on actions, both in the toolbar or in the drop down menu
  */
 @Composable
@@ -48,8 +46,6 @@ fun MenuActions(
     maxActionsToShow: Int,
     onActionClick: (MenuAction) -> Unit,
     enabled: Boolean = true,
-    selectMode: Boolean = false,
-    tint: Color? = null,
 ) {
     val sortedActions = actions.sortedBy { it.orderInCategory }
     val visible = sortedActions
@@ -60,8 +56,6 @@ fun MenuActions(
             menuAction = it,
             onActionClick = onActionClick,
             enabled = enabled && it.enabled,
-            selectMode = selectMode,
-            tint = tint,
         )
     }
     sortedActions.filterNot { visible.contains(it) }.takeIf { it.isNotEmpty() }?.let { notVisible ->
@@ -69,8 +63,6 @@ fun MenuActions(
             actions = notVisible,
             onActionClick = onActionClick,
             enabled = enabled,
-            selectMode = selectMode,
-            tint = tint,
         )
     }
 
@@ -81,8 +73,6 @@ private fun IconButtonForAction(
     menuAction: MenuActionWithIcon,
     onActionClick: (MenuAction) -> Unit,
     enabled: Boolean = true,
-    selectMode: Boolean = false,
-    tint: Color? = null,
 ) {
     IconButtonWithTooltip(
         iconPainter = menuAction.getIconPainter(),
@@ -90,8 +80,6 @@ private fun IconButtonForAction(
         onClick = { onActionClick(menuAction) },
         modifier = Modifier.testTag(menuAction.testTag),
         enabled = enabled,
-        selectMode = selectMode,
-        tint = tint,
     )
 }
 
@@ -100,37 +88,35 @@ private fun DropDown(
     actions: List<MenuAction>,
     onActionClick: (MenuAction) -> Unit,
     enabled: Boolean = true,
-    selectMode: Boolean = false,
-    tint: Color? = null,
 ) {
     var showMoreMenu by remember {
         mutableStateOf(false)
     }
-    IconButtonWithTooltip(
-        iconPainter = painterResource(id = R.drawable.ic_more),
-        description = stringResource(id = com.google.android.material.R.string.abc_action_menu_overflow_description),
-        onClick = { showMoreMenu = !showMoreMenu },
-        modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
-        enabled = enabled,
-        selectMode = selectMode,
-        tint = tint,
-    )
+    Box(contentAlignment = Alignment.BottomEnd) {
+        IconButtonWithTooltip(
+            iconPainter = painterResource(id = R.drawable.ic_more),
+            description = stringResource(id = com.google.android.material.R.string.abc_action_menu_overflow_description),
+            onClick = { showMoreMenu = !showMoreMenu },
+            modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
+            enabled = enabled,
+        )
 
-    DropdownMenu(
-        expanded = showMoreMenu,
-        onDismissRequest = {
-            showMoreMenu = false
-        }
-    ) {
-        actions.forEach {
-            DropdownMenuItem(
-                onClick = {
-                    onActionClick(it)
-                    showMoreMenu = false
-                },
-                modifier = Modifier.testTag(it.getDescription())
-            ) {
-                Text(text = it.getDescription())
+        DropdownMenu(
+            expanded = showMoreMenu,
+            onDismissRequest = {
+                showMoreMenu = false
+            }
+        ) {
+            actions.forEach {
+                DropdownMenuItem(
+                    onClick = {
+                        onActionClick(it)
+                        showMoreMenu = false
+                    },
+                    modifier = Modifier.testTag(it.getDescription())
+                ) {
+                    Text(text = it.getDescription())
+                }
             }
         }
     }
@@ -145,8 +131,6 @@ private fun IconButtonWithTooltip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    selectMode: Boolean = false,
-    tint: Color? = null,
 ) {
     Box(modifier = modifier) {
         val showTooltip = remember { mutableStateOf(false) }
@@ -170,9 +154,7 @@ private fun IconButtonWithTooltip(
             Icon(
                 painter = iconPainter,
                 contentDescription = description,
-                tint = if (selectMode) MegaTheme.colors.icon.accent
-                else tint ?: if (enabled) MegaTheme.colors.icon.primary
-                else MegaTheme.colors.icon.disabled,
+                tint = if (enabled) LocalMegaAppBarTint.current.iconsTintColor else MegaTheme.colors.icon.disabled,
             )
         }
         Tooltip(showTooltip) {

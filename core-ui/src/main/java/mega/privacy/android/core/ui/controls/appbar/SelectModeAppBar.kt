@@ -1,21 +1,12 @@
 package mega.privacy.android.core.ui.controls.appbar
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.menus.MenuActions
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionString
 import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
@@ -30,7 +21,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  * @param modifier [Modifier]
  * @param onNavigationPressed Action for navigation button.
  * @param actions Available options.
- * @param onActionClick Action for each available option.
+ * @param onActionPressed Action for each available option.
  * @param elevation Elevation.
  */
 @Composable
@@ -39,49 +30,20 @@ fun SelectModeAppBar(
     modifier: Modifier = Modifier,
     actions: List<MenuAction> = emptyList(),
     onNavigationPressed: (() -> Unit)? = null,
-    onActionClick: ((MenuAction) -> Unit)? = null,
+    onActionPressed: ((MenuAction) -> Unit)? = null,
     elevation: Dp = AppBarDefaults.TopAppBarElevation,
-) = TopAppBar(
-    modifier = modifier,
-    title = {
-        Text(
-            text = title,
-            maxLines = 1,
-            color = MegaTheme.colors.text.accent,
-            style = MaterialTheme.typography.subtitle1
-        )
-    },
-    navigationIcon = {
-        NavigationIcon(
-            onNavigationPressed = { onNavigationPressed?.invoke() },
-            iconId = R.drawable.ic_back,
-            modifier = Modifier.testTag(SELECT_MODE_APP_BAR_BACK_BUTTON_TAG)
-        )
-    },
-    actions = {
-        MenuActions(
-            actions = actions,
-            maxActionsToShow = 4,
-            onActionClick = { action -> onActionClick?.invoke(action) },
-            selectMode = true,
-        )
-    },
-    elevation = elevation,
-)
-
-internal const val SELECT_MODE_APP_BAR_BACK_BUTTON_TAG = "select_mode_appbar:button_back"
-
-@Composable
-private fun NavigationIcon(
-    onNavigationPressed: (() -> Unit),
-    @DrawableRes iconId: Int,
-    modifier: Modifier = Modifier,
-) = IconButton(onClick = onNavigationPressed) {
-    Icon(
-        imageVector = ImageVector.vectorResource(id = iconId),
-        contentDescription = "Navigation button",
-        tint = MegaTheme.colors.icon.accent,
+) = CompositionLocalProvider(
+    LocalMegaAppBarTint provides
+            MegaAppBarTint(MegaTheme.colors.icon.accent, MegaTheme.colors.text.accent)
+) {
+    BaseMegaAppBar(
+        appBarType = AppBarType.BACK_NAVIGATION,
+        title = title,
         modifier = modifier,
+        onNavigationPressed = onNavigationPressed,
+        actions = actions,
+        onActionPressed = onActionPressed,
+        elevation = elevation
     )
 }
 

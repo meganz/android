@@ -60,7 +60,6 @@ internal fun FileInfoSelectActionModeTopBar(
                 actions = FileInfoMenuAction.SelectionModeAction.all(),
                 onActionClick = onActionClick,
                 tint = tintColor,
-                selectMode = true,
             )
         },
         backgroundColor = MaterialTheme.colors.surface,

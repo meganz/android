@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.controls
 
 import android.R
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -90,8 +89,6 @@ class MenuActionsTest {
             defaultAmount,
             {},
             enabled = true,
-            selectMode = false,
-            Color.Black,
         )
 
     private class MenuActionWithIconForTest(val title: String, override val testTag: String) :
