@@ -223,6 +223,7 @@ fun CreateNewAlbumDialog(
         confirmButton = {
             Button(
                 onClick = {
+
                     onDialogPositiveButtonClicked(textState)
                 },
                 colors = ButtonDefaults.buttonColors(

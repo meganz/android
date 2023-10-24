@@ -91,6 +91,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.mobile.analytics.event.CreateAlbumDialogButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CreateAlbumFABEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumConfirmButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumsConfirmationDialogEvent
@@ -203,6 +204,7 @@ fun AlbumsView(
                 ) {
                     FloatingActionButton(
                         onClick = {
+                            Analytics.tracker.trackEvent(CreateAlbumFABEvent)
                             setShowCreateAlbumDialog(true)
                             setDialogInputPlaceholder(placeholderText)
                         },

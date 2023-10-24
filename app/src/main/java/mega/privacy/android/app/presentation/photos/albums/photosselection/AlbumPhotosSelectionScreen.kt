@@ -24,6 +24,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -66,6 +67,11 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.mobile.analytics.event.AddItemsToExistingAlbumFABEvent
 import mega.privacy.mobile.analytics.event.AddItemsToNewAlbumFABEvent
+import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionAllLocationsButtonEvent
+import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionCameraUploadsButtonEvent
+import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionCloudDriveButtonEvent
+import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionFilterMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionScreenEvent
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -85,6 +91,10 @@ fun AlbumPhotosSelectionScreen(
     var showMaxSelectionDialog by rememberSaveable { mutableStateOf(false) }
 
     if (state.isInvalidAlbum) onBackClicked()
+
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(AlbumPhotosSelectionScreenEvent)
+    }
 
     HandleSelectLocationDialog(
         showSelectLocationDialog = showSelectLocationDialog,
@@ -132,6 +142,7 @@ fun AlbumPhotosSelectionScreen(
                     }
                 },
                 onFilterClicked = {
+                    Analytics.tracker.trackEvent(AlbumPhotosSelectionFilterMenuToolbarEvent)
                     showSelectLocationDialog = true
                 },
                 onMoreClicked = {
@@ -360,6 +371,7 @@ private fun SelectLocationDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
+                                locationFilterAnalytics(location)
                                 if (location == selectedLocation) {
                                     onDialogDismissed()
                                 } else {
@@ -472,3 +484,11 @@ private fun TimelinePhotosSource.text(): String = when (this) {
     CLOUD_DRIVE -> stringResource(id = R.string.filter_button_cd_only)
     CAMERA_UPLOAD -> stringResource(id = R.string.photos_filter_camera_uploads)
 }
+
+private fun locationFilterAnalytics(location: TimelinePhotosSource) =
+    Analytics.tracker.trackEvent(when (location) {
+            ALL_PHOTOS -> AlbumPhotosSelectionAllLocationsButtonEvent
+            CLOUD_DRIVE -> AlbumPhotosSelectionCloudDriveButtonEvent
+            CAMERA_UPLOAD -> AlbumPhotosSelectionCameraUploadsButtonEvent
+        }
+    )
