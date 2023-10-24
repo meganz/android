@@ -95,6 +95,28 @@ class AdsViewModelTest {
             }
         }
 
+    private fun provideOrientationParameters() = Stream.of(
+        Arguments.of(true, true),
+        Arguments.of(false, false),
+    )
+
+    @ParameterizedTest(name = "when screen orientation isPortrait is: {0}, showAdsView is {1}")
+    @MethodSource("provideOrientationParameters")
+    fun `test that showAdsView will be updated with the right value when screen orientation changes`(
+        input: Boolean,
+        expected: Boolean,
+    ) =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            initTestClass()
+            testScheduler.advanceUntilIdle()
+            underTest.onScreenOrientationChanged(input)
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showAdsView).isEqualTo(expected)
+            }
+        }
+
     private fun provideFeatureFlagParameters() = Stream.of(
         Arguments.of(true, true),
         Arguments.of(false, false),

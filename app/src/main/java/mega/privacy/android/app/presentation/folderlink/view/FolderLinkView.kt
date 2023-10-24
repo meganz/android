@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.folderlink.view
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -58,6 +59,8 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
+import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
+import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
@@ -146,12 +149,15 @@ internal fun FolderLinkView(
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
+    adsUiState: AdsUIState,
+    onAdClicked: (uri: Uri?) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val isAdDismissed = remember { mutableStateOf(false) }
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
@@ -279,6 +285,15 @@ internal fun FolderLinkView(
                     onImportClicked = onImportClicked,
                     onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                 )
+
+                if (isAdDismissed.value.not()) {
+                    AdsBannerView(
+                        uiState = adsUiState,
+                        onAdClicked = onAdClicked,
+                        onAdsWebpageLoaded = {},
+                        onAdDismissed = { isAdDismissed.value = true }
+                    )
+                }
             }
         }
 

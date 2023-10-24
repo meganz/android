@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.folderlink
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -29,10 +30,13 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
+import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.advertisements.AdsViewModel
+import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
@@ -64,6 +68,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
 
     private val viewModel: FolderLinkViewModel by viewModels()
     private val thumbnailViewModel: ThumbnailViewModel by viewModels()
+    private val adsViewModel: AdsViewModel by viewModels()
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
@@ -142,12 +147,21 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         intent?.let { viewModel.handleIntent(it) }
         setupObservers()
         viewModel.checkLoginRequired()
+        if (isPortrait()) {
+            adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        adsViewModel.onScreenOrientationChanged(isPortrait())
     }
 
     @Composable
     private fun StartFolderLinkView() {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
+        val adsUiState by adsViewModel.uiState.collectAsStateWithLifecycle()
 
         AndroidTheme(isDark = themeMode.isDarkMode()) {
             FolderLinkView(
@@ -180,6 +194,17 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onDisputeTakeDownClicked = ::navigateToLink,
                 onLinkClicked = ::navigateToLink,
                 onEnterMediaDiscoveryClick = ::onEnterMediaDiscoveryClick,
+                adsUiState = adsUiState,
+                onAdClicked = { uri ->
+                    uri?.let {
+                        val intent = Intent(Intent.ACTION_VIEW, it)
+                        if (intent.resolveActivity(packageManager) != null) {
+                            startActivity(intent)
+                        } else {
+                            Timber.d("No Application found to can handle Ads intent")
+                        }
+                    }
+                },
             )
         }
     }

@@ -31,6 +31,7 @@ class AdsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdsUIState())
+    private var isPortrait = true
 
     /**
      * Ads state
@@ -45,6 +46,18 @@ class AdsViewModel @Inject constructor(
 
     init {
         getDefaultStartScreen()
+    }
+
+    /**
+     * Update the ads visibility when configuration changes and cancels any ongoing fetching ad's job
+     */
+    fun onScreenOrientationChanged(isPortrait: Boolean) {
+        this.isPortrait = isPortrait
+        if (isPortrait.not())
+            cancelFetchingAds()
+        _uiState.update { state ->
+            state.copy(showAdsView = isPortrait && isAdsFeatureEnabled)
+        }
     }
 
     /**
@@ -97,7 +110,7 @@ class AdsViewModel @Inject constructor(
                     val url = fetchAdDetailUseCase(fetchAdDetailRequest)?.url
                     _uiState.update { state ->
                         state.copy(
-                            showAdsView = url != null,
+                            showAdsView = url != null && isPortrait,
                             adsBannerUrl = url.orEmpty()
                         )
                     }

@@ -11,6 +11,8 @@ import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
+import mega.privacy.android.app.presentation.advertisements.view.WEB_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
@@ -34,7 +36,10 @@ class FolderLinkViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun setComposeContent(uiState: FolderLinkState = FolderLinkState()) {
+    private fun setComposeContent(
+        adsUiState: AdsUIState = AdsUIState(),
+        uiState: FolderLinkState = FolderLinkState(),
+    ) {
         composeTestRule.setContent {
             FolderLinkView(
                 state = uiState,
@@ -65,14 +70,16 @@ class FolderLinkViewTest {
                 thumbnailViewModel = mock(),
                 onLinkClicked = { },
                 onDisputeTakeDownClicked = { },
-                onEnterMediaDiscoveryClick = { }
+                onEnterMediaDiscoveryClick = { },
+                adsUiState = adsUiState,
+                onAdClicked = { }
             )
         }
     }
 
     @Test
     fun `test that toolbar title has correct initial value`() {
-        setComposeContent(FolderLinkState())
+        setComposeContent(uiState = FolderLinkState())
         composeTestRule.onNodeWithText("MEGA - ${fromId(R.string.general_loading)}")
             .assertIsDisplayed()
     }
@@ -80,7 +87,7 @@ class FolderLinkViewTest {
     @Test
     fun `test that toolbar title has correct value when nodes are fetched`() {
         val title = "Folder Title"
-        setComposeContent(FolderLinkState(isNodesFetched = true, title = title))
+        setComposeContent(uiState = FolderLinkState(isNodesFetched = true, title = title))
         composeTestRule.onNodeWithText(title).assertIsDisplayed()
     }
 
@@ -88,7 +95,7 @@ class FolderLinkViewTest {
     fun `test that correct toolbar is displayed when node is selected`() {
         val title = "1 selected"
         setComposeContent(
-            FolderLinkState(isNodesFetched = true, title = title, selectedNodeCount = 1)
+            uiState = FolderLinkState(isNodesFetched = true, title = title, selectedNodeCount = 1)
         )
         composeTestRule.onNodeWithContentDescription(fromId(R.string.general_back_button))
             .assertIsDisplayed()
@@ -100,7 +107,7 @@ class FolderLinkViewTest {
 
     @Test
     fun `test that empty view is displayed when nodes list is empty`() {
-        setComposeContent(FolderLinkState(isNodesFetched = true, nodesList = listOf()))
+        setComposeContent(uiState = FolderLinkState(isNodesFetched = true, nodesList = listOf()))
         composeTestRule.onNodeWithText(R.string.file_browser_empty_folder).assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Folder").assertIsDisplayed()
     }
@@ -112,7 +119,7 @@ class FolderLinkViewTest {
         val node = mock<TypedFolderNode>()
         whenever(node.name).thenReturn(nodeName)
         setComposeContent(
-            FolderLinkState(
+            uiState = FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false)),
                 hasDbCredentials = true,
@@ -128,7 +135,7 @@ class FolderLinkViewTest {
         val node = mock<TypedFolderNode>()
         whenever(node.name).thenReturn(nodeName)
         setComposeContent(
-            FolderLinkState(
+            uiState = FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(
                     NodeUIItem(
@@ -143,12 +150,56 @@ class FolderLinkViewTest {
     }
 
     @Test
+    fun `test that AdsBannerView does not exist when showAdsView is false`() {
+        val nodeName = "Folder1"
+        val node = mock<TypedFolderNode>()
+        whenever(node.name).thenReturn(nodeName)
+        setComposeContent(
+            uiState = FolderLinkState(
+                isNodesFetched = true,
+                nodesList = listOf(
+                    NodeUIItem(
+                        node,
+                        isSelected = false,
+                        isInvisible = false
+                    )
+                ),
+                hasDbCredentials = true
+            ),
+            adsUiState = AdsUIState(showAdsView = false)
+        )
+        composeTestRule.onNodeWithTag(WEB_VIEW_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that AdsBannerView is shown when showAdsView is true`() {
+        val nodeName = "Folder1"
+        val node = mock<TypedFolderNode>()
+        whenever(node.name).thenReturn(nodeName)
+        setComposeContent(
+            uiState = FolderLinkState(
+                isNodesFetched = true,
+                nodesList = listOf(
+                    NodeUIItem(
+                        node,
+                        isSelected = false,
+                        isInvisible = false
+                    )
+                ),
+                hasDbCredentials = true
+            ),
+            adsUiState = AdsUIState(showAdsView = true)
+        )
+        composeTestRule.onNodeWithTag(WEB_VIEW_TEST_TAG).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that import and save to device buttons are shown`() {
         val nodeName = "Folder1"
         val node = mock<TypedFolderNode>()
         whenever(node.name).thenReturn(nodeName)
         setComposeContent(
-            FolderLinkState(
+            uiState = FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(
                     NodeUIItem(
@@ -170,7 +221,7 @@ class FolderLinkViewTest {
         val node = mock<TypedFolderNode>()
         whenever(node.name).thenReturn(nodeName)
         setComposeContent(
-            FolderLinkState(
+            uiState = FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(
                     NodeUIItem(
@@ -191,7 +242,7 @@ class FolderLinkViewTest {
         val node = mock<TypedFolderNode>()
         whenever(node.name).thenReturn(nodeName)
         setComposeContent(
-            FolderLinkState(
+            uiState = FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(
                     NodeUIItem(

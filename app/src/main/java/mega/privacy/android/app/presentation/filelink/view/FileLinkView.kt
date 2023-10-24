@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.filelink.view
 
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -48,6 +48,8 @@ import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
+import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
@@ -73,7 +75,6 @@ import mega.privacy.android.domain.entity.StorageState
 internal const val IMPORT_BUTTON_TAG = "file_link_view:button_import"
 internal const val SAVE_BUTTON_TAG = "file_link_view:button_save"
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun FileLinkView(
     viewState: FileLinkState,
@@ -88,6 +89,8 @@ internal fun FileLinkView(
     onErrorMessageConsumed: () -> Unit,
     onOverQuotaErrorConsumed: () -> Unit,
     onForeignNodeErrorConsumed: () -> Unit,
+    adsUiState: AdsUIState,
+    onAdClicked: (uri: Uri?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -95,6 +98,7 @@ internal fun FileLinkView(
     val snackBarHostState = remember { SnackbarHostState() }
     val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
     val showForeignNodeErrorDialog = remember { mutableStateOf(false) }
+    val isAdDismissed = remember { mutableStateOf(false) }
 
     EventEffect(
         event = viewState.errorMessage,
@@ -192,7 +196,7 @@ internal fun FileLinkView(
             },
         ) { innerPadding ->
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                //to set the minimum height of the colum so it's always possible to collapse the header
+                //to set the minimum height of the column so it's always possible to collapse the header
                 val boxWithConstraintsScope = this
                 Column(
                     modifier = Modifier
@@ -208,16 +212,26 @@ internal fun FileLinkView(
                         )
                     )
                 }
-                ImportDownloadView(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .align(Alignment.BottomEnd)
-                        .background(MaterialTheme.colors.grey_020_grey_700),
-                    hasDbCredentials = viewState.hasDbCredentials,
-                    onImportClicked = onImportClicked,
-                    onSaveToDeviceClicked = onSaveToDeviceClicked
-                )
+
+                Column(modifier = Modifier.align(Alignment.BottomEnd)) {
+                    ImportDownloadView(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .background(MaterialTheme.colors.grey_020_grey_700),
+                        hasDbCredentials = viewState.hasDbCredentials,
+                        onImportClicked = onImportClicked,
+                        onSaveToDeviceClicked = onSaveToDeviceClicked
+                    )
+                    if (isAdDismissed.value.not()) {
+                        AdsBannerView(
+                            uiState = adsUiState,
+                            onAdClicked = onAdClicked,
+                            onAdsWebpageLoaded = {},
+                            onAdDismissed = { isAdDismissed.value = true }
+                        )
+                    }
+                }
 
                 AnimatedVisibility(
                     visible = transferState.widgetVisible,
@@ -350,7 +364,9 @@ private fun PreviewFileLinkView() {
             onConfirmErrorDialogClick = {},
             onErrorMessageConsumed = {},
             onOverQuotaErrorConsumed = {},
-            onForeignNodeErrorConsumed = {}
+            onForeignNodeErrorConsumed = {},
+            adsUiState = AdsUIState(),
+            onAdClicked = {},
         )
     }
 }

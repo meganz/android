@@ -8,6 +8,7 @@ import android.webkit.WebViewClient
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
@@ -35,12 +36,15 @@ internal fun AdsBannerView(
     onAdClicked: (uri: Uri?) -> Unit,
     onAdsWebpageLoaded: () -> Unit,
     onAdDismissed: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val url = uiState.adsBannerUrl
 
     if (uiState.showAdsView) {
         Box(
-            modifier = Modifier
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .fillMaxWidth()
                 .testTag(WEB_VIEW_TEST_TAG)
         ) {
             val webpageBackgroundColor = MaterialTheme.colors.surface.toArgb()
