@@ -544,7 +544,7 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_status -> {
-                handleCUIconStatusClick()
+                openCameraUploadsSettings()
                 true
             }
 
