@@ -5,12 +5,13 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
+import androidx.work.ProgressUpdater
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.foreground.ForegroundProcessor
 import androidx.work.impl.utils.WorkForegroundUpdater
-import androidx.work.impl.utils.WorkProgressUpdater
+import androidx.work.impl.utils.futures.SettableFuture
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.*
@@ -44,7 +45,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -77,6 +80,7 @@ class DownloadsWorkerTest {
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val transfersFinishedNotificationMapper = mock<TransfersFinishedNotificationMapper>()
+    private val workProgressUpdater = mock<ProgressUpdater>()
 
     @Before
     fun setup() {
@@ -98,7 +102,7 @@ class DownloadsWorkerTest {
                 executor,
                 workExecutor,
                 WorkerFactory.getDefaultWorkerFactory(),
-                WorkProgressUpdater(workDatabase, workExecutor),
+                workProgressUpdater,
                 WorkForegroundUpdater(workDatabase, object : ForegroundProcessor {
                     override fun startForeground(
                         workSpecId: String,
@@ -262,6 +266,17 @@ class DownloadsWorkerTest {
             verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
         }
 
+    @Test
+    fun `test that progress is set as work progress`() = runTest {
+        val transferTotal = mockActiveTransferTotals(true)
+        val expectedProgress = 100
+        whenever(transferTotal.progressPercent).thenReturn(expectedProgress)
+        commonStub(transferTotals = listOf(transferTotal))
+        underTest.doWork()
+        val expectedData = workDataOf(DownloadsWorker.Progress to expectedProgress)
+        verify(workProgressUpdater).updateProgress(eq(context), any(), eq(expectedData))
+    }
+
     private suspend fun commonStub(
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
@@ -283,6 +298,8 @@ class DownloadsWorkerTest {
                 }
             })
         whenever(areNotificationsEnabledUseCase()).thenReturn(true)
+        whenever(workProgressUpdater.updateProgress(any(), any(), any()))
+            .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
     }
 
     private fun mockActiveTransferTotals(

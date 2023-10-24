@@ -12,6 +12,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -73,6 +74,8 @@ class DownloadsWorker @AssistedInject constructor(
             monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)
                 .catch { Timber.e("DownloadsWorker error: $it") }
                 .onEach { (transferTotals, paused, _) ->
+                    //set progress percent as worker progress
+                    setProgress(workDataOf(Progress to transferTotals.progressPercent))
                     //update the notification
                     if (areNotificationsEnabledUseCase()) {
                         notify(downloadNotificationMapper(transferTotals, paused))
@@ -170,6 +173,11 @@ class DownloadsWorker @AssistedInject constructor(
 
 
     companion object {
+        /**
+         * Tag to get the progress percent of this worker
+         */
+        const val Progress = "Progress"
+
         /**
          * Tag for enqueue the worker to work manager
          */
