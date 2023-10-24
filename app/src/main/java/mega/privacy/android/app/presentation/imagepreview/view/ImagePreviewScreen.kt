@@ -77,11 +77,21 @@ import mega.privacy.android.domain.entity.node.ImageNode
 fun ImagePreviewScreen(
     viewModel: ImagePreviewViewModel = viewModel(),
     onClickBack: () -> Unit,
-    onClickSaveToDevice: (ImageNode) -> Unit,
-    onClickGetLink: (ImageNode) -> Unit,
-    onClickSendTo: (ImageNode) -> Unit,
     onClickVideoPlay: (ImageNode) -> Unit,
     onClickSlideshow: () -> Unit,
+    onClickInfo: (ImageNode) -> Unit,
+    onClickFavourite: (ImageNode) -> Unit = {},
+    onClickLabel: (ImageNode) -> Unit = {},
+    onClickOpenWith: (ImageNode) -> Unit = {},
+    onClickSaveToDevice: (ImageNode) -> Unit = {},
+    onSwitchAvailableOffline: ((Boolean, ImageNode) -> Unit)? = null,
+    onClickGetLink: (ImageNode) -> Unit = {},
+    onClickSendTo: (ImageNode) -> Unit = {},
+    onClickShare: (ImageNode) -> Unit = {},
+    onClickRename: (ImageNode) -> Unit = {},
+    onClickMove: (ImageNode) -> Unit = {},
+    onClickCopy: (ImageNode) -> Unit = {},
+    onClickMoveToRubbishBin: (ImageNode) -> Unit = {},
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val imageNodes = viewState.imageNodes
@@ -95,6 +105,7 @@ fun ImagePreviewScreen(
         val inFullScreenMode = viewState.inFullScreenMode
         val scaffoldState = rememberScaffoldState()
         val isLight = MaterialTheme.colors.isLight
+        val context = LocalContext.current
         val photoState = rememberPhotoState()
         val pagerState = rememberPagerState(
             initialPage = initialPage,
@@ -120,8 +131,19 @@ fun ImagePreviewScreen(
                 scaffoldState.snackbarHostState.showSnackbar(
                     message = viewState.transferMessage,
                 )
+                viewModel.clearTransferMessage()
             }
         }
+
+        if (viewState.resultMessage.isNotEmpty()) {
+            LaunchedEffect(Unit) {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = viewState.resultMessage,
+                )
+                viewModel.clearResultMessage()
+            }
+        }
+
         Scaffold(
             scaffoldState = scaffoldState,
             snackbarHost = { snackBarHostState ->
@@ -148,6 +170,21 @@ fun ImagePreviewScreen(
                     downloadImage = viewModel::monitorImageResult,
                     onImageTap = { viewModel.switchFullScreenMode() },
                     onClickVideoPlay = onClickVideoPlay,
+                    onClickInfo = onClickInfo,
+                    onClickFavourite = { imageNode -> onClickFavourite(imageNode) },
+                    onClickLabel = { imageNode -> onClickLabel(imageNode) },
+                    onClickOpenWith = { imageNode -> onClickOpenWith(imageNode) },
+                    onClickSaveToDevice = { imageNode -> onClickSaveToDevice(imageNode) },
+                    onSwitchAvailableOffline = { checked, imageNode ->
+                        onSwitchAvailableOffline?.invoke(checked, imageNode)
+                    },
+                    onClickGetLink = { imageNode -> onClickGetLink(imageNode) },
+                    onClickSendTo = { imageNode -> onClickSendTo(imageNode) },
+                    onClickShare = { imageNode -> onClickShare(imageNode) },
+                    onClickRename = { imageNode -> onClickRename(imageNode) },
+                    onClickMove = { imageNode -> onClickMove(imageNode) },
+                    onClickCopy = { imageNode -> onClickCopy(imageNode) },
+                    onClickMoveToRubbishBin = { imageNode -> onClickMoveToRubbishBin(imageNode) },
                     topAppBar = { imageNode ->
                         AnimatedVisibility(
                             visible = !inFullScreenMode,
@@ -213,6 +250,19 @@ private fun ImagePreviewContent(
     getInfoText: (ImageNode, Context) -> String,
     modalSheetState: ModalBottomSheetState,
     onClickVideoPlay: (ImageNode) -> Unit,
+    onClickInfo: (ImageNode) -> Unit,
+    onClickFavourite: (ImageNode) -> Unit = {},
+    onClickLabel: (ImageNode) -> Unit = {},
+    onClickOpenWith: (ImageNode) -> Unit = {},
+    onClickSaveToDevice: (ImageNode) -> Unit = {},
+    onSwitchAvailableOffline: ((Boolean, ImageNode) -> Unit)? = null,
+    onClickGetLink: (ImageNode) -> Unit = {},
+    onClickSendTo: (ImageNode) -> Unit = {},
+    onClickShare: (ImageNode) -> Unit = {},
+    onClickRename: (ImageNode) -> Unit = {},
+    onClickMove: (ImageNode) -> Unit = {},
+    onClickCopy: (ImageNode) -> Unit = {},
+    onClickMoveToRubbishBin: (ImageNode) -> Unit = {},
 ) {
     val context = LocalContext.current
     Box(modifier = modifier.background(color = Color.Black)) {
@@ -223,16 +273,16 @@ private fun ImagePreviewContent(
             beyondBoundsPageCount = 5,
             key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L }
         ) { index ->
-            val currentImageNode = imageNodes[index]
+            val imageNode = imageNodes[index]
             val currentImageNodeInfo = remember(index) {
                 getInfoText(
-                    currentImageNode,
+                    imageNode,
                     context,
                 )
             }
 
             val imageResult by produceState<ImageResult?>(initialValue = null) {
-                downloadImage(currentImageNode).collectLatest { imageResult ->
+                downloadImage(imageNode).collectLatest { imageResult ->
                     value = imageResult
                 }
             }
@@ -240,8 +290,23 @@ private fun ImagePreviewContent(
             ImagePreviewBottomSheet(
                 modalSheetState = modalSheetState,
                 imageThumbnailPath = imageResult?.getLowestResolutionAvailableUri(),
-                imageName = currentImageNode.name,
+                imageName = imageNode.name,
                 imageInfo = currentImageNodeInfo,
+                onClickInfo = { onClickInfo(imageNode) },
+                onClickFavourite = { onClickFavourite(imageNode) },
+                onClickLabel = { onClickLabel(imageNode) },
+                onClickOpenWith = { onClickOpenWith(imageNode) },
+                onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
+                onSwitchAvailableOffline = { checked ->
+                    onSwitchAvailableOffline?.invoke(checked, imageNode)
+                },
+                onClickGetLink = { onClickGetLink(imageNode) },
+                onClickSendTo = { onClickSendTo(imageNode) },
+                onClickShare = { onClickShare(imageNode) },
+                onClickRename = { onClickRename(imageNode) },
+                onClickMove = { onClickMove(imageNode) },
+                onClickCopy = { onClickCopy(imageNode) },
+                onClickMoveToRubbishBin = { onClickMoveToRubbishBin(imageNode) },
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize()) {
@@ -250,10 +315,10 @@ private fun ImagePreviewContent(
                             photoState = photoState,
                             onImageTap = onImageTap
                         )
-                        if (currentImageNode.type is VideoFileTypeInfo) {
+                        if (imageNode.type is VideoFileTypeInfo) {
                             IconButton(
                                 modifier = Modifier.align(Alignment.Center),
-                                onClick = { onClickVideoPlay(currentImageNode) }
+                                onClick = { onClickVideoPlay(imageNode) }
                             ) {
                                 Icon(
                                     painter = painterResource(id = RExoPlayer.drawable.exo_icon_play),
@@ -268,14 +333,14 @@ private fun ImagePreviewContent(
                             .wrapContentSize()
                             .align(Alignment.TopCenter)
                     ) {
-                        topAppBar(currentImageNode)
+                        topAppBar(imageNode)
                     }
                     Box(
                         modifier = Modifier
                             .wrapContentSize()
                             .align(Alignment.BottomCenter)
                     ) {
-                        bottomAppBar(currentImageNode, index)
+                        bottomAppBar(imageNode, index)
                     }
                 }
             }

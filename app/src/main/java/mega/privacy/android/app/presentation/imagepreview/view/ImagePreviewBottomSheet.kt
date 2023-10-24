@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
@@ -25,6 +24,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.core.R.drawable.link_ic
+import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -32,7 +32,6 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
-@OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
 internal fun ImagePreviewBottomSheetPreview() {
@@ -53,25 +52,33 @@ internal fun ImagePreviewBottomSheet(
     imageName: String = "",
     imageInfo: String = "",
     imageThumbnailPath: String? = "",
-    onInfoClicked: () -> Unit = {},
-    onFavouriteClicked: () -> Unit = {},
-    onDisputeTakeDownClicked: () -> Unit = {},
-    onSlideShowClicked: () -> Unit = {},
-    onOpenWithClicked: () -> Unit = {},
-    onForwardClicked: () -> Unit = {},
-    onSaveToDeviceClicked: () -> Unit = {},
-    onAvailableOfflineClicked: () -> Unit = {},
-    onManageLinkClicked: () -> Unit = {},
-    onRemoveLinkClicked: () -> Unit = {},
-    onSendToClicked: () -> Unit = {},
-    onShareClicked: () -> Unit = {},
-    onRenameClicked: () -> Unit = {},
-    onMoveClicked: () -> Unit = {},
-    onCopyClicked: () -> Unit = {},
-    onRestoreClicked: () -> Unit = {},
-    onRemoveFromOfflineClicked: () -> Unit = {},
-    onRemoveClicked: () -> Unit = {},
-    onMoveToRubbishBinClicked: () -> Unit = {},
+    onClickInfo: () -> Unit = {},
+    onClickFavourite: () -> Unit = {},
+    onClickLabel: () -> Unit = {},
+    onClickDisputeTakeDown: () -> Unit = {},
+    onClickSlideShow: () -> Unit = {},
+    onClickOpenWith: () -> Unit = {},
+    onClickForward: () -> Unit = {},
+    onClickSaveToDevice: () -> Unit = {},
+    onSwitchAvailableOffline: ((Boolean) -> Unit)? = null,
+    onClickGetLink: () -> Unit = {},
+    onClickRemoveLink: () -> Unit = {},
+    onClickSendTo: () -> Unit = {},
+    onClickShare: () -> Unit = {},
+    onClickRename: () -> Unit = {},
+    onClickMove: () -> Unit = {},
+    onClickCopy: () -> Unit = {},
+    onClickRestore: () -> Unit = {},
+    onClickRemoveFromOffline: () -> Unit = {},
+    onClickRemove: () -> Unit = {},
+    onClickMoveToRubbishBin: () -> Unit = {},
+    showDisputeTakeDown: Boolean = false,
+    showSlideShow: Boolean = false,
+    showForward: Boolean = false,
+    showRemoveLink: Boolean = false,
+    showRestore: Boolean = false,
+    showRemoveFromOffline: Boolean = false,
+    showRemove: Boolean = false,
     content: (@Composable () -> Unit)? = null,
 ) {
     BottomSheet(
@@ -88,109 +95,144 @@ internal fun ImagePreviewBottomSheet(
                 MenuActionListTile(
                     icon = R.drawable.info_ic,
                     text = stringResource(id = R.string.general_info),
-                    onActionClicked = onInfoClicked,
+                    onActionClicked = onClickInfo,
+                    addSeparator = false,
                 )
                 MenuActionListTile(
                     icon = R.drawable.ic_add_favourite,
                     text = stringResource(id = R.string.file_properties_favourite),
-                    onActionClicked = onFavouriteClicked,
+                    onActionClicked = onClickFavourite,
+                    addSeparator = false,
                 )
                 MenuActionListTile(
                     icon = R.drawable.ic_label,
                     text = stringResource(id = R.string.file_properties_label),
-                    onActionClicked = onFavouriteClicked,
+                    onActionClicked = onClickLabel,
+                    addSeparator = true,
                 )
-                Divider(startIndent = 72.dp)
-                MenuActionListTile(
-                    icon = R.drawable.ic_taken_down_bottom_sheet,
-                    text = stringResource(id = R.string.dispute_takendown_file),
-                    onActionClicked = onDisputeTakeDownClicked,
-                )
-                Divider(startIndent = 72.dp)
-                MenuActionListTile(
-                    icon = R.drawable.ic_slideshow,
-                    text = stringResource(id = R.string.action_slideshow),
-                    onActionClicked = onSlideShowClicked,
-                )
+                if (showDisputeTakeDown) {
+                    MenuActionListTile(
+                        icon = R.drawable.ic_taken_down_bottom_sheet,
+                        text = stringResource(id = R.string.dispute_takendown_file),
+                        onActionClicked = onClickDisputeTakeDown,
+                        addSeparator = false,
+                    )
+                }
+                if (showSlideShow) {
+                    MenuActionListTile(
+                        icon = R.drawable.ic_slideshow,
+                        text = stringResource(id = R.string.action_slideshow),
+                        onActionClicked = onClickSlideShow,
+                        addSeparator = false,
+                    )
+                }
                 MenuActionListTile(
                     icon = R.drawable.ic_open_with,
                     text = stringResource(id = R.string.external_play),
-                    onActionClicked = onOpenWithClicked,
+                    onActionClicked = onClickOpenWith,
+                    addSeparator = true,
                 )
-                MenuActionListTile(
-                    icon = R.drawable.ic_forward,
-                    text = stringResource(id = R.string.forward_menu_item),
-                    onActionClicked = onForwardClicked,
-                )
+                if (showForward) {
+                    MenuActionListTile(
+                        icon = R.drawable.ic_forward,
+                        text = stringResource(id = R.string.forward_menu_item),
+                        onActionClicked = onClickForward,
+                        addSeparator = false,
+                    )
+                }
                 MenuActionListTile(
                     icon = R.drawable.ic_save_to_device,
                     text = stringResource(id = R.string.general_save_to_device),
-                    onActionClicked = onSaveToDeviceClicked,
+                    onActionClicked = onClickSaveToDevice,
+                    addSeparator = false,
                 )
-                Divider(startIndent = 72.dp)
                 MenuActionListTile(
-                    icon = R.drawable.ic_save_offline,
                     text = stringResource(id = R.string.file_properties_available_offline),
-                    onActionClicked = onAvailableOfflineClicked,
-                )
-                Divider(startIndent = 72.dp)
+                    icon = R.drawable.ic_save_offline,
+                    addSeparator = true,
+                ) {
+                    MegaSwitch(
+                        checked = false,
+                        onCheckedChange = onSwitchAvailableOffline,
+                    )
+                }
                 MenuActionListTile(
                     icon = link_ic,
-                    text = stringResource(id = R.string.edit_link_option),
-                    onActionClicked = onManageLinkClicked,
+                    text = LocalContext.current.resources.getQuantityString(
+                        R.plurals.get_links,
+                        1,
+                    ),
+                    onActionClicked = onClickGetLink,
+                    addSeparator = false,
                 )
-                MenuActionListTile(
-                    icon = R.drawable.ic_remove_link,
-                    text = stringResource(id = R.string.context_remove_link_menu),
-                    onActionClicked = onRemoveLinkClicked,
-                )
+                if (showRemoveLink) {
+                    MenuActionListTile(
+                        icon = R.drawable.ic_remove_link,
+                        text = stringResource(id = R.string.context_remove_link_menu),
+                        onActionClicked = onClickRemoveLink,
+                        addSeparator = false,
+                    )
+                }
                 MenuActionListTile(
                     icon = R.drawable.ic_send_to_contact,
                     text = stringResource(id = R.string.context_send_file_to_chat),
-                    onActionClicked = onSendToClicked,
+                    onActionClicked = onClickSendTo,
+                    addSeparator = false,
                 )
                 MenuActionListTile(
                     icon = R.drawable.ic_social_share_white,
                     text = stringResource(id = R.string.general_share),
-                    onActionClicked = onShareClicked,
+                    onActionClicked = onClickShare,
+                    addSeparator = true,
                 )
-                Divider(startIndent = 72.dp)
                 MenuActionListTile(
                     icon = R.drawable.ic_rename,
                     text = stringResource(id = R.string.context_rename),
-                    onActionClicked = onRenameClicked,
+                    onActionClicked = onClickRename,
+                    addSeparator = false,
                 )
                 MenuActionListTile(
                     icon = R.drawable.ic_move,
                     text = stringResource(id = R.string.general_move),
-                    onActionClicked = onMoveClicked,
+                    onActionClicked = onClickMove,
+                    addSeparator = false,
                 )
                 MenuActionListTile(
                     icon = R.drawable.ic_menu_copy,
                     text = stringResource(id = R.string.context_copy),
-                    onActionClicked = onCopyClicked,
+                    onActionClicked = onClickCopy,
+                    addSeparator = true,
                 )
-                Divider(startIndent = 72.dp)
-                MenuActionListTile(
-                    icon = R.drawable.ic_restore,
-                    text = stringResource(id = R.string.context_restore),
-                    onActionClicked = onRestoreClicked,
-                )
-                Divider(startIndent = 72.dp)
-                MenuActionListTile(
-                    icon = R.drawable.ic_remove,
-                    text = stringResource(id = R.string.context_delete_offline),
-                    onActionClicked = onRemoveFromOfflineClicked,
-                )
-                MenuActionListTile(
-                    icon = R.drawable.ic_remove,
-                    text = stringResource(id = R.string.context_remove),
-                    onActionClicked = onRemoveClicked,
-                )
+                if (showRestore) {
+                    MenuActionListTile(
+                        icon = R.drawable.ic_restore,
+                        text = stringResource(id = R.string.context_restore),
+                        onActionClicked = onClickRestore,
+                        addSeparator = false,
+                    )
+                }
+                if (showRemoveFromOffline) {
+                    MenuActionListTile(
+                        icon = R.drawable.ic_remove,
+                        text = stringResource(id = R.string.context_delete_offline),
+                        onActionClicked = onClickRemoveFromOffline,
+                        addSeparator = false,
+                    )
+                }
+                if (showRemove) {
+                    MenuActionListTile(
+                        icon = R.drawable.ic_remove,
+                        text = stringResource(id = R.string.context_remove),
+                        onActionClicked = onClickRemove,
+                        addSeparator = false,
+                    )
+                }
                 MenuActionListTile(
                     icon = R.drawable.ic_rubbish_bin,
                     text = stringResource(id = R.string.context_move_to_trash),
-                    onActionClicked = onMoveToRubbishBinClicked,
+                    onActionClicked = onClickMoveToRubbishBin,
+                    addSeparator = false,
+                    isDestructive = true,
                 )
             }
         },

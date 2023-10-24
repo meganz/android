@@ -5,30 +5,43 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.os.bundleOf
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
+import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -40,9 +53,17 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var imagePreviewVideoLauncher: ImagePreviewVideoLauncher
-
+    private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
+        registerForActivityResult(
+            SelectFolderToMoveActivityContract(),
+            ::handleMoveFolderResult,
+        )
+    private val selectCopyFolderLauncher: ActivityResultLauncher<LongArray> =
+        registerForActivityResult(
+            SelectFolderToCopyActivityContract(),
+            ::handleCopyFolderResult,
+        )
     private val viewModel: ImagePreviewViewModel by viewModels()
-
     private val nodeSaver: NodeSaver by lazy {
         NodeSaver(
             activityLauncher = this,
@@ -51,7 +72,6 @@ class ImagePreviewActivity : BaseActivity() {
             confirmDialogShower = AlertsAndWarnings.showSaveToDeviceConfirmDialog(this),
         )
     }
-
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,45 +85,139 @@ class ImagePreviewActivity : BaseActivity() {
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 ImagePreviewScreen(
                     onClickBack = ::finish,
-                    onClickSaveToDevice = ::onClickSaveToDevice,
-                    onClickGetLink = ::onClickGetLink,
-                    onClickSendTo = ::onClickSendTo,
-                    onClickVideoPlay = ::onClickVideoPlay,
-                    onClickSlideshow = ::onClickSlideshow,
+                    onClickVideoPlay = ::playVideo,
+                    onClickSlideshow = ::playSlideshow,
+                    onClickInfo = ::checkInfo,
+                    onClickFavourite = ::favouriteNode,
+                    onClickLabel = ::handleLabel,
+                    onClickOpenWith = ::handleOpenWith,
+                    onClickSaveToDevice = ::saveNodeToDevice,
+                    onSwitchAvailableOffline = ::onSwitchAvailableOffline,
+                    onClickGetLink = ::getNodeLink,
+                    onClickSendTo = ::sendNodeToChat,
+                    onClickShare = ::shareNode,
+                    onClickRename = ::renameNode,
+                    onClickMove = ::moveNode,
+                    onClickCopy = ::copyNode,
+                    onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
                 )
             }
         }
+        setupFlow()
     }
 
-    private fun onClickSlideshow() {
+    private fun setupFlow() {
+        viewModel.state
+            .onEach(::handleState)
+            .flowWithLifecycle(lifecycle, minActiveState = Lifecycle.State.RESUMED)
+            .launchIn(lifecycleScope)
+    }
+
+    private fun handleState(state: ImagePreviewState) {
+        manageCopyMoveException(state.copyMoveException)
+    }
+
+    private fun handleMoveFolderResult(result: Pair<LongArray, Long>?) {
+        result ?: return
+        val (handles, toHandle) = result
+
+        val targetHandle = handles.firstOrNull()
+        if (targetHandle == null || targetHandle == MegaApiJava.INVALID_HANDLE || toHandle == MegaApiJava.INVALID_HANDLE) return
+
+        viewModel.moveNode(
+            context = this,
+            moveHandle = targetHandle,
+            toHandle = toHandle,
+        )
+    }
+
+    private fun handleCopyFolderResult(result: Pair<LongArray, Long>?) {
+        result ?: return
+        val (handles, toHandle) = result
+
+        val targetHandle = handles.firstOrNull()
+        if (targetHandle == null || targetHandle == MegaApiJava.INVALID_HANDLE || toHandle == MegaApiJava.INVALID_HANDLE) return
+
+        viewModel.copyNode(
+            context = this,
+            copyHandle = targetHandle,
+            toHandle = toHandle,
+        )
+    }
+
+    private fun checkInfo(imageNode: ImageNode) {
+        val intent = Intent(this, FileInfoActivity::class.java).apply {
+            putExtra(Constants.HANDLE, imageNode.id.longValue)
+            putExtra(Constants.NAME, imageNode.name)
+        }
+        startActivity(intent)
+    }
+
+    private fun favouriteNode(imageNode: ImageNode) {
+        viewModel.favouriteNode(imageNode)
+    }
+
+    private fun handleLabel(imageNode: ImageNode) {
+        //TODO label
+    }
+
+    private fun handleOpenWith(imageNode: ImageNode) {
+        ModalBottomSheetUtil.openWith(this, MegaNode.unserialize(imageNode.serializedData))
+    }
+
+    private fun saveNodeToDevice(imageNode: ImageNode) {
+        viewModel.executeTransfer(transferMessage = getString(R.string.resume_paused_transfers_text)) {
+            saveNode(MegaNode.unserialize(imageNode.serializedData))
+        }
+    }
+
+    private fun onSwitchAvailableOffline(checked: Boolean, imageNode: ImageNode) {
+        viewModel.switchAvailableOffline(checked, imageNode)
+    }
+
+    private fun sendNodeToChat(imageNode: ImageNode) {
+        nodeAttacher.attachNode(imageNode.id.longValue)
+    }
+
+    private fun getNodeLink(imageNode: ImageNode) {
+        LinksUtil.showGetLinkActivity(this, imageNode.id.longValue)
+    }
+
+    private fun shareNode(imageNode: ImageNode) {
+        viewModel.shareImageNode(imageNode)
+    }
+
+    private fun renameNode(imageNode: ImageNode) {
+        viewModel.renameImageNode(imageNode)
+    }
+
+    private fun moveNode(imageNode: ImageNode) {
+        selectMoveFolderLauncher.launch(longArrayOf(imageNode.id.longValue))
+    }
+
+    private fun copyNode(imageNode: ImageNode) {
+        selectCopyFolderLauncher.launch(longArrayOf(imageNode.id.longValue))
+    }
+
+    private fun moveNodeToRubbishBin(imageNode: ImageNode) {
+        ConfirmMoveToRubbishBinDialogFragment.newInstance(listOf(imageNode.id.longValue))
+            .show(
+                supportFragmentManager,
+                ConfirmMoveToRubbishBinDialogFragment.TAG
+            )
+    }
+
+    private fun playSlideshow() {
         //TODO
         Toast.makeText(this, "Slideshow", Toast.LENGTH_SHORT).show()
     }
 
-    private fun onClickGetLink(imageNode: ImageNode) {
-        LinksUtil.showGetLinkActivity(this, imageNode.id.longValue)
-    }
-
-    private fun onClickSendTo(imageNode: ImageNode) {
-        nodeAttacher.attachNode(imageNode.id.longValue)
-    }
-
-    private fun onClickVideoPlay(imageNode: ImageNode) {
+    private fun playVideo(imageNode: ImageNode) {
         lifecycleScope.launch {
             imagePreviewVideoLauncher.launchVideoScreen(
                 imageNode = imageNode,
                 context = this@ImagePreviewActivity,
             )
-        }
-    }
-
-    private fun onClickSaveToDevice(imageNode: ImageNode) {
-        lifecycleScope.launch {
-            viewModel.executeTransfer(
-                transferMessage = getString(R.string.resume_paused_transfers_text)
-            ) {
-                saveNode(MegaNode.unserialize(imageNode.serializedData))
-            }
         }
     }
 
