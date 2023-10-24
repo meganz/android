@@ -402,6 +402,32 @@ internal class ChatViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = " with own privilege change {0}")
+    @EnumSource(ChatRoomPermission::class)
+    fun `test that my permission is updated when chat room updates`(
+        newPermission: ChatRoomPermission,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        val updateFlow = MutableSharedFlow<ChatRoom>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().myPermission).isEqualTo(ChatRoomPermission.Moderator)
+        }
+        val newChatRoom = mock<ChatRoom> {
+            on { ownPrivilege } doReturn newPermission
+            on { changes } doReturn listOf(ChatRoomChange.OwnPrivilege)
+        }
+        updateFlow.emit(newChatRoom)
+        underTest.state.test {
+            assertThat(awaitItem().myPermission).isEqualTo(newPermission)
+        }
+    }
+
     private fun provideUserChatStatusParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(UserChatStatus.Offline, UserChatStatus.Away),
         Arguments.of(UserChatStatus.Away, UserChatStatus.Online),

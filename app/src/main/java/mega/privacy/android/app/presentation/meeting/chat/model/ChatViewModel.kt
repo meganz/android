@@ -117,11 +117,23 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId)
                 .collect { chat ->
-                    chat.changes?.forEach { change ->
-                        if (change == ChatRoomChange.Title) {
-                            _state.update { state -> state.copy(title = chat.title) }
-                        } else if (change == ChatRoomChange.ChatMode) {
-                            _state.update { state -> state.copy(isPrivateChat = !chat.isPublic) }
+                    with(chat) {
+                        changes?.forEach { change ->
+                            when (change) {
+                                ChatRoomChange.Title -> _state.update { state ->
+                                    state.copy(title = title)
+                                }
+
+                                ChatRoomChange.ChatMode -> _state.update { state ->
+                                    state.copy(isPrivateChat = !isPublic)
+                                }
+
+                                ChatRoomChange.OwnPrivilege -> _state.update { state ->
+                                    state.copy(myPermission = ownPrivilege)
+                                }
+
+                                else -> {}
+                            }
                         }
                     }
                 }
