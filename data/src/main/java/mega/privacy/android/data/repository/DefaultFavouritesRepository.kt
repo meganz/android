@@ -6,6 +6,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -25,6 +26,15 @@ internal class DefaultFavouritesRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val nodeMapper: NodeMapper,
 ) : FavouritesRepository {
+
+    override suspend fun addFavourites(nodeIds: List<NodeId>) {
+        withContext(ioDispatcher) {
+            nodeIds.forEach { nodeId ->
+                val megaNode = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+                megaApiGateway.setNodeFavourite(megaNode, true)
+            }
+        }
+    }
 
     override suspend fun getAllFavorites(): List<UnTypedNode> =
         withContext(ioDispatcher) {

@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaApiJava
@@ -20,6 +21,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -124,4 +127,17 @@ class DefaultFavouritesRepositoryTest {
         underTest.getAllFavorites()
     }
 
+    @Test
+    fun `test that add favourites works properly`() = runTest {
+        val nodeIds = listOf(
+            NodeId(1L),
+            NodeId(2L),
+            NodeId(3L),
+        )
+
+        whenever(megaApiGateway.getMegaNodeByHandle(any()))
+            .thenReturn(mock())
+        underTest.addFavourites(nodeIds)
+        verify(megaApiGateway, times(3)).setNodeFavourite(any(), any())
+    }
 }
