@@ -10,7 +10,7 @@ import javax.inject.Inject
 /**
  * Rubbish bin menu action
  */
-class RubbishBinMenuAction @Inject constructor() : MenuActionWithIcon {
+class TrashMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_move_to_rubbish_bin)
