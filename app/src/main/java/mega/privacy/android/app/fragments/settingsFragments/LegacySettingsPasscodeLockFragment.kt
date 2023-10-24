@@ -50,9 +50,48 @@ class LegacySettingsPasscodeLockFragment : SettingsBaseFragment() {
 
     private var passcodeLock = false
 
-    private lateinit var executor: Executor
-    private lateinit var biometricPrompt: BiometricPrompt
-    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+    private val executor: Executor by lazy {
+        ContextCompat.getMainExecutor(requireContext())
+    }
+    private val biometricPrompt: BiometricPrompt
+        get() = BiometricPrompt(
+            this,
+            executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(
+                    errorCode: Int,
+                    errString: CharSequence,
+                ) {
+                    super.onAuthenticationError(errorCode, errString)
+                    Timber.w("Error: $errString")
+                    fingerprintSwitch?.isChecked = false
+                }
+    
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult,
+                ) {
+                    super.onAuthenticationSucceeded(result)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        passcodePreferencesWrapper.setFingerprintLockEnabled(true)
+                    }
+                    snackbarCallBack?.showSnackbar(
+                        getString(R.string.confirmation_fingerprint_enabled)
+                    )
+                }
+    
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    Timber.w("Authentication failed")
+                }
+            })
+    private val promptInfo: BiometricPrompt.PromptInfo by lazy {
+        BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.title_enable_fingerprint))
+            .setNegativeButtonText(getString(R.string.general_cancel))
+            .setAllowedAuthenticators(BIOMETRIC_STRONG)
+            .build()
+    }
+
     private lateinit var pinLauncher: ActivityResultLauncher<Boolean>
 
 
@@ -173,51 +212,6 @@ class LegacySettingsPasscodeLockFragment : SettingsBaseFragment() {
      * Shows the dialog to enable fingerprint unlock.
      */
     private fun showEnableFingerprint() {
-        if (!this::executor.isInitialized) {
-            executor = ContextCompat.getMainExecutor(requireContext())
-        }
-
-        if (!this::biometricPrompt.isInitialized) {
-            biometricPrompt = BiometricPrompt(
-                this,
-                executor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationError(
-                        errorCode: Int,
-                        errString: CharSequence,
-                    ) {
-                        super.onAuthenticationError(errorCode, errString)
-                        Timber.w("Error: $errString")
-                        fingerprintSwitch?.isChecked = false
-                    }
-
-                    override fun onAuthenticationSucceeded(
-                        result: BiometricPrompt.AuthenticationResult,
-                    ) {
-                        super.onAuthenticationSucceeded(result)
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            passcodePreferencesWrapper.setFingerprintLockEnabled(true)
-                        }
-                        snackbarCallBack?.showSnackbar(
-                            getString(R.string.confirmation_fingerprint_enabled)
-                        )
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        Timber.w("Authentication failed")
-                    }
-                })
-        }
-
-        if (!this::promptInfo.isInitialized) {
-            promptInfo = BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.title_enable_fingerprint))
-                .setNegativeButtonText(getString(R.string.general_cancel))
-                .setAllowedAuthenticators(BIOMETRIC_STRONG)
-                .build()
-        }
-
         biometricPrompt.authenticate(promptInfo)
     }
 
