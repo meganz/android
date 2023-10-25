@@ -108,8 +108,13 @@ class ChatViewModel @Inject constructor(
 
     private fun getNotificationMute(chatId: Long) {
         viewModelScope.launch {
-            val isMute = isChatNotificationMuteUseCase(chatId)
-            _state.update { it.copy(isChatNotificationMute = isMute) }
+            runCatching {
+                isChatNotificationMuteUseCase(chatId)
+            }.onSuccess { isMute ->
+                _state.update { it.copy(isChatNotificationMute = isMute) }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

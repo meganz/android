@@ -296,6 +296,19 @@ internal class ChatViewModelTest {
         }
 
     @Test
+    fun `test that initial mute icon visibility is always false when it fails to fetch the chat notification mute status`() =
+        runTest {
+            whenever(isChatNotificationMuteUseCase(chatId))
+                .thenAnswer { throw Exception("failure to get chat notification mute status") }
+
+            initTestClass()
+
+            underTest.state.test {
+                assertThat(awaitItem().isChatNotificationMute).isFalse()
+            }
+        }
+
+    @Test
     fun `test that private room update when chat room update with mode change`() = runTest {
         val chatRoom = mock<ChatRoom> {
             on { isGroup } doReturn true
