@@ -59,12 +59,12 @@ private fun SelectModeAppBarPreview() {
 }
 
 private fun getSampleToolbarActions(): List<MenuAction> {
-    val item1 = object : MenuActionString(R.drawable.ic_down, R.string.cancel, "cancel") {}
-    val item2 = object : MenuActionString(R.drawable.ic_menu, R.string.action_long, "menu") {}
+    val item1 = object : MenuActionString(R.drawable.ic_down, R.string.password_text, "cancel") {}
+    val item2 = object : MenuActionString(R.drawable.ic_menu, R.string.password_text, "menu") {}
     val item3 =
-        object : MenuActionString(R.drawable.ic_chevron_up, R.string.action_long, "chevron up") {}
+        object : MenuActionString(R.drawable.ic_chevron_up, R.string.password_text, "chevron up") {}
     val item4 =
-        object : MenuActionString(R.drawable.ic_alert_circle, R.string.action_long, "circle") {}
+        object : MenuActionString(R.drawable.ic_alert_circle, R.string.password_text, "circle") {}
     val item5 = object : MenuActionWithoutIcon(R.string.password_text, "password") {}
     return listOf(item1, item2, item3, item4, item5)
 }
