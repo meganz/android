@@ -20,6 +20,9 @@ room-test = "2.5.2"
 runner = "1.5.2"
 
 [libraries]
+androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-testManifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 arch-core-test = { module = "androidx.arch.core:core-testing", version.ref = "androidx-arch" }
 compose-junit = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 compose-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }

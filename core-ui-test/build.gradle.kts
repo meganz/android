@@ -53,12 +53,15 @@ android {
 }
 
 dependencies {
-
-    implementation(project(":app"))
-    implementation(project(":analytics"))
-    implementation(lib.mega.analytics)
-
     implementation(testlib.bundles.ui.test)
     implementation(testlib.bundles.unit.test)
     implementation(testlib.compose.junit)
+
+    // Compose testing dependencies
+    implementation(platform(androidx.compose.bom))
+    androidTestImplementation(platform(androidx.compose.bom))
+    androidTestImplementation(testlib.androidx.compose.ui.test)
+    androidTestImplementation(testlib.androidx.compose.ui.test.junit4)
+    debugImplementation(testlib.androidx.compose.ui.testManifest)
+
 }

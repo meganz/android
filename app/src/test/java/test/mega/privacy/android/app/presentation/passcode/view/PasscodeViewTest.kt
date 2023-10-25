@@ -26,7 +26,7 @@ import mega.privacy.android.app.presentation.passcode.view.LOGOUT_BUTTON_TAG
 import mega.privacy.android.app.presentation.passcode.view.PASSCODE_FIELD_TAG
 import mega.privacy.android.app.presentation.passcode.view.PASSWORD_FIELD_TAG
 import mega.privacy.android.app.presentation.passcode.view.PasscodeView
-import mega.privacy.android.core.ui.test.AnalyticsTestRule
+import mega.privacy.android.analytics.AnalyticsTestRule
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
