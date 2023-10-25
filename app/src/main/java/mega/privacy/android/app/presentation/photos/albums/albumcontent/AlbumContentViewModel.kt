@@ -300,7 +300,7 @@ internal class AlbumContentViewModel @Inject constructor(
     }
 
     fun removeFavourites() = viewModelScope.launch {
-        val selectedPhotoIds = _state.value.selectedPhotos.map { it.id }
+        val selectedPhotoIds = _state.value.selectedPhotos.map { NodeId(it.id) }
         removeFavouritesUseCase(selectedPhotoIds)
 
         _state.update {

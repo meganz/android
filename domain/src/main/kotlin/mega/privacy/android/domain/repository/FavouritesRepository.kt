@@ -22,7 +22,7 @@ interface FavouritesRepository {
 
     /**
      * Removing favourites
-     * @param handles the handle of items that are removed.
+     * @param nodeIds the nodeId of items that are removed.
      */
-    suspend fun removeFavourites(handles: List<Long>)
+    suspend fun removeFavourites(nodeIds: List<NodeId>)
 }

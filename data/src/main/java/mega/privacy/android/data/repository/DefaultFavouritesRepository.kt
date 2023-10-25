@@ -56,11 +56,10 @@ internal class DefaultFavouritesRepository @Inject constructor(
             mapNodesToFavouriteInfo(handleList.getNodes())
         }
 
-    override suspend fun removeFavourites(handles: List<Long>) {
+    override suspend fun removeFavourites(nodeIds: List<NodeId>) {
         withContext(ioDispatcher) {
-            handles.map { handle ->
-                megaApiGateway.getMegaNodeByHandle(handle)
-            }.forEach { megaNode ->
+            nodeIds.forEach { nodeId ->
+                val megaNode = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
                 megaApiGateway.setNodeFavourite(megaNode, false)
             }
         }

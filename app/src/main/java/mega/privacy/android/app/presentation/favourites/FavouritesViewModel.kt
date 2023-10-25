@@ -183,7 +183,7 @@ class FavouritesViewModel @Inject constructor(
      */
     fun favouritesRemoved(nodeHandles: List<Long>) {
         viewModelScope.launch {
-            removeFavouritesUseCase(nodeHandles)
+            removeFavouritesUseCase(nodeHandles.map { NodeId(it) })
         }
     }
 

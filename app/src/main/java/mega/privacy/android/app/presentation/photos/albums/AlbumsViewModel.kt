@@ -622,7 +622,7 @@ class AlbumsViewModel @Inject constructor(
 
     fun removeFavourites() {
         viewModelScope.launch {
-            removeFavouritesUseCase(_state.value.selectedPhotos.map { it.id }.toList())
+            removeFavouritesUseCase(_state.value.selectedPhotos.map { NodeId(it.id) }.toList())
         }
         _state.update {
             it.copy(selectedPhotos = emptySet())

@@ -51,6 +51,7 @@ internal fun ImagePreviewBottomSheet(
     modalSheetState: ModalBottomSheetState,
     imageName: String = "",
     imageInfo: String = "",
+    isFavourite: Boolean = false,
     imageThumbnailPath: String? = "",
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
@@ -99,8 +100,10 @@ internal fun ImagePreviewBottomSheet(
                     addSeparator = false,
                 )
                 MenuActionListTile(
-                    icon = R.drawable.ic_add_favourite,
-                    text = stringResource(id = R.string.file_properties_favourite),
+                    icon = if (isFavourite) R.drawable.ic_remove_favourite
+                    else R.drawable.ic_add_favourite,
+                    text = if (isFavourite) stringResource(id = R.string.file_properties_unfavourite)
+                    else stringResource(id = R.string.file_properties_favourite),
                     onActionClicked = onClickFavourite,
                     addSeparator = false,
                 )

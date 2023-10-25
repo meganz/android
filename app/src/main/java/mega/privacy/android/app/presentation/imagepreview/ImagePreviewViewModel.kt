@@ -31,6 +31,8 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
+import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -51,6 +53,8 @@ class ImagePreviewViewModel @Inject constructor(
     private val checkNameCollision: CheckNameCollision,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
+    private val addFavouritesUseCase: AddFavouritesUseCase,
+    private val removeFavouritesUseCase: RemoveFavouritesUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -193,7 +197,13 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     fun favouriteNode(imageNode: ImageNode) {
-        //TODO viewModel.markNodeAsFavorite(nodeHandle!!, !node.isFavourite)
+        viewModelScope.launch {
+            if (imageNode.isFavourite) {
+                removeFavouritesUseCase(listOf(imageNode.id))
+            } else {
+                addFavouritesUseCase(listOf(imageNode.id))
+            }
+        }
     }
 
     fun switchAvailableOffline(checked: Boolean, imageNode: ImageNode) {

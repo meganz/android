@@ -105,7 +105,6 @@ fun ImagePreviewScreen(
         val inFullScreenMode = viewState.inFullScreenMode
         val scaffoldState = rememberScaffoldState()
         val isLight = MaterialTheme.colors.isLight
-        val context = LocalContext.current
         val photoState = rememberPhotoState()
         val pagerState = rememberPagerState(
             initialPage = initialPage,
@@ -292,6 +291,7 @@ private fun ImagePreviewContent(
                 imageThumbnailPath = imageResult?.getLowestResolutionAvailableUri(),
                 imageName = imageNode.name,
                 imageInfo = currentImageNodeInfo,
+                isFavourite = imageNode.isFavourite,
                 onClickInfo = { onClickInfo(imageNode) },
                 onClickFavourite = { onClickFavourite(imageNode) },
                 onClickLabel = { onClickLabel(imageNode) },
