@@ -61,6 +61,7 @@ import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
 
 @Deprecated(message = "In favor of mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentScreen")
@@ -317,7 +318,10 @@ fun AlbumContentScreen(
                 ) {
                     AddFabButton(
                         modifier = Modifier,
-                        onNavigatePhotosSelection = { onNavigatePhotosSelection(userAlbum) }
+                        onNavigatePhotosSelection = {
+                            Analytics.tracker.trackEvent(AlbumAddPhotosFABEvent)
+                            onNavigatePhotosSelection(userAlbum)
+                        }
                     )
                 }
             }

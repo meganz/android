@@ -61,6 +61,7 @@ import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -303,7 +304,10 @@ internal fun AlbumContentScreen(
                 ) {
                     AddFabButton(
                         modifier = Modifier,
-                        onNavigatePhotosSelection = { onNavigatePhotosSelection(userAlbum) }
+                        onNavigatePhotosSelection = {
+                            Analytics.tracker.trackEvent(AlbumAddPhotosFABEvent)
+                            onNavigatePhotosSelection(userAlbum)
+                        }
                     )
                 }
             }
