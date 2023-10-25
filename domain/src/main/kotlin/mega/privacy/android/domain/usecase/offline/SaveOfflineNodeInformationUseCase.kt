@@ -1,11 +1,12 @@
 package mega.privacy.android.domain.usecase.offline
 
+import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.repository.NodeRepository
-
+import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import javax.inject.Inject
 
 /**
@@ -13,6 +14,7 @@ import javax.inject.Inject
  */
 class SaveOfflineNodeInformationUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
+    private val monitorBackupFolder: MonitorBackupFolder,
     private val getOfflineNodeInformationUseCase: GetOfflineNodeInformationUseCase,
 ) {
     /**
@@ -21,8 +23,7 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
      */
     suspend operator fun invoke(nodeId: NodeId) {
         //we don't want to save backup parent node (Vault)
-        val backupRootNodeId =
-            runCatching { nodeRepository.getBackupFolderId() }.getOrNull() ?: NodeId(-1L)
+        val backupRootNodeId = monitorBackupFolder().firstOrNull()?.getOrNull() ?: NodeId(-1L)
         val driveRootNode = nodeRepository.getRootNode()?.id ?: NodeId(-1L)
         nodeRepository.getNodeById(nodeId)?.let { node ->
             //we need to save parents before the node itself
