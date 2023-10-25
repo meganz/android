@@ -1,10 +1,12 @@
 package test.mega.privacy.android.app.presentation.filelink
 
 import android.content.Intent
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -12,7 +14,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
-import mega.privacy.android.app.presentation.mapper.GetIntentFromFileLinkToOpenFileMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -21,7 +22,10 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisio
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
@@ -31,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -45,8 +50,9 @@ class FileLinkViewModelTest {
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
     private val copyPublicNodeUseCase = mock<CopyPublicNodeUseCase>()
     private val checkPublicNodesNameCollisionUseCase = mock<CheckPublicNodesNameCollisionUseCase>()
-    private val getIntentFromFileLinkToOpenFileMapper =
-        mock<GetIntentFromFileLinkToOpenFileMapper>()
+    private val httpServerStart = mock<MegaApiHttpServerStartUseCase>()
+    private val httpServerIsRunning = mock<MegaApiHttpServerIsRunningUseCase>()
+    private val getFileUrlByPublicLinkUseCase = mock<GetFileUrlByPublicLinkUseCase>()
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -75,9 +81,11 @@ class FileLinkViewModelTest {
             hasCredentials = hasCredentials,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             getPublicNodeUseCase = getPublicNodeUseCase,
-            getIntentFromFileLinkToOpenFileMapper = getIntentFromFileLinkToOpenFileMapper,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
-            copyPublicNodeUseCase = copyPublicNodeUseCase
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            httpServerStart = httpServerStart,
+            httpServerIsRunning = httpServerIsRunning,
+            getFileUrlByPublicLinkUseCase = getFileUrlByPublicLinkUseCase,
         )
     }
 
@@ -129,112 +137,6 @@ class FileLinkViewModelTest {
                 assertThat(newValue.hasDbCredentials).isTrue()
             }
         }
-
-    /*@Test
-    fun `test that on importing node with same name collision value is set correctly`() = runTest {
-        val parentNodeHandle = 123L
-        val nameCollision = mock<NameCollision.Copy>()
-        val node = mock<MegaNode>()
-
-        whenever(checkNameCollisionUseCase.check(node, parentNodeHandle, NameCollisionType.COPY))
-            .thenReturn(nameCollision)
-
-        underTest.state.test {
-            underTest.handleImportNode(node, parentNodeHandle)
-            val newValue = expectMostRecentItem()
-            assertThat(newValue.collision).isNotNull()
-        }
-    }*/
-
-    /*@Test
-    fun `test that on calling resetCollision then collision value is reset`() = runTest {
-        val parentNodeHandle = 123L
-        val nameCollision = mock<NameCollision.Copy>()
-        val node = mock<MegaNode>()
-
-        whenever(checkNameCollisionUseCase.check(node, parentNodeHandle, NameCollisionType.COPY))
-            .thenReturn(nameCollision)
-
-        underTest.state.test {
-            underTest.handleImportNode(node, parentNodeHandle)
-            var newValue = expectMostRecentItem()
-            assertThat(newValue.collision).isNotNull()
-            underTest.resetCollision()
-            newValue = expectMostRecentItem()
-            assertThat(newValue.collision).isNull()
-        }
-    }*/
-
-    /*@Test
-    fun `test that on importing node without same name collision value is null`() = runTest {
-        val parentNodeHandle = 123L
-        val node = mock<MegaNode>()
-
-        whenever(checkNameCollisionUseCase.check(node, parentNodeHandle, NameCollisionType.COPY))
-            .thenThrow(MegaNodeException.ChildDoesNotExistsException())
-
-        underTest.state.test {
-            underTest.handleImportNode(node, parentNodeHandle)
-            val newValue = expectMostRecentItem()
-            assertThat(newValue.collision).isNull()
-        }
-    }*/
-
-    /*@Test
-    fun `test that when checking name collision throws ParentDoesNotExistException collisionCheckThrowable is set`() =
-        runTest {
-            val parentHandle = 123L
-            val node = mock<MegaNode>()
-
-            whenever(checkNameCollisionUseCase.check(node, parentHandle, NameCollisionType.COPY))
-                .thenThrow(MegaNodeException.ParentDoesNotExistException())
-
-            underTest.state.test {
-                underTest.handleImportNode(node, parentHandle)
-                val newValue = expectMostRecentItem()
-                assertThat(newValue.collision).isNull()
-                assertThat(newValue.collisionCheckThrowable).isNotNull()
-            }
-        }*/
-
-    /*@Test
-    fun `test that on calling resetCollisionError then collisionCheckThrowable is reset`() =
-        runTest {
-            val parentHandle = 123L
-            val node = mock<MegaNode>()
-
-            whenever(checkNameCollisionUseCase.check(node, parentHandle, NameCollisionType.COPY))
-                .thenThrow(MegaNodeException.ParentDoesNotExistException())
-
-            underTest.state.test {
-                underTest.handleImportNode(node, parentHandle)
-                var newValue = expectMostRecentItem()
-                assertThat(newValue.collisionCheckThrowable).isNotNull()
-                underTest.resetCollisionError()
-                newValue = expectMostRecentItem()
-                assertThat(newValue.collisionCheckThrowable).isNull()
-            }
-        }*/
-
-    /*@Test
-    fun `test that on importing node without same name then copy is successful`() = runTest {
-        val parentNodeHandle = 123L
-        val node = mock<MegaNode>()
-        val parentNode = mock<MegaNode>()
-
-        whenever(checkNameCollisionUseCase.check(node, parentNodeHandle, NameCollisionType.COPY))
-            .thenThrow(MegaNodeException.ChildDoesNotExistsException())
-        whenever(getNodeByHandle(parentNodeHandle)).thenReturn(parentNode)
-        whenever(legacyCopyNodeUseCase.copyAsync(node, parentNode)).thenReturn(true)
-
-        underTest.handleImportNode(node, parentNodeHandle)
-        advanceUntilIdle()
-
-        underTest.state.test {
-            val newValue = awaitItem()
-            assertThat(newValue.copySuccess).isTrue()
-        }
-    }*/
 
     @Test
     fun `test that on getting valid public node correct values are set`() = runTest {
@@ -426,4 +328,45 @@ class FileLinkViewModelTest {
                 assertThat(newValue.foreignNodeError).isEqualTo(consumed)
             }
         }
+
+    @Test
+    fun `test that openFile is triggered when updateImageIntent is invoked`() = runTest {
+        val intent = mock<Intent>()
+        underTest.updateImageIntent(intent)
+        underTest.state.test {
+            val res = awaitItem()
+            assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+        }
+    }
+
+    @Test
+    fun `test that openFile is triggered with correct pdf intent when updatePdfIntent is invoked`() =
+        runTest {
+            val uriMock = Mockito.mockStatic(Uri::class.java)
+            val intent = mock<Intent>()
+            val contentUriMock: Uri = mock()
+            val path = "/path"
+
+
+            whenever(httpServerIsRunning()).thenReturn(0)
+            whenever(getFileUrlByPublicLinkUseCase(any())).thenReturn(path)
+            whenever(Uri.parse(path)).thenReturn(contentUriMock)
+
+            underTest.updatePdfIntent(intent, "pdf")
+            underTest.state.test {
+                val res = awaitItem()
+                assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+            }
+            uriMock.close()
+        }
+
+    @Test
+    fun `test that openFile is triggered when updateTextEditorIntent is invoked`() = runTest {
+        val intent = mock<Intent>()
+        underTest.updateTextEditorIntent(intent)
+        underTest.state.test {
+            val res = awaitItem()
+            assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+        }
+    }
 }

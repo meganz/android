@@ -16,20 +16,26 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
+import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -104,7 +110,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                     transferState = transferState,
                     onBackPressed = { onBackPressedDispatcher.onBackPressed() },
                     onShareClicked = ::onShareClicked,
-                    onPreviewClick = { viewModel.onPreviewClick(this@FileLinkComposeActivity) },
+                    onPreviewClick = ::onPreviewClick,
                     onSaveToDeviceClicked = viewModel::handleSaveFile,
                     onImportClicked = ::onImportClicked,
                     onTransferWidgetClick = ::onTransfersWidgetClick,
@@ -243,6 +249,57 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
             .build()
         decryptAlertDialog.show(supportFragmentManager, TAG_DECRYPT)
         viewModel.resetAskForDecryptionKeyDialog()
+    }
+
+    private fun onPreviewClick() {
+        with(viewModel.state.value) {
+            val nameType = typeForName(title)
+            when {
+                nameType.isImage -> {
+                    val intent = ImageViewerActivity.getIntentForSingleNode(
+                        this@FileLinkComposeActivity,
+                        url
+                    )
+                    viewModel.updateImageIntent(intent)
+                }
+
+                nameType.isVideoMimeType || nameType.isAudio -> {
+                    val intent =
+                        if (nameType.isVideoNotSupported || nameType.isAudioNotSupported) {
+                            Intent(Intent.ACTION_VIEW)
+                        } else {
+                            if (nameType.isAudio) {
+                                Intent(
+                                    this@FileLinkComposeActivity,
+                                    AudioPlayerActivity::class.java
+                                )
+                            } else {
+                                Intent(
+                                    this@FileLinkComposeActivity,
+                                    VideoPlayerActivity::class.java
+                                )
+                            }
+                        }
+                    viewModel.updateAudioVideoIntent(intent, nameType)
+                }
+
+                nameType.isPdf -> {
+                    val intent = Intent(this@FileLinkComposeActivity, PdfViewerActivity::class.java)
+                    viewModel.updatePdfIntent(intent, nameType.type)
+                }
+
+                nameType.isOpenableTextFile(sizeInBytes) -> {
+                    val intent =
+                        Intent(this@FileLinkComposeActivity, TextEditorActivity::class.java)
+                    viewModel.updateTextEditorIntent(intent)
+                }
+
+                else -> {
+                    Timber.w("Unknown File Type")
+                    null
+                }
+            }
+        }
     }
 
     override fun onDialogPositiveClick(key: String?) {

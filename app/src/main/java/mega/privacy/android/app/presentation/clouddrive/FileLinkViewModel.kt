@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.clouddrive
 
-import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
@@ -14,11 +14,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
-import mega.privacy.android.app.presentation.mapper.GetIntentFromFileLinkToOpenFileMapper
+import mega.privacy.android.app.presentation.mapper.UrlDownloadException
+import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
@@ -29,7 +31,10 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
@@ -46,9 +51,11 @@ class FileLinkViewModel @Inject constructor(
     private val hasCredentials: HasCredentials,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
-    private val getIntentFromFileLinkToOpenFileMapper: GetIntentFromFileLinkToOpenFileMapper,
     private val checkPublicNodesNameCollisionUseCase: CheckPublicNodesNameCollisionUseCase,
     private val copyPublicNodeUseCase: CopyPublicNodeUseCase,
+    private val httpServerStart: MegaApiHttpServerStartUseCase,
+    private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
+    private val getFileUrlByPublicLinkUseCase: GetFileUrlByPublicLinkUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -280,25 +287,114 @@ class FileLinkViewModel @Inject constructor(
     }
 
     /**
-     * Handle preview content click
+     * update intent values for image
      */
-    fun onPreviewClick(activity: Activity) = viewModelScope.launch {
-        runCatching {
-            with(state.value) {
-                getIntentFromFileLinkToOpenFileMapper(
-                    activity,
-                    handle,
-                    title,
-                    sizeInBytes,
-                    serializedData,
-                    url
+    fun updateImageIntent(intent: Intent) {
+        _state.update { it.copy(openFile = triggered(intent)) }
+    }
+
+    /**
+     * Update intent values for audio/video
+     */
+    fun updateAudioVideoIntent(intent: Intent, nameType: MimeTypeList) {
+        viewModelScope.launch {
+            runCatching {
+                with(state.value) {
+                    intent.apply {
+                        putExtra(
+                            Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                            Constants.FILE_LINK_ADAPTER
+                        )
+                        putExtra(Constants.INTENT_EXTRA_KEY_IS_PLAYLIST, false)
+                        putExtra(Constants.URL_FILE_LINK, url)
+                        putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, handle)
+                        putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, title)
+                        putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
+                    }
+
+                    startHttpServer(intent)
+                    val path = getFileUrlByPublicLinkUseCase(url) ?: throw UrlDownloadException()
+                    intent.setDataAndType(Uri.parse(path), nameType.type)
+
+                    if (nameType.isVideoNotSupported || nameType.isAudioNotSupported) {
+                        val s = title.split("\\.".toRegex())
+                        if (s.size > 1 && s[s.size - 1] == "opus") {
+                            intent.setDataAndType(intent.data, "audio/*")
+                        }
+                    }
+                    intent
+                }
+            }.onSuccess { intent ->
+                intent.let { _state.update { it.copy(openFile = triggered(intent)) } }
+            }.onFailure {
+                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+            }
+        }
+    }
+
+    /**
+     * Update intent values for pdf
+     */
+    fun updatePdfIntent(pdfIntent: Intent, mimeType: String) {
+        viewModelScope.launch {
+            runCatching {
+                with(state.value) {
+                    pdfIntent.apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                        putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, handle)
+                        putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, title)
+                        putExtra(Constants.URL_FILE_LINK, url)
+                        putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
+                        putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+                        putExtra(
+                            Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                            Constants.FILE_LINK_ADAPTER
+                        )
+                    }
+                    startHttpServer(pdfIntent)
+                    val path = getFileUrlByPublicLinkUseCase(url) ?: throw UrlDownloadException()
+                    pdfIntent.setDataAndType(Uri.parse(path), mimeType)
+                }
+            }.onSuccess { intent ->
+                intent.let { _state.update { it.copy(openFile = triggered(intent)) } }
+            }.onFailure {
+                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+            }
+        }
+    }
+
+    /**
+     * Update intent value for text editor
+     */
+    fun updateTextEditorIntent(intent: Intent) {
+        with(state.value) {
+            intent.apply {
+                putExtra(Constants.URL_FILE_LINK, url)
+                putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
+                putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
+                putExtra(
+                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                    Constants.FILE_LINK_ADAPTER
                 )
             }
-        }.onSuccess { intent ->
-            intent?.let { _state.update { it.copy(openFile = triggered(intent)) } }
-        }.onFailure {
-            Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+            _state.update { it.copy(openFile = triggered(intent)) }
         }
+    }
+
+    /**
+     * Start the server if not started
+     * also setMax buffer size based on available buffer size
+     * @param intent [Intent]
+     *
+     * @return intent
+     */
+    private suspend fun startHttpServer(intent: Intent): Intent {
+        if (httpServerIsRunning() == 0) {
+            httpServerStart()
+            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+        }
+        return intent
     }
 
     /**
