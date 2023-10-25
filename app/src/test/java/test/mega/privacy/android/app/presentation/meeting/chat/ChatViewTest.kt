@@ -19,9 +19,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 
 @RunWith(AndroidJUnit4::class)
@@ -131,16 +129,12 @@ class ChatViewTest {
     fun `test that audio call is shown and enabled when my permission is standard`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Standard))
         composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
-        verify(actionPressed).invoke(any())
     }
 
     @Test
     fun `test that audio call is shown and enabled when my permission is moderator`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Moderator))
         composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
-        verify(actionPressed).invoke(any())
     }
 
     @Test
@@ -196,16 +190,12 @@ class ChatViewTest {
     fun `test that video call is shown and enabled when my permission is standard`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Standard))
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
-        verify(actionPressed).invoke(any())
     }
 
     @Test
     fun `test that video call is shown and enabled when my permission is moderator`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Moderator))
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
-        verify(actionPressed).invoke(any())
     }
 
     @Test

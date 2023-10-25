@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.chat.view
 
+import android.Manifest
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
@@ -8,23 +11,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.vectorRes
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import timber.log.Timber
 
 /**
  * Chat view
@@ -39,6 +53,27 @@ internal fun ChatView(
     onBackPressed: () -> Unit,
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
 ) {
+    val context = LocalContext.current
+    val snackBarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val callPermissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        if (result[Manifest.permission.RECORD_AUDIO] == true) {
+            Timber.d("Ready to start call")
+            // start call here
+        } else {
+            coroutineScope.launch {
+                val result = snackBarHostState.showSnackbar(
+                    context.getString(R.string.allow_acces_calls_subtitle_microphone),
+                    context.getString(R.string.general_allow),
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    context.navigateToAppSettings()
+                }
+            }
+        }
+    }
     Scaffold(
         topBar = {
             MegaAppBar(
@@ -47,9 +82,26 @@ internal fun ChatView(
                 onNavigationPressed = onBackPressed,
                 titleIcons = { TitleIcons(uiState) },
                 actions = getChatRoomActions(uiState),
-                onActionPressed = { (it as ChatRoomMenuAction).let(onMenuActionPressed) },
+                onActionPressed = {
+                    when (it) {
+                        is ChatRoomMenuAction.AudioCall -> {
+                            callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
+                        }
+
+                        is ChatRoomMenuAction.VideoCall -> {
+                            callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
+                        }
+
+                        else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
+                    }
+                },
                 elevation = 0.dp
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState) { data ->
+                MegaSnackbar(snackbarData = data)
+            }
         }
     )
     { innerPadding ->

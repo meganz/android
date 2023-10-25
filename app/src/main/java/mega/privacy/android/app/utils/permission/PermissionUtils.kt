@@ -261,14 +261,14 @@ object PermissionUtils {
      */
     @JvmStatic
     fun requestCallPermissions(request: ActivityResultLauncher<Array<String>>) =
-        request.launch(getListCallPermissionsByVersion())
+        request.launch(getCallPermissionListByVersion())
 
     /**
      * Get list of call permissions by version
      *
      * @return List of required permissions
      */
-    private fun getListCallPermissionsByVersion() =
+    fun getCallPermissionListByVersion() =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             arrayOf(
                 getBluetoothConnectPermission(),
