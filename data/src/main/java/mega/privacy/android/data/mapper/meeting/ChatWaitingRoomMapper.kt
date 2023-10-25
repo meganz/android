@@ -19,15 +19,15 @@ internal class ChatWaitingRoomMapper @Inject constructor(
         megaChatWaitingRoom?.let {
             return ChatWaitingRoom(
                 size = megaChatWaitingRoom.size(),
-                peers = handleListMapper(megaChatWaitingRoom.peers),
+                peers = handleListMapper(megaChatWaitingRoom.users),
                 peerStatus = megaChatWaitingRoom.toPeerStatusByHandles(),
             )
         }
 
     private fun MegaChatWaitingRoom.toPeerStatusByHandles(): Map<Long, WaitingRoomStatus> =
-        (0 until peers.size()).associateWith { peerHandle ->
+        (0 until users.size()).associateWith { peerHandle ->
             waitingRoomStatusMapper(
-                getPeerStatus(
+                getUserStatus(
                     peerHandle
                 )
             )
