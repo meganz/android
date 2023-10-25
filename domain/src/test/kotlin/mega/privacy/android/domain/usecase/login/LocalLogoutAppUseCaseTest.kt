@@ -7,6 +7,7 @@ import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
+import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
@@ -36,6 +37,7 @@ class LocalLogoutAppUseCaseTest {
     private val photosRepository = mock<PhotosRepository>()
     private val albumRepository = mock<AlbumRepository>()
     private val clearPsaUseCase = mock<ClearPsaUseCase>()
+    private val settingsRepository = mock<SettingsRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -50,6 +52,7 @@ class LocalLogoutAppUseCaseTest {
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             stopAudioService = stopAudioService,
             clearPsaUseCase = clearPsaUseCase,
+            settingsRepository = settingsRepository,
         )
     }
 
@@ -84,5 +87,6 @@ class LocalLogoutAppUseCaseTest {
         verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
         verify(stopAudioService).invoke()
         verify(clearPsaUseCase).invoke()
+        verify(settingsRepository).resetSetting()
     }
 }

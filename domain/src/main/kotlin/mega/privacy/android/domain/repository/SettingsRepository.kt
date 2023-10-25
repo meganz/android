@@ -467,4 +467,8 @@ interface SettingsRepository {
      */
     fun monitorOfflineWarningMessageVisibility(): Flow<Boolean?>
 
+    /**
+     * Handle reset setting when user logout
+     */
+    suspend fun resetSetting()
 }

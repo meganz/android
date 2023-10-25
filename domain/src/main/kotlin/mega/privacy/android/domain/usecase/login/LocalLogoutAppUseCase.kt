@@ -5,6 +5,7 @@ import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
+import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
@@ -26,6 +27,7 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val photosRepository: PhotosRepository,
     private val albumRepository: AlbumRepository,
     private val clearPsaUseCase: ClearPsaUseCase,
+    private val settingsRepository: SettingsRepository,
 ) {
 
     /**
@@ -45,6 +47,7 @@ class LocalLogoutAppUseCase @Inject constructor(
         billingRepository.clearCache()
         albumRepository.clearCache()
         photosRepository.clearCache()
+        settingsRepository.resetSetting()
         loginRepository.broadcastLogout()
         stopCameraUploadsUseCase(shouldReschedule = false)
         stopAudioService()

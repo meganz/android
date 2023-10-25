@@ -492,4 +492,8 @@ internal class DefaultSettingsRepository @Inject constructor(
                 continuation.failWithError(error, "onIsMasterKeyExportedRequestFinished")
             }
         }
+
+    override suspend fun resetSetting() {
+        setSubfolderMediaDiscoveryEnabled(true)
+    }
 }
