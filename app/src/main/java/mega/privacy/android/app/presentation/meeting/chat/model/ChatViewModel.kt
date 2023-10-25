@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
@@ -45,6 +46,7 @@ class ChatViewModel @Inject constructor(
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -57,12 +59,22 @@ class ChatViewModel @Inject constructor(
 
     init {
         checkIfIsParticipatingInACall()
+        monitorStorageStateEvent()
         chatId?.let {
             getChatRoom(it)
             getNotificationMute(it)
             checkIfIsParticipatingInACallInThisChat(it)
             monitorChatRoom(it)
             monitorNotificationMute(it)
+        }
+    }
+
+    private fun monitorStorageStateEvent() {
+        viewModelScope.launch {
+            monitorStorageStateEventUseCase()
+                .collect { storageState ->
+                    _state.update { state -> state.copy(storageState = storageState.storageState) }
+                }
         }
     }
 
@@ -82,7 +94,7 @@ class ChatViewModel @Inject constructor(
                                 isGroup = isGroup
                             )
                         }
-                        if (!isGroup) {
+                        if (!isGroup && peerHandlesList.isNotEmpty()) {
                             getUserChatStatus(peerHandlesList[0])
                             monitorChatOnlineStatusUpdates(peerHandlesList[0])
                         }

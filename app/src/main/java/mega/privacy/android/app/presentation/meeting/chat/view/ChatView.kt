@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.meeting.chat.view
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.vectorRes
@@ -37,6 +40,7 @@ import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import timber.log.Timber
 
@@ -84,12 +88,10 @@ internal fun ChatView(
                 actions = getChatRoomActions(uiState),
                 onActionPressed = {
                     when (it) {
-                        is ChatRoomMenuAction.AudioCall -> {
-                            callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
-                        }
-
-                        is ChatRoomMenuAction.VideoCall -> {
-                            callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
+                        is ChatRoomMenuAction.AudioCall, is ChatRoomMenuAction.VideoCall -> {
+                            if (checkStorageState(context, uiState.storageState)) {
+                                callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
+                            }
                         }
 
                         else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
@@ -167,6 +169,16 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> {
     }
 
     return actions
+}
+
+private fun checkStorageState(context: Context, storageState: StorageState): Boolean {
+    if (storageState == StorageState.PayWall) {
+        context.startActivity(Intent(context, OverDiskQuotaPaywallActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        })
+        return false
+    }
+    return true
 }
 
 @Preview

@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -14,11 +15,15 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
@@ -35,11 +40,13 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -49,13 +56,31 @@ internal class ChatViewModelTest {
     private val getChatRoomUseCase: GetChatRoom = mock()
     private val savedStateHandle: SavedStateHandle = mock()
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase = mock()
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates = mock()
+    private val monitorChatRoomUpdates: MonitorChatRoomUpdates = mock {
+        onBlocking { invoke(any()) } doReturn emptyFlow()
+    }
     private val monitorUpdatePushNotificationSettingsUseCase
-            : MonitorUpdatePushNotificationSettingsUseCase = mock()
+            : MonitorUpdatePushNotificationSettingsUseCase = mock {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
-    private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase = mock()
+    private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase = mock {
+        onBlocking { invoke(any()) } doReturn emptyFlow()
+    }
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
     private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase = mock()
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock {
+        onBlocking { invoke() } doReturn MutableStateFlow(
+            StorageStateEvent(
+                handle = 1L,
+                eventString = "",
+                number = 0L,
+                text = "",
+                type = EventType.Storage,
+                storageState = StorageState.Unknown
+            )
+        )
+    }
 
     private val chatId = 123L
     private val userHandle = 321L
@@ -77,12 +102,22 @@ internal class ChatViewModelTest {
             getChatRoomUseCase,
             savedStateHandle,
             isChatNotificationMuteUseCase,
-            monitorChatRoomUpdates,
-            monitorUpdatePushNotificationSettingsUseCase,
             getUserOnlineStatusByHandleUseCase,
-            monitorUserChatStatusByHandleUseCase,
             isParticipatingInChatCallUseCase,
             hasACallInThisChatByChatIdUseCase,
+        )
+        wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
+        wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorUserChatStatusByHandleUseCase(any()) } doReturn emptyFlow()
+        wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
+            StorageStateEvent(
+                handle = 1L,
+                eventString = "",
+                number = 0L,
+                text = "",
+                type = EventType.Storage,
+                storageState = StorageState.Unknown
+            )
         )
     }
 
@@ -96,6 +131,7 @@ internal class ChatViewModelTest {
             monitorUserChatStatusByHandleUseCase = monitorUserChatStatusByHandleUseCase,
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             hasACallInThisChatByChatIdUseCase = hasACallInThisChatByChatIdUseCase,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             savedStateHandle = savedStateHandle
         )
     }
@@ -202,8 +238,6 @@ internal class ChatViewModelTest {
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(false)
-        whenever(monitorChatRoomUpdates(chatId)).thenReturn(emptyFlow())
-        whenever(monitorUpdatePushNotificationSettingsUseCase()).thenReturn(emptyFlow())
         whenever(getUserOnlineStatusByHandleUseCase(userHandle)).thenReturn(firstUserChatStatus)
         whenever(monitorUserChatStatusByHandleUseCase(userHandle)).thenReturn(updateFlow)
         initTestClass()
@@ -320,7 +354,6 @@ internal class ChatViewModelTest {
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
         whenever(isChatNotificationMuteUseCase(chatId)).thenReturn(false)
-        whenever(monitorUpdatePushNotificationSettingsUseCase()).thenReturn(emptyFlow())
         initTestClass()
         underTest.state.test {
             assertThat(awaitItem().isPrivateChat).isFalse()
@@ -438,6 +471,41 @@ internal class ChatViewModelTest {
         updateFlow.emit(newChatRoom)
         underTest.state.test {
             assertThat(awaitItem().myPermission).isEqualTo(newPermission)
+        }
+    }
+
+    @ParameterizedTest(name = " with storage state {0}")
+    @EnumSource(StorageState::class)
+    fun `test that storage state is updated when getting new storage state event`(
+        state: StorageState,
+    ) = runTest {
+        val updateFlow = MutableStateFlow(
+            StorageStateEvent(
+                handle = 1L,
+                eventString = "",
+                number = 0L,
+                text = "",
+                type = EventType.Storage,
+                storageState = StorageState.Unknown  // initial state is [StorageState.Unknown]
+            )
+        )
+        whenever(monitorStorageStateEventUseCase()).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().storageState).isEqualTo(StorageState.Unknown)
+        }
+        updateFlow.emit(
+            StorageStateEvent(
+                handle = 1L,
+                eventString = "",
+                number = 0L,
+                text = "",
+                type = EventType.Storage,
+                storageState = state
+            )
+        )
+        underTest.state.test {
+            assertThat(awaitItem().storageState).isEqualTo(state)
         }
     }
 
