@@ -1,5 +1,6 @@
-package mega.privacy.android.analytics
+package test.mega.privacy.android.app
 
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import org.junit.rules.TestRule

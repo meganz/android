@@ -87,7 +87,7 @@ dependencies {
     testRuntimeOnly(testlib.junit.jupiter.engine)
     testImplementation(testlib.junit.test.ktx)
 
-    implementation(testlib.bundles.unit.test)
+    testImplementation(testlib.bundles.unit.test)
 
     testImplementation(testlib.compose.junit)
     testImplementation(testlib.mockito)

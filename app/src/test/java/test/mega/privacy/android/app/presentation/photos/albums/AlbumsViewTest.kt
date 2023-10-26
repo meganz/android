@@ -12,7 +12,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
-import mega.privacy.android.analytics.AnalyticsTestRule
+import test.mega.privacy.android.app.AnalyticsTestRule
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
