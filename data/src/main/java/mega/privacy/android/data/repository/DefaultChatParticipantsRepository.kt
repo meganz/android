@@ -29,12 +29,13 @@ import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromEmailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromHandleUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatParticipantEmailUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.chat.GetUserPrivilegeUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetContactFullNameUseCase
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRoom
 import java.io.File
 import javax.inject.Inject
 
@@ -57,6 +58,8 @@ import javax.inject.Inject
  * @property areCredentialsVerifiedUseCase  [AreCredentialsVerifiedUseCase]
  * @property getContactFullNameUseCase      [GetContactFullNameUseCase]
  * @property getUserPrivilegeUseCase        [GetUserPrivilegeUseCase]
+ * @property getChatParticipantEmailUseCase [GetChatParticipantEmailUseCase]
+ * @property getChatParticipantFullNameUseCase [GetChatParticipantFullNameUseCase]
  * @property ioDispatcher                   [CoroutineDispatcher]
  */
 internal class DefaultChatParticipantsRepository @Inject constructor(
@@ -76,6 +79,8 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getContactFullNameUseCase: GetContactFullNameUseCase,
     private val getUserPrivilegeUseCase: GetUserPrivilegeUseCase,
+    private val getChatParticipantEmailUseCase: GetChatParticipantEmailUseCase,
+    private val getChatParticipantFullNameUseCase: GetChatParticipantFullNameUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userChatStatusMapper: UserChatStatusMapper,
 ) : ChatParticipantsRepository {
@@ -86,56 +91,58 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     ): List<ChatParticipant> =
         withContext(ioDispatcher) {
             megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
+                val myHandle = megaChatApiGateway.getMyUserHandle()
                 val participants = mutableListOf<ChatParticipant>()
+                if (myHandle == 0L) {
+                    return@withContext participants
+                }
                 val peerHandles = getChatParticipantsHandles(chatId)
-
                 if (preloadUserAttributes) {
                     peerHandles.map {
                         async { loadUserAttributes(chatId, listOf(it)) }
                     }.awaitAll() // Retrieve User Attributes in parallel
                 }
-
-                megaChatApiGateway.getMyEmail()?.let { myEmail ->
-                    val myName = megaChatApiGateway.getMyFullname()
-                    participants.add(
-                        ChatParticipant(
-                            handle = megaChatApiGateway.getMyUserHandle(),
-                            data = ContactData(
-                                fullName = myName?.ifEmpty { myEmail },
-                                alias = null,
-                                avatarUri = null
-                            ),
-                            email = myEmail,
-                            isMe = true,
-                            defaultAvatarColor = getMyAvatarColorUseCase(),
-                            privilege = chatPermissionsMapper(chatRoom.ownPrivilege)
-                        )
-                    )
-                }
+                val myEmail = megaChatApiGateway.getMyEmail() ?: ""
+                val myName = megaChatApiGateway.getMyFullname() ?: myEmail
+                val myAvatarColor = getMyAvatarColorUseCase()
+                val myPrivileges = chatPermissionsMapper(chatRoom.ownPrivilege)
+                val myParticipant = ChatParticipant(
+                    handle = myHandle,
+                    data = ContactData(
+                        fullName = myName,
+                        alias = null,
+                        avatarUri = null
+                    ),
+                    email = myEmail,
+                    isMe = true,
+                    defaultAvatarColor = myAvatarColor,
+                    privilege = myPrivileges
+                )
+                participants.add(myParticipant)
 
                 peerHandles.forEach { handle ->
-                    val participantPrivilege = chatRoom.getPeerPrivilegeByHandle(handle)
-                    if (participantPrivilege != MegaChatRoom.PRIV_RM) {
-                        val alias = async { megaChatApiGateway.getUserAliasFromCache(handle) }
-                        val fullName = async {
-                            getContactFullNameUseCase(handle)
-                        }
-                        val email = async { getContactEmail(handle) }
-                        val privilege = async { chatPermissionsMapper(participantPrivilege) }
-                        val avatarColor = async { getUserAvatarColorUseCase(handle) }
+                    val participantPrivilege =
+                        chatPermissionsMapper(chatRoom.getPeerPrivilegeByHandle(handle))
+                    if (participantPrivilege != ChatRoomPermission.Removed) {
+                        val participantEmail =
+                            async { getChatParticipantEmailUseCase(handle) ?: "" }
+                        val participantName = async { getChatParticipantFullNameUseCase(handle) }
+                        val participantAvatarColor = async { getUserAvatarColorUseCase(handle) }
+                        val participantAlias =
+                            async { megaChatApiGateway.getUserAliasFromCache(handle) }
 
                         participants.add(
                             ChatParticipant(
                                 handle = handle,
                                 data = ContactData(
-                                    fullName = fullName.await(),
-                                    alias = alias.await(),
+                                    fullName = participantName.await(),
+                                    alias = participantAlias.await(),
                                     avatarUri = null
                                 ),
-                                email = email.await() ?: "",
+                                email = participantEmail.await(),
                                 isMe = false,
-                                privilege = privilege.await(),
-                                defaultAvatarColor = avatarColor.await()
+                                privilege = participantPrivilege,
+                                defaultAvatarColor = participantAvatarColor.await()
                             )
                         )
                     }

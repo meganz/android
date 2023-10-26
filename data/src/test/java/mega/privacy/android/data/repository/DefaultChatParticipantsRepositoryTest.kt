@@ -19,6 +19,8 @@ import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromEmailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromHandleUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatParticipantEmailUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.chat.GetUserPrivilegeUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
@@ -57,6 +59,8 @@ internal class DefaultChatParticipantsRepositoryTest {
     private val megaHandleListMapper: MegaHandleListMapper = mock()
     private val userStatusToIntMapper: UserStatusToIntMapper = mock()
     private val userChatStatusMapper: UserChatStatusMapper = mock()
+    private val getChatParticipantEmailUseCase: GetChatParticipantEmailUseCase = mock()
+    private val getChatParticipantFullNameUseCase: GetChatParticipantFullNameUseCase = mock()
 
 
     @BeforeAll
@@ -78,6 +82,8 @@ internal class DefaultChatParticipantsRepositoryTest {
             areCredentialsVerifiedUseCase,
             getContactFullNameUseCase,
             getUserPrivilegeUseCase,
+            getChatParticipantEmailUseCase,
+            getChatParticipantFullNameUseCase,
             UnconfinedTestDispatcher(),
             userChatStatusMapper,
         )
