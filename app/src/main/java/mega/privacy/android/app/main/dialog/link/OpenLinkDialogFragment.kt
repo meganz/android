@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
@@ -31,12 +32,15 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -55,6 +59,9 @@ internal class OpenLinkDialogFragment : DialogFragment() {
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
+    lateinit var getChatRoomUseCase: GetChatRoom
+
+    @Inject
     lateinit var openLinkErrorMapper: OpenLinkErrorMapper
 
     @Inject
@@ -62,6 +69,10 @@ internal class OpenLinkDialogFragment : DialogFragment() {
 
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @ApplicationScope
+    @Inject
+    lateinit var applicationScope: CoroutineScope
 
     private val viewModel: OpenLinkViewModel by viewModels()
     override fun onCreateView(
@@ -234,16 +245,30 @@ internal class OpenLinkDialogFragment : DialogFragment() {
 
             chatLinkContent is ChatLinkContent.MeetingLink -> {
                 Timber.d("It's a meeting link")
-                CallUtil.joinMeetingOrReturnCall(
-                    requireContext(),
-                    chatLinkContent.chatHandle,
-                    chatLinkContent.link,
-                    chatLinkContent.text,
-                    chatLinkContent.exist,
-                    chatLinkContent.userHandle,
-                    passcodeManagement,
-                    chatLinkContent.isWaitingRoom,
-                )
+                applicationScope.launch {
+                    runCatching {
+                        getChatRoomUseCase(chatLinkContent.chatHandle)
+                    }.onSuccess { chatRoom ->
+                        chatRoom?.let {
+                            if (chatRoom.isMeeting && chatRoom.isWaitingRoom && chatRoom.ownPrivilege == ChatRoomPermission.Moderator) {
+                                viewModel.startOrAnswerMeetingWithWaitingRoomAsHost(chatId = chatLinkContent.chatHandle)
+                            } else {
+                                CallUtil.joinMeetingOrReturnCall(
+                                    requireContext(),
+                                    chatLinkContent.chatHandle,
+                                    chatLinkContent.link,
+                                    chatLinkContent.text,
+                                    chatLinkContent.exist,
+                                    chatLinkContent.userHandle,
+                                    passcodeManagement,
+                                    chatLinkContent.isWaitingRoom,
+                                )
+                            }
+                        }
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }
+                }
             }
 
             chatLinkContent is ChatLinkContent.ChatLink -> {

@@ -1008,8 +1008,14 @@ public class ChatActivity extends PasscodeActivity
                     }
                 }, false).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
-            } else {
-                CallUtil.checkMeetingInProgress(ChatActivity.this, ChatActivity.this, chatId, isFromOpenChatPreview, link, request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement, waitingRoom);
+            } else if (!CallUtil.checkMeetingInProgress(ChatActivity.this, ChatActivity.this, chatId, isFromOpenChatPreview, link, request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement, waitingRoom)) {
+                if (chatId == viewModel.getState().getValue().getChatId()) {
+                    startVideo = false;
+                    shouldCallRing = false;
+                    startCall();
+                } else {
+                    viewModel.startOrAnswerMeetingOfOtherChatRoomWithWaitingRoomAsHost(chatId);
+                }
             }
         } else {
             Timber.d("It's a chat link");

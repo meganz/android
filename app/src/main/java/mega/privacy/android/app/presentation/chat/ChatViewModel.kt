@@ -88,7 +88,7 @@ import javax.inject.Inject
  * @property chatManagement                                 [ChatManagement]
  * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
  * @property startChatCallNoRingingUseCase                  [StartChatCallNoRingingUseCase]
- * @property startMeetingInWaitingRoomChatUseCase                  [StartMeetingInWaitingRoomChatUseCase]
+ * @property startMeetingInWaitingRoomChatUseCase           [StartMeetingInWaitingRoomChatUseCase]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
  * @property getChatCall                                    [GetChatCall]
  * @property monitorChatCallUpdates                         [MonitorChatCallUpdates]
@@ -894,4 +894,114 @@ class ChatViewModel @Inject constructor(
      * @return True if the call option should be enabled or False otherwise.
      */
     fun shouldEnableCallOption(): Boolean = !_state.value.isWaitingRoom || _state.value.isHost
+
+    /**
+     * Start or answer a meeting of other chat room with waiting room as a host
+     *
+     * @param chatId   Chat ID
+     */
+    fun startOrAnswerMeetingOfOtherChatRoomWithWaitingRoomAsHost(chatId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                val call = getChatCall(chatId)
+                val scheduledMeetingStatus = when (call?.status) {
+                    ChatCallStatus.UserNoPresent -> ScheduledMeetingStatus.NotJoined(call.duration)
+
+                    ChatCallStatus.Connecting,
+                    ChatCallStatus.Joining,
+                    ChatCallStatus.InProgress,
+                    -> ScheduledMeetingStatus.Joined(call.duration)
+
+                    else -> ScheduledMeetingStatus.NotStarted
+                }
+                if (scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted) {
+                    runCatching {
+                        getScheduledMeetingByChat(chatId)
+                    }.onSuccess { scheduledMeetingList ->
+                        scheduledMeetingList?.first()?.schedId?.let { schedId ->
+                            startSchedMeetingOfOtherChatRoomWithWaitingRoom(
+                                chatId = chatId, schedIdWr = schedId
+                            )
+                        }
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }
+                } else {
+                    answerSchedMeetingOfOtherChatRoom(chatId = chatId)
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    /**
+     * Start scheduled meeting of other chat room with waiting room
+     *
+     * @param chatId    Chat ID
+     * @param schedIdWr Scheduled meeting ID
+     */
+    private fun startSchedMeetingOfOtherChatRoomWithWaitingRoom(chatId: Long, schedIdWr: Long) =
+        viewModelScope.launch {
+            Timber.d("Start scheduled meeting with waiting room")
+            runCatching {
+                startMeetingInWaitingRoomChatUseCase(
+                    chatId = chatId,
+                    schedIdWr = schedIdWr,
+                    enabledVideo = false,
+                    enabledAudio = true
+                )
+            }.onSuccess { call ->
+                call?.let {
+                    call.chatId.takeIf { it != INVALID_HANDLE }?.let {
+                        Timber.d("Meeting started")
+                        openCall(call)
+                    }
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    /**
+     * Answer scheduled meeting of other chat room
+     *
+     * @param chatId    Chat Id.
+     */
+    private fun answerSchedMeetingOfOtherChatRoom(chatId: Long) {
+        chatManagement.addJoiningCallChatId(chatId)
+
+        viewModelScope.launch {
+            Timber.d("Answer call")
+            runCatching {
+                setChatVideoInDeviceUseCase()
+                answerChatCallUseCase(chatId = chatId, video = false, audio = true)
+            }.onSuccess { call ->
+                call?.apply {
+                    chatManagement.removeJoiningCallChatId(chatId)
+                    rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                    CallUtil.clearIncomingCallNotification(callId)
+                    openCall(call)
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    /**
+     * Open call
+     *
+     * @param call  [ChatCall]
+     */
+    private fun openCall(call: ChatCall) {
+        chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
+        chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
+        CallUtil.openMeetingInProgress(
+            getInstance().applicationContext,
+            call.chatId,
+            true,
+            passcodeManagement
+        )
+    }
 }

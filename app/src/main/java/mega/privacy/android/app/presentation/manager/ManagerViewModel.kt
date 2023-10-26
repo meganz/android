@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
@@ -24,16 +26,23 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -62,6 +71,10 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
@@ -119,6 +132,14 @@ import javax.inject.Inject
  * @param monitorOfflineNodeAvailabilityUseCase monitor the offline availability of the file to update the UI
  * @param getNumUnreadChatsUseCase  monitor number of unread chats
  * @property monitorBackupFolder
+ * @property getScheduledMeetingByChat  [GetScheduledMeetingByChat]
+ * @property getChatCallUseCase [GetChatCall]
+ * @property startMeetingInWaitingRoomChatUseCase [StartMeetingInWaitingRoomChatUseCase]
+ * @property answerChatCallUseCase [AnswerChatCallUseCase]
+ * @property setChatVideoInDeviceUseCase [SetChatVideoInDeviceUseCase]
+ * @property rtcAudioManagerGateway [RTCAudioManagerGateway]
+ * @property chatManagement [ChatManagement]
+ * @property passcodeManagement [PasscodeManagement]
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -179,6 +200,14 @@ class ManagerViewModel @Inject constructor(
     private val dismissPsaUseCase: DismissPsaUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase,
+    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getChatCallUseCase: GetChatCall,
+    private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
+    private val answerChatCallUseCase: AnswerChatCallUseCase,
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway,
+    private val chatManagement: ChatManagement,
+    private val passcodeManagement: PasscodeManagement,
 ) : ViewModel() {
 
     /**
@@ -928,7 +957,118 @@ class ManagerViewModel @Inject constructor(
         _state.update { it.copy(chatLinkContent = null) }
     }
 
+    /**
+     * Start or answer a meeting with waiting room as a host
+     *
+     * @param chatId   Chat ID
+     */
+    fun startOrAnswerMeetingWithWaitingRoomAsHost(chatId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                val call = getChatCallUseCase(chatId)
+                val scheduledMeetingStatus = when (call?.status) {
+                    ChatCallStatus.UserNoPresent -> ScheduledMeetingStatus.NotJoined(call.duration)
+
+                    ChatCallStatus.Connecting,
+                    ChatCallStatus.Joining,
+                    ChatCallStatus.InProgress,
+                    -> ScheduledMeetingStatus.Joined(call.duration)
+
+                    else -> ScheduledMeetingStatus.NotStarted
+                }
+                if (scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted) {
+                    runCatching {
+                        getScheduledMeetingByChat(chatId)
+                    }.onSuccess { scheduledMeetingList ->
+                        scheduledMeetingList?.first()?.schedId?.let { schedId ->
+                            startSchedMeetingWithWaitingRoom(
+                                chatId = chatId, schedIdWr = schedId
+                            )
+                        }
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }
+                } else {
+                    answerCall(chatId = chatId)
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    /**
+     * Start scheduled meeting with waiting room
+     *
+     * @param chatId    Chat ID
+     * @param schedIdWr Scheduled meeting ID
+     */
+    private fun startSchedMeetingWithWaitingRoom(chatId: Long, schedIdWr: Long) =
+        viewModelScope.launch {
+            Timber.d("Start scheduled meeting with waiting room")
+            runCatching {
+                startMeetingInWaitingRoomChatUseCase(
+                    chatId = chatId,
+                    schedIdWr = schedIdWr,
+                    enabledVideo = false,
+                    enabledAudio = true
+                )
+            }.onSuccess { call ->
+                call?.let {
+                    call.chatId.takeIf { it != INVALID_HANDLE }?.let {
+                        Timber.d("Meeting started")
+                        openCall(call)
+                    }
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    /**
+     * Answer call
+     *
+     * @param chatId    Chat Id.
+     */
+    private fun answerCall(chatId: Long) {
+        chatManagement.addJoiningCallChatId(chatId)
+
+        viewModelScope.launch {
+            Timber.d("Answer call")
+            runCatching {
+                setChatVideoInDeviceUseCase()
+                answerChatCallUseCase(chatId = chatId, video = false, audio = true)
+            }.onSuccess { call ->
+                call?.apply {
+                    chatManagement.removeJoiningCallChatId(chatId)
+                    rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                    CallUtil.clearIncomingCallNotification(callId)
+                    openCall(call)
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    /**
+     * Open call
+     *
+     * @param call  [ChatCall]
+     */
+    private fun openCall(call: ChatCall) {
+        chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
+        chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
+        CallUtil.openMeetingInProgress(
+            MegaApplication.getInstance().applicationContext,
+            call.chatId,
+            true,
+            passcodeManagement
+        )
+    }
+
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"
+        private const val INVALID_HANDLE = -1L
     }
 }

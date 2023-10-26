@@ -282,6 +282,7 @@ import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.ShareData
@@ -303,6 +304,7 @@ import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
@@ -429,6 +431,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var hasArchivedChatsUseCase: HasArchivedChatsUseCase
+
+    @Inject
+    lateinit var getChatRoomUseCase: GetChatRoom
 
     @Inject
     lateinit var managerRedirectIntentMapper: ManagerRedirectIntentMapper
@@ -7898,16 +7903,30 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     return
                 }
                 if (chatLinkContent.link.isEmpty()) return
-                CallUtil.joinMeetingOrReturnCall(
-                    this,
-                    chatLinkContent.chatHandle,
-                    chatLinkContent.link,
-                    chatLinkContent.text,
-                    chatLinkContent.exist,
-                    chatLinkContent.userHandle,
-                    passcodeManagement,
-                    chatLinkContent.isWaitingRoom,
-                )
+                lifecycleScope.launch {
+                    runCatching {
+                        getChatRoomUseCase(chatLinkContent.chatHandle)
+                    }.onSuccess { chatRoom ->
+                        chatRoom?.let {
+                            if (chatRoom.isMeeting && chatRoom.isWaitingRoom && chatRoom.ownPrivilege == ChatRoomPermission.Moderator) {
+                                viewModel.startOrAnswerMeetingWithWaitingRoomAsHost(chatId = chatLinkContent.chatHandle)
+                            } else {
+                                CallUtil.joinMeetingOrReturnCall(
+                                    applicationContext,
+                                    chatLinkContent.chatHandle,
+                                    chatLinkContent.link,
+                                    chatLinkContent.text,
+                                    chatLinkContent.exist,
+                                    chatLinkContent.userHandle,
+                                    passcodeManagement,
+                                    chatLinkContent.isWaitingRoom,
+                                )
+                            }
+                        }
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }
+                }
             } else if (chatLinkContent is ChatLinkContent.ChatLink) {
                 Timber.d("It's a chat")
                 if (chatLinkContent.link.isEmpty()) return

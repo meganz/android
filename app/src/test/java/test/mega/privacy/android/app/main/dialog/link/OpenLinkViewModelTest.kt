@@ -5,17 +5,27 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment
 import mega.privacy.android.app.main.dialog.link.OpenLinkViewModel
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -34,6 +44,17 @@ internal class OpenLinkViewModelTest {
     private val savedStateHandle: SavedStateHandle = mock()
     private val getHandleFromContactLinkUseCase: GetHandleFromContactLinkUseCase = mock()
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase = mock()
+    private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
+    private val getChatCallUseCase: GetChatCall = mock()
+    private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
+    private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
+    private val chatManagement: ChatManagement = mock()
+    private val passcodeManagement: PasscodeManagement = mock()
+
+    private val testCoroutineDispatcher = StandardTestDispatcher()
+    private val testCoroutineScope = TestScope(testCoroutineDispatcher)
 
     @BeforeAll
     fun setup() {
@@ -61,7 +82,16 @@ internal class OpenLinkViewModelTest {
             getUrlRegexPatternTypeUseCase,
             savedStateHandle,
             getHandleFromContactLinkUseCase,
-            getChatLinkContentUseCase
+            getChatLinkContentUseCase,
+            getScheduledMeetingByChat,
+            getChatCallUseCase,
+            startMeetingInWaitingRoomChatUseCase,
+            answerChatCallUseCase,
+            setChatVideoInDeviceUseCase,
+            rtcAudioManagerGateway,
+            chatManagement,
+            passcodeManagement,
+            testCoroutineScope,
         )
     }
 

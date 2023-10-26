@@ -19,12 +19,16 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.EventType
@@ -76,6 +80,10 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
@@ -253,6 +261,14 @@ class ManagerViewModelTest {
     private val dismissPsaUseCase = mock<DismissPsaUseCase>()
     private val rootNodeUseCase = mock<GetRootNodeUseCase>()
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase = mock()
+    private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
+    private val getChatCallUseCase: GetChatCall = mock()
+    private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
+    private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
+    private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
+    private val chatManagement: ChatManagement = mock()
+    private val passcodeManagement: PasscodeManagement = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -321,6 +337,14 @@ class ManagerViewModelTest {
             dismissPsaUseCase = dismissPsaUseCase,
             getRootNodeUseCase = rootNodeUseCase,
             getChatLinkContentUseCase = getChatLinkContentUseCase,
+            getScheduledMeetingByChat = getScheduledMeetingByChat,
+            getChatCallUseCase = getChatCallUseCase,
+            startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
+            answerChatCallUseCase = answerChatCallUseCase,
+            setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
+            rtcAudioManagerGateway = rtcAudioManagerGateway,
+            chatManagement = chatManagement,
+            passcodeManagement = passcodeManagement,
         )
     }
 
