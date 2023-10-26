@@ -817,12 +817,20 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             if (_state.value.isMediaUploadsEnabled) {
                 // we need to disable media upload
                 disableMediaUploads()
+                rescheduleCameraUpload()
+                _state.update {
+                    it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
+                }
             } else {
-                enableMediaUploads()
-            }
-            rescheduleCameraUpload()
-            _state.update {
-                it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
+                if (isNewSettingValid(isSecondaryEnabled = true)) {
+                    enableMediaUploads()
+                    rescheduleCameraUpload()
+                    _state.update {
+                        it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
+                    }
+                } else {
+                    setInvalidFolderSelectedPromptShown(true)
+                }
             }
         }
     }
@@ -830,7 +838,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * updateMediaUploadsLocalFolder
      * @param mediaUploadPath
-     * @param isFolderInSDCard
      */
     fun updateMediaUploadsLocalFolder(mediaUploadPath: String?) {
         viewModelScope.launch {
@@ -853,6 +860,35 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    /**
+     * Is New Settings Valid
+     *
+     * @param primaryPath Defines the Primary Folder path
+     * @param secondaryPath Defines the Secondary Folder path
+     * @param primaryHandle Defines the Primary Folder handle
+     * @param secondaryHandle Defines the Secondary Folder handle
+     * @param isSecondaryEnabled whether isSecondaryFolder is enabled or not
+     */
+    fun isNewSettingValid(
+        primaryPath: String? = _state.value.primaryFolderPath,
+        secondaryPath: String? = _state.value.secondaryFolderPath,
+        primaryHandle: Long? = _state.value.primaryUploadSyncHandle,
+        secondaryHandle: Long? = _state.value.secondaryUploadSyncHandle,
+        isSecondaryEnabled: Boolean = _state.value.isMediaUploadsEnabled,
+    ): Boolean {
+        with(_state.value) {
+            if ((isCameraUploadsEnabled && primaryPath.isNullOrBlank() && primaryHandle == null)
+                || (isSecondaryEnabled && secondaryPath.isNullOrBlank() && secondaryHandle == null)
+                || (primaryHandle == secondaryHandle && isSecondaryEnabled)
+                || (primaryPath?.contains(secondaryPath ?: "-1") == true && isSecondaryEnabled)
+                || (secondaryPath?.contains(primaryPath ?: "-1") == true && isSecondaryEnabled)
+            ) {
+                return false
+            }
+            return true
         }
     }
 }

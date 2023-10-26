@@ -432,13 +432,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             REQUEST_MEGA_CAMERA_FOLDER -> {
                 // Primary Folder to Sync
                 val handle = intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
-                if (!isNewSettingValid(
-                        primaryPath = viewModel.state.value.primaryFolderPath,
-                        secondaryPath = viewModel.state.value.secondaryFolderPath,
-                        primaryHandle = handle.toString(),
-                        secondaryHandle = prefs?.megaHandleSecondaryFolder,
-                    )
-                ) {
+                if (!viewModel.isNewSettingValid(primaryHandle = handle)) {
                     Toast.makeText(
                         context,
                         getString(R.string.error_invalid_folder_selected),
@@ -458,13 +452,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER -> {
                 // Secondary Folder to Sync
                 val secondaryPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                if (!isNewSettingValid(
-                        primaryPath = viewModel.state.value.primaryFolderPath,
-                        secondaryPath = secondaryPath,
-                        primaryHandle = prefs?.camSyncHandle,
-                        secondaryHandle = prefs?.megaHandleSecondaryFolder,
-                    )
-                ) {
+                if (!viewModel.isNewSettingValid(secondaryPath = secondaryPath)) {
                     Toast.makeText(
                         context,
                         getString(R.string.error_invalid_folder_selected),
@@ -479,13 +467,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 // Secondary Folder to Sync
                 val secondaryHandle =
                     intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
-                if (!isNewSettingValid(
-                        primaryPath = viewModel.state.value.primaryFolderPath,
-                        secondaryPath = viewModel.state.value.secondaryFolderPath,
-                        primaryHandle = prefs?.camSyncHandle,
-                        secondaryHandle = secondaryHandle.toString(),
-                    )
-                ) {
+                if (!viewModel.isNewSettingValid(secondaryHandle = secondaryHandle)) {
                     Toast.makeText(
                         context,
                         getString(R.string.error_invalid_folder_selected),
@@ -1329,30 +1311,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
 
         disableMediaUploadUIProcess()
-    }
-
-    /**
-     * Is New Settings Valid
-     *
-     * @param primaryPath Defines the Primary Folder path
-     * @param secondaryPath Defines the Secondary Folder path
-     * @param primaryHandle Defines the Primary Folder handle
-     * @param secondaryHandle Defines the Secondary Folder handle
-     */
-    private fun isNewSettingValid(
-        primaryPath: String?,
-        secondaryPath: String?,
-        primaryHandle: String?,
-        secondaryHandle: String?,
-    ): Boolean {
-        return if (!viewModel.state.value.isMediaUploadsEnabled || primaryPath == null || primaryHandle == null
-            || secondaryPath == null || secondaryHandle == null
-        ) {
-            true
-        } else {
-            primaryHandle != secondaryHandle || !primaryPath.contains(secondaryPath)
-                    && !secondaryPath.contains(primaryPath)
-        }
     }
 
     /**
