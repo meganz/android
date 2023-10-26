@@ -409,6 +409,28 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body1.Red600Red300">
+        <item name="android:textColor">@color/red_600_red_300</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body1.Amber700Amber300">
+        <item name="android:textColor">@color/amber_700_amber_300</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body1.Grey87White54">
+        <item name="android:textColor">@color/grey_087_white_054</item>
+    </style>
+
+    <!-- Medium -->
+    <style name="TextAppearance.Mega.Body1.Medium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body1.Medium.Grey87White87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
     <!-- ================== Body2 ====================== -->
 
     <!-- In material design, Alert Dialog, Snack bar, Chip text. Default value is

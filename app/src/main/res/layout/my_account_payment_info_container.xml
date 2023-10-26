@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginBottom="10dp"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.WhiteGrey87"
+        android:textAppearance="@style/TextAppearance.Mega.Body1.Grey87White54"
         tools:text="Renews on" />
 
     <TextView
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginBottom="10dp"
-        android:textAppearance="@style/TextAppearance.Mega.Body2.Red400"
+        android:textAppearance="@style/TextAppearance.Mega.Body1.Red600Red300"
         tools:text="Payment overdue" />
 
 </RelativeLayout>

@@ -34,6 +34,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -116,7 +117,7 @@ import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.grey_020_black
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_700
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_900
-import mega.privacy.android.core.ui.theme.extensions.grey_100_alpha_060_grey_100
+import mega.privacy.android.core.ui.theme.extensions.grey_100_grey_600
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -464,7 +465,7 @@ private fun AccountInfoSection(
     uiActions: MyAccountHomeViewActions,
     modifier: Modifier = Modifier,
 ) {
-    var lastSessionClick by remember { mutableStateOf(0) }
+    var lastSessionClick by remember { mutableIntStateOf(0) }
     val isExpiredOrGracePeriod =
         uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not()
     val isPaymentAlertVisible =
@@ -666,7 +667,7 @@ internal fun AccountTypeSection(
                 .constrainAs(currentPlan) {
                     start.linkTo(iconIv.end, 16.dp)
                 },
-            text = "Current plan",
+            text = stringResource(id = R.string.account_my_account_home_view_current_plan_title),
             style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.textColorPrimary,
         )
@@ -743,7 +744,7 @@ internal fun UsageMeterSection(
                         .testTag(USAGE_STORAGE_PROGRESS)
                         .size(50.dp)
                         .align(Alignment.Center),
-                    backgroundColor = MaterialTheme.colors.grey_100_alpha_060_grey_100,
+                    backgroundColor = MaterialTheme.colors.grey_100_grey_600,
                     color = if (isStorageOverQuota) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary,
                     strokeWidth = 5.dp,
                     progress = (usedStoragePercentage.toFloat() / 100).coerceAtMost(1f)
@@ -823,7 +824,7 @@ internal fun UsageMeterSection(
                         modifier = Modifier
                             .size(55.dp)
                             .testTag(USAGE_TRANSFER_PROGRESS),
-                        backgroundColor = MaterialTheme.colors.grey_100_alpha_060_grey_100,
+                        backgroundColor = MaterialTheme.colors.grey_100_grey_600,
                         color = MaterialTheme.colors.secondary,
                         strokeWidth = 6.dp,
                         progress = (usedTransferPercentage.toFloat() / 100).coerceAtMost(1f)

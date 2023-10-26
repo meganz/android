@@ -527,6 +527,9 @@
     <color name="amber_800_amber_700">@color/amber_800</color>
     <color name="red_400_red_300">@color/red_400</color>
 
+    <!-- Expiration/Renew time on MyAccountUsage view -->
+    <color name="grey_087_white_054">@color/grey_alpha_087</color>
+
     <color name="yellow_100_yellow_700_alpha_015">@color/yellow_100</color>
     <color name="grey_alpha_087_yellow_700">@color/grey_alpha_087</color>
 

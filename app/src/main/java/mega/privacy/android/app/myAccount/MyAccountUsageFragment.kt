@@ -1,5 +1,6 @@
 package mega.privacy.android.app.myAccount
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,7 @@ import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.setRenewalDateForProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
@@ -67,6 +69,10 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
         setupView()
         setupObservers()
+        binding.upgradeButton.setOnClickListener {
+            startActivity(Intent(requireActivity(), UpgradeAccountActivity::class.java))
+            viewModel.setOpenUpgradeFrom()
+        }
     }
 
     private fun setupView() {
@@ -81,7 +87,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
         )
 
         paymentAlertBinding.renewExpiryText.setTextAppearance(
-            R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
+            R.style.TextAppearance_Mega_Body1_Grey87White54,
         )
 
         binding.rubbishSeparator.isVisible = false
@@ -139,6 +145,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 ActiveFragment.MY_ACCOUNT_USAGE
             )
             paymentAlertBinding.root.isVisible = true
+            binding.upgradeButton.isVisible = false
         } else if (viewModel.isProFlexiAccount()) {
             usageBinding.updateBusinessOrProFlexi(
                 requireContext(),
@@ -146,6 +153,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.getUsedTransfer()
             )
             paymentAlertBinding.setRenewalDateForProFlexi(viewModel)
+            binding.upgradeButton.isVisible = false
         } else {
             usageBinding.update(
                 requireContext(),
@@ -164,6 +172,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.hasExpirableSubscription(),
                 ActiveFragment.MY_ACCOUNT_USAGE
             )
+            binding.upgradeButton.isVisible = true
         }
 
         binding.cloudStorageText.text = viewModel.getCloudStorage()

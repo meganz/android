@@ -231,8 +231,8 @@ object MyAccountViewUtil {
                 context
             )
             text = viewModel.context.getString(R.string.account_info_renews_on, renewalDate)
-                .formatColorTag(context, 'A', R.color.grey_500_grey_400)
-                .formatColorTag(context, 'B', R.color.grey_087_white)
+                .formatColorTag(context, 'A', R.color.grey_087_white_054)
+                .formatColorTag(context, 'B', R.color.grey_087_white_054)
                 .toSpannedHtmlText()
         }
     }
@@ -266,18 +266,15 @@ object MyAccountViewUtil {
             text = when (fragment) {
                 ActiveFragment.MY_ACCOUNT -> {
                     text.toString()
-                        .replace("[A]", "<font face='sans-serif'>")
-                        .replace("[/A]", "</font>")
-                        .replace("[B]", "<big><font face='sans-serif-medium'>")
-                        .replace("[/B]", "</font></big>")
+                        .formatColorTag(context, 'A', R.color.grey_087_white_054)
+                        .formatColorTag(context, 'B', R.color.grey_087_white_054)
                         .toSpannedHtmlText()
                 }
 
                 ActiveFragment.MY_ACCOUNT_USAGE -> {
                     text.toString()
-                        .replace("[A]", "")
-                        .replace("[/A]", "")
-                        .formatColorTag(context, 'B', R.color.grey_087_white)
+                        .formatColorTag(context, 'A', R.color.grey_087_white_054)
+                        .formatColorTag(context, 'B', R.color.grey_087_white_054)
                         .toSpannedHtmlText()
                 }
             }
@@ -306,10 +303,10 @@ object MyAccountViewUtil {
 
             setTextAppearance(
                 when {
-                    expandedView && expired -> R.style.TextAppearance_Mega_Body2_Red400Red300
-                    expandedView -> R.style.TextAppearance_Mega_Body2_Amber800Amber700
-                    expired -> R.style.TextAppearance_Mega_Body2_Red400
-                    else -> R.style.TextAppearance_Mega_Body2_Amber400
+                    expandedView && expired -> R.style.TextAppearance_Mega_Body1_Red600Red300
+                    expandedView -> R.style.TextAppearance_Mega_Body1_Amber700Amber300
+                    expired -> R.style.TextAppearance_Mega_Body1_Red600Red300
+                    else -> R.style.TextAppearance_Mega_Body1_Amber700Amber300
                 }
             )
         }

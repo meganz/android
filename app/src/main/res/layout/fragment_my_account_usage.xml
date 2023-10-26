@@ -8,15 +8,22 @@
     android:background="@color/white_grey_087"
     android:fillViewport="true">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="390dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingStart="14dp"
         android:paddingTop="20dp"
         android:paddingEnd="14dp"
         android:paddingBottom="50dp"
-        android:transitionName="end_container">
+        android:transitionName="end_container"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <include
             android:id="@+id/usage_view_layout"
@@ -41,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="38dp"
             android:text="@string/usage_storage_details_label"
-            android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Grey87White87" />
+            android:textAppearance="@style/TextAppearance.Mega.Body1.Medium.Grey87White87" />
 
         <!--cloud drive-->
         <RelativeLayout
@@ -56,14 +63,14 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/cloud_storage_text"
                 android:text="@string/section_cloud_drive"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             <TextView
                 android:id="@+id/cloud_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Teal300Teal200"
+                android:textAppearance="@style/TextAppearance.Mega.Body2"
                 tools:text="65.05 GB" />
 
             <View
@@ -89,14 +96,14 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/backups_storage_text"
                 android:text="@string/home_side_menu_backups_title"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             <TextView
                 android:id="@+id/backups_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Teal300Teal200"
+                android:textAppearance="@style/TextAppearance.Mega.Body2"
                 tools:text="21.35 GB" />
 
             <View
@@ -121,14 +128,14 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/incoming_storage_text"
                 android:text="@string/title_incoming_shares_explorer"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             <TextView
                 android:id="@+id/incoming_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Teal300Teal200"
+                android:textAppearance="@style/TextAppearance.Mega.Body2"
                 tools:text="680.1 GB" />
 
             <View
@@ -153,14 +160,14 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/rubbish_storage_text"
                 android:text="@string/section_rubbish_bin"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             <TextView
                 android:id="@+id/rubbish_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Teal300Teal200"
+                android:textAppearance="@style/TextAppearance.Mega.Body2"
                 tools:text="673.5 GB" />
 
             <View
@@ -186,17 +193,42 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/previous_versions_text"
                 android:text="@string/file_properties_folder_previous_versions"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             <TextView
                 android:id="@+id/previous_versions_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Teal300Teal200" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2" />
+
+            <View
+                android:id="@+id/previous_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/grey_012_white_012" />
+
+        </RelativeLayout>
+
+        <!--Get more storage button-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="32dp">
+
+            <Button
+                android:id="@+id/upgrade_button"
+                style="?attr/materialButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/drawer_upgrade_button_background_selector"
+                android:text="@string/account_my_account_usage_get_more_storage_button"
+                android:textColor="@color/white_dark_grey" />
 
         </RelativeLayout>
 
     </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
