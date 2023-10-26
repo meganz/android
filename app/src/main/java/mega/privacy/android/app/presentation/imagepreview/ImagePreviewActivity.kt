@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.imagepreview
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
@@ -32,6 +31,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
+import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -208,8 +208,9 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun playSlideshow() {
-        //TODO
-        Toast.makeText(this, "Slideshow", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, SlideshowActivity::class.java)
+        intent.putExtras(intent.extras ?: Bundle())
+        startActivity(intent)
     }
 
     private fun playVideo(imageNode: ImageNode) {
@@ -262,10 +263,6 @@ class ImagePreviewActivity : BaseActivity() {
         nodeSaver.destroy()
         super.onDestroy()
     }
-
-    /**
-     * End
-     */
 
     companion object {
         fun createIntent(

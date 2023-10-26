@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.presentation.slideshow.model.SlideshowItem
 import mega.privacy.android.app.presentation.slideshow.model.SlideshowViewState
@@ -19,7 +18,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetPhotosByIdsUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
@@ -42,7 +40,7 @@ import kotlin.io.path.exists
  *
  */
 @HiltViewModel
-class SlideshowViewModel @Inject constructor(
+class LegacySlideshowViewModel @Inject constructor(
     private val getPhotosByIdsUseCase: GetPhotosByIdsUseCase,
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase,
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase,

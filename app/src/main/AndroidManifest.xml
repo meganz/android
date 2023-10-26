@@ -65,7 +65,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- For apps targeting Android 14 (API level 34) -->
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
@@ -110,23 +110,22 @@
     <application
         android:name=".MegaApplication"
         android:allowBackup="false"
+        android:gwpAsanMode="always"
         android:icon="@mipmap/ic_launcher_mega"
         android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_mega_round"
         android:screenOrientation="fullUser"
-        android:theme="@style/Theme.Mega"
-        android:usesCleartextTraffic="true"
-        android:localeConfig="@xml/locales_config"
-        android:gwpAsanMode="always"
         android:supportsRtl="true"
-        >
+        android:theme="@style/Theme.Mega"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".presentation.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/action_settings"
             android:launchMode="singleTop"
-            android:parentActivityName=".main.ManagerActivity"/>
+            android:parentActivityName=".main.ManagerActivity" />
 
         <meta-data
             android:name="fontProviderRequests"
@@ -146,7 +145,7 @@
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
-            android:value="barcode_ui"/>
+            android:value="barcode_ui" />
 
         <activity
             android:name=".presentation.login.LoginActivity"
@@ -173,8 +172,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity
-            android:name=".presentation.achievements.AchievementsFeatureActivity" />
+        <activity android:name=".presentation.achievements.AchievementsFeatureActivity" />
         <activity
             android:name=".presentation.openlink.OpenLinkActivity"
             android:exported="true"
@@ -265,14 +263,10 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".main.megachat.ChatExplorerActivity" />
-        <activity
-            android:name=".main.megachat.NodeAttachmentHistoryActivity" />
-        <activity
-            android:name=".main.CountryCodePickerActivity" />
-        <activity
-            android:name=".providers.PasscodeFileProviderActivity" />
+        <activity android:name=".main.megachat.ChatExplorerActivity" />
+        <activity android:name=".main.megachat.NodeAttachmentHistoryActivity" />
+        <activity android:name=".main.CountryCodePickerActivity" />
+        <activity android:name=".providers.PasscodeFileProviderActivity" />
         <activity
             android:name=".providers.FileProviderActivity"
             android:exported="true"
@@ -359,17 +353,13 @@
             android:name=".presentation.meeting.chat.ChatHostActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity
-            android:name=".presentation.contactinfo.ContactInfoActivity" />
-        <activity
-            android:name=".presentation.fileinfo.FileInfoActivity" />
+        <activity android:name=".presentation.contactinfo.ContactInfoActivity" />
+        <activity android:name=".presentation.fileinfo.FileInfoActivity" />
         <activity
             android:name=".activities.OfflineFileInfoActivity"
             android:launchMode="singleTop" />
-        <activity
-            android:name=".main.VersionsFileActivity" />
-        <activity
-            android:name=".main.megachat.GroupChatInfoActivity" />
+        <activity android:name=".main.VersionsFileActivity" />
+        <activity android:name=".main.megachat.GroupChatInfoActivity" />
         <activity
             android:name=".presentation.pdfviewer.PdfViewerActivity"
             android:exported="true"
@@ -415,26 +405,23 @@
         </activity>
         <activity
             android:name=".mediaplayer.VideoPlayerActivity"
-            android:windowSoftInputMode="adjustNothing"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"/>
+            android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
+            android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
-        <activity
-            android:name=".presentation.qrcode.QRCodeActivity" />
+        <activity android:name=".presentation.qrcode.QRCodeActivity" />
         <activity
             android:name=".presentation.qrcode.QRCodeComposeActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".presentation.twofactorauthentication.TwoFactorAuthenticationActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".presentation.verifytwofactor.VerifyTwoFactorActivity" />
-        <activity
-            android:name=".BusinessExpiredAlertActivity" />
+        <activity android:name=".presentation.verifytwofactor.VerifyTwoFactorActivity" />
+        <activity android:name=".BusinessExpiredAlertActivity" />
         <activity android:name=".presentation.verification.SMSVerificationActivity" />
         <activity android:name=".presentation.verification.SMSVerificationTextActivity" />
         <activity
@@ -510,8 +497,9 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
-        <activity android:name=".presentation.search.SearchActivity"
-            android:launchMode="singleTop"/>
+        <activity
+            android:name=".presentation.search.SearchActivity"
+            android:launchMode="singleTop" />
 
         <service
             android:name=".main.megachat.ChatUploadService"
@@ -519,8 +507,8 @@
             android:foregroundServiceType="dataSync" />
         <service
             android:name=".meeting.CallService"
-            android:foregroundServiceType="phoneCall"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="phoneCall" />
         <service
             android:name=".DownloadService"
             android:exported="false"
@@ -543,6 +531,7 @@
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
+
         <receiver
             android:name=".receivers.ChargeEventReceiver"
             android:enabled="true"
@@ -571,11 +560,11 @@
         </provider>
 
         <provider
-            tools:replace="android:authorities"
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
-            tools:node="merge">
+            tools:node="merge"
+            tools:replace="android:authorities">
             <!--    remove default WorkManager initializer-->
             <meta-data
                 android:name="androidx.work.WorkManagerInitializer"
@@ -680,41 +669,41 @@
         <activity
             android:name=".activities.settingsActivities.StartScreenPreferencesActivity"
             android:label="@string/start_screen_setting"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop" />
 
         <activity
             android:name="mega.privacy.android.app.namecollision.NameCollisionActivity"
-            android:theme="@style/Theme.Mega.FullScreen.Viewer"
             android:label="@string/title_duplicated_items"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Mega.FullScreen.Viewer" />
 
         <activity
             android:name="mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop" />
 
         <activity
             android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustNothing"/>
+            android:windowSoftInputMode="adjustNothing" />
 
         <activity
             android:name="mega.privacy.android.app.presentation.startconversation.StartConversationActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustNothing"/>
+            android:windowSoftInputMode="adjustNothing" />
 
         <activity
             android:name="mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustNothing"/>
+            android:windowSoftInputMode="adjustNothing" />
 
         <activity
             android:name="mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustNothing"/>
+            android:windowSoftInputMode="adjustNothing" />
 
         <activity
             android:name="mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity"
-            android:windowSoftInputMode="adjustNothing"/>
+            android:windowSoftInputMode="adjustNothing" />
 
         <activity
             android:name="mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity"
@@ -724,13 +713,13 @@
         <activity
             android:name="mega.privacy.android.app.presentation.meeting.WaitingRoomActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
 
         <activity android:name=".presentation.contactinfo.ComposeContactInfoActivity" />
 
         <activity
             android:name="mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity"
-            android:windowSoftInputMode="adjustNothing"/>
+            android:windowSoftInputMode="adjustNothing" />
 
         <activity
             android:name="mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity"
@@ -741,6 +730,14 @@
             android:label=""
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Viewer"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <activity
+            android:name="mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <activity
+            android:name="mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowSettingsActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
     </application>
 

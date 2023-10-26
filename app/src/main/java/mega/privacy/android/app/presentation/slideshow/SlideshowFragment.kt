@@ -85,7 +85,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class SlideshowFragment : Fragment() {
-    private val slideshowViewModel: SlideshowViewModel by viewModels()
+    private val legacySlideshowViewModel: LegacySlideshowViewModel by viewModels()
     private val imageViewerViewModel: ImageViewerViewModel by activityViewModels()
 
     @Inject
@@ -152,7 +152,7 @@ class SlideshowFragment : Fragment() {
         imageViewerViewModel.images.observe(viewLifecycleOwner) { items ->
             items?.let {
                 if (it.isNotEmpty()) {
-                    slideshowViewModel.setData(it)
+                    legacySlideshowViewModel.setData(it)
                 }
             }
         }
@@ -163,7 +163,7 @@ class SlideshowFragment : Fragment() {
 
     override fun onStop() {
         if (activity?.isChangingConfigurations != true && activity?.isFinishing != true) {
-            slideshowViewModel.updateIsPlaying(false)
+            legacySlideshowViewModel.updateIsPlaying(false)
         }
         super.onStop()
     }
@@ -175,7 +175,7 @@ class SlideshowFragment : Fragment() {
 
     @Composable
     private fun SlideshowBody() {
-        val slideshowViewState by slideshowViewModel.state.collectAsStateWithLifecycle()
+        val slideshowViewState by legacySlideshowViewModel.state.collectAsStateWithLifecycle()
         val scaffoldState = rememberScaffoldState()
         val photoState = rememberPhotoState()
         val items = slideshowViewState.slideshowItems
@@ -201,17 +201,17 @@ class SlideshowFragment : Fragment() {
             isPlaying = isPlaying,
             onPlayIconClick = {
                 photoState.resetScale()
-                slideshowViewModel.updateIsPlaying(!isPlaying)
+                legacySlideshowViewModel.updateIsPlaying(!isPlaying)
             },
             onImageTap = {
-                slideshowViewModel.updateIsPlaying(false)
+                legacySlideshowViewModel.updateIsPlaying(false)
             }
         ) {
             LaunchedEffect(pagerState.canScrollForward) {
                 // Not repeat and the last one.
                 if (!pagerState.canScrollForward && !repeat && isPlaying) {
                     Timber.d("Slideshow canScrollForward")
-                    slideshowViewModel.updateIsPlaying(false)
+                    legacySlideshowViewModel.updateIsPlaying(false)
                 }
             }
         }
@@ -248,7 +248,7 @@ class SlideshowFragment : Fragment() {
                 if (slideshowViewState.shouldPlayFromFirst) {
                     Timber.d("Slideshow shouldPlayFromFirst")
                     pagerState.animateScrollToPage(0)
-                    slideshowViewModel.shouldPlayFromFirst(shouldPlayFromFirst = false)
+                    legacySlideshowViewModel.shouldPlayFromFirst(shouldPlayFromFirst = false)
                 }
             }
         }
@@ -265,7 +265,7 @@ class SlideshowFragment : Fragment() {
             // Observe if scaling, then pause slideshow
             if (photoState.isScaled) {
                 Timber.d("Slideshow is scaling")
-                slideshowViewModel.updateIsPlaying(false)
+                legacySlideshowViewModel.updateIsPlaying(false)
             }
         }
     }
@@ -297,7 +297,7 @@ class SlideshowFragment : Fragment() {
                     val imageState =
                         produceState<String?>(initialValue = null) {
                             runCatching {
-                                slideshowViewModel.downloadFullSizeImage(
+                                legacySlideshowViewModel.downloadFullSizeImage(
                                     slideshowItem = slideshowItem
                                 ).collectLatest { imageResult ->
                                     value = imageResult.previewUri ?: imageResult.thumbnailUri

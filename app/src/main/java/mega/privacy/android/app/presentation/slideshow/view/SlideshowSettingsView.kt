@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -65,6 +66,7 @@ import mega.privacy.mobile.analytics.event.SlideshowSettingSpeedSlowButtonEvent
 @Composable
 fun SlideshowSettingsView(
     slideshowSettingViewModel: SlideshowSettingViewModel,
+    topPadding: Dp = 100.dp,
 ) {
     val state by slideshowSettingViewModel.state.collectAsStateWithLifecycle()
     val isLight = MaterialTheme.colors.isLight
@@ -80,7 +82,7 @@ fun SlideshowSettingsView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 100.dp)
+            .padding(top = topPadding)
     ) {
         Column(
             modifier = Modifier

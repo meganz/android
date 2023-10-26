@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.slideshow.SlideshowViewModel
+import mega.privacy.android.app.presentation.slideshow.LegacySlideshowViewModel
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.usecase.GetPhotosByIdsUseCase
@@ -30,8 +30,8 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SlideshowViewModelTest {
-    private lateinit var underTest: SlideshowViewModel
+class LegacySlideshowViewModelTest {
+    private lateinit var underTest: LegacySlideshowViewModel
 
     private val getPhotosByIdsUseCase: GetPhotosByIdsUseCase = mock()
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase = mock()
@@ -59,7 +59,7 @@ class SlideshowViewModelTest {
             .thenReturn(flowOf())
     }
 
-    private fun createSUT() = SlideshowViewModel(
+    private fun createSUT() = LegacySlideshowViewModel(
         getPhotosByIdsUseCase = getPhotosByIdsUseCase,
         monitorSlideshowOrderSettingUseCase = monitorSlideshowOrderSettingUseCase,
         monitorSlideshowSpeedSettingUseCase = monitorSlideshowSpeedSettingUseCase,
