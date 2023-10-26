@@ -13,6 +13,7 @@ import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
 import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.provider.MediaStore.VOLUME_INTERNAL
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.exifinterface.media.ExifInterface
@@ -300,6 +301,12 @@ class FileFacade @Inject constructor(
                 onFailure = { false }
             )
         }
+
+    override suspend fun getUriForFile(file: File, authority: String): Uri =
+        withContext(Dispatchers.IO) {
+            FileProvider.getUriForFile(context, authority, file)
+        }
+
 
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"

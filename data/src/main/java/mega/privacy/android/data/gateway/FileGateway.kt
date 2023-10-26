@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway
 
+import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import java.io.File
 import java.io.IOException
@@ -225,4 +226,9 @@ interface FileGateway {
      * @param text Text to write in the content uri
      */
     suspend fun saveTextOnContentUri(uri: String, text: String): Boolean
+
+    /**
+     * Get uri of the given file
+     */
+    suspend fun getUriForFile(file: File, authority: String): Uri
 }

@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Environment
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
@@ -32,8 +34,9 @@ import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
-import mega.privacy.android.app.presentation.mapper.GetIntentFromFolderLinkToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
+import mega.privacy.android.app.presentation.mapper.UrlDownloadException
+import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
@@ -53,17 +56,25 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.AddNodeType
+import mega.privacy.android.domain.usecase.GetLocalFileForNode
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -89,7 +100,6 @@ class FolderLinkViewModel @Inject constructor(
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val addNodeType: AddNodeType,
-    private val getIntentFromFolderLinkToOpenFileMapper: GetIntentFromFolderLinkToOpenFileMapper,
     private val getPublicNodeListByIds: GetPublicNodeListByIds,
     private val getNodeUseCase: GetNodeUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
@@ -98,6 +108,14 @@ class FolderLinkViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val getPricing: GetPricing,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
+    private val getLocalFileForNode: GetLocalFileForNode,
+    private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
+    private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
+    private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
+    private val httpServerStart: MegaApiHttpServerStartUseCase,
+    private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
+    private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
+    private val getFileUriUseCase: GetFileUriUseCase,
 ) : ViewModel() {
 
     /**
@@ -568,43 +586,11 @@ class FolderLinkViewModel @Inject constructor(
     }
 
     /**
-     * Handle item click
-     *
-     * @param nodeUIItem    Item that is clicked
-     * @param activity      Activity
-     */
-    fun onItemClick(nodeUIItem: NodeUIItem<TypedNode>, activity: Activity) {
-        viewModelScope.launch {
-            if (isMultipleNodeSelected()) {
-                onItemLongClick(nodeUIItem)
-            } else {
-                if (nodeUIItem.node is FolderNode) {
-                    openFolder(nodeUIItem)
-                } else if (nodeUIItem.node is FileNode) {
-                    runCatching {
-                        getIntentFromFolderLinkToOpenFileMapper(
-                            activity = activity,
-                            fileNode = nodeUIItem.node,
-                            viewType = Constants.FOLDER_LINK_ADAPTER,
-                            hasDbCredentials = state.value.hasDbCredentials,
-                            childrenNodeIds = state.value.nodesList.map { it.id.longValue }
-                        )
-                    }.onSuccess { intent ->
-                        intent?.let { _state.update { it.copy(openFile = triggered(intent)) } }
-                    }.onFailure {
-                        Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Navigate to selected folder
      *
      * @param nodeUIItem    Folder node to navigate to
      */
-    private fun openFolder(nodeUIItem: NodeUIItem<TypedNode>) {
+    fun openFolder(nodeUIItem: NodeUIItem<TypedNode>) {
         viewModelScope.launch {
             val children =
                 runCatching { getFolderLinkChildrenNodesUseCase(nodeUIItem.id.longValue, null) }
@@ -626,7 +612,7 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Get if multiple nodes are selected
      */
-    private fun isMultipleNodeSelected(): Boolean = state.value.selectedNodeCount > 0
+    fun isMultipleNodeSelected(): Boolean = state.value.selectedNodeCount > 0
 
     /**
      * Reset and notify that openFile event is consumed
@@ -708,6 +694,166 @@ class FolderLinkViewModel @Inject constructor(
                 } ?: Timber.w("rootNode null!!")
             }
         }
+    }
+
+    /**
+     * update intent values for image
+     */
+    fun updateImageIntent(intent: Intent) {
+        _state.update { it.copy(openFile = triggered(intent)) }
+    }
+
+    /**
+     * Update intent values for audio/video
+     */
+    fun updateAudioVideoIntent(intent: Intent, fileNode: FileNode, nameType: MimeTypeList) {
+        viewModelScope.launch {
+            runCatching {
+                intent.apply {
+                    putExtra(Constants.INTENT_EXTRA_KEY_PLACEHOLDER, 0)
+                    putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FOLDER_LINK_ADAPTER)
+                    putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, true)
+                    putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
+                    putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
+                    putExtra(
+                        Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                        fileNode.parentId.longValue
+                    )
+                }
+
+                getLocalFileForNode(fileNode)?.let {
+                    val path = it.path
+                    if (path.contains(Environment.getExternalStorageDirectory().path)) {
+                        val uri = getFileUriUseCase(it, Constants.AUTHORITY_STRING_FILE_PROVIDER)
+                        intent.setDataAndType(Uri.parse(uri), nameType.type)
+                    } else {
+                        intent.setDataAndType(Uri.fromFile(it), nameType.type)
+                    }
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } ?: run {
+                    setStreamingIntentParams(
+                        intent,
+                        state.value.hasDbCredentials,
+                        fileNode.id.longValue,
+                        nameType.type
+                    )
+                }
+                if (nameType.isVideoNotSupported || nameType.isAudioNotSupported) {
+                    val s = fileNode.name.split("\\.".toRegex())
+                    if (s.size > 1 && s[s.size - 1] == "opus") {
+                        intent.setDataAndType(intent.data, "audio/*")
+                    }
+                }
+                intent
+            }.onSuccess { intent ->
+                intent.let { _state.update { it.copy(openFile = triggered(intent)) } }
+            }.onFailure {
+                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+            }
+        }
+    }
+
+    /**
+     * Update intent values for pdf
+     */
+    fun updatePdfIntent(pdfIntent: Intent, fileNode: FileNode, mimeType: String) {
+        viewModelScope.launch {
+            runCatching {
+                pdfIntent.apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                    putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, true)
+                    putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
+                    putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+                    putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
+                    putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FOLDER_LINK_ADAPTER)
+                }
+                getLocalFileForNode(fileNode)?.let {
+                    val path = it.path
+                    if (path.contains(Environment.getExternalStorageDirectory().path)) {
+                        val uri = getFileUriUseCase(it, Constants.AUTHORITY_STRING_FILE_PROVIDER)
+                        pdfIntent.setDataAndType(Uri.parse(uri), mimeType)
+                    } else {
+                        pdfIntent.setDataAndType(Uri.fromFile(it), mimeType)
+                    }
+                    pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } ?: run {
+                    setStreamingIntentParams(
+                        pdfIntent,
+                        state.value.hasDbCredentials,
+                        fileNode.id.longValue,
+                        mimeType
+                    )
+                }
+                pdfIntent
+            }.onSuccess { intent ->
+                intent.let { _state.update { it.copy(openFile = triggered(intent)) } }
+            }.onFailure {
+                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+            }
+        }
+    }
+
+    /**
+     * Update intent value for text editor
+     */
+    fun updateTextEditorIntent(intent: Intent, fileNode: FileNode) {
+        intent.apply {
+            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
+            putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
+            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FOLDER_LINK_ADAPTER)
+        }
+        _state.update { it.copy(openFile = triggered(intent)) }
+    }
+
+    /**
+     * Update nodes to download
+     */
+    fun updateNodesToDownload(ids: List<Long>) {
+        viewModelScope.launch {
+            val nodes = getPublicNodeListByIds(ids)
+            _state.update { it.copy(downloadNodes = triggered(nodes)) }
+        }
+    }
+
+    private suspend fun setStreamingIntentParams(
+        intent: Intent,
+        hasDbCredentials: Boolean,
+        handle: Long,
+        mimeType: String,
+    ) {
+        val path = if (hasDbCredentials) {
+            startMegaApiHttpServer(intent)
+            getLocalFolderLinkFromMegaApiUseCase(handle) ?: throw UrlDownloadException()
+        } else {
+            startMegaApiFolderHttpServer(intent)
+            getLocalFolderLinkFromMegaApiFolderUseCase(handle) ?: throw UrlDownloadException()
+        }
+        intent.setDataAndType(Uri.parse(path), mimeType)
+    }
+
+    /**
+     * Start the server if not started
+     * @param intent [Intent]
+     */
+    private suspend fun startMegaApiFolderHttpServer(intent: Intent): Intent {
+        if (megaApiFolderHttpServerIsRunningUseCase() == 0) {
+            megaApiFolderHttpServerStartUseCase()
+            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+        }
+        return intent
+    }
+
+    /**
+     * Start the server if not started
+     * @param intent [Intent]
+     */
+    private suspend fun startMegaApiHttpServer(intent: Intent): Intent {
+        if (httpServerIsRunning() == 0) {
+            httpServerStart()
+            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+        }
+        return intent
     }
 
     /**

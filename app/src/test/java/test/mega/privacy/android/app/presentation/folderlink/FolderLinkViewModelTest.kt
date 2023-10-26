@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.folderlink
 
 import android.content.Intent
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -8,8 +9,6 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -19,29 +18,37 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
-import mega.privacy.android.app.presentation.mapper.GetIntentFromFolderLinkToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.AddNodeType
+import mega.privacy.android.domain.usecase.GetLocalFileForNode
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -51,6 +58,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
+import org.mockito.Mockito
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -72,8 +81,6 @@ class FolderLinkViewModelTest {
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val addNodeType: AddNodeType = mock()
-    private val getIntentFromFolderLinkToOpenFileMapper: GetIntentFromFolderLinkToOpenFileMapper =
-        mock()
     private val getPublicNodeListByIds: GetPublicNodeListByIds = mock()
     private val getNodeUseCase: GetNodeUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
@@ -82,6 +89,16 @@ class FolderLinkViewModelTest {
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val getPricing: GetPricing = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
+    private val getLocalFileForNode: GetLocalFileForNode = mock()
+    private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase =
+        mock()
+    private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase = mock()
+    private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase =
+        mock()
+    private val httpServerStart: MegaApiHttpServerStartUseCase = mock()
+    private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase = mock()
+    private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase = mock()
+    private val getFileUriUseCase: GetFileUriUseCase = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -112,7 +129,6 @@ class FolderLinkViewModelTest {
             getFolderParentNodeUseCase,
             getFolderLinkChildrenNodesUseCase,
             addNodeType,
-            getIntentFromFolderLinkToOpenFileMapper,
             getPublicNodeListByIds,
             getNodeUseCase,
             getStringFromStringResMapper,
@@ -120,7 +136,15 @@ class FolderLinkViewModelTest {
             getAccountTypeUseCase,
             getCurrentUserEmail,
             getPricing,
-            containsMediaItemUseCase
+            containsMediaItemUseCase,
+            getLocalFileForNode,
+            getLocalFolderLinkFromMegaApiFolderUseCase,
+            megaApiFolderHttpServerStartUseCase,
+            megaApiFolderHttpServerIsRunningUseCase,
+            httpServerStart,
+            httpServerIsRunning,
+            getLocalFolderLinkFromMegaApiUseCase,
+            getFileUriUseCase
         )
     }
 
@@ -460,6 +484,68 @@ class FolderLinkViewModelTest {
             val newValue = expectMostRecentItem()
             assertThat(newValue.selectImportLocation).isEqualTo(triggered)
             assertThat(newValue.importNode).isEqualTo(node)
+        }
+    }
+
+    @Test
+    fun `test that openFile is triggered when updateImageIntent is invoked`() = runTest {
+        val intent = mock<Intent>()
+        underTest.updateImageIntent(intent)
+        underTest.state.test {
+            val res = awaitItem()
+            assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+        }
+    }
+
+    @Test
+    fun `test that openFile is triggered with correct pdf intent when updatePdfIntent is invoked`() =
+        runTest {
+            val uriMock = Mockito.mockStatic(Uri::class.java)
+            val intent = mock<Intent>()
+            val contentUriMock: Uri = mock()
+            val path = "/path"
+            val handle = 1234L
+            val fileNode = mock<FileNode> {
+                on { id.longValue }.thenReturn(handle)
+            }
+
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
+            whenever(getLocalFileForNode(any())).thenReturn(null)
+            whenever(getLocalFolderLinkFromMegaApiFolderUseCase(handle)).thenReturn(path)
+            whenever(Uri.parse(path)).thenReturn(contentUriMock)
+
+            underTest.updatePdfIntent(intent, fileNode, "pdf")
+            underTest.state.test {
+                val res = awaitItem()
+                assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+            }
+            uriMock.close()
+        }
+
+    @Test
+    fun `test that openFile is triggered when updateTextEditorIntent is invoked`() = runTest {
+        val intent = mock<Intent>()
+        val fileNode = mock<FileNode> {
+            on { id.longValue }.thenReturn(1234L)
+        }
+
+        underTest.updateTextEditorIntent(intent, fileNode)
+        underTest.state.test {
+            val res = awaitItem()
+            assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+        }
+    }
+
+    @Test
+    fun `test that downloadNodes is triggered when updateNodesToDownload is invoked`() = runTest {
+        val nodes: List<MegaNode> = mock()
+        val ids = listOf(1234L)
+
+        whenever(getPublicNodeListByIds(ids)).thenReturn(nodes)
+        underTest.updateNodesToDownload(ids)
+        underTest.state.test {
+            val res = awaitItem()
+            assertThat(res.downloadNodes).isInstanceOf(triggered(nodes).javaClass)
         }
     }
 

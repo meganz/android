@@ -248,4 +248,9 @@ interface FileSystemRepository {
      * @param text Text to write in the content uri
      */
     suspend fun saveTextOnContentUri(uri: String, text: String): Boolean
+
+    /**
+     * Get uri of the given file
+     */
+    suspend fun getUriForFile(file: File, authority: String): String
 }

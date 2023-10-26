@@ -341,4 +341,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             fileGateway.saveTextOnContentUri(uri, text)
         }
+
+    override suspend fun getUriForFile(file: File, authority: String): String =
+        withContext(ioDispatcher) {
+            fileGateway.getUriForFile(file, authority).toString()
+        }
 }

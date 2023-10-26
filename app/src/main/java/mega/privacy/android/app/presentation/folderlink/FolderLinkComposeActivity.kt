@@ -25,24 +25,31 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.isPortrait
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil
@@ -54,6 +61,9 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
@@ -169,7 +179,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onBackPressed = viewModel::handleBackPress,
                 onShareClicked = ::onShareClicked,
                 onMoreOptionClick = viewModel::handleMoreOptionClick,
-                onItemClicked = { viewModel.onItemClick(it, this) },
+                onItemClicked = ::onItemClick,
                 onLongClick = viewModel::onItemLongClick,
                 onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                 onSortOrderClick = { },
@@ -218,6 +228,72 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
             folderName = viewModel.state.value.title,
             isOpenByMDIcon = true
         )
+    }
+
+    /**
+     * Handle item click
+     *
+     * @param nodeUIItem    Item that is clicked
+     */
+    private fun onItemClick(nodeUIItem: NodeUIItem<TypedNode>) {
+        if (viewModel.isMultipleNodeSelected()) {
+            viewModel.onItemLongClick(nodeUIItem)
+        } else {
+            if (nodeUIItem.node is FolderNode) {
+                viewModel.openFolder(nodeUIItem)
+            } else if (nodeUIItem.node is FileNode) {
+                val fileNode = nodeUIItem.node
+                val nameType = MimeTypeList.typeForName(fileNode.name)
+                when {
+                    nameType.isImage -> {
+                        val intent = ImageViewerActivity.getIntentForChildren(
+                            this@FolderLinkComposeActivity,
+                            viewModel.state.value.nodesList.map { it.id.longValue }.toLongArray(),
+                            fileNode.id.longValue,
+                            fromFolderLink = true
+                        )
+                        viewModel.updateImageIntent(intent)
+                    }
+
+                    nameType.isVideoMimeType || nameType.isAudio -> {
+                        val intent =
+                            if (nameType.isVideoNotSupported || nameType.isAudioNotSupported) {
+                                Intent(Intent.ACTION_VIEW)
+                            } else {
+                                if (nameType.isAudio) {
+                                    Intent(
+                                        this@FolderLinkComposeActivity,
+                                        AudioPlayerActivity::class.java
+                                    )
+                                } else {
+                                    Intent(
+                                        this@FolderLinkComposeActivity,
+                                        VideoPlayerActivity::class.java
+                                    )
+                                }
+                            }
+                        viewModel.updateAudioVideoIntent(intent, fileNode, nameType)
+                    }
+
+                    nameType.isPdf -> {
+                        val intent =
+                            Intent(this@FolderLinkComposeActivity, PdfViewerActivity::class.java)
+                        viewModel.updatePdfIntent(intent, fileNode, nameType.type)
+                    }
+
+                    nameType.isOpenableTextFile(fileNode.size) -> {
+                        val intent =
+                            Intent(this@FolderLinkComposeActivity, TextEditorActivity::class.java)
+                        viewModel.updateTextEditorIntent(intent, fileNode)
+                    }
+
+                    else -> {
+                        Timber.w("Unknown File Type")
+                        viewModel.updateNodesToDownload(listOf(fileNode.id.longValue))
+                    }
+                }
+            }
+        }
     }
 
     private fun onSelectImportLocation() {
