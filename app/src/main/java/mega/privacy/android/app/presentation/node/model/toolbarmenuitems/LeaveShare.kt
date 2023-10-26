@@ -25,7 +25,7 @@ class LeaveShare @Inject constructor(
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ) = noNodeTakenDown
+    ) = noNodeTakenDown && selectedNodes.isNotEmpty()
             && selectedNodes.all { it.isIncomingShare }
 
 }

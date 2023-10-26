@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShare
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Remove
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkDropDown
@@ -152,7 +153,7 @@ abstract class ToolbarItemModule {
             selectAll: SelectAll,
             clearSelection: ClearSelection,
             rename: Rename,
-            manageLink: ManageLink,
+            manageLink: MultiSelectManageLink,
             getLink: GetLink,
             removeLinkDropDown: RemoveLinkDropDown,
             download: Download,
