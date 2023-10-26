@@ -20,9 +20,7 @@ class RemoveShare @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon
         allFileNodes: Boolean,
         resultCount: Int,
     ): Boolean {
-        val allAreSharedFolders = selectedNodes.all { isOutShare(it) }
-        return noNodeTakenDown
-                && allAreSharedFolders
+        return selectedNodes.isNotEmpty() && selectedNodes.all { isOutShare(it) }
     }
 
     private fun isOutShare(node: TypedNode) = if (node is FolderNode) {

@@ -22,6 +22,6 @@ class Remove @Inject constructor(
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ) = true
+    ) = selectedNodes.isNotEmpty()
 
 }

@@ -20,6 +20,6 @@ class Share @Inject constructor(
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ) = noNodeTakenDown
+    ) = selectedNodes.isNotEmpty() && noNodeTakenDown
 
 }

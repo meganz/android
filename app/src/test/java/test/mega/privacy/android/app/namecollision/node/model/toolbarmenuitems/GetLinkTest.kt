@@ -21,9 +21,7 @@ class GetLinkTest {
         on { isTakenDown }.thenReturn(false)
         on { exportedData }.thenReturn(null)
     }
-    private val oneFolderNodeSelected = mock<TypedFolderNode> {
-
-    }
+    private val oneFolderNodeSelected = mock<TypedFolderNode>()
     private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when are selected nodes taken down is {0} and selected nodes are {1}, then is get link item visible is {2}")

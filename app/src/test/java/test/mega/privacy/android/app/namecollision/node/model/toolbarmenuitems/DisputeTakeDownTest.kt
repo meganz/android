@@ -22,9 +22,7 @@ class DisputeTakeDownTest {
     private val oneFileNodeSelected = mock<TypedFolderNode> {
         on { isTakenDown }.thenReturn(false)
     }
-    private val oneFolderNodeSelected = mock<TypedFolderNode> {
-
-    }
+    private val oneFolderNodeSelected = mock<TypedFolderNode>()
     private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     private val listWithTakenDownNode =
