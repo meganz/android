@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
 import mega.privacy.android.app.presentation.slideshow.view.SlideshowSettingsView
@@ -18,7 +18,7 @@ import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 
 @Composable
 fun SlideshowSettingScreen(
-    slideshowSettingViewModel: SlideshowSettingViewModel = viewModel(),
+    slideshowSettingViewModel: SlideshowSettingViewModel = hiltViewModel(),
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher

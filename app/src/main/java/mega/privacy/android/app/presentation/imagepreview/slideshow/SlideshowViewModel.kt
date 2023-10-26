@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
-import mega.privacy.android.app.presentation.imagepreview.slideshow.model.IPSlideshowState
+import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowState
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
@@ -54,7 +54,7 @@ class SlideshowViewModel @Inject constructor(
     /**
      * Slideshow ViewState
      */
-    private val _state = MutableStateFlow(IPSlideshowState())
+    private val _state = MutableStateFlow(SlideshowState())
     val state = _state.asStateFlow()
 
     init {

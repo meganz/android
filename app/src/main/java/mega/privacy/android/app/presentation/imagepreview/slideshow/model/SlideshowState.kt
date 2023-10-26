@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
  * @property shouldPlayFromFirst Should play slideshow from the first item
  * @property isFirstInSlideshow Is first time in slideshow
  */
-data class IPSlideshowState(
+data class SlideshowState(
     val imageNodes: List<ImageNode> = emptyList(),
     val order: SlideshowOrder? = null,
     val speed: SlideshowSpeed? = null,
