@@ -257,10 +257,11 @@ public class CallUtil {
     }
 
     /**
-     * Retrieve if there's a call in progress that you're participating in.
+     * Retrieve if there's a call in progress that you're participating in. use [IsParticipatingInChatCallUseCase] instead
      *
      * @return True if you're on a call in progress. Otherwise false.
      */
+    @Deprecated
     public static boolean participatingInACall() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         MegaHandleList listCallsInitial = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_INITIAL);

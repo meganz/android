@@ -91,7 +91,8 @@ class ChatViewModel @Inject constructor(
                                 isPrivateChat = chatRoom.isPrivateRoom,
                                 myPermission = ownPrivilege,
                                 isPreviewMode = isPreview,
-                                isGroup = isGroup
+                                isGroup = isGroup,
+                                isArchived = isArchived,
                             )
                         }
                         if (!isGroup && peerHandlesList.isNotEmpty()) {

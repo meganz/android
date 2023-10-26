@@ -1,11 +1,13 @@
 package test.mega.privacy.android.app.presentation.meeting.chat
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_AUDIO_CALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_VIDEO_CALL_ACTION
@@ -28,7 +30,7 @@ class ChatViewTest {
     private val actionPressed = mock<(ChatRoomMenuAction) -> Unit>()
 
     @get:Rule
-    var composeTestRule = createComposeRule()
+    var composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun `test that title shows correctly when passing title to uiState`() {
@@ -209,6 +211,56 @@ class ChatViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
         verifyNoInteractions(actionPressed)
+    }
+
+    @Test
+    fun `test that participating in a call dialog show when click to audio call and user is in another call`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Standard,
+                isParticipatingInACall = true
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.ongoing_call_content))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that participating in a call dialog doesn't show when click to audio call and user is in another call`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Standard,
+                isParticipatingInACall = false
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.ongoing_call_content))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that archive label shown when chat is archived`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isArchived = true
+            )
+        )
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.archived_chat))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that archive label doesn't show when chat is not archived`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isArchived = false
+            )
+        )
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.archived_chat))
+            .assertDoesNotExist()
     }
 
     private fun initComposeRuleContent(state: ChatUiState) {

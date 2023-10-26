@@ -509,6 +509,23 @@ internal class ChatViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = " with isArchived {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that archive update when we passing the chatId`(
+        isArchived: Boolean
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { this.isArchived } doReturn isArchived
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isArchived).isEqualTo(isArchived)
+        }
+    }
+
     private fun provideUserChatStatusParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(UserChatStatus.Offline, UserChatStatus.Away),
         Arguments.of(UserChatStatus.Away, UserChatStatus.Online),

@@ -31,4 +31,5 @@ data class ChatUiState(
     val hasACallInThisChat: Boolean = false,
     val isGroup: Boolean = false,
     val storageState: StorageState = StorageState.Unknown,
+    val isArchived: Boolean = false,
 )
