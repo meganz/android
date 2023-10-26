@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Upload
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBacku
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
@@ -146,7 +148,7 @@ class SettingsCameraUploadsViewModelTest {
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
     private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
-    private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>() {
+    private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase> {
         onBlocking { invoke() }.thenReturn(true)
     }
     private val monitorCameraUploadsSettingsActionsUseCase =
@@ -181,6 +183,7 @@ class SettingsCameraUploadsViewModelTest {
         onBlocking { invoke(any()) }.thenReturn(true)
     }
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
+    private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase = mock()
 
     @Before
     fun setUp() {
@@ -265,6 +268,7 @@ class SettingsCameraUploadsViewModelTest {
             setupMediaUploadsSyncHandleUseCase = setupMediaUploadsSyncHandleUseCase,
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
+            clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
         )
     }
 
@@ -501,7 +505,7 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that the value of videoQuality is not updated if its integer equivalent is invalid`() =
-        runTest() {
+        runTest {
             setupUnderTest()
             underTest.changeUploadVideoQuality(4)
             verifyNoInteractions(
@@ -813,7 +817,7 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that media uploads is enabled when onEnableOrDisableMediaUpload is invoked`() =
-        runTest() {
+        runTest {
             setupUnderTest()
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             //disable
@@ -847,7 +851,7 @@ class SettingsCameraUploadsViewModelTest {
             setupUnderTest()
             val nodeId = NodeId(1L)
             testScheduler.advanceUntilIdle()
-            val cameraUploadsNode = mock<TypedFolderNode>() {
+            val cameraUploadsNode = mock<TypedFolderNode> {
                 on { id }.thenReturn(nodeId)
                 on { name }.thenReturn("Camera Uploads")
             }
@@ -866,7 +870,7 @@ class SettingsCameraUploadsViewModelTest {
             setupUnderTest()
             val nodeId = NodeId(1L)
             testScheduler.advanceUntilIdle()
-            val cameraUploadsNode = mock<TypedFolderNode>() {
+            val cameraUploadsNode = mock<TypedFolderNode> {
                 on { id }.thenReturn(nodeId)
                 on { name }.thenReturn("Media Uploads")
             }
@@ -912,5 +916,41 @@ class SettingsCameraUploadsViewModelTest {
                 secondaryPath = "path/to/CU/to/MU"
             )
             assertThat(actual).isFalse()
+        }
+
+    @Test
+    fun `test that the primary folder records are cleared when the primary folder path changes`() =
+        runTest(StandardTestDispatcher()) {
+            val testPath = "test/new/folder/path"
+            val isPrimaryFolderInSDCard = false
+
+            whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+            whenever(getPrimaryFolderPathUseCase()).thenReturn(testPath)
+
+            setupUnderTest()
+
+            underTest.changePrimaryFolderPath(
+                newPath = testPath,
+                isFolderInSDCard = isPrimaryFolderInSDCard,
+            )
+
+            verify(clearCameraUploadsRecordUseCase).invoke(
+                listOf(CameraUploadFolderType.Primary)
+            )
+        }
+
+    @Test
+    fun `test that the secondary folder records are cleared when the secondary folder path changes`() =
+        runTest(StandardTestDispatcher()) {
+            val mediaUploadsFolderPath = "/path/to/media uploads"
+            whenever(isSecondaryFolderPathValidUseCase(mediaUploadsFolderPath)).thenReturn(true)
+
+            setupUnderTest()
+
+            underTest.updateMediaUploadsLocalFolder(mediaUploadsFolderPath)
+
+            verify(clearCameraUploadsRecordUseCase).invoke(
+                listOf(CameraUploadFolderType.Secondary)
+            )
         }
 }

@@ -389,6 +389,13 @@ interface MegaLocalRoomGateway {
     )
 
     /**
+     * Delete the camera uploads record given the folder types
+     *
+     * @param folderTypes a list of folder type (Primary, Secondary, or both)
+     */
+    suspend fun deleteCameraUploadsRecords(folderTypes: List<CameraUploadFolderType>)
+
+    /**
      * Remove back up folder
      *
      * @param backupId back up id to be removed

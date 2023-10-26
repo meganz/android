@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Upload
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBacku
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
@@ -176,6 +178,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupMediaUploadsSyncHandleUseCase: SetupMediaUploadsSyncHandleUseCase,
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
+    private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -542,6 +545,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                         )
                     }
                     resetTimestampsAndCacheDirectory()
+                    clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))
                     rescheduleCameraUpload()
                     refreshPrimaryFolderPath()
                     setupOrUpdateCameraUploadsBackupUseCase(
@@ -847,6 +851,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                         setSecondaryFolderLocalPathUseCase(mediaUploadPath)
                     }
                     restoreSecondaryTimestamps()
+                    clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
                     // Update Sync when the Secondary Local Folder has changed
                     updateMediaUploadsBackup(mediaUploadPath)
                     rescheduleCameraUpload()

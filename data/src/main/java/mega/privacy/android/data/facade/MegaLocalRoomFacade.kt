@@ -362,6 +362,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
         // Implementation to be added with the implementation of the table
     }
 
+    override suspend fun deleteCameraUploadsRecords(folderTypes: List<CameraUploadFolderType>) {
+        // Implementation to be added with the implementation of the table
+    }
+
     override suspend fun deleteBackupById(backupId: Long) {
         encryptData(backupId.toString())?.let {
             backupDao.deleteBackupByBackupId(it)

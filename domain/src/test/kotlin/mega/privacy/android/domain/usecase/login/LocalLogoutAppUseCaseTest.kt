@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
@@ -11,6 +12,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -38,6 +40,7 @@ class LocalLogoutAppUseCaseTest {
     private val albumRepository = mock<AlbumRepository>()
     private val clearPsaUseCase = mock<ClearPsaUseCase>()
     private val settingsRepository = mock<SettingsRepository>()
+    private val clearCameraUploadsRecordUseCase = mock<ClearCameraUploadsRecordUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -53,6 +56,7 @@ class LocalLogoutAppUseCaseTest {
             stopAudioService = stopAudioService,
             clearPsaUseCase = clearPsaUseCase,
             settingsRepository = settingsRepository,
+            clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
         )
     }
 
@@ -67,6 +71,7 @@ class LocalLogoutAppUseCaseTest {
             stopCameraUploadsUseCase,
             stopAudioService,
             clearPsaUseCase,
+            clearCameraUploadsRecordUseCase,
         )
     }
 
@@ -88,5 +93,7 @@ class LocalLogoutAppUseCaseTest {
         verify(stopAudioService).invoke()
         verify(clearPsaUseCase).invoke()
         verify(settingsRepository).resetSetting()
+        verify(clearCameraUploadsRecordUseCase)
+            .invoke(listOf(CameraUploadFolderType.Primary, CameraUploadFolderType.Secondary))
     }
 }

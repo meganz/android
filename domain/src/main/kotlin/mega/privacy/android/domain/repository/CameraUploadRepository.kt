@@ -803,4 +803,11 @@ interface CameraUploadRepository {
         folderType: CameraUploadFolderType,
         generatedFingerprint: String,
     )
+
+    /**
+     * Clear the camera uploads record given the folder types
+     *
+     * @param folderTypes a list of folder type (Primary, Secondary, or both)
+     */
+    suspend fun clearRecords(folderTypes: List<CameraUploadFolderType>)
 }
