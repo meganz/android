@@ -12,6 +12,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
+import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Download
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
@@ -25,11 +29,15 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.jupiter.api.AfterAll
@@ -59,6 +67,21 @@ class SearchActivityViewModelTest {
     private val setViewType: SetViewType = mock()
     private val monitorViewType: MonitorViewType = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
+    private val getRubbishNodeUseCase: GetRubbishNodeUseCase = mock()
+    private val getNodeAccessPermission: GetNodeAccessPermission = mock()
+    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
+    private val nodeToolbarActionMapper = NodeToolbarActionMapper()
+    private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
+        setOf(Download(DownloadMenuAction()))
+    private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
+        setOf(Download(DownloadMenuAction()))
+    private val outgoingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
+        setOf(Download(DownloadMenuAction()))
+    private val linksToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
+        setOf(Download(DownloadMenuAction()))
+    private val rubbishBinToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
+        setOf(Download(DownloadMenuAction()))
     private val fileDurationMapper: FileDurationMapper = mock {
         onBlocking { invoke(any()) }.thenReturn(null)
     }
@@ -99,6 +122,16 @@ class SearchActivityViewModelTest {
             getSearchCategoriesUseCase = getSearchCategoriesUseCase,
             searchFilterMapper = searchFilterMapper,
             emptySearchViewMapper = emptySearchViewMapper,
+            cloudDriveToolbarOptions = cloudDriveToolbarOptions,
+            incomingSharesToolbarOptions = incomingSharesToolbarOptions,
+            outgoingSharesToolbarOptions = outgoingSharesToolbarOptions,
+            rubbishBinToolbarOptions = rubbishBinToolbarOptions,
+            linksToolbarOptions = linksToolbarOptions,
+            getRubbishNodeUseCase = getRubbishNodeUseCase,
+            getNodeAccessPermission = getNodeAccessPermission,
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            nodeToolbarActionMapper = nodeToolbarActionMapper,
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
         )
     }
 
@@ -111,6 +144,7 @@ class SearchActivityViewModelTest {
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             initViewModel()
             underTest.onSortOrderChanged()
             underTest.onLongItemClicked(
@@ -171,6 +205,7 @@ class SearchActivityViewModelTest {
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             initViewModel()
             underTest.onSortOrderChanged()
             underTest.onLongItemClicked(

@@ -5,20 +5,27 @@ import androidx.compose.runtime.Composable
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.appbar.ExpandedSearchAppBar
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Search toolbar used in search activity
+ *
+ * @param selectionCount
+ * @param searchQuery
+ * @param updateSearchQuery
+ * @param menuActions
  */
 @Composable
 fun SearchToolBar(
     selectionCount: Int,
     searchQuery: String,
     updateSearchQuery: (String) -> Unit,
+    menuActions: List<MenuAction> = emptyList(),
 ) {
     if (selectionCount > 0) {
-        SelectModeAppBar(title = "$selectionCount")
+        SelectModeAppBar(title = "$selectionCount", actions = menuActions)
     } else {
         ExpandedSearchAppBar(
             text = searchQuery,

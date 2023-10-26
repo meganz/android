@@ -81,6 +81,7 @@ fun SearchComposeView(
                 selectionCount = state.selectedNodes.size,
                 searchQuery = state.searchQuery,
                 updateSearchQuery = updateSearchQuery,
+                menuActions = state.menuActions
             )
         },
         snackbarHost = {

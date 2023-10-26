@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.search.model
 import androidx.annotation.StringRes
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.search.SearchType
  * @property emptyState
  * @property selectedNodes
  * @property lastSelectedNode
+ * @property menuActions
  */
 data class SearchActivityState(
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
@@ -38,4 +40,5 @@ data class SearchActivityState(
     val selectedFilter: SearchFilter? = null,
     val emptyState: Pair<Int, String>? = null,
     val searchType: SearchType = SearchType.OTHER,
+    val menuActions: List<MenuAction> = emptyList()
 )
