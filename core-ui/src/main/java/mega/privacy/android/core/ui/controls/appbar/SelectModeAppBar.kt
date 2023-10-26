@@ -1,7 +1,6 @@
 package mega.privacy.android.core.ui.controls.appbar
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -31,10 +30,10 @@ fun SelectModeAppBar(
     actions: List<MenuAction> = emptyList(),
     onNavigationPressed: (() -> Unit)? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+    elevation: Dp = LocalMegaAppBarElevation.current,
 ) = CompositionLocalProvider(
-    LocalMegaAppBarTint provides
-            MegaAppBarTint(MegaTheme.colors.icon.accent, MegaTheme.colors.text.accent)
+    LocalMegaAppBarColors provides
+            MegaAppBarColors(MegaTheme.colors.icon.accent, MegaTheme.colors.text.accent)
 ) {
     BaseMegaAppBar(
         appBarType = AppBarType.BACK_NAVIGATION,

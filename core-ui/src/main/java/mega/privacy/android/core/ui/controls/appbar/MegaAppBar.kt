@@ -79,9 +79,9 @@ fun MegaAppBar(
     onActionPressed: ((MenuAction) -> Unit)? = null,
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+    elevation: Dp = LocalMegaAppBarElevation.current,
 ) = CompositionLocalProvider(
-    LocalMegaAppBarTint provides MegaAppBarTint(
+    LocalMegaAppBarColors provides MegaAppBarColors(
         MegaTheme.colors.icon.primary,
         MegaTheme.colors.text.primary
     )
@@ -103,14 +103,17 @@ fun MegaAppBar(
 }
 
 //this will be internal once FileInfoAppbar is based on BaseMegaAppBar
-data class MegaAppBarTint(
+data class MegaAppBarColors(
     val iconsTintColor: Color,
     val titleColor: Color,
+    val backgroundAlpha: Float = 1f,
 )
 
 
-val LocalMegaAppBarTint =
-    compositionLocalOf { MegaAppBarTint(Color.Unspecified, Color.Unspecified) }
+val LocalMegaAppBarColors =
+    compositionLocalOf { MegaAppBarColors(Color.Unspecified, Color.Unspecified) }
+
+internal val LocalMegaAppBarElevation = compositionLocalOf { AppBarDefaults.TopAppBarElevation }
 
 @Composable
 internal fun BaseMegaAppBar(
@@ -125,7 +128,7 @@ internal fun BaseMegaAppBar(
     onActionPressed: ((MenuAction) -> Unit)? = null,
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+    elevation: Dp = LocalMegaAppBarElevation.current,
 ) {
     TopAppBar(
         title = {
@@ -138,7 +141,7 @@ internal fun BaseMegaAppBar(
                         text = title,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = LocalMegaAppBarTint.current.titleColor,
+                        color = LocalMegaAppBarColors.current.titleColor,
                         style = MaterialTheme.typography.subtitle1,
                     )
                     CompositionLocalProvider(
@@ -158,7 +161,7 @@ internal fun BaseMegaAppBar(
                 }
             }
         },
-        backgroundColor = MegaTheme.colors.background.pageBackground,
+        backgroundColor = MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
         modifier = modifier,
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
             Box {
@@ -225,7 +228,7 @@ private fun NavigationIcon(
     Icon(
         imageVector = ImageVector.vectorResource(id = iconId),
         contentDescription = "Navigation button",
-        tint = LocalMegaAppBarTint.current.iconsTintColor
+        tint = LocalMegaAppBarColors.current.iconsTintColor
     )
 }
 
