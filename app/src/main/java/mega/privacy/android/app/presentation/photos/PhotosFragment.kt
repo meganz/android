@@ -66,14 +66,11 @@ import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
-import mega.privacy.android.app.presentation.photos.timeline.showCUStatusTestDialog
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCameraUploadsMessage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
@@ -248,9 +245,8 @@ class PhotosFragment : Fragment() {
                         handleOptionsMenu(state)
                         handleActionMode(state)
                         handleActionsForCameraUploads(state)
-                        adjustCameraUploadsMenuVisibility()
+                        handleCameraUploadsMenu(state)
                         handleFilterIcons(state)
-                        handleCUIconStatus(state)
                     }
                 }
 
@@ -263,49 +259,23 @@ class PhotosFragment : Fragment() {
         }
     }
 
-    private fun handleCUIconStatus(state: TimelineViewState) {
-        if (!isNewCUEnabled)
-            return
-        when (state.cameraUploadsStatus) {
-            CameraUploadsStatus.None -> {
-                this.menu?.findItem(R.id.action_cu_status)?.isVisible = true
-                this.menu?.findItem(R.id.action_cu_status)?.setIcon(R.drawable.ic_cu_status)
-            }
+    private fun handleCameraUploadsMenu(
+        state: TimelineViewState,
+        isMenuVisible: Boolean = photosViewModel.state.value.isMenuShowing,
+    ) {
+        if (!isNewCUEnabled) return
 
-            CameraUploadsStatus.Idle -> {
-                this.menu?.findItem(R.id.action_cu_status)?.isVisible = true
-                this.menu?.findItem(R.id.action_cu_status)
-                    ?.setIcon(R.drawable.ic_cu_status_completed)
-            }
+        // CU default menu
+        val showCameraUploadsButton = state.enableCameraUploadButtonShowing
+        this.menu?.findItem(R.id.action_cu_status_default)?.isVisible = showCameraUploadsButton && isMenuVisible
 
-            CameraUploadsStatus.Warning -> {}
+        // CU complete menu
+        val showCameraUploadsComplete = state.showCameraUploadsComplete
+        this.menu?.findItem(R.id.action_cu_status_complete)?.isVisible = showCameraUploadsComplete && isMenuVisible
 
-            CameraUploadsStatus.Error -> {}
-            CameraUploadsStatus.Sync,
-            CameraUploadsStatus.Uploading,
-            CameraUploadsStatus.Completed,
-            -> {
-                this.menu?.findItem(R.id.action_cu_status)?.isVisible = false
-            }
-        }
-    }
-
-    private fun handleCUIconStatusClick() {
-        when (timelineViewModel.state.value.cameraUploadsStatus) {
-            CameraUploadsStatus.None -> {}
-
-            CameraUploadsStatus.Idle -> {
-                timelineViewModel.setCameraUploadsMessage(getString(R.string.camera_uploads_up_to_date))
-            }
-
-            CameraUploadsStatus.Warning -> {}
-
-            CameraUploadsStatus.Error -> {}
-            CameraUploadsStatus.Sync -> {}
-            CameraUploadsStatus.Uploading -> {}
-            CameraUploadsStatus.Completed -> {}
-
-        }
+        // CU warning menu
+        val showCameraUploadsWarning = state.showCameraUploadsWarning
+        this.menu?.findItem(R.id.action_cu_status_warning)?.isVisible = showCameraUploadsWarning && isMenuVisible
     }
 
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
@@ -432,14 +402,10 @@ class PhotosFragment : Fragment() {
         this.menu = menu
         handleMenuIcons(isShowing = photosViewModel.state.value.isMenuShowing)
         handleFilterIcons(timelineViewModel.state.value)
-        viewLifecycleOwner.lifecycleScope.launch {
-            val isEnabled = false
-            this@PhotosFragment.menu?.findItem(R.id.action_import)?.isVisible = isEnabled
-        }
     }
 
     internal fun handleMenuIcons(isShowing: Boolean) {
-        adjustCameraUploadsMenuVisibility()
+        handleCameraUploadsMenu(timelineViewModel.state.value, isShowing)
 
         this.menu?.findItem(R.id.action_zoom_in)?.isVisible = isShowing && !isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_out)?.isVisible = isShowing && !isNewCUEnabled
@@ -448,18 +414,6 @@ class PhotosFragment : Fragment() {
         this.menu?.findItem(R.id.action_zoom_in_secondary)?.isVisible = isShowing && isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_out_secondary)?.isVisible = isShowing && isNewCUEnabled
         this.menu?.findItem(R.id.action_cu_settings)?.isVisible = isShowing && !timelineViewModel.state.value.enableCameraUploadButtonShowing && isNewCUEnabled
-        this.menu?.findItem(R.id.action_cu_status_test)?.isVisible = isShowing && isNewCUEnabled
-    }
-
-    private fun adjustCameraUploadsMenuVisibility() {
-        val isAllMenuVisible = photosViewModel.state.value.isMenuShowing
-        val isCameraUploadsButtonShowing =
-            timelineViewModel.state.value.enableCameraUploadButtonShowing
-        val isMenuVisible = isAllMenuVisible && isCameraUploadsButtonShowing && isNewCUEnabled
-
-        this.menu?.findItem(R.id.action_cu_status)?.isVisible = isMenuVisible
-        if (isMenuVisible)
-            handleCUIconStatus(timelineViewModel.state.value)
     }
 
     private fun openCameraUploadsSettings() {
@@ -543,14 +497,18 @@ class PhotosFragment : Fragment() {
                 true
             }
 
-            R.id.action_cu_status -> {
+            R.id.action_cu_status_default -> {
                 openCameraUploadsSettings()
                 true
             }
 
+            R.id.action_cu_status_complete -> {
+                /* TODO */
+                true
+            }
+
             R.id.action_cu_status_warning -> {
-                timelineViewModel.setCameraUploadsLimitedAccess(true)
-                timelineViewModel.showCameraUploadsChangePermissionsMessage(true)
+                /* TODO */
                 true
             }
 
@@ -566,21 +524,6 @@ class PhotosFragment : Fragment() {
 
             R.id.action_cu_settings -> {
                 openCameraUploadsSettings()
-                true
-            }
-
-            R.id.action_import -> {
-                val intent =
-                    AlbumScreenWrapperActivity.createAlbumImportDeeplinkScreen(requireContext())
-                startActivity(intent)
-                true
-            }
-
-            R.id.action_cu_status_test -> {
-                showCUStatusTestDialog(
-                    fragment = this,
-                    viewModel = timelineViewModel
-                )
                 true
             }
 

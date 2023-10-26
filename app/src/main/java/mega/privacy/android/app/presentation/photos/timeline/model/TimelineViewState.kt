@@ -84,13 +84,11 @@ data class TimelineViewState(
     val shouldTriggerCameraUploads: Boolean = false,
     val shouldShowBusinessAccountPrompt: Boolean = false,
     val shouldTriggerMediaPermissionsDeniedLogic: Boolean = false,
+    val showCameraUploadsComplete: Boolean = false,
+    val showCameraUploadsWarning: Boolean = false,
     val cameraUploadsStatus: CameraUploadsStatus = CameraUploadsStatus.None,
     val cameraUploadsProgress: Float = 0f,
-    val cameraUploadsPending: Int = 0,
     val cameraUploadsMessage: String = "",
-    //Test data, will remove after QA
-    val showCUStatusFabs: Boolean = false,
-    val cameraUploadsTotalFiles: Int = 1,
     val isCameraUploadsLimitedAccess: Boolean = false,
     val showCameraUploadsChangePermissionsMessage: Boolean = false,
 )

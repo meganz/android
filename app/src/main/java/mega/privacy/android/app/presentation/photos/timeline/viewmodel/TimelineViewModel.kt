@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.TimelineFilterPreferences
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
@@ -548,15 +549,106 @@ class TimelineViewModel @Inject constructor(
         stopCameraUploadAndHeartbeatUseCase()
     }
 
+    /**
+     * Timeline x CU Revamp Controller
+     */
+
+    // The flag controls CU complete icon visibility on top bar.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1300-16994&mode=design&t=apaI1dEqa2bUBPIP-0
+    fun setCameraUploadsCompleteMenu(isVisible: Boolean) {
+        _state.update {
+            it.copy(showCameraUploadsComplete = isVisible)
+        }
+    }
+
+    // The flag controls CU warning icon visibility on top bar.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1300-16945&mode=design&t=apaI1dEqa2bUBPIP-0
+    fun setCameraUploadsWarningMenu(isVisible: Boolean) {
+        _state.update {
+            it.copy(showCameraUploadsWarning = isVisible)
+        }
+    }
+
+    // The flag controls CU sync fab visibility.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27891&mode=design&t=vcAb54xEixEVIEvN-0
+    fun setCameraUploadsSyncFab(isVisible: Boolean) {
+        _state.update {
+            it.copy(
+                cameraUploadsStatus = CameraUploadsStatus.Sync.takeIf {
+                    isVisible
+                } ?: CameraUploadsStatus.None,
+            )
+        }
+    }
+
+    // The flag controls CU uploading fab visibility + progress value.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27947&mode=design&t=apaI1dEqa2bUBPIP-0
+    fun setCameraUploadsUploadingFab(isVisible: Boolean, progress: Float) {
+        _state.update {
+            it.copy(
+                cameraUploadsStatus = CameraUploadsStatus.Uploading.takeIf {
+                    isVisible
+                } ?: CameraUploadsStatus.None,
+                progress = progress,
+            )
+        }
+    }
+
+    // The flag controls CU complete fab visibility.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-28067&mode=design&t=apaI1dEqa2bUBPIP-0
+    fun setCameraUploadsCompleteFab(isVisible: Boolean) {
+        _state.update {
+            it.copy(
+                cameraUploadsStatus = CameraUploadsStatus.Complete.takeIf {
+                    isVisible
+                } ?: CameraUploadsStatus.None,
+            )
+        }
+    }
+
+    // The flag controls CU warning fab visibility + progress value.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=2089-12855&mode=design&t=vcAb54xEixEVIEvN-0
+    fun setCameraUploadsWarningFab(isVisible: Boolean, progress: Float) {
+        _state.update {
+            it.copy(
+                cameraUploadsStatus = CameraUploadsStatus.Warning.takeIf {
+                    isVisible
+                } ?: CameraUploadsStatus.None,
+                cameraUploadsProgress = progress,
+            )
+        }
+    }
+
+    // Convenient way in case to hide any showing CU status fab.
+    fun hideCameraUploadsFab() {
+        _state.update {
+            it.copy(cameraUploadsStatus = CameraUploadsStatus.None)
+        }
+    }
+
+    // The flag controls CU limited access banner visibility.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27609&mode=design&t=apaI1dEqa2bUBPIP-0
     fun setCameraUploadsLimitedAccess(isLimitedAccess: Boolean) {
         _state.update {
             it.copy(isCameraUploadsLimitedAccess = isLimitedAccess)
         }
     }
 
+    // Show snackbar to display the CU change permissions message.
+    // It will show upon FAB if they appear together.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1791-39721&mode=design&t=vcAb54xEixEVIEvN-0
     fun showCameraUploadsChangePermissionsMessage(show: Boolean) {
         _state.update {
             it.copy(showCameraUploadsChangePermissionsMessage = show)
+        }
+    }
+
+    // Show snackbar to display the CU message.
+    // It will show upon FAB if they appear together.
+    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-28657&mode=design&t=apaI1dEqa2bUBPIP-0
+    fun setCameraUploadsMessage(message: String) {
+        _state.update {
+            it.copy(cameraUploadsMessage = message)
         }
     }
 }

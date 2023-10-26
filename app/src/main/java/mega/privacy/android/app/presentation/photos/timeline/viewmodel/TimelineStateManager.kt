@@ -164,16 +164,3 @@ fun TimelineViewModel.updateProgress(
         it.copy(pending = pending, progressBarShowing = showProgress, progress = progress)
     }
 }
-
-//New CU
-fun TimelineViewModel.setCameraUploadsStatus(cameraUploadsStatus: CameraUploadsStatus) {
-    _state.update {
-        it.copy(cameraUploadsStatus = cameraUploadsStatus)
-    }
-}
-
-fun TimelineViewModel.setCameraUploadsMessage(message: String) {
-    _state.update {
-        it.copy(cameraUploadsMessage = message)
-    }
-}

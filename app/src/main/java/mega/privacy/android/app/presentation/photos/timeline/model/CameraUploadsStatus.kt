@@ -7,8 +7,6 @@ enum class CameraUploadsStatus {
     None,
     Sync,
     Uploading,
-    Completed,
-    Idle,
+    Complete,
     Warning,
-    Error,
 }

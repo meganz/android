@@ -35,8 +35,6 @@ import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUploadVideos
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCameraUploadsMessage
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
@@ -164,8 +162,11 @@ fun PhotosScreen(
                     )
                 },
                 isNewCUEnabled = isNewCUEnabled,
-                setCameraUploadsStatus = timelineViewModel::setCameraUploadsStatus,
-                setCameraUploadsMessage = timelineViewModel::setCameraUploadsMessage,
+                onClickCameraUploadsSync = { /* TODO */ },
+                onClickCameraUploadsUploading ={ /* TODO */ },
+                onClickCameraUploadsComplete = { /* TODO */ },
+                onClickCameraUploadsWarning = { /* TODO */ },
+                onChangeCameraUploadsPermissions = onNavigateCameraUploadsSettings,
                 clearCameraUploadsMessage = {
                     timelineViewModel.setCameraUploadsMessage("")
                 },
