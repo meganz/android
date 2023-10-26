@@ -107,6 +107,7 @@ internal fun ChatView(
                         else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
                     }
                 },
+                maxActionsToShow = MENU_ACTIONS_TO_SHOW,
                 subtitle = getSubtitle(uiState = uiState),
                 elevation = 0.dp
             )
@@ -173,22 +174,24 @@ private fun PrivateChatIcon(isPrivateChat: Boolean?) {
     }
 }
 
-private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> {
-    val actions = mutableListOf<ChatRoomMenuAction>()
-
+private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> = buildList {
     with(uiState) {
-        if ((myPermission == ChatRoomPermission.Moderator || myPermission == ChatRoomPermission.Standard)
+        val hasModeratorPermission = myPermission == ChatRoomPermission.Moderator
+
+        if ((hasModeratorPermission || myPermission == ChatRoomPermission.Standard)
             && !isJoiningOrLeaving && !isPreviewMode
         ) {
-            actions.add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat))
+            add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat))
 
             if (!isGroup) {
-                actions.add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat))
+                add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat))
             }
         }
-    }
 
-    return actions
+        if (!isJoiningOrLeaving && isGroup && (hasModeratorPermission || isActive && isOpenInvite)) {
+            add(ChatRoomMenuAction.AddParticipants)
+        }
+    }
 }
 
 private fun checkStorageState(context: Context, storageState: StorageState): Boolean {
@@ -233,3 +236,4 @@ private fun ChatViewPreview() {
 internal const val TEST_TAG_USER_CHAT_STATE = "chat_view:icon_user_chat_status"
 internal const val TEST_TAG_NOTIFICATION_MUTE = "chat_view:icon_chat_notification_mute"
 internal const val TEST_TAG_PRIVATE_ICON = "chat_view:icon_chat_room_private"
+internal const val MENU_ACTIONS_TO_SHOW = 2

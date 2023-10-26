@@ -92,6 +92,8 @@ class ChatViewModel @Inject constructor(
                                 myPermission = ownPrivilege,
                                 isPreviewMode = isPreview,
                                 isGroup = isGroup,
+                                isOpenInvite = isOpenInvite,
+                                isActive = isActive,
                                 isArchived = isArchived,
                             )
                         }
@@ -147,7 +149,11 @@ class ChatViewModel @Inject constructor(
                                 }
 
                                 ChatRoomChange.OwnPrivilege -> _state.update { state ->
-                                    state.copy(myPermission = ownPrivilege)
+                                    state.copy(myPermission = ownPrivilege, isActive = isActive)
+                                }
+
+                                ChatRoomChange.OpenInvite -> _state.update { state ->
+                                    state.copy(isOpenInvite = isOpenInvite)
                                 }
 
                                 else -> {}
@@ -204,6 +210,7 @@ class ChatViewModel @Inject constructor(
         when (action) {
             is ChatRoomMenuAction.AudioCall -> {}
             is ChatRoomMenuAction.VideoCall -> {}
+            is ChatRoomMenuAction.AddParticipants -> {}
         }
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_ADD_PARTICIPANTS_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_AUDIO_CALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_VIDEO_CALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
@@ -16,6 +17,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_NOTIFICATION_MUTE
 import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_PRIVATE_ICON
 import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_USER_CHAT_STATE
+import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Rule
@@ -211,6 +213,71 @@ class ChatViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_AUDIO_CALL_ACTION).performClick()
         verifyNoInteractions(actionPressed)
+    }
+
+    @Test
+    fun `test that add participants is available when the chat is a group my permission is moderator`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                myPermission = ChatRoomPermission.Moderator
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).assertExists()
+    }
+
+    @Test
+    fun `test that add participants is available when the chat is a group and is open invite`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                isOpenInvite = true
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that add participants is not available when the chat is not a group`() {
+        initComposeRuleContent(ChatUiState(isGroup = false))
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that add participants is not available when is joining or leaving`() {
+        initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that add participants is not available when the group is not active`() {
+        initComposeRuleContent(ChatUiState(isGroup = true, isActive = false))
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that add participants is not available when the group does not open invite`() {
+        initComposeRuleContent(ChatUiState(isGroup = true, isOpenInvite = false))
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that add participants is not available when my permission is not moderator`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                myPermission = ChatRoomPermission.Standard
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).assertDoesNotExist()
     }
 
     @Test

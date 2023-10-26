@@ -113,7 +113,7 @@ private fun DropDown(
                         onActionClick(it)
                         showMoreMenu = false
                     },
-                    modifier = Modifier.testTag(it.getDescription())
+                    modifier = Modifier.testTag(it.testTag)
                 ) {
                     Text(text = it.getDescription())
                 }

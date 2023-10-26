@@ -170,7 +170,6 @@ internal class ChatViewModelTest {
 
     @Test
     fun `test that is private chat when call sdk returns chat room is not group chat`() = runTest {
-        val chatId = 123L
         val chatRoom = mock<ChatRoom> {
             on { isGroup } doReturn false
             on { ownPrivilege } doReturn ChatRoomPermission.Moderator
@@ -450,27 +449,38 @@ internal class ChatViewModelTest {
 
     @ParameterizedTest(name = " with own privilege change {0}")
     @EnumSource(ChatRoomPermission::class)
-    fun `test that my permission is updated when chat room updates`(
+    fun `test that my permission and is active is updated when chat room updates`(
         newPermission: ChatRoomPermission,
     ) = runTest {
         val chatRoom = mock<ChatRoom> {
             on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { isActive } doReturn true
         }
         val updateFlow = MutableSharedFlow<ChatRoom>()
+        val expectedIsActive = newPermission in listOf(
+            ChatRoomPermission.Moderator,
+            ChatRoomPermission.Standard,
+            ChatRoomPermission.ReadOnly,
+        )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
         initTestClass()
         underTest.state.test {
-            assertThat(awaitItem().myPermission).isEqualTo(ChatRoomPermission.Moderator)
+            val actual = awaitItem()
+            assertThat(actual.myPermission).isEqualTo(ChatRoomPermission.Moderator)
+            assertThat(actual.isActive).isTrue()
         }
         val newChatRoom = mock<ChatRoom> {
             on { ownPrivilege } doReturn newPermission
             on { changes } doReturn listOf(ChatRoomChange.OwnPrivilege)
+            on { isActive } doReturn expectedIsActive
         }
         updateFlow.emit(newChatRoom)
         underTest.state.test {
-            assertThat(awaitItem().myPermission).isEqualTo(newPermission)
+            val actual = awaitItem()
+            assertThat(actual.myPermission).isEqualTo(newPermission)
+            assertThat(actual.isActive).isEqualTo(expectedIsActive)
         }
     }
 
@@ -506,6 +516,67 @@ internal class ChatViewModelTest {
         )
         underTest.state.test {
             assertThat(awaitItem().storageState).isEqualTo(state)
+        }
+    }
+
+    @ParameterizedTest(name = " with value {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is open invite is updated when there is a valid chat room`(
+        expectedOpenInvite: Boolean
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isOpenInvite } doReturn expectedOpenInvite
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isOpenInvite).isEqualTo(expectedOpenInvite)
+        }
+    }
+
+    @ParameterizedTest(name = " with value {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is active is updated when there is a valid chat room`(
+        expectedIsActive: Boolean
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isActive } doReturn expectedIsActive
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isActive).isEqualTo(expectedIsActive)
+        }
+    }
+
+    @ParameterizedTest(name = " with value {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is open invite update when chat room update with open invite change`(
+        expectedOpenInvite: Boolean,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isOpenInvite } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Standard
+        }
+        val updateFlow = MutableSharedFlow<ChatRoom>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isOpenInvite).isTrue()
+        }
+        val newChatRoom = mock<ChatRoom> {
+            on { isOpenInvite } doReturn expectedOpenInvite
+            on { changes } doReturn listOf(ChatRoomChange.OpenInvite)
+        }
+        updateFlow.emit(newChatRoom)
+        underTest.state.test {
+            assertThat(awaitItem().isOpenInvite).isEqualTo(expectedOpenInvite)
         }
     }
 

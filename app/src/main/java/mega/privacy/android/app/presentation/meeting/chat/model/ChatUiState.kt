@@ -18,6 +18,9 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property hasACallInThisChat True if the current logged in user has a call in this chat, false otherwise.
  * @property isGroup True if is a chat group, false otherwise.
  * @property storageState [StorageState] of the chat.
+ * @property isOpenInvite True if the group is open for invitation other than moderators, false otherwise.
+ * @property isActive True if currently a member of the chatroom (for group chats), or we are contacts with the peer (for 1on1 chats), false otherwise.
+ * @property isArchived True if the chat is archived, false otherwise.
  */
 data class ChatUiState(
     val title: String? = null,
@@ -31,5 +34,7 @@ data class ChatUiState(
     val hasACallInThisChat: Boolean = false,
     val isGroup: Boolean = false,
     val storageState: StorageState = StorageState.Unknown,
+    val isOpenInvite: Boolean = false,
+    val isActive: Boolean = true,
     val isArchived: Boolean = false,
 )
