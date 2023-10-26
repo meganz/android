@@ -22,8 +22,10 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
@@ -36,6 +38,7 @@ import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScree
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
+import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -158,7 +161,8 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun handleLabel(imageNode: ImageNode) {
-        //TODO label
+        NodeLabelBottomSheetDialogFragment.newInstance(imageNode.id.longValue)
+            .show(supportFragmentManager, TAG)
     }
 
     private fun handleOpenWith(imageNode: ImageNode) {
@@ -184,11 +188,12 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun shareNode(imageNode: ImageNode) {
-        viewModel.shareImageNode(imageNode)
+        viewModel.shareImageNode(context = this, imageNode = imageNode)
     }
 
     private fun renameNode(imageNode: ImageNode) {
-        viewModel.renameImageNode(imageNode)
+        val node = MegaNode.unserialize(imageNode.serializedData)
+        MegaNodeDialogUtil.showRenameNodeDialog(this, node, this, null)
     }
 
     private fun moveNode(imageNode: ImageNode) {
@@ -265,6 +270,8 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     companion object {
+        private const val TAG = "ImagePreviewActivity"
+
         fun createIntent(
             context: Context,
             imageSource: ImagePreviewFetcherSource,

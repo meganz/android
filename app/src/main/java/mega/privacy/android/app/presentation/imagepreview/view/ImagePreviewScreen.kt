@@ -3,7 +3,6 @@
 package mega.privacy.android.app.presentation.imagepreview.view
 
 import com.google.android.exoplayer2.ui.R as RExoPlayer
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -47,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,6 +63,8 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
+import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
@@ -72,6 +74,7 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
+import nz.mega.sdk.MegaNode
 
 @Composable
 fun ImagePreviewScreen(
@@ -161,7 +164,6 @@ fun ImagePreviewScreen(
             content = { innerPadding ->
                 ImagePreviewContent(
                     innerPadding = innerPadding,
-                    getInfoText = viewModel::getInfoText,
                     modalSheetState = modalSheetState,
                     pagerState = pagerState,
                     imageNodes = imageNodes,
@@ -246,7 +248,6 @@ private fun ImagePreviewContent(
     topAppBar: @Composable (ImageNode) -> Unit,
     bottomAppBar: @Composable (ImageNode, Int) -> Unit,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
-    getInfoText: (ImageNode, Context) -> String,
     modalSheetState: ModalBottomSheetState,
     onClickVideoPlay: (ImageNode) -> Unit,
     onClickInfo: (ImageNode) -> Unit,
@@ -274,10 +275,15 @@ private fun ImagePreviewContent(
         ) { index ->
             val imageNode = imageNodes[index]
             val currentImageNodeInfo = remember(index) {
-                getInfoText(
-                    imageNode,
-                    context,
-                )
+                MegaNode.unserialize(imageNode.serializedData).getInfoText(context)
+            }
+
+            val labelColorResId = remember(index, imageNode.label) {
+                MegaNodeUtil.getNodeLabelColor(imageNode.label)
+            }
+
+            val labelColorText = remember(index, imageNode.label) {
+                MegaNodeUtil.getNodeLabelText(imageNode.label, context)
             }
 
             val imageResult by produceState<ImageResult?>(initialValue = null) {
@@ -292,6 +298,9 @@ private fun ImagePreviewContent(
                 imageName = imageNode.name,
                 imageInfo = currentImageNodeInfo,
                 isFavourite = imageNode.isFavourite,
+                showLabel = imageNode.label != MegaNode.NODE_LBL_UNKNOWN,
+                labelColor = colorResource(id = labelColorResId),
+                labelColorText = labelColorText,
                 onClickInfo = { onClickInfo(imageNode) },
                 onClickFavourite = { onClickFavourite(imageNode) },
                 onClickLabel = { onClickLabel(imageNode) },

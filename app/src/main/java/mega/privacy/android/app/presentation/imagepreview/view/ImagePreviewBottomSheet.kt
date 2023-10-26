@@ -2,11 +2,14 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
@@ -14,7 +17,9 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -52,6 +57,9 @@ internal fun ImagePreviewBottomSheet(
     imageName: String = "",
     imageInfo: String = "",
     isFavourite: Boolean = false,
+    showLabel: Boolean = false,
+    labelColorText: String = "",
+    labelColor: Color = Color.Unspecified,
     imageThumbnailPath: String? = "",
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
@@ -112,6 +120,25 @@ internal fun ImagePreviewBottomSheet(
                     text = stringResource(id = R.string.file_properties_label),
                     onActionClicked = onClickLabel,
                     addSeparator = true,
+                    trailingItem = {
+                        if (showLabel) {
+                            Row {
+                                Text(
+                                    text = labelColorText,
+                                    color = labelColor,
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(start = 4.dp)
+                                        .size(10.dp)
+                                        .background(
+                                            shape = CircleShape, color = labelColor
+                                        )
+                                )
+                            }
+                        }
+                    }
                 )
                 if (showDisputeTakeDown) {
                     MenuActionListTile(

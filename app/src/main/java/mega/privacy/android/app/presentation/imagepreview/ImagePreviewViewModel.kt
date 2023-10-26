@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -36,9 +36,9 @@ import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,6 +55,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val addFavouritesUseCase: AddFavouritesUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
+    private val exportNodeUseCase: ExportNodeUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -175,14 +176,6 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
-    fun getInfoText(
-        imageNode: ImageNode,
-        context: Context,
-    ): String {
-        val megaNode = MegaNode.unserialize(imageNode.serializedData)
-        return megaNode.getInfoText(context)
-    }
-
     /**
      * Check if transfers are paused.
      */
@@ -208,14 +201,21 @@ class ImagePreviewViewModel @Inject constructor(
 
     fun switchAvailableOffline(checked: Boolean, imageNode: ImageNode) {
         //TODO viewModel.switchNodeOfflineAvailability(nodeItem!!, requireActivity())
+        //Need to refactor rx usecase first
     }
 
-    fun shareImageNode(imageNode: ImageNode) {
-        //TODO viewModel.exportNode(node)
-    }
-
-    fun renameImageNode(imageNode: ImageNode) {
-        //TODO  ImageViewerActivity.showRenameNodeDialog(this, node, this, null)
+    fun shareImageNode(context: Context, imageNode: ImageNode) {
+        viewModelScope.launch {
+            runCatching {
+                exportNodeUseCase(imageNode.id)
+            }.onSuccess { link ->
+                if (link.isNotBlank()) {
+                    MegaNodeUtil.shareLink(context, link)
+                }
+            }.onFailure { error ->
+                Timber.e(error)
+            }
+        }
     }
 
     fun moveNode(context: Context, moveHandle: Long, toHandle: Long) {
