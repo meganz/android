@@ -48,6 +48,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.USE_CAMERA_UPLOADS_RECORDS
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
@@ -346,6 +347,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Flag to check if performance benchmark is enabled
      */
     private var performanceEnabled: Boolean = false
+
+    /**
+     * Flag to check if upload process with camera uploads records is enabled
+     */
+    private var useCameraUploadsRecordsEnabled: Boolean = false
 
     override suspend fun doWork() = coroutineScope {
         try {
@@ -707,6 +713,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun compressVideos() {
         if (compressedVideoPending()) {
             startVideoCompression()
+            cameraUploadsNotificationManagerWrapper.cancelCompressionNotification()
         }
     }
 
@@ -1156,7 +1163,10 @@ class CameraUploadsWorker @AssistedInject constructor(
         sendStatusToBackupCenter(aborted = aborted)
         cancelAllPendingTransfers()
         broadcastProgress(100, 0)
-        cameraUploadsNotificationManagerWrapper.cancelNotification()
+        with(cameraUploadsNotificationManagerWrapper) {
+            cancelNotification()
+            cancelCompressionNotification()
+        }
 
         // isStopped signals means that the worker has been cancelled from the WorkManager
         // If the process has been stopped for another reason, we can re-schedule the worker
@@ -1607,7 +1617,8 @@ class CameraUploadsWorker @AssistedInject constructor(
                 STATUS_INFO to COMPRESSION_PROGRESS,
                 CURRENT_PROGRESS to progress,
                 CURRENT_FILE_INDEX to currentFileIndex,
-                TOTAL_COUNT to totalCount
+                TOTAL_COUNT to totalCount,
+                USE_CAMERA_UPLOADS_RECORDS to useCameraUploadsRecordsEnabled,
             )
         )
     }

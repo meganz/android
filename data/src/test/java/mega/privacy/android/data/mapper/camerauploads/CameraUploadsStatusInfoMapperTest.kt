@@ -77,6 +77,7 @@ class CameraUploadsStatusInfoMapperTest {
         currentFileIndex = currentFileIndex,
         totalCount = totalCount,
         progress = progress,
+        useCameraUploadsRecords = false,
     )
 
     @BeforeAll

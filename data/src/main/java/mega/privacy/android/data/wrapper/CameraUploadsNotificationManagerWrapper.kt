@@ -21,4 +21,9 @@ interface CameraUploadsNotificationManagerWrapper {
      *  cancel camera uploads notification
      */
     fun cancelNotification()
+
+    /**
+     * cancel camera uploads compression notification
+     */
+    fun cancelCompressionNotification()
 }

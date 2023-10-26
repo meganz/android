@@ -187,6 +187,8 @@ abstract class UtilWrapperModule {
                 override fun cancelNotification() =
                     cameraUploadsNotificationManager.cancelNotification()
 
+                override fun cancelCompressionNotification() =
+                    cameraUploadsNotificationManager.cancelCompressionNotification()
             }
 
         /**

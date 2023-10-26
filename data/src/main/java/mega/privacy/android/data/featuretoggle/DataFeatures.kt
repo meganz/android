@@ -21,6 +21,14 @@ enum class DataFeatures(
     CameraUploadsPerformance(
         "Enable Camera Uploads Performance benchmark",
         false
+    ),
+
+    /**
+     * Use new camera uploads records
+     */
+    UseCameraUploadsRecords(
+        "Use Camera Uploads Records",
+        false
     );
 
     companion object : FeatureFlagValueProvider {

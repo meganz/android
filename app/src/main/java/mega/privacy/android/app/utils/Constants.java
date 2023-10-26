@@ -358,6 +358,10 @@ public class Constants {
     public static final int NOTIFICATION_CHAT_UPLOAD = 15;
     public static final int NOTIFICATION_UPLOAD_FOLDER = 16;
     public static final int NOTIFICATION_NOT_ENOUGH_STORAGE = 17;
+    public static final int NOTIFICATION_VIDEO_COMPRESSION = 18;
+    public static final int NOTIFICATION_CAMERA_UPLOADS_PRIMARY_FOLDER_UNAVAILABLE = 19;
+    public static final int NOTIFICATION_CAMERA_UPLOADS_SECONDARY_FOLDER_UNAVAILABLE = 20;
+    public static final int NOTIFICATION_COMPRESSION_ERROR = 21;
 
     public static final int SUCCESSFUL_VOICE_CLIP_TRANSFER = 1;
     public static final int ERROR_VOICE_CLIP_TRANSFER = 2;

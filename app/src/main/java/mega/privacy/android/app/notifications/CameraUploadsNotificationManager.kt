@@ -37,14 +37,24 @@ class CameraUploadsNotificationManager @Inject constructor(
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID
         private const val NOTIFICATION_CHANNEL_NAME =
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME
-        private const val NOTIFICATION_ID = Constants.NOTIFICATION_CAMERA_UPLOADS
-        private const val PRIMARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID = 1908
-        private const val SECONDARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID = 1909
-        private const val COMPRESSION_ERROR_NOTIFICATION_ID = 1910
+        private const val NOTIFICATION_ID =
+            Constants.NOTIFICATION_CAMERA_UPLOADS
+        private const val COMPRESSION_NOTIFICATION_ID =
+            Constants.NOTIFICATION_VIDEO_COMPRESSION
+        private const val PRIMARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID =
+            Constants.NOTIFICATION_CAMERA_UPLOADS_PRIMARY_FOLDER_UNAVAILABLE
+        private const val SECONDARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID =
+            Constants.NOTIFICATION_CAMERA_UPLOADS_SECONDARY_FOLDER_UNAVAILABLE
+        private const val COMPRESSION_ERROR_NOTIFICATION_ID =
+            Constants.NOTIFICATION_COMPRESSION_ERROR
         private const val NOT_ENOUGH_STORAGE_NOTIFICATION_ID =
             Constants.NOTIFICATION_NOT_ENOUGH_STORAGE
         private const val OVER_STORAGE_QUOTA_NOTIFICATION_ID =
             Constants.NOTIFICATION_STORAGE_OVERQUOTA
+
+        private const val ACTION_CANCEL_CAM_SYNC = Constants.ACTION_CANCEL_CAM_SYNC
+        private const val ACTION_SHOW_SETTINGS = Constants.ACTION_SHOW_SETTINGS
+        private const val ACTION_OVER_QUOTA_STORAGE = Constants.ACTION_OVERQUOTA_STORAGE
     }
 
     /**
@@ -56,11 +66,11 @@ class CameraUploadsNotificationManager @Inject constructor(
 
     /**
      * Default notification pending intent
-     * that will redirect to the manager activity with a [Constants.ACTION_CANCEL_CAM_SYNC] action
+     * that will redirect to the manager activity with a [ACTION_CANCEL_CAM_SYNC] action
      */
     private val defaultPendingIntent: PendingIntent by lazy {
         Intent(context, ManagerActivity::class.java).apply {
-            action = Constants.ACTION_CANCEL_CAM_SYNC
+            action = ACTION_CANCEL_CAM_SYNC
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
         }.let {
@@ -96,6 +106,7 @@ class CameraUploadsNotificationManager @Inject constructor(
                 progress = cameraUploadsStatusInfo.progress,
                 currentFileIndex = cameraUploadsStatusInfo.currentFileIndex,
                 totalCount = cameraUploadsStatusInfo.totalCount,
+                useCameraUploadsRecords = cameraUploadsStatusInfo.useCameraUploadsRecords,
             )
         }
     }
@@ -174,6 +185,7 @@ class CameraUploadsNotificationManager @Inject constructor(
         progress: Int,
         currentFileIndex: Int,
         totalCount: Int,
+        useCameraUploadsRecords: Boolean,
     ) {
         val content = context.getString(
             R.string.title_compress_video,
@@ -189,7 +201,10 @@ class CameraUploadsNotificationManager @Inject constructor(
             isOngoing = true,
             progress = progress,
         )
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(
+            if (useCameraUploadsRecords) COMPRESSION_NOTIFICATION_ID else NOTIFICATION_ID,
+            notification
+        )
     }
 
     /**
@@ -217,7 +232,7 @@ class CameraUploadsNotificationManager @Inject constructor(
                 context,
                 0,
                 Intent(context, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_OVERQUOTA_STORAGE
+                    action = ACTION_OVER_QUOTA_STORAGE
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ),
@@ -278,7 +293,7 @@ class CameraUploadsNotificationManager @Inject constructor(
                 context,
                 0,
                 Intent(context, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_SHOW_SETTINGS
+                    action = ACTION_SHOW_SETTINGS
                 },
                 PendingIntent.FLAG_IMMUTABLE
             ),
@@ -316,7 +331,7 @@ class CameraUploadsNotificationManager @Inject constructor(
                     context,
                     0,
                     Intent(context, ManagerActivity::class.java).apply {
-                        action = Constants.ACTION_SHOW_SETTINGS
+                        action = ACTION_SHOW_SETTINGS
                     },
                     PendingIntent.FLAG_IMMUTABLE
                 ),
@@ -366,6 +381,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             cancel(COMPRESSION_ERROR_NOTIFICATION_ID)
             cancel(NOT_ENOUGH_STORAGE_NOTIFICATION_ID)
             cancel(OVER_STORAGE_QUOTA_NOTIFICATION_ID)
+            cancel(COMPRESSION_NOTIFICATION_ID)
         }
     }
 
@@ -375,4 +391,12 @@ class CameraUploadsNotificationManager @Inject constructor(
     fun cancelNotification() {
         notificationManager.cancel(NOTIFICATION_ID)
     }
+
+    /**
+     * Dismiss compression progress notification
+     */
+    fun cancelCompressionNotification() {
+        notificationManager.cancel(COMPRESSION_NOTIFICATION_ID)
+    }
+
 }
