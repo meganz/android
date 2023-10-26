@@ -27,6 +27,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,11 +42,15 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.BaseMegaAppBar
 import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarElevation
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBarColors
+import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.core.ui.model.MenuActionString
+import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -54,9 +59,9 @@ import mega.privacy.android.core.ui.theme.darkColorPalette
 
 /**
  * Scaffold wrapper that includes a collapsible header that includes the status bar and will be fade out when collapsed.
- * @param headerBelowAppBar a Composable for the header to be drawn below the app bar. If set, it's assumed that it will have dark content and values for Local providers such as LocalMegaAppBarElevation or LocalMegaAppBarColors will be set to transition the app bar from transparent with light content when expanded to an ordinary app bar when collapsed
+ * @param headerBelowAppBar a Composable for the header to be drawn below the app bar. If set, it's assumed that it will have dark content and values for Local providers such as LocalMegaAppBarElevation or LocalMegaAppBarColors will be set to transition the app bar from transparent with light content when expanded to an ordinary app bar when collapsed. Please notice that automation tool (appium) doesn't see anything behind a scaffold, so anything here won't be visible to appium, consider using [headerAboveAppBar] for this.
  * @param topBar top app bar of the screen. Consider using [MegaAppBarForCollapsibleHeader] to have an animated title.
- * @param headerAboveAppBar a Composable for the header to be drawn above the app bar. Usually have a transparent background to don't completely hide the [topBar]. Consider using [CollapsibleHeader] to have an animated title.
+ * @param headerAboveAppBar a Composable for the header to be drawn above the app bar. Usually have a transparent background to don't completely hide the [topBar]. Consider using [CollapsibleHeaderWithTitle] to have an animated title.
  * @param modifier the [Modifier] to be applied to the layout
  * @param snackbarHost component to host [Snackbar]s that are pushed to be shown via
  * @param content content of your screen.
@@ -138,6 +143,16 @@ fun ScaffoldWithCollapsibleHeader(
                 }
             }
         }
+        val collapsibleHeaderTitleTransition by remember {
+            derivedStateOf {
+                //The offset is 0 when it's collapsed, and it grows half of the expansion when expanded.
+                val offset =
+                    ((headerHeight - headerGoneHeight(statusBarHeight)) * 0.5f).coerceAtLeast(0f).dp
+                // alpha transition will be done in last 20dp
+                val alpha = (offset / 20.dp).coerceIn(0f, 1f)
+                CollapsibleHeaderTitleTransition(offset, alpha)
+            }
+        }
 
         //set the status bar color to match toolbar color
         if (!LocalView.current.isInEditMode) {
@@ -155,15 +170,22 @@ fun ScaffoldWithCollapsibleHeader(
         }
 
         //draw the composables
-        headerBelowAppBar?.let {
-            if (headerAlpha > 0) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(headerHeight.dp)
-                        .alpha(headerAlpha)
+        if (headerBelowAppBar != null && headerAlpha > 0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(headerHeight.dp)
+                    .alpha(headerAlpha)
+            ) {
+                CompositionLocalProvider(
+                    LocalMegaAppBarColors provides MegaAppBarColors(
+                        iconsTintColor = iconTintColor,
+                        titleColor = titleColor,
+                        backgroundAlpha = topBarBackgroundAlpha,
+                    ),
+                    LocalCollapsibleHeaderTitleTransition provides collapsibleHeaderTitleTransition,
                 ) {
-                    it()
+                    headerBelowAppBar()
                 }
             }
         }
@@ -177,7 +199,8 @@ fun ScaffoldWithCollapsibleHeader(
                         titleColor = titleColor,
                         backgroundAlpha = topBarBackgroundAlpha,
                     ),
-                    LocalMegaAppBarElevation provides elevation
+                    LocalMegaAppBarElevation provides elevation,
+                    LocalCollapsibleHeaderTitleTransition provides collapsibleHeaderTitleTransition,
                 ) {
                     topBar()
                 }
@@ -201,22 +224,34 @@ fun ScaffoldWithCollapsibleHeader(
                 }
             }
         }
-        headerAboveAppBar?.let {
-            if (headerAlpha > 0) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(headerHeight.dp)
-                        .alpha(headerAlpha)
+        if (headerAboveAppBar != null && headerAlpha > 0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(headerHeight.dp)
+                    .alpha(collapsibleHeaderTitleTransition.expandedAlpha)
+            ) {
+                CompositionLocalProvider(
+                    LocalMegaAppBarColors provides MegaAppBarColors(
+                        iconsTintColor = iconTintColor,
+                        titleColor = titleColor,
+                        backgroundAlpha = topBarBackgroundAlpha,
+                    ),
+                    LocalCollapsibleHeaderTitleTransition provides collapsibleHeaderTitleTransition,
                 ) {
-                    it()
+                    headerAboveAppBar()
                 }
             }
         }
     }
 }
 
-private const val APP_BAR_HEIGHT = 56f
+internal data class CollapsibleHeaderTitleTransition(val offset: Dp, val expandedAlpha: Float)
+
+internal val LocalCollapsibleHeaderTitleTransition =
+    compositionLocalOf { CollapsibleHeaderTitleTransition(0.dp, 1f) }
+
+internal const val APP_BAR_HEIGHT = 56f
 private fun headerMinHeight(statusBarHeight: Float) = APP_BAR_HEIGHT + statusBarHeight
 private fun headerMaxHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 96f
 private fun headerStartGoneHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 76f
@@ -242,6 +277,7 @@ private fun CollapsableAppBarScaffoldPreview(
     @PreviewParameter(BooleanProvider::class) hasHeaderBelowAppbar: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
+        val title = "Title very long that can take up to 3 lines when the header is expanded"
         ScaffoldWithCollapsibleHeader(
             headerBelowAppBar = if (!hasHeaderBelowAppbar) null else {
                 @Composable {
@@ -260,16 +296,24 @@ private fun CollapsableAppBarScaffoldPreview(
                 }
             },
             topBar = {
-                BaseMegaAppBar(appBarType = AppBarType.MENU, title = "Title")
+                BaseMegaAppBar(
+                    appBarType = AppBarType.MENU,
+                    title = title,
+                    actions = getSampleToolbarActions()
+                )
             },
             headerAboveAppBar = {
-                Text(
-                    text = "Header above app bar",
-                    color = MegaTheme.colors.text.primary,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 16.dp)
-                )
+                CollapsibleHeaderWithTitle(title = title) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = "Header above app bar",
+                            color = MegaTheme.colors.text.primary,
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(start = 16.dp)
+                        )
+                    }
+                }
             },
         ) {
             Column(
@@ -285,3 +329,8 @@ private fun CollapsableAppBarScaffoldPreview(
         }
     }
 }
+
+private fun getSampleToolbarActions(): List<MenuAction> = listOf(
+    object : MenuActionString(R.drawable.ic_alert_circle, R.string.password_text, "circle") {},
+    object : MenuActionWithoutIcon(R.string.password_text, "password") {},
+)

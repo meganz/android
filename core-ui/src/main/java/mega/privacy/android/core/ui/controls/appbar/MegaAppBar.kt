@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +29,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -37,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.layouts.LocalCollapsibleHeaderTitleTransition
 import mega.privacy.android.core.ui.controls.menus.MenuActions
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -137,12 +140,11 @@ internal fun BaseMegaAppBar(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    Text(
-                        text = title,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = LocalMegaAppBarColors.current.titleColor,
-                        style = MaterialTheme.typography.subtitle1,
+                    MegaAppBarTitle(
+                        title,
+                        modifier = Modifier
+                            .offset(y = LocalCollapsibleHeaderTitleTransition.current.offset)
+                            .alpha(1 - LocalCollapsibleHeaderTitleTransition.current.expandedAlpha)
                     )
                     CompositionLocalProvider(
                         LocalContentColor provides MegaTheme.colors.icon.secondary,
@@ -217,6 +219,17 @@ internal fun BaseMegaAppBar(
         elevation = elevation
     )
 }
+
+@Composable
+internal fun MegaAppBarTitle(title: String, modifier: Modifier = Modifier, maxLines: Int = 1) =
+    Text(
+        text = title,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        color = LocalMegaAppBarColors.current.titleColor,
+        style = MaterialTheme.typography.subtitle1,
+        modifier = modifier
+    )
 
 @Composable
 private fun NavigationIcon(
