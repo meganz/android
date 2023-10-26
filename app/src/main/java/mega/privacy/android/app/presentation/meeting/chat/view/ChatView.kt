@@ -205,12 +205,24 @@ private fun checkStorageState(context: Context, storageState: StorageState): Boo
 }
 
 @Composable
-private fun getSubtitle(uiState: ChatUiState): String? {
-    if (uiState.isArchived) {
-        return stringResource(id = R.string.archived_chat)
-    }
+private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
+    when {
+        isArchived -> {
+            stringResource(id = R.string.archived_chat)
+        }
 
-    return null
+        myPermission == ChatRoomPermission.ReadOnly -> {
+            stringResource(id = R.string.observer_permission_label_participants_panel)
+        }
+
+        myPermission == ChatRoomPermission.Removed -> {
+            stringResource(id = R.string.inactive_chat)
+        }
+
+        else -> {
+            null
+        }
+    }
 }
 
 @Preview

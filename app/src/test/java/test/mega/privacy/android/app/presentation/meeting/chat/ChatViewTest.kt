@@ -330,6 +330,42 @@ class ChatViewTest {
             .assertDoesNotExist()
     }
 
+    @Test
+    fun `test that read only label shown when in a chat I have read only permission`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.ReadOnly
+            )
+        )
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.observer_permission_label_participants_panel))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that ready only label does not show in a chat I do not have read only permission`() {
+        initComposeRuleContent(ChatUiState())
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.observer_permission_label_participants_panel))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that inactive label shown when in a chat I have read only permission`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Removed
+            )
+        )
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.inactive_chat))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that inactive label does not show in a chat I do not have read only permission`() {
+        initComposeRuleContent(ChatUiState())
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.inactive_chat))
+            .assertDoesNotExist()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(
