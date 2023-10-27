@@ -5,11 +5,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import javax.inject.Inject
 
 /**
  * Open with menu action
  */
-class OpenWithMenuAction : MenuActionWithIcon {
+class OpenWithMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_open_with)
 

@@ -5,11 +5,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import javax.inject.Inject
 
 /**
  * Versions menu action
  */
-class VersionsMenuAction : MenuActionWithIcon {
+class VersionsMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_g_version)
 
