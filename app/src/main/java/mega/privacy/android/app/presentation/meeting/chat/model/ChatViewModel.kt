@@ -156,6 +156,14 @@ class ChatViewModel @Inject constructor(
                                     state.copy(isOpenInvite = isOpenInvite)
                                 }
 
+                                ChatRoomChange.Closed -> _state.update { state ->
+                                    state.copy(myPermission = ownPrivilege, isActive = isActive)
+                                }
+
+                                ChatRoomChange.Archive -> _state.update { state ->
+                                    state.copy(isArchived = isArchived)
+                                }
+
                                 else -> {}
                             }
                         }

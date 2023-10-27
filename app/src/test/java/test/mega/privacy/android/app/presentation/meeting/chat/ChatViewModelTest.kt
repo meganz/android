@@ -522,7 +522,7 @@ internal class ChatViewModelTest {
     @ParameterizedTest(name = " with value {0}")
     @ValueSource(booleans = [true, false])
     fun `test that is open invite is updated when there is a valid chat room`(
-        expectedOpenInvite: Boolean
+        expectedOpenInvite: Boolean,
     ) = runTest {
         val chatRoom = mock<ChatRoom> {
             on { isOpenInvite } doReturn expectedOpenInvite
@@ -539,7 +539,7 @@ internal class ChatViewModelTest {
     @ParameterizedTest(name = " with value {0}")
     @ValueSource(booleans = [true, false])
     fun `test that is active is updated when there is a valid chat room`(
-        expectedIsActive: Boolean
+        expectedIsActive: Boolean,
     ) = runTest {
         val chatRoom = mock<ChatRoom> {
             on { isActive } doReturn expectedIsActive
@@ -580,10 +580,67 @@ internal class ChatViewModelTest {
         }
     }
 
+    @Test
+    fun `test that my permission and is active update when chat room update with closed change`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { isActive } doReturn true
+                on { ownPrivilege } doReturn ChatRoomPermission.Standard
+            }
+            val updateFlow = MutableSharedFlow<ChatRoom>()
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+            initTestClass()
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.isActive).isTrue()
+                assertThat(actual.myPermission).isEqualTo(ChatRoomPermission.Standard)
+            }
+            val newChatRoom = mock<ChatRoom> {
+                on { isActive } doReturn false
+                on { ownPrivilege } doReturn ChatRoomPermission.Removed
+                on { changes } doReturn listOf(ChatRoomChange.Closed)
+            }
+            updateFlow.emit(newChatRoom)
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.isActive).isFalse()
+                assertThat(actual.myPermission).isEqualTo(ChatRoomPermission.Removed)
+            }
+        }
+
+    @ParameterizedTest(name = " with value {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is archived update when chat room update with archived change`(
+        expectedArchived: Boolean,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isArchived } doReturn false
+            on { ownPrivilege } doReturn ChatRoomPermission.Standard
+        }
+        val updateFlow = MutableSharedFlow<ChatRoom>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isArchived).isFalse()
+        }
+        val newChatRoom = mock<ChatRoom> {
+            on { isArchived } doReturn expectedArchived
+            on { changes } doReturn listOf(ChatRoomChange.Archive)
+        }
+        updateFlow.emit(newChatRoom)
+        underTest.state.test {
+            assertThat(awaitItem().isArchived).isEqualTo(expectedArchived)
+        }
+    }
+
     @ParameterizedTest(name = " with isArchived {0}")
     @ValueSource(booleans = [true, false])
     fun `test that archive update when we passing the chatId`(
-        isArchived: Boolean
+        isArchived: Boolean,
     ) = runTest {
         val chatRoom = mock<ChatRoom> {
             on { this.isArchived } doReturn isArchived
