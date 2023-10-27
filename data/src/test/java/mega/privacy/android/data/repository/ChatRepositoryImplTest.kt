@@ -8,7 +8,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -32,7 +34,9 @@ import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.RichPreviewMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ConnectionState
@@ -96,6 +100,8 @@ class ChatRepositoryImplTest {
     private val appEventGateway = mock<AppEventGateway>()
     private val chatHistoryLoadStatusMapper = mock<ChatHistoryLoadStatusMapper>()
     private val chatPreviewMapper = mock<ChatPreviewMapper>()
+    private val databaseHandler = mock<DatabaseHandler>()
+    private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
 
     @Before
     fun setUp() {
@@ -121,6 +127,8 @@ class ChatRepositoryImplTest {
             chatInitStateMapper = chatInitStateMapper,
             pendingMessageListMapper = mock(),
             chatPreviewMapper = chatPreviewMapper,
+            databaseHandler = databaseHandler,
+            megaLocalRoomGateway = megaLocalRoomGateway,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)
@@ -521,4 +529,61 @@ class ChatRepositoryImplTest {
         whenever(chatPreviewMapper(any(), any())).thenReturn(chatPreview)
         assertThat(underTest.openChatPreview(link)).isEqualTo(chatPreview)
     }
+
+
+    @Test
+    fun `test that first name returns correctly when calling from contact database`() = runTest {
+        val handle = 123L
+        val contact = Contact(
+            email = "email",
+            firstName = "firstName",
+            lastName = "lastName",
+            nickname = "nickname",
+            userId = handle,
+        )
+        whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(contact)
+        assertThat(underTest.getParticipantFirstName(handle)).isEqualTo(contact.nickname)
+    }
+
+    @Test
+    fun `test that first name returns correctly when calling from non-contact database`() =
+        runTest {
+            val handle = 123L
+            val nonContact = NonContactInfo(
+                handle.toString(),
+                "fullName",
+                "firstName",
+                "lastName",
+                "email",
+            )
+            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
+            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(
+                nonContact
+            )
+            assertThat(underTest.getParticipantFirstName(handle)).isEqualTo(nonContact.firstName)
+        }
+
+    @Test
+    fun `test that first name returns correctly when calling from first name sdk cache`() =
+        runTest {
+            val handle = 123L
+            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
+            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaChatApiGateway.getUserFirstnameFromCache(handle)).thenReturn("firstName")
+            whenever(megaChatApiGateway.getUserLastnameFromCache(handle)).thenReturn("lastName")
+            whenever(megaChatApiGateway.getUserEmailFromCache(handle)).thenReturn("email")
+            assertThat(underTest.getParticipantFirstName(handle)).isEqualTo("firstName")
+        }
+
+    @Test
+    fun `test that first name returns correctly when calling from last name sdk cache`() =
+        runTest {
+            val handle = 123L
+            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
+            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaChatApiGateway.getUserFirstnameFromCache(handle)).thenReturn(null)
+            whenever(megaChatApiGateway.getUserLastnameFromCache(handle)).thenReturn("lastName")
+            whenever(megaChatApiGateway.getUserEmailFromCache(handle)).thenReturn("email")
+            assertThat(underTest.getParticipantFirstName(handle)).isEqualTo("lastName")
+        }
 }

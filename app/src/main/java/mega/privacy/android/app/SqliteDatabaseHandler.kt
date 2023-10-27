@@ -30,8 +30,8 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.chat.PendingMessage
@@ -1137,7 +1137,7 @@ class SqliteDatabaseHandler @Inject constructor(
         return rows
     }
 
-    override fun findNonContactByHandle(handle: String?): NonContactInfo? {
+    override fun findNonContactByHandle(handle: String): NonContactInfo? {
         Timber.d("findNONContactByHandle: %s", handle)
         val selectQuery =
             "SELECT * FROM $TABLE_NON_CONTACTS WHERE $KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'"

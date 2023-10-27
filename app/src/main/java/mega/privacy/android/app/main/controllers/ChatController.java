@@ -1075,6 +1075,7 @@ public class ChatController {
     }
 
     /**
+     * Use [GetParticipantFirstNameUseCase] instead.
      * Gets the participant's first name.
      * If the participant has an alias, it returns the alias.
      * If the participant has a first name, it returns the first name.
@@ -1084,6 +1085,7 @@ public class ChatController {
      * @param userHandle participant's identifier
      * @return The participant's first name
      */
+    @Deprecated
     public String getParticipantFirstName(long userHandle) {
         String firstName = getFirstNameDB(userHandle);
 

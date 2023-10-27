@@ -687,4 +687,12 @@ interface ChatRepository {
      * @return True if there is a call in a chatroom. False in other case
      */
     suspend fun hasCallInChatRoom(chatId: Long): Boolean
+
+    /**
+     * Get participant first name
+     *
+     * @param handle
+     * @return first name of the participant
+     */
+    suspend fun getParticipantFirstName(handle: Long): String?
 }
