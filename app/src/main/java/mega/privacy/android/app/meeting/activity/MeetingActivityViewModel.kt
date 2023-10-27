@@ -61,11 +61,13 @@ import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.CreateChatLink
@@ -374,25 +376,47 @@ class MeetingActivityViewModel @Inject constructor(
         runCatching {
             getChatCall(_state.value.chatId)
         }.onSuccess { call ->
-            call?.apply {
+            call?.let {
+                checkEphemeralAccountAndWaitingRoom(it)
+            }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Check ephemeral account and waiting room
+     *
+     * @param call  [ChatCall]
+     */
+    private fun checkEphemeralAccountAndWaitingRoom(call: ChatCall) {
+        call.apply {
+            checkEphemeralAccount()
+            waitingRoom?.let { waitingRoom ->
                 _state.update {
                     it.copy(
-                        isGuest = isEphemeralPlusPlusUseCase(),
+                        usersInWaitingRoomIDs = waitingRoom.peers ?: emptyList()
                     )
                 }
-                waitingRoom?.let { waitingRoom ->
-                    _state.update {
-
-                        it.copy(
-                            usersInWaitingRoomIDs = waitingRoom.peers ?: emptyList()
-                        )
-                    }
-
-                    if (state.value.usersInWaitingRoomIDs.isNotEmpty()) {
-                        updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
-                    }
-                    checkParticipantLists()
+                if (state.value.usersInWaitingRoomIDs.isNotEmpty()) {
+                    updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
                 }
+                checkParticipantLists()
+            }
+        }
+    }
+
+    /**
+     * Check ephemeral account
+     */
+    private fun checkEphemeralAccount() = viewModelScope.launch {
+        runCatching {
+            isEphemeralPlusPlusUseCase()
+        }.onSuccess { isEphemeralAccount ->
+            _state.update {
+                it.copy(
+                    isGuest = isEphemeralAccount,
+                )
             }
         }.onFailure { exception ->
             Timber.e(exception)
@@ -408,6 +432,12 @@ class MeetingActivityViewModel @Inject constructor(
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
                     call.changes?.apply {
+                        if (contains(ChatCallChanges.Status)) {
+                            if (call.status == ChatCallStatus.InProgress) {
+                                checkEphemeralAccountAndWaitingRoom(call)
+                            }
+
+                        }
                         if (contains(ChatCallChanges.LocalAVFlags)) {
                             val isEnable = call.hasLocalAudio
                             _micLiveData.value = isEnable
@@ -1314,7 +1344,7 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Show or hide remove participant dialog
      */
-    fun showOrHideRemoveParticipantDialog(shouldShowDialog:Boolean) =
+    fun showOrHideRemoveParticipantDialog(shouldShowDialog: Boolean) =
         _state.update { state ->
             state.copy(
                 removeParticipantDialog = shouldShowDialog,
