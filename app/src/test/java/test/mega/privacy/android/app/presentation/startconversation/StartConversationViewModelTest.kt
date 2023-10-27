@@ -18,7 +18,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.startconversation.StartConversationViewModel
-import mega.privacy.android.core.ui.model.SearchWidgetState
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus

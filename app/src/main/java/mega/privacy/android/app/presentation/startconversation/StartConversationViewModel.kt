@@ -19,7 +19,7 @@ import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
-import mega.privacy.android.core.ui.model.SearchWidgetState
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.AddNewContacts

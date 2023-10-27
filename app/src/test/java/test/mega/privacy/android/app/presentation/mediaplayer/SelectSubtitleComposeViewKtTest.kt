@@ -12,7 +12,7 @@ import mega.privacy.android.app.mediaplayer.Constants.SUBTITLE_FILES_TEST_TAG
 import mega.privacy.android.app.mediaplayer.SelectSubtitleView
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
-import mega.privacy.android.core.ui.model.SearchWidgetState
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import org.junit.Rule
 import org.junit.Test

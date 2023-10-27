@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.startconversation.model
 
-import mega.privacy.android.core.ui.model.SearchWidgetState
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactItem
 
 /**

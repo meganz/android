@@ -27,11 +27,11 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.chat.archived.model.ArchivedChatsState
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.chat.list.view.ChatListView
-import mega.privacy.android.core.ui.controls.appbar.LegacySearchAppBar
-import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 /**
  * Archived chats view

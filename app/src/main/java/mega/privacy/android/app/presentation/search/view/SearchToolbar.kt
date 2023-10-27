@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.search.view
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.appbar.ExpandedSearchAppBar
+import mega.privacy.android.legacy.core.ui.controls.appbar.ExpandedSearchAppBar
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews

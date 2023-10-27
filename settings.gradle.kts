@@ -58,3 +58,4 @@ buildCache {
         isEnabled = isServerBuild()
     }
 }
+include(":legacy-core-ui")

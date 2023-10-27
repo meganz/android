@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.model
+package mega.privacy.android.legacy.core.ui.model
 
 /**
  * Search widget state.

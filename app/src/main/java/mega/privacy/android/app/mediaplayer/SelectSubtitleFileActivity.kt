@@ -12,10 +12,10 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.INTENT_KEY_SUBTITLE_FILE_INFO
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.AddSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.CancelSelectSubtitlePressedEvent
 import javax.inject.Inject

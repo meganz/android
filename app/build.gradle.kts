@@ -294,6 +294,7 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":domain"))
     implementation(project(":core-ui"))
+    implementation(project(":legacy-core-ui"))
     implementation(project(":data"))
     implementation(project(":navigation"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")

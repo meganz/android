@@ -58,11 +58,11 @@ import mega.privacy.android.app.mediaplayer.Constants.SELECTED_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.mediaplayer.Constants.SUBTITLE_FILES_TEST_TAG
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
-import mega.privacy.android.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import timber.log.Timber
 
 internal object Constants {
