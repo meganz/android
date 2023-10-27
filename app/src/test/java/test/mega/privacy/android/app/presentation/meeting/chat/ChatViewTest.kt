@@ -366,6 +366,39 @@ class ChatViewTest {
             .assertDoesNotExist()
     }
 
+    @Test
+    fun `test that online label shows if the chat is 1to1 and the contacts status is online`() {
+        initComposeRuleContent(ChatUiState(isGroup = false, userChatStatus = UserChatStatus.Online))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.online_status))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that away label shows if the chat is 1to1 and the contacts status is away`() {
+        initComposeRuleContent(ChatUiState(isGroup = false, userChatStatus = UserChatStatus.Away))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.away_status))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that busy label shows if the chat is 1to1 and the contacts status is busy`() {
+        initComposeRuleContent(ChatUiState(isGroup = false, userChatStatus = UserChatStatus.Busy))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.busy_status))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that offline label shows if the chat is 1to1 and the contacts status is offline`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = false,
+                userChatStatus = UserChatStatus.Offline
+            )
+        )
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.offline_status))
+            .assertIsDisplayed()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(

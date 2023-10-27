@@ -36,6 +36,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.extensions.isValid
+import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.vectorRes
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
@@ -217,6 +218,10 @@ private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
 
         myPermission == ChatRoomPermission.Removed -> {
             stringResource(id = R.string.inactive_chat)
+        }
+
+        !isGroup && userChatStatus?.isValid() == true -> {
+            stringResource(id = userChatStatus.text)
         }
 
         else -> {
