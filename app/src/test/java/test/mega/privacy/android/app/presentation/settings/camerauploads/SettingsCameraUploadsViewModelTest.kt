@@ -6,7 +6,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -74,57 +73,46 @@ import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 /**
  * Test class for [SettingsCameraUploadsViewModel]
  */
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SettingsCameraUploadsViewModelTest {
 
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
-    private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase> {
-        onBlocking { invoke() }.thenReturn(true)
-    }
-    private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase> {
-        onBlocking { invoke() }.thenReturn(true)
-    }
-    private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase> {
-        onBlocking { invoke() }.thenReturn(true)
-    }
+    private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
+    private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
+    private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
-    private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase> {
-        onBlocking { invoke() }.thenReturn("/path/to/CU")
-    }
-    private val getUploadOptionUseCase = mock<GetUploadOptionUseCase> {
-        onBlocking { invoke() }.thenReturn(UploadOption.PHOTOS_AND_VIDEOS)
-    }
-    private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase> {
-        onBlocking { invoke() }.thenReturn(VideoQuality.ORIGINAL)
-    }
-    private val getVideoCompressionSizeLimitUseCase = mock<GetVideoCompressionSizeLimitUseCase> {
-        onBlocking { invoke() }.thenReturn(200)
-    }
-    private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase> {
-        onBlocking { invoke() }.thenReturn(true)
-    }
+    private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
+    private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
+    private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
+    private val getVideoCompressionSizeLimitUseCase = mock<GetVideoCompressionSizeLimitUseCase>()
+    private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase =
-        mock<IsChargingRequiredForVideoCompressionUseCase> {
-            onBlocking { invoke() }.thenReturn(true)
-        }
-    private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(true)
-    }
+        mock<IsChargingRequiredForVideoCompressionUseCase>()
+    private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
@@ -148,9 +136,7 @@ class SettingsCameraUploadsViewModelTest {
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
     private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
-    private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase> {
-        onBlocking { invoke() }.thenReturn(true)
-    }
+    private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
     private val monitorCameraUploadsSettingsActionsUseCase =
         mock<MonitorCameraUploadsSettingsActionsUseCase>()
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase = mock()
@@ -162,56 +148,91 @@ class SettingsCameraUploadsViewModelTest {
         mock()
     private val broadcastBusinessAccountExpiredUseCase =
         mock<BroadcastBusinessAccountExpiredUseCase>()
-    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock {
-        onBlocking { invoke() }.thenReturn(1L)
-    }
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
-    private val isSecondaryFolderEnabledUseCase: IsSecondaryFolderEnabled = mock {
-        onBlocking { invoke() }.thenReturn(true)
-    }
-    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock {
-        onBlocking { invoke() }.thenReturn(true)
-    }
-    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock {
-        onBlocking { invoke() }.thenReturn(2L)
-    }
-    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock {
-        onBlocking { invoke() }.thenReturn("Path/to/MU")
-    }
+    private val isSecondaryFolderEnabledUseCase: IsSecondaryFolderEnabled = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock()
     private val setupMediaUploadsSyncHandleUseCase: SetupMediaUploadsSyncHandleUseCase = mock()
-    private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase = mock {
-        onBlocking { invoke(any()) }.thenReturn(true)
-    }
+    private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase = mock()
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase = mock()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            isCameraUploadsEnabledUseCase,
+            areLocationTagsEnabledUseCase,
+            areUploadFileNamesKeptUseCase,
+            checkEnableCameraUploadsStatus,
+            clearCacheDirectory,
+            disableMediaUploadSettings,
+            getPrimaryFolderPathUseCase,
+            getUploadOptionUseCase,
+            getUploadVideoQualityUseCase,
+            getVideoCompressionSizeLimitUseCase,
+            isCameraUploadsByWifiUseCase,
+            isChargingRequiredForVideoCompressionUseCase,
+            isPrimaryFolderPathValidUseCase,
+            preparePrimaryFolderPathUseCase,
+            resetCameraUploadTimeStamps,
+            resetMediaUploadTimeStamps,
+            restorePrimaryTimestamps,
+            restoreSecondaryTimestamps,
+            setCameraUploadsByWifiUseCase,
+            setChargingRequiredForVideoCompressionUseCase,
+            setDefaultPrimaryFolderPathUseCase,
+            setLocationTagsEnabledUseCase,
+            setPrimaryFolderPathUseCase,
+            setUploadFileNamesKeptUseCase,
+            setUploadOptionUseCase,
+            setUploadVideoQualityUseCase,
+            setUploadVideoSyncStatusUseCase,
+            setVideoCompressionSizeLimitUseCase,
+            setupDefaultSecondaryFolderUseCase,
+            setupPrimaryFolderUseCase,
+            setupSecondaryFolderUseCase,
+            startCameraUploadUseCase,
+            stopCameraUploadsUseCase,
+            rescheduleCameraUploadUseCase,
+            stopCameraUploadAndHeartbeatUseCase,
+            hasMediaPermissionUseCase,
+            monitorCameraUploadsSettingsActionsUseCase,
+            isConnectedToInternetUseCase,
+            setupCameraUploadsSettingUseCase,
+            setupMediaUploadsSettingUseCase,
+            setupCameraUploadsSyncHandleUseCase,
+            setupOrUpdateCameraUploadsBackupUseCase,
+            setupOrUpdateMediaUploadsBackupUseCase,
+            broadcastBusinessAccountExpiredUseCase,
+            getPrimarySyncHandleUseCase,
+            getNodeByIdUseCase,
+            isSecondaryFolderEnabledUseCase,
+            getSecondarySyncHandleUseCase,
+            getSecondaryFolderPathUseCase,
+            setupMediaUploadsSyncHandleUseCase,
+            isSecondaryFolderPathValidUseCase,
+            setSecondaryFolderLocalPathUseCase,
+            clearCameraUploadsRecordUseCase,
+        )
     }
 
     /**
      * Initializes [SettingsCameraUploadsViewModel] for testing
      */
-    private suspend fun setupUnderTest(
-        isPrimaryFolderPathValid: IsPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
-    ) {
-        val cuNode = mock<TypedFolderNode> {
-            on { id }.thenReturn(NodeId(1L))
-            on { name }.thenReturn("Camera Uploads")
-        }
-        val muNode = mock<TypedFolderNode> {
-            on { id }.thenReturn(NodeId(2L))
-            on { name }.thenReturn("Media Uploads")
-        }
-        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(cuNode)
-
-        whenever(getNodeByIdUseCase(NodeId(2L))).thenReturn(muNode)
+    private suspend fun setupUnderTest() {
+        stubCommon()
         underTest = SettingsCameraUploadsViewModel(
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
@@ -225,7 +246,7 @@ class SettingsCameraUploadsViewModelTest {
             getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
-            isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValid,
+            isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
             monitorConnectivityUseCase = mock(),
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
@@ -270,6 +291,36 @@ class SettingsCameraUploadsViewModelTest {
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
         )
+    }
+
+    private suspend fun stubCommon() {
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
+        whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
+        whenever(areUploadFileNamesKeptUseCase()).thenReturn(true)
+        whenever(getPrimaryFolderPathUseCase()).thenReturn("/path/to/CU")
+        whenever(getUploadOptionUseCase()).thenReturn(UploadOption.PHOTOS_AND_VIDEOS)
+        whenever(getUploadVideoQualityUseCase()).thenReturn(VideoQuality.ORIGINAL)
+        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(200)
+        whenever(isCameraUploadsByWifiUseCase()).thenReturn(true)
+        whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(true)
+        whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+        whenever(hasMediaPermissionUseCase()).thenReturn(true)
+        whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
+        whenever(isSecondaryFolderEnabledUseCase()).thenReturn(true)
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(getSecondarySyncHandleUseCase()).thenReturn(2L)
+        whenever(getSecondaryFolderPathUseCase()).thenReturn("path/to/MU")
+        whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+        val cuNode = mock<TypedFolderNode> {
+            on { id }.thenReturn(NodeId(1L))
+            on { name }.thenReturn("Camera Uploads")
+        }
+        val muNode = mock<TypedFolderNode> {
+            on { id }.thenReturn(NodeId(2L))
+            on { name }.thenReturn("Media Uploads")
+        }
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(cuNode)
+        whenever(getNodeByIdUseCase(NodeId(2L))).thenReturn(muNode)
     }
 
     @Test
@@ -461,47 +512,51 @@ class SettingsCameraUploadsViewModelTest {
             }
         }
 
-    @Test
-    fun `test that the value of uploadOption is PHOTOS when calling changeUploadOption`() =
-        testUploadOption(UploadOption.PHOTOS)
+    @ParameterizedTest(name = "invoked with {0}")
+    @MethodSource("provideUploadOptionsParams")
+    fun `test that the value of uploadOption changes when changeUploadOption`(uploadOption: UploadOption) =
+        runTest {
+            setupUnderTest()
+            whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
 
-    @Test
-    fun `test that the value of uploadOption is VIDEOS when calling changeUploadOption`() =
-        testUploadOption(UploadOption.VIDEOS)
+            underTest.changeUploadOption(uploadOption)
 
-    @Test
-    fun `test that the value of uploadOption is PHOTOS_AND_VIDEOS when calling changeUploadOption`() =
-        testUploadOption(UploadOption.PHOTOS_AND_VIDEOS)
+            verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
+            verify(clearCacheDirectory).invoke()
+            verify(rescheduleCameraUploadUseCase).invoke()
+            underTest.state.test {
+                assertThat(awaitItem().uploadOption).isEqualTo(uploadOption)
+            }
+        }
 
-    private fun testUploadOption(uploadOption: UploadOption) = runTest {
+    private fun provideUploadOptionsParams() = Stream.of(
+        UploadOption.PHOTOS,
+        UploadOption.VIDEOS,
+        UploadOption.PHOTOS_AND_VIDEOS
+    )
+
+    @ParameterizedTest(name = "with {1}, the videoQuality is {0}")
+    @MethodSource("provideVideQualityParams")
+    fun `test that  when calling changeUploadVideoQuality`(
+        value: Int,
+        expectedVideoQuality: VideoQuality,
+    ) = runTest {
         setupUnderTest()
-        whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
 
-        underTest.changeUploadOption(uploadOption)
+        whenever(getUploadVideoQualityUseCase()).thenReturn(expectedVideoQuality)
 
-        verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
-        verify(clearCacheDirectory).invoke()
-        verify(rescheduleCameraUploadUseCase).invoke()
+        underTest.changeUploadVideoQuality(value)
         underTest.state.test {
-            assertThat(awaitItem().uploadOption).isEqualTo(uploadOption)
+            assertThat(awaitItem().videoQuality).isEqualTo(expectedVideoQuality)
         }
     }
 
-    @Test
-    fun `test that the value of videoQuality is LOW when calling changeUploadVideoQuality`() =
-        testUploadVideoQuality(value = 0, expectedVideoQuality = VideoQuality.LOW)
-
-    @Test
-    fun `test that the value of videoQuality is MEDIUM when calling changeUploadVideoQuality`() =
-        testUploadVideoQuality(value = 1, expectedVideoQuality = VideoQuality.MEDIUM)
-
-    @Test
-    fun `test that the value of videoQuality is HIGH when calling changeUploadVideoQuality`() =
-        testUploadVideoQuality(value = 2, expectedVideoQuality = VideoQuality.HIGH)
-
-    @Test
-    fun `test that the value of videoQuality is ORIGINAL when calling changeUploadVideoQuality`() =
-        testUploadVideoQuality(value = 3, expectedVideoQuality = VideoQuality.ORIGINAL)
+    private fun provideVideQualityParams() = Stream.of(
+        Arguments.of(0, VideoQuality.LOW),
+        Arguments.of(1, VideoQuality.MEDIUM),
+        Arguments.of(2, VideoQuality.HIGH),
+        Arguments.of(3, VideoQuality.ORIGINAL)
+    )
 
     @Test
     fun `test that the value of videoQuality is not updated if its integer equivalent is invalid`() =
@@ -514,68 +569,44 @@ class SettingsCameraUploadsViewModelTest {
             )
         }
 
-    private fun testUploadVideoQuality(value: Int, expectedVideoQuality: VideoQuality) = runTest {
+    @ParameterizedTest(name = "invoked with {0}, video sync status is {1}")
+    @MethodSource("provideSyncStatusParams")
+    fun `test that when changeUploadVideoQuality is`(
+        value: Int,
+        expectedVideoSyncStatus: SyncStatus,
+    ) = runTest {
         setupUnderTest()
-
-        whenever(getUploadVideoQualityUseCase()).thenReturn(expectedVideoQuality)
-
-        underTest.changeUploadVideoQuality(value)
-        underTest.state.test {
-            assertThat(awaitItem().videoQuality).isEqualTo(expectedVideoQuality)
-        }
-    }
-
-    @Test
-    fun `test that the video sync status is set to STATUS_TO_COMPRESS if the videoQuality is LOW`() =
-        testUploadSyncStatus(value = 0, expectedVideoSyncStatus = SyncStatus.STATUS_TO_COMPRESS)
-
-    @Test
-    fun `test that the video sync status is set to STATUS_TO_COMPRESS if the videoQuality is MEDIUM`() =
-        testUploadSyncStatus(value = 1, expectedVideoSyncStatus = SyncStatus.STATUS_TO_COMPRESS)
-
-    @Test
-    fun `test that the video sync status is set to STATUS_TO_COMPRESS if the videoQuality is HIGH`() =
-        testUploadSyncStatus(value = 2, expectedVideoSyncStatus = SyncStatus.STATUS_TO_COMPRESS)
-
-    @Test
-    fun `test that the video sync status is set to STATUS_PENDING if the videoQuality is ORIGINAL`() =
-        testUploadSyncStatus(value = 3, expectedVideoSyncStatus = SyncStatus.STATUS_PENDING)
-
-    private fun testUploadSyncStatus(value: Int, expectedVideoSyncStatus: SyncStatus) = runTest {
-        setupUnderTest()
-
         underTest.changeUploadVideoQuality(value)
         verify(setUploadVideoSyncStatusUseCase).invoke(expectedVideoSyncStatus)
     }
 
-    @Test
-    fun `test that the device must now be charged in order to compress videos`() =
-        testChargingRequiredForVideoCompression(true)
+    private fun provideSyncStatusParams() = Stream.of(
+        Arguments.of(0, SyncStatus.STATUS_TO_COMPRESS),
+        Arguments.of(1, SyncStatus.STATUS_TO_COMPRESS),
+        Arguments.of(2, SyncStatus.STATUS_TO_COMPRESS),
+        Arguments.of(3, SyncStatus.STATUS_PENDING)
+    )
 
-    @Test
-    fun `test that the device no longer needs to be charged in order to compress videos`() =
-        testChargingRequiredForVideoCompression(false)
-
-    private fun testChargingRequiredForVideoCompression(expectedAnswer: Boolean) = runTest {
-        whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(expectedAnswer)
-
-        setupUnderTest()
-
-        underTest.changeChargingRequiredForVideoCompression(expectedAnswer)
-
-        verify(setChargingRequiredForVideoCompressionUseCase).invoke(expectedAnswer)
-        underTest.state.test {
-            assertThat(awaitItem().isChargingRequiredForVideoCompression).isEqualTo(expectedAnswer)
+    @ParameterizedTest(name = "invoked with {0}, device is needed to charge {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that when changeChargingRequiredForVideoCompression`(expectedAnswer: Boolean) =
+        runTest {
+            setupUnderTest()
+            whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(expectedAnswer)
+            underTest.changeChargingRequiredForVideoCompression(expectedAnswer)
+            verify(setChargingRequiredForVideoCompressionUseCase).invoke(expectedAnswer)
+            underTest.state.test {
+                assertThat(awaitItem().isChargingRequiredForVideoCompression).isEqualTo(
+                    expectedAnswer
+                )
+            }
         }
-    }
 
     @Test
     fun `test that a new maximum video compression size limit is set`() = runTest {
         val newSize = 300
-        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(newSize)
-
         setupUnderTest()
-
+        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(newSize)
         underTest.changeVideoCompressionSizeLimit(newSize)
 
         verify(setVideoCompressionSizeLimitUseCase).invoke(newSize)
@@ -584,24 +615,15 @@ class SettingsCameraUploadsViewModelTest {
         }
     }
 
-    @Test
-    fun `test that the file names should now be kept when uploading content`() =
-        testKeepUploadFileNames(true)
-
-    @Test
-    fun `test that the file names should no longer be kept when uploading content`() =
-        testKeepUploadFileNames(false)
-
-    private fun testKeepUploadFileNames(keepFileNames: Boolean) = runTest {
-        whenever(areUploadFileNamesKeptUseCase()).thenReturn(keepFileNames)
-
+    @ParameterizedTest(name = "with {0}, file names should be kept {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that when keepUploadFileNames is invoked`(expected: Boolean) = runTest {
         setupUnderTest()
-
-        underTest.keepUploadFileNames(keepFileNames)
-
-        verify(setUploadFileNamesKeptUseCase).invoke(keepFileNames)
+        whenever(areUploadFileNamesKeptUseCase()).thenReturn(expected)
+        underTest.keepUploadFileNames(expected)
+        verify(setUploadFileNamesKeptUseCase).invoke(expected)
         underTest.state.test {
-            assertThat(awaitItem().areUploadFileNamesKept).isEqualTo(keepFileNames)
+            assertThat(awaitItem().areUploadFileNamesKept).isEqualTo(expected)
         }
     }
 
@@ -609,12 +631,9 @@ class SettingsCameraUploadsViewModelTest {
     fun `test that the new primary folder path is set`() = runTest {
         val testPath = "test/new/folder/path"
         val isPrimaryFolderInSDCard = false
-
+        setupUnderTest()
         whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
         whenever(getPrimaryFolderPathUseCase()).thenReturn(testPath)
-
-        setupUnderTest()
-
         underTest.changePrimaryFolderPath(
             newPath = testPath,
             isFolderInSDCard = isPrimaryFolderInSDCard,
@@ -642,8 +661,8 @@ class SettingsCameraUploadsViewModelTest {
             val testPath = "test/invalid/folder/path"
             val isPrimaryFolderInSDCard = false
 
-            whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(false)
             setupUnderTest()
+            whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(false)
 
             underTest.changePrimaryFolderPath(
                 testPath,
@@ -707,7 +726,7 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that media uploads are disabled when calling onEnableOrDisableMediaUpload`() =
-        runTest(StandardTestDispatcher()) {
+        runTest {
             setupUnderTest()
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             // enable media upload
@@ -788,10 +807,8 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that shouldDisplayError is true when an exception occurs while setting up the default secondary folder`() =
-        runTest(StandardTestDispatcher()) {
-            whenever(isSecondaryFolderEnabledUseCase()).thenReturn(true)
+        runTest {
             setupUnderTest()
-            testScheduler.advanceUntilIdle()
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(setupDefaultSecondaryFolderUseCase()).thenThrow(RuntimeException())
             //disable it
@@ -847,11 +864,10 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that camera upload node and name is updated when updatePrimaryUploadNode is invoked`() =
-        runTest(StandardTestDispatcher()) {
+        runTest {
             setupUnderTest()
             val nodeId = NodeId(1L)
-            testScheduler.advanceUntilIdle()
-            val cameraUploadsNode = mock<TypedFolderNode> {
+            val cameraUploadsNode = mock<TypedFolderNode>() {
                 on { id }.thenReturn(nodeId)
                 on { name }.thenReturn("Camera Uploads")
             }
@@ -866,11 +882,10 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that media upload node and name is updated when updateSecondaryUploadNode is invoked`() =
-        runTest(StandardTestDispatcher()) {
+        runTest {
             setupUnderTest()
             val nodeId = NodeId(1L)
-            testScheduler.advanceUntilIdle()
-            val cameraUploadsNode = mock<TypedFolderNode> {
+            val cameraUploadsNode = mock<TypedFolderNode>() {
                 on { id }.thenReturn(nodeId)
                 on { name }.thenReturn("Media Uploads")
             }
@@ -920,12 +935,9 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that the primary folder records are cleared when the primary folder path changes`() =
-        runTest(StandardTestDispatcher()) {
+        runTest {
             val testPath = "test/new/folder/path"
             val isPrimaryFolderInSDCard = false
-
-            whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
-            whenever(getPrimaryFolderPathUseCase()).thenReturn(testPath)
 
             setupUnderTest()
 
@@ -941,12 +953,10 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that the secondary folder records are cleared when the secondary folder path changes`() =
-        runTest(StandardTestDispatcher()) {
+        runTest {
             val mediaUploadsFolderPath = "/path/to/media uploads"
-            whenever(isSecondaryFolderPathValidUseCase(mediaUploadsFolderPath)).thenReturn(true)
-
             setupUnderTest()
-
+            whenever(isSecondaryFolderPathValidUseCase(mediaUploadsFolderPath)).thenReturn(true)
             underTest.updateMediaUploadsLocalFolder(mediaUploadsFolderPath)
 
             verify(clearCameraUploadsRecordUseCase).invoke(
