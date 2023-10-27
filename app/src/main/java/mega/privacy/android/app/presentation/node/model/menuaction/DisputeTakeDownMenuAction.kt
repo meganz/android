@@ -17,7 +17,7 @@ class DisputeTakeDownMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_taken_down_menu_option)
 
-    override val orderInCategory = 240
+    override val orderInCategory = 100
 
     override val testTag: String = "menu_action:Dispute_take_down"
 }

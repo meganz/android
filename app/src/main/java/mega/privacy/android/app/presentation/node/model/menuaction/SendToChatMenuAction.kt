@@ -18,7 +18,7 @@ class SendToChatMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_send_to_contact)
 
-    override val orderInCategory = 270
+    override val orderInCategory = 200
 
     override val testTag: String = "menu_action:send_to_chat"
 }

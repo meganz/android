@@ -18,7 +18,7 @@ class ShareFolderMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_share)
 
-    override val orderInCategory = 280
+    override val orderInCategory = 190
 
     override val testTag: String = "menu_action:share_folder"
 }

@@ -18,7 +18,7 @@ class CopyMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_copy_white)
 
-    override val orderInCategory = 330
+    override val orderInCategory = 240
 
     override val testTag: String = "menu_action:copy"
 }

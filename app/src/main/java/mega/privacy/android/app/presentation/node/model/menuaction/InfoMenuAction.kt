@@ -8,17 +8,16 @@ import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import javax.inject.Inject
 
 /**
- * Move menu action
+ * Info menu action
  */
-class MoveMenuAction @Inject constructor() : MenuActionWithIcon {
+class InfoMenuAction @Inject constructor() : MenuActionWithIcon {
+    @Composable
+    override fun getIconPainter() = painterResource(id = R.drawable.info_ic)
 
     @Composable
-    override fun getDescription() = stringResource(id = R.string.general_move)
+    override fun getDescription() = stringResource(id = R.string.general_info)
 
-    @Composable
-    override fun getIconPainter() = painterResource(id = R.drawable.ic_move_white)
-
-    override val orderInCategory = 230
-
-    override val testTag: String = "menu_action:move"
+    override val orderInCategory = 50
+    override val testTag: String
+        get() = "menu_action:info"
 }

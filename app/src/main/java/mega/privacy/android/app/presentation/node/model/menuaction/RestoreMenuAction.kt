@@ -18,7 +18,7 @@ class RestoreMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_restore)
 
-    override val orderInCategory = 220
+    override val orderInCategory = 250
 
     override val testTag: String = "menu_action:restore"
 }

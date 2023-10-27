@@ -8,17 +8,17 @@ import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import javax.inject.Inject
 
 /**
- * Leave share menu action
+ * Edit menu action
  */
-class LeaveShareMenuAction @Inject constructor() : MenuActionWithIcon {
+class EditMenuAction @Inject constructor() : MenuActionWithIcon {
+    @Composable
+    override fun getIconPainter() = painterResource(id = R.drawable.ic_file_edit)
 
     @Composable
-    override fun getDescription() = stringResource(id = R.string.alert_leave_share)
+    override fun getDescription() = stringResource(id = R.string.title_edit_profile_info)
 
-    @Composable
-    override fun getIconPainter() = painterResource(id = R.drawable.ic_leave_share_w)
+    override val orderInCategory = 30
 
-    override val orderInCategory = 260
-
-    override val testTag: String = "menu_action:leave_share"
+    override val testTag: String
+        get() = "menu_action:edit"
 }

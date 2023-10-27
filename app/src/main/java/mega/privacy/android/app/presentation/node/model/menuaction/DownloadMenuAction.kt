@@ -18,7 +18,7 @@ class DownloadMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_download_white)
 
-    override val orderInCategory = 200
+    override val orderInCategory = 140
 
     override val testTag: String = "menu_action:download"
 }

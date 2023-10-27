@@ -18,7 +18,7 @@ class GetLinkMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getIconPainter() =
         painterResource(id = mega.privacy.android.core.R.drawable.link_ic_white)
 
-    override val orderInCategory = 250
+    override val orderInCategory = 160
 
     override val testTag: String = "menu_action:get_link"
 }

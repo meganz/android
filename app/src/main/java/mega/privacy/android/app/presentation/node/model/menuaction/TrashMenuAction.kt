@@ -18,7 +18,7 @@ class TrashMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getDescription() = stringResource(id = R.string.context_move_to_trash)
 
-    override val orderInCategory = 350
+    override val orderInCategory = 270
 
     override val testTag: String = "menu_action:rubbish_bin"
 }
