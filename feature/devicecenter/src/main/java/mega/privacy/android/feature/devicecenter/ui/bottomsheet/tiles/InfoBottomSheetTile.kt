@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -28,7 +29,7 @@ internal fun InfoBottomSheetTile(
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_INFO),
         text = stringResource(R.string.device_center_bottom_sheet_item_info),
-        icon = R.drawable.ic_bottom_sheet_info,
+        icon = painterResource(id = R.drawable.ic_bottom_sheet_info),
         onActionClicked = onActionClicked,
     )
 }

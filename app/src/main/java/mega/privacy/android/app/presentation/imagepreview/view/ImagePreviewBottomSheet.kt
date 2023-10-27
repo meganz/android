@@ -37,6 +37,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
+@OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
 internal fun ImagePreviewBottomSheetPreview() {
@@ -51,6 +52,7 @@ internal fun ImagePreviewBottomSheetPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ImagePreviewBottomSheet(
     modalSheetState: ModalBottomSheetState,
@@ -102,21 +104,23 @@ internal fun ImagePreviewBottomSheet(
         sheetBody = {
             Column {
                 MenuActionListTile(
-                    icon = R.drawable.info_ic,
+                    icon = painterResource(id = R.drawable.info_ic),
                     text = stringResource(id = R.string.general_info),
                     onActionClicked = onClickInfo,
                     addSeparator = false,
                 )
                 MenuActionListTile(
-                    icon = if (isFavourite) R.drawable.ic_remove_favourite
-                    else R.drawable.ic_add_favourite,
+                    icon = painterResource(
+                        id = if (isFavourite) R.drawable.ic_remove_favourite
+                        else R.drawable.ic_add_favourite
+                    ),
                     text = if (isFavourite) stringResource(id = R.string.file_properties_unfavourite)
                     else stringResource(id = R.string.file_properties_favourite),
                     onActionClicked = onClickFavourite,
                     addSeparator = false,
                 )
                 MenuActionListTile(
-                    icon = R.drawable.ic_label,
+                    icon = painterResource(id = R.drawable.ic_label),
                     text = stringResource(id = R.string.file_properties_label),
                     onActionClicked = onClickLabel,
                     addSeparator = true,
@@ -142,7 +146,7 @@ internal fun ImagePreviewBottomSheet(
                 )
                 if (showDisputeTakeDown) {
                     MenuActionListTile(
-                        icon = R.drawable.ic_taken_down_bottom_sheet,
+                        icon = painterResource(id = R.drawable.ic_taken_down_bottom_sheet),
                         text = stringResource(id = R.string.dispute_takendown_file),
                         onActionClicked = onClickDisputeTakeDown,
                         addSeparator = false,
@@ -150,35 +154,35 @@ internal fun ImagePreviewBottomSheet(
                 }
                 if (showSlideShow) {
                     MenuActionListTile(
-                        icon = R.drawable.ic_slideshow,
+                        icon = painterResource(id = R.drawable.ic_slideshow),
                         text = stringResource(id = R.string.action_slideshow),
                         onActionClicked = onClickSlideShow,
                         addSeparator = false,
                     )
                 }
                 MenuActionListTile(
-                    icon = R.drawable.ic_open_with,
+                    icon = painterResource(id = R.drawable.ic_open_with),
                     text = stringResource(id = R.string.external_play),
                     onActionClicked = onClickOpenWith,
                     addSeparator = true,
                 )
                 if (showForward) {
                     MenuActionListTile(
-                        icon = R.drawable.ic_forward,
+                        icon = painterResource(id = R.drawable.ic_forward),
                         text = stringResource(id = R.string.forward_menu_item),
                         onActionClicked = onClickForward,
                         addSeparator = false,
                     )
                 }
                 MenuActionListTile(
-                    icon = R.drawable.ic_save_to_device,
+                    icon = painterResource(id = R.drawable.ic_save_to_device),
                     text = stringResource(id = R.string.general_save_to_device),
                     onActionClicked = onClickSaveToDevice,
                     addSeparator = false,
                 )
                 MenuActionListTile(
                     text = stringResource(id = R.string.file_properties_available_offline),
-                    icon = R.drawable.ic_save_offline,
+                    icon = painterResource(id = R.drawable.ic_save_offline),
                     addSeparator = true,
                 ) {
                     MegaSwitch(
@@ -187,7 +191,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
                 MenuActionListTile(
-                    icon = link_ic,
+                    icon = painterResource(id = link_ic),
                     text = LocalContext.current.resources.getQuantityString(
                         R.plurals.get_links,
                         1,
@@ -197,45 +201,45 @@ internal fun ImagePreviewBottomSheet(
                 )
                 if (showRemoveLink) {
                     MenuActionListTile(
-                        icon = R.drawable.ic_remove_link,
+                        icon = painterResource(id = R.drawable.ic_remove_link),
                         text = stringResource(id = R.string.context_remove_link_menu),
                         onActionClicked = onClickRemoveLink,
                         addSeparator = false,
                     )
                 }
                 MenuActionListTile(
-                    icon = R.drawable.ic_send_to_contact,
+                    icon = painterResource(id = R.drawable.ic_send_to_contact),
                     text = stringResource(id = R.string.context_send_file_to_chat),
                     onActionClicked = onClickSendTo,
                     addSeparator = false,
                 )
                 MenuActionListTile(
-                    icon = R.drawable.ic_social_share_white,
+                    icon = painterResource(id = R.drawable.ic_social_share_white),
                     text = stringResource(id = R.string.general_share),
                     onActionClicked = onClickShare,
                     addSeparator = true,
                 )
                 MenuActionListTile(
-                    icon = R.drawable.ic_rename,
+                    icon = painterResource(id = R.drawable.ic_rename),
                     text = stringResource(id = R.string.context_rename),
                     onActionClicked = onClickRename,
                     addSeparator = false,
                 )
                 MenuActionListTile(
-                    icon = R.drawable.ic_move,
+                    icon = painterResource(id = R.drawable.ic_move),
                     text = stringResource(id = R.string.general_move),
                     onActionClicked = onClickMove,
                     addSeparator = false,
                 )
                 MenuActionListTile(
-                    icon = R.drawable.ic_menu_copy,
+                    icon = painterResource(id = R.drawable.ic_menu_copy),
                     text = stringResource(id = R.string.context_copy),
                     onActionClicked = onClickCopy,
                     addSeparator = true,
                 )
                 if (showRestore) {
                     MenuActionListTile(
-                        icon = R.drawable.ic_restore,
+                        icon = painterResource(id = R.drawable.ic_restore),
                         text = stringResource(id = R.string.context_restore),
                         onActionClicked = onClickRestore,
                         addSeparator = false,
@@ -243,7 +247,7 @@ internal fun ImagePreviewBottomSheet(
                 }
                 if (showRemoveFromOffline) {
                     MenuActionListTile(
-                        icon = R.drawable.ic_remove,
+                        icon = painterResource(id = R.drawable.ic_remove),
                         text = stringResource(id = R.string.context_delete_offline),
                         onActionClicked = onClickRemoveFromOffline,
                         addSeparator = false,
@@ -251,14 +255,14 @@ internal fun ImagePreviewBottomSheet(
                 }
                 if (showRemove) {
                     MenuActionListTile(
-                        icon = R.drawable.ic_remove,
+                        icon = painterResource(id = R.drawable.ic_remove),
                         text = stringResource(id = R.string.context_remove),
                         onActionClicked = onClickRemove,
                         addSeparator = false,
                     )
                 }
                 MenuActionListTile(
-                    icon = R.drawable.ic_rubbish_bin,
+                    icon = painterResource(id = R.drawable.ic_rubbish_bin),
                     text = stringResource(id = R.string.context_move_to_trash),
                     onActionClicked = onClickMoveToRubbishBin,
                     addSeparator = false,

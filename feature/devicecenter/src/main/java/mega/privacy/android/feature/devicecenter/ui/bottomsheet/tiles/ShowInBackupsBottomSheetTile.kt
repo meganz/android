@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -29,7 +30,7 @@ internal fun ShowInBackupsBottomSheetTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_SHOW_IN_BACKUPS),
         addSeparator = false,
         text = stringResource(R.string.device_center_bottom_sheet_item_show_in_backups),
-        icon = R.drawable.ic_bottom_sheet_backups,
+        icon = painterResource(id = R.drawable.ic_bottom_sheet_backups),
         onActionClicked = onActionClicked,
     )
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ internal fun ContactInfoBottomSheet(
             Column {
                 MenuActionListTile(
                     text = stringResource(id = R.string.title_edit_profile_info),
-                    icon = R.drawable.ic_rename,
+                    icon = painterResource(id = R.drawable.ic_rename),
                     onActionClicked = {
                         coroutineScope.launch { modalSheetState.hide() }
                         updateNickNameDialogVisibility(true)
@@ -43,7 +44,7 @@ internal fun ContactInfoBottomSheet(
                 )
                 MenuActionListTile(
                     text = stringResource(id = R.string.general_remove),
-                    icon = R.drawable.ic_remove,
+                    icon = painterResource(id = R.drawable.ic_remove),
                     addSeparator = false,
                     onActionClicked = {
                         coroutineScope.launch { modalSheetState.hide() }

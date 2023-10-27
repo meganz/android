@@ -2,6 +2,7 @@ package mega.privacy.android.core.ui.controls.lists
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -39,7 +40,7 @@ class MenuActionListTileTest {
         composeRule.setContent {
             MenuActionListTile(
                 text = "MenuListViewItem",
-                icon = R.drawable.ic_favorite,
+                icon = painterResource(id = R.drawable.ic_favorite),
             ) {
                 MegaSwitch(
                     modifier = Modifier.testTag(switchTag),
@@ -62,7 +63,7 @@ class MenuActionListTileTest {
         composeRule.setContent {
             MenuActionListTile(
                 text = "MenuListViewItem",
-                icon = R.drawable.ic_favorite
+                icon = painterResource(id = R.drawable.ic_favorite)
             )
         }
         composeRule.onNodeWithText("MenuListViewItem").assertExists()

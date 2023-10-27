@@ -8,6 +8,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -61,13 +62,13 @@ private fun BottomSheetContent(
         MenuActionHeader(text = stringResource(id = R.string.save_action))
         MenuActionListTile(
             text = stringResource(id = R.string.save_cloud_drive),
-            icon = R.drawable.ic_pick_cloud_drive,
+            icon = painterResource(id = R.drawable.ic_pick_cloud_drive),
             addSeparator = true,
             onActionClicked = onCloudDriveClicked
         )
         MenuActionListTile(
             text = stringResource(id = R.string.save_file_system),
-            icon = R.drawable.ic_save_to_file_system,
+            icon = painterResource(id = R.drawable.ic_save_to_file_system),
             addSeparator = false,
             onActionClicked = onFileSystemClicked
         )

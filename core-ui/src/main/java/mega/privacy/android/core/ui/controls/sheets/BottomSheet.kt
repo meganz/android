@@ -30,7 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -154,7 +154,10 @@ private fun BottomSheetPreview() {
             sheetBody = {
                 LazyColumn {
                     items(100) {
-                        MenuActionListTile(text = "title $it", icon = R.drawable.ic_folder_list)
+                        MenuActionListTile(
+                            text = "title $it",
+                            icon = painterResource(id = R.drawable.ic_folder_list)
+                        )
                     }
                 }
             }) {

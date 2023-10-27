@@ -12,6 +12,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
@@ -53,7 +54,7 @@ internal fun ContactInfoContent(
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
     MenuActionListTile(
         text = stringResource(id = R.string.title_incoming_shares_explorer),
-        icon = R.drawable.ic_incoming_share,
+        icon = painterResource(id = R.drawable.ic_incoming_share),
     ) {
         Text(
             text = pluralStringResource(
@@ -66,7 +67,7 @@ internal fun ContactInfoContent(
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_notifications_contact),
-        icon = R.drawable.ic_bell,
+        icon = painterResource(id = R.drawable.ic_bell),
     ) {
         MegaSwitch(
             checked = true,
@@ -75,22 +76,22 @@ internal fun ContactInfoContent(
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_share_contact),
-        icon = R.drawable.ic_share_contact,
+        icon = painterResource(id = R.drawable.ic_share_contact),
     )
     VerifyCredentialsView(isVerified = uiState.areCredentialsVerified)
     if (uiState.chatRoom != null) {
         MenuActionListTile(
             text = stringResource(id = R.string.title_chat_shared_files_info),
-            icon = R.drawable.ic_shared_files,
+            icon = painterResource(id = R.drawable.ic_shared_files),
         )
         MenuActionListTile(
             text = stringResource(id = R.string.title_properties_manage_chat),
-            icon = R.drawable.ic_clear_chat_history,
+            icon = painterResource(id = R.drawable.ic_clear_chat_history),
         )
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_remove_contact),
-        icon = R.drawable.ic_remove_contact,
+        icon = painterResource(id = R.drawable.ic_remove_contact),
         isDestructive = true,
         addSeparator = false,
     )

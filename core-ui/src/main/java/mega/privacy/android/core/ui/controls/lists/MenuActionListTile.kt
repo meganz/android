@@ -1,6 +1,5 @@
 package mega.privacy.android.core.ui.controls.lists
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,7 +51,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 fun MenuActionListTile(
     text: String,
     modifier: Modifier = Modifier,
-    @DrawableRes icon: Int? = null,
+    icon: Painter? = null,
     addIconPadding: Boolean = true,
     isDestructive: Boolean = false,
     addSeparator: Boolean = true,
@@ -78,7 +78,7 @@ fun MenuActionListTile(
                         .testTag(MENU_ITEM_ICON_TAG)
                         .padding(end = 32.dp)
                         .size(size = 24.dp),
-                    painter = painterResource(id = icon),
+                    painter = icon,
                     contentDescription = null,
                     tint = if (isDestructive) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.textColorSecondary,
                 )
@@ -118,7 +118,7 @@ private fun PreviewPreviewMegaMenuAction(
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
-            icon = R.drawable.ic_folder_list,
+            icon = painterResource(id = R.drawable.ic_folder_list),
             isDestructive = isDestructive,
         )
     }
@@ -132,7 +132,7 @@ private fun PreviewMegaMenuActionWithSwitch(
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
-            icon = R.drawable.ic_folder_list,
+            icon = painterResource(id = R.drawable.ic_folder_list),
         ) {
             MegaSwitch(
                 modifier = Modifier.testTag(MENU_ITEM_SWITCH_TAG),
@@ -159,7 +159,7 @@ private fun PreviewMegaMenuActionWithTextButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
-            icon = R.drawable.ic_folder_list,
+            icon = painterResource(id = R.drawable.ic_folder_list),
         ) {
             Text(
                 text = "Button",
