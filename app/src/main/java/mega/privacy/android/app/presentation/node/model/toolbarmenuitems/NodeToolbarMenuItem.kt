@@ -2,10 +2,9 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.search.SearchType
 
 /**
- * Node toolbar menu item without icon
+ * Node toolbar menu item
  */
 interface NodeToolbarMenuItem<T : MenuAction> {
 
@@ -14,6 +13,14 @@ interface NodeToolbarMenuItem<T : MenuAction> {
      * should display
      *
      * checks if menu item should be displayed or not
+     *
+     * @param hasNodeAccessPermission
+     * @param selectedNodes
+     * @param canBeMovedToTarget
+     * @param noNodeInBackups
+     * @param noNodeTakenDown
+     * @param allFileNodes
+     * @param resultCount
      * @return [Boolean]
      */
     fun shouldDisplay(
