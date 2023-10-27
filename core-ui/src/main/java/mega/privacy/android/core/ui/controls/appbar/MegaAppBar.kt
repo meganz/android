@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -29,7 +28,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -39,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.layouts.LocalCollapsibleHeaderTitleTransition
 import mega.privacy.android.core.ui.controls.menus.MenuActions
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -91,7 +88,7 @@ fun MegaAppBar(
 ) {
     BaseMegaAppBar(
         appBarType = appBarType,
-        title = title,
+        title = { MegaAppBarTitle(title) },
         modifier = modifier,
         onNavigationPressed = onNavigationPressed,
         badgeCount = badgeCount,
@@ -121,7 +118,7 @@ internal val LocalMegaAppBarElevation = compositionLocalOf { AppBarDefaults.TopA
 @Composable
 internal fun BaseMegaAppBar(
     appBarType: AppBarType,
-    title: String,
+    title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onNavigationPressed: (() -> Unit)? = null,
     badgeCount: Int? = null,
@@ -140,12 +137,7 @@ internal fun BaseMegaAppBar(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    MegaAppBarTitle(
-                        title,
-                        modifier = Modifier
-                            .offset(y = LocalCollapsibleHeaderTitleTransition.current.offset)
-                            .alpha(1 - LocalCollapsibleHeaderTitleTransition.current.expandedAlpha)
-                    )
+                    title()
                     CompositionLocalProvider(
                         LocalContentColor provides MegaTheme.colors.icon.secondary,
                         LocalContentAlpha provides 1f,

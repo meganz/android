@@ -43,8 +43,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.BaseMegaAppBar
 import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarElevation
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBarColors
@@ -58,9 +58,11 @@ import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.darkColorPalette
 
 /**
+ * ScaffoldWithCollapsibleHeader
+ *
  * Scaffold wrapper that includes a collapsible header that includes the status bar and will be fade out when collapsed.
  * @param headerBelowAppBar a Composable for the header to be drawn below the app bar. If set, it's assumed that it will have dark content and values for Local providers such as LocalMegaAppBarElevation or LocalMegaAppBarColors will be set to transition the app bar from transparent with light content when expanded to an ordinary app bar when collapsed. Please notice that automation tool (appium) doesn't see anything behind a scaffold, so anything here won't be visible to appium, consider using [headerAboveAppBar] for this.
- * @param topBar top app bar of the screen. Consider using [MegaAppBarForCollapsibleHeader] to have an animated title.
+ * @param topBar top app bar of the screen. Consider using [AppBarForCollapsibleHeader] to have an animated title.
  * @param headerAboveAppBar a Composable for the header to be drawn above the app bar. Usually have a transparent background to don't completely hide the [topBar]. Consider using [CollapsibleHeaderWithTitle] to have an animated title.
  * @param modifier the [Modifier] to be applied to the layout
  * @param snackbarHost component to host [Snackbar]s that are pushed to be shown via
@@ -249,7 +251,7 @@ fun ScaffoldWithCollapsibleHeader(
 internal data class CollapsibleHeaderTitleTransition(val offset: Dp, val expandedAlpha: Float)
 
 internal val LocalCollapsibleHeaderTitleTransition =
-    compositionLocalOf { CollapsibleHeaderTitleTransition(0.dp, 1f) }
+    compositionLocalOf { CollapsibleHeaderTitleTransition(0.dp, 0f) }
 
 internal const val APP_BAR_HEIGHT = 56f
 private fun headerMinHeight(statusBarHeight: Float) = APP_BAR_HEIGHT + statusBarHeight
@@ -273,11 +275,12 @@ private fun Color.surfaceColorAtElevation(
 
 @CombinedThemePreviews
 @Composable
-private fun CollapsableAppBarScaffoldPreview(
+private fun ScaffoldWithCollapsibleHeaderPreview(
     @PreviewParameter(BooleanProvider::class) hasHeaderBelowAppbar: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         val title = "Title very long that can take up to 3 lines when the header is expanded"
+        val appBarType = if (hasHeaderBelowAppbar) AppBarType.NONE else AppBarType.BACK_NAVIGATION
         ScaffoldWithCollapsibleHeader(
             headerBelowAppBar = if (!hasHeaderBelowAppbar) null else {
                 @Composable {
@@ -296,14 +299,14 @@ private fun CollapsableAppBarScaffoldPreview(
                 }
             },
             topBar = {
-                BaseMegaAppBar(
-                    appBarType = AppBarType.MENU,
+                AppBarForCollapsibleHeader(
+                    appBarType = appBarType,
                     title = title,
-                    actions = getSampleToolbarActions()
+                    actions = getSampleToolbarActions(),
                 )
             },
             headerAboveAppBar = {
-                CollapsibleHeaderWithTitle(title = title) {
+                CollapsibleHeaderWithTitle(appBarType = appBarType, title = title) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Text(
                             text = "Header above app bar",

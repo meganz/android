@@ -37,7 +37,7 @@ fun SelectModeAppBar(
 ) {
     BaseMegaAppBar(
         appBarType = AppBarType.BACK_NAVIGATION,
-        title = title,
+        title = { MegaAppBarTitle(title) },
         modifier = modifier,
         onNavigationPressed = onNavigationPressed,
         actions = actions,

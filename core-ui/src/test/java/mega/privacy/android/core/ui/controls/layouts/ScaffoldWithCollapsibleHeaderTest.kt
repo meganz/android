@@ -15,8 +15,8 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.BaseMegaAppBar
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +45,7 @@ class ScaffoldWithCollapsibleHeaderTest {
                     }
                 },
                 topBar = {
-                    BaseMegaAppBar(
+                    AppBarForCollapsibleHeader(
                         appBarType = AppBarType.MENU,
                         title = "Title",
                         modifier = Modifier.testTag(TOOLBAR_APP_TAG),

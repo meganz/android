@@ -17,20 +17,29 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.constraintlayout.compose.Dimension
+import mega.privacy.android.core.ui.controls.appbar.AppBarForCollapsibleHeader
+import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBarTitle
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 
+
 /**
- * Helper composable to add a collapsible title in [ScaffoldWithCollapsibleHeader] together with [MegaAppBarForCollapsibleHeader]
- * @param title for the toolbar, should be the same as the [MegaAppBarForCollapsibleHeader]. Here, as the header has more space, it will take up to 3 lines.
+ * CollapsibleHeaderWithTitle
+ *
+ * Layout to add a header with collapsible title in [ScaffoldWithCollapsibleHeader] together with [AppBarForCollapsibleHeader]. Check ScaffoldWithCollapsibleHeader preview for an example
+ * @param appBarType this will be used to set the correct paddings of the title, should be the same as the [AppBarForCollapsibleHeader]
+ * @param title for the toolbar, it should be the same as the [AppBarForCollapsibleHeader]. Here, as the header has more space, it will take up to [titleMaxLines] lines.
+ * @param titleMaxLines the maximum title lines when expanded. Default to 3
  * @param content any other content that will be show in the header.
  */
 @Composable
 fun CollapsibleHeaderWithTitle(
+    appBarType: AppBarType,
     title: String,
     modifier: Modifier = Modifier,
+    titleMaxLines: Int = 3,
     content: @Composable ConstraintLayoutScope.() -> Unit,
 ) = ConstraintLayout(
     modifier = modifier
@@ -48,7 +57,7 @@ fun CollapsibleHeaderWithTitle(
         modifier = Modifier
             .alpha(0f)
             .constrainAs(titlePlaceholder) {
-                start.linkTo(parent.start, 72.dp)
+                start.linkTo(parent.start, if (appBarType == AppBarType.NONE) 16.dp else 72.dp)
                 end.linkTo(parent.end, 8.dp)
                 top.linkTo(parent.top, statusBarHeight)
                 bottom.linkTo(appBarBottomGuideline)
@@ -68,7 +77,7 @@ fun CollapsibleHeaderWithTitle(
                 width = Dimension.fillToConstraints
             },
         title = title,
-        maxLines = 3,
+        maxLines = titleMaxLines,
     )
 }
 
@@ -76,7 +85,7 @@ fun CollapsibleHeaderWithTitle(
 @Composable
 private fun CollapsibleHeaderPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        CollapsibleHeaderWithTitle("Title") {
+        CollapsibleHeaderWithTitle(AppBarType.MENU, "Title") {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
