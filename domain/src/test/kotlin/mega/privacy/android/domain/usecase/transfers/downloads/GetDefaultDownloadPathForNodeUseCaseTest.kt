@@ -54,16 +54,17 @@ class GetDefaultDownloadPathForNodeUseCaseTest {
 
 
     @Test
-    fun `test that invoke returns the full path when node is in cloud drive`() = runTest {
-        whenever(isNodeInCloudDriveUseCase(any())).thenReturn(true)
-        stubNodes()
-        stubDeviceFolder()
-        whenever(getNestedParentFoldersUseCase(any()))
-            .thenReturn(listOf(greatGrandParent, grandParent))
-        val actual = underTest(parent)
-        Truth.assertThat(actual)
-            .isEqualTo(DEVICE_PATH + File.separator + GREAT_GRAND_PARENT_NAME + File.separator + GRAND_PARENT_NAME + File.separator)
-    }
+    fun `test that invoke returns the full path except cloud drive root when node is in cloud drive`() =
+        runTest {
+            whenever(isNodeInCloudDriveUseCase(any())).thenReturn(true)
+            stubNodes()
+            stubDeviceFolder()
+            whenever(getNestedParentFoldersUseCase(any()))
+                .thenReturn(listOf(greatGrandParent, grandParent))
+            val actual = underTest(parent)
+            Truth.assertThat(actual)
+                .isEqualTo(DEVICE_PATH + File.separator + GRAND_PARENT_NAME + File.separator + PARENT_NAME + File.separator)
+        }
 
     @Test
     fun `test that invoke returns the download root path when node is not in cloud drive`() =

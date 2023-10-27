@@ -153,6 +153,15 @@ class StartDownloadTransfersViewModelTest {
         }
 
     @Test
+    fun `test that cancel event is emitted when start download nodes is invoked with no sibling nodes`() =
+        runTest {
+            stubNodeForDownload()
+            whenever(parentNode.parentId).thenReturn(NodeId(55L))
+            underTest.startDownloadNode(listOf(node, parentNode))
+            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
+        }
+
+    @Test
     fun `test that job in progress is set to ProcessingFiles when start download use case starts`() =
         runTest {
             stubNodeForDownload()

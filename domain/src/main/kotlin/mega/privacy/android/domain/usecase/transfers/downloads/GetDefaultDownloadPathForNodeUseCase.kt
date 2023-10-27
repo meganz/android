@@ -24,7 +24,10 @@ class GetDefaultDownloadPathForNodeUseCase @Inject constructor(
     suspend operator fun invoke(parentFolder: FolderNode): String? {
         val location = getStorageDownloadLocationUseCase() ?: return null
         return if (isNodeInCloudDriveUseCase(parentFolder.id.longValue)) {
-            location.removeSuffix(File.separator) + getNestedParentFoldersUseCase(parentFolder).joinAsPath()
+            location.removeSuffix(File.separator) + getNestedParentFoldersUseCase(parentFolder)
+                .plus(parentFolder)//the parent itself needs to be added too
+                .drop(1) //we don't want to add "Cloud Drive" root to the path
+                .joinAsPath()
         } else {
             location
         }

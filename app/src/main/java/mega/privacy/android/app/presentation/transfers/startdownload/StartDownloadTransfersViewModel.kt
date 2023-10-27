@@ -64,10 +64,16 @@ class StartDownloadTransfersViewModel @Inject constructor(
      */
     fun startDownloadNode(typedNodes: List<TypedNode>) {
         if (typedNodes.isEmpty()) return
-        currentInProgressJob = viewModelScope.launch {
-            startDownloadNode(typedNodes) {
-                (getNodeByIdUseCase(typedNodes.first().parentId) as? FolderNode)?.let { parent ->
-                    getDefaultDownloadPathForNodeUseCase(parent)
+        val parentId = typedNodes.first().parentId
+        if (!typedNodes.all { it.parentId == parentId }) {
+            Timber.e("All nodes must have the same parent")
+            _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+        } else {
+            currentInProgressJob = viewModelScope.launch {
+                startDownloadNode(typedNodes) {
+                    (getNodeByIdUseCase(parentId) as? FolderNode)?.let { parent ->
+                        getDefaultDownloadPathForNodeUseCase(parent)
+                    }
                 }
             }
         }
