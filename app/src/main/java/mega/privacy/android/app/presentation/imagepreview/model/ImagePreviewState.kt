@@ -9,7 +9,7 @@ data class ImagePreviewState(
     val currentImageNodeId: NodeId = NodeId(0L),
     val showAppBar: Boolean = true,
     val showSlideshowOption: Boolean = false,
-    val inFullScreenMode: Boolean = true,
+    val inFullScreenMode: Boolean = false,
     val transferMessage: String = "",
     val resultMessage: String = "",
     val copyMoveException: Throwable? = null,

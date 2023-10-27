@@ -21,6 +21,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.BottomAppBar
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -37,9 +38,12 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +61,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
@@ -265,7 +270,25 @@ private fun ImagePreviewContent(
     onClickMoveToRubbishBin: (ImageNode) -> Unit = {},
 ) {
     val context = LocalContext.current
-    Box(modifier = modifier.background(color = Color.Black)) {
+    var currentImageNode: ImageNode? by remember {
+        mutableStateOf(null)
+    }
+    var currentImageNodeIndex by remember {
+        mutableIntStateOf(0)
+    }
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
+            currentImageNode = imageNodes.getOrNull(page)
+            currentImageNodeIndex = page
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color.Black)
+    ) {
         HorizontalPager(
             modifier = Modifier
                 .fillMaxSize(),
@@ -274,6 +297,7 @@ private fun ImagePreviewContent(
             key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L }
         ) { index ->
             val imageNode = imageNodes[index]
+
             val currentImageNodeInfo = remember(index) {
                 MegaNode.unserialize(imageNode.serializedData).getInfoText(context)
             }
@@ -318,41 +342,49 @@ private fun ImagePreviewContent(
                 onClickMoveToRubbishBin = { onClickMoveToRubbishBin(imageNode) },
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        ImageContent(
-                            fullSizePath = imageResult?.getHighestResolutionAvailableUri(),
-                            photoState = photoState,
-                            onImageTap = onImageTap
-                        )
-                        if (imageNode.type is VideoFileTypeInfo) {
-                            IconButton(
-                                modifier = Modifier.align(Alignment.Center),
-                                onClick = { onClickVideoPlay(imageNode) }
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = RExoPlayer.drawable.exo_icon_play),
-                                    contentDescription = "Image Preview play video",
-                                    tint = Color.White,
-                                )
-                            }
+                    ImageContent(
+                        fullSizePath = imageResult?.getHighestResolutionAvailableUri(),
+                        photoState = photoState,
+                        onImageTap = onImageTap
+                    )
+                    if (imageNode.type is VideoFileTypeInfo) {
+                        IconButton(
+                            modifier = Modifier.align(Alignment.Center),
+                            onClick = { onClickVideoPlay(imageNode) }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = RExoPlayer.drawable.exo_icon_play),
+                                contentDescription = "Image Preview play video",
+                                tint = Color.White,
+                            )
                         }
                     }
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .align(Alignment.TopCenter)
-                    ) {
-                        topAppBar(imageNode)
-                    }
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .align(Alignment.BottomCenter)
-                    ) {
-                        bottomAppBar(imageNode, index)
+
+                    val progress = imageResult?.getProgressPercentage() ?: 0L
+                    if (progress in 1 until 100) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.BottomEnd),
+                            progress = progress.toFloat(),
+                            color = MaterialTheme.colors.secondary,
+                            strokeWidth = 2.dp,
+                        )
                     }
                 }
             }
+        }
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .align(Alignment.TopCenter)
+        ) {
+            currentImageNode?.let { topAppBar(it) }
+        }
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .align(Alignment.BottomCenter)
+        ) {
+            currentImageNode?.let { bottomAppBar(it, currentImageNodeIndex) }
         }
     }
 }
