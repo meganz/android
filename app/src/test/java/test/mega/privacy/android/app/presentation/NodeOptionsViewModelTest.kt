@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformat
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -47,6 +48,8 @@ class NodeOptionsViewModelTest {
         )
     }
 
+    private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase = mock()
+
     private val nodeIdFlow = MutableStateFlow(-1L)
 
     private val nodeShareInformationFlow = MutableStateFlow<NodeShareInformation?>(null)
@@ -73,6 +76,7 @@ class NodeOptionsViewModelTest {
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             savedStateHandle = savedStateHandle,
+            removeOfflineNodeUseCase = removeOfflineNodeUseCase,
         )
     }
 

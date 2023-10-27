@@ -58,7 +58,9 @@ class OfflineAvailabilityMapperTest {
         val megaNode = getMockNode()
         val offline = getOffline(lastModifiedTime)
         val file: File = mock()
-        whenever(file.lastModified().milliseconds.inWholeSeconds).thenReturn(expectedModificationTime)
+        whenever(file.lastModified().milliseconds.inWholeSeconds).thenReturn(
+            expectedModificationTime
+        )
         whenever(megaLocalRoomGateway.getOfflineInformation(megaNode.handle)).thenReturn(offline)
         whenever(
             fileGateway.getLocalFile(
@@ -68,7 +70,7 @@ class OfflineAvailabilityMapperTest {
             )
         ).thenReturn(file)
 
-        val availableOffline = underTest(megaNode)
+        val availableOffline = underTest(megaNode, offline)
         Truth.assertThat(availableOffline).isEqualTo(expected)
     }
 

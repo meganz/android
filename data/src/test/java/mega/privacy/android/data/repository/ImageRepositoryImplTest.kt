@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -76,6 +77,7 @@ class ImageRepositoryImplTest {
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
             fileGateway = fileGateway,
             imageNodeMapper = imageNodeMapper,
+            megaLocalRoomGateway = mock()
         )
     }
 
@@ -111,7 +113,7 @@ class ImageRepositoryImplTest {
             whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(null)
             whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
             whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
-            whenever(imageNodeMapper.invoke(any(), any(), any())).thenReturn(imageNode)
+            whenever(imageNodeMapper.invoke(any(), any(), any(), anyOrNull())).thenReturn(imageNode)
             val result = underTest.getImageNodeByHandle(
                 handle = handle
             )
@@ -127,7 +129,7 @@ class ImageRepositoryImplTest {
             underTest.getImageNodeByHandle(
                 handle = handle
             )
-            verify(imageNodeMapper).invoke(any(), any(), any())
+            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull())
         }
     }
 
@@ -197,7 +199,7 @@ class ImageRepositoryImplTest {
                 )
             }
             underTest.getImageNodeForPublicLink(nodeFileLink)
-            verify(imageNodeMapper).invoke(any(), any(), any())
+            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull())
         }
     }
 
@@ -319,7 +321,7 @@ class ImageRepositoryImplTest {
                 chatRoomId = chatRoomId,
                 chatMessageId = chatMessageId
             )
-            verify(imageNodeMapper).invoke(any(), any(), any())
+            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull())
         }
     }
 }

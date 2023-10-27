@@ -884,8 +884,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 node
             )
         ) {
-            val mOffDelete = dbH.findByHandle(node.handle)
-            removeFromOffline(mOffDelete)
+            nodeOptionsViewModel.removeOfflineNode(node.handle)
+            refreshView()
             Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
         } else {
             saveForOffline(node)
@@ -1090,11 +1090,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun removeFromOffline(mOffDelete: MegaOffline?) {
-        OfflineUtils.removeOffline(mOffDelete, dbH, requireContext())
-        refreshView()
-    }
-
     private fun saveForOffline(node: MegaNode?) {
         var adapterType = Constants.FROM_OTHERS
         when (drawerItem) {
@@ -1121,8 +1116,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         requireContext(),
                         node
                     ).absolutePath + File.separator
-                    val mOffDelete = dbH.findbyPathAndName(parentName, node?.name)
-                    removeFromOffline(mOffDelete)
+                    node?.let {
+                        nodeOptionsViewModel.removeOfflineNode(it.handle)
+                        refreshView()
+                    }
                 }
             }
         }

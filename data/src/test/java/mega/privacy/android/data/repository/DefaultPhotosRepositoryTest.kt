@@ -251,6 +251,7 @@ class DefaultPhotosRepositoryTest {
         timelineFilterPreferencesJSONMapper = timelineFilterPreferencesJSONMapper,
         contentConsumptionMegaStringMapMapper = contentConsumptionMegaStringMapMapper,
         imageNodeMapper = mock(),
+        megaLocalRoomGateway = mock()
     )
 
     private fun createMegaNode(

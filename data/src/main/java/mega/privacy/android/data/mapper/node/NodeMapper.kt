@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.node
 
+import mega.privacy.android.domain.entity.Offline
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -25,9 +26,19 @@ internal class NodeMapper @Inject constructor(
         megaNode: MegaNode,
         fromFolderLink: Boolean = false,
         requireSerializedData: Boolean = false,
+        offline: Offline? = null,
     ) = if (megaNode.isFolder) {
-        folderNodeMapper(megaNode, fromFolderLink, requireSerializedData)
+        folderNodeMapper(
+            megaNode = megaNode,
+            fromFolderLink = fromFolderLink,
+            requireSerializedData = requireSerializedData,
+            isAvailableOffline = offline != null
+        )
     } else {
-        fileNodeMapper(megaNode, requireSerializedData)
+        fileNodeMapper(
+            megaNode = megaNode,
+            requireSerializedData = requireSerializedData,
+            offline = offline
+        )
     }
 }

@@ -7,6 +7,7 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -40,6 +41,7 @@ internal class FileNodeMapper @Inject constructor(
     suspend operator fun invoke(
         megaNode: MegaNode,
         requireSerializedData: Boolean,
+        offline: Offline?
     ): FileNode = DefaultFileNode(
         id = NodeId(megaNode.handle),
         name = megaNode.name,
@@ -75,7 +77,7 @@ internal class FileNodeMapper @Inject constructor(
         hasThumbnail = megaNode.hasThumbnail(),
         hasPreview = megaNode.hasPreview(),
         serializedData = if (requireSerializedData) megaNode.serialize() else null,
-        isAvailableOffline = offlineAvailabilityMapper(megaNode)
+        isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false
     )
 
     private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: File?): String? =

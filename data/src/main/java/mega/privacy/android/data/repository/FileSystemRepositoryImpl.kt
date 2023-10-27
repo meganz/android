@@ -346,4 +346,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             fileGateway.getUriForFile(file, authority).toString()
         }
+
+    override suspend fun deleteFolderAndItsFiles(path: String) {
+        val file = File(path)
+        fileGateway.deleteFolderAndSubFolders(file)
+    }
 }

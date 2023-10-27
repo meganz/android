@@ -42,7 +42,9 @@ class GetOfflineFileUseCaseTest {
                 name = fileName,
                 handle = handle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected = offlinePath + File.separator + fileName
 
@@ -59,7 +61,9 @@ class GetOfflineFileUseCaseTest {
                 name = fileName,
                 handle = handle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected = offlinePath + File.separator + fileName
 
@@ -77,7 +81,9 @@ class GetOfflineFileUseCaseTest {
                 name = fileName,
                 handle = handle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected = offlinePath + File.separator + path + File.separator + fileName
 
@@ -94,7 +100,9 @@ class GetOfflineFileUseCaseTest {
                 name = fileName,
                 handle = handle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected = offlineBackupsPath + File.separator + fileName
 
@@ -111,7 +119,9 @@ class GetOfflineFileUseCaseTest {
                 name = fileName,
                 handle = handle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected = offlineBackupsPath + File.separator + fileName
 
@@ -129,7 +139,9 @@ class GetOfflineFileUseCaseTest {
                 name = fileName,
                 handle = handle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected = offlineBackupsPath + File.separator + path + File.separator + fileName
 
@@ -148,7 +160,9 @@ class GetOfflineFileUseCaseTest {
                 handle = handle,
                 incomingHandle = incomingHandle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected = offlinePath + File.separator + incomingHandle + File.separator + fileName
 
@@ -167,7 +181,9 @@ class GetOfflineFileUseCaseTest {
                 handle = handle,
                 incomingHandle = incomingHandle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected = offlinePath + File.separator + incomingHandle + File.separator + fileName
 
@@ -187,7 +203,9 @@ class GetOfflineFileUseCaseTest {
                 handle = handle,
                 incomingHandle = incomingHandle,
                 isFolder = false,
-                lastModifiedTime = 0
+                lastModifiedTime = 0,
+                id = 1,
+                parentId = -1
             )
             val expected =
                 offlinePath + File.separator + incomingHandle + File.separator + path + File.separator + fileName

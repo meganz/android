@@ -5,6 +5,11 @@ package mega.privacy.android.domain.entity.offline
  */
 sealed interface OfflineNodeInformation {
     /**
+     * Id
+     */
+    val id: Int
+
+    /**
      * Path
      */
     val path: String
@@ -28,6 +33,11 @@ sealed interface OfflineNodeInformation {
      * last modified time
      */
     val lastModifiedTime: Long?
+
+    /**
+     * parent Id
+     */
+    val parentId: Int
 }
 
 /**
@@ -37,11 +47,13 @@ sealed interface OfflineNodeInformation {
  * @property name
  */
 data class OtherOfflineNodeInformation(
+    override val id: Int,
     override val path: String,
     override val name: String,
     override val handle: String,
     override val isFolder: Boolean,
-    override val lastModifiedTime: Long?
+    override val lastModifiedTime: Long?,
+    override val parentId: Int
 ) : OfflineNodeInformation
 
 /**
@@ -51,11 +63,13 @@ data class OtherOfflineNodeInformation(
  * @property name
  */
 data class BackupsOfflineNodeInformation(
+    override val id: Int,
     override val path: String,
     override val name: String,
     override val handle: String,
     override val isFolder: Boolean,
-    override val lastModifiedTime: Long?
+    override val lastModifiedTime: Long?,
+    override val parentId: Int
 ) : OfflineNodeInformation
 
 /**
@@ -66,10 +80,12 @@ data class BackupsOfflineNodeInformation(
  * @property incomingHandle
  */
 data class IncomingShareOfflineNodeInformation(
+    override val id: Int,
     override val path: String,
     override val name: String,
     override val handle: String,
     override val isFolder: Boolean,
     override val lastModifiedTime: Long?,
     val incomingHandle: String,
+    override val parentId: Int
 ) : OfflineNodeInformation

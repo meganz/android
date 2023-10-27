@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -14,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
@@ -38,6 +40,7 @@ import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
+import timber.log.Timber
 import java.util.Stack
 import javax.inject.Inject
 
@@ -77,6 +80,7 @@ class FileBrowserViewModel @Inject constructor(
     private val transfersManagement: TransfersManagement,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val fileDurationMapper: FileDurationMapper,
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -98,6 +102,7 @@ class FileBrowserViewModel @Inject constructor(
         checkViewType()
         monitorRefreshSession()
         changeTransferOverQuotaBannerVisibility()
+        monitorOfflineNodes()
     }
 
     /**
@@ -149,8 +154,18 @@ class FileBrowserViewModel @Inject constructor(
      */
     private fun monitorFileBrowserChildrenNodes() {
         viewModelScope.launch {
-            monitorNodeUpdates().collect {
+            monitorNodeUpdates().catch {
+                Timber.e(it)
+            }.collect {
                 checkForNodeIsInRubbish(it.changes)
+            }
+        }
+    }
+
+    private fun monitorOfflineNodes() {
+        viewModelScope.launch {
+            monitorOfflineNodeUpdatesUseCase().collect {
+                setPendingRefreshNodes()
             }
         }
     }

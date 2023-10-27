@@ -120,6 +120,11 @@ public class OfflineUtils {
         }
     }
 
+    /**
+     * @deprecated
+     * use DeleteOfflineNodeUseCase instead
+     */
+    @Deprecated
     public static void removeOffline(MegaOffline mOffDelete, LegacyDatabaseHandler dbH, Context context) {
 
         if (mOffDelete == null) {
@@ -190,6 +195,7 @@ public class OfflineUtils {
                 deleteChildrenDB(mOffListChildren2, dbH);
 
             }
+            Timber.d("deleting %s", mOffDelete.getName());
             dbH.removeById(mOffDelete.getId());
         }
     }

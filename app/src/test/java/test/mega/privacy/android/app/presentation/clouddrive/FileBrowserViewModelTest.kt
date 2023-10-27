@@ -103,6 +103,7 @@ class FileBrowserViewModelTest {
             transfersManagement = transfersManagement,
             containsMediaItemUseCase = containsMediaItemUseCase,
             fileDurationMapper = fileDurationMapper,
+            monitorOfflineNodeUpdatesUseCase = mock()
         )
     }
 

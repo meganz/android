@@ -489,7 +489,7 @@ class DefaultAlbumRepositoryTest {
         underTest = createUnderTest(this)
         (underTest as DefaultAlbumRepository).publicNodesMap[nodeId] = node
 
-        whenever(imageNodeMapper(node, { false }))
+        whenever(imageNodeMapper(node, { false }, offline = null))
             .thenReturn(mock())
 
         // then
@@ -549,6 +549,7 @@ class DefaultAlbumRepositoryTest {
         imageNodeMapper = imageNodeMapper,
         ioDispatcher = UnconfinedTestDispatcher(),
         appScope = coroutineScope,
+        megaLocalRoomGateway = mock()
     )
 
     private fun createUserSet(

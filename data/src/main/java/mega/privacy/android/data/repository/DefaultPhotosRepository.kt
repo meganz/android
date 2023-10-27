@@ -27,6 +27,7 @@ import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -41,6 +42,7 @@ import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapp
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
@@ -93,6 +95,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper,
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper,
     private val imageNodeMapper: ImageNodeMapper,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway
 ) : PhotosRepository {
     private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
@@ -172,11 +175,14 @@ internal class DefaultPhotosRepository @Inject constructor(
         imageNodes: List<MegaNode>,
         videoNodes: List<MegaNode>,
     ) = appScope.launch {
+        val offlineMap = megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
         val nodes = (imageNodes + videoNodes).map { node ->
+            val offline: Offline? = offlineMap?.get(node.handle.toString())
             imageNodeMapper(
                 megaNode = node,
                 hasVersion = megaApiFacade::hasVersion,
                 requireSerializedData = true,
+                offline = offline
             )
         }
         timelineNodesFlow.update { nodes }

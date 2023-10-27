@@ -253,4 +253,9 @@ interface FileSystemRepository {
      * Get uri of the given file
      */
     suspend fun getUriForFile(file: File, authority: String): String
+
+    /**
+     * Delete folder is its files
+     */
+    suspend fun deleteFolderAndItsFiles(path: String)
 }

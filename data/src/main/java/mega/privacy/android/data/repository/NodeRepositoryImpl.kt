@@ -36,6 +36,7 @@ import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -98,10 +99,8 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val accessPermissionMapper: AccessPermissionMapper,
     private val nodeShareKeyResultMapper: NodeShareKeyResultMapper,
     private val accessPermissionIntMapper: AccessPermissionIntMapper,
-    private val megaLocalRoomGateway: MegaLocalRoomGateway
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) : NodeRepository {
-
-
     override suspend fun getOutgoingSharesNode(order: SortOrder) =
         withContext(ioDispatcher) {
             megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order))
@@ -181,8 +180,9 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getNodeById(nodeId: NodeId) = withContext(ioDispatcher) {
+        val offline = getOfflineNode(nodeId.longValue)
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
-            convertToUnTypedNode(it)
+            convertToUnTypedNode(node = it, offline = offline)
         }
     }
 
@@ -194,10 +194,14 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode> {
         return withContext(ioDispatcher) {
+            val offlineNodes = getAllOfflineNodeHandle()
             megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue)?.let { parent ->
                 megaApiGateway.getChildrenByNode(parent)
                     .map {
-                        convertToUnTypedNode(it)
+                        convertToUnTypedNode(
+                            node = it,
+                            offline = offlineNodes?.get(it.handle.toString())
+                        )
                     }
             } ?: throw SynchronisationException("Non null node found be null when fetched from api")
         }
@@ -209,6 +213,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     ): List<UnTypedNode> {
         return withContext(ioDispatcher) {
             return@withContext megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { parent ->
+                val offlineItems = getAllOfflineNodeHandle()
                 val childList = order?.let { sortOrder ->
                     megaApiGateway.getChildrenByNode(
                         parent,
@@ -217,7 +222,12 @@ internal class NodeRepositoryImpl @Inject constructor(
                 } ?: run {
                     megaApiGateway.getChildrenByNode(parent)
                 }
-                childList.map { convertToUnTypedNode(it) }
+                childList.map {
+                    convertToUnTypedNode(
+                        node = it,
+                        offline = offlineItems?.get(it.handle.toString())
+                    )
+                }
             } ?: run {
                 emptyList()
             }
@@ -233,7 +243,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getNodeHistoryVersions(handle: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle.longValue)?.let { megaNode ->
             megaApiGateway.getVersions(megaNode).map { version ->
-                convertToUnTypedNode(version)
+                convertToUnTypedNode(node = version, offline = getOfflineNode(version.handle))
             }
         } ?: throw SynchronisationException("Non null node found be null when fetched from api")
     }
@@ -284,6 +294,9 @@ internal class NodeRepositoryImpl @Inject constructor(
             .flowOn(ioDispatcher)
     }
 
+    override fun monitorOfflineNodeUpdates(): Flow<List<Offline>> =
+        megaLocalRoomGateway.monitorOfflineUpdates()
+
     override suspend fun isNodeInRubbishOrDeleted(nodeHandle: Long): Boolean =
         withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(nodeHandle)?.let { megaApiGateway.isInRubbish(it) }
@@ -292,7 +305,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getOfflineNodeInformation(nodeId: NodeId) =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.getOfflineInformation(nodeId.longValue)
+            getOfflineNode(nodeId.longValue)
                 ?.let { offlineNodeInformationMapper(it) }
         }
 
@@ -301,7 +314,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         parentNodeId: NodeId?,
     ) = withContext(ioDispatcher) {
         val parent = parentNodeId?.let { parentId ->
-            megaLocalRoomGateway.getOfflineInformation(parentId.longValue)
+            getOfflineNode(parentId.longValue)
                 ?: throw IllegalArgumentException("Parent offline information must have been previously saved in order to have a consistent hierarchy. ParentId: ${parentId.longValue}")
         }
         megaLocalRoomGateway.saveOfflineInformation(
@@ -315,7 +328,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getOfflineNodeInformation(nodeHandle: Long) =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.getOfflineInformation(nodeHandle)
+            getOfflineNode(nodeHandle)
                 ?.let { offlineNodeInformationMapper(it) }
         }
 
@@ -335,10 +348,15 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
-        nodeMapper(
-            node,
+    private suspend fun convertToUnTypedNode(
+        node: MegaNode,
+        offline: Offline? = null,
+    ): UnTypedNode {
+        return nodeMapper(
+            megaNode = node, offline = offline
         )
+    }
+
 
     override suspend fun stopSharingNode(nodeId: NodeId): Unit = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
@@ -533,7 +551,8 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getParentNode(nodeId: NodeId) = withContext(ioDispatcher) {
         val megaNode = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
         megaNode?.let {
-            megaApiGateway.getParentNode(megaNode)?.let { nodeMapper(it) }
+            megaApiGateway.getParentNode(megaNode)
+                ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(nodeId.longValue)) }
         }
     }
 
@@ -545,7 +564,7 @@ internal class NodeRepositoryImpl @Inject constructor(
             parentNodeId?.let { megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue) }
         megaApiGateway.getNodesByOriginalFingerprint(originalFingerprint, megaNode)?.let {
             if (it.size() > 0) {
-                return@let nodeMapper(it[0])
+                return@let nodeMapper(megaNode = it[0], offline = getOfflineNode(it[0].handle))
             }
             return@let null
         }.also {
@@ -559,14 +578,15 @@ internal class NodeRepositoryImpl @Inject constructor(
     ): UnTypedNode? = withContext(ioDispatcher) {
         val megaNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
         megaApiGateway.getNodeByFingerprintAndParentNode(fingerprint, megaNode)
-            ?.let { nodeMapper(it) }.also {
+            ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }.also {
                 Timber.d("Found node by fingerprint with the same local fingerprint in node with handle: ${parentNodeId}, node: $it")
             }
     }
 
     override suspend fun getNodeByFingerprint(fingerprint: String) =
         withContext(ioDispatcher) {
-            megaApiGateway.getNodeByFingerprint(fingerprint)?.let { nodeMapper(it) }
+            megaApiGateway.getNodeByFingerprint(fingerprint)
+                ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }
         }.also {
             Timber.d("Found node by fingerprint with the same local fingerprint in the account, node: $it")
         }
@@ -582,7 +602,8 @@ internal class NodeRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val parent = parentNodeId
                 ?.let { megaApiGateway.getMegaNodeByHandle(it.longValue) }
-            megaApiGateway.getChildNode(parent, name)?.let { nodeMapper(it) }
+            megaApiGateway.getChildNode(parent, name)
+                ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }
         }
 
     override suspend fun setOriginalFingerprint(nodeId: NodeId, originalFingerprint: String) =
@@ -611,15 +632,17 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getNodeByHandle(handle: Long, attemptFromFolderApi: Boolean) =
         withContext(ioDispatcher) {
             getMegaNodeByHandle(NodeId(handle), attemptFromFolderApi)
-                ?.let { nodeMapper(it) }
+                ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }
         }
 
-    override suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode> =
-        handles.mapNotNull { handle ->
+    override suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode> {
+        val offlineMap = getAllOfflineNodeHandle()
+        return handles.mapNotNull { handle ->
             megaApiGateway.getMegaNodeByHandle(handle)
         }.map { node ->
-            convertToUnTypedNode(node)
+            convertToUnTypedNode(node = node, offline = offlineMap?.get(node.handle.toString()))
         }
+    }
 
     override suspend fun getRubbishNode(): UnTypedNode? =
         withContext(ioDispatcher) {
@@ -631,21 +654,21 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getBackupsNode(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiGateway.getBackupsNode()?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
+                convertToUnTypedNode(node = megaNode, offline = getOfflineNode(megaNode.handle))
             }
         }
 
     override suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiFolderGateway.getRootNode()?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
+                convertToUnTypedNode(node = megaNode, offline = getOfflineNode(megaNode.handle))
             }
         }
 
     override suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiFolderGateway.getMegaNodeByHandle(parentHandle)?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
+                convertToUnTypedNode(node = megaNode, offline = getOfflineNode(megaNode.handle))
             }
         }
 
@@ -721,4 +744,26 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaApiGateway.checkAccessErrorExtended(it, accessLevel).errorCode == MegaError.API_OK
         } ?: false
     }
+
+    override suspend fun removeOfflineNode(nodeId: String) {
+        megaLocalRoomGateway.removeOfflineInformation(nodeId)
+    }
+
+    override suspend fun getOfflineNodeByParentId(parentId: Int): List<OfflineNodeInformation>? =
+        megaLocalRoomGateway.getOfflineInfoByParentId(parentId)?.map {
+            offlineNodeInformationMapper(it)
+        }
+
+    override suspend fun getOfflineNodeById(id: Int) =
+        megaLocalRoomGateway.getOfflineLineById(id)?.let { offlineNodeInformationMapper(it) }
+
+    override suspend fun removeOfflineNodeById(id: Int) {
+        megaLocalRoomGateway.removeOfflineInformationById(id)
+    }
+
+    private suspend fun getAllOfflineNodeHandle() =
+        megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
+
+    private suspend fun getOfflineNode(handle: Long) =
+        megaLocalRoomGateway.getOfflineInformation(handle)
 }

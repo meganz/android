@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -150,6 +151,11 @@ interface NodeRepository {
      * @return a flow of all global node updates
      */
     fun monitorNodeUpdates(): Flow<NodeUpdate>
+
+    /**
+     * monitor offline node updates
+     */
+    fun monitorOfflineNodeUpdates(): Flow<List<Offline>>
 
     /**
      * Check if node is in rubbish or deleted
@@ -527,4 +533,29 @@ interface NodeRepository {
         nodeId: NodeId,
         level: AccessPermission,
     ): Boolean
+
+    /**
+     * Remove Offline node
+     * @param nodeId [NodeId]
+     */
+    suspend fun removeOfflineNode(nodeId: String)
+
+    /**
+     * Get offline Node from parent id
+     * @param parentId
+     * @return list of [OfflineNodeInformation]
+     */
+    suspend fun getOfflineNodeByParentId(parentId: Int): List<OfflineNodeInformation>?
+
+    /**
+     * Get offline node from id
+     * @param id
+     * @return [OfflineNodeInformation]
+     */
+    suspend fun getOfflineNodeById(id: Int): OfflineNodeInformation?
+
+    /**
+     * Remove offline Node by ID
+     */
+    suspend fun removeOfflineNodeById(id: Int)
 }

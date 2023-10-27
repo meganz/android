@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.node
 
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -21,11 +22,12 @@ internal class ImageNodeMapper @Inject constructor(
         megaNode: MegaNode,
         hasVersion: suspend (MegaNode) -> Boolean,
         requireSerializedData: Boolean = false,
+        offline: Offline?
     ) = if (megaNode.isFolder) {
         throw IllegalStateException("Node is a folder")
     } else {
         val hasVersion = hasVersion(megaNode)
-        val isAvailableOffline = offlineAvailabilityMapper(megaNode)
+        val isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false
         object : ImageNode {
             override val id = NodeId(megaNode.handle)
             override val name = megaNode.name

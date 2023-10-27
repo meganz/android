@@ -455,6 +455,33 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun clearOffline() = offlineDao.deleteAllOffline()
 
+    override fun monitorOfflineUpdates() = offlineDao.monitorOffline()
+        .map { it.map { offlineEntity -> offlineModelMapper(offlineEntity) } }
+
+
+    override suspend fun getAllOfflineInfo() =
+        offlineDao.getOfflineFiles()?.map { offlineModelMapper(it) }
+
+    override suspend fun removeOfflineInformation(nodeId: String) {
+        encryptData(nodeId)?.let {
+            offlineDao.deleteOfflineByHandle(it)
+        }
+    }
+
+    override suspend fun getOfflineInfoByParentId(parentId: Int): List<Offline>? =
+        offlineDao.getOfflineByParentId(parentId)?.map {
+            offlineModelMapper(it)
+        }
+
+    override suspend fun getOfflineLineById(id: Int): Offline? =
+        offlineDao.getOfflineById(id)?.let {
+            offlineModelMapper(it)
+        }
+
+    override suspend fun removeOfflineInformationById(id: Int) {
+        offlineDao.deleteOfflineById(id)
+    }
+
     companion object {
         private const val MAX_COMPLETED_TRANSFER_ROWS = 100
     }

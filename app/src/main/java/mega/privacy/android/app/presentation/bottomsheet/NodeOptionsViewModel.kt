@@ -18,7 +18,9 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformat
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -28,6 +30,7 @@ import javax.inject.Inject
  * @property getNodeByHandle [GetNodeByHandle]
  * @property isNodeDeletedFromBackupsUseCase [IsNodeDeletedFromBackupsUseCase]
  * @property monitorConnectivityUseCase [MonitorConnectivityUseCase]
+ * @property removeOfflineNodeUseCase [RemoveOfflineNodeUseCase]
  */
 @HiltViewModel
 class NodeOptionsViewModel @Inject constructor(
@@ -35,6 +38,7 @@ class NodeOptionsViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -129,6 +133,19 @@ class NodeOptionsViewModel @Inject constructor(
         MimeTypeList.typeForName(node.name).let {
             it.isAudio || it.isVideoMimeType
         }
+
+
+    /**
+     * Remove offline node
+     */
+    fun removeOfflineNode(handle: Long) {
+        viewModelScope.launch {
+            runCatching { removeOfflineNodeUseCase(NodeId(handle)) }
+                .onFailure {
+                    Timber.e(it)
+                }
+        }
+    }
 
     companion object {
         /**

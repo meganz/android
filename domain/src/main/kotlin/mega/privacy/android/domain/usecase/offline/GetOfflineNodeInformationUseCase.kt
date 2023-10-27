@@ -49,32 +49,38 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
         return when {
             isInBackups -> {
                 BackupsOfflineNodeInformation(
+                    id = -1,
                     path = path,
                     name = node.name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
-                    lastModifiedTime = System.currentTimeMillis()
+                    lastModifiedTime = System.currentTimeMillis(),
+                    parentId = -1
                 )
             }
 
             isIncomingShareId != null -> {
                 IncomingShareOfflineNodeInformation(
+                    id = -1,
                     path = path,
                     name = node.name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
                     incomingHandle = isIncomingShareId.longValue.toString(),
-                    lastModifiedTime = System.currentTimeMillis()
+                    lastModifiedTime = System.currentTimeMillis(),
+                    parentId = -1
                 )
             }
 
             else ->
                 OtherOfflineNodeInformation(
+                    id = -1,
                     path = path,
                     name = node.name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
-                    lastModifiedTime = System.currentTimeMillis()
+                    lastModifiedTime = System.currentTimeMillis(),
+                    parentId = -1
                 )
         }
     }

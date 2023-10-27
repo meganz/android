@@ -38,21 +38,27 @@ internal class OfflineMapperTest {
                     handle = expectedHandle,
                     incomingHandle = expectedIncomingHandle,
                     isFolder = isFolderNode,
-                    lastModifiedTime = 0
+                    lastModifiedTime = 0,
+                    id = -1,
+                    parentId = parentId
                 ),
                 Offline.BACKUPS to BackupsOfflineNodeInformation(
                     path = expectedPath,
                     name = expectedName,
                     handle = expectedHandle,
                     isFolder = isFolderNode,
-                    lastModifiedTime = 0
+                    lastModifiedTime = 0,
+                    id = -1,
+                    parentId = parentId
                 ),
                 Offline.OTHER to OtherOfflineNodeInformation(
                     path = expectedPath,
                     name = expectedName,
                     handle = expectedHandle,
                     isFolder = isFolderNode,
-                    lastModifiedTime = 0
+                    lastModifiedTime = 0,
+                    id = -1,
+                    parentId = parentId
                 )
             ).map { Triple(it.first, it.second, isFolderNode) }
         }.map { (expected, input, isFolderNode) ->

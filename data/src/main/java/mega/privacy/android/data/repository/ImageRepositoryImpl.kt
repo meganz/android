@@ -9,6 +9,7 @@ import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -45,6 +46,7 @@ internal class ImageRepositoryImpl @Inject constructor(
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
     private val fileGateway: FileGateway,
     private val imageNodeMapper: ImageNodeMapper,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway
 ) : ImageRepository {
     override suspend fun getImageNodeByHandle(handle: Long): ImageNode =
         withContext(ioDispatcher) {
@@ -72,8 +74,9 @@ internal class ImageRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val megaNode = getMegaNode()
                 ?: throw IllegalArgumentException("Node not found")
+            val offline = megaLocalRoomGateway.getOfflineInformation(megaNode.handle)
             imageNodeMapper(
-                megaNode, megaApiGateway::hasVersion
+                megaNode = megaNode, hasVersion = megaApiGateway::hasVersion, offline = offline
             )
         }
 

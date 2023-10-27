@@ -12,6 +12,7 @@ import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
@@ -29,6 +30,7 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class NodeMapperTest {
     private lateinit var underTest: NodeMapper
+    val offline = mock<Offline>()
 
     private val megaApiGateway = mock<MegaApiGateway> {
         onBlocking { hasVersion(any()) }.thenReturn(false)
@@ -72,7 +74,6 @@ class NodeMapperTest {
                 megaApiGateway = megaApiGateway,
                 megaApiFolderGateway = megaApiFolderGateway,
                 fetChildrenMapper = mock { on { invoke(any(), any()) }.thenReturn { emptyList() } },
-                megaLocalRoomGateway = megaLocalRoomGateway
             )
         )
     }
@@ -80,7 +81,7 @@ class NodeMapperTest {
     @Test
     fun `test that files are mapped if isFile is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
-        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(true)
+        whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(true)
 
         val actual =
             underTest(
@@ -138,7 +139,7 @@ class NodeMapperTest {
     @Test
     fun `test that serialized string is not null when requireSerializedString is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
-        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(false)
+        whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(false)
         val actual = underTest(megaNode, requireSerializedData = true)
         assertThat(actual.serializedData).isEqualTo(expectedSerializedString)
     }
@@ -146,7 +147,7 @@ class NodeMapperTest {
     @Test
     fun `test that serialized string is null when requireSerializedString is false`() = runTest {
         val megaNode = getMockNode(isFile = true)
-        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(true)
+        whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(true)
         val actual = underTest(megaNode, requireSerializedData = false)
         assertThat(actual.serializedData).isNull()
     }

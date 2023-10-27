@@ -11,28 +11,34 @@ internal typealias OfflineNodeInformationMapper = (@JvmSuppressWildcards Offline
 internal fun toOfflineNodeInformation(offline: Offline): OfflineNodeInformation {
     return when (offline.origin) {
         Offline.INCOMING -> IncomingShareOfflineNodeInformation(
+            id = offline.id,
             path = offline.path,
             name = offline.name,
             handle = offline.handle,
             incomingHandle = offline.handleIncoming,
             isFolder = offline.isFolder,
-            lastModifiedTime = offline.lastModifiedTime
+            lastModifiedTime = offline.lastModifiedTime,
+            parentId = offline.parentId
         )
 
         Offline.BACKUPS -> BackupsOfflineNodeInformation(
+            id = offline.id,
             path = offline.path,
             name = offline.name,
             handle = offline.handle,
             isFolder = offline.isFolder,
-            lastModifiedTime = offline.lastModifiedTime
+            lastModifiedTime = offline.lastModifiedTime,
+            parentId = offline.parentId
         )
 
         else -> OtherOfflineNodeInformation(
+            id = offline.id,
             path = offline.path,
             name = offline.name,
             handle = offline.handle,
             isFolder = offline.isFolder,
-            lastModifiedTime = offline.lastModifiedTime
+            lastModifiedTime = offline.lastModifiedTime,
+            parentId = offline.parentId
         )
     }
 }

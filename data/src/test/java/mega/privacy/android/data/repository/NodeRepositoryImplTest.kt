@@ -110,9 +110,10 @@ class NodeRepositoryImplTest {
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
             fetChildrenMapper = fetChildrenMapper,
-            megaLocalRoomGateway = megaLocalRoomGateway
         )
     )
+
+    val offline: Offline = mock()
 
     @BeforeAll
     fun setup() {
@@ -235,7 +236,7 @@ class NodeRepositoryImplTest {
             on { email }.thenReturn(testEmail)
         }
         val megaNode = mockMegaNodeForConversion()
-        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(true)
+        whenever(offlineAvailabilityMapper(megaNode,offline)).thenReturn(true)
         val nodeList = listOf(megaNode)
         whenever(megaApiGateway.getContact(testEmail)).thenReturn(user)
         whenever(megaApiGateway.getInShares(user)).thenReturn(nodeList)
@@ -512,7 +513,7 @@ class NodeRepositoryImplTest {
     fun `test that getNodesByHandle invokes correct function`() = runTest {
         val handle = 1L
         val megaNode = mockMegaNodeForConversion()
-        whenever(offlineAvailabilityMapper(megaNode)).thenReturn(false)
+        whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(false)
         whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
         assertThat(underTest.getNodeByHandle(handle)?.base64Id).isEqualTo("base64Handle")
     }

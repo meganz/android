@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -485,4 +486,34 @@ interface MegaLocalRoomGateway {
      * Clears offline files.
      */
     suspend fun clearOffline()
+
+    /**
+     * Observer for Offline update
+     */
+    fun monitorOfflineUpdates(): Flow<List<Offline>>
+
+    /**
+     * Get all offline files
+     */
+    suspend fun getAllOfflineInfo(): List<Offline>?
+
+    /**
+     * Remove offline node
+     */
+    suspend fun removeOfflineInformation(nodeId: String)
+
+    /**
+     * Get offline node by parent id
+     */
+    suspend fun getOfflineInfoByParentId(parentId: Int): List<Offline>?
+
+    /**
+     * Get offline node by ID
+     */
+    suspend fun getOfflineLineById(id: Int): Offline?
+
+    /**
+     * Remove offline info by ID
+     */
+    suspend fun removeOfflineInformationById(id: Int)
 }

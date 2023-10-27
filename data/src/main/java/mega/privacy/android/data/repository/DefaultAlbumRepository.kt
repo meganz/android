@@ -22,6 +22,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.facade.AlbumStringResourceGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CopyPreviewNodeListenerInterface
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
@@ -78,6 +79,7 @@ internal class DefaultAlbumRepository @Inject constructor(
     private val imageNodeMapper: ImageNodeMapper,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway
 ) : AlbumRepository {
     private val userSets: MutableMap<Long, UserSet> = mutableMapOf()
 
@@ -660,9 +662,14 @@ internal class DefaultAlbumRepository @Inject constructor(
     }
 
     override suspend fun getPublicPhotoImageNode(nodeId: NodeId): ImageNode {
+        val offline = megaLocalRoomGateway.getOfflineInformation(nodeId.longValue)
         return withContext(ioDispatcher) {
             val node = publicNodesMap[nodeId] ?: throw IllegalArgumentException("Node not found")
-            imageNodeMapper(node, megaApiGateway::hasVersion)
+            imageNodeMapper(
+                megaNode = node,
+                hasVersion = megaApiGateway::hasVersion,
+                offline = offline
+            )
         }
     }
 
