@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property isChatNotificationMute whether notification is mute
  * @property isPrivateChat whether the chat is private
  * @property userChatStatus User chat status if is a 1to1 conversation, null otherwise.
+ * @property userLastGreen User chat last green if is a 1to1 conversation and if chat status is different than online, null otherwise.
  * @property myPermission [ChatRoomPermission] of the current logged in user.
  * @property isPreviewMode True if the current logged in user is in a chat link in preview mode (not participating).
  * @property isJoiningOrLeaving True if the current logged in user is joining or leaving this chat, false otherwise.
@@ -27,6 +28,7 @@ data class ChatUiState(
     val isChatNotificationMute: Boolean = false,
     val isPrivateChat: Boolean? = null,
     val userChatStatus: UserChatStatus? = null,
+    val userLastGreen: Int? = null,
     val myPermission: ChatRoomPermission = ChatRoomPermission.Unknown,
     val isPreviewMode: Boolean = false,
     val isJoiningOrLeaving: Boolean = false,

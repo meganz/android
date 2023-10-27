@@ -34,7 +34,6 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
@@ -47,6 +46,7 @@ import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUs
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
+import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -84,7 +84,7 @@ class ContactInfoViewModelTest {
     private var chatManagement: ChatManagement = mock()
     private var monitorContactUpdates: MonitorContactUpdates = mock()
     private var getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
-    private var requestLastGreen: RequestLastGreen = mock()
+    private var requestUserLastGreenUseCase: RequestUserLastGreenUseCase = mock()
     private var getChatRoom: GetChatRoom = mock()
     private var getContactFromEmailUseCase: GetContactFromEmailUseCase = mock()
     private var getContactFromChatUseCase: GetContactFromChatUseCase = mock()
@@ -161,7 +161,7 @@ class ContactInfoViewModelTest {
             chatManagement = chatManagement,
             monitorContactUpdates = monitorContactUpdates,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
-            requestLastGreen = requestLastGreen,
+            requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             getChatRoom = getChatRoom,
             getChatRoomByUserUseCase = getChatRoomByUserUseCase,
             getContactFromChatUseCase = getContactFromChatUseCase,
@@ -206,7 +206,7 @@ class ContactInfoViewModelTest {
             underTest.getUserStatusAndRequestForLastGreen()
             underTest.state.test {
                 assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Online)
-                verifyNoInteractions(requestLastGreen)
+                verifyNoInteractions(requestUserLastGreenUseCase)
             }
         }
 
@@ -218,7 +218,7 @@ class ContactInfoViewModelTest {
             underTest.getUserStatusAndRequestForLastGreen()
             underTest.state.test {
                 assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Away)
-                verify(requestLastGreen).invoke(userHandle = anyLong())
+                verify(requestUserLastGreenUseCase).invoke(userHandle = anyLong())
             }
         }
 

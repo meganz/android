@@ -23,7 +23,6 @@ import mega.privacy.android.domain.exception.NullMegaHandleListException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.GetUserAliasUseCase
 import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromEmailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromHandleUseCase
@@ -35,6 +34,7 @@ import mega.privacy.android.domain.usecase.chat.GetUserPrivilegeUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetContactFullNameUseCase
+import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import nz.mega.sdk.MegaChatError
 import java.io.File
 import javax.inject.Inject
@@ -45,7 +45,7 @@ import javax.inject.Inject
  * @property megaChatApiGateway             [MegaChatApiGateway]
  * @property megaApiGateway                 [MegaApiGateway]
  * @property getMyAvatarColorUseCase        [GetMyAvatarColorUseCase]
- * @property requestLastGreen               [RequestLastGreen]
+ * @property requestUserLastGreenUseCase    [RequestUserLastGreenUseCase]
  * @property getContactEmail                [GetContactEmail]
  * @property getUserAvatarColorUseCase      [GetUserAvatarColorUseCase]
  * @property userStatusToIntMapper          [UserStatusToIntMapper]
@@ -66,7 +66,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiGateway: MegaApiGateway,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
-    private val requestLastGreen: RequestLastGreen,
+    private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val getContactEmail: GetContactEmail,
     private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase,
     private val chatPermissionsMapper: ChatPermissionsMapper,
@@ -212,7 +212,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
         if (participant.isMe) {
             val status = getCurrentStatus()
             if (status != UserChatStatus.Online) {
-                requestLastGreen(participant.handle)
+                requestUserLastGreenUseCase(participant.handle)
             }
             return status
         }
@@ -221,7 +221,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             megaApiGateway.getContact(email)?.let {
                 val status = userChatStatusMapper(megaChatApiGateway.getUserOnlineStatus(it.handle))
                 if (status != UserChatStatus.Online) {
-                    requestLastGreen(it.handle)
+                    requestUserLastGreenUseCase(it.handle)
                 }
 
                 return status

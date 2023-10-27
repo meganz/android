@@ -28,11 +28,11 @@ import mega.privacy.android.domain.usecase.GetContactDataUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -49,7 +49,7 @@ import javax.inject.Inject
  * @property monitorChatOnlineStatusUseCase                 [MonitorChatOnlineStatusUseCase]
  * @property monitorContactRequestUpdates                   [MonitorContactRequestUpdates]
  * @property addNewContacts                                 [AddNewContacts]
- * @property requestLastGreen                               [RequestLastGreen]
+ * @property requestUserLastGreenUseCase                    [RequestUserLastGreenUseCase]
  * @property state                    Current view state as [StartConversationState]
  */
 @HiltViewModel
@@ -64,7 +64,7 @@ class StartConversationViewModel @Inject constructor(
     private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
     private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val addNewContacts: AddNewContacts,
-    private val requestLastGreen: RequestLastGreen,
+    private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -217,7 +217,7 @@ class StartConversationViewModel @Inject constructor(
         viewModelScope.launch {
             monitorChatOnlineStatusUseCase().collectLatest { (userHandle, status) ->
                 if (status != UserChatStatus.Online) {
-                    requestLastGreen(userHandle)
+                    requestUserLastGreenUseCase(userHandle)
                 }
 
                 _state.value.contactItemList.apply {

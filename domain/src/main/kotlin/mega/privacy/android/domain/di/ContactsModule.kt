@@ -11,7 +11,6 @@ import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
@@ -45,10 +44,6 @@ internal abstract class ContactsModule {
         @Provides
         fun provideMonitorContactRequestUpdates(contactsRepository: ContactsRepository): MonitorContactRequestUpdates =
             MonitorContactRequestUpdates(contactsRepository::monitorContactRequestUpdates)
-
-        @Provides
-        fun provideRequestLastGreen(contactsRepository: ContactsRepository): RequestLastGreen =
-            RequestLastGreen(contactsRepository::requestLastGreen)
 
         @Provides
         fun provideMonitorContactUpdates(contactsRepository: ContactsRepository): MonitorContactUpdates =

@@ -19,6 +19,7 @@ import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import javax.inject.Inject
 
 /**
@@ -28,7 +29,7 @@ import javax.inject.Inject
  * @property chatParticipantsRepository     [ChatParticipantsRepository]
  * @property contactsRepository             [ContactsRepository]
  * @property avatarRepository               [AvatarRepository]
- * @property requestLastGreen               [RequestLastGreen]
+ * @property requestUserLastGreenUseCase        [RequestUserLastGreenUseCase]
  * @property defaultDispatcher              [CoroutineDispatcher]
 
  */
@@ -37,7 +38,7 @@ class DefaultGetChatParticipants @Inject constructor(
     private val chatParticipantsRepository: ChatParticipantsRepository,
     private val contactsRepository: ContactsRepository,
     private val avatarRepository: AvatarRepository,
-    private val requestLastGreen: RequestLastGreen,
+    private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetChatParticipants {
 
@@ -124,7 +125,7 @@ class DefaultGetChatParticipants @Inject constructor(
                     val currentItemIndex = indexOfFirst { it.handle == update.userHandle }
                     val currentItem = get(currentItemIndex)
                     if (update.status != UserChatStatus.Online) {
-                        this@DefaultGetChatParticipants.requestLastGreen(update.userHandle)
+                        this@DefaultGetChatParticipants.requestUserLastGreenUseCase(update.userHandle)
                         set(currentItemIndex, currentItem.copy(status = update.status))
                     } else {
                         set(currentItemIndex,

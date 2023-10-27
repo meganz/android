@@ -28,6 +28,8 @@ import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCas
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -44,6 +46,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -81,6 +84,9 @@ internal class ChatViewModelTest {
             )
         )
     }
+    private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
+    private val monitorUserLastGreenUpdatesUseCase =
+        mock<MonitorUserLastGreenUpdatesUseCase>()
 
     private val chatId = 123L
     private val userHandle = 321L
@@ -105,6 +111,7 @@ internal class ChatViewModelTest {
             getUserOnlineStatusByHandleUseCase,
             isParticipatingInChatCallUseCase,
             hasACallInThisChatByChatIdUseCase,
+            requestUserLastGreenUseCase,
         )
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() } doReturn emptyFlow()
@@ -119,6 +126,7 @@ internal class ChatViewModelTest {
                 storageState = StorageState.Unknown
             )
         )
+        wheneverBlocking { monitorUserLastGreenUpdatesUseCase(userHandle) } doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -132,6 +140,8 @@ internal class ChatViewModelTest {
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             hasACallInThisChatByChatIdUseCase = hasACallInThisChatByChatIdUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            requestUserLastGreenUseCase = requestUserLastGreenUseCase,
+            monitorUserLastGreenUpdatesUseCase = monitorUserLastGreenUpdatesUseCase,
             savedStateHandle = savedStateHandle
         )
     }
@@ -653,6 +663,114 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().isArchived).isEqualTo(isArchived)
         }
     }
+
+    @Test
+    fun `test that last green is requested if the chat is 1to1 and the contact status is not online`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { isGroup } doReturn false
+                on { peerHandlesList } doReturn listOf(userHandle)
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            }
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            whenever(getUserOnlineStatusByHandleUseCase(userHandle)).thenReturn(UserChatStatus.Away)
+            initTestClass()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Away)
+                verify(requestUserLastGreenUseCase).invoke(userHandle)
+            }
+        }
+
+    @Test
+    fun `test that last green is not requested and null if the chat is 1to1 and the contact status is online`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { isGroup } doReturn false
+                on { peerHandlesList } doReturn listOf(userHandle)
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            }
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            whenever(getUserOnlineStatusByHandleUseCase(userHandle)).thenReturn(UserChatStatus.Online)
+            initTestClass()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.userChatStatus).isEqualTo(UserChatStatus.Online)
+                assertThat(actual.userLastGreen).isNull()
+                verifyNoInteractions(requestUserLastGreenUseCase)
+            }
+        }
+
+    @Test
+    fun `test that contact last green is updated if new update is received and user chat status is not online`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { isGroup } doReturn false
+                on { peerHandlesList } doReturn listOf(userHandle)
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            }
+            val updateFlow = MutableSharedFlow<Int>()
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            whenever(getUserOnlineStatusByHandleUseCase(userHandle)).thenReturn(UserChatStatus.Away)
+            whenever(monitorUserLastGreenUpdatesUseCase(userHandle)).thenReturn(updateFlow)
+            initTestClass()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.userChatStatus).isEqualTo(UserChatStatus.Away)
+                assertThat(actual.userLastGreen).isNull()
+            }
+            val lastGreen = 5
+            updateFlow.emit(lastGreen)
+            underTest.state.test {
+                assertThat(awaitItem().userLastGreen).isEqualTo(lastGreen)
+            }
+            val newLastGreen = 10
+            updateFlow.emit(newLastGreen)
+            underTest.state.test {
+                assertThat(awaitItem().userLastGreen).isEqualTo(newLastGreen)
+            }
+        }
+
+    @Test
+    fun `test that contact last green is not updated if new update is received and user chat status is online`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { isGroup } doReturn false
+                on { peerHandlesList } doReturn listOf(userHandle)
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            }
+            val lastGreenFlow = MutableSharedFlow<Int>()
+            val statusFlow = MutableSharedFlow<UserChatStatus>()
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            whenever(getUserOnlineStatusByHandleUseCase(userHandle)).thenReturn(UserChatStatus.Away)
+            whenever(monitorUserChatStatusByHandleUseCase(userHandle)).thenReturn(statusFlow)
+            whenever(monitorUserLastGreenUpdatesUseCase(userHandle)).thenReturn(lastGreenFlow)
+            initTestClass()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.userChatStatus).isEqualTo(UserChatStatus.Away)
+                assertThat(actual.userLastGreen).isNull()
+            }
+            val newStatus = UserChatStatus.Online
+            statusFlow.emit(newStatus)
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.userChatStatus).isEqualTo(newStatus)
+                assertThat(actual.userLastGreen).isNull()
+            }
+            val lastGreen = 5
+            lastGreenFlow.emit(lastGreen)
+            underTest.state.test {
+                assertThat(awaitItem().userLastGreen).isNull()
+            }
+        }
 
     private fun provideUserChatStatusParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(UserChatStatus.Offline, UserChatStatus.Away),

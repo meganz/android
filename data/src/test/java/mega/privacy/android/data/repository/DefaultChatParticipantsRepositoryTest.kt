@@ -13,7 +13,6 @@ import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.GetUserAliasUseCase
 import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromEmailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromHandleUseCase
@@ -25,6 +24,7 @@ import mega.privacy.android.domain.usecase.chat.GetUserPrivilegeUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetContactFullNameUseCase
+import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import org.junit.jupiter.api.BeforeAll
@@ -54,7 +54,7 @@ internal class DefaultChatParticipantsRepositoryTest {
     private val getContactFullNameUseCase: GetContactFullNameUseCase = mock()
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock()
     private val getUserPrivilegeUseCase: GetUserPrivilegeUseCase = mock()
-    private val requestLastGreen: RequestLastGreen = mock()
+    private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase = mock()
     private val chatPermissionsMapper: ChatPermissionsMapper = mock()
     private val megaHandleListMapper: MegaHandleListMapper = mock()
     private val userStatusToIntMapper: UserStatusToIntMapper = mock()
@@ -69,7 +69,7 @@ internal class DefaultChatParticipantsRepositoryTest {
             megaChatApiGateway,
             megaApiGateway,
             getMyAvatarColorUseCase,
-            requestLastGreen,
+            requestUserLastGreenUseCase,
             getContactEmail,
             getUserAvatarColorUseCase,
             chatPermissionsMapper,
@@ -95,7 +95,7 @@ internal class DefaultChatParticipantsRepositoryTest {
             megaChatApiGateway,
             megaApiGateway,
             getMyAvatarColorUseCase,
-            requestLastGreen,
+            requestUserLastGreenUseCase,
             getContactEmail,
             getUserAvatarColorUseCase,
             chatPermissionsMapper,

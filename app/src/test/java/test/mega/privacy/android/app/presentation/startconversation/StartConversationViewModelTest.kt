@@ -142,7 +142,7 @@ class StartConversationViewModelTest {
             addNewContacts = addNewContacts,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             savedStateHandle = savedStateHandle,
-            requestLastGreen = mock(),
+            requestUserLastGreenUseCase = mock(),
             createGroupChatRoomUseCase = mock(),
         )
     }

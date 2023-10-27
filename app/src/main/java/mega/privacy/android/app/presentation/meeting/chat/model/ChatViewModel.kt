@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -19,6 +20,8 @@ import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCas
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
@@ -47,6 +50,8 @@ class ChatViewModel @Inject constructor(
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
+    private val monitorUserLastGreenUpdatesUseCase: MonitorUserLastGreenUpdatesUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -98,8 +103,11 @@ class ChatViewModel @Inject constructor(
                             )
                         }
                         if (!isGroup && peerHandlesList.isNotEmpty()) {
-                            getUserChatStatus(peerHandlesList[0])
-                            monitorChatOnlineStatusUpdates(peerHandlesList[0])
+                            peerHandlesList[0].let {
+                                getUserChatStatus(it)
+                                monitorUserOnlineStatusUpdates(it)
+                                monitorUserLastGreen(it)
+                            }
                         }
                     }
                 }
@@ -114,7 +122,7 @@ class ChatViewModel @Inject constructor(
             runCatching {
                 getUserOnlineStatusByHandleUseCase(userHandle)
             }.onSuccess { userChatStatus ->
-                _state.update { state -> state.copy(userChatStatus = userChatStatus) }
+                updateUserChatStatus(userHandle, userChatStatus)
             }.onFailure {
                 Timber.e(it)
             }
@@ -182,12 +190,29 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun monitorChatOnlineStatusUpdates(userHandle: Long) {
+    private fun monitorUserOnlineStatusUpdates(userHandle: Long) {
         viewModelScope.launch {
             monitorUserChatStatusByHandleUseCase(userHandle).conflate()
                 .collect { userChatStatus ->
-                    _state.update { state -> state.copy(userChatStatus = userChatStatus) }
+                    updateUserChatStatus(userHandle, userChatStatus)
                 }
+        }
+    }
+
+    private fun updateUserChatStatus(userHandle: Long, userChatStatus: UserChatStatus) {
+        viewModelScope.launch {
+            if (userChatStatus != UserChatStatus.Online) {
+                _state.update { state -> state.copy(userChatStatus = userChatStatus) }
+                runCatching { requestUserLastGreenUseCase(userHandle) }
+                    .onFailure { Timber.e(it) }
+            } else {
+                _state.update { state ->
+                    state.copy(
+                        userChatStatus = userChatStatus,
+                        userLastGreen = null
+                    )
+                }
+            }
         }
     }
 
@@ -206,6 +231,17 @@ class ChatViewModel @Inject constructor(
                 .onSuccess {
                     _state.update { state -> state.copy(hasACallInThisChat = it) }
                 }.onFailure { Timber.e(it) }
+        }
+    }
+
+    private fun monitorUserLastGreen(userHandle: Long) {
+        viewModelScope.launch {
+            monitorUserLastGreenUpdatesUseCase(userHandle).conflate()
+                .collect { userLastGreen ->
+                    if (state.value.userChatStatus != UserChatStatus.Online) {
+                        _state.update { state -> state.copy(userLastGreen = userLastGreen) }
+                    }
+                }
         }
     }
 

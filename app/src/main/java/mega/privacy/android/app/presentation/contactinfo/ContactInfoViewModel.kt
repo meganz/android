@@ -42,7 +42,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
@@ -55,6 +54,7 @@ import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUs
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
+import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -79,7 +79,7 @@ import javax.inject.Inject
  * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
  * @property chatManagement                     [ChatManagement]
  * @property monitorContactUpdates              [MonitorContactUpdates]
- * @property requestLastGreen                   [RequestLastGreen]
+ * @property requestUserLastGreenUseCase        [RequestUserLastGreenUseCase]
  * @property getChatRoom                        [GetChatRoom]
  * @property getUserOnlineStatusByHandleUseCase [GetUserOnlineStatusByHandleUseCase]
  * @property getChatRoomByUserUseCase           [GetChatRoomByUserUseCase]
@@ -99,7 +99,7 @@ class ContactInfoViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
-    private val requestLastGreen: RequestLastGreen,
+    private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val getChatRoom: GetChatRoom,
     private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase,
     private val getContactFromChatUseCase: GetContactFromChatUseCase,
@@ -299,7 +299,7 @@ class ContactInfoViewModel @Inject constructor(
             getContactFromEmailUseCase(email, isOnline())
         }.onSuccess {
             _state.update { state -> state.copy(contactItem = it) }
-            it?.handle?.let { handle -> runCatching { requestLastGreen(handle) } }
+            it?.handle?.let { handle -> runCatching { requestUserLastGreenUseCase(handle) } }
         }
     }
 
@@ -369,7 +369,7 @@ class ContactInfoViewModel @Inject constructor(
         val handle = state.value.contactItem?.handle ?: return@launch
         runCatching { getUserOnlineStatusByHandleUseCase(handle) }.onSuccess { status ->
             if (status.isAwayOrOffline()) {
-                requestLastGreen(handle)
+                requestUserLastGreenUseCase(handle)
             }
             _state.update { it.copy(userChatStatus = status) }
         }
