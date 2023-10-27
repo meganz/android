@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 import mega.privacy.android.app.presentation.node.model.menuaction.RemoveLinkMenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.search.SearchType
 import javax.inject.Inject
 
 /**
@@ -14,7 +13,7 @@ import javax.inject.Inject
  */
 class RemoveLink @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override val menuAction: RemoveLinkMenuAction = RemoveLinkMenuAction(260)
+    override val menuAction: RemoveLinkMenuAction = RemoveLinkMenuAction(170)
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: Set<TypedNode>,

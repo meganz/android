@@ -15,7 +15,7 @@ import javax.inject.Inject
  */
 class MultiSelectManageLink @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override val menuAction = ManageLinkMenuAction(251)
+    override val menuAction = ManageLinkMenuAction(160)
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: Set<TypedNode>,

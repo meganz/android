@@ -19,9 +19,7 @@ class RemoveShare @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ): Boolean {
-        return selectedNodes.isNotEmpty() && selectedNodes.all { isOutShare(it) }
-    }
+    ): Boolean = selectedNodes.isNotEmpty() && selectedNodes.all { isOutShare(it) }
 
     private fun isOutShare(node: TypedNode) = if (node is FolderNode) {
         node.isPendingShare || node.isShared

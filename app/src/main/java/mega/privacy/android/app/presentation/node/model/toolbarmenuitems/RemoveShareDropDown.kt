@@ -21,15 +21,13 @@ class RemoveShareDropDown @Inject constructor() : NodeToolbarMenuItem<MenuAction
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ): Boolean {
-        return selectedNodes.isNotEmpty() && selectedNodes.all { isOutShare(it) }
-    }
+    ): Boolean = selectedNodes.isNotEmpty() && selectedNodes.all { isOutShare(it) }
 
     private fun isOutShare(node: TypedNode) = if (node is FolderNode) {
         node.isPendingShare || node.isShared
     } else false
 
 
-    override val menuAction = RemoveShareMenuAction(40)
+    override val menuAction = RemoveShareMenuAction(210)
 
 }

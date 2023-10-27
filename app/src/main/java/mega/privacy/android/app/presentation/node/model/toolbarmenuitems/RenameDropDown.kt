@@ -12,7 +12,7 @@ import javax.inject.Inject
  */
 class RenameDropDown @Inject constructor() : NodeToolbarMenuItem<MenuAction> {
 
-    override val menuAction: RenameMenuAction = RenameMenuAction(50)
+    override val menuAction: RenameMenuAction = RenameMenuAction(220)
 
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,

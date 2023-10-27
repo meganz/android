@@ -354,7 +354,7 @@ class SearchActivityViewModel @Inject constructor(
         } else false
         val hasAccessPermission = if (state.value.searchType == INCOMING_SHARES) {
             checkIfNodeHasFullAccessPermission(selectedNodes)
-        } else false
+        } else true
         return nodeToolbarActionMapper(
             toolbarOptions = toolbarOptions,
             hasNodeAccessPermission = hasAccessPermission,

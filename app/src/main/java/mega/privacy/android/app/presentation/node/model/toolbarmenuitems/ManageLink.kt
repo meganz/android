@@ -10,7 +10,7 @@ import javax.inject.Inject
  */
 class ManageLink @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override val menuAction = ManageLinkMenuAction(250)
+    override val menuAction = ManageLinkMenuAction(160)
 
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,

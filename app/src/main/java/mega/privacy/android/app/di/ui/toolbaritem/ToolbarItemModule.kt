@@ -162,6 +162,7 @@ abstract class ToolbarItemModule {
             move: Move,
             sendToChat: SendToChat,
             shareFolder: ShareFolder,
+            removeShare: RemoveShare,
             disputeTakeDown: DisputeTakeDown,
             share: Share,
         ): Set<NodeToolbarMenuItem<*>> {
@@ -180,6 +181,7 @@ abstract class ToolbarItemModule {
                 rename,
                 copy,
                 trash,
+                removeShare,
             )
         }
 

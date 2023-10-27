@@ -10,7 +10,7 @@ import javax.inject.Inject
  */
 class Rename @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override val menuAction = RenameMenuAction(310)
+    override val menuAction = RenameMenuAction(220)
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: Set<TypedNode>,
