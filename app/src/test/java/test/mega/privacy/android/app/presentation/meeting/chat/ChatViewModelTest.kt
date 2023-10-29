@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -27,6 +28,8 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
@@ -59,6 +62,8 @@ internal class ChatViewModelTest {
     private val getChatRoomUseCase: GetChatRoom = mock()
     private val savedStateHandle: SavedStateHandle = mock()
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase = mock()
+    private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase = mock()
+    private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates = mock {
         onBlocking { invoke(any()) } doReturn emptyFlow()
     }
@@ -112,6 +117,8 @@ internal class ChatViewModelTest {
             isParticipatingInChatCallUseCase,
             hasACallInThisChatByChatIdUseCase,
             requestUserLastGreenUseCase,
+            getMyUserHandleUseCase,
+            getParticipantFirstNameUseCase
         )
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() } doReturn emptyFlow()
@@ -142,7 +149,9 @@ internal class ChatViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorUserLastGreenUpdatesUseCase = monitorUserLastGreenUpdatesUseCase,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
+            getParticipantFirstNameUseCase = getParticipantFirstNameUseCase,
+            getMyUserHandleUseCase = getMyUserHandleUseCase,
         )
     }
 
@@ -769,6 +778,36 @@ internal class ChatViewModelTest {
             lastGreenFlow.emit(lastGreen)
             underTest.state.test {
                 assertThat(awaitItem().userLastGreen).isNull()
+            }
+        }
+
+    @Test
+    fun `test that users typing update correctly when chat room update with user typing change`() =
+        runTest {
+            val myUserHandle = 1L
+            val userHandle = 123L
+            val chatRoom = mock<ChatRoom> {
+                on { changes } doReturn listOf(ChatRoomChange.UserTyping)
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                on { userTyping } doReturn userHandle
+            }
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(getParticipantFirstNameUseCase(userHandle)).thenReturn("firstName")
+            whenever(getMyUserHandleUseCase()).thenReturn(myUserHandle)
+            val updateFlow = MutableSharedFlow<ChatRoom>()
+            whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+            initTestClass()
+            underTest.state.test {
+                assertThat(awaitItem().usersTyping).isEmpty()
+            }
+            updateFlow.emit(chatRoom)
+            underTest.state.test {
+                assertThat(awaitItem().usersTyping).isEqualTo(listOf("firstName"))
+            }
+            // test reset after 5s
+            advanceTimeBy(6000L)
+            underTest.state.test {
+                assertThat(awaitItem().usersTyping).isEmpty()
             }
         }
 

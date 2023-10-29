@@ -935,4 +935,8 @@ internal class ChatRepositoryImpl @Inject constructor(
             ?: megaChatApiGateway.getUserLastnameFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserEmailFromCache(handle)?.takeIf { it.isNotBlank() }
     }
+
+    override suspend fun getMyUserHandle() = withContext(ioDispatcher) {
+        megaChatApiGateway.getMyUserHandle()
+    }
 }

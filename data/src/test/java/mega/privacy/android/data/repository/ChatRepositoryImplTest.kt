@@ -586,4 +586,10 @@ class ChatRepositoryImplTest {
             whenever(megaChatApiGateway.getUserEmailFromCache(handle)).thenReturn("email")
             assertThat(underTest.getParticipantFirstName(handle)).isEqualTo("lastName")
         }
+
+    @Test
+    fun `test that returns correctly when calling get my user handle`() = runTest {
+        whenever(megaChatApiGateway.getMyUserHandle()).thenReturn(123L)
+        assertThat(underTest.getMyUserHandle()).isEqualTo(123L)
+    }
 }

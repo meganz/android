@@ -120,7 +120,10 @@ internal fun ChatView(
         }
     )
     { innerPadding ->
-        Text(modifier = Modifier.padding(innerPadding), text = "Hello chat fragment")
+        Text(
+            modifier = Modifier.padding(innerPadding),
+            text = if (uiState.usersTyping.isNotEmpty()) "User typing" else "No user typing"
+        )
     }
     if (showParticipatingInACallDialog) {
         ParticipatingInACallDialog(

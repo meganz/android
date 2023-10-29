@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property isOpenInvite True if the group is open for invitation other than moderators, false otherwise.
  * @property isActive True if currently a member of the chatroom (for group chats), or we are contacts with the peer (for 1on1 chats), false otherwise.
  * @property isArchived True if the chat is archived, false otherwise.
+ * @property usersTyping list of user typing in the chat
  */
 data class ChatUiState(
     val title: String? = null,
@@ -39,4 +40,5 @@ data class ChatUiState(
     val isOpenInvite: Boolean = false,
     val isActive: Boolean = true,
     val isArchived: Boolean = false,
+    val usersTyping: List<String?> = emptyList()
 )

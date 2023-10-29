@@ -695,4 +695,11 @@ interface ChatRepository {
      * @return first name of the participant
      */
     suspend fun getParticipantFirstName(handle: Long): String?
+
+    /**
+     * Get my user handle
+     *
+     * @return my user handle
+     */
+    suspend fun getMyUserHandle(): Long
 }

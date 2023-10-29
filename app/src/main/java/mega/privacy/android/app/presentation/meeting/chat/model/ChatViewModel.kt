@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
@@ -19,12 +21,16 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
+import java.util.Collections
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -52,12 +58,16 @@ class ChatViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val monitorUserLastGreenUpdatesUseCase: MonitorUserLastGreenUpdatesUseCase,
+    private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase,
+    private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
 
     private val chatId = savedStateHandle.get<Long>(Constants.CHAT_ID)
+    private val usersTyping = Collections.synchronizedMap(hashMapOf<Long, String?>())
+    private val jobs = hashMapOf<Long, Job>()
 
     private val ChatRoom.isPrivateRoom: Boolean
         get() = !isGroup || !isPublic
@@ -172,11 +182,39 @@ class ChatViewModel @Inject constructor(
                                     state.copy(isArchived = isArchived)
                                 }
 
+                                ChatRoomChange.UserTyping -> {
+                                    if (userTyping != getMyUserHandleUseCase()) {
+                                        handleUserTyping(userTyping)
+                                    }
+                                }
+
                                 else -> {}
                             }
                         }
                     }
                 }
+        }
+    }
+
+    private fun handleUserTyping(userTypingHandle: Long) {
+        // if user is in the map, we don't need to add again
+        if (!usersTyping.contains(userTypingHandle)) {
+            viewModelScope.launch {
+                val firstName = getParticipantFirstNameUseCase(userTypingHandle)
+                usersTyping[userTypingHandle] = firstName
+                _state.update { state ->
+                    state.copy(usersTyping = usersTyping.values.toList())
+                }
+            }
+        }
+        // if user continue typing, cancel timer and start new timer
+        jobs[userTypingHandle]?.cancel()
+        jobs[userTypingHandle] = viewModelScope.launch {
+            delay(TimeUnit.SECONDS.toMillis(5))
+            usersTyping.remove(userTypingHandle)
+            _state.update { state ->
+                state.copy(usersTyping = usersTyping.values.toList())
+            }
         }
     }
 
