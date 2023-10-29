@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.upgradeAccount
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.upgradeAccount.ChooseAccountViewModel
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
@@ -22,7 +21,7 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
+import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -55,6 +54,8 @@ class ChooseAccountViewModelTest {
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
         )
+    private val getCheapestSubscriptionUseCase =
+        mock<GetCheapestSubscriptionUseCase>()
 
     @BeforeAll
     fun initialise() {
@@ -69,6 +70,7 @@ class ChooseAccountViewModelTest {
             localisedPriceStringMapper,
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
+            getCheapestSubscriptionUseCase,
         )
     }
 
@@ -78,6 +80,7 @@ class ChooseAccountViewModelTest {
             getMonthlySubscriptionsUseCase = getMonthlySubscriptionsUseCase,
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
+            getCheapestSubscriptionUseCase = getCheapestSubscriptionUseCase,
         )
     }
 
@@ -104,7 +107,18 @@ class ChooseAccountViewModelTest {
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
         initViewModel()
         underTest.state.map { it.localisedSubscriptionsList }.test {
-            Truth.assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
+            assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
+        }
+    }
+
+    @Test
+    fun `test that initial state has cheapest Pro plan`() = runTest {
+        whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
+        whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+        whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+        initViewModel()
+        underTest.state.map { it.cheapestSubscriptionAvailable }.test {
+            assertThat(awaitItem()).isEqualTo(subscriptionProLiteMonthly)
         }
     }
 

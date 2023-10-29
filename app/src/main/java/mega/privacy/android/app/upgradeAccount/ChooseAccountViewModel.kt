@@ -11,6 +11,7 @@ import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import timber.log.Timber
@@ -22,6 +23,7 @@ internal class ChooseAccountViewModel @Inject constructor(
     private val getMonthlySubscriptionsUseCase: GetMonthlySubscriptionsUseCase,
     private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
+    private val getCheapestSubscriptionUseCase: GetCheapestSubscriptionUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChooseAccountState())
@@ -48,6 +50,14 @@ internal class ChooseAccountViewModel @Inject constructor(
                 }
             }
             _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
+        }
+        viewModelScope.launch {
+            val cheapestSubscriptionAvailable =
+                runCatching { getCheapestSubscriptionUseCase() }.getOrElse {
+                    Timber.e(it)
+                    null
+                }
+            _state.update { it.copy(cheapestSubscriptionAvailable = cheapestSubscriptionAvailable) }
         }
         refreshPricing()
     }
