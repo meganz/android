@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate

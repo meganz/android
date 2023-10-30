@@ -6,6 +6,8 @@ import mega.privacy.android.domain.entity.passcode.PasscodeType
 
 /**
  * Passcode repository
+ *
+ * @constructor Create empty Passcode repository
  */
 interface PasscodeRepository {
 
@@ -59,7 +61,7 @@ interface PasscodeRepository {
      *
      * @param lastPausedUTCTimestamp
      */
-    suspend fun setLastPausedTime(lastPausedUTCTimestamp: Long)
+    suspend fun setLastPausedTime(lastPausedUTCTimestamp: Long?)
 
     /**
      * Get last paused time
@@ -109,4 +111,18 @@ interface PasscodeRepository {
      * @param passcodeType
      */
     suspend fun setPasscodeType(passcodeType: PasscodeType?)
+
+    /**
+     * Set last orientation
+     *
+     * @param orientation
+     */
+    suspend fun setLastOrientation(orientation: Int)
+
+    /**
+     * Monitor last orientation
+     *
+     * @return flow of the latest orientation
+     */
+    fun monitorLastOrientation(): Flow<Int?>
 }

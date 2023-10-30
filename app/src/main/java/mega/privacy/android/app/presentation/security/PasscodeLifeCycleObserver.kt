@@ -1,9 +1,8 @@
 package mega.privacy.android.app.presentation.security
 
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.passcode.SetAppPausedTimeUseCase
 import mega.privacy.android.domain.usecase.passcode.UpdatePasscodeStateUseCase
 import timber.log.Timber
@@ -20,19 +19,20 @@ import javax.inject.Singleton
 class PasscodeLifeCycleObserver @Inject constructor(
     private val setAppPausedTimeUseCase: SetAppPausedTimeUseCase,
     private val updatePasscodeStateUseCase: UpdatePasscodeStateUseCase,
-) : DefaultLifecycleObserver {
+    @ApplicationScope private val scope: CoroutineScope,
+) : PasscodeProcessLifeCycleObserver {
 
-    override fun onPause(owner: LifecycleOwner) {
-        owner.lifecycleScope.launch {
-            Timber.d("App paused")
-            setAppPausedTimeUseCase(System.currentTimeMillis())
+    override fun onStart(data: PasscodeProcessLifeCycleEventData) {
+        scope.launch {
+            Timber.d("App started")
+            updatePasscodeStateUseCase(System.currentTimeMillis(), data.orientation)
         }
     }
 
-    override fun onResume(owner: LifecycleOwner) {
-        owner.lifecycleScope.launch {
-            Timber.d("App resumed")
-            updatePasscodeStateUseCase(System.currentTimeMillis())
+    override fun onStop(data: PasscodeProcessLifeCycleEventData) {
+        scope.launch {
+            Timber.d("App paused")
+            setAppPausedTimeUseCase(System.currentTimeMillis(), data.orientation)
         }
     }
 }
