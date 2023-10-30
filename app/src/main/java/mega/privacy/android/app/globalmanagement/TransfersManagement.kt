@@ -333,12 +333,6 @@ class TransfersManagement @Inject constructor(
 
         Handler(Looper.getMainLooper()).postDelayed({
             try {
-                val active =
-                    ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
-                val shouldStartForeground =
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-                            (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || active) //starting with Android 12 only active apps can startForegroundService
-
                 applicationScope.launch {
                     if (!getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
                         @Suppress("DEPRECATION")
@@ -346,12 +340,7 @@ class TransfersManagement @Inject constructor(
                             val downloadServiceIntent =
                                 Intent(context, DownloadService::class.java)
                                     .setAction(Constants.ACTION_RESTART_SERVICE)
-
-                            if (shouldStartForeground) {
-                                context.startForegroundService(downloadServiceIntent)
-                            } else {
-                                context.startService(downloadServiceIntent)
-                            }
+                            tryToStartForegroundService(downloadServiceIntent)
                         }
                     }
                 }
@@ -363,19 +352,33 @@ class TransfersManagement @Inject constructor(
 
                     val chatUploadServiceIntent = Intent(context, ChatUploadService::class.java)
                         .setAction(Constants.ACTION_RESTART_SERVICE)
-
-                    if (shouldStartForeground) {
-                        context.startForegroundService(uploadServiceIntent)
-                        context.startForegroundService(chatUploadServiceIntent)
-                    } else {
-                        context.startService(uploadServiceIntent)
-                        context.startService(chatUploadServiceIntent)
-                    }
+                    tryToStartForegroundService(uploadServiceIntent, chatUploadServiceIntent)
                 }
             } catch (e: Exception) {
                 Timber.w(e, "Exception checking pending transfers")
             }
         }, WAIT_TIME_TO_RESTART_SERVICES)
+    }
+
+    /**
+     * Tries to start a foreground service for each [Intent] if the requirements are meet, if not it may start it with [startService]
+     */
+    private fun tryToStartForegroundService(vararg intents: Intent) {
+        val active =
+            ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(
+                Lifecycle.State.STARTED
+            )
+        val shouldStartForeground =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                    (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || active) //starting with Android 12 only active apps can startForegroundService
+
+        intents.forEach {
+            if (shouldStartForeground) {
+                context.startForegroundService(it)
+            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                context.startService(it)
+            }
+        }
     }
 
 
