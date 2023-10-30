@@ -40,7 +40,7 @@ internal class SetAppPausedTimeUseCaseTest {
             )
         }
         val expected = 123L
-        underTest(expected)
+        underTest(expected, 1)
         verifyBlocking(passcodeRepository) { setLastPausedTime(expected) }
     }
 
@@ -56,8 +56,22 @@ internal class SetAppPausedTimeUseCaseTest {
         }
 
         val expected = 123L
-        underTest(expected)
+        underTest(expected, 1)
         verifyNoInteractions(passcodeRepository)
+    }
+
+    @Test
+    internal fun `test that orientation is set if state is not locked`() = runTest {
+        monitorPasscodeLockStateUseCase.stub {
+            on { invoke() }.thenReturn(flow {
+                emit(false)
+                awaitCancellation()
+            }
+            )
+        }
+        val expected = 1
+        underTest(123L, expected)
+        verifyBlocking(passcodeRepository) { setLastOrientation(expected) }
     }
 
 }

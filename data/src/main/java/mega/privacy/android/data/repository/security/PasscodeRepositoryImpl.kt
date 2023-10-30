@@ -45,7 +45,7 @@ internal class PasscodeRepositoryImpl @Inject constructor(
     override fun monitorLockState() = passcodeStoreGateway.monitorLockState()
         .flowOn(ioDispatcher)
 
-    override suspend fun setLastPausedTime(lastPausedUTCTimestamp: Long) =
+    override suspend fun setLastPausedTime(lastPausedUTCTimestamp: Long?) =
         withContext(ioDispatcher) {
             passcodeStoreGateway.setLastBackgroundTime(
                 lastPausedUTCTimestamp
@@ -105,4 +105,12 @@ internal class PasscodeRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun setLastOrientation(orientation: Int) = withContext(ioDispatcher) {
+        passcodeStoreGateway.setOrientation(orientation)
+    }
+
+    override fun monitorLastOrientation() = passcodeStoreGateway.monitorOrientation()
+        .map { it?.toIntOrNull() }
+        .flowOn(ioDispatcher)
 }

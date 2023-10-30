@@ -119,4 +119,18 @@ interface PasscodeStoreGateway {
      * @return biometrics enabled state as flow
      */
     fun monitorBiometricEnabledState(): Flow<Boolean?>
+
+    /**
+     * Set last orientation
+     *
+     * @param orientation
+     */
+    suspend fun setOrientation(orientation: Int?)
+
+    /**
+     * Monitor orientation
+     *
+     * @return orientation as a flow
+     */
+    fun monitorOrientation(): Flow<String?>
 }

@@ -2,7 +2,6 @@ package mega.privacy.android.app.initializer
 
 import android.content.Context
 import androidx.lifecycle.ProcessLifecycleInitializer
-import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.startup.Initializer
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -14,6 +13,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.security.PasscodeLifeCycleObserver
+import mega.privacy.android.app.presentation.security.PasscodeLifecycleDispatcher
+import mega.privacy.android.app.presentation.security.PasscodeProcessLifecycleOwner
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -65,15 +66,15 @@ class PasscodeInitializer : Initializer<Unit> {
      * Create
      */
     override fun create(context: Context) {
+        PasscodeLifecycleDispatcher.init(context)
+        PasscodeProcessLifecycleOwner.init(context)
         val entryPoint =
             EntryPointAccessors.fromApplication(context, PasscodeInitializerEntrypoint::class.java)
         with(entryPoint) {
             appScope().launch {
                 if (getFeatureFlagValue()(AppFeatures.Passcode)) {
                     withContext(mainDispatcher()) {
-                        ProcessLifecycleOwner.get().lifecycle.addObserver(
-                            passcodeLifecycleObserver()
-                        )
+                        PasscodeProcessLifecycleOwner.get().observer = passcodeLifecycleObserver()
                     }
                 }
             }

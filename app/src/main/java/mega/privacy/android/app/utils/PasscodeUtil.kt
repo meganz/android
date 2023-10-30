@@ -375,26 +375,29 @@ class PasscodeUtil @Inject constructor(
         val backendFlag = getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)
         if (uiFlag && backendFlag) {
             val activity = context as Activity
-            val themeMode = getThemeMode().first()
-            val view = ComposeView(activity)
-                .apply {
-                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
-                    setContent {
-                        val locked: Boolean by monitorPasscodeLockStateUseCase().collectAsStateWithLifecycle(
-                            initialValue = true
-                        )
-                        if (locked) {
-                            AndroidTheme(isDark = themeMode.isDarkMode()) {
-                                PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory)
+            if (activity.findViewById<ComposeView>(R.id.pass_code) == null) {
+                val themeMode = getThemeMode().first()
+                val view = ComposeView(activity)
+                    .apply {
+                        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+                        setContent {
+                            val locked: Boolean by monitorPasscodeLockStateUseCase().collectAsStateWithLifecycle(
+                                initialValue = true
+                            )
+                            if (locked) {
+                                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                                    PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory)
+                                }
                             }
                         }
+                    }.apply {
+                        id = R.id.pass_code
                     }
-                }
-
-            activity.addContentView(
-                view,
-                (activity.findViewById(android.R.id.content) as ViewGroup).layoutParams
-            )
+                activity.addContentView(
+                    view,
+                    (activity.findViewById(android.R.id.content) as ViewGroup).layoutParams
+                )
+            }
 
         } else {
             context.startActivity(

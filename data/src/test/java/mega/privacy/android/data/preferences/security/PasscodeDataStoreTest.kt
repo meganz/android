@@ -246,4 +246,30 @@ internal class PasscodeDataStoreTest {
 
         verifyBlocking(encryptData) { invoke(null) }
     }
+
+    @Test
+    internal fun `test that orientation is encrypted`() = runTest {
+        val input = 1
+
+        underTest.setOrientation(input)
+
+        verifyBlocking(encryptData) { invoke(input.toString()) }
+    }
+
+    @Test
+    internal fun `test that orientation is decrypted`() = runTest {
+        val expected = 2.toString()
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
+
+        underTest.monitorOrientation().test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    internal fun `test that null orientation is encrypted as null`() = runTest {
+        underTest.setOrientation(null)
+
+        verifyBlocking(encryptData) { invoke(null) }
+    }
 }

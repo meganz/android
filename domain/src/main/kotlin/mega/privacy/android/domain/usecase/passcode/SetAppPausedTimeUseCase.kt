@@ -19,10 +19,14 @@ class SetAppPausedTimeUseCase @Inject constructor(
      *
      * @param currentTime
      */
-    suspend operator fun invoke(currentTime: Long) {
+    suspend operator fun invoke(
+        currentTime: Long,
+        orientation: Int,
+    ) {
         val locked = monitorPasscodeLockStateUseCase().firstOrNull() ?: false
         if (!locked) {
             passcodeRepository.setLastPausedTime(currentTime)
+            passcodeRepository.setLastOrientation(orientation)
         }
     }
 }

@@ -18,30 +18,39 @@ class UpdatePasscodeStateUseCase @Inject constructor(
      *
      * @param currentTime
      */
-    suspend operator fun invoke(currentTime: Long) {
+    suspend operator fun invoke(
+        currentTime: Long,
+        orientation: Int,
+    ) {
         if (passcodeRepository.monitorIsPasscodeEnabled().firstOrNull() != true) return
+        val lastOrientation = passcodeRepository.monitorLastOrientation().firstOrNull() ?: orientation
 
         when (val timeOut = passcodeRepository.monitorPasscodeTimeOut().firstOrNull()) {
-            is PasscodeTimeout.Immediate -> {
-                passcodeRepository.setLocked(true)
+            PasscodeTimeout.Immediate -> {
+                if (lastOrientation != orientation) checkTimeSpan(
+                    currentTime,
+                    ROTATION_GRACE_MILLISECONDS
+                ) else passcodeRepository.setLocked(true)
             }
 
             is PasscodeTimeout.TimeSpan -> {
-                checkTimeSpan(currentTime, timeOut)
+                checkTimeSpan(currentTime, timeOut.milliseconds)
             }
 
             null -> return
         }
+
+        passcodeRepository.setLastPausedTime(null)
     }
 
     private suspend fun checkTimeSpan(
         currentTime: Long,
-        timeOut: PasscodeTimeout.TimeSpan,
+        timeOutMilliseconds: Long,
     ) {
         if (shouldLock(
                 passcodeRepository.getLastPausedTime(),
                 currentTime,
-                timeOut
+                timeOutMilliseconds
             )
         ) passcodeRepository.setLocked(
             true
@@ -51,6 +60,10 @@ class UpdatePasscodeStateUseCase @Inject constructor(
     private fun shouldLock(
         lastPaused: Long?,
         currentTime: Long,
-        timeOut: PasscodeTimeout.TimeSpan,
-    ) = lastPaused == null || currentTime - lastPaused >= timeOut.milliseconds
+        timeOutMilliseconds: Long,
+    ) = lastPaused != null && currentTime - lastPaused >= timeOutMilliseconds
+
+    companion object {
+        internal const val ROTATION_GRACE_MILLISECONDS: Long = 700
+    }
 }
