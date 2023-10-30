@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_ADD_PARTICIPANTS_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_AUDIO_CALL_ACTION
@@ -479,6 +480,17 @@ class ChatViewTest {
 
     }
 
+    @Test
+    fun `test that last green label shows if the chat is 1to1 and the contacts last green is not null`() {
+        val lastGreen = initComposeRuleContentWithLastGreen(
+            ChatUiState(
+                isGroup = false,
+                userLastGreen = 123456
+            )
+        )
+        composeTestRule.onNodeWithText(lastGreen).assertIsDisplayed()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(
@@ -487,5 +499,18 @@ class ChatViewTest {
                 onMenuActionPressed = actionPressed
             )
         }
+    }
+
+    private fun initComposeRuleContentWithLastGreen(state: ChatUiState): String {
+        var lastGreen = "last green"
+        composeTestRule.setContent {
+            ChatView(
+                uiState = state,
+                onBackPressed = {},
+                onMenuActionPressed = actionPressed
+            )
+            lastGreen = getLastSeenString(lastGreen = state.userLastGreen) ?: ""
+        }
+        return lastGreen
     }
 }

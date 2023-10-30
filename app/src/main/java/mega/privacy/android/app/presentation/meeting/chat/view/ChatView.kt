@@ -39,6 +39,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
+import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
@@ -77,8 +78,8 @@ internal fun ChatView(
     val coroutineScope = rememberCoroutineScope()
     val callPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { result ->
-        if (result[Manifest.permission.RECORD_AUDIO] == true) {
+    ) { permissionsResult ->
+        if (permissionsResult[Manifest.permission.RECORD_AUDIO] == true) {
             Timber.d("Ready to start call")
             // start call here
         } else {
@@ -123,6 +124,7 @@ internal fun ChatView(
                 },
                 maxActionsToShow = MENU_ACTIONS_TO_SHOW,
                 subtitle = getSubtitle(uiState = uiState),
+                marqueeSubtitle = uiState.userLastGreen != null,
                 elevation = 0.dp
             )
         },
@@ -132,11 +134,13 @@ internal fun ChatView(
             }
         }
     )
-    { _ ->
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            item("first_message_header") {
-                FirstMessageHeader(uiState)
-            }
+    { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            item("first_message_header") { FirstMessageHeader(uiState) }
         }
         if (showParticipatingInACallDialog) {
             ParticipatingInACallDialog(
@@ -291,6 +295,10 @@ private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
 
         myPermission == ChatRoomPermission.Removed -> {
             stringResource(id = R.string.inactive_chat)
+        }
+
+        userLastGreen != null -> {
+            getLastSeenString(userLastGreen) ?: ""
         }
 
         !isGroup && userChatStatus?.isValid() == true -> {
