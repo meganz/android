@@ -3358,7 +3358,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、%1$sを通して現在のサブスクリプションをキャンセルしてください。詳しくは、ヘルプセンターをご覧ください。</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、iTunesアカウントから現在のサブスクリプションをキャンセルしてください。詳しくは、ヘルプセンターをご覧ください。</string>
+    <string name="message_subscription_from_itunes">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、Appleアカウントから現在のサブスクリプションをキャンセルしてください。詳しくは、ヘルプセンターをご覧ください。</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、デスクトップまたはモバイルのウェブブラウザでMEGAにアクセスし、現在のサブスクリプションを解約してください。詳しくは、ヘルプセンターをご覧ください。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3372,7 +3372,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">アクティブなMEGAサブスクリプションをお持ちです。これは、アカウント削除後、自動的に解除されます。 詳しくは、当社のヘルプセンターをご覧ください。</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">AppleとのアクティブなMEGAサブスクリプションをお持ちです。MEGAではそれをキャンセルできないため、iTunesアカウントから別にキャンセルする必要があります。詳細については、当社のヘルプセンターをご覧ください。</string>
+    <string name="message_itunes_platform_subscription">AppleとのアクティブなMEGAサブスクリプションをお持ちです。MEGAではそれをキャンセルできないため、Appleアカウントから別にキャンセルする必要があります。詳細については、当社のヘルプセンターをご覧ください。</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">%1sにアクセス</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4961,4 +4961,14 @@
     <plurals name="meetings_meeting_not_in_call_section_subtitle">
         <item quantity="other">%d人の被招待者</item>
     </plurals>
+    <!-- Title of button to share the chat link in bottom panel in the group call screen -->
+    <string name="meetings_group_call_bottom_panel_share_chat_link_button">チャットリンクを共有</string>
+    <!-- Title to display Current plan for user on My account screen. -->
+    <string name="account_my_account_home_view_current_plan_title">現在のプラン</string>
+    <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
+    <string name="account_my_account_usage_get_more_storage_button">ストレージをさらに増やす</string>
+    <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGAは、必須の安全保証をご提供するゼロ知識暗号化を使用してお客様の通信を保護いたします：</string>
+    <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">このシステムは、受信したデータが表示された送信者からのものであり、そのコンテンツが転送中に操作されていないことを保証します。</string>
 </resources>

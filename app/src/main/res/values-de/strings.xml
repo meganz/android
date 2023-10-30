@@ -655,13 +655,13 @@
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Pincodes nicht ident. Bitte nochmals versuchen.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="unlock_pin_title">Geben Sie Ihren Pincode ein</string>
+    <string name="unlock_pin_title">Geben Sie Ihren Passcode ein</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="unlock_pin_title_2">Pincode wiederholen</string>
+    <string name="unlock_pin_title_2">Passcode wiederholen</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="reset_pin_title">Geben Sie Ihren neuen Pincode ein</string>
+    <string name="reset_pin_title">Geben Sie Ihren neuen Passcode ein</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="reset_pin_title_2">Neuen Pincode wiederholen</string>
+    <string name="reset_pin_title_2">Neuen Passcode wiederholen</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">Version</string>
     <!-- Preference screen item action button -->
@@ -3451,7 +3451,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement über %1$s. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement in Ihrem iTunes-Account. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <string name="message_subscription_from_itunes">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement in Ihrem Apple-Account. Weitere Informationen finden Sie in unserem Hilfecenter.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement, indem Sie MEGA in einem Desktop- oder mobilen Webbrowser öffnen. Weitere Informationen finden Sie in unserem Hilfecenter.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3465,7 +3465,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Sie haben ein aktives MEGA-Abonnement. Dieses wird automatisch gekündigt, nachdem der Account gelöscht wurde. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">Sie haben ein aktives MEGA-Abonnement bei Apple. Sie müssen dieses separat in Ihrem iTunes-Account kündigen, da MEGA die Kündigung nicht für Sie vornehmen kann. Weitere Informationen finden Sie in unserem Hilfecenter.</string>
+    <string name="message_itunes_platform_subscription">Sie haben ein aktives MEGA-Abonnement bei Apple. Sie müssen dieses separat in Ihrem Apple-Account kündigen, da MEGA die Kündigung nicht für Sie vornehmen kann. Weitere Informationen finden Sie in unserem Hilfecenter.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Besuchen Sie %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -5196,4 +5196,14 @@
         <item quantity="one">%d eingeladene Person</item>
         <item quantity="other">%d eingeladene Personen</item>
     </plurals>
+    <!-- Title of button to share the chat link in bottom panel in the group call screen -->
+    <string name="meetings_group_call_bottom_panel_share_chat_link_button">Chatlink teilen</string>
+    <!-- Title to display Current plan for user on My account screen. -->
+    <string name="account_my_account_home_view_current_plan_title">Aktiv</string>
+    <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
+    <string name="account_my_account_usage_get_more_storage_button">Erhalten Sie mehr Speicherplatz</string>
+    <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA schützt Ihre Kommunikation mit einer Zero-Knowledge-Verschlüsselung, die wichtige Sicherheitsgarantien bietet:</string>
+    <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
 </resources>

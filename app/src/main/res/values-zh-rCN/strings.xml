@@ -61,7 +61,7 @@
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-恢复密钥</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">次级媒体文件夹不存在，请选择一个新文件夹</string>
+    <string name="secondary_media_service_error_local_folder">辅助媒体文件夹不存在，请选择一个新文件夹</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">未检测到外部存储</string>
     <!-- Button where the user can sign off or logout -->
@@ -1990,7 +1990,7 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">云盘空间几乎已满。立即升级并获得高达%1$s的存储空间和%2$s的传输流量。</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">云盘空间几乎已满。如果您需要更多存储空间，请联系MEGA支持团队获取自定义方案。</string>
+    <string name="text_almost_full_warning_pro3_account">云盘空间几乎已满。如果您需要更多存储空间，请联系MEGA客服团队以获取自定义方案。</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">云盘空间已满。升级至Pro会员并获得高达%1$s的存储空间和%2$s的传输流量。</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
@@ -3358,7 +3358,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请通过%1$s取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请从您的iTunes帐户取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
+    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your Apple account. Visit our Help Centre for more information.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请在电脑或手机网页浏览器中登录MEGA以取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3372,7 +3372,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">您当前有一个MEGA订阅。此订阅会在帐户删除后自动取消。访问我们的帮助中心了解更多信息。</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">您当前在Apple有一个MEGA订阅。您必须从iTunes账户中单独取消它，因为MEGA无法为您取消订阅。访问我们的帮助中心了解更多信息。</string>
+    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your Apple account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">访问%1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4961,4 +4961,14 @@
     <plurals name="meetings_meeting_not_in_call_section_subtitle">
         <item quantity="other">%d位受邀请者</item>
     </plurals>
+    <!-- Title of button to share the chat link in bottom panel in the group call screen -->
+    <string name="meetings_group_call_bottom_panel_share_chat_link_button">分享聊天链接</string>
+    <!-- Title to display Current plan for user on My account screen. -->
+    <string name="account_my_account_home_view_current_plan_title">当前方案</string>
+    <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
+    <string name="account_my_account_usage_get_more_storage_button">获取更多存储空间</string>
+    <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA通过我们的零知识加密系统保护您的通信，提供必要的安全保障：</string>
+    <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
 </resources>

@@ -3358,7 +3358,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">คุณมีการสมัครใช้งานอยู่แล้ว หากคุณซื้ออีกรายการหนึ่ง คุณจะถูกเรียกเก็บเงินสองครั้ง เพื่อหลีกเลี่ยงปัญหานี้ ให้ยกเลิกการสมัครปัจจุบันของคุณผ่าน %1$s ก่อน เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">คุณมีการสมัครใช้งานอยู่แล้ว หากคุณซื้ออีกรายการหนึ่ง คุณจะถูกเรียกเก็บเงินสองครั้ง เพื่อหลีกเลี่ยงปัญหานี้ ให้ยกเลิกการสมัครรับข้อมูลปัจจุบันจากบัญชี iTunes ของคุณ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
+    <string name="message_subscription_from_itunes">คุณมีการสมัครใช้งานอยู่แล้ว หากคุณซื้อรายการอื่นอีก คุณจะถูกเรียกเก็บเงินสองครั้ง เพื่อหลีกเลี่ยงปัญหานี้ ให้ยกเลิกการสมัครใช้งานข้อมูลปัจจุบันจากบัญชี Apple ของคุณ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">คุณมีการสมัครใช้งานอยู่แล้ว หากคุณซื้ออีกรายการหนึ่ง คุณจะถูกเรียกเก็บเงินสองครั้ง เพื่อหลีกเลี่ยงปัญหานี้ ให้ยกเลิกการสมัครใช้งานปัจจุบันของคุณโดยไปที่ MEGA ในเบราว์เซอร์เดสก์ท็อปหรือมือถือ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3372,7 +3372,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">คุณมีการสมัครใช้งาน MEGA อยู่ แต่เมื่อบัญชีคุณถูกลบออก ระบบจะยกเลิกการสมัครใช้งานของคุณโดยอัตโนมัติ สำหรับข้อมูลเพิ่มเติม กรุณาเยี่ยมชมได้ที่ศูนย์ช่วยเหลือของเรา</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ Apple คุณต้องยกเลิกที่ iTunes ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ สำหรับข้อมูลเพิ่มเติม กรุณาเยี่ยมชมได้ที่ศูนย์ช่วยเหลือของเรา</string>
+    <string name="message_itunes_platform_subscription">คุณได้สมัครใช้งาน MEGA กับ Apple อยู่แล้ว คุณต้องยกเลิกที่ Apple ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ สำหรับข้อมูลเพิ่มเติม กรุณาเยี่ยมชมได้ที่ศูนย์ช่วยเหลือของเรา</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">เยี่ยมชม %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4940,7 +4940,7 @@
     <!--  -->
     <string name="camera_uploads_up_to_date">การอัปโหลดจากกล้องได้อัปเดตล่าสุดแล้ว</string>
     <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
+    <string name="camera_uploads_paused_due_to_no_internet">การอัปโหลดถูกหยุดชั่วคราวเนื่องจากการเชื่อมต่ออินเทอร์เน็ตขาดหายไป</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
         <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>
@@ -4955,11 +4955,20 @@
     <string name="camera_uploads_change_permissions">แตะเพื่อเปลี่ยนการอนุญาต</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
     <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
-        <item quantity="one">Invitee (%d)</item>
-        <item quantity="other">Invitees (%d)</item>
+        <item quantity="other">ผู้ได้รับเชิญ (%d)</item>
     </plurals>
     <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
     <plurals name="meetings_meeting_not_in_call_section_subtitle">
         <item quantity="other">มีผู้รับเชิญอยู่ %d คน</item>
     </plurals>
+    <!-- Title of button to share the chat link in bottom panel in the group call screen -->
+    <string name="meetings_group_call_bottom_panel_share_chat_link_button">แชร์ลิงก์แชท</string>
+    <!-- Title to display Current plan for user on My account screen. -->
+    <string name="account_my_account_home_view_current_plan_title">แผนปัจจุบัน</string>
+    <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
+    <string name="account_my_account_usage_get_more_storage_button">รับพื้นที่เก็บข้อมูลมากกว่านี้</string>
+    <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA ปกป้องการสื่อสารของคุณด้วยการเข้ารหัสแบบซีโร่-นอว์เลจเพื่อให้คุณมั่นใจได้ในเรื่องความปลอดภัยข้อมูลของคุณอย่างสูงสุด</string>
+    <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">ระบบตรวจสอบความถูกต้องของข้อมูลที่ได้รับ โดยตรวจสอบว่าข้อมูลนั้นมาจากผู้ส่งที่ถูกต้อง และเนื้อหาของข้อมูลนั้นไม่ได้ถูกแก้ไขในระหว่างการขนส่ง</string>
 </resources>

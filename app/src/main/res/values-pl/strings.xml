@@ -611,7 +611,7 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Jak wgrywać zdjęcia</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Włącz kopię przesyłanych zdjęć i filmów</string>
+    <string name="settings_secondary_upload_on">Włącz dodatkowe przesyłanie multimediów</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
     <string name="settings_secondary_upload_off">Wyłącz kopię przesyłanych zdjęć i filmów</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
@@ -3637,7 +3637,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Masz już abonament. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, anuluj swoją obecną subskrypcję za pośrednictwem %1$s. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Masz już abonament. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, należy anulować bieżącą subskrypcję na swoim koncie iTunes. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <string name="message_subscription_from_itunes">Masz już subskrypcję. Jeśli kupisz kolejną, opłata zostanie naliczona dwukrotnie. Aby tego uniknąć, anuluj bieżącą subskrypcję na swoim koncie Apple. Odwiedź nasze Centrum pomocy, aby uzyskać więcej informacji.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Masz już wykupioną subskrypcję. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, anuluj swoją obecną subskrypcję, wchodząc na stronę MEGA w przeglądarce internetowej na komputerze lub w telefonie komórkowym. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3651,7 +3651,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Masz aktywną subskrypcję MEGA. Zostanie ona automatycznie anulowana po usunięciu konta. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">Masz aktywną subskrypcję MEGA w Apple. Musisz ją anulować oddzielnie ze swojego konta iTunes, ponieważ MEGA nie jest w stanie anulować jej za Ciebie. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <string name="message_itunes_platform_subscription">Masz aktywną subskrypcję MEGA w Apple. Musisz ją anulować oddzielnie od konta Apple, ponieważ MEGA nie jest w stanie anulować jej za Ciebie. Odwiedź nasze Centrum pomocy, aby uzyskać więcej informacji.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Zobacz %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4100,7 +4100,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Automatyczne otwieranie katalogów zawierających tylko obrazy i filmy w widoku Media Discovery. Umożliwia to oglądanie multimediów w trybie galerii i filtrowanie według daty.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Ponieważ katalog ten zawiera tylko obrazy i filmy, automatycznie otworzyliśmy go w widoku odkrywania multimediów. Możesz cieszyć się treściami wizualnymi w bardziej wciągającym układzie. Możesz to wyłączyć w Ustawieniach.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Ustawienia</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5601,7 +5601,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Wykrywanie multimediów w podfolderach</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in media discovery view.</string>
+    <string name="settings_media_discovery_sub_folder_context">Obrazy i filmy z podfolderów będą również uwzględniane w widoku wykrywania multimediów.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Brak wyników</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5629,33 +5629,51 @@
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Zobacz wszystkie</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Nie odmawiaj</string>
     <!--  -->
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">Zaktualizowano przesyłanie zdjęć z kamery</string>
     <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Przesyłanie wstrzymane z powodu braku połączenia internetowego</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
-        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+        <item quantity="one">Trwa przesyłanie kamery, %1$d plików oczekuje na przesłanie</item>
+        <item quantity="few">Trwa przesyłanie kamery, %1$d plików oczekuje na przesłanie</item>
+        <item quantity="many">Trwa przesyłanie kamery, %1$d plików oczekuje na przesłanie</item>
+        <item quantity="other">Trwa przesyłanie kamery, %1$d pliku oczekuje na przesłanie</item>
     </plurals>
     <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
-        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+        <item quantity="one">Przesyłanie kamery zakończone, przesłano %1$d plik</item>
+        <item quantity="few">Przesyłanie kamery zakończone, przesłano %1$d plików</item>
+        <item quantity="many">Przesyłanie kamery zakończone, przesłano %1$d plików</item>
+        <item quantity="other">Przesyłanie kamery zakończone, przesłano %1$d plików</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA ma ograniczony dostęp do biblioteki zdjęć i nie może tworzyć kopii zapasowych wszystkich zdjęć.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
+    <string name="camera_uploads_change_permissions">Wybierz, aby zmienić uprawnienia.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
     <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
-        <item quantity="one">Invitee (%d)</item>
-        <item quantity="other">Invitees (%d)</item>
+        <item quantity="one">Zaproszony (%d)</item>
+        <item quantity="few">Zaproszeni (%d)</item>
+        <item quantity="many">Zaproszeni (%d)</item>
+        <item quantity="other">Zaproszeni (%d)</item>
     </plurals>
     <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
     <plurals name="meetings_meeting_not_in_call_section_subtitle">
-        <item quantity="one">%d invitee</item>
-        <item quantity="other">%d invitees</item>
+        <item quantity="one">%d zaproszony</item>
+        <item quantity="few">%d zaproszonych</item>
+        <item quantity="many">%d zaproszonych</item>
+        <item quantity="other">%d zaproszonych</item>
     </plurals>
+    <!-- Title of button to share the chat link in bottom panel in the group call screen -->
+    <string name="meetings_group_call_bottom_panel_share_chat_link_button">Udostępnij łącze do czatu</string>
+    <!-- Title to display Current plan for user on My account screen. -->
+    <string name="account_my_account_home_view_current_plan_title">Obecny plan</string>
+    <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
+    <string name="account_my_account_usage_get_more_storage_button">Uzyskaj więcej pamięci</string>
+    <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA chroni Twoją komunikację za pomocą naszego systemu szyfrowania \“zero wiedzy\“, zapewniając istotne gwarancje bezpieczeństwa:</string>
+    <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
 </resources>

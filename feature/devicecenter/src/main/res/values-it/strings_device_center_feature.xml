@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Title of the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_title">Rename device</string>
+    <string name="device_center_rename_device_dialog_title">Rinomina dispositivo</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_positive_button">Rinomina</string>
     <!-- The name of the Negative Button for the Rename Device Dialog -->
@@ -11,7 +11,7 @@
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
     <string name="device_center_list_view_item_header_other_devices">Altri dispositivi</string>
     <!-- The name of the Device or Folder Status when no matching Status is found-->
-    <string name="device_center_list_view_item_status_unknown_status">Unknown status</string>
+    <string name="device_center_list_view_item_status_unknown_status">Stato sconosciuto</string>
     <!-- The name of the Device if the SDK cannot retrieve the name for that Device -->
     <string name="device_center_list_view_item_title_unknown_device">Dispositivo sconosciuto</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
@@ -23,7 +23,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">Aggiornamento&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Updating&#8230;</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% aggiornamento in corso&#8230;</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">Nessun caricamento da fotocamera</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
@@ -53,7 +53,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">Info</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_backups">Show in Backups</string>
+    <string name="device_center_bottom_sheet_item_show_in_backups">Mostra in Backup</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Mostra nel Cloud drive</string>
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
@@ -137,13 +137,13 @@
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">La cartella non può essere sincronizzata in quanto è già dentro una cartella sincronizzata.</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Camera uploads disabled</string>
+    <string name="device_center_list_view_item_status_camera_uploads_disabled">Caricamenti da fotocamera disattivati</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
-    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Enter a device name.</string>
+    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Inserisci un nome per il dispositivo.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
-    <string name="device_center_rename_device_dialog_error_message_name_already_exists">A device with this name already exists. Enter a different name.</string>
+    <string name="device_center_rename_device_dialog_error_message_name_already_exists">Un dispositivo con questo nome esiste già. Inserisci un nome differente.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name with invalid characters -->
     <string name="device_center_rename_device_dialog_error_message_invalid_characters">I seguenti caratteri non sono ammessi: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
-    <string name="device_center_snackbar_message_rename_device_successful">Device renamed</string>
+    <string name="device_center_snackbar_message_rename_device_successful">Dispositivo rinominato</string>
 </resources>
