@@ -48,6 +48,7 @@ import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.AlbumContentScreenEvent
 import mega.privacy.mobile.analytics.event.AlbumContentShareLinkMenuToolbarEvent
 import javax.inject.Inject
@@ -278,6 +279,7 @@ class AlbumContentFragment : Fragment() {
             }
 
             R.id.action_menu_delete -> {
+                Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
                 handleAlbumDeletion()
             }
 

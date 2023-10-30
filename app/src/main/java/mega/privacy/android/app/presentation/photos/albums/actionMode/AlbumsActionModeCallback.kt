@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.mobile.analytics.event.AlbumDeselectAllEvent
 import mega.privacy.mobile.analytics.event.AlbumListShareLinkMenuItemEvent
 import mega.privacy.mobile.analytics.event.AlbumSelectAllEvent
+import mega.privacy.mobile.analytics.event.AlbumsListDeleteAlbumsEvent
 
 /**
  * Action Mode Callback class for Albums
@@ -70,6 +71,7 @@ class AlbumsActionModeCallback(
             }
 
             R.id.action_delete -> {
+                Analytics.tracker.trackEvent(AlbumsListDeleteAlbumsEvent)
                 fragment.albumsViewModel.showDeleteAlbumsConfirmation()
             }
 
