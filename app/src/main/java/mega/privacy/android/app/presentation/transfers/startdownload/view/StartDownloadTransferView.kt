@@ -61,7 +61,7 @@ internal fun StartDownloadTransferView(
                 }
 
                 is StartDownloadNode -> {
-                    viewModel.startDownloadNode(it.typedNodes)
+                    viewModel.startDownloadNodes(it.typedNodes)
                 }
             }
         })

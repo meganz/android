@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.transfers.downloads
 
-import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNestedParentFoldersUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
@@ -9,7 +9,7 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * Get the default path where nodes should be downloaded given its parent folder
+ * Get the default path where node should be downloaded
  */
 class GetDefaultDownloadPathForNodeUseCase @Inject constructor(
     private val getStorageDownloadLocationUseCase: GetStorageDownloadLocationUseCase,
@@ -18,14 +18,13 @@ class GetDefaultDownloadPathForNodeUseCase @Inject constructor(
 ) {
     /**
      * * Get the default path where nodes should be downloaded given its parent folder
-     * @param parentFolder the parent folder of the nodes that will be downloaded
+     * @param node the parent folder of the nodes that will be downloaded
      * @return a string
      */
-    suspend operator fun invoke(parentFolder: FolderNode): String? {
+    suspend operator fun invoke(node: Node): String? {
         val location = getStorageDownloadLocationUseCase() ?: return null
-        return if (isNodeInCloudDriveUseCase(parentFolder.id.longValue)) {
-            location.removeSuffix(File.separator) + getNestedParentFoldersUseCase(parentFolder)
-                .plus(parentFolder)//the parent itself needs to be added too
+        return if (isNodeInCloudDriveUseCase(node.id.longValue)) {
+            location.removeSuffix(File.separator) + getNestedParentFoldersUseCase(node)
                 .drop(1) //we don't want to add "Cloud Drive" root to the path
                 .joinAsPath()
         } else {

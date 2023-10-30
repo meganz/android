@@ -4,6 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNestedParentFoldersUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
@@ -27,6 +28,7 @@ class GetDefaultDownloadPathForNodeUseCaseTest {
     private val getNestedParentFoldersUseCase: GetNestedParentFoldersUseCase = mock()
     private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase = mock()
 
+    private val node = mock<Node>()
     private val parent = mock<FolderNode>()
     private val grandParent = mock<FolderNode>()
     private val greatGrandParent = mock<FolderNode>()
@@ -46,6 +48,7 @@ class GetDefaultDownloadPathForNodeUseCaseTest {
             getStorageDownloadLocationUseCase,
             getNestedParentFoldersUseCase,
             isNodeInCloudDriveUseCase,
+            node,
             parent,
             grandParent,
             greatGrandParent,
@@ -60,8 +63,8 @@ class GetDefaultDownloadPathForNodeUseCaseTest {
             stubNodes()
             stubDeviceFolder()
             whenever(getNestedParentFoldersUseCase(any()))
-                .thenReturn(listOf(greatGrandParent, grandParent))
-            val actual = underTest(parent)
+                .thenReturn(listOf(greatGrandParent, grandParent, parent))
+            val actual = underTest(node)
             Truth.assertThat(actual)
                 .isEqualTo(DEVICE_PATH + File.separator + GRAND_PARENT_NAME + File.separator + PARENT_NAME + File.separator)
         }
