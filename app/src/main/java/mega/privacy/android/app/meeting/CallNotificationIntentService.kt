@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +17,7 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHun
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener.OnCallOnHoldCallback
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
 import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
 import mega.privacy.android.app.utils.CallUtil.openMeetingRinging
@@ -23,8 +25,11 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartScheduledMeetingUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -36,16 +41,19 @@ import javax.inject.Inject
 /**
  * Service which should be for call notifications.
  *
- * @property passcodeManagement         [PasscodeManagement]
- * @property rtcAudioManagerGateway     [RTCAudioManagerGateway]
- * @property answerChatCallUseCase          [AnswerChatCallUseCase]
- * @property startScheduledMeetingUseCase   [StartScheduledMeetingUseCase]
- * @property ioDispatcher               [CoroutineDispatcher]
- * @property coroutineScope             [CoroutineScope]
- * @property megaApi                    [MegaApiAndroid]
- * @property megaChatApi                [MegaApiAndroid]
- * @property app                        [MegaApplication]
- * @property megaChatApiGateway         [MegaChatApiGateway]
+ * @property passcodeManagement                     [PasscodeManagement]
+ * @property rtcAudioManagerGateway                 [RTCAudioManagerGateway]
+ * @property answerChatCallUseCase                  [AnswerChatCallUseCase]
+ * @property startScheduledMeetingUseCase           [StartScheduledMeetingUseCase]
+ * @property startMeetingInWaitingRoomChatUseCase   [StartMeetingInWaitingRoomChatUseCase]
+ * @property getChatRoomUseCase                     [GetChatRoom]
+ * @property notificationManager                    [NotificationManagerCompat]
+ * @property ioDispatcher                           [CoroutineDispatcher]
+ * @property coroutineScope                         [CoroutineScope]
+ * @property megaApi                                [MegaApiAndroid]
+ * @property megaChatApi                            [MegaApiAndroid]
+ * @property app                                    [MegaApplication]
+ * @property megaChatApiGateway                     [MegaChatApiGateway]
  */
 @AndroidEntryPoint
 class CallNotificationIntentService : Service(),
@@ -61,7 +69,16 @@ class CallNotificationIntentService : Service(),
     lateinit var startScheduledMeetingUseCase: StartScheduledMeetingUseCase
 
     @Inject
+    lateinit var startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase
+
+    @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
+
+    @Inject
+    lateinit var getChatRoomUseCase: GetChatRoom
+
+    @Inject
+    lateinit var notificationManager: NotificationManagerCompat
 
     /**
      * Coroutine dispatcher for camera upload work
@@ -194,6 +211,7 @@ class CallNotificationIntentService : Service(),
 
                 START_SCHED_MEET -> {
                     processMeetingCall()
+                    notificationManager.cancel(chatIdIncomingCall.toInt())
                 }
 
                 DECLINE -> {
@@ -232,29 +250,67 @@ class CallNotificationIntentService : Service(),
     private fun processMeetingCall() {
         coroutineScope.launch {
             runCatching {
-                requireNotNull(
-                    startScheduledMeetingUseCase(
-                        chatId = chatIdIncomingCall,
-                        schedId = schedIdIncomingCall,
-                        enableVideo = false,
-                        enableAudio = false
-                    )
-                )
-            }.onSuccess { call ->
-                if (call.chatId != megaChatApiGateway.getChatInvalidHandle()) {
-                    openMeetingInProgress(
-                        this@CallNotificationIntentService,
-                        call.chatId,
-                        true,
-                        passcodeManagement
-                    )
+                val chatRoom = getChatRoomUseCase(chatIdIncomingCall)
+                val isWaitingRoom = chatRoom?.isWaitingRoom ?: false
+                val isHost = chatRoom?.ownPrivilege == ChatRoomPermission.Moderator
+                if (isWaitingRoom && !isHost) {
+                    openWaitingRoom(chatIdIncomingCall)
+                } else {
+                    runCatching {
+                        if (isWaitingRoom) {
+                            requireNotNull(
+                                startMeetingInWaitingRoomChatUseCase(
+                                    chatId = chatIdIncomingCall,
+                                    schedIdWr = schedIdIncomingCall,
+                                    enabledVideo = false,
+                                    enabledAudio = false,
+                                )
+                            )
+                        } else {
+                            requireNotNull(
+                                startScheduledMeetingUseCase(
+                                    chatId = chatIdIncomingCall,
+                                    schedId = schedIdIncomingCall,
+                                    enableVideo = false,
+                                    enableAudio = false
+                                )
+                            )
+                        }
+                    }.onSuccess { call ->
+                        if (call.chatId != megaChatApiGateway.getChatInvalidHandle()) {
+                            openMeetingInProgress(
+                                this@CallNotificationIntentService,
+                                call.chatId,
+                                true,
+                                passcodeManagement
+                            )
+                        }
+                        stopSelf()
+                    }.onFailure { error ->
+                        Timber.e(error)
+                        stopSelf()
+                    }
                 }
+            }.onSuccess {
                 stopSelf()
             }.onFailure { error ->
                 Timber.e(error)
                 stopSelf()
             }
         }
+    }
+
+    /**
+     * Open the waiting room
+     *
+     * @param chatId    Meeting's Chat ID
+     */
+    private fun openWaitingRoom(chatId: Long) {
+        val intent = Intent(applicationContext, WaitingRoomActivity::class.java).apply {
+            putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, chatId)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        applicationContext.startActivity(intent)
     }
 
     /**
