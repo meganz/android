@@ -61,7 +61,7 @@
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-CHIAVEDIRECUPERO</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">La cartella secondaria non esiste, per favore scegli una nuova cartella</string>
+    <string name="secondary_media_service_error_local_folder">La cartella per i caricamenti secondari dei media non esiste, per favore scegli una nuova cartella</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Nessuno spazio esterno rilevato</string>
     <!-- Button where the user can sign off or logout -->
@@ -603,9 +603,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Come caricare</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Attiva i caricamenti dei media secondari</string>
+    <string name="settings_secondary_upload_on">Attiva i caricamenti secondari dei media</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Disattiva i caricamenti dei media secondari</string>
+    <string name="settings_secondary_upload_off">Disattiva i caricamenti secondari dei media</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Scegli cartella</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -632,7 +632,7 @@
     <!-- The location of where the user photos or videos are stored in MEGA. -->
     <string name="settings_mega_camera_upload_folder">Cartella MEGA Caricamenti da fotocamera</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">Cartella Secondaria Locale</string>
+    <string name="settings_local_secondary_folder">Cartella secondaria locale</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
     <string name="settings_mega_secondary_folder">Cartella MEGA secondaria</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -1413,7 +1413,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i Caricamenti da fotocamera.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i caricamenti dei media secondari.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i caricamenti secondari dei media.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Spostare nel Cestino?</string>
     <!-- confirmation message before removing a file -->
@@ -3544,7 +3544,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente tramite %1$s. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente dal tuo account iTunes. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
+    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your Apple account. Visit our Help Centre for more information.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente andando su MEGA da un browser desktop o mobile. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3558,7 +3558,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Hai un abbonamento MEGA attivo. Verrà annullato automaticamente dopo che l\’account viene eliminato. Visita il nostro Centro di Assistenza per maggiori informazioni.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">Hai già un abbonamento MEGA attivo con Apple. Devi annullarlo separatamente tramite il tuo account iTunes, in quanto MEGA non può farlo al posto tuo. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
+    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your Apple account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Visita %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -3852,13 +3852,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">L\’utente [A]%1$s[/A][B] è stato impostato come \“di sola lettura\“ da [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to a standard participant by [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[/B][A]%2$s[/A] ha impostato [A]%1$s[/A][B] come partecipante standard</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">L\’utente [A]%1$s[/A][B] è stato impostato come host da [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">L\’utente %1$s  è stato impostato come \“di sola lettura\“ da %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to a standard participant by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s ha impostato %1$s come partecipante standard</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">L\’utente %1$s è stato impostato come host da %2$s</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -5280,7 +5280,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Sala d\’attesa</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Solo i partecipanti ammessi dall\’host possono unirsi al meeting.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">I partecipanti aggiunti da utenti che non sono l\’host non verranno inviati nella sala d\’attesa.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -5394,37 +5394,51 @@
     <!-- Option to show the list of participants who are not on the call in the meeting screen -->
     <string name="meetings_bottom_panel_participants_not_in_call_button">Non nella chiamata</string>
     <!-- Label to show the number of participants in the waiting room-->
-    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Waiting (%d)</string>
+    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">In attesa (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Vedi tutti</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Non negare</string>
     <!--  -->
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">Caricamenti da fotocamera aggiornati</string>
     <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Il caricamento è stato messo in pausa a causa dell\’assenza di connessione ad internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
-        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+        <item quantity="one">Caricamenti da fotocamera in corso, %1$d file in attesa</item>
+        <item quantity="many">Caricamenti da fotocamera in corso, %1$d di file in attesa</item>
+        <item quantity="other">Caricamenti da fotocamera in corso, %1$d file in attesa</item>
     </plurals>
     <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
-        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+        <item quantity="one">Caricamenti da fotocamera completati, %1$d file caricato</item>
+        <item quantity="many">Caricamenti da fotocamera completati, %1$d di file caricati</item>
+        <item quantity="other">Caricamenti da fotocamera completati, %1$d file caricati</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA ha accesso limitato alla tua Galleria e non può effettuare il backup di tutte le tue foto.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
+    <string name="camera_uploads_change_permissions">Tocca per cambiare i permessi.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
     <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
-        <item quantity="one">Invitee (%d)</item>
-        <item quantity="other">Invitees (%d)</item>
+        <item quantity="one">Invitato (%d)</item>
+        <item quantity="many">Invitati (%d)</item>
+        <item quantity="other">Invitati (%d)</item>
     </plurals>
     <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
     <plurals name="meetings_meeting_not_in_call_section_subtitle">
-        <item quantity="one">%d invitee</item>
-        <item quantity="other">%d invitees</item>
+        <item quantity="one">%d invitato</item>
+        <item quantity="many">%d di invitati</item>
+        <item quantity="other">%d invitati</item>
     </plurals>
+    <!-- Title of button to share the chat link in bottom panel in the group call screen -->
+    <string name="meetings_group_call_bottom_panel_share_chat_link_button">Condividi il link della chat</string>
+    <!-- Title to display Current plan for user on My account screen. -->
+    <string name="account_my_account_home_view_current_plan_title">Piano corrente</string>
+    <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
+    <string name="account_my_account_usage_get_more_storage_button">Ottieni più spazio</string>
+    <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA protegge le tue comunicazioni con il nostro sistema di criptazione a conoscenza zero che fornisce rassicurazioni essenziali sulla sicurezza:</string>
+    <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
 </resources>

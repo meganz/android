@@ -61,7 +61,7 @@
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-CLÉdeRÉCUPÉRATION</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">Le dossier des médias secondaires n’existe pas, veuillez choisir un nouveau dossier</string>
+    <string name="secondary_media_service_error_local_folder">Le dossier secondaire de médias n’existe pas, veuillez choisir un nouveau dossier</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Aucune mémoire externe n’a été détectée</string>
     <!-- Button where the user can sign off or logout -->
@@ -603,9 +603,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Comment téléverser</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Activer les téléversements des médias secondaires</string>
+    <string name="settings_secondary_upload_on">Activer les téléversements secondaires de médias</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Désactiver les téléversements des médias secondaires</string>
+    <string name="settings_secondary_upload_off">Désactiver les téléversements secondaires de médias</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Choisir un dossier</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -1413,7 +1413,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements de l’appareil photo sera désactivée.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements des médias secondaires sera désactivée.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Les téléversements secondaires de médias seront désactivée.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing a file -->
@@ -3544,7 +3544,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement dans %1$s. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement dans votre compte&#160;iTunes. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <string name="message_subscription_from_itunes">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement dans votre compte&#160;Apple. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement actuel en accédant à MEGA dans un navigateur Web mobile ou pour ordinateur. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3558,7 +3558,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Vous avez un abonnement MEGA actif. Il sera annulé automatiquement après suppression du compte. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">Vous avez un abonnement MEGA actif auprès d’Apple. Vous devez l’annuler séparément dans votre compte iTunes, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <string name="message_itunes_platform_subscription">Vous avez un abonnement MEGA actif auprès d’Apple. Vous devez l’annuler séparément dans votre compte Apple, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Accéder à %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -5431,4 +5431,14 @@
         <item quantity="many">%d de personnes invitées</item>
         <item quantity="other">%d&#160;personnes invitées</item>
     </plurals>
+    <!-- Title of button to share the chat link in bottom panel in the group call screen -->
+    <string name="meetings_group_call_bottom_panel_share_chat_link_button">Partager le lien de la conversation</string>
+    <!-- Title to display Current plan for user on My account screen. -->
+    <string name="account_my_account_home_view_current_plan_title">Abonnement actuel</string>
+    <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
+    <string name="account_my_account_usage_get_more_storage_button">Obtenir plus d’espace de stockage</string>
+    <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA protège vos communications grâce à notre système de chiffrement à divulgation nulle de connaissance apportant ainsi une garantie de sécurité essentielle&#160;:</string>
+    <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
 </resources>
