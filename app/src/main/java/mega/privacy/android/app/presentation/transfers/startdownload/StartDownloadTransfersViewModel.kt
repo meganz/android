@@ -25,7 +25,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetDefaultDownloadPathForNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetDownloadLocationForNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StartDownloadTransfersViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
-    private val getDefaultDownloadPathForNodeUseCase: GetDefaultDownloadPathForNodeUseCase,
+    private val getDownloadLocationForNodeUseCase: GetDownloadLocationForNodeUseCase,
     private val startDownloadUseCase: StartDownloadUseCase,
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
@@ -69,7 +69,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
                 startDownloadNodes(
                     siblingNodes,
                     getPath = {
-                        getDefaultDownloadPathForNodeUseCase(firstSibling)
+                        getDownloadLocationForNodeUseCase(firstSibling)
                     },
                 )
             }
@@ -114,7 +114,6 @@ class StartDownloadTransfersViewModel @Inject constructor(
         val terminalEvent = runCatching {
             getPath().also {
                 if (it.isNullOrBlank()) {
-                    // this will be checked in TRAN-196 and a proper error will be thrown or emitted
                     throw NullPointerException("path not found!")
                 }
             }

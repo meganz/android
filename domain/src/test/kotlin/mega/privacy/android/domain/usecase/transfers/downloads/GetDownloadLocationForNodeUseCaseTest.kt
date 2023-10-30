@@ -5,7 +5,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNestedParentFoldersUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import org.junit.jupiter.api.Assertions.*
@@ -21,10 +20,11 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetDefaultDownloadPathForNodeUseCaseTest {
-    private lateinit var underTest: GetDefaultDownloadPathForNodeUseCase
+class GetDownloadLocationForNodeUseCaseTest {
+    private lateinit var underTest: GetDownloadLocationForNodeUseCase
 
-    private val getStorageDownloadLocationUseCase: GetStorageDownloadLocationUseCase = mock()
+    private val getOrCreateStorageDownloadLocationUseCase =
+        mock<GetOrCreateStorageDownloadLocationUseCase>()
     private val getNestedParentFoldersUseCase: GetNestedParentFoldersUseCase = mock()
     private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase = mock()
 
@@ -35,8 +35,8 @@ class GetDefaultDownloadPathForNodeUseCaseTest {
 
     @BeforeAll
     fun setup() {
-        underTest = GetDefaultDownloadPathForNodeUseCase(
-            getStorageDownloadLocationUseCase,
+        underTest = GetDownloadLocationForNodeUseCase(
+            getOrCreateStorageDownloadLocationUseCase,
             getNestedParentFoldersUseCase,
             isNodeInCloudDriveUseCase,
         )
@@ -45,7 +45,7 @@ class GetDefaultDownloadPathForNodeUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            getStorageDownloadLocationUseCase,
+            getOrCreateStorageDownloadLocationUseCase,
             getNestedParentFoldersUseCase,
             isNodeInCloudDriveUseCase,
             node,
@@ -86,7 +86,7 @@ class GetDefaultDownloadPathForNodeUseCaseTest {
     }
 
     private suspend fun stubDeviceFolder() {
-        whenever(getStorageDownloadLocationUseCase()).thenReturn(DEVICE_PATH)
+        whenever(getOrCreateStorageDownloadLocationUseCase()).thenReturn(DEVICE_PATH)
     }
 
     companion object {

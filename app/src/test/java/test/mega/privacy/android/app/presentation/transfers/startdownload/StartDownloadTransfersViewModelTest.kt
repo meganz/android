@@ -25,7 +25,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetDefaultDownloadPathForNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetDownloadLocationForNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -50,7 +50,7 @@ class StartDownloadTransfersViewModelTest {
     lateinit var underTest: StartDownloadTransfersViewModel
 
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase = mock()
-    private val getDefaultDownloadPathForNodeUseCase: GetDefaultDownloadPathForNodeUseCase = mock()
+    private val getDownloadLocationForNodeUseCase: GetDownloadLocationForNodeUseCase = mock()
     private val startDownloadUseCase: StartDownloadUseCase = mock()
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase = mock()
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase =
@@ -67,7 +67,7 @@ class StartDownloadTransfersViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = StartDownloadTransfersViewModel(
             getOfflinePathForNodeUseCase,
-            getDefaultDownloadPathForNodeUseCase,
+            getDownloadLocationForNodeUseCase,
             startDownloadUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
@@ -80,7 +80,7 @@ class StartDownloadTransfersViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            getDefaultDownloadPathForNodeUseCase,
+            getDownloadLocationForNodeUseCase,
             startDownloadUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
@@ -209,7 +209,7 @@ class StartDownloadTransfersViewModelTest {
         whenever(node.parentId).thenReturn(parentId)
         whenever(parentNode.id).thenReturn(parentId)
 
-        whenever(getDefaultDownloadPathForNodeUseCase(node)).thenReturn(destination)
+        whenever(getDownloadLocationForNodeUseCase(node)).thenReturn(destination)
 
         whenever(isConnectedToInternetUseCase()).thenReturn(internetConnection)
     }
