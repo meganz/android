@@ -28,7 +28,7 @@ internal class TransferMapper @Inject constructor(
             parentPath = transfer.parentPath.orEmpty(),
             nodeHandle = transfer.nodeHandle,
             parentHandle = transfer.parentHandle,
-            fileName = transfer.fileName,
+            fileName = transfer.fileName.orEmpty(),
             stage = transfer.stage.toTransferStage(),
             tag = transfer.tag,
             speed = transfer.speed,
