@@ -10,20 +10,24 @@ import javax.inject.Inject
 
 /**
  * Remove link bottom sheet menu item
- *
- * @param menuAction [RemoveLinkMenuAction]
  */
-class RemoveLinkBottomSheetMenuItem @Inject constructor(
-    override val menuAction: RemoveLinkMenuAction,
-) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
+class RemoveLinkBottomSheetMenuItem @Inject constructor() :
+    NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override fun shouldDisplay() = true
 
-    override fun menuAction(selectedNode: TypedNode): @Composable ((MenuAction) -> Unit) -> Unit =
+    override val menuAction: RemoveLinkMenuAction = RemoveLinkMenuAction(170)
+    override val groupId: Int
+        get() = 7
+
+    override fun menuAction(
+        selectedNode: TypedNode,
+        showDivider: Boolean,
+    ): @Composable ((MenuAction) -> Unit) -> Unit =
         {
             MenuActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
-                addSeparator = false,
+                addSeparator = showDivider,
                 isDestructive = false,
                 onActionClicked = { it(menuAction) },
             )

@@ -26,12 +26,21 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
      *
      * Creates composable menu item for bottom sheet
      * @param selectedNode
+     * @param showDivider
      */
-    fun menuAction(selectedNode: TypedNode): @Composable ((MenuAction) -> Unit) -> Unit
+    fun menuAction(
+        selectedNode: TypedNode,
+        showDivider: Boolean,
+    ): @Composable ((MenuAction) -> Unit) -> Unit
 
 
     /**
      * Menu action item
      */
     val menuAction: T
+
+    /**
+     * Group in which menu item is part of
+     */
+    val groupId: Int
 }

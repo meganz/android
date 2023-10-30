@@ -18,14 +18,20 @@ class TrashBottomSheetMenuItem @Inject constructor(
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override fun shouldDisplay() = true
 
-    override fun menuAction(selectedNode: TypedNode): @Composable ((MenuAction) -> Unit) -> Unit =
+    override fun menuAction(
+        selectedNode: TypedNode,
+        showDivider: Boolean,
+    ): @Composable ((MenuAction) -> Unit) -> Unit =
         {
             MenuActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
-                addSeparator = false,
-                isDestructive = false,
+                addSeparator = showDivider,
+                isDestructive = true,
                 onActionClicked = { it(menuAction) },
             )
         }
+
+    override val groupId: Int
+        get() = 9
 }

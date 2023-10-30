@@ -18,11 +18,14 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     override val menuAction: AvailableOfflineMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override fun shouldDisplay() = true
-    override fun menuAction(selectedNode: TypedNode): @Composable ((MenuAction) -> Unit) -> Unit = {
+    override fun menuAction(
+        selectedNode: TypedNode,
+        showDivider: Boolean,
+    ): @Composable ((MenuAction) -> Unit) -> Unit = {
         MenuActionListTile(
             text = menuAction.getDescription(),
             icon = menuAction.getIconPainter(),
-            addSeparator = true,
+            addSeparator = showDivider,
             isDestructive = false,
             onActionClicked = { it(menuAction) },
             trailingItem = {
@@ -33,4 +36,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
             }
         )
     }
+
+    override val groupId: Int
+        get() = 6
 }

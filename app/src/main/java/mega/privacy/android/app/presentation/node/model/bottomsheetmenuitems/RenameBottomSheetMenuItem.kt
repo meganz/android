@@ -10,20 +10,24 @@ import javax.inject.Inject
 
 /**
  * Rename bottom sheet menu item
- *
- * @param menuAction [RenameMenuAction]
  */
-class RenameBottomSheetMenuItem @Inject constructor(
-    override val menuAction: RenameMenuAction,
-) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
+class RenameBottomSheetMenuItem @Inject constructor() :
+    NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override fun shouldDisplay() = true
 
-    override fun menuAction(selectedNode: TypedNode): @Composable ((MenuAction) -> Unit) -> Unit =
+    override val menuAction: RenameMenuAction = RenameMenuAction(220)
+    override val groupId: Int
+        get() = 8
+
+    override fun menuAction(
+        selectedNode: TypedNode,
+        showDivider: Boolean,
+    ): @Composable ((MenuAction) -> Unit) -> Unit =
         {
             MenuActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
-                addSeparator = false,
+                addSeparator = showDivider,
                 isDestructive = false,
                 onActionClicked = { it(menuAction) },
             )

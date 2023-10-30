@@ -22,10 +22,15 @@ class NodeBottomSheetActionMapper @Inject constructor() {
     operator fun invoke(
         toolbarOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<*>>,
         selectedNode: TypedNode,
-    ): List<@Composable ((MenuAction) -> Unit) -> Unit> = toolbarOptions
-        .mapNotNull {
-            if (it.shouldDisplay()) {
-                it.menuAction(selectedNode)
-            } else null
+    ): List<@Composable ((MenuAction) -> Unit) -> Unit> {
+        val displayableItems = toolbarOptions
+            .filter { it.shouldDisplay() }
+            .sortedBy { it.menuAction.orderInCategory }
+        return displayableItems.mapIndexed { index, item ->
+            val nextGroupId = displayableItems.getOrNull(index + 1)?.groupId
+            val showDivider = nextGroupId != null
+                    && item.groupId != nextGroupId
+            item.menuAction(selectedNode, showDivider)
         }
+    }
 }
