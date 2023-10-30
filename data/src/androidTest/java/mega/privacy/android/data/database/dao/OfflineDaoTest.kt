@@ -5,7 +5,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.OfflineEntity
@@ -71,7 +70,7 @@ class OfflineDaoTest {
             offlineDao.insertOrUpdateOffline(offline)
             offline
         }
-        offlineDao.getAllOffline().first().forEachIndexed { i, entity ->
+        offlineDao.getOfflineFiles()?.forEachIndexed { i, entity ->
             Truth.assertThat(entity.encryptedHandle).isEqualTo(contacts[i].encryptedHandle)
             Truth.assertThat(entity.encryptedName).isEqualTo(contacts[i].encryptedName)
         }
@@ -94,6 +93,6 @@ class OfflineDaoTest {
             offlineDao.insertOrUpdateOffline(offline)
         }
         offlineDao.deleteAllOffline()
-        Truth.assertThat(offlineDao.getAllOffline().first().size).isEqualTo(0)
+        Truth.assertThat(offlineDao.getOfflineFiles()?.size).isEqualTo(0)
     }
 }

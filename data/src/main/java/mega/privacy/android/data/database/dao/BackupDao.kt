@@ -15,10 +15,10 @@ internal interface BackupDao {
     @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_BACKUPS}")
     suspend fun getAllBackups(): List<BackupEntity>
 
-    @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_BACKUPS} WHERE backup_type = :backupType AND outdated = :encryptedIsOutdated ORDER BY id DESC")
+    @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_BACKUPS} WHERE backup_type = :backupType AND outdated = :encryptedIsOutdated ORDER BY id")
     suspend fun getBackupByType(backupType: Int, encryptedIsOutdated: String): List<BackupEntity>
 
-    @Query("SELECT backup_id FROM ${MegaDatabaseConstant.TABLE_BACKUPS} WHERE backup_type = :backupType AND outdated = :encryptedIsOutdated ORDER BY id DESC")
+    @Query("SELECT backup_id FROM ${MegaDatabaseConstant.TABLE_BACKUPS} WHERE backup_type = :backupType AND outdated = :encryptedIsOutdated ORDER BY id")
     suspend fun getBackupIdByType(backupType: Int, encryptedIsOutdated: String): List<String?>
 
     @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_BACKUPS} WHERE backup_id = :encryptedBackupId")
