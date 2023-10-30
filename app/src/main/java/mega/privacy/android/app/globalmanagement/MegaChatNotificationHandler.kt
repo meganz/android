@@ -59,48 +59,39 @@ class MegaChatNotificationHandler @Inject constructor(
     override fun onChatNotification(api: MegaChatApiJava?, chatId: Long, msg: MegaChatMessage?) {
         Timber.d("onChatNotification")
 
-        if (msg?.type == MegaChatMessage.TYPE_CALL_STARTED
-            || msg?.type == MegaChatMessage.TYPE_CALL_ENDED
-            || msg?.type == MegaChatMessage.TYPE_SCHED_MEETING
-        ) {
-            Timber.d("No notification required ${msg.type}")
-            return
-        }
-
-        updateAppBadge()
-
-        val seenMessage = msg?.status == MegaChatMessage.STATUS_SEEN
-
-        if (MegaApplication.openChatId == chatId && !seenMessage) {
-            Timber.d("Do not update/show notification - opened chat")
-            return
-        }
-
         msg?.apply {
+            if (type != MegaChatMessage.TYPE_NORMAL && type != MegaChatMessage.TYPE_NODE_ATTACHMENT &&
+                type != MegaChatMessage.TYPE_CONTACT_ATTACHMENT && type != MegaChatMessage.TYPE_CONTAINS_META &&
+                type != MegaChatMessage.TYPE_VOICE_CLIP
+            ) {
+                Timber.d("No notification required $type")
+                return
+            }
+
+            updateAppBadge()
+
+            val seenMessage = status == MegaChatMessage.STATUS_SEEN
+
+            if (MegaApplication.openChatId == chatId && !seenMessage) {
+                Timber.d("Do not update/show notification - opened chat")
+                return
+            }
+
             val shouldBeep = if (status == MegaChatMessage.STATUS_NOT_SEEN) {
-                when (type) {
-                    MegaChatMessage.TYPE_NORMAL, MegaChatMessage.TYPE_CONTACT_ATTACHMENT,
-                    MegaChatMessage.TYPE_NODE_ATTACHMENT, MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT,
-                    -> {
-                        if (isDeleted) {
-                            Timber.d("Message deleted")
-                            false
-                        } else if (isEdited) {
-                            Timber.d("Message edited")
-                            false
-                        } else {
-                            Timber.d("New normal message")
-                            true
-                        }
+                when {
+                    isDeleted -> {
+                        Timber.d("Message deleted")
+                        false
                     }
 
-                    MegaChatMessage.TYPE_TRUNCATE -> {
-                        Timber.d("New TRUNCATE message")
+                    isEdited -> {
+                        Timber.d("Message edited")
                         false
                     }
 
                     else -> {
-                        false
+                        Timber.d("New normal message")
+                        true
                     }
                 }
             } else {
@@ -131,6 +122,7 @@ class MegaChatNotificationHandler @Inject constructor(
                     )
                 }.onFailure { error -> Timber.e(error) }
             }
+
         } ?: Timber.w("Message is null, no way to notify")
     }
 
