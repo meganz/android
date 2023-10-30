@@ -55,15 +55,24 @@ class RemoveOfflineNodeUseCase @Inject constructor(
         fileRepository.deleteFolderAndItsFiles(path)
     }
 
-    private suspend fun deleteChildrenInDb(offlineInfoChildren: List<OfflineNodeInformation>) {
-        offlineInfoChildren.forEach {
-            val children = nodeRepository.getOfflineNodeByParentId(it.id)
-            children?.let { childNodes ->
-                deleteChildrenInDb(childNodes)
-            }
-            nodeRepository.removeOfflineNodeById(it.id)
+    private tailrec suspend fun deleteChildrenInDb(offlineInfoChildren: List<OfflineNodeInformation>) {
+        if (offlineInfoChildren.isEmpty()) {
+            return
         }
+
+        val nextNodes = buildList {
+            for (node in offlineInfoChildren) {
+                val children = nodeRepository.getOfflineNodeByParentId(node.id)
+                children?.let { childNodes ->
+                    addAll(childNodes)
+                }
+                nodeRepository.removeOfflineNodeById(node.id)
+            }
+        }
+
+        deleteChildrenInDb(nextNodes)
     }
+
 
     private suspend fun updateParentOfflineStatus(parentId: Int) {
         val siblings = nodeRepository.getOfflineNodeByParentId(parentId)

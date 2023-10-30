@@ -7,15 +7,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -37,8 +41,9 @@ import javax.inject.Inject
 class AudioViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
-    monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdates: MonitorNodeUpdates,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
 ) : ViewModel(), SearchCallback.Data {
 
     private var _query = MutableLiveData<String>()
@@ -124,24 +129,31 @@ class AudioViewModel @Inject constructor(
         }
     }
 
-    private val nodesChangeObserver = Observer<Boolean> { forceUpdate ->
-        if (!forceUpdate) {
-            refreshUi()
-        }
-    }
-
     init {
         fetchOrderAndLoadAudio()
-
+        observeNodeChanges()
+        observeOfflineNodes()
         items.observeForever(loadFinishedObserver)
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .observeForever(nodesChangeObserver)
+    }
 
+    private fun observeNodeChanges() {
         viewModelScope.launch {
             monitorNodeUpdates().collectLatest {
                 Timber.d("Received node update")
                 loadAudio(true)
             }
+        }
+    }
+
+    private fun observeOfflineNodes() {
+        viewModelScope.launch {
+            monitorOfflineNodeUpdatesUseCase()
+                .catch { Timber.e(it) }
+                .conflate()
+                .collect {
+                    delay(500L)
+                    refreshUi()
+                }
         }
     }
 
@@ -217,8 +229,6 @@ class AudioViewModel @Inject constructor(
     fun getRealNodeCount() = items.value?.size?.minus(if (searchMode) 0 else 1) ?: 0
 
     override fun onCleared() {
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
     }
 

@@ -1083,8 +1083,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             DrawerItem.BACKUPS -> (requireActivity() as ManagerActivity).onNodesBackupsUpdate()
             DrawerItem.SHARED_ITEMS -> (requireActivity() as ManagerActivity).refreshSharesFragments()
             DrawerItem.SEARCH -> (requireActivity() as ManagerActivity).onNodesSearchUpdate()
-            DrawerItem.HOMEPAGE -> LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE)
-                .post(false)
 
             else -> {}
         }

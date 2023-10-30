@@ -769,7 +769,6 @@ public class Constants {
     public static final int MAX_BADGE_NUM = 9;
 
     /** Event Keys */
-    public static final String EVENT_NODES_CHANGE = "nodes_change";
     public static final String EVENT_ORDER_CHANGE = "order_change";
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";

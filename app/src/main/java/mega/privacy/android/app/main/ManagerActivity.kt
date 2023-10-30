@@ -4794,8 +4794,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             onNodesSharedUpdate()
         } else if (drawerItem === DrawerItem.SEARCH) {
             refreshSearch()
-        } else if (drawerItem === DrawerItem.HOMEPAGE) {
-            LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE).post(false)
         }
         refreshRubbishBin()
         setToolbarTitle()
