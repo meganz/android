@@ -66,8 +66,8 @@ class ChatViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     private val chatId = savedStateHandle.get<Long>(Constants.CHAT_ID)
-    private val usersTyping = Collections.synchronizedMap(hashMapOf<Long, String?>())
-    private val jobs = hashMapOf<Long, Job>()
+    private val usersTyping = Collections.synchronizedMap(mutableMapOf<Long, String?>())
+    private val jobs = mutableMapOf<Long, Job>()
 
     private val ChatRoom.isPrivateRoom: Boolean
         get() = !isGroup || !isPublic
@@ -188,11 +188,21 @@ class ChatViewModel @Inject constructor(
                                     }
                                 }
 
+                                ChatRoomChange.UserStopTyping -> handleUserStopTyping(userTyping)
+
                                 else -> {}
                             }
                         }
                     }
                 }
+        }
+    }
+
+    private fun handleUserStopTyping(userTypingHandle: Long) {
+        jobs[userTypingHandle]?.cancel()
+        usersTyping.remove(userTypingHandle)
+        _state.update { state ->
+            state.copy(usersTyping = usersTyping.values.toList())
         }
     }
 

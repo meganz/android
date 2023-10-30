@@ -786,13 +786,14 @@ internal class ChatViewModelTest {
         runTest {
             val myUserHandle = 1L
             val userHandle = 123L
+            val expectedFirstName = "firstName"
             val chatRoom = mock<ChatRoom> {
                 on { changes } doReturn listOf(ChatRoomChange.UserTyping)
                 on { ownPrivilege } doReturn ChatRoomPermission.Moderator
                 on { userTyping } doReturn userHandle
             }
             whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
-            whenever(getParticipantFirstNameUseCase(userHandle)).thenReturn("firstName")
+            whenever(getParticipantFirstNameUseCase(userHandle)).thenReturn(expectedFirstName)
             whenever(getMyUserHandleUseCase()).thenReturn(myUserHandle)
             val updateFlow = MutableSharedFlow<ChatRoom>()
             whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
@@ -802,10 +803,45 @@ internal class ChatViewModelTest {
             }
             updateFlow.emit(chatRoom)
             underTest.state.test {
-                assertThat(awaitItem().usersTyping).isEqualTo(listOf("firstName"))
+                assertThat(awaitItem().usersTyping).isEqualTo(listOf(expectedFirstName))
             }
             // test reset after 5s
             advanceTimeBy(6000L)
+            underTest.state.test {
+                assertThat(awaitItem().usersTyping).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that users typing update correctly when chat room update with user stop typing`() =
+        runTest {
+            val myUserHandle = 1L
+            val userHandle = 123L
+            val expectedFirstName = "firstName"
+            val chatRoom = mock<ChatRoom> {
+                on { changes } doReturn listOf(ChatRoomChange.UserTyping)
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                on { userTyping } doReturn userHandle
+            }
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(getParticipantFirstNameUseCase(userHandle)).thenReturn(expectedFirstName)
+            whenever(getMyUserHandleUseCase()).thenReturn(myUserHandle)
+            val updateFlow = MutableSharedFlow<ChatRoom>()
+            whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+            initTestClass()
+            underTest.state.test {
+                assertThat(awaitItem().usersTyping).isEmpty()
+            }
+            val stopTypingChatRoom = mock<ChatRoom> {
+                on { changes } doReturn listOf(ChatRoomChange.UserStopTyping)
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                on { userTyping } doReturn userHandle
+            }
+            updateFlow.emit(chatRoom)
+            underTest.state.test {
+                assertThat(awaitItem().usersTyping).isEqualTo(listOf(expectedFirstName))
+            }
+            updateFlow.emit(stopTypingChatRoom)
             underTest.state.test {
                 assertThat(awaitItem().usersTyping).isEmpty()
             }
