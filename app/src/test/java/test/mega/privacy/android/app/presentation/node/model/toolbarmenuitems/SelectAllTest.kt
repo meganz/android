@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.namecollision.node.model.toolbarmenuitems
+package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
@@ -13,7 +13,7 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ClearSelectionTest {
+class SelectAllTest {
 
     private val underTest = ClearSelection(ClearSelectionMenuAction())
 
@@ -23,10 +23,11 @@ class ClearSelectionTest {
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
     private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
 
-    @ParameterizedTest(name = "when selected nodes are {0}, then is clear selection item visible is {1}")
+    @ParameterizedTest(name = "when selected nodes are {0} and result count is {1} then visibility is {2}")
     @MethodSource("provideArguments")
-    fun `test that the clear selection item visibility is adjusted`(
+    fun `test that select all item visibility is updated`(
         selectedNodes: Set<TypedNode>,
+        resultCount: Int,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -36,13 +37,13 @@ class ClearSelectionTest {
             noNodeInBackups = false,
             noNodeTakenDown = false,
             allFileNodes = false,
-            resultCount = 10
+            resultCount = resultCount
         )
         Truth.assertThat(result).isEqualTo(expected)
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(emptySet<TypedFolderNode>(), false),
-        Arguments.of(multipleNodes, true)
+        Arguments.of(emptySet<TypedFolderNode>(), 10, false),
+        Arguments.of(multipleNodes, 2, true)
     )
 }

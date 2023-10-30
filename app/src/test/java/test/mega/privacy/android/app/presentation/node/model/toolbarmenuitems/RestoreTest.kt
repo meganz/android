@@ -1,8 +1,8 @@
-package test.mega.privacy.android.app.namecollision.node.model.toolbarmenuitems
+package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.menuaction.RemoveMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Remove
+import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Restore
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -13,17 +13,20 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveTest {
+class RestoreTest {
 
-    private val underTest = Remove(RemoveMenuAction())
+    private val underTest = Restore(RestoreMenuAction())
 
-    private val oneFileNodeSelected = mock<TypedFolderNode>()
+    private val oneFileNodeSelected = mock<TypedFolderNode> {
+        on { isTakenDown }.thenReturn(false)
+    }
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
     private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
 
-    @ParameterizedTest(name = "when selected nodes are {0} then visibility is {1}")
+    @ParameterizedTest(name = "when noNodeIsTakenDown: {0} and selected nodes are {1} then visibility is {2}")
     @MethodSource("provideArguments")
-    fun `test that remove item visibility is updated`(
+    fun `test that restore item visibility is updated`(
+        noNodeIsTakenDown: Boolean,
         selectedNodes: Set<TypedNode>,
         expected: Boolean,
     ) {
@@ -32,7 +35,7 @@ class RemoveTest {
             selectedNodes = selectedNodes,
             canBeMovedToTarget = false,
             noNodeInBackups = false,
-            noNodeTakenDown = false,
+            noNodeTakenDown = noNodeIsTakenDown,
             allFileNodes = false,
             resultCount = 10
         )
@@ -40,7 +43,9 @@ class RemoveTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(emptySet<TypedFolderNode>(), false),
-        Arguments.of(multipleNodes, true)
+        Arguments.of(false, emptySet<TypedFolderNode>(), false),
+        Arguments.of(false, multipleNodes, false),
+        Arguments.of(true, emptySet<TypedFolderNode>(), false),
+        Arguments.of(true, multipleNodes, true),
     )
 }

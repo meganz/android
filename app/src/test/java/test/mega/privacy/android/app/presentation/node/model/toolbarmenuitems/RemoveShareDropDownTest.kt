@@ -1,7 +1,7 @@
-package test.mega.privacy.android.app.namecollision.node.model.toolbarmenuitems
+package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -12,10 +12,9 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveShareTest {
+class RemoveShareDropDownTest {
 
-    private val underTest = RemoveShare()
-
+    private val underTest = RemoveShareDropDown()
 
     private val sharedFolder1 = mock<TypedFolderNode> {
         on { isPendingShare }.thenReturn(true)
@@ -31,7 +30,7 @@ class RemoveShareTest {
 
     @ParameterizedTest(name = "when selected nodes are {0} then visibility is {1}")
     @MethodSource("provideArguments")
-    fun `test that remove share item visibility is updated`(
+    fun `test that remove share dropdown item visibility is adjusted`(
         selectedNodes: Set<TypedNode>,
         expected: Boolean,
     ) {

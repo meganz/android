@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.namecollision.node.model.toolbarmenuitems
+package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction

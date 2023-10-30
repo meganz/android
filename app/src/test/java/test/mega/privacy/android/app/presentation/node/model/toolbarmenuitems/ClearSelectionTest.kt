@@ -1,8 +1,8 @@
-package test.mega.privacy.android.app.namecollision.node.model.toolbarmenuitems
+package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
+import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelection
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -13,9 +13,9 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ShareTest {
+class ClearSelectionTest {
 
-    private val underTest = Share(ShareMenuAction())
+    private val underTest = ClearSelection(ClearSelectionMenuAction())
 
     private val oneFileNodeSelected = mock<TypedFolderNode> {
         on { isTakenDown }.thenReturn(false)
@@ -23,10 +23,9 @@ class ShareTest {
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
     private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
 
-    @ParameterizedTest(name = "when noNodeTakenDown: {0} and selected nodes are {1} then visibility is {2}")
+    @ParameterizedTest(name = "when selected nodes are {0}, then is clear selection item visible is {1}")
     @MethodSource("provideArguments")
-    fun `test that share item visibility is updated`(
-        noNodeTakenDown: Boolean,
+    fun `test that the clear selection item visibility is adjusted`(
         selectedNodes: Set<TypedNode>,
         expected: Boolean,
     ) {
@@ -35,7 +34,7 @@ class ShareTest {
             selectedNodes = selectedNodes,
             canBeMovedToTarget = false,
             noNodeInBackups = false,
-            noNodeTakenDown = noNodeTakenDown,
+            noNodeTakenDown = false,
             allFileNodes = false,
             resultCount = 10
         )
@@ -43,9 +42,7 @@ class ShareTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(false, emptySet<TypedFolderNode>(), false),
-        Arguments.of(false, multipleNodes, false),
-        Arguments.of(true, emptySet<TypedFolderNode>(), false),
-        Arguments.of(true, multipleNodes, true),
+        Arguments.of(emptySet<TypedFolderNode>(), false),
+        Arguments.of(multipleNodes, true)
     )
 }
