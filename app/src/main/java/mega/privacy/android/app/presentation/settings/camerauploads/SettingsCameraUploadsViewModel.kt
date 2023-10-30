@@ -546,12 +546,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     }
                     resetTimestampsAndCacheDirectory()
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))
-                    rescheduleCameraUpload()
-                    refreshPrimaryFolderPath()
                     setupOrUpdateCameraUploadsBackupUseCase(
                         localFolder = newPath,
                         targetNode = null
                     )
+                    rescheduleCameraUpload()
+                    refreshPrimaryFolderPath()
                 } else {
                     setInvalidFolderSelectedPromptShown(true)
                 }
@@ -826,7 +826,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
                 }
             } else {
-                if (isNewSettingValid(isSecondaryEnabled = true)) {
+                if (isNewSettingValid(
+                        isSecondaryEnabled = true,
+                        secondaryPath = _state.value.secondaryFolderPath.takeIf { it.isNotBlank() }
+                            ?: "-1"
+                    )
+                ) {
                     enableMediaUploads()
                     rescheduleCameraUpload()
                     _state.update {
@@ -885,10 +890,15 @@ class SettingsCameraUploadsViewModel @Inject constructor(
         isSecondaryEnabled: Boolean = _state.value.isMediaUploadsEnabled,
     ): Boolean {
         with(_state.value) {
-            if ((isCameraUploadsEnabled && primaryPath.isNullOrBlank() && primaryHandle == null)
-                || (isSecondaryEnabled && secondaryPath.isNullOrBlank() && secondaryHandle == null)
-                || (primaryHandle == secondaryHandle && isSecondaryEnabled)
+            // if primary uploads is enabled, local path of primary upload can't be empty
+            if ((isCameraUploadsEnabled && primaryPath.isNullOrBlank())
+                // if secondary uploads is enabled, local path of secondary upload can't be empty
+                || (isSecondaryEnabled && secondaryPath.isNullOrBlank())
+                // if secondary upload is enabled primary upload and secondary upload cloud folder can't be the same
+                || (primaryHandle != null && primaryHandle == secondaryHandle && isSecondaryEnabled)
+                // if secondary media is enabled  secondary upload local folder can't be the sub folder of primary local folder
                 || (primaryPath?.contains(secondaryPath ?: "-1") == true && isSecondaryEnabled)
+                // if secondary media is enabled  primary upload local folder can't be the sub folder of secondary local folder
                 || (secondaryPath?.contains(primaryPath ?: "-1") == true && isSecondaryEnabled)
             ) {
                 return false

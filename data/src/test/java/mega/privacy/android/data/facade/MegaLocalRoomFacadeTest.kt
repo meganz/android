@@ -520,7 +520,7 @@ internal class MegaLocalRoomFacadeTest {
                     encryptedIsOutdated = falseString
                 )
             ).thenReturn(entities)
-            whenever(backupModelMapper(entities.first())).thenReturn(backup)
+            whenever(backupModelMapper(entities.last())).thenReturn(backup)
             val actual = underTest.getCuBackUp()
             assertThat(actual).isEqualTo(backup)
         }
@@ -541,7 +541,7 @@ internal class MegaLocalRoomFacadeTest {
                     encryptedIsOutdated = falseString
                 )
             ).thenReturn(entities)
-            whenever(backupModelMapper(entities.first())).thenReturn(backup)
+            whenever(backupModelMapper(entities.last())).thenReturn(backup)
             val actual = underTest.getMuBackUp()
             assertThat(actual).isEqualTo(backup)
         }
@@ -561,9 +561,9 @@ internal class MegaLocalRoomFacadeTest {
                     encryptedIsOutdated = falseString
                 )
             ).thenReturn(ids)
-            whenever(decryptData(ids.first())).thenReturn(ids.first())
+            whenever(decryptData(ids.last())).thenReturn(ids.last())
             val actual = underTest.getCuBackUpId()
-            assertThat(actual).isEqualTo(ids.first().toLong())
+            assertThat(actual).isEqualTo(ids.last().toLong())
         }
 
     @Test
@@ -581,9 +581,9 @@ internal class MegaLocalRoomFacadeTest {
                     encryptedIsOutdated = falseString
                 )
             ).thenReturn(ids)
-            whenever(decryptData(ids.first())).thenReturn(ids.first())
+            whenever(decryptData(ids.last())).thenReturn(ids.last())
             val actual = underTest.getMuBackUpId()
-            assertThat(actual).isEqualTo(ids.first().toLong())
+            assertThat(actual).isEqualTo(ids.last().toLong())
         }
 
     @Test
@@ -661,7 +661,8 @@ internal class MegaLocalRoomFacadeTest {
                 completedTransfers
             )
             underTest.deleteOldestCompletedTransfers()
-            verify(completedTransferDao).deleteCompletedTransferByIds(deletedTransfers.mapNotNull { it.id }.sortedDescending())
+            verify(completedTransferDao).deleteCompletedTransferByIds(deletedTransfers.mapNotNull { it.id }
+                .sortedDescending())
         }
 
     private fun provideDoesFileNameExistParameters() = Stream.of(

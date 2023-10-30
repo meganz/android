@@ -529,7 +529,9 @@ class CameraUploadsWorker @AssistedInject constructor(
         return if (areFoldersEstablished()) {
             true
         } else {
-            runCatching { establishFolders() }.isSuccess.also {
+            runCatching { establishFolders() }.onFailure {
+                Timber.e("Establishing Folder $it")
+            }.isSuccess.also {
                 Timber.d("Establish Folder $it")
             }
         }

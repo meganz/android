@@ -394,7 +394,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
             backupDao.getBackupByType(
                 backupType = backupInfoTypeIntMapper(BackupInfoType.CAMERA_UPLOADS),
                 encryptedIsOutdated = encryptedFalse
-            ).firstOrNull()
+            ).lastOrNull()
         }?.let { backupModelMapper(it) }
     }
 
@@ -403,7 +403,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
             backupDao.getBackupByType(
                 backupInfoTypeIntMapper(BackupInfoType.MEDIA_UPLOADS),
                 encryptedFalse
-            ).firstOrNull()
+            ).lastOrNull()
         }?.let { backupModelMapper(it) }
     }
 
@@ -412,7 +412,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
             backupDao.getBackupIdByType(
                 backupInfoTypeIntMapper(BackupInfoType.CAMERA_UPLOADS),
                 encryptedFalse
-            ).firstOrNull()
+            ).lastOrNull()
         }?.let { decryptData(it) }?.toLong()
     }
 
@@ -421,7 +421,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
             backupDao.getBackupIdByType(
                 backupInfoTypeIntMapper(BackupInfoType.MEDIA_UPLOADS),
                 encryptedFalse
-            ).firstOrNull()
+            ).lastOrNull()
         }?.let { decryptData(it) }?.toLong()
     }
 
