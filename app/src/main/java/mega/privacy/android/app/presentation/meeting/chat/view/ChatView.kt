@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view
 
+import mega.privacy.android.core.R as CoreR
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -8,15 +9,17 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +46,9 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderParagraph
+import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderSubtitleWithIcon
+import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderTitle
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -119,19 +125,54 @@ internal fun ChatView(
             }
         }
     )
-    { innerPadding ->
-        Text(
-            modifier = Modifier.padding(innerPadding),
-            text = if (uiState.usersTyping.isNotEmpty()) "User typing" else "No user typing"
-        )
-    }
-    if (showParticipatingInACallDialog) {
-        ParticipatingInACallDialog(
-            onDismiss = { showParticipatingInACallDialog = false },
-            onConfirm = {
-                showParticipatingInACallDialog = false
-                // return to active call
+    { _ ->
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            item("first_message_header") {
+                FirstMessageHeader(uiState)
             }
+        }
+        if (showParticipatingInACallDialog) {
+            ParticipatingInACallDialog(
+                onDismiss = { showParticipatingInACallDialog = false },
+                onConfirm = {
+                    showParticipatingInACallDialog = false
+                    // return to active call
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun FirstMessageHeader(uiState: ChatUiState) {
+    Column(
+        modifier = Modifier.padding(start = 72.dp, top = 40.dp, end = 24.dp),
+    ) {
+        uiState.title?.let {
+            FirstMessageHeaderTitle(
+                title = it,
+                modifier = Modifier.padding(bottom = 24.dp),
+            )
+        }
+
+        FirstMessageHeaderParagraph(
+            paragraph = stringResource(id = R.string.chat_chatroom_first_message_header_mega_info_text),
+            modifier = Modifier.padding(bottom = 24.dp),
+        )
+        FirstMessageHeaderSubtitleWithIcon(
+            subtitle = stringResource(id = R.string.title_mega_confidentiality_empty_screen),
+            iconRes = R.drawable.ic_lock
+        )
+        FirstMessageHeaderParagraph(
+            paragraph = stringResource(id = R.string.mega_confidentiality_empty_screen),
+            modifier = Modifier.padding(bottom = 24.dp),
+        )
+        FirstMessageHeaderSubtitleWithIcon(
+            subtitle = stringResource(id = R.string.title_mega_authenticity_empty_screen),
+            iconRes = CoreR.drawable.ic_check_circle
+        )
+        FirstMessageHeaderParagraph(
+            paragraph = stringResource(id = R.string.chat_chatroom_first_message_header_authenticity_info_text)
         )
     }
 }

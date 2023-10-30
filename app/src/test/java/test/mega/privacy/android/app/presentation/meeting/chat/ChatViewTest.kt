@@ -3,6 +3,8 @@ package test.mega.privacy.android.app.presentation.meeting.chat
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -25,6 +27,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
+import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ChatViewTest {
@@ -40,7 +43,8 @@ class ChatViewTest {
         initComposeRuleContent(
             ChatUiState(title = title)
         )
-        composeTestRule.onNodeWithText(title).assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(title).onFirst().assertIsDisplayed()
+
     }
 
     @Test
@@ -399,6 +403,21 @@ class ChatViewTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `test that first message header is shown`() {
+        initComposeRuleContent(ChatUiState())
+        composeTestRule.onNodeWithText(R.string.chat_chatroom_first_message_header_mega_info_text)
+            .assertExists()
+        composeTestRule.onNodeWithText(R.string.title_mega_confidentiality_empty_screen)
+            .assertExists()
+        composeTestRule.onNodeWithText(R.string.mega_confidentiality_empty_screen).assertExists()
+        composeTestRule.onNodeWithText(R.string.title_mega_confidentiality_empty_screen)
+            .assertExists()
+        composeTestRule.onNodeWithText(R.string.chat_chatroom_first_message_header_authenticity_info_text)
+            .assertExists()
+
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(
@@ -408,4 +427,6 @@ class ChatViewTest {
             )
         }
     }
+
+
 }
