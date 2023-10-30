@@ -1,11 +1,13 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import javax.inject.Inject
@@ -19,6 +21,7 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
     private val transferRepository: TransferRepository,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
 ) {
 
     /**
@@ -26,7 +29,7 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
      * @param event the [TransferEvent] that has been received.
      */
     suspend operator fun invoke(event: TransferEvent) {
-        if (event.transfer.isVoiceClip() || event.transfer.isBackgroundTransfer()) {
+        if (event.transfer.isVoiceClip() || event.transfer.isBackgroundTransfer() || event.transfer.isStreamingTransfer) {
             return
         }
 
@@ -52,6 +55,10 @@ class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
 
                 if (event.error is BusinessAccountExpiredMegaException) {
                     broadcastBusinessAccountExpiredUseCase()
+                }
+                if (event.transfer.transferType == TransferType.DOWNLOAD) {
+                    //broadcast success and failed transfers, listeners will check the new status
+                    broadcastOfflineFileAvailabilityUseCase(event.transfer.nodeHandle)
                 }
             }
 

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -19,6 +20,7 @@ import org.mockito.kotlin.KStubbing
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -30,13 +32,16 @@ class AddOrUpdateActiveTransferUseCaseTest {
     private val broadcastBusinessAccountExpiredUseCase =
         mock<BroadcastBusinessAccountExpiredUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
+    private val broadcastOfflineFileAvailabilityUseCase =
+        mock<BroadcastOfflineFileAvailabilityUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = AddOrUpdateActiveTransferUseCase(
             transferRepository = transferRepository,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
-            broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase
+            broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            broadcastOfflineFileAvailabilityUseCase = broadcastOfflineFileAvailabilityUseCase,
         )
     }
 
@@ -45,7 +50,8 @@ class AddOrUpdateActiveTransferUseCaseTest {
         reset(
             transferRepository,
             broadcastBusinessAccountExpiredUseCase,
-            broadcastTransferOverQuotaUseCase
+            broadcastTransferOverQuotaUseCase,
+            broadcastOfflineFileAvailabilityUseCase
         )
     }
 
@@ -83,6 +89,19 @@ class AddOrUpdateActiveTransferUseCaseTest {
     ) = runTest {
         underTest.invoke(transferEvent)
         verify(broadcastTransferOverQuotaUseCase).invoke(true)
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideFinishEvents")
+    fun `test that broadcastOfflineFileAvailabilityUseCase is invoked when the event is a download finish event`(
+        transferEvent: TransferEvent.TransferFinishEvent,
+    ) = runTest {
+        underTest.invoke(transferEvent)
+        if (transferEvent.transfer.transferType == TransferType.DOWNLOAD) {
+            verify(broadcastOfflineFileAvailabilityUseCase).invoke(transferEvent.transfer.nodeHandle)
+        } else {
+            verifyNoInteractions(broadcastOfflineFileAvailabilityUseCase)
+        }
     }
 
     @ParameterizedTest

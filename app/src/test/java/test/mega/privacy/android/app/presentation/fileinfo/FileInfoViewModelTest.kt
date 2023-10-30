@@ -790,15 +790,15 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
-    fun `test availableOfflineChanged does nothing if getState`() = runTest {
-        mockMonitorStorageStateEvent(StorageState.PayWall)
-        whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(emptyFlow())
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-        whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(false)
-        underTest.setNode(node.handle, true)
-        underTest.availableOfflineChanged(true, activity)
-        verifyNoInteractions(setNodeAvailableOffline)
-    }
+    fun `test availableOfflineChanged does not start download if storage state is pay wall`() =
+        runTest {
+            mockMonitorStorageStateEvent(StorageState.PayWall)
+            whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(emptyFlow())
+            whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(false)
+            underTest.setNode(node.handle, true)
+            underTest.availableOfflineChanged(true, activity)
+            verifyNoInteractions(setNodeAvailableOffline)
+        }
 
     @Test
     fun `test when stopSharing is called then disableExport use case is called`() =

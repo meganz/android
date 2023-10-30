@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent.StartDownloadForOffline
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
@@ -319,14 +320,19 @@ class FileInfoViewModel @Inject constructor(
         activity: WeakReference<Activity>,
     ) {
         viewModelScope.launch {
+            if (availableOffline == _uiState.value.isAvailableOffline) return@launch
+            if (availableOffline && monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+                updateState { it.copy(oneOffViewEvent = triggered(FileInfoOneOffViewEvent.OverDiskQuota)) }
+                return@launch
+            }
             if (availableOffline && getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                _uiState.updateDownloadEvent(TransferTriggerEvent.StartDownloadForOffline(typedNode))
-            } else {
-                if (availableOffline == _uiState.value.isAvailableOffline) return@launch
-                if (availableOffline && monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
-                    updateState { it.copy(oneOffViewEvent = triggered(FileInfoOneOffViewEvent.OverDiskQuota)) }
-                    return@launch
+                updateState {
+                    it.copy(
+                        downloadEvent = triggered(StartDownloadForOffline(typedNode)),
+                        isAvailableOffline = true,
+                    )
                 }
+            } else {
                 updateState {
                     it.copy(isAvailableOfflineEnabled = false) // to avoid multiple changes while changing
                 }
