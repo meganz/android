@@ -298,7 +298,7 @@ private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
         }
 
         else -> {
-            null
+            ""
         }
     }
 }

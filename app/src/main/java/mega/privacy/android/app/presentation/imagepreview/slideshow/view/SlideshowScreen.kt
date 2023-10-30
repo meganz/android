@@ -199,7 +199,6 @@ private fun SlideshowTopBar(
 ) {
     MegaAppBar(
         title = stringResource(string.action_slideshow),
-        subtitle = null,
         appBarType = AppBarType.BACK_NAVIGATION,
         elevation = 0.dp,
         onNavigationPressed = {

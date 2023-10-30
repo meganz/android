@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -32,9 +32,9 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
-import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
+import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesRoute
 import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
@@ -94,7 +94,6 @@ internal fun SyncListScreen(
             topBar = {
                 MegaAppBar(
                     title = stringResource(R.string.sync_toolbar_title),
-                    subtitle = null,
                     appBarType = AppBarType.BACK_NAVIGATION,
                     elevation = 0.dp,
                     onNavigationPressed = {

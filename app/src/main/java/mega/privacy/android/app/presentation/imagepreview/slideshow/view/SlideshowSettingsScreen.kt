@@ -27,7 +27,6 @@ fun SlideshowSettingScreen(
         topBar = {
             MegaAppBar(
                 title = stringResource(R.string.slideshow_settings_page_title),
-                subtitle = null,
                 appBarType = AppBarType.BACK_NAVIGATION,
                 elevation = 0.dp,
                 onNavigationPressed = {

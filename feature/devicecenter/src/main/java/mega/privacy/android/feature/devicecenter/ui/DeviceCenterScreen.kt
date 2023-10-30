@@ -133,7 +133,6 @@ internal fun DeviceCenterScreen(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = selectedDevice?.name
                     ?: stringResource(R.string.device_center_top_app_bar_title),
-                subtitle = null,
                 elevation = 0.dp,
                 onNavigationPressed = {
                     if (modalSheetState.isVisible) {

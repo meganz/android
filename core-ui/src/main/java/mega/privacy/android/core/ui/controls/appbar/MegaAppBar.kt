@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.menus.MenuActions
+import mega.privacy.android.core.ui.controls.text.MarqueeText
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -59,7 +60,6 @@ import mega.privacy.android.core.ui.utils.composeLet
  * @param onNavigationPressed Action for navigation button.
  * @param badgeCount Count if should show a badge, null otherwise.
  * @param titleIcons Icons to show at the end of the title if any, null otherwise.
- * @param subtitle Subtitle.
  * @param actions Available options.
  * @param onActionPressed Action for each available option.
  * @param maxActionsToShow The Max [actions] to be shown, if there are more they will be under three dots menu
@@ -74,7 +74,6 @@ fun MegaAppBar(
     onNavigationPressed: (() -> Unit)? = null,
     badgeCount: Int? = null,
     titleIcons: @Composable (RowScope.() -> Unit)? = null,
-    subtitle: String? = null,
     actions: List<MenuAction>? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
     maxActionsToShow: Int = 4,
@@ -93,7 +92,70 @@ fun MegaAppBar(
         onNavigationPressed = onNavigationPressed,
         badgeCount = badgeCount,
         titleIcons = titleIcons,
-        subtitle = subtitle,
+        actions = actions,
+        onActionPressed = onActionPressed,
+        maxActionsToShow = maxActionsToShow,
+        enabled = enabled,
+        elevation = elevation
+    )
+}
+
+/**
+ * Mega app bar.
+ *
+ * This component has been implemented following the latest rules for the new design system.
+ * If this component does not serve your purpose, discuss this with the team in charge of
+ * developing the new design system. It will be updated or override depending on the needs.
+ *
+ * @param appBarType [AppBarType]
+ * @param title Title.
+ * @param subtitle Subtitle.
+ * @param modifier [Modifier]
+ * @param onNavigationPressed Action for navigation button.
+ * @param badgeCount Count if should show a badge, null otherwise.
+ * @param titleIcons Icons to show at the end of the title if any, null otherwise.
+ * @param marqueeSubtitle True if the subtitle view should be marquee, false otherwise.
+ * @param actions Available options.
+ * @param onActionPressed Action for each available option.
+ * @param maxActionsToShow The Max [actions] to be shown, if there are more they will be under three dots menu
+ * @param enabled if false, the navigation icon and actions will be disabled
+ * @param elevation Elevation.
+ */
+@Composable
+fun MegaAppBar(
+    appBarType: AppBarType,
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+    onNavigationPressed: (() -> Unit)? = null,
+    badgeCount: Int? = null,
+    titleIcons: @Composable (RowScope.() -> Unit)? = null,
+    marqueeSubtitle: Boolean = false,
+    actions: List<MenuAction>? = null,
+    onActionPressed: ((MenuAction) -> Unit)? = null,
+    maxActionsToShow: Int = 4,
+    enabled: Boolean = true,
+    elevation: Dp = LocalMegaAppBarElevation.current,
+) = CompositionLocalProvider(
+    LocalMegaAppBarColors provides MegaAppBarColors(
+        MegaTheme.colors.icon.primary,
+        MegaTheme.colors.text.primary
+    )
+) {
+    BaseMegaAppBar(
+        appBarType = appBarType,
+        title = { MegaAppBarTitle(title) },
+        modifier = modifier,
+        onNavigationPressed = onNavigationPressed,
+        badgeCount = badgeCount,
+        titleIcons = titleIcons,
+        subtitle = {
+            if (marqueeSubtitle) {
+                MegaAppBarMarqueeSubTitle(subtitle)
+            } else {
+                MegaAppBarSubTitle(subtitle)
+            }
+        },
         actions = actions,
         onActionPressed = onActionPressed,
         maxActionsToShow = maxActionsToShow,
@@ -109,7 +171,6 @@ data class MegaAppBarColors(
     val backgroundAlpha: Float = 1f,
 )
 
-
 val LocalMegaAppBarColors =
     compositionLocalOf { MegaAppBarColors(Color.Unspecified, Color.Unspecified) }
 
@@ -123,7 +184,7 @@ internal fun BaseMegaAppBar(
     onNavigationPressed: (() -> Unit)? = null,
     badgeCount: Int? = null,
     titleIcons: @Composable (RowScope.() -> Unit)? = null,
-    subtitle: String? = null,
+    subtitle: @Composable (() -> Unit)? = null,
     actions: List<MenuAction>? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
     maxActionsToShow: Int = 4,
@@ -132,7 +193,7 @@ internal fun BaseMegaAppBar(
 ) {
     TopAppBar(
         title = {
-            Column {
+            Column(modifier = Modifier.then(Modifier.padding(end = if (actions.isNullOrEmpty()) 12.dp else 0.dp))) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -145,14 +206,7 @@ internal fun BaseMegaAppBar(
                         titleIcons?.let { it() }
                     }
                 }
-                subtitle?.let {
-                    Text(
-                        text = subtitle,
-                        maxLines = 1,
-                        color = MegaTheme.colors.text.secondary,
-                        style = MaterialTheme.typography.body4
-                    )
-                }
+                subtitle?.let { it() }
             }
         },
         backgroundColor = MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
@@ -224,6 +278,30 @@ internal fun MegaAppBarTitle(title: String, modifier: Modifier = Modifier, maxLi
     )
 
 @Composable
+internal fun MegaAppBarSubTitle(
+    subtitle: String,
+    modifier: Modifier = Modifier,
+    maxLines: Int = 1,
+) = Text(
+    text = subtitle,
+    modifier = modifier,
+    color = MegaTheme.colors.text.secondary,
+    maxLines = maxLines,
+    style = MaterialTheme.typography.body4
+)
+
+@Composable
+internal fun MegaAppBarMarqueeSubTitle(
+    subtitle: String,
+    modifier: Modifier = Modifier,
+) = MarqueeText(
+    text = subtitle,
+    modifier = modifier,
+    color = MegaTheme.colors.text.secondary,
+    style = MaterialTheme.typography.body4
+)
+
+@Composable
 private fun NavigationIcon(
     onNavigationPressed: (() -> Unit),
     enabled: Boolean,
@@ -269,6 +347,20 @@ private fun MegaAppBarPreviewWithoutSubtitle() {
         MegaAppBar(
             appBarType = AppBarType.MENU,
             title = "App bar title",
+            badgeCount = 3,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MegaAppBarPreviewWithMarqueeSubtitle() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        MegaAppBar(
+            appBarType = AppBarType.MENU,
+            title = "App bar title",
+            subtitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+            marqueeSubtitle = true,
             badgeCount = 3,
         )
     }

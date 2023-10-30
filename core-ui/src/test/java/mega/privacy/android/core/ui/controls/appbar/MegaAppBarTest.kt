@@ -27,7 +27,27 @@ class MegaAppBarTest {
 
     private fun setTopBarScreen(
         title: String,
-        subtitle: String? = null,
+        badgeCount: Int? = null,
+        appBarType: AppBarType = AppBarType.BACK_NAVIGATION,
+        actions: List<MenuAction> = emptyList(),
+    ) {
+        composeTestRule.setContent {
+            Scaffold(topBar = {
+                MegaAppBar(
+                    appBarType = appBarType,
+                    title = title,
+                    badgeCount = badgeCount,
+                    actions = actions,
+                )
+            }) { padding ->
+                Text(text = "Empty screen", modifier = Modifier.padding(padding))
+            }
+        }
+    }
+
+    private fun setTopBarScreenWithSubtitle(
+        title: String,
+        subtitle: String,
         badgeCount: Int? = null,
         appBarType: AppBarType = AppBarType.BACK_NAVIGATION,
         actions: List<MenuAction> = emptyList(),
@@ -59,7 +79,7 @@ class MegaAppBarTest {
     fun `test subtitle is displayed when app bar is shown with subtitle`() {
         val title = "sample"
         val subtitle = "subtitle"
-        setTopBarScreen(title = title, subtitle = subtitle)
+        setTopBarScreenWithSubtitle(title = title, subtitle = subtitle)
         composeTestRule.onNodeWithText(subtitle).assertIsDisplayed()
     }
 
