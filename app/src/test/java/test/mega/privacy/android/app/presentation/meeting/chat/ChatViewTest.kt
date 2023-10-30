@@ -13,6 +13,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_ADD_PARTICIPANTS_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_AUDIO_CALL_ACTION
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_INFO_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_VIDEO_CALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
@@ -371,6 +372,66 @@ class ChatViewTest {
     }
 
     @Test
+    fun `test that Info menu action is not available when chat is joining or leaving`() {
+        initComposeRuleContent(ChatUiState(isGroup = true, isOpenInvite = false))
+        composeTestRule.onNodeWithTag(TEST_TAG_INFO_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Info menu action is not available when chat is in preview mode`() {
+        initComposeRuleContent(ChatUiState(isPreviewMode = true))
+        composeTestRule.onNodeWithTag(TEST_TAG_INFO_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Info menu action is not available when chat is not connected`() {
+        initComposeRuleContent(ChatUiState(isConnected = false))
+        composeTestRule.onNodeWithTag(TEST_TAG_INFO_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Info menu action is not available when 1on1 chat is read only`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = false,
+                myPermission = ChatRoomPermission.ReadOnly
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_INFO_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Info menu action is available in 1on1 chat and my permission is Moderator`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isJoiningOrLeaving = false,
+                isPreviewMode = false,
+                isConnected = true,
+                isGroup = false,
+                myPermission = ChatRoomPermission.Moderator
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_INFO_ACTION).assertIsDisplayed()
+    }
+
+
+    @Test
+    fun `test that Info menu action is available in group chat`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isJoiningOrLeaving = false,
+                isPreviewMode = false,
+                isConnected = true,
+                isGroup = true,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_INFO_ACTION).assertIsDisplayed()
+    }
+
+
     fun `test that online label shows if the chat is 1to1 and the contacts status is online`() {
         initComposeRuleContent(ChatUiState(isGroup = false, userChatStatus = UserChatStatus.Online))
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.online_status))
@@ -427,6 +488,4 @@ class ChatViewTest {
             )
         }
     }
-
-
 }

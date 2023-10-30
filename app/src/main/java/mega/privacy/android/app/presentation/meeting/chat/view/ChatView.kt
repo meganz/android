@@ -38,11 +38,14 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.vectorRes
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
@@ -111,6 +114,10 @@ internal fun ChatView(
                             }
                         }
 
+                        is ChatRoomMenuAction.Info -> {
+                            showGroupOrContactInfoActivity(context, uiState)
+                        }
+
                         else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
                     }
                 },
@@ -177,6 +184,22 @@ private fun FirstMessageHeader(uiState: ChatUiState) {
     }
 }
 
+private fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
+    val isScheduledMeetingValid: Boolean = uiState.scheduledMeeting != null
+    if (isScheduledMeetingValid) {
+        Timber.d("show scheduled meeting info")
+    } else {
+        val targetActivity =
+            if (uiState.isGroup) GroupChatInfoActivity::class.java else ContactInfoActivity::class.java
+        Intent(context, targetActivity).apply {
+            putExtra(Constants.HANDLE, uiState.chatId)
+            putExtra(Constants.ACTION_CHAT_OPEN, true)
+        }.also {
+            context.startActivity(it)
+        }
+    }
+}
+
 @Composable
 private fun TitleIcons(uiState: ChatUiState) {
     UserChatStateIcon(uiState.userChatStatus)
@@ -231,6 +254,12 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             if (!isGroup) {
                 add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat))
             }
+        }
+
+        if (isJoiningOrLeaving.not() && isPreviewMode.not() && isConnected
+            && (isGroup || myPermission != ChatRoomPermission.ReadOnly)
+        ) {
+            add(ChatRoomMenuAction.Info(true))
         }
 
         if (!isJoiningOrLeaving && isGroup && (hasModeratorPermission || isActive && isOpenInvite)) {

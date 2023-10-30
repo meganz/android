@@ -35,6 +35,13 @@ sealed interface ChatRoomMenuAction : MenuAction {
         override val orderInCategory = 100
     }
 
+    class Info(override val enabled: Boolean) : MenuActionWithoutIcon(
+        descriptionRes = R.string.general_info,
+        testTag = TEST_TAG_INFO_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory: Int = 100
+    }
+
     /**
      * Add participants
      */
@@ -55,6 +62,7 @@ sealed interface ChatRoomMenuAction : MenuAction {
     companion object {
         const val TEST_TAG_AUDIO_CALL_ACTION = "chat_view:action_chat_audio_call"
         const val TEST_TAG_VIDEO_CALL_ACTION = "chat_view:action_chat_video_call"
+        const val TEST_TAG_INFO_ACTION = "chat_view:action_chat_info"
         const val TEST_TAG_ADD_PARTICIPANTS_ACTION = "chat_view:action_add_participants"
     }
 }

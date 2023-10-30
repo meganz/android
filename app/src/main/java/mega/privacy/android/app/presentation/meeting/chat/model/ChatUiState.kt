@@ -2,11 +2,13 @@ package mega.privacy.android.app.presentation.meeting.chat.model
 
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**
  * Chat ui state
  *
+ * @property chatId ID of the chat
  * @property title title of the chat
  * @property isChatNotificationMute whether notification is mute
  * @property isPrivateChat whether the chat is private
@@ -19,12 +21,15 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property hasACallInThisChat True if the current logged in user has a call in this chat, false otherwise.
  * @property isGroup True if is a chat group, false otherwise.
  * @property storageState [StorageState] of the chat.
+ * @property isConnected True if current chat is connected.
+ * @property scheduledMeeting  [ChatScheduledMeeting]
  * @property isOpenInvite True if the group is open for invitation other than moderators, false otherwise.
  * @property isActive True if currently a member of the chatroom (for group chats), or we are contacts with the peer (for 1on1 chats), false otherwise.
  * @property isArchived True if the chat is archived, false otherwise.
  * @property usersTyping list of user typing in the chat
  */
 data class ChatUiState(
+    val chatId: Long = -1L,
     val title: String? = null,
     val isChatNotificationMute: Boolean = false,
     val isPrivateChat: Boolean? = null,
@@ -37,6 +42,8 @@ data class ChatUiState(
     val hasACallInThisChat: Boolean = false,
     val isGroup: Boolean = false,
     val storageState: StorageState = StorageState.Unknown,
+    val isConnected: Boolean = false,
+    val scheduledMeeting: ChatScheduledMeeting? = null,
     val isOpenInvite: Boolean = false,
     val isActive: Boolean = true,
     val isArchived: Boolean = false,

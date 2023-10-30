@@ -9,9 +9,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -20,13 +22,16 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
 import java.util.Collections
@@ -56,6 +61,9 @@ class ChatViewModel @Inject constructor(
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
+    private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val monitorUserLastGreenUpdatesUseCase: MonitorUserLastGreenUpdatesUseCase,
     private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase,
@@ -76,11 +84,68 @@ class ChatViewModel @Inject constructor(
         checkIfIsParticipatingInACall()
         monitorStorageStateEvent()
         chatId?.let {
+            updateChatId(it)
             getChatRoom(it)
             getNotificationMute(it)
+            getChatConnectionState(it)
             checkIfIsParticipatingInACallInThisChat(it)
             monitorChatRoom(it)
             monitorNotificationMute(it)
+            monitorChatConnectionState(it)
+            monitorNetworkConnectivity(it)
+        }
+    }
+
+    private fun monitorNetworkConnectivity(chatId: Long) {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .collect { networkConnected ->
+                    val isChatConnected = if (networkConnected) {
+                        isChatStatusConnectedForCallUseCase(chatId = chatId)
+                    } else {
+                        false
+                    }
+
+                    _state.update {
+                        it.copy(isConnected = isChatConnected)
+                    }
+                }
+        }
+    }
+
+    private fun updateChatId(chatId: Long) {
+        viewModelScope.launch {
+            _state.update { it.copy(chatId = chatId) }
+        }
+    }
+
+    private fun monitorChatConnectionState(chatId: Long) {
+        viewModelScope.launch {
+            monitorChatConnectionStateUseCase()
+                .filter { it.chatId == chatId }
+                .collect { state ->
+                    if (state.chatConnectionStatus != ChatConnectionStatus.Online) {
+                        _state.update {
+                            it.copy(isConnected = false)
+                        }
+                    } else {
+                        getChatConnectionState(chatId = chatId)
+                    }
+                }
+        }
+    }
+
+    private fun getChatConnectionState(chatId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                isChatStatusConnectedForCallUseCase(chatId = chatId)
+            }.onSuccess { connected ->
+                _state.update { state ->
+                    state.copy(isConnected = connected)
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
@@ -302,6 +367,7 @@ class ChatViewModel @Inject constructor(
         when (action) {
             is ChatRoomMenuAction.AudioCall -> {}
             is ChatRoomMenuAction.VideoCall -> {}
+            is ChatRoomMenuAction.Info -> {}
             is ChatRoomMenuAction.AddParticipants -> {}
         }
     }

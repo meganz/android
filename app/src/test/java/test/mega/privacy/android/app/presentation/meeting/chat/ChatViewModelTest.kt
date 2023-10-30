@@ -19,6 +19,8 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.chat.ChatConnectionState
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -27,13 +29,16 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -89,6 +94,14 @@ internal class ChatViewModelTest {
             )
         )
     }
+    private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase = mock {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
+    private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase = mock()
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
+
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val monitorUserLastGreenUpdatesUseCase =
         mock<MonitorUserLastGreenUpdatesUseCase>()
@@ -116,9 +129,10 @@ internal class ChatViewModelTest {
             getUserOnlineStatusByHandleUseCase,
             isParticipatingInChatCallUseCase,
             hasACallInThisChatByChatIdUseCase,
+            isChatStatusConnectedForCallUseCase,
             requestUserLastGreenUseCase,
             getMyUserHandleUseCase,
-            getParticipantFirstNameUseCase
+            getParticipantFirstNameUseCase,
         )
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() } doReturn emptyFlow()
@@ -133,6 +147,8 @@ internal class ChatViewModelTest {
                 storageState = StorageState.Unknown
             )
         )
+        wheneverBlocking { monitorChatConnectionStateUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorConnectivityUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorUserLastGreenUpdatesUseCase(userHandle) } doReturn emptyFlow()
     }
 
@@ -147,11 +163,14 @@ internal class ChatViewModelTest {
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             hasACallInThisChatByChatIdUseCase = hasACallInThisChatByChatIdUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
+            isChatStatusConnectedForCallUseCase = isChatStatusConnectedForCallUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorUserLastGreenUpdatesUseCase = monitorUserLastGreenUpdatesUseCase,
-            savedStateHandle = savedStateHandle,
             getParticipantFirstNameUseCase = getParticipantFirstNameUseCase,
             getMyUserHandleUseCase = getMyUserHandleUseCase,
+            savedStateHandle = savedStateHandle,
         )
     }
 
@@ -854,4 +873,93 @@ internal class ChatViewModelTest {
         Arguments.of(UserChatStatus.Busy, UserChatStatus.Invalid),
         Arguments.of(UserChatStatus.Invalid, UserChatStatus.Offline),
     )
+
+    @Test
+    fun `test that chat ID is saved in state when it is passed in`() = runTest {
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().chatId).isEqualTo(chatId)
+        }
+    }
+
+    @ParameterizedTest(name = " {0} when isChatStatusConnectedForCallUseCase is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that chat connected state is `(connected: Boolean) = runTest {
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(isChatStatusConnectedForCallUseCase(chatId)).thenReturn(connected)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isConnected).isEqualTo(connected)
+        }
+    }
+
+    @ParameterizedTest(name = " {0}")
+    @MethodSource("provideChatConnectionStatusParameters")
+    fun `test that chat connected state is false when monitor chat connection status returns`(
+        chatConnectionStatus: ChatConnectionStatus,
+        isChatConnected: Boolean,
+    ) =
+        runTest {
+            val updateFlow = MutableStateFlow(
+                ChatConnectionState(
+                    chatId = chatId,
+                    chatConnectionStatus = chatConnectionStatus
+                )
+            )
+
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(monitorChatConnectionStateUseCase()).thenReturn(updateFlow)
+            whenever(isChatStatusConnectedForCallUseCase(chatId)).thenReturn(true)
+            initTestClass()
+            updateFlow.emit(
+                ChatConnectionState(
+                    chatId = chatId,
+                    chatConnectionStatus = chatConnectionStatus
+                )
+            )
+            underTest.state.test {
+                assertThat(awaitItem().isConnected).isEqualTo(isChatConnected)
+            }
+        }
+
+
+    private fun provideChatConnectionStatusParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(ChatConnectionStatus.Offline, false),
+        Arguments.of(ChatConnectionStatus.InProgress, false),
+        Arguments.of(ChatConnectionStatus.Logging, false),
+        Arguments.of(ChatConnectionStatus.Unknown, false),
+        Arguments.of(ChatConnectionStatus.Online, true),
+    )
+
+    @Test
+    fun `test that chat connected state is false when network connectivity is false`() = runTest {
+        val updateFlow = MutableStateFlow(true)
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(monitorConnectivityUseCase()).thenReturn(updateFlow)
+
+        initTestClass()
+        updateFlow.emit(false)
+        underTest.state.test {
+            assertThat(awaitItem().isConnected).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that chat connected state is true when network connectivity is false and isChatStatusConnectedForCall is true`() =
+        runTest {
+            val updateFlow = MutableStateFlow(true)
+
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(monitorConnectivityUseCase()).thenReturn(updateFlow)
+            whenever(isChatStatusConnectedForCallUseCase(chatId)).thenReturn(true)
+
+            initTestClass()
+            updateFlow.emit(true)
+            underTest.state.test {
+                assertThat(awaitItem().isConnected).isTrue()
+            }
+        }
+
+
 }
