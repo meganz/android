@@ -70,7 +70,6 @@ fun ParticipantInCallItem(
     Column {
         Row(
             modifier = Modifier
-                .padding(start = 0.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {

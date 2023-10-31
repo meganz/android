@@ -65,11 +65,11 @@ internal object ChatMessageNotification {
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)
         val title = EmojiUtilsShortcodes.emojify(chat?.title)
+
         val msgContent = EmojiUtilsShortcodes.emojify(
             getMsgContent(
                 context,
                 msg,
-                senderName.orEmpty(),
                 fileDurationMapper
             )
         )
@@ -120,7 +120,6 @@ internal object ChatMessageNotification {
     private fun getMsgContent(
         context: Context,
         msg: ChatMessage,
-        senderName: String,
         fileDurationMapper: FileDurationMapper,
     ) = when (msg.type) {
         ChatMessageType.NODE_ATTACHMENT, ChatMessageType.VOICE_CLIP -> {
@@ -141,7 +140,7 @@ internal object ChatMessageNotification {
             Timber.d("TYPE_CONTACT_ATTACHMENT")
             val userCount = msg.usersCount
             if (userCount == 1L) {
-                senderName
+                msg.userNames[0]
             } else {
                 val name = StringBuilder("")
                 name.append(msg.userNames[0])
@@ -150,11 +149,6 @@ internal object ChatMessageNotification {
                 }
                 name.toString()
             }
-        }
-
-        ChatMessageType.TRUNCATE -> {
-            Timber.d("TYPE_TRUNCATE")
-            context.getString(R.string.history_cleared_message)
         }
 
         ChatMessageType.CONTAINS_META -> {
