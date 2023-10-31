@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCas
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -105,6 +107,7 @@ internal class ChatViewModelTest {
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val monitorUserLastGreenUpdatesUseCase =
         mock<MonitorUserLastGreenUpdatesUseCase>()
+    private val getScheduledMeetingByChat = mock<GetScheduledMeetingByChat>()
 
     private val chatId = 123L
     private val userHandle = 321L
@@ -133,6 +136,7 @@ internal class ChatViewModelTest {
             requestUserLastGreenUseCase,
             getMyUserHandleUseCase,
             getParticipantFirstNameUseCase,
+            getScheduledMeetingByChat,
         )
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() } doReturn emptyFlow()
@@ -170,6 +174,7 @@ internal class ChatViewModelTest {
             monitorUserLastGreenUpdatesUseCase = monitorUserLastGreenUpdatesUseCase,
             getParticipantFirstNameUseCase = getParticipantFirstNameUseCase,
             getMyUserHandleUseCase = getMyUserHandleUseCase,
+            getScheduledMeetingByChatUseCase = getScheduledMeetingByChat,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -961,5 +966,28 @@ internal class ChatViewModelTest {
             }
         }
 
+    @Test
+    fun `test that ui state is updated when get scheduled meeting by chatId succeeds`() = runTest {
+        val invalidHandle = -1L
+        val expectedScheduledMeeting = ChatScheduledMeeting(parentSchedId = invalidHandle)
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().scheduledMeeting).isEqualTo(expectedScheduledMeeting)
+        }
+    }
 
+    @Test
+    fun `test that scheduled meeting in ui state is null when get scheduled meeting by chatId fails`() =
+        runTest {
+            whenever(getScheduledMeetingByChat(any())).thenAnswer {
+                throw Exception("get scheduled meeting by chat failed")
+            }
+
+            initTestClass()
+            underTest.state.test {
+                assertThat(awaitItem().scheduledMeeting).isNull()
+            }
+        }
 }

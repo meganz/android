@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCas
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -68,6 +70,7 @@ class ChatViewModel @Inject constructor(
     private val monitorUserLastGreenUpdatesUseCase: MonitorUserLastGreenUpdatesUseCase,
     private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChat,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -88,11 +91,33 @@ class ChatViewModel @Inject constructor(
             getChatRoom(it)
             getNotificationMute(it)
             getChatConnectionState(it)
+            getScheduledMeeting(it)
             checkIfIsParticipatingInACallInThisChat(it)
             monitorChatRoom(it)
             monitorNotificationMute(it)
             monitorChatConnectionState(it)
             monitorNetworkConnectivity(it)
+        }
+    }
+
+    private fun getScheduledMeeting(chatId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                getScheduledMeetingByChatUseCase(chatId)
+            }.onSuccess { scheduledMeetingList ->
+                scheduledMeetingList?.firstOrNull { it.parentSchedId == INVALID_HANDLE }
+                    ?.let { meeting ->
+                        _state.update {
+                            it.copy(
+                                schedIsPending = !meeting.isPast(),
+                                scheduledMeeting = meeting
+                            )
+                        }
+                    }
+            }.onFailure {
+                Timber.e(it)
+                _state.update { state -> state.copy(scheduledMeeting = null) }
+            }
         }
     }
 
@@ -175,6 +200,7 @@ class ChatViewModel @Inject constructor(
                                 isOpenInvite = isOpenInvite,
                                 isActive = isActive,
                                 isArchived = isArchived,
+                                isMeeting = isMeeting,
                             )
                         }
                         if (!isGroup && peerHandlesList.isNotEmpty()) {
@@ -370,5 +396,9 @@ class ChatViewModel @Inject constructor(
             is ChatRoomMenuAction.Info -> {}
             is ChatRoomMenuAction.AddParticipants -> {}
         }
+    }
+
+    companion object {
+        private const val INVALID_HANDLE = -1L
     }
 }

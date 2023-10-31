@@ -44,6 +44,7 @@ import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.vectorRes
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.Constants
@@ -189,9 +190,14 @@ private fun FirstMessageHeader(uiState: ChatUiState) {
 }
 
 private fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
-    val isScheduledMeetingValid: Boolean = uiState.scheduledMeeting != null
-    if (isScheduledMeetingValid) {
+    if (uiState.scheduledMeeting != null && uiState.schedIsPending && uiState.isMeeting && uiState.isActive) {
         Timber.d("show scheduled meeting info")
+        Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
+            putExtra(Constants.CHAT_ID, uiState.scheduledMeeting.chatId)
+            putExtra(Constants.SCHEDULED_MEETING_ID, uiState.scheduledMeeting.schedId)
+        }.also {
+            context.startActivity(it)
+        }
     } else {
         val targetActivity =
             if (uiState.isGroup) GroupChatInfoActivity::class.java else ContactInfoActivity::class.java

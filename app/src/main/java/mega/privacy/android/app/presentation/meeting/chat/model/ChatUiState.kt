@@ -22,11 +22,13 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property isGroup True if is a chat group, false otherwise.
  * @property storageState [StorageState] of the chat.
  * @property isConnected True if current chat is connected.
+ * @property schedIsPending True, if scheduled meeting is pending. False, if not.
  * @property scheduledMeeting  [ChatScheduledMeeting]
  * @property isOpenInvite True if the group is open for invitation other than moderators, false otherwise.
  * @property isActive True if currently a member of the chatroom (for group chats), or we are contacts with the peer (for 1on1 chats), false otherwise.
  * @property isArchived True if the chat is archived, false otherwise.
  * @property usersTyping list of user typing in the chat
+ * @property isMeeting whether this chat is a meeting.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -43,9 +45,11 @@ data class ChatUiState(
     val isGroup: Boolean = false,
     val storageState: StorageState = StorageState.Unknown,
     val isConnected: Boolean = false,
+    val schedIsPending: Boolean = false,
     val scheduledMeeting: ChatScheduledMeeting? = null,
     val isOpenInvite: Boolean = false,
     val isActive: Boolean = true,
     val isArchived: Boolean = false,
-    val usersTyping: List<String?> = emptyList()
+    val usersTyping: List<String?> = emptyList(),
+    val isMeeting: Boolean = false,
 )
