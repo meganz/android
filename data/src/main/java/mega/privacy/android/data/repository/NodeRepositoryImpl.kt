@@ -761,6 +761,14 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaLocalRoomGateway.removeOfflineInformationById(id)
     }
 
+    override suspend fun updateFavoriteNode(nodeId: NodeId, isFavorite: Boolean) =
+        withContext(ioDispatcher) {
+            megaApiGateway.setNodeFavourite(
+                node = megaApiGateway.getMegaNodeByHandle(nodeId.longValue),
+                favourite = isFavorite
+            )
+        }
+
     private suspend fun getAllOfflineNodeHandle() =
         megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
 
