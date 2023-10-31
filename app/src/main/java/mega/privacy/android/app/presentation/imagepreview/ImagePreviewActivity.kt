@@ -22,7 +22,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
@@ -46,6 +45,7 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -95,7 +95,7 @@ class ImagePreviewActivity : BaseActivity() {
                     onClickLabel = ::handleLabel,
                     onClickOpenWith = ::handleOpenWith,
                     onClickSaveToDevice = ::saveNodeToDevice,
-                    onSwitchAvailableOffline = ::onSwitchAvailableOffline,
+                    onSwitchAvailableOffline = ::setAvailableOffline,
                     onClickGetLink = ::getNodeLink,
                     onClickSendTo = ::sendNodeToChat,
                     onClickShare = ::shareNode,
@@ -175,8 +175,12 @@ class ImagePreviewActivity : BaseActivity() {
         }
     }
 
-    private fun onSwitchAvailableOffline(checked: Boolean, imageNode: ImageNode) {
-        viewModel.switchAvailableOffline(checked, imageNode)
+    private fun setAvailableOffline(checked: Boolean, imageNode: ImageNode) {
+        viewModel.setNodeAvailableOffline(
+            activity = WeakReference(this@ImagePreviewActivity),
+            setOffline = checked,
+            imageNode = imageNode
+        )
     }
 
     private fun sendNodeToChat(imageNode: ImageNode) {

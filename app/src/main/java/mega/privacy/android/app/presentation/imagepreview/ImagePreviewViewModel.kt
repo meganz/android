@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.imagepreview
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
@@ -18,6 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuOptions
@@ -32,14 +35,17 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,6 +62,10 @@ class ImagePreviewViewModel @Inject constructor(
     private val addFavouritesUseCase: AddFavouritesUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
+    private val setNodeAvailableOffline: SetNodeAvailableOffline,
+    private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -70,16 +80,36 @@ class ImagePreviewViewModel @Inject constructor(
     private val imagePreviewMenuSource: ImagePreviewMenuSource
         get() = savedStateHandle[IMAGE_PREVIEW_MENU_OPTIONS] ?: ImagePreviewMenuSource.TIMELINE
 
-    private val _state = MutableStateFlow(
-        ImagePreviewState(
-            currentImageNodeId = NodeId(currentImageNodeIdValue),
-        )
-    )
+    private val imageNodesOffline: MutableMap<NodeId, Boolean> = mutableMapOf()
+
+    private val _state = MutableStateFlow(ImagePreviewState())
 
     val state: StateFlow<ImagePreviewState> = _state
 
     init {
         monitorImageNodes()
+        monitorOfflineNodeUpdates()
+    }
+
+    private fun monitorOfflineNodeUpdates() {
+        monitorOfflineNodeUpdatesUseCase()
+            .catch { Timber.e(it) }
+            .mapLatest { offlineList ->
+                Timber.d("IP monitorOfflineNodeUpdates:$offlineList")
+                _state.value.currentImageNode?.let { currentImageNode ->
+                    val handle = currentImageNode.id.longValue.toString()
+                    val index = offlineList.indexOfFirst { handle == it.handle }
+                    val isAvailableOffline = index != -1 && isAvailableOffline(currentImageNode)
+
+                    imageNodesOffline[currentImageNode.id] = isAvailableOffline
+                    _state.update {
+                        it.copy(
+                            isCurrentImageNodeAvailableOffline = isAvailableOffline
+                        )
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun monitorImageNodes() {
@@ -87,14 +117,29 @@ class ImagePreviewViewModel @Inject constructor(
         imageFetcher.monitorImageNodes(params)
             .catch { Timber.e(it) }
             .mapLatest { imageNodes ->
+                val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(imageNodes)
+                val isCurrentImageNodeAvailableOffline =
+                    currentImageNode?.isAvailableOffline ?: false
                 _state.update {
                     it.copy(
                         showSlideshowOption = shouldShowSlideshowOption(imageNodes),
                         imageNodes = imageNodes,
+                        currentImageNodeIndex = currentImageNodeIndex,
+                        currentImageNode = currentImageNode,
+                        isCurrentImageNodeAvailableOffline = isCurrentImageNodeAvailableOffline
                     )
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    private fun findCurrentImageNode(imageNodes: List<ImageNode>): Pair<Int, ImageNode?> {
+        val index = imageNodes.indexOfFirst { currentImageNodeIdValue == it.id.longValue }
+        return if (index != -1) {
+            index to imageNodes[index]
+        } else {
+            0 to null
+        }
     }
 
     private suspend fun shouldShowSlideshowOption(imageNodes: List<ImageNode>): Boolean =
@@ -149,10 +194,18 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
-    fun setCurrentImageNodeId(nodeId: NodeId) {
+    fun setCurrentImageNodeIndex(currentImageNodeIndex: Int) {
         _state.update {
             it.copy(
-                currentImageNodeId = nodeId,
+                currentImageNodeIndex = currentImageNodeIndex,
+            )
+        }
+    }
+
+    fun setCurrentImageNode(currentImageNode: ImageNode) {
+        _state.update {
+            it.copy(
+                currentImageNode = currentImageNode,
             )
         }
     }
@@ -199,9 +252,22 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
-    fun switchAvailableOffline(checked: Boolean, imageNode: ImageNode) {
-        //TODO viewModel.switchNodeOfflineAvailability(nodeItem!!, requireActivity())
-        //Need to refactor rx usecase first
+    fun setNodeAvailableOffline(
+        activity: WeakReference<Activity>,
+        setOffline: Boolean,
+        imageNode: ImageNode,
+    ) {
+        viewModelScope.launch {
+            if (setOffline) {
+                setNodeAvailableOffline(
+                    nodeId = imageNode.id,
+                    availableOffline = true,
+                    activity = activity
+                )
+            } else {
+                removeOfflineNodeUseCase(imageNode.id)
+            }
+        }
     }
 
     fun shareImageNode(context: Context, imageNode: ImageNode) {
@@ -314,6 +380,27 @@ class ImagePreviewViewModel @Inject constructor(
                 else -> Timber.e(it)
             }
         }
+    }
+
+    fun setCurrentImageNodeAvailableOffline(imageNode: ImageNode) {
+        viewModelScope.launch {
+            val isAvailableOffline = if (imageNodesOffline[imageNode.id] != null) {
+                imageNodesOffline[imageNode.id] ?: false
+            } else {
+                isAvailableOffline(imageNode)
+            }
+            imageNodesOffline[imageNode.id] = isAvailableOffline
+            _state.update {
+                it.copy(
+                    isCurrentImageNodeAvailableOffline = isAvailableOffline
+                )
+            }
+        }
+    }
+
+    suspend fun isAvailableOffline(imageNode: ImageNode): Boolean {
+        val typedNode = addImageTypeUseCase(imageNode)
+        return isAvailableOfflineUseCase(typedNode)
     }
 
     companion object {

@@ -62,6 +62,7 @@ internal fun ImagePreviewBottomSheet(
     showLabel: Boolean = false,
     labelColorText: String = "",
     labelColor: Color = Color.Unspecified,
+    isAvailableOffline: Boolean = false,
     imageThumbnailPath: String? = "",
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
@@ -71,7 +72,7 @@ internal fun ImagePreviewBottomSheet(
     onClickOpenWith: () -> Unit = {},
     onClickForward: () -> Unit = {},
     onClickSaveToDevice: () -> Unit = {},
-    onSwitchAvailableOffline: ((Boolean) -> Unit)? = null,
+    onSwitchAvailableOffline: ((checked: Boolean) -> Unit)? = null,
     onClickGetLink: () -> Unit = {},
     onClickRemoveLink: () -> Unit = {},
     onClickSendTo: () -> Unit = {},
@@ -186,7 +187,7 @@ internal fun ImagePreviewBottomSheet(
                     addSeparator = true,
                 ) {
                     MegaSwitch(
-                        checked = false,
+                        checked = isAvailableOffline,
                         onCheckedChange = onSwitchAvailableOffline,
                     )
                 }

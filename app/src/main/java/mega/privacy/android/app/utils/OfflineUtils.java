@@ -122,7 +122,7 @@ public class OfflineUtils {
 
     /**
      * @deprecated
-     * use DeleteOfflineNodeUseCase instead
+     * use RemoveOfflineNodeUseCase instead
      */
     @Deprecated
     public static void removeOffline(MegaOffline mOffDelete, LegacyDatabaseHandler dbH, Context context) {

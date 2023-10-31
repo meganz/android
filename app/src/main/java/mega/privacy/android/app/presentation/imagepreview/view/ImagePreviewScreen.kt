@@ -38,12 +38,9 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,9 +56,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
@@ -92,7 +89,7 @@ fun ImagePreviewScreen(
     onClickLabel: (ImageNode) -> Unit = {},
     onClickOpenWith: (ImageNode) -> Unit = {},
     onClickSaveToDevice: (ImageNode) -> Unit = {},
-    onSwitchAvailableOffline: ((Boolean, ImageNode) -> Unit)? = null,
+    onSwitchAvailableOffline: ((checked: Boolean, ImageNode) -> Unit)? = null,
     onClickGetLink: (ImageNode) -> Unit = {},
     onClickSendTo: (ImageNode) -> Unit = {},
     onClickShare: (ImageNode) -> Unit = {},
@@ -104,141 +101,224 @@ fun ImagePreviewScreen(
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val imageNodes = viewState.imageNodes
     if (imageNodes.isNotEmpty()) {
-        val currentImageNodeId = viewState.currentImageNodeId
-        val initialPage = remember {
-            imageNodes.withIndex().first {
-                currentImageNodeId.longValue == it.value.id.longValue
-            }.index
-        }
-        val inFullScreenMode = viewState.inFullScreenMode
-        val scaffoldState = rememberScaffoldState()
-        val isLight = MaterialTheme.colors.isLight
-        val photoState = rememberPhotoState()
-        val pagerState = rememberPagerState(
-            initialPage = initialPage,
-            initialPageOffsetFraction = 0f,
-        ) {
-            imageNodes.size
-        }
-
-        val coroutineScope = rememberCoroutineScope()
-        val modalSheetState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-            skipHalfExpanded = false,
-        )
-
-        LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.currentPage }.collect { page ->
-                imageNodes.getOrNull(page)?.id?.let { viewModel.setCurrentImageNodeId(it) }
+        val currentImageNodeIndex = viewState.currentImageNodeIndex
+        viewState.currentImageNode?.let { currentImageNode ->
+            val isCurrentImageNodeAvailableOffline = viewState.isCurrentImageNodeAvailableOffline
+            val context = LocalContext.current
+            val currentImageNodeInfo = remember(currentImageNodeIndex) {
+                MegaNode.unserialize(currentImageNode.serializedData).getInfoText(context)
             }
-        }
-
-        if (viewState.transferMessage.isNotEmpty()) {
-            LaunchedEffect(Unit) {
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = viewState.transferMessage,
-                )
-                viewModel.clearTransferMessage()
+            val labelColorResId = remember(currentImageNodeIndex, currentImageNode.label) {
+                MegaNodeUtil.getNodeLabelColor(currentImageNode.label)
             }
-        }
-
-        if (viewState.resultMessage.isNotEmpty()) {
-            LaunchedEffect(Unit) {
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = viewState.resultMessage,
-                )
-                viewModel.clearResultMessage()
+            val labelColorText = remember(currentImageNodeIndex, currentImageNode.label) {
+                MegaNodeUtil.getNodeLabelText(currentImageNode.label, context)
             }
-        }
+            val imageResult by produceState<ImageResult?>(
+                initialValue = null,
+                key1 = currentImageNodeIndex
+            ) {
+                viewModel.monitorImageResult(currentImageNode).collectLatest { imageResult ->
+                    value = imageResult
+                }
+            }
 
-        Scaffold(
-            scaffoldState = scaffoldState,
-            snackbarHost = { snackBarHostState ->
-                SnackbarHost(
-                    hostState = snackBarHostState,
-                    snackbar = { snackBarData ->
-                        Snackbar(
-                            snackbarData = snackBarData,
-                            actionOnNewLine = true,
-                            backgroundColor = black.takeIf { isLight } ?: white,
-                            actionColor = teal_200.takeIf { isLight } ?: teal_300,
+            val inFullScreenMode = viewState.inFullScreenMode
+            val scaffoldState = rememberScaffoldState()
+            val isLight = MaterialTheme.colors.isLight
+            val photoState = rememberPhotoState()
+            val pagerState = rememberPagerState(
+                initialPage = currentImageNodeIndex,
+                initialPageOffsetFraction = 0f,
+            ) {
+                imageNodes.size
+            }
+
+            val coroutineScope = rememberCoroutineScope()
+            val modalSheetState = rememberModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Hidden,
+                skipHalfExpanded = false,
+            )
+
+            LaunchedEffect(pagerState) {
+                snapshotFlow { pagerState.currentPage }.collect { page ->
+                    imageNodes.getOrNull(page)?.let {
+                        viewModel.setCurrentImageNodeIndex(page)
+                        viewModel.setCurrentImageNode(it)
+                        viewModel.setCurrentImageNodeAvailableOffline(it)
+                    }
+
+                }
+            }
+
+            if (viewState.transferMessage.isNotEmpty()) {
+                LaunchedEffect(Unit) {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = viewState.transferMessage,
+                    )
+                    viewModel.clearTransferMessage()
+                }
+            }
+
+            if (viewState.resultMessage.isNotEmpty()) {
+                LaunchedEffect(Unit) {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = viewState.resultMessage,
+                    )
+                    viewModel.clearResultMessage()
+                }
+            }
+
+            Scaffold(
+                scaffoldState = scaffoldState,
+                snackbarHost = { snackBarHostState ->
+                    SnackbarHost(
+                        hostState = snackBarHostState,
+                        snackbar = { snackBarData ->
+                            Snackbar(
+                                snackbarData = snackBarData,
+                                actionOnNewLine = true,
+                                backgroundColor = black.takeIf { isLight } ?: white,
+                                actionColor = teal_200.takeIf { isLight } ?: teal_300,
+                            )
+                        }
+                    )
+                },
+                content = { innerPadding ->
+                    ImagePreviewBottomSheet(
+                        modalSheetState = modalSheetState,
+                        imageThumbnailPath = imageResult?.getLowestResolutionAvailableUri(),
+                        imageName = currentImageNode.name,
+                        imageInfo = currentImageNodeInfo,
+                        isFavourite = currentImageNode.isFavourite,
+                        showLabel = currentImageNode.label != MegaNode.NODE_LBL_UNKNOWN,
+                        labelColor = colorResource(id = labelColorResId),
+                        labelColorText = labelColorText,
+                        isAvailableOffline = isCurrentImageNodeAvailableOffline,
+                        onClickInfo = {
+                            onClickInfo(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickFavourite = {
+                            onClickFavourite(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickLabel = {
+                            onClickLabel(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickOpenWith = {
+                            onClickOpenWith(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickSaveToDevice = {
+                            onClickSaveToDevice(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onSwitchAvailableOffline = { checked ->
+                            onSwitchAvailableOffline?.invoke(checked, currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickGetLink = {
+                            onClickGetLink(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickSendTo = {
+                            onClickSendTo(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickShare = {
+                            onClickShare(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickRename = {
+                            onClickRename(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickMove = {
+                            onClickMove(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickCopy = {
+                            onClickCopy(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickMoveToRubbishBin = {
+                            onClickMoveToRubbishBin(currentImageNode)
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                    ) {
+                        ImagePreviewContent(
+                            innerPadding = innerPadding,
+                            pagerState = pagerState,
+                            imageNodes = imageNodes,
+                            currentImageNodeIndex = currentImageNodeIndex,
+                            currentImageNode = currentImageNode,
+                            photoState = photoState,
+                            downloadImage = viewModel::monitorImageResult,
+                            onImageTap = { viewModel.switchFullScreenMode() },
+                            onClickVideoPlay = onClickVideoPlay,
+                            topAppBar = { imageNode ->
+                                AnimatedVisibility(
+                                    visible = !inFullScreenMode,
+                                    enter = fadeIn() + expandVertically(),
+                                    exit = fadeOut() + shrinkVertically()
+                                ) {
+                                    ImagePreviewTopBar(
+                                        showSlideshowMenu = viewState.showSlideshowOption
+                                                && viewModel.isSlideshowOptionVisible(imageNode),
+                                        showSaveToDeviceMenu = viewModel.isSaveToDeviceOptionVisible(
+                                            imageNode
+                                        ),
+                                        showManageLinkMenu = viewModel.isGetLinkOptionVisible(
+                                            imageNode
+                                        ),
+                                        showSendToMenu = viewModel.isSendToOptionVisible(imageNode),
+                                        onClickBack = onClickBack,
+                                        onClickSlideshow = onClickSlideshow,
+                                        onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
+                                        onClickGetLink = { onClickGetLink(imageNode) },
+                                        onClickSendTo = { onClickSendTo(imageNode) },
+                                        onClickMore = {
+                                            coroutineScope.launch {
+                                                modalSheetState.show()
+                                            }
+                                        },
+                                    )
+                                }
+                            },
+                            bottomAppBar = { currentImageNode, index ->
+                                AnimatedVisibility(
+                                    visible = !inFullScreenMode,
+                                    enter = fadeIn() + expandVertically(),
+                                    exit = fadeOut() + shrinkVertically()
+                                ) {
+                                    val photoIndexText = stringResource(
+                                        R.string.wizard_steps_indicator,
+                                        index + 1,
+                                        imageNodes.size
+                                    )
+
+                                    ImagePreviewBottomBar(
+                                        imageName = currentImageNode.name,
+                                        imageIndex = photoIndexText,
+                                    )
+                                }
+                            }
                         )
                     }
-                )
-            },
-            content = { innerPadding ->
-                ImagePreviewContent(
-                    innerPadding = innerPadding,
-                    modalSheetState = modalSheetState,
-                    pagerState = pagerState,
-                    imageNodes = imageNodes,
-                    photoState = photoState,
-                    downloadImage = viewModel::monitorImageResult,
-                    onImageTap = { viewModel.switchFullScreenMode() },
-                    onClickVideoPlay = onClickVideoPlay,
-                    onClickInfo = onClickInfo,
-                    onClickFavourite = { imageNode -> onClickFavourite(imageNode) },
-                    onClickLabel = { imageNode -> onClickLabel(imageNode) },
-                    onClickOpenWith = { imageNode -> onClickOpenWith(imageNode) },
-                    onClickSaveToDevice = { imageNode -> onClickSaveToDevice(imageNode) },
-                    onSwitchAvailableOffline = { checked, imageNode ->
-                        onSwitchAvailableOffline?.invoke(checked, imageNode)
-                    },
-                    onClickGetLink = { imageNode -> onClickGetLink(imageNode) },
-                    onClickSendTo = { imageNode -> onClickSendTo(imageNode) },
-                    onClickShare = { imageNode -> onClickShare(imageNode) },
-                    onClickRename = { imageNode -> onClickRename(imageNode) },
-                    onClickMove = { imageNode -> onClickMove(imageNode) },
-                    onClickCopy = { imageNode -> onClickCopy(imageNode) },
-                    onClickMoveToRubbishBin = { imageNode -> onClickMoveToRubbishBin(imageNode) },
-                    topAppBar = { imageNode ->
-                        AnimatedVisibility(
-                            visible = !inFullScreenMode,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
-                        ) {
-                            ImagePreviewTopBar(
-                                showSlideshowMenu = viewState.showSlideshowOption
-                                        && viewModel.isSlideshowOptionVisible(imageNode),
-                                showSaveToDeviceMenu = viewModel.isSaveToDeviceOptionVisible(
-                                    imageNode
-                                ),
-                                showManageLinkMenu = viewModel.isGetLinkOptionVisible(imageNode),
-                                showSendToMenu = viewModel.isSendToOptionVisible(imageNode),
-                                onClickBack = onClickBack,
-                                onClickSlideshow = onClickSlideshow,
-                                onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
-                                onClickGetLink = { onClickGetLink(imageNode) },
-                                onClickSendTo = { onClickSendTo(imageNode) },
-                                onClickMore = {
-                                    coroutineScope.launch {
-                                        modalSheetState.show()
-                                    }
-                                },
-                            )
-                        }
-                    },
-                    bottomAppBar = { currentImageNode, index ->
-                        AnimatedVisibility(
-                            visible = !inFullScreenMode,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
-                        ) {
-                            val photoIndexText = stringResource(
-                                R.string.wizard_steps_indicator,
-                                index + 1,
-                                imageNodes.size
-                            )
+                },
+            )
+        }
+    }
+}
 
-                            ImagePreviewBottomBar(
-                                imageName = currentImageNode.name,
-                                imageIndex = photoIndexText,
-                            )
-                        }
-                    }
-                )
-            },
-        )
+private fun hideBottomSheet(
+    coroutineScope: CoroutineScope,
+    modalSheetState: ModalBottomSheetState,
+) {
+    coroutineScope.launch {
+        modalSheetState.hide()
     }
 }
 
@@ -248,42 +328,15 @@ private fun ImagePreviewContent(
     innerPadding: PaddingValues,
     pagerState: PagerState,
     imageNodes: List<ImageNode>,
+    currentImageNodeIndex: Int,
+    currentImageNode: ImageNode?,
     photoState: PhotoState,
     onImageTap: () -> Unit,
     topAppBar: @Composable (ImageNode) -> Unit,
     bottomAppBar: @Composable (ImageNode, Int) -> Unit,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
-    modalSheetState: ModalBottomSheetState,
     onClickVideoPlay: (ImageNode) -> Unit,
-    onClickInfo: (ImageNode) -> Unit,
-    onClickFavourite: (ImageNode) -> Unit = {},
-    onClickLabel: (ImageNode) -> Unit = {},
-    onClickOpenWith: (ImageNode) -> Unit = {},
-    onClickSaveToDevice: (ImageNode) -> Unit = {},
-    onSwitchAvailableOffline: ((Boolean, ImageNode) -> Unit)? = null,
-    onClickGetLink: (ImageNode) -> Unit = {},
-    onClickSendTo: (ImageNode) -> Unit = {},
-    onClickShare: (ImageNode) -> Unit = {},
-    onClickRename: (ImageNode) -> Unit = {},
-    onClickMove: (ImageNode) -> Unit = {},
-    onClickCopy: (ImageNode) -> Unit = {},
-    onClickMoveToRubbishBin: (ImageNode) -> Unit = {},
 ) {
-    val context = LocalContext.current
-    var currentImageNode: ImageNode? by remember {
-        mutableStateOf(null)
-    }
-    var currentImageNodeIndex by remember {
-        mutableIntStateOf(0)
-    }
-
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
-            currentImageNode = imageNodes.getOrNull(page)
-            currentImageNodeIndex = page
-        }
-    }
-
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -298,77 +351,39 @@ private fun ImagePreviewContent(
         ) { index ->
             val imageNode = imageNodes[index]
 
-            val currentImageNodeInfo = remember(index) {
-                MegaNode.unserialize(imageNode.serializedData).getInfoText(context)
-            }
-
-            val labelColorResId = remember(index, imageNode.label) {
-                MegaNodeUtil.getNodeLabelColor(imageNode.label)
-            }
-
-            val labelColorText = remember(index, imageNode.label) {
-                MegaNodeUtil.getNodeLabelText(imageNode.label, context)
-            }
-
             val imageResult by produceState<ImageResult?>(initialValue = null) {
                 downloadImage(imageNode).collectLatest { imageResult ->
                     value = imageResult
                 }
             }
 
-            ImagePreviewBottomSheet(
-                modalSheetState = modalSheetState,
-                imageThumbnailPath = imageResult?.getLowestResolutionAvailableUri(),
-                imageName = imageNode.name,
-                imageInfo = currentImageNodeInfo,
-                isFavourite = imageNode.isFavourite,
-                showLabel = imageNode.label != MegaNode.NODE_LBL_UNKNOWN,
-                labelColor = colorResource(id = labelColorResId),
-                labelColorText = labelColorText,
-                onClickInfo = { onClickInfo(imageNode) },
-                onClickFavourite = { onClickFavourite(imageNode) },
-                onClickLabel = { onClickLabel(imageNode) },
-                onClickOpenWith = { onClickOpenWith(imageNode) },
-                onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
-                onSwitchAvailableOffline = { checked ->
-                    onSwitchAvailableOffline?.invoke(checked, imageNode)
-                },
-                onClickGetLink = { onClickGetLink(imageNode) },
-                onClickSendTo = { onClickSendTo(imageNode) },
-                onClickShare = { onClickShare(imageNode) },
-                onClickRename = { onClickRename(imageNode) },
-                onClickMove = { onClickMove(imageNode) },
-                onClickCopy = { onClickCopy(imageNode) },
-                onClickMoveToRubbishBin = { onClickMoveToRubbishBin(imageNode) },
-            ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    ImageContent(
-                        fullSizePath = imageResult?.getHighestResolutionAvailableUri(),
-                        photoState = photoState,
-                        onImageTap = onImageTap
-                    )
-                    if (imageNode.type is VideoFileTypeInfo) {
-                        IconButton(
-                            modifier = Modifier.align(Alignment.Center),
-                            onClick = { onClickVideoPlay(imageNode) }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = RExoPlayer.drawable.exo_icon_play),
-                                contentDescription = "Image Preview play video",
-                                tint = Color.White,
-                            )
-                        }
-                    }
-
-                    val progress = imageResult?.getProgressPercentage() ?: 0L
-                    if (progress in 1 until 100) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.BottomEnd),
-                            progress = progress.toFloat(),
-                            color = MaterialTheme.colors.secondary,
-                            strokeWidth = 2.dp,
+            Box(modifier = Modifier.fillMaxSize()) {
+                ImageContent(
+                    fullSizePath = imageResult?.getHighestResolutionAvailableUri(),
+                    photoState = photoState,
+                    onImageTap = onImageTap
+                )
+                if (imageNode.type is VideoFileTypeInfo) {
+                    IconButton(
+                        modifier = Modifier.align(Alignment.Center),
+                        onClick = { onClickVideoPlay(imageNode) }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = RExoPlayer.drawable.exo_icon_play),
+                            contentDescription = "Image Preview play video",
+                            tint = Color.White,
                         )
                     }
+                }
+
+                val progress = imageResult?.getProgressPercentage() ?: 0L
+                if (progress in 1 until 100) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.BottomEnd),
+                        progress = progress.toFloat(),
+                        color = MaterialTheme.colors.secondary,
+                        strokeWidth = 2.dp,
+                    )
                 }
             }
         }
