@@ -560,6 +560,19 @@ interface NodeRepository {
     suspend fun removeOfflineNodeById(id: Int)
 
     /**
+     * Set label for node
+     * @param nodeId [NodeId]
+     * @param label Int
+     */
+    suspend fun setNodeLabel(nodeId: NodeId, label: Int)
+
+    /**
+     * Resets the label for node
+     * @param nodeId [NodeId]
+     */
+    suspend fun resetNodeLabel(nodeId: NodeId)
+
+    /**
      * Update Node to favorite
      */
     suspend fun updateFavoriteNode(nodeId: NodeId, isFavorite: Boolean)

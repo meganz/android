@@ -3074,4 +3074,17 @@ interface MegaApiGateway {
      * @param psaId
      */
     suspend fun setPsaHandled(psaId: Int)
+
+    /**
+     * Set label to Node
+     * @param node [MegaNode]
+     * @param label Int
+     */
+    suspend fun setNodeLabel(node: MegaNode, label: Int)
+
+    /**
+     * Reset label from node
+     * @param node [MegaNode]
+     */
+    suspend fun resetNodeLabel(node: MegaNode)
 }

@@ -1428,4 +1428,12 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getPSAWithUrl(listener)
 
     override suspend fun setPsaHandled(psaId: Int) = megaApi.setPSA(psaId)
+
+    override suspend fun setNodeLabel(node: MegaNode, label: Int) {
+        megaApi.setNodeLabel(node, label)
+    }
+
+    override suspend fun resetNodeLabel(node: MegaNode) {
+        megaApi.resetNodeLabel(node)
+    }
 }

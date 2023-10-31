@@ -761,6 +761,20 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaLocalRoomGateway.removeOfflineInformationById(id)
     }
 
+    override suspend fun setNodeLabel(nodeId: NodeId, label: Int): Unit =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+                megaApiGateway.setNodeLabel(it, label)
+            }
+        }
+
+    override suspend fun resetNodeLabel(nodeId: NodeId): Unit =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+                megaApiGateway.resetNodeLabel(it)
+            }
+        }
+
     override suspend fun updateFavoriteNode(nodeId: NodeId, isFavorite: Boolean) =
         withContext(ioDispatcher) {
             megaApiGateway.setNodeFavourite(
