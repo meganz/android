@@ -1,17 +1,18 @@
 package mega.privacy.android.app.meeting.fragments
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.InputType
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
@@ -48,14 +49,6 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var chatTitle: String = ""
     private var chatLink: String = ""
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
-        binding = FragmentMeetingInfoBinding.inflate(LayoutInflater.from(context), null, false)
-        dialog.setContentView(binding.root)
-    }
-
     override fun onStart() {
         super.onStart()
 
@@ -64,8 +57,17 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             BottomSheetBehavior.STATE_EXPANDED
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentMeetingInfoBinding.inflate(LayoutInflater.from(context), null, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initView()
     }
 
@@ -92,7 +94,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 )
         }
 
-        collectFlow(shareViewModel.state) { state: MeetingState ->
+        viewLifecycleOwner.collectFlow(shareViewModel.state) { state: MeetingState ->
             if (state.meetingLink.isNotEmpty()) {
                 binding.copyLink.isVisible = true
                 binding.copyLink.text = state.meetingLink
@@ -124,7 +126,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
     /**
      * Copy link
      */
-    fun copyLink() {
+    private fun copyLink() {
         Timber.d("copyLink")
         if (chatLink.isNotEmpty()) {
             val clipboard =
@@ -146,8 +148,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
     /**
      * Show dialog for changing the meeting name, only for moderator
      */
-    @Suppress("DEPRECATION")
-    fun showRenameGroupDialog() {
+    private fun showRenameGroupDialog() {
         val activity = requireActivity()
         val layout = LinearLayout(requireActivity())
         layout.orientation = LinearLayout.VERTICAL
@@ -221,11 +222,13 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 input.error = getString(R.string.invalid_string)
                 input.requestFocus()
             }
+
             !ChatUtil.isAllowedTitle(title) -> {
                 Timber.w("Title is too long")
                 input.error = getString(R.string.title_long)
                 input.requestFocus()
             }
+
             else -> {
                 Timber.d("Positive button pressed - change title")
                 inMeetingViewModel.setTitleChat(title)
@@ -235,12 +238,9 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     }
 
-
     companion object {
         fun newInstance(): MeetingInfoBottomSheetDialogFragment {
             return MeetingInfoBottomSheetDialogFragment()
         }
     }
-
-
 }
