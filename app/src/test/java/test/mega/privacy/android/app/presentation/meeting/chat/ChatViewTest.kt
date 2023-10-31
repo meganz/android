@@ -506,6 +506,19 @@ class ChatViewTest {
             .assertExists()
     }
 
+    @Test
+    fun `test that number of participants shows if the chat is in preview mode`() {
+        val count = 5
+        initComposeRuleContent(
+            ChatUiState(
+                isPreviewMode = true,
+                participantsCount = count.toLong()
+            )
+        )
+        composeTestRule.onNodeWithPlural(R.plurals.subtitle_of_group_chat, count)
+            .assertExists()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(
