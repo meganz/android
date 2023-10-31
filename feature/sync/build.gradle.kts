@@ -80,6 +80,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":core:formatter"))
     implementation(project(":core-ui"))
+    implementation(project(":legacy-core-ui"))
 
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)

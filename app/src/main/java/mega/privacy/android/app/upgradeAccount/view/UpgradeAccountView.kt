@@ -72,7 +72,7 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.appbar.SimpleNoTitleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
 import mega.privacy.android.core.ui.controls.text.MegaSpannedAlignedText
 import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText

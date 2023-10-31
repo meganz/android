@@ -30,7 +30,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toStorageString
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.AchievementsOverviewViewModel
-import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012

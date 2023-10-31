@@ -36,7 +36,7 @@ import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel
 import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
 import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
-import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200

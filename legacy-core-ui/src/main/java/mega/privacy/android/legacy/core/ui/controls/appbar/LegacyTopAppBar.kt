@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.appbar
+package mega.privacy.android.legacy.core.ui.controls.appbar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

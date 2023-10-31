@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.appbar
+package mega.privacy.android.legacy.core.ui.controls.appbar
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
