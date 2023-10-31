@@ -3,9 +3,13 @@ package mega.privacy.android.core.ui.controls.layouts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +23,9 @@ import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.core.ui.controls.appbar.MegaAppBarSubTitle
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBarTitle
+import mega.privacy.android.core.ui.controls.appbar.MegaAppBarTitleAndSubtitle
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -30,7 +36,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  *
  * Layout to add a header with collapsible title in [ScaffoldWithCollapsibleHeader] together with [AppBarForCollapsibleHeader]. Check ScaffoldWithCollapsibleHeader preview for an example
  * @param appBarType this will be used to set the correct paddings of the title, should be the same as the [AppBarForCollapsibleHeader]
- * @param title for the toolbar, it should be the same as the [AppBarForCollapsibleHeader]. Here, as the header has more space, it will take up to [titleMaxLines] lines.
+ * @param title for the toolbar, should match that of the [AppBarForCollapsibleHeader]. Here, as the header has more space, it will take up to [titleMaxLines] lines.
  * @param titleMaxLines the maximum title lines when expanded. Default to 3
  * @param content any other content that will be show in the header.
  */
@@ -81,11 +87,58 @@ fun CollapsibleHeaderWithTitle(
     )
 }
 
+/**
+ * CollapsibleHeaderWithTitle
+ *
+ * Layout to add a header with collapsible title and subtitle in [ScaffoldWithCollapsibleHeader] together with [AppBarForCollapsibleHeader]. Check ScaffoldWithCollapsibleHeader preview for an example
+ * @param appBarType this will be used to set the correct paddings of the title, should be the same as the [AppBarForCollapsibleHeader]
+ * @param title for the toolbar, should match that of the [AppBarForCollapsibleHeader].
+ * @param subtitle for the toolbar, should match that of the [AppBarForCollapsibleHeader].
+ * @param content any other content that will be show in the header.
+ */
+@Composable
+fun CollapsibleHeaderWithTitle(
+    appBarType: AppBarType,
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+    titleIcons: @Composable (RowScope.() -> Unit)? = null,
+    content: @Composable BoxScope.() -> Unit,
+) = Box(
+    modifier = modifier
+        .fillMaxWidth()
+) {
+    content()
+    val statusBarHeight = WindowInsets.Companion.statusBars.getTop(LocalDensity.current).dp
+    val titleDisplacement = LocalCollapsibleHeaderTitleTransition.current.offset
+    Box(
+        modifier = Modifier
+            .padding(top = statusBarHeight + titleDisplacement)
+            .height(APP_BAR_HEIGHT.dp),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        MegaAppBarTitleAndSubtitle(
+            modifier = Modifier
+                .padding(
+                    start = if (appBarType == AppBarType.NONE) 16.dp else 72.dp,
+                    end = 12.dp
+                ),
+            title = {
+                MegaAppBarTitle(title = title)
+            },
+            subtitle = {
+                MegaAppBarSubTitle(subtitle = subtitle)
+            },
+            titleIcons = titleIcons,
+        )
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun CollapsibleHeaderPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        CollapsibleHeaderWithTitle(AppBarType.MENU, "Title") {
+        CollapsibleHeaderWithTitle(AppBarType.MENU, "Title", "Subtitle") {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

@@ -1,6 +1,7 @@
 package mega.privacy.android.core.ui.controls.appbar
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -14,6 +15,7 @@ import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.utils.composeLet
 
 /**
  * MegaAppBarForCollapsibleHeader
@@ -37,6 +39,8 @@ fun AppBarForCollapsibleHeader(
     appBarType: AppBarType,
     title: String,
     modifier: Modifier = Modifier,
+    titleIcons: @Composable (RowScope.() -> Unit)? = null,
+    subtitle: String? = null,
     onNavigationPressed: (() -> Unit)? = null,
     badgeCount: Int? = null,
     actions: List<MenuAction>? = null,
@@ -46,11 +50,16 @@ fun AppBarForCollapsibleHeader(
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) = BaseMegaAppBar(
     appBarType = appBarType,
-    title = {
-        MegaAppBarTitle(
-            title, modifier = Modifier
+    titleAndSubtitle = {
+        MegaAppBarTitleAndSubtitle(
+            title = { MegaAppBarTitle(title) },
+            titleIcons = titleIcons,
+            subtitle = subtitle?.composeLet {
+                MegaAppBarSubTitle(subtitle = it)
+            },
+            modifier = Modifier
                 .offset(y = LocalCollapsibleHeaderTitleTransition.current.offset)
-                .alpha(1 - LocalCollapsibleHeaderTitleTransition.current.expandedAlpha)
+                .alpha(LocalCollapsibleHeaderTitleTransition.current.toolbarAlpha)
         )
     },
     modifier = modifier,
@@ -75,7 +84,7 @@ private fun MegaAppBarForCollapsibleHeaderPreview() {
                 backgroundAlpha = 1f,
             )
         ) {
-            AppBarForCollapsibleHeader(AppBarType.MENU, "Title")
+            AppBarForCollapsibleHeader(AppBarType.MENU, "Title", subtitle = "Subtitle")
         }
     }
 }

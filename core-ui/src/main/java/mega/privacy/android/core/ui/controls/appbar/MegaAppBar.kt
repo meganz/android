@@ -29,6 +29,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
@@ -81,8 +82,9 @@ fun MegaAppBar(
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        MegaTheme.colors.icon.primary,
-        MegaTheme.colors.text.primary
+        iconsTintColor = MegaTheme.colors.icon.primary,
+        titleColor = MegaTheme.colors.text.primary,
+        subtitleColor = MegaTheme.colors.text.secondary,
     )
 ) {
     BaseMegaAppBar(
@@ -138,8 +140,9 @@ fun MegaAppBar(
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        MegaTheme.colors.icon.primary,
-        MegaTheme.colors.text.primary
+        iconsTintColor = MegaTheme.colors.icon.primary,
+        titleColor = MegaTheme.colors.text.primary,
+        subtitleColor = MegaTheme.colors.text.secondary,
     )
 ) {
     BaseMegaAppBar(
@@ -168,6 +171,7 @@ fun MegaAppBar(
 data class MegaAppBarColors(
     val iconsTintColor: Color,
     val titleColor: Color,
+    val subtitleColor: Color = Color.Unspecified,
     val backgroundAlpha: Float = 1f,
 )
 
@@ -190,25 +194,41 @@ internal fun BaseMegaAppBar(
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
+) = BaseMegaAppBar(
+    appBarType = appBarType,
+    titleAndSubtitle = {
+        MegaAppBarTitleAndSubtitle(
+            title = title,
+            titleIcons = titleIcons,
+            subtitle = subtitle,
+            modifier = Modifier.then(Modifier.padding(end = if (actions.isNullOrEmpty()) 12.dp else 0.dp))
+        )
+    },
+    actions = actions,
+    modifier = modifier,
+    onNavigationPressed = onNavigationPressed,
+    badgeCount = badgeCount,
+    onActionPressed = onActionPressed,
+    maxActionsToShow = maxActionsToShow,
+    enabled = enabled,
+    elevation = elevation
+)
+
+@Composable
+internal fun BaseMegaAppBar(
+    appBarType: AppBarType,
+    titleAndSubtitle: @Composable () -> Unit,
+    actions: List<MenuAction>? = null,
+    modifier: Modifier = Modifier,
+    onNavigationPressed: (() -> Unit)? = null,
+    badgeCount: Int? = null,
+    onActionPressed: ((MenuAction) -> Unit)? = null,
+    maxActionsToShow: Int = 4,
+    enabled: Boolean = true,
+    elevation: Dp = LocalMegaAppBarElevation.current,
 ) {
     TopAppBar(
-        title = {
-            Column(modifier = Modifier.then(Modifier.padding(end = if (actions.isNullOrEmpty()) 12.dp else 0.dp))) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    title()
-                    CompositionLocalProvider(
-                        LocalContentColor provides MegaTheme.colors.icon.secondary,
-                        LocalContentAlpha provides 1f,
-                    ) {
-                        titleIcons?.let { it() }
-                    }
-                }
-                subtitle?.let { it() }
-            }
-        },
+        title = titleAndSubtitle,
         backgroundColor = MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
         modifier = modifier,
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
@@ -285,7 +305,7 @@ internal fun MegaAppBarSubTitle(
 ) = Text(
     text = subtitle,
     modifier = modifier,
-    color = MegaTheme.colors.text.secondary,
+    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { MegaTheme.colors.text.secondary },
     maxLines = maxLines,
     style = MaterialTheme.typography.body4
 )
@@ -297,9 +317,33 @@ internal fun MegaAppBarMarqueeSubTitle(
 ) = MarqueeText(
     text = subtitle,
     modifier = modifier,
-    color = MegaTheme.colors.text.secondary,
+    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { MegaTheme.colors.text.secondary },
     style = MaterialTheme.typography.body4
 )
+
+@Composable
+internal fun MegaAppBarTitleAndSubtitle(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    titleIcons: @Composable (RowScope.() -> Unit)? = null,
+    subtitle: @Composable (() -> Unit)? = null,
+) =
+    Column(modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            title()
+            CompositionLocalProvider(
+                LocalContentColor provides MegaTheme.colors.icon.secondary,
+                LocalContentAlpha provides 1f,
+            ) {
+                titleIcons?.let { it() }
+            }
+        }
+        subtitle?.let { it() }
+    }
+
 
 @Composable
 private fun NavigationIcon(

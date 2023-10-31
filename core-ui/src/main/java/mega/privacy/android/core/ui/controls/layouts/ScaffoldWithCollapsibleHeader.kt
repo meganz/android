@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.LocalElevationOverlay
 import androidx.compose.material.MaterialTheme
@@ -70,10 +73,11 @@ import mega.privacy.android.core.ui.theme.darkColorPalette
  */
 @Composable
 fun ScaffoldWithCollapsibleHeader(
-    headerBelowAppBar: @Composable (BoxScope.() -> Unit)?,
     topBar: @Composable () -> Unit,
     headerAboveAppBar: @Composable (BoxScope.() -> Unit)?,
     modifier: Modifier = Modifier,
+    headerBelowAppBar: @Composable (BoxScope.() -> Unit)? = null,
+    titleDisplacementFactor: Float = 0.5f,
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     content: @Composable () -> Unit,
 ) {
@@ -145,14 +149,28 @@ fun ScaffoldWithCollapsibleHeader(
                 }
             }
         }
+        val subtitleColor by remember(hasHeaderBelow) {
+            derivedStateOf {
+                if (hasHeaderBelow) {
+                    titleColor
+                } else {
+                    Color.Unspecified
+                }
+            }
+        }
         val collapsibleHeaderTitleTransition by remember {
             derivedStateOf {
-                //The offset is 0 when it's collapsed, and it grows half of the expansion when expanded.
-                val offset =
-                    ((headerHeight - headerGoneHeight(statusBarHeight)) * 0.5f).coerceAtLeast(0f).dp
-                // alpha transition will be done in last 20dp
-                val alpha = (offset / 20.dp).coerceIn(0f, 1f)
-                CollapsibleHeaderTitleTransition(offset, alpha)
+                //The offset is 0 when it's collapsed, and it grows [titleDisplacementFactor] of the expansion when expanded.
+                val offset = ((headerHeight - headerGoneHeight(statusBarHeight))
+                        * titleDisplacementFactor).coerceAtLeast(0f).dp
+                // alpha transition will be done in last 20dp, title alpha will start earlier because we want the title to be opaque all the time (to views with 0.5f alpha are like 0.75 alpha, not 1f alpha)
+                val startShowingToolbarTitle = 20.dp
+                val startHidingHeaderTitle = 15.dp
+                val headerTitleAlpha = (offset / startHidingHeaderTitle).coerceIn(0f, 1f)
+                val toolbarTitleAlpha = 1 -
+                        ((offset - startHidingHeaderTitle) / (startShowingToolbarTitle - startShowingToolbarTitle))
+                            .coerceIn(0f, 1f)
+                CollapsibleHeaderTitleTransition(offset, headerTitleAlpha, toolbarTitleAlpha)
             }
         }
 
@@ -183,6 +201,7 @@ fun ScaffoldWithCollapsibleHeader(
                     LocalMegaAppBarColors provides MegaAppBarColors(
                         iconsTintColor = iconTintColor,
                         titleColor = titleColor,
+                        subtitleColor = subtitleColor,
                         backgroundAlpha = topBarBackgroundAlpha,
                     ),
                     LocalCollapsibleHeaderTitleTransition provides collapsibleHeaderTitleTransition,
@@ -199,6 +218,7 @@ fun ScaffoldWithCollapsibleHeader(
                     LocalMegaAppBarColors provides MegaAppBarColors(
                         iconsTintColor = iconTintColor,
                         titleColor = titleColor,
+                        subtitleColor = subtitleColor,
                         backgroundAlpha = topBarBackgroundAlpha,
                     ),
                     LocalMegaAppBarElevation provides elevation,
@@ -231,12 +251,13 @@ fun ScaffoldWithCollapsibleHeader(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(headerHeight.dp)
-                    .alpha(collapsibleHeaderTitleTransition.expandedAlpha)
+                    .alpha(collapsibleHeaderTitleTransition.headerAlpha)
             ) {
                 CompositionLocalProvider(
                     LocalMegaAppBarColors provides MegaAppBarColors(
                         iconsTintColor = iconTintColor,
                         titleColor = titleColor,
+                        subtitleColor = subtitleColor,
                         backgroundAlpha = topBarBackgroundAlpha,
                     ),
                     LocalCollapsibleHeaderTitleTransition provides collapsibleHeaderTitleTransition,
@@ -248,10 +269,20 @@ fun ScaffoldWithCollapsibleHeader(
     }
 }
 
-internal data class CollapsibleHeaderTitleTransition(val offset: Dp, val expandedAlpha: Float)
+/**
+ * Values for animating the transition between the title in the header (when expanded) and the title in the toolbar (when collapsed).
+ * @param offset the y offset of the title respect toolbar ordinary position
+ * @param headerAlpha the alpha of the title in the header
+ * @param toolbarAlpha the alpha of the title in the toolbar
+ */
+internal data class CollapsibleHeaderTitleTransition(
+    val offset: Dp,
+    val headerAlpha: Float,
+    val toolbarAlpha: Float,
+)
 
 internal val LocalCollapsibleHeaderTitleTransition =
-    compositionLocalOf { CollapsibleHeaderTitleTransition(0.dp, 0f) }
+    compositionLocalOf { CollapsibleHeaderTitleTransition(0.dp, 0f, 1f) }
 
 internal const val APP_BAR_HEIGHT = 56f
 private fun headerMinHeight(statusBarHeight: Float) = APP_BAR_HEIGHT + statusBarHeight
@@ -284,18 +315,7 @@ private fun ScaffoldWithCollapsibleHeaderPreview(
         ScaffoldWithCollapsibleHeader(
             headerBelowAppBar = if (!hasHeaderBelowAppbar) null else {
                 @Composable {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MegaTheme.colors.background.blur)
-                    )
-                    Text(
-                        text = "Header below app bar",
-                        color = MegaTheme.colors.text.primary,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(end = 16.dp)
-                    )
+                    Header()
                 }
             },
             topBar = {
@@ -319,19 +339,73 @@ private fun ScaffoldWithCollapsibleHeaderPreview(
                 }
             },
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                Text("Content", color = MegaTheme.colors.text.primary)
-                Text("Content", color = MegaTheme.colors.text.primary)
-                Text("Content", color = MegaTheme.colors.text.primary)
-                Text("Content", color = MegaTheme.colors.text.primary)
-            }
+            Content()
         }
     }
 }
+
+@CombinedThemePreviews
+@Composable
+private fun ScaffoldWithCollapsibleHeaderWithSubtitlePreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        val title = "Collapsable With Subtitle"
+        val subtitle = "Subtitle"
+        val appBarType = AppBarType.BACK_NAVIGATION
+        val titleIcons: @Composable RowScope.() -> Unit = {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(6.dp)
+                    .background(MegaTheme.colors.components.selectionControl, shape = CircleShape)
+            )
+        }
+        ScaffoldWithCollapsibleHeader(
+            topBar = {
+                AppBarForCollapsibleHeader(
+                    appBarType = appBarType,
+                    title = title,
+                    subtitle = subtitle,
+                    actions = getSampleToolbarActions(),
+                    titleIcons = titleIcons,
+                )
+            },
+            headerAboveAppBar = {
+                CollapsibleHeaderWithTitle(
+                    appBarType = appBarType,
+                    title = title,
+                    subtitle = subtitle,
+                    titleIcons = titleIcons,
+                ) {
+                }
+            },
+            headerBelowAppBar = {
+                Header()
+            },
+            titleDisplacementFactor = 1f,
+        ) {
+            Content()
+        }
+    }
+}
+
+@Composable
+private fun Content() = Column(
+    modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)
+) {
+    Text("Content", color = MegaTheme.colors.text.primary)
+    Text("Content", color = MegaTheme.colors.text.primary)
+    Text("Content", color = MegaTheme.colors.text.primary)
+    Text("Content", color = MegaTheme.colors.text.primary)
+}
+
+@Composable
+private fun Header() = Box(
+    modifier = Modifier
+        .fillMaxSize()
+        .background(MegaTheme.colors.background.blur)
+)
 
 private fun getSampleToolbarActions(): List<MenuAction> = listOf(
     object : MenuActionString(R.drawable.ic_alert_circle, R.string.password_text, "circle") {},
