@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUse
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
@@ -108,6 +109,9 @@ internal class ChatViewModelTest {
     private val monitorUserLastGreenUpdatesUseCase =
         mock<MonitorUserLastGreenUpdatesUseCase>()
     private val getScheduledMeetingByChat = mock<GetScheduledMeetingByChat>()
+    private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase> {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
 
     private val chatId = 123L
     private val userHandle = 321L
@@ -154,6 +158,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorChatConnectionStateUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorConnectivityUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorUserLastGreenUpdatesUseCase(userHandle) } doReturn emptyFlow()
+        wheneverBlocking { monitorHasAnyContactUseCase() } doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -175,6 +180,7 @@ internal class ChatViewModelTest {
             getParticipantFirstNameUseCase = getParticipantFirstNameUseCase,
             getMyUserHandleUseCase = getMyUserHandleUseCase,
             getScheduledMeetingByChatUseCase = getScheduledMeetingByChat,
+            monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -990,4 +996,26 @@ internal class ChatViewModelTest {
                 assertThat(awaitItem().scheduledMeeting).isNull()
             }
         }
+
+    @Test
+    fun `test that hasAnyContact updates when a new flag is received`() = runTest {
+        val updateFlow = MutableSharedFlow<Boolean>()
+        whenever(monitorHasAnyContactUseCase()).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().hasAnyContact).isFalse()
+        }
+        updateFlow.emit(true)
+        underTest.state.test {
+            assertThat(awaitItem().hasAnyContact).isTrue()
+        }
+        updateFlow.emit(true)
+        underTest.state.test {
+            assertThat(awaitItem().hasAnyContact).isTrue()
+        }
+        updateFlow.emit(false)
+        underTest.state.test {
+            assertThat(awaitItem().hasAnyContact).isFalse()
+        }
+    }
 }

@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.model.ChatUpdate
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -55,6 +56,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -1245,4 +1247,63 @@ class DefaultContactsRepositoryTest {
             whenever(megaApiGateway.outgoingContactRequests()).thenReturn(arrayListOf(contactRequest))
             assertThat(underTest.isContactRequestSent(myEmail)).isFalse()
         }
+
+    @Test
+    fun `test that hasAnyContact returns true if has any contact`() = runTest {
+        val contact = mock<MegaUser> {
+            on { visibility } doReturn MegaUser.VISIBILITY_VISIBLE
+        }
+        whenever(megaApiGateway.getContacts()).thenReturn(listOf(mock(), contact, mock()))
+        assertThat(underTest.hasAnyContact()).isTrue()
+    }
+
+    @Test
+    fun `test that hasAnyContact returns false if does not has any contact`() = runTest {
+        whenever(megaApiGateway.getContacts()).thenReturn(emptyList())
+        assertThat(underTest.hasAnyContact()).isFalse()
+    }
+
+    @Test
+    fun `test that monitorContactRemoved emits the user handles of removed contacts`() = runTest {
+        val userHandle = 321L
+        val myUserHandle = 123L
+        val user1 = mock<MegaUser> {
+            on { handle } doReturn userHandle
+            on { changes } doReturn 0L
+        }
+        val user2 = mock<MegaUser> {
+            on { handle } doReturn myUserHandle
+            on { changes } doReturn MegaUser.CHANGE_TYPE_AVATAR.toLong()
+        }
+        whenever(megaApiGateway.myUserHandle).thenReturn(myUserHandle)
+        whenever(megaApiGateway.globalUpdates).thenReturn(
+            flowOf(GlobalUpdate.OnUsersUpdate(arrayListOf(user1, user2)))
+        )
+        underTest.monitorContactRemoved().test {
+            val actual = awaitItem()
+            awaitComplete()
+            assertThat(actual).isEqualTo(listOf(userHandle))
+        }
+    }
+
+    @Test
+    fun `test that monitorNewContacts emits the user handles of new contacts`() = runTest {
+        val userHandle = 321L
+        val request1 = mock<MegaContactRequest> {
+            on { handle } doReturn userHandle
+            on { status } doReturn MegaContactRequest.STATUS_ACCEPTED
+        }
+        val request2 = mock<MegaContactRequest> {
+            on { handle } doReturn 123L
+            on { status } doReturn MegaContactRequest.STATUS_DELETED
+        }
+        whenever(megaApiGateway.globalUpdates).thenReturn(
+            flowOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(request1, mock(), request2)))
+        )
+        underTest.monitorNewContacts().test {
+            val actual = awaitItem()
+            awaitComplete()
+            assertThat(actual).isEqualTo(listOf(userHandle))
+        }
+    }
 }

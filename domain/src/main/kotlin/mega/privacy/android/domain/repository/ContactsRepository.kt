@@ -375,4 +375,25 @@ interface ContactsRepository {
      * @param email
      */
     suspend fun isContactRequestSent(email: String): Boolean
+
+    /**
+     * Has any contact
+     *
+     * @return True if has any contact, false otherwise.
+     */
+    suspend fun hasAnyContact(): Boolean
+
+    /**
+     * Monitor whether a contact has removed me or I removed a contact.
+     *
+     * @return List of user ids of the removed contacts.
+     */
+    fun monitorContactRemoved(): Flow<List<Long>>
+
+    /**
+     * Monitor whether a contact has accepted my invitation or I accepted a contact invitation.
+     *
+     * @return List of user ids of the new contacts.
+     */
+    fun monitorNewContacts(): Flow<List<Long>>
 }

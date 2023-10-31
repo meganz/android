@@ -54,6 +54,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaStringMap
@@ -840,4 +841,29 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun isContactRequestSent(email: String) = withContext(ioDispatcher) {
         megaApiGateway.outgoingContactRequests().any { it.targetEmail == email }
     }
+
+    override suspend fun hasAnyContact() = withContext(ioDispatcher) {
+        megaApiGateway.getContacts()
+            .any { contact -> contact.visibility == MegaUser.VISIBILITY_VISIBLE }
+    }
+
+    override fun monitorContactRemoved() = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+        .mapNotNull { it.users }
+        .map { usersList ->
+            usersList.filter { user ->
+                user.handle != megaApiGateway.myUserHandle && user.changes == 0L
+            }.map { it.handle }
+        }
+        .flowOn(ioDispatcher)
+
+    override fun monitorNewContacts() = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
+        .mapNotNull { it.requests }
+        .map { requestList ->
+            requestList.filter { request ->
+                request.status == MegaContactRequest.STATUS_ACCEPTED
+            }.map { it.handle }
+        }
+        .flowOn(ioDispatcher)
 }

@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUse
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
@@ -71,6 +72,7 @@ class ChatViewModel @Inject constructor(
     private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChat,
+    private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -86,6 +88,7 @@ class ChatViewModel @Inject constructor(
     init {
         checkIfIsParticipatingInACall()
         monitorStorageStateEvent()
+        monitorHasAnyContact()
         chatId?.let {
             updateChatId(it)
             getChatRoom(it)
@@ -380,6 +383,15 @@ class ChatViewModel @Inject constructor(
                     if (state.value.userChatStatus != UserChatStatus.Online) {
                         _state.update { state -> state.copy(userLastGreen = userLastGreen) }
                     }
+                }
+        }
+    }
+
+    private fun monitorHasAnyContact() {
+        viewModelScope.launch {
+            monitorHasAnyContactUseCase().conflate()
+                .collect { hasAnyContact ->
+                    _state.update { state -> state.copy(hasAnyContact = hasAnyContact) }
                 }
         }
     }

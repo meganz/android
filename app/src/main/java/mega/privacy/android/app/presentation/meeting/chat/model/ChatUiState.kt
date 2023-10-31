@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property isArchived True if the chat is archived, false otherwise.
  * @property usersTyping list of user typing in the chat
  * @property isMeeting whether this chat is a meeting.
+ * @property hasAnyContact True if the current logged in user has any contact, false otherwise.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -52,4 +53,5 @@ data class ChatUiState(
     val isArchived: Boolean = false,
     val usersTyping: List<String?> = emptyList(),
     val isMeeting: Boolean = false,
+    val hasAnyContact: Boolean = false,
 )
