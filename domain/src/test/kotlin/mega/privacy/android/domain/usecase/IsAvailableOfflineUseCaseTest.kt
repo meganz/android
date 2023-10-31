@@ -20,32 +20,16 @@ import java.io.File
 class IsAvailableOfflineUseCaseTest {
     private lateinit var underTest: IsAvailableOfflineUseCase
 
-
-    private val file = mock<File>()
     private val nodeId = NodeId(34)
     private val nodeModifiedDateInSeconds = 10L
-    private val fileNode = mock<TypedFileNode> {
-        on { id }.thenReturn(nodeId)
-        on { modificationTime }.thenReturn(nodeModifiedDateInSeconds)
-    }
-    private val folderNode = mock<TypedFolderNode> {
-        on { id }.thenReturn(nodeId)
-    }
+
     private val offlineNodeInformation = mock<IncomingShareOfflineNodeInformation>()
-    private val nodeRepository = mock<NodeRepository> {
-        onBlocking { getOfflineNodeInformation(nodeId) }.thenReturn(
-            offlineNodeInformation
-        )
-    }
-    private val getOfflineFile = mock<GetOfflineFileUseCase> {
-        onBlocking { invoke(offlineNodeInformation) }.thenReturn(file)
-    }
+    private val nodeRepository = mock<NodeRepository>()
 
     @Before
     fun setUp() {
         underTest = IsAvailableOfflineUseCase(
             nodeRepository = nodeRepository,
-            getOfflineFile = getOfflineFile,
         )
     }
 
@@ -54,39 +38,73 @@ class IsAvailableOfflineUseCaseTest {
         val node = mock<TypedFileNode> {
             on { id }.thenReturn(NodeId(56))
         }
+        whenever(nodeRepository.getOfflineNodeInformation(node.id)).thenReturn(null)
         assertThat(underTest(node)).isFalse()
     }
 
     @Test
-    fun `test that false is returned if offline information is returned but file does not exist`() =
+    fun `test that false is returned if offline information is found but its timestamp is less than last modified timestamp on FileNode`() =
         runTest {
-            whenever(file.exists()).thenReturn(false)
-
-            assertThat(underTest(fileNode)).isFalse()
+            val node = mock<TypedFileNode> {
+                on { id }.thenReturn(nodeId)
+                on { modificationTime }.thenReturn(nodeModifiedDateInSeconds)
+            }
+            whenever(offlineNodeInformation.lastModifiedTime).thenReturn(1L)
+            whenever(nodeRepository.getOfflineNodeInformation(node.id)).thenReturn(
+                offlineNodeInformation
+            )
+            assertThat(underTest(node)).isFalse()
         }
 
     @Test
-    fun `test that false is returned if offline file exists, but is older than the node's latest modified date if the node is a file`() =
+    fun `test that true is returned if offline information is found and its timestamp is equal to last modified timestamp on FileNode`() =
         runTest {
-            whenever(file.exists()).thenReturn(true)
-            whenever(file.lastModified()).thenReturn((nodeModifiedDateInSeconds * 1000) - 1)
-
-            assertThat(underTest(fileNode)).isFalse()
+            val node = mock<TypedFileNode> {
+                on { id }.thenReturn(nodeId)
+                on { modificationTime }.thenReturn(nodeModifiedDateInSeconds)
+            }
+            whenever(offlineNodeInformation.lastModifiedTime).thenReturn(nodeModifiedDateInSeconds)
+            whenever(nodeRepository.getOfflineNodeInformation(node.id)).thenReturn(
+                offlineNodeInformation
+            )
+            assertThat(underTest(node)).isTrue()
         }
 
     @Test
-    fun `test that true is returned if local file exists and the node is a folder`() = runTest {
-        whenever(file.exists()).thenReturn(true)
-
-        assertThat(underTest(folderNode)).isTrue()
-    }
+    fun `test that true is returned if offline information is found and its timestamp is greater than last modified timestamp on FileNode`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { id }.thenReturn(nodeId)
+                on { modificationTime }.thenReturn(nodeModifiedDateInSeconds)
+            }
+            whenever(offlineNodeInformation.lastModifiedTime).thenReturn(11L)
+            whenever(nodeRepository.getOfflineNodeInformation(node.id)).thenReturn(
+                offlineNodeInformation
+            )
+            assertThat(underTest(node)).isTrue()
+        }
 
     @Test
-    fun `test that true is returned if offline file exists, and is not older than the node's latest modified date if the node is a file`() =
+    fun `test that true is returned if offline information is found for folder in offline database`() =
         runTest {
-            whenever(file.exists()).thenReturn(true)
-            whenever(file.lastModified()).thenReturn((nodeModifiedDateInSeconds * 1000) + 1)
+            val node = mock<TypedFolderNode> {
+                on { id }.thenReturn(nodeId)
+            }
+            whenever(offlineNodeInformation.isFolder).thenReturn(true)
+            whenever(nodeRepository.getOfflineNodeInformation(node.id)).thenReturn(
+                offlineNodeInformation
+            )
+            assertThat(underTest(node)).isTrue()
+        }
 
-            assertThat(underTest(fileNode)).isTrue()
+    @Test
+    fun `test that false is returned if offline information is not found for folder in offline database`() =
+        runTest {
+            val node = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(56L))
+            }
+            whenever(offlineNodeInformation.isFolder).thenReturn(true)
+            whenever(nodeRepository.getOfflineNodeInformation(node.id)).thenReturn(null)
+            assertThat(underTest(node)).isFalse()
         }
 }
