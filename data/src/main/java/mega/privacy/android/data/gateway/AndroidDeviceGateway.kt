@@ -40,19 +40,8 @@ internal class AndroidDeviceGateway @Inject constructor(
 
     override fun getManufacturerName(): String = Build.MANUFACTURER
 
-    override fun getDeviceModel(): String =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            getDeviceModelPost25()
-        } else {
-            getDeviceModelPre25()
-        }
+    override fun getDeviceModel(): String = getDeviceModelPost25()
 
-    private fun getDeviceModelPre25(): String = Build.MODEL.apply {
-        removePrefix(Build.MANUFACTURER)
-        trim()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun getDeviceModelPost25() = Settings.Global.getString(
         context.contentResolver,
         Settings.Global.DEVICE_NAME

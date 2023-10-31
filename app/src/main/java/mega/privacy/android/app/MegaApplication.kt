@@ -322,7 +322,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                     .build()
             )
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (SDK_INT >= Build.VERSION_CODES.S) {
                 StrictMode.setVmPolicy(
                     StrictMode.VmPolicy.Builder() // Other StrictMode checks that you've previously added.
                         .detectUnsafeIntentLaunch()
@@ -486,7 +486,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             Timber.d("Start call Service. Chat iD = $chatId")
             Intent(this, CallService::class.java).run {
                 putExtra(Constants.CHAT_ID, chatId)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (SDK_INT >= Build.VERSION_CODES.O) {
                     startForegroundService(this)
                 } else {
                     startService(this)

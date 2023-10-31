@@ -704,23 +704,7 @@ public class Util {
      * @return Device name, always starts with manufacturer, prefer user set name.
      */
     public static String getDeviceName() {
-        final String manufacturer = Build.MANUFACTURER;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            return manufacturer + " " + Settings.Global.getString(MegaApplication.getInstance().getContentResolver(), Settings.Global.DEVICE_NAME);
-        } else {
-            final String model = Build.MODEL;
-
-            if (model.startsWith(manufacturer)) {
-                return model;
-            }
-
-            if (manufacturer.equalsIgnoreCase("HTC")) {
-                // make sure "HTC" is fully capitalized.
-                return "HTC " + model;
-            }
-            return manufacturer + " " + model;
-        }
+        return Build.MANUFACTURER + " " + Settings.Global.getString(MegaApplication.getInstance().getContentResolver(), Settings.Global.DEVICE_NAME);
     }
 
     public static int scaleHeightPx(int px, DisplayMetrics metrics) {
