@@ -20,8 +20,8 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionAction
-import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionActionType
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 
 @Composable
 internal fun IssuesResolutionDialog(

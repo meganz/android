@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +33,7 @@ import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionAction
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
@@ -46,6 +50,7 @@ internal fun SyncListScreen(
     stalledIssuesCount: Int,
     addFolderClicked: () -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
+    snackBarHostState: SnackbarHostState,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -80,6 +85,9 @@ internal fun SyncListScreen(
                         actions = content.stalledIssueUiItem.actions,
                         actionSelected = { action ->
                             actionSelected(content.stalledIssueUiItem, action)
+                            coroutineScope.launch {
+                                modalSheetState.hide()
+                            }
                         }
                     )
                 }
@@ -118,6 +126,18 @@ internal fun SyncListScreen(
                         }
                     },
                     addFolderClicked
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackBarHostState,
+                    snackbar = { data ->
+                        Snackbar(
+                            snackbarData = data,
+                            modifier = Modifier.padding(bottom = 4.dp),
+                            backgroundColor = MaterialTheme.colors.onPrimary,
+                        )
+                    }
                 )
             }
         )
@@ -202,7 +222,8 @@ private fun PreviewSyncListScreen() {
         SyncListScreen(
             stalledIssuesCount = 3,
             addFolderClicked = {},
-            actionSelected = { _, _ -> }
+            actionSelected = { _, _ -> },
+            snackBarHostState = SnackbarHostState()
         )
     }
 }

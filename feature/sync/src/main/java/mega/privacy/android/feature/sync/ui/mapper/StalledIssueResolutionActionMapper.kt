@@ -4,8 +4,8 @@ import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType.NamesWouldClashWhenSynced
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType.LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose
-import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionAction
-import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionActionType
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import javax.inject.Inject
 
 internal class StalledIssueResolutionActionMapper @Inject constructor() {

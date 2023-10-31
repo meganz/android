@@ -1,8 +1,7 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionAction
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
-import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 internal sealed interface SyncListAction {
 
@@ -10,4 +9,6 @@ internal sealed interface SyncListAction {
         val uiItem: StalledIssueUiItem,
         val selectedResolution: StalledIssueResolutionAction,
     ) : SyncListAction
+
+    object SnackBarShown : SyncListAction
 }

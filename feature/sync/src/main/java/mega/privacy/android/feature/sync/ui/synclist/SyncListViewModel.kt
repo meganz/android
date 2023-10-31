@@ -9,15 +9,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
-import mega.privacy.android.feature.sync.ui.model.StalledIssueResolutionAction
 import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncListViewModel @Inject constructor(
     private val setOnboardingShownUseCase: SetOnboardingShownUseCase,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
+    private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncListState())
@@ -38,7 +40,19 @@ internal class SyncListViewModel @Inject constructor(
     fun handleAction(action: SyncListAction) {
         when (action) {
             is SyncListAction.ResolveStalledIssue -> {
-                // implement issue resolution logic
+                viewModelScope.launch {
+                    resolveStalledIssueUseCase(
+                        stalledIssueResolutionAction = action.selectedResolution,
+                        megaNodeId = action.uiItem.nodeId,
+                        localPath = action.uiItem.localPath,
+                    )
+                }
+
+                _state.update { SyncListState(snackbarMessage = "Conflict resolved") }
+            }
+
+            SyncListAction.SnackBarShown -> {
+                _state.update { SyncListState(snackbarMessage = null) }
             }
         }
     }

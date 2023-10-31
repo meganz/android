@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.sync.ui.model
+package mega.privacy.android.feature.sync.domain.entity
 
 internal data class StalledIssueResolutionAction(
     val actionName: String,

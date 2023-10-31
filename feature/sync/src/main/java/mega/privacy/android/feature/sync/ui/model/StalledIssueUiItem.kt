@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.ui.model
 
 import androidx.annotation.DrawableRes
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 
 internal data class StalledIssueUiItem(
     val nodeId: Long,

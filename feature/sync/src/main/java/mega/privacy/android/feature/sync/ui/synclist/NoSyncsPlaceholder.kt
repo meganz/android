@@ -54,10 +54,6 @@ internal fun NoSyncsPlaceholder(modifier: Modifier) {
 @Composable
 private fun PreviewEmptyScreen() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        SyncListScreen(
-            stalledIssuesCount = 3,
-            addFolderClicked = {},
-            actionSelected = { _, _ -> }
-        )
+        NoSyncsPlaceholder(Modifier)
     }
 }
