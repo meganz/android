@@ -182,11 +182,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     MeetingNotificationSettings("Enable Meeting notification settings", false),
 
     /**
-     * Meeting notification settings
-     */
-    WaitingRoomSettings("Enable Waiting room settings", false),
-
-    /**
      * Clean refactored search implementation
      */
     SearchWithChips("Advanced search implementation in clean architecture", false),

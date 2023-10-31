@@ -133,7 +133,7 @@ fun ScheduledMeetingInfoView(
 
     val shouldShowWarningDialog =
         state.enabledAllowNonHostAddParticipantsOption && state.enabledWaitingRoomOption && state.isHost
-                && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled && managementState.isWaitingRoomFeatureFlagEnabled
+                && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -198,7 +198,6 @@ fun ScheduledMeetingInfoView(
                     ActionButton(
                         state = state,
                         action = button,
-                        isWaitingRoomFeatureFlagEnabled = managementState.isWaitingRoomFeatureFlagEnabled,
                         enabledMeetingLinkOption = managementState.enabledMeetingLinkOption,
                         isCallInProgress = managementState.isCallInProgress,
                         onButtonClicked = onButtonClicked
@@ -528,7 +527,6 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
 @Composable
 private fun ActionButton(
     state: ScheduledMeetingInfoState,
-    isWaitingRoomFeatureFlagEnabled: Boolean,
     enabledMeetingLinkOption: Boolean,
     isCallInProgress: Boolean,
     action: ScheduledMeetingInfoAction,
@@ -653,7 +651,7 @@ private fun ActionButton(
                 }
 
             ScheduledMeetingInfoAction.WaitingRoom -> {
-                if (state.isHost && isWaitingRoomFeatureFlagEnabled) {
+                if (state.isHost) {
                     ActionOption(
                         state = state,
                         action = action,
@@ -1304,7 +1302,6 @@ fun PreviewActionButton() {
             )
         ),
             action = ScheduledMeetingInfoAction.MeetingLink,
-            isWaitingRoomFeatureFlagEnabled = true,
             enabledMeetingLinkOption = true,
             isCallInProgress = false,
             onButtonClicked = {})
