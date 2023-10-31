@@ -5,6 +5,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -34,6 +35,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
@@ -47,6 +50,7 @@ import mega.privacy.android.app.presentation.extensions.vectorRes
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
@@ -60,6 +64,19 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import timber.log.Timber
+
+@Composable
+internal fun ChatView(
+    viewModel: ChatViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    ChatView(
+        uiState = uiState,
+        onBackPressed = { onBackPressedDispatcher?.onBackPressed() },
+        onMenuActionPressed = viewModel::handleActionPress,
+    )
+}
 
 /**
  * Chat view
