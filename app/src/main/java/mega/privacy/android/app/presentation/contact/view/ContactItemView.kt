@@ -9,7 +9,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.with
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,17 +25,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
-import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
-import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.core.ui.controls.text.MarqueeText
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
@@ -98,7 +93,7 @@ internal fun ContactItemView(
                     )
 
                     if (contactItem.status != UserChatStatus.Invalid) {
-                        ContactStatus(status = contactItem.status)
+                        ContactStatusView(status = contactItem.status)
                     }
                 }
 
@@ -142,6 +137,7 @@ internal fun getLastSeenString(lastGreen: Int?): String? {
         lastGreen >= timeToConsiderAsLongTimeAgo -> {
             stringResource(id = R.string.last_seen_long_time_ago)
         }
+
         compareLastSeenWithToday(lastGreenCalendar) == 0 -> {
             val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
                 timeZone = lastGreenCalendar.timeZone
@@ -149,6 +145,7 @@ internal fun getLastSeenString(lastGreen: Int?): String? {
             val time = dateFormat.format(lastGreenCalendar.time)
             stringResource(R.string.last_seen_today, time)
         }
+
         else -> {
             var dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
                 timeZone = lastGreenCalendar.timeZone
@@ -172,27 +169,15 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
         lastGreen.get(Calendar.YEAR) != today.get(Calendar.YEAR) -> {
             lastGreen.get(Calendar.YEAR) - today.get(Calendar.YEAR)
         }
+
         lastGreen.get(Calendar.MONTH) != today.get(Calendar.MONTH) -> {
             lastGreen.get(Calendar.MONTH) - today.get(Calendar.MONTH)
         }
+
         else -> {
             lastGreen.get(Calendar.DAY_OF_MONTH) - today.get(Calendar.DAY_OF_MONTH)
         }
     }
-}
-
-@Composable
-fun ContactStatus(
-    modifier: Modifier = Modifier,
-    status: UserChatStatus,
-) {
-    val statusIcon = status.iconRes(MaterialTheme.colors.isLight)
-
-    Image(
-        modifier = modifier.padding(start = 5.dp, top = 2.dp),
-        painter = painterResource(id = statusIcon),
-        contentDescription = "Contact status"
-    )
 }
 
 @Composable
@@ -203,9 +188,9 @@ private fun ContactAvatar(
     val avatarUri = contactItem.contactData.avatarUri
 
     if (avatarUri != null) {
-        UriAvatar(modifier = modifier, uri = avatarUri)
+        UriAvatarView(modifier = modifier, uri = avatarUri)
     } else {
-        DefaultContactAvatar(
+        DefaultAvatarView(
             modifier = modifier,
             color = Color(contactItem.defaultAvatarColor?.toColorInt() ?: -1),
             content = contactItem.getAvatarFirstLetter()
@@ -258,40 +243,6 @@ internal fun ContactAvatarVerified(
                 contentDescription = "Verified user"
             )
         }
-    }
-}
-
-@Composable
-internal fun UriAvatar(modifier: Modifier, uri: String) {
-    Image(
-        modifier = modifier,
-        painter = rememberAsyncImagePainter(model = uri),
-        contentDescription = "User avatar"
-    )
-}
-
-@Composable
-internal fun DefaultContactAvatar(modifier: Modifier = Modifier, color: Color, content: String) {
-    Box(contentAlignment = Alignment.Center,
-        modifier = modifier
-            .background(color = color, shape = CircleShape)
-            .layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                val currentHeight = placeable.height
-                var heightCircle = currentHeight
-                if (placeable.width > heightCircle)
-                    heightCircle = placeable.width
-
-                layout(heightCircle, heightCircle) {
-                    placeable.placeRelative(0, (heightCircle - currentHeight) / 2)
-                }
-            }) {
-        Text(
-            text = content,
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            style = MaterialTheme.typography.h6
-        )
     }
 }
 

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -18,6 +19,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,8 +29,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
-import mega.privacy.android.app.presentation.contact.view.ContactStatus
+import mega.privacy.android.app.presentation.contact.view.ContactStatusView
+import mega.privacy.android.app.presentation.contact.view.DefaultAvatarView
+import mega.privacy.android.app.presentation.contact.view.UriAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -58,6 +62,7 @@ fun ParticipantInCallItem(
     hasHostPermission: Boolean,
     isGuest: Boolean,
     participant: ChatParticipant,
+    modifier: Modifier = Modifier,
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
@@ -65,7 +70,7 @@ fun ParticipantInCallItem(
     Column {
         Row(
             modifier = Modifier
-                .padding(start = 16.dp)
+                .padding(start = 0.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -75,25 +80,30 @@ fun ParticipantInCallItem(
                     .height(56.dp)
             ) {
                 Column(
-                    modifier = Modifier
-                        .padding(end = 16.dp)
-                        .align(Alignment.CenterVertically)
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 ) {
-                    Box {
-                        ChatAvatarView(
+                    Box(
+                        modifier = modifier,
+                    ) {
+                        val avatarModifier = Modifier
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = if (participant.areCredentialsVerified) 16.dp else 8.dp
+                            )
+                            .size(40.dp)
+
+                        ParticipantAvatar(
+                            modifier = avatarModifier.clip(CircleShape),
                             avatarUri = participant.data.avatarUri,
-                            avatarPlaceholder = participant.getAvatarFirstLetter(),
                             avatarColor = participant.defaultAvatarColor,
-                            avatarTimestamp = participant.avatarUpdateTimestamp,
-                            modifier = Modifier
-                                .size(40.dp)
+                            avatarFirstLetter = participant.getAvatarFirstLetter(),
                         )
 
                         if (participant.areCredentialsVerified) {
                             Image(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
-                                    .padding(10.dp),
+                                    .padding(6.dp),
                                 painter = painterResource(id = R.drawable.ic_verified),
                                 contentDescription = "Verified user"
                             )
@@ -101,18 +111,16 @@ fun ParticipantInCallItem(
                     }
                 }
                 Column(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         val contactName =
-                            participant.data.alias ?: participant.data.fullName
-                            ?: participant.email ?: ""
+                            participant.data.alias ?: participant.data.fullName ?: participant.email
+                            ?: ""
 
                         Text(
                             text = if (participant.isMe) stringResource(
-                                R.string.chat_me_text_bracket,
-                                contactName
+                                R.string.chat_me_text_bracket, contactName
                             ) else contactName,
                             style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.grey_alpha_087_white),
                             maxLines = 1,
@@ -128,7 +136,7 @@ fun ParticipantInCallItem(
                         }
 
                         if (section == ParticipantsSection.NotInCallSection && participant.status != UserChatStatus.Invalid && !isGuest) {
-                            ContactStatus(status = participant.status)
+                            ContactStatusView(status = participant.status)
                         }
                     }
 
@@ -144,8 +152,7 @@ fun ParticipantInCallItem(
             }
 
             Box(
-                modifier = Modifier
-                    .wrapContentSize(Alignment.CenterEnd)
+                modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
             ) {
                 Row(
                     modifier = Modifier
@@ -197,9 +204,7 @@ fun ParticipantInCallItem(
                             )
 
                             if (!isGuest) {
-                                IconButton(
-                                    onClick = { onParticipantMoreOptionsClicked(participant) }
-                                ) {
+                                IconButton(onClick = { onParticipantMoreOptionsClicked(participant) }) {
                                     Icon(
                                         modifier = Modifier.padding(start = 10.dp),
                                         painter = painterResource(id = mega.privacy.android.core.R.drawable.ic_dots_vertical_grey),
@@ -224,6 +229,23 @@ fun ParticipantInCallItem(
     }
 }
 
+
+@Composable
+private fun ParticipantAvatar(
+    avatarUri: String?,
+    avatarColor: Int,
+    avatarFirstLetter: String,
+    modifier: Modifier = Modifier,
+) {
+    if (avatarUri != null) {
+        UriAvatarView(modifier = modifier, uri = avatarUri)
+    } else {
+        DefaultAvatarView(
+            modifier = modifier, color = Color(avatarColor), content = avatarFirstLetter
+        )
+    }
+}
+
 /**
  * [ParticipantInCallItem] preview
  */
@@ -241,7 +263,8 @@ fun PreviewParticipantInWaitingRoomItem() {
                 email = "name1@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Standard,
-                defaultAvatarColor = 111
+                defaultAvatarColor = -11152656,
+                areCredentialsVerified = true
             ),
             onAdmitParticipantClicked = {},
             onDenyParticipantClicked = {},
@@ -267,11 +290,9 @@ fun PreviewMeParticipantInCallItem() {
                 email = "name2@mega.nz",
                 isMe = true,
                 privilege = ChatRoomPermission.Moderator,
-                defaultAvatarColor = 222,
+                defaultAvatarColor = -6624513,
                 callParticipantData = CallParticipantData(
-                    clientId = 2L,
-                    isAudioOn = true,
-                    isVideoOn = true
+                    clientId = 2L, isAudioOn = true, isVideoOn = true
                 )
             ),
             onAdmitParticipantClicked = {},
@@ -324,7 +345,7 @@ fun PreviewGuestParticipantInCallItem() {
                 email = "name6@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
-                defaultAvatarColor = 666,
+                defaultAvatarColor = -30327,
             ),
             onAdmitParticipantClicked = {},
             onDenyParticipantClicked = {},
@@ -350,7 +371,7 @@ fun PreviewParticipantNotInCallItem() {
                 email = "name2@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
-                defaultAvatarColor = 444,
+                defaultAvatarColor = -30327,
                 status = UserChatStatus.Online
             ),
             onAdmitParticipantClicked = {},
@@ -377,8 +398,9 @@ fun PreviewParticipantNotInCallItemNonHost() {
                 email = "name2@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
-                defaultAvatarColor = 444,
-                status = UserChatStatus.Online
+                defaultAvatarColor = -30327,
+                status = UserChatStatus.Online,
+                areCredentialsVerified = true
             ),
             onAdmitParticipantClicked = {},
             onDenyParticipantClicked = {},
@@ -404,7 +426,7 @@ fun PreviewGuestParticipantNotInCallItem() {
                 email = "name2@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
-                defaultAvatarColor = 555,
+                defaultAvatarColor = -30327,
                 status = UserChatStatus.Online
             ),
             onAdmitParticipantClicked = {},

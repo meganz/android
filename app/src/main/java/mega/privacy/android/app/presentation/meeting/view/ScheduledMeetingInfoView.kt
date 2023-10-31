@@ -61,7 +61,7 @@ import androidx.compose.ui.unit.sp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
-import mega.privacy.android.app.presentation.contact.view.ContactStatus
+import mega.privacy.android.app.presentation.contact.view.ContactStatusView
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
@@ -1074,7 +1074,7 @@ private fun ParticipantItemView(
                         )
 
                         if (participant.status != UserChatStatus.Invalid) {
-                            ContactStatus(status = participant.status)
+                            ContactStatusView(status = participant.status)
                         }
                     }
 
