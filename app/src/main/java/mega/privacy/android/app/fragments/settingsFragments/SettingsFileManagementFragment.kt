@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
 import android.view.LayoutInflater
@@ -15,6 +16,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING
+import mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUTO_PLAY_SWITCH
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CACHE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CLEAR_VERSIONS
@@ -27,7 +30,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_OFFLINE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RUBBISH
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.main.tasks.ManageCacheTask
 import mega.privacy.android.app.main.tasks.ManageOfflineTask
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
@@ -108,7 +110,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             R.string.settings_advanced_features_size,
             myAccountInfo.formattedUsedRubbish
         )
-        taskGetSizeCache()
+        viewModel.getCacheSize()
         taskGetSizeOffline()
         if (savedInstanceState != null
             && savedInstanceState.getBoolean(IS_DISABLE_VERSIONS_SHOWN, false)
@@ -157,6 +159,15 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                 }
             }
         }
+
+        if (filePreferencesState.updateCacheSizeSetting != null) {
+            Intent(ACTION_UPDATE_CACHE_SIZE_SETTING).apply {
+                putExtra(CACHE_SIZE, filePreferencesState.updateCacheSizeSetting)
+                setPackage(requireContext().packageName)
+                requireContext().sendBroadcast(this)
+            }
+            viewModel.resetUpdateCacheSizeSetting()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -174,8 +185,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
         when (preference.key) {
             KEY_OFFLINE -> (activity as? FileManagementPreferencesActivity)?.showClearOfflineDialog()
             KEY_CACHE -> {
-                val clearCacheTask = ManageCacheTask(true)
-                clearCacheTask.execute()
+                viewModel.clearCache()
             }
 
             KEY_RUBBISH -> (activity as? FileManagementPreferencesActivity)?.showClearRubbishBinDialog()
@@ -228,7 +238,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
     }
 
     override fun onResume() {
-        taskGetSizeCache()
+        viewModel.getCacheSize()
         taskGetSizeOffline()
         super.onResume()
     }
@@ -261,16 +271,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
     fun setRubbishInfo() {
         rubbishFileManagement?.summary =
             getString(R.string.settings_advanced_features_size, myAccountInfo.formattedUsedRubbish)
-    }
-
-    /**
-     * The task for get cache size
-     *
-     * @return cache size
-     */
-    fun taskGetSizeCache() {
-        val getCacheSizeTask = ManageCacheTask(false)
-        getCacheSizeTask.execute()
     }
 
     /**

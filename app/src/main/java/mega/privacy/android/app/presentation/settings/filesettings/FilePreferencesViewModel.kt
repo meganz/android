@@ -13,6 +13,8 @@ import mega.privacy.android.app.presentation.settings.filesettings.model.FilePre
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.cache.ClearCacheUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -20,6 +22,9 @@ import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * File Preferences ViewModel
+ */
 @HiltViewModel
 class FilePreferencesViewModel @Inject constructor(
     private val getFolderVersionInfo: GetFolderVersionInfo,
@@ -28,6 +33,8 @@ class FilePreferencesViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val enableFileVersionsOption: EnableFileVersionsOption,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val clearCacheUseCase: ClearCacheUseCase,
+    private val getCacheSizeUseCase: GetCacheSizeUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FilePreferencesState())
 
@@ -97,5 +104,32 @@ class FilePreferencesViewModel @Inject constructor(
         runCatching { enableFileVersionsOption(enabled = enable) }
             .onSuccess { _state.update { it.copy(isFileVersioningEnabled = enable) } }
             .onFailure { Timber.w("Exception enabling file versioning.", it) }
+    }
+
+    /**
+     * Clear the cache
+     */
+    fun clearCache() {
+        viewModelScope.launch {
+            clearCacheUseCase()
+            getCacheSize()
+        }
+    }
+
+    /**
+     * Get cache size
+     */
+    fun getCacheSize() {
+        viewModelScope.launch {
+            val size = getCacheSizeUseCase()
+            _state.update { it.copy(updateCacheSizeSetting = size) }
+        }
+    }
+
+    /**
+     * Reset updateCacheSizeSetting
+     */
+    fun resetUpdateCacheSizeSetting() {
+        _state.update { it.copy(updateCacheSizeSetting = null) }
     }
 }

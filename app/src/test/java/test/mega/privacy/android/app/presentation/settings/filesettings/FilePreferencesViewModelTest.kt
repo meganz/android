@@ -15,6 +15,8 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.cache.ClearCacheUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -43,6 +45,8 @@ internal class FilePreferencesViewModelTest {
         on { invoke() }.thenReturn(fakeMonitorUserUpdates)
     }
     private val enableFileVersionsOption: EnableFileVersionsOption = mock()
+    private val clearCacheUseCase: ClearCacheUseCase = mock()
+    private val getCacheSizeUseCase: GetCacheSizeUseCase = mock()
 
     @Before
     fun setUp() {
@@ -62,7 +66,9 @@ internal class FilePreferencesViewModelTest {
             getFileVersionsOption,
             monitorUserUpdates,
             enableFileVersionsOption,
-            isConnectedToInternetUseCase
+            isConnectedToInternetUseCase,
+            clearCacheUseCase,
+            getCacheSizeUseCase
         )
     }
 

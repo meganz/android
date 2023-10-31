@@ -4,4 +4,5 @@ data class FilePreferencesState(
     val numberOfPreviousVersions: Int? = null,
     val sizeOfPreviousVersionsInBytes: Long? = null,
     val isFileVersioningEnabled: Boolean = true,
+    val updateCacheSizeSetting: Long? = null,
 )
