@@ -8,6 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
@@ -22,8 +23,8 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -63,7 +64,7 @@ class ChatViewModel @Inject constructor(
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
-    private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase,
+    private val monitorACallInThisChatUseCase: MonitorACallInThisChatUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase,
@@ -392,10 +393,11 @@ class ChatViewModel @Inject constructor(
 
     private fun checkIfIsParticipatingInACallInThisChat(chatId: Long) {
         viewModelScope.launch {
-            runCatching { hasACallInThisChatByChatIdUseCase(chatId) }
-                .onSuccess {
+            monitorACallInThisChatUseCase(chatId)
+                .catch { Timber.e(it) }
+                .collect {
                     _state.update { state -> state.copy(hasACallInThisChat = it) }
-                }.onFailure { Timber.e(it) }
+                }
         }
     }
 

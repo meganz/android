@@ -28,8 +28,8 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.chat.HasACallInThisChatByChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -84,7 +84,9 @@ internal class ChatViewModelTest {
         onBlocking { invoke(any()) } doReturn emptyFlow()
     }
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
-    private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase = mock()
+    private val monitorACallInThisChatUseCase: MonitorACallInThisChatUseCase = mock {
+        onBlocking { invoke(any()) } doReturn emptyFlow()
+    }
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock {
         onBlocking { invoke() } doReturn MutableStateFlow(
             StorageStateEvent(
@@ -135,7 +137,6 @@ internal class ChatViewModelTest {
             isChatNotificationMuteUseCase,
             getUserOnlineStatusByHandleUseCase,
             isParticipatingInChatCallUseCase,
-            hasACallInThisChatByChatIdUseCase,
             isChatStatusConnectedForCallUseCase,
             requestUserLastGreenUseCase,
             getMyUserHandleUseCase,
@@ -159,6 +160,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorConnectivityUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorUserLastGreenUpdatesUseCase(userHandle) } doReturn emptyFlow()
         wheneverBlocking { monitorHasAnyContactUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorACallInThisChatUseCase(any()) } doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -170,7 +172,7 @@ internal class ChatViewModelTest {
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             monitorUserChatStatusByHandleUseCase = monitorUserChatStatusByHandleUseCase,
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
-            hasACallInThisChatByChatIdUseCase = hasACallInThisChatByChatIdUseCase,
+            monitorACallInThisChatUseCase = monitorACallInThisChatUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             isChatStatusConnectedForCallUseCase = isChatStatusConnectedForCallUseCase,
@@ -482,15 +484,16 @@ internal class ChatViewModelTest {
         }
     }
 
-    @ParameterizedTest(name = " returns {0}")
+    @ParameterizedTest(name = " emits {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that has a call in this chat has correct state if use case`(
+    fun `test that has a call in this chat has correct state if the flow`(
         hasACallInThisChat: Boolean,
     ) = runTest {
+        val flow = MutableSharedFlow<Boolean>()
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
-        whenever(hasACallInThisChatByChatIdUseCase(chatId)).thenReturn(hasACallInThisChat)
+        whenever(monitorACallInThisChatUseCase(chatId)).thenReturn(flow)
         initTestClass()
-        testScheduler.advanceUntilIdle()
+        flow.emit(hasACallInThisChat)
         underTest.state.test {
             assertThat(awaitItem().hasACallInThisChat).isEqualTo(hasACallInThisChat)
         }
