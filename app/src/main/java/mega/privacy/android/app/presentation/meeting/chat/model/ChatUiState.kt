@@ -30,6 +30,8 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property usersTyping list of user typing in the chat
  * @property isMeeting whether this chat is a meeting.
  * @property hasAnyContact True if the current logged in user has any contact, false otherwise.
+ * @property hasCustomTitle True if it is a group and has custom subtitle, false otherwise.
+ * @property participantsCount Number of participants if the chat is a group, null otherwise.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -54,4 +56,6 @@ data class ChatUiState(
     val usersTyping: List<String?> = emptyList(),
     val isMeeting: Boolean = false,
     val hasAnyContact: Boolean = false,
+    val hasCustomTitle: Boolean = false,
+    val participantsCount: Long? = null,
 )

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
@@ -84,6 +85,10 @@ class ChatViewModel @Inject constructor(
 
     private val ChatRoom.isPrivateRoom: Boolean
         get() = !isGroup || !isPublic
+
+    private val ChatRoom.haveAtLeastReadPermission: Boolean
+        get() = ownPrivilege != ChatRoomPermission.Unknown
+                && ownPrivilege != ChatRoomPermission.Removed
 
     init {
         checkIfIsParticipatingInACall()
@@ -204,6 +209,8 @@ class ChatViewModel @Inject constructor(
                                 isActive = isActive,
                                 isArchived = isArchived,
                                 isMeeting = isMeeting,
+                                hasCustomTitle = hasCustomTitle,
+                                participantsCount = getNumberParticipants()
                             )
                         }
                         if (!isGroup && peerHandlesList.isNotEmpty()) {
@@ -220,6 +227,10 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
+
+    private fun ChatRoom.getNumberParticipants() =
+        (peerCount + if (haveAtLeastReadPermission) 1 else 0)
+            .takeIf { isGroup }
 
     private fun getUserChatStatus(userHandle: Long) {
         viewModelScope.launch {
@@ -253,7 +264,7 @@ class ChatViewModel @Inject constructor(
                         changes?.forEach { change ->
                             when (change) {
                                 ChatRoomChange.Title -> _state.update { state ->
-                                    state.copy(title = title)
+                                    state.copy(title = title, hasCustomTitle = hasCustomTitle)
                                 }
 
                                 ChatRoomChange.ChatMode -> _state.update { state ->
@@ -261,7 +272,11 @@ class ChatViewModel @Inject constructor(
                                 }
 
                                 ChatRoomChange.OwnPrivilege -> _state.update { state ->
-                                    state.copy(myPermission = ownPrivilege, isActive = isActive)
+                                    state.copy(
+                                        myPermission = ownPrivilege,
+                                        isActive = isActive,
+                                        participantsCount = getNumberParticipants()
+                                    )
                                 }
 
                                 ChatRoomChange.OpenInvite -> _state.update { state ->
@@ -269,7 +284,11 @@ class ChatViewModel @Inject constructor(
                                 }
 
                                 ChatRoomChange.Closed -> _state.update { state ->
-                                    state.copy(myPermission = ownPrivilege, isActive = isActive)
+                                    state.copy(
+                                        myPermission = ownPrivilege,
+                                        isActive = isActive,
+                                        participantsCount = getNumberParticipants()
+                                    )
                                 }
 
                                 ChatRoomChange.Archive -> _state.update { state ->
@@ -283,6 +302,10 @@ class ChatViewModel @Inject constructor(
                                 }
 
                                 ChatRoomChange.UserStopTyping -> handleUserStopTyping(userTyping)
+
+                                ChatRoomChange.Participants -> _state.update { state ->
+                                    state.copy(participantsCount = getNumberParticipants())
+                                }
 
                                 else -> {}
                             }

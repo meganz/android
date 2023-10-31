@@ -1018,4 +1018,138 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().hasAnyContact).isFalse()
         }
     }
+
+    @ParameterizedTest(name = " is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that has custom title is updated when getting the chat and the property`(
+        custom: Boolean,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { hasCustomTitle } doReturn custom
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().hasCustomTitle).isEqualTo(custom)
+        }
+    }
+
+    @ParameterizedTest(name = " and is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that has custom title is updated when chat room update with title change is received`(
+        custom: Boolean,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { hasCustomTitle } doReturn false
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        val updateFlow = MutableSharedFlow<ChatRoom>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().hasCustomTitle).isFalse()
+        }
+        val newChatRoom = mock<ChatRoom> {
+            on { hasCustomTitle } doReturn custom
+            on { changes } doReturn listOf(ChatRoomChange.Title)
+        }
+        updateFlow.emit(newChatRoom)
+        underTest.state.test {
+            assertThat(awaitItem().hasCustomTitle).isEqualTo(custom)
+        }
+    }
+
+    @ParameterizedTest(name = " my permission is {0}, is group is {1}, and peer count is {2}")
+    @MethodSource("providePeerCountParameters")
+    fun `test that participants count is updated when getting the chat and`(
+        myPermission: ChatRoomPermission,
+        group: Boolean,
+        participantsCount: Long,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { ownPrivilege } doReturn myPermission
+            on { isGroup } doReturn group
+            on { peerCount } doReturn participantsCount
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.myPermission).isEqualTo(myPermission)
+            assertThat(actual.isGroup).isEqualTo(group)
+            assertThat(actual.participantsCount).isEqualTo(chatRoom.getNumberParticipants())
+        }
+    }
+
+    @ParameterizedTest(name = " with change {0}, is group is {1}")
+    @MethodSource("providePeerCountUpdateParameters")
+    fun `test that participants count is updated when chat room updates`(
+        change: ChatRoomChange,
+        group: Boolean,
+    ) = runTest {
+        val count = if (group) 10L else 0L
+        val chatRoom = mock<ChatRoom> {
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { isGroup } doReturn group
+            on { peerCount } doReturn count
+        }
+        val updateFlow = MutableSharedFlow<ChatRoom>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.myPermission).isEqualTo(ChatRoomPermission.Moderator)
+            assertThat(actual.isGroup).isEqualTo(group)
+            assertThat(actual.participantsCount).isEqualTo(chatRoom.getNumberParticipants())
+        }
+        val permission =
+            if (change == ChatRoomChange.OwnPrivilege || change == ChatRoomChange.Closed) ChatRoomPermission.Removed
+            else chatRoom.ownPrivilege
+        val newCount =
+            if (change == ChatRoomChange.Participants) count - 1
+            else count
+        val newChatRoom = mock<ChatRoom> {
+            on { ownPrivilege } doReturn permission
+            on { changes } doReturn listOf(change)
+            on { isGroup } doReturn group
+            on { peerCount } doReturn newCount
+        }
+        updateFlow.emit(newChatRoom)
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.myPermission).isEqualTo(permission)
+            assertThat(actual.isGroup).isEqualTo(group)
+            assertThat(actual.participantsCount).isEqualTo(newChatRoom.getNumberParticipants())
+        }
+    }
+
+    private fun ChatRoom.getNumberParticipants() =
+        (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown
+            && ownPrivilege != ChatRoomPermission.Removed
+        ) 1 else 0).takeIf { isGroup }
+
+    private fun providePeerCountParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(ChatRoomPermission.Unknown, false, 0L),
+        Arguments.of(ChatRoomPermission.Removed, true, 1L),
+        Arguments.of(ChatRoomPermission.Removed, false, 0L),
+        Arguments.of(ChatRoomPermission.Standard, true, 300L),
+        Arguments.of(ChatRoomPermission.ReadOnly, true, 7L),
+        Arguments.of(ChatRoomPermission.Moderator, true, 15L),
+        Arguments.of(ChatRoomPermission.Moderator, true, 0L),
+    )
+
+    private fun providePeerCountUpdateParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(ChatRoomChange.OwnPrivilege, false),
+        Arguments.of(ChatRoomChange.OwnPrivilege, true),
+        Arguments.of(ChatRoomChange.Closed, false),
+        Arguments.of(ChatRoomChange.Closed, true),
+        Arguments.of(ChatRoomChange.Participants, true),
+    )
 }

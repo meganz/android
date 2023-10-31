@@ -29,6 +29,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
+import test.mega.privacy.android.app.onNodeWithPlural
 import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
@@ -489,6 +490,20 @@ class ChatViewTest {
             )
         )
         composeTestRule.onNodeWithText(lastGreen).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that number of participants shows if the chat is a group and does not have a custom title`() {
+        val count = 5
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                hasCustomTitle = false,
+                participantsCount = count.toLong()
+            )
+        )
+        composeTestRule.onNodeWithPlural(R.plurals.subtitle_of_group_chat, count)
+            .assertExists()
     }
 
     private fun initComposeRuleContent(state: ChatUiState) {
