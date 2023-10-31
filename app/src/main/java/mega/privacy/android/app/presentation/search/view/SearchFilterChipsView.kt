@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.SearchState
-import mega.privacy.android.core.ui.controls.chips.TextButtonWithIconChipForSearch
+import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonWithIconChipForSearch
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.search.SearchCategory

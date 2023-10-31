@@ -58,10 +58,10 @@ import mega.privacy.android.app.presentation.extensions.meeting.StringId
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
-import mega.privacy.android.core.ui.controls.chips.DropdownMenuChip
-import mega.privacy.android.core.ui.controls.chips.TextButtonChip
-import mega.privacy.android.core.ui.controls.chips.TextButtonWithIconChip
-import mega.privacy.android.core.ui.controls.chips.TextFieldChip
+import mega.privacy.android.legacy.core.ui.controls.chips.DropdownMenuChip
+import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonChip
+import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonWithIconChip
+import mega.privacy.android.legacy.core.ui.controls.chips.TextFieldChip
 import mega.privacy.android.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme

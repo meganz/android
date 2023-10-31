@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.chips
+package mega.privacy.android.legacy.core.ui.controls.chips
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag

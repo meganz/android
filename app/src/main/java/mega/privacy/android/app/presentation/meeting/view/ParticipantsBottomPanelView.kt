@@ -34,7 +34,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.controls.chips.CallTextButtonChip
+import mega.privacy.android.legacy.core.ui.controls.chips.CallTextButtonChip
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary

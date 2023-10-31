@@ -5,7 +5,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 /**
  * TextField parameter provider for compose previews.
  */
-internal class TextFieldProvider : PreviewParameterProvider<TextFieldState> {
+class TextFieldProvider : PreviewParameterProvider<TextFieldState> {
     override val values = listOf(
         TextFieldState(),
         TextFieldState(text = "Text goes here"),
@@ -16,7 +16,7 @@ internal class TextFieldProvider : PreviewParameterProvider<TextFieldState> {
 /**
  * Data class defining the possible TextField states.
  */
-internal data class TextFieldState(
+data class TextFieldState(
     val text: String = "",
     val error: String? = null,
 )

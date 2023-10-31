@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.chips
+package mega.privacy.android.legacy.core.ui.controls.chips
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
