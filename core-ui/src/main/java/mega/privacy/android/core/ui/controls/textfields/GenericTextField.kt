@@ -229,7 +229,11 @@ private fun GenericDecorationBox(
     )
 }
 
-internal const val GENERIC_TEXT_FIELD_ERROR_TAG = "generic_text_field:error_text"
+/**
+ * GENERIC TEXT FIELD ERROR TAG
+ */
+const val GENERIC_TEXT_FIELD_ERROR_TAG = "generic_text_field:error_text"
+
 internal const val GENERIC_TEXT_FIELD_TEXT_TAG = "generic_text_field:text_field"
 
 @CombinedThemePreviews

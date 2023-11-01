@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.dialogs
+package mega.privacy.android.legacy.core.ui.controls.dialogs
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement

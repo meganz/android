@@ -43,7 +43,7 @@ import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
-import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.caption
 import mega.privacy.android.core.ui.theme.grey_300

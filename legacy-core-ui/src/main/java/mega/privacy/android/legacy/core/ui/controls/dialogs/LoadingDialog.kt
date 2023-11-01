@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.dialogs
+package mega.privacy.android.legacy.core.ui.controls.dialogs
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +21,6 @@ import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgr
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.teal_300
 
 /**
  *  A common loading dialog with a [MegaCircularProgressIndicator] and text.

@@ -60,7 +60,7 @@ import mega.privacy.android.app.presentation.extensions.getTimeFormatted
 import mega.privacy.android.app.presentation.meeting.dialog.view.RecurringMeetingOccurrenceBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
-import mega.privacy.android.core.ui.controls.dialogs.EditOccurrenceDialog
+import mega.privacy.android.legacy.core.ui.controls.dialogs.EditOccurrenceDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054

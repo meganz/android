@@ -30,7 +30,7 @@ import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivit
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.dialogs.InputDialog
+import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.RegexPatternType

@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
-import mega.privacy.android.core.ui.controls.controlssliders.LabelledSwitch
-import mega.privacy.android.core.ui.controls.dialogs.ProgressDialog
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
+import mega.privacy.android.legacy.core.ui.controls.dialogs.ProgressDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_087

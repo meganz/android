@@ -85,7 +85,7 @@ import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews

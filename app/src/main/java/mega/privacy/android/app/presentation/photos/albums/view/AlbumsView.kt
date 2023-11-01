@@ -77,7 +77,7 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button
 import mega.privacy.android.core.ui.theme.caption

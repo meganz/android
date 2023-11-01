@@ -85,7 +85,7 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants.SEE_P
 import mega.privacy.android.app.presentation.changepassword.view.Constants.SNACKBAR_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.TNC_CHECKBOX_TEST_TAG
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.core.ui.model.SpanIndicator

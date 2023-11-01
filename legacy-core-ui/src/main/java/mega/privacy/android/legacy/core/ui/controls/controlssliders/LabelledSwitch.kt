@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.controlssliders
+package mega.privacy.android.legacy.core.ui.controls.controlssliders
 
 
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -18,6 +18,7 @@ import androidx.compose.ui.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
