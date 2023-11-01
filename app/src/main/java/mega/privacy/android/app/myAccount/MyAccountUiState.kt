@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.Feature
  * @property canVerifyPhoneNumber
  * @property isBusinessAccount
  * @property enabledFeatureFlags
+ * @property backupStorageSize
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
@@ -28,5 +29,6 @@ data class MyAccountUiState(
     val verifiedPhoneNumber: String? = null,
     val canVerifyPhoneNumber: Boolean = false,
     val isBusinessAccount: Boolean = false,
-    val enabledFeatureFlags: Set<Feature> = emptySet()
+    val enabledFeatureFlags: Set<Feature> = emptySet(),
+    val backupStorageSize: Long = 0L,
 )

@@ -22,6 +22,7 @@ import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.setRenewalDateForProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
+import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.data.qualifier.MegaApi
@@ -37,6 +38,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var fileSizeStringMapper: FileSizeStringMapper
 
     private val viewModel: MyAccountViewModel by activityViewModels()
 
@@ -177,15 +181,23 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
         binding.cloudStorageText.text = viewModel.getCloudStorage()
 
-        val backupsStorage = viewModel.getBackupsStorage()
-        if (backupsStorage.isEmpty()) {
+        binding.incomingStorageText.text = viewModel.getIncomingStorage()
+        binding.rubbishStorageText.text = viewModel.getRubbishStorage()
+
+        updateBackupStorage(viewModel.state.value.backupStorageSize)
+    }
+
+    /**
+     * Update back up storage size display
+     *
+     * @param backupStorageSize
+     */
+    private fun updateBackupStorage(backupStorageSize: Long) {
+        if (backupStorageSize < 1) {
             binding.backupsStorageContainer.isVisible = false
         } else {
             binding.backupsStorageContainer.isVisible = true
-            binding.backupsStorageText.text = backupsStorage
+            binding.backupsStorageText.text = fileSizeStringMapper(backupStorageSize)
         }
-
-        binding.incomingStorageText.text = viewModel.getIncomingStorage()
-        binding.rubbishStorageText.text = viewModel.getRubbishStorage()
     }
 }

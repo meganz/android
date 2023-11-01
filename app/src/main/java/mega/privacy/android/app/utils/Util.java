@@ -568,6 +568,8 @@ public class Util {
      *
      * @param speed the speed to show in the string
      * @return The speed string.
+     *
+     * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSpeedMapper] instead
      */
     public static String getSpeedString(long speed, Context context) {
         return getUnitString(speed, true, context);
@@ -578,6 +580,8 @@ public class Util {
      *
      * @param size the size to show in the string
      * @return The size string.
+     *
+     * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSizeMapper] instead
      */
     public static String getSizeString(long size, Context context) {
         return getUnitString(size, false, context);

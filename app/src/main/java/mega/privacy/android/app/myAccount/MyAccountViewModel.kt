@@ -21,9 +21,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -72,13 +74,17 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
+import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
@@ -176,6 +182,9 @@ class MyAccountViewModel @Inject constructor(
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
     private val broadcastRefreshSessionUseCase: BroadcastRefreshSessionUseCase,
     private val logoutUseCase: LogoutUseCase,
+    private val monitorBackupFolder: MonitorBackupFolder,
+    private val getFolderTreeInfo: GetFolderTreeInfo,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -239,6 +248,26 @@ class MyAccountViewModel @Inject constructor(
                     )
                 }
             }
+        }
+        viewModelScope.launch {
+            monitorBackupFolder()
+                .catch { Timber.w("Exception monitoring backups folder: $it") }
+                .map { it.getOrNull() }
+                .collectLatest { backupsFolderNodeId ->
+                    backupsFolderNodeId?.let {
+                        runCatching {
+                            getNodeByIdUseCase(it)?.let { node ->
+                                getFolderTreeInfo(node as FolderNode).let { folderTreeInfo ->
+                                    _state.update {
+                                        it.copy(
+                                            backupStorageSize = folderTreeInfo.totalCurrentSizeInBytes
+                                        )
+                                    }
+                                }
+                            }
+                        }.onFailure { Timber.w(it) }
+                    }
+                }
         }
     }
 
@@ -557,13 +586,6 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun getCloudStorage(): String = myAccountInfo.formattedUsedCloud
-
-    /**
-     * Get backups storage
-     *
-     * @return
-     */
-    fun getBackupsStorage(): String = myAccountInfo.formattedUsedBackups
 
     /**
      * Get incoming storage

@@ -96,6 +96,8 @@ fun Long.toStorageString(context: Context): String {
  * Gets a string from bytes in readable unit
  *
  * @return [String] unit string from bytes
+ *
+ * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper] instead
  */
 fun Long.toUnitString(context: Context): String {
     val formatter = DecimalFormat("#.##")

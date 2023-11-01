@@ -1,7 +1,6 @@
 package mega.privacy.android.app.globalmanagement
 
 import android.content.Context
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.TimeUtils.getDateString
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -9,9 +8,6 @@ import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,7 +43,6 @@ class MyAccountInfo @Inject constructor(
     var usedFormatted = ""
     var totalFormatted = ""
     var formattedUsedCloud = ""
-    var formattedUsedBackups = ""
     var formattedUsedIncoming = ""
     var formattedUsedRubbish = ""
     private var formattedAvailableSpace = ""
@@ -86,7 +81,6 @@ class MyAccountInfo @Inject constructor(
         usedFormatted = ""
         totalFormatted = ""
         formattedUsedCloud = ""
-        formattedUsedBackups = ""
         formattedUsedIncoming = ""
         formattedUsedRubbish = ""
         formattedAvailableSpace = ""
@@ -130,20 +124,6 @@ class MyAccountInfo @Inject constructor(
                     accountInfo.getStorageUsed(megaApi.rootNode?.handle ?: INVALID_HANDLE)
                 formattedUsedCloud = getSizeString(usedCloudDrive, context)
             }
-
-            // Check the My Backups root folder
-            megaApi.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { request, error ->
-                        if (error.errorCode == MegaError.API_OK) {
-                            // The Backups Root Folder may be null if
-                            // the user has not setup his/her Backups
-                            megaApi.getNodeByHandle(request.nodeHandle)
-                                ?.let { setUsedBackupsStorage(it, context) }
-                        }
-                    }
-                )
-            )
 
             if (megaApi.rubbishNode != null) {
                 usedRubbish =
@@ -204,22 +184,6 @@ class MyAccountInfo @Inject constructor(
 
         isAccountDetailsFinished = true
         Timber.d("LEVELACCOUNTDETAILS: $levelAccountDetails")
-    }
-
-    /**
-     * Displays the total storage used by the My Backups root folder
-     * @param rootFolder The My Backups root folder which may be nullable
-     */
-    private fun setUsedBackupsStorage(rootFolder: MegaNode, context: Context) {
-        megaApi.getFolderInfo(rootFolder, OptionalMegaRequestListenerInterface(
-            onRequestFinish = { request, error ->
-                if (error.errorCode == MegaError.API_OK) {
-                    val totalStorage = request.megaFolderInfo.currentSize
-                    formattedUsedBackups =
-                        if (totalStorage < 1) "" else getSizeString(totalStorage, context)
-                }
-            }
-        ))
     }
 
     fun getFormattedPreviousVersionsSize(context: Context): String? {

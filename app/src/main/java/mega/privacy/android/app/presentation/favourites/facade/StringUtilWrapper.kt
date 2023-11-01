@@ -9,6 +9,8 @@ interface StringUtilWrapper {
     /**
      * Wrapping getSizeString function
      * @return size string
+     *
+     * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper] instead
      */
     fun getSizeString(size: Long, context: Context): String
 
