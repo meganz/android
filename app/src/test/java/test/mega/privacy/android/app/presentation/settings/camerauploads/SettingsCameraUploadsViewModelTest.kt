@@ -69,7 +69,6 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCa
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
-import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -134,7 +133,6 @@ class SettingsCameraUploadsViewModelTest {
     private val setupSecondaryFolderUseCase = mock<SetupSecondaryFolderUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
-    private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
     private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
     private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
     private val monitorCameraUploadsSettingsActionsUseCase =
@@ -205,7 +203,6 @@ class SettingsCameraUploadsViewModelTest {
             setupSecondaryFolderUseCase,
             startCameraUploadUseCase,
             stopCameraUploadsUseCase,
-            rescheduleCameraUploadUseCase,
             stopCameraUploadAndHeartbeatUseCase,
             hasMediaPermissionUseCase,
             monitorCameraUploadsSettingsActionsUseCase,
@@ -268,7 +265,6 @@ class SettingsCameraUploadsViewModelTest {
             setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
-            rescheduleCameraUploadUseCase = rescheduleCameraUploadUseCase,
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
@@ -523,7 +519,7 @@ class SettingsCameraUploadsViewModelTest {
 
             verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
             verify(clearCacheDirectory).invoke()
-            verify(rescheduleCameraUploadUseCase).invoke()
+            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
             underTest.state.test {
                 assertThat(awaitItem().uploadOption).isEqualTo(uploadOption)
             }
@@ -595,6 +591,7 @@ class SettingsCameraUploadsViewModelTest {
             whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(expectedAnswer)
             underTest.changeChargingRequiredForVideoCompression(expectedAnswer)
             verify(setChargingRequiredForVideoCompressionUseCase).invoke(expectedAnswer)
+            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
             underTest.state.test {
                 assertThat(awaitItem().isChargingRequiredForVideoCompression).isEqualTo(
                     expectedAnswer
@@ -610,6 +607,7 @@ class SettingsCameraUploadsViewModelTest {
         underTest.changeVideoCompressionSizeLimit(newSize)
 
         verify(setVideoCompressionSizeLimitUseCase).invoke(newSize)
+        verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
         underTest.state.test {
             assertThat(awaitItem().videoCompressionSizeLimit).isEqualTo(newSize)
         }
@@ -622,6 +620,7 @@ class SettingsCameraUploadsViewModelTest {
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(expected)
         underTest.keepUploadFileNames(expected)
         verify(setUploadFileNamesKeptUseCase).invoke(expected)
+        verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
         underTest.state.test {
             assertThat(awaitItem().areUploadFileNamesKept).isEqualTo(expected)
         }
@@ -645,7 +644,7 @@ class SettingsCameraUploadsViewModelTest {
         )
         verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
         verify(clearCacheDirectory).invoke()
-        verify(rescheduleCameraUploadUseCase).invoke()
+        verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
         verify(setupOrUpdateCameraUploadsBackupUseCase).invoke(
             localFolder = testPath,
             targetNode = null
@@ -680,6 +679,7 @@ class SettingsCameraUploadsViewModelTest {
 
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             underTest.includeLocationTags(true)
+            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
 
             underTest.state.map { it.areLocationTagsIncluded }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isTrue()
@@ -755,16 +755,6 @@ class SettingsCameraUploadsViewModelTest {
             underTest.stopCameraUploads()
 
             verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
-        }
-
-    @Test
-    fun `test that when rescheduleCameraUpload is called, rescheduleCameraUploadUseCase is called`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.rescheduleCameraUpload()
-
-            verify(rescheduleCameraUploadUseCase).invoke()
         }
 
     @Test
@@ -859,7 +849,7 @@ class SettingsCameraUploadsViewModelTest {
             )
             verify(setSecondaryFolderLocalPathUseCase).invoke(mediaUploadsFolderPath)
             verify(restoreSecondaryTimestamps).invoke()
-            verify(rescheduleCameraUploadUseCase).invoke()
+            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
         }
 
     @Test

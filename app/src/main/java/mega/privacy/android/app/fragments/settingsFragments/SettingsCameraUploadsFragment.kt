@@ -304,7 +304,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             KEY_CAMERA_UPLOAD_CHARGING -> {
                 val chargingRequired = optionChargingOnVideoCompression?.isChecked ?: false
                 viewModel.changeChargingRequiredForVideoCompression(chargingRequired)
-                viewModel.rescheduleCameraUpload()
             }
 
             KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE -> showResetCompressionQueueSizeDialog()
@@ -987,14 +986,13 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     }
 
     /**
-     * Includes or excludes adding Location tags to Photo uploads. This also reschedules
+     * Includes or excludes adding Location tags to Photo uploads. This also stops
      * Camera Uploads
      *
      * @param include true if Location data should be added to Photos, and false if otherwise
      */
     private fun includeLocationTags(include: Boolean) {
         viewModel.includeLocationTags(include)
-        viewModel.rescheduleCameraUpload()
     }
 
     /**
@@ -1128,7 +1126,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             val newSize = value.toInt()
             if (isQueueSizeValid(newSize)) {
                 viewModel.changeVideoCompressionSizeLimit(newSize)
-                viewModel.rescheduleCameraUpload()
                 compressionQueueSizeDialog?.dismiss()
             } else {
                 resetSizeInput(input)

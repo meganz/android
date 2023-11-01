@@ -550,11 +550,6 @@ interface CameraUploadRepository {
     suspend fun scheduleCameraUploadJob()
 
     /**
-     * Reschedule Camera Upload with time interval
-     */
-    suspend fun rescheduleCameraUpload()
-
-    /**
      * Stop the camera upload work by tag.
      * Stop regular camera upload sync heartbeat work by tag.
      *

@@ -8,7 +8,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.await
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
@@ -36,7 +35,6 @@ private const val UP_TO_DATE_HEARTBEAT_INTERVAL: Long = 30 // Minutes
 private const val HEARTBEAT_FLEX_INTERVAL: Long = 20 // Minutes
 private const val CU_SCHEDULER_INTERVAL: Long = 60 // Minutes
 private const val SCHEDULER_FLEX_INTERVAL: Long = 50 // Minutes
-private const val CU_RESCHEDULE_INTERVAL: Long = 5000 // Milliseconds
 
 /**
  * Worker Facade implements [WorkerGateway]
@@ -162,15 +160,6 @@ class WorkerFacade @Inject constructor(
             }"
         )
         Timber.d("scheduleCameraUploadSyncActiveHeartbeat() SUCCESS")
-    }
-
-    /**
-     * Reschedule Camera Upload with time interval
-     */
-    override suspend fun rescheduleCameraUpload() {
-        stopCameraUploads(shouldReschedule = false)
-        delay(CU_RESCHEDULE_INTERVAL)
-        scheduleCameraUploadJob()
     }
 
     /**

@@ -586,10 +586,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         workerGateway.scheduleCameraUploadJob()
     }
 
-    override suspend fun rescheduleCameraUpload() = withContext(ioDispatcher) {
-        workerGateway.rescheduleCameraUpload()
-    }
-
     override suspend fun stopCameraUploadSyncHeartbeatWorkers() = withContext(ioDispatcher) {
         workerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
     }

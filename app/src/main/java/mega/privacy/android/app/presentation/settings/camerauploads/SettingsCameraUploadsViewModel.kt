@@ -73,7 +73,6 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
-import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -117,7 +116,6 @@ import javax.inject.Inject
  * @property setupSecondaryFolderUseCase Sets up the Secondary Folder of Camera Uploads
  * @property startCameraUploadUseCase Start the camera upload
  * @property stopCameraUploadsUseCase Stop the camera upload
- * @property rescheduleCameraUploadUseCase Reschedule the camera upload
  * @property stopCameraUploadAndHeartbeatUseCase Stop the camera upload and heartbeat
  * @property broadcastBusinessAccountExpiredUseCase broadcast business account expired
  */
@@ -157,7 +155,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
-    private val rescheduleCameraUploadUseCase: RescheduleCameraUploadUseCase,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
@@ -327,6 +324,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun setupPrimaryCameraUploadFolder(primaryHandle: Long) = viewModelScope.launch {
         runCatching {
             setupPrimaryFolderUseCase(primaryHandle)
+            stopCameraUploadsUseCase(shouldReschedule = true)
         }.onFailure {
             Timber.w(it)
             setErrorState(shouldShow = true)
@@ -432,7 +430,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setCameraUploadsByWifiUseCase(wifiOnly)
                 refreshUploadConnectionType()
-                rescheduleCameraUploadUseCase()
+                stopCameraUploadsUseCase(shouldReschedule = true)
             }.onFailure {
                 Timber.e(it)
             }
@@ -450,7 +448,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 setUploadOptionUseCase(uploadOption)
                 refreshUploadOption()
                 resetTimestampsAndCacheDirectory()
-                rescheduleCameraUploadUseCase()
+                stopCameraUploadsUseCase(shouldReschedule = true)
             }.onFailure {
                 Timber.e(it)
             }
@@ -463,9 +461,16 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @param include If true, Location Tags will be included for every Photo upload
      * If false, no Location Tags will be included when uploading Photos
      */
-    fun includeLocationTags(include: Boolean) = viewModelScope.launch {
-        setLocationTagsEnabledUseCase(include)
-        refreshLocationTags()
+    fun includeLocationTags(include: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setLocationTagsEnabledUseCase(include)
+                refreshLocationTags()
+                stopCameraUploadsUseCase(shouldReschedule = true)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     /**
@@ -487,7 +492,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                         }
                     )
                     refreshUploadVideoQuality()
-                    rescheduleCameraUploadUseCase()
+                    stopCameraUploadsUseCase(shouldReschedule = true)
                 }
             }.onFailure {
                 Timber.e(it)
@@ -501,20 +506,33 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @param chargingRequired True if charging is required for video compression, and false
      * if otherwise
      */
-    fun changeChargingRequiredForVideoCompression(chargingRequired: Boolean) =
+    fun changeChargingRequiredForVideoCompression(chargingRequired: Boolean) {
         viewModelScope.launch {
-            setChargingRequiredForVideoCompressionUseCase(chargingRequired)
-            refreshChargingRequiredForVideoCompression()
+            runCatching {
+                setChargingRequiredForVideoCompressionUseCase(chargingRequired)
+                refreshChargingRequiredForVideoCompression()
+                stopCameraUploadsUseCase(shouldReschedule = true)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
+    }
 
     /**
      * Sets the new video compression size limit
      *
      * @param size The new video compression size limit
      */
-    fun changeVideoCompressionSizeLimit(size: Int) = viewModelScope.launch {
-        setVideoCompressionSizeLimitUseCase(size)
-        refreshVideoCompressionSizeLimit()
+    fun changeVideoCompressionSizeLimit(size: Int) {
+        viewModelScope.launch {
+            runCatching {
+                setVideoCompressionSizeLimitUseCase(size)
+                refreshVideoCompressionSizeLimit()
+                stopCameraUploadsUseCase(shouldReschedule = true)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     /**
@@ -522,9 +540,16 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      *
      * @param keepFileNames true if the File Names should now be left as is, and false if otherwise
      */
-    fun keepUploadFileNames(keepFileNames: Boolean) = viewModelScope.launch {
-        setUploadFileNamesKeptUseCase(keepFileNames)
-        refreshUploadFilesNamesKept()
+    fun keepUploadFileNames(keepFileNames: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setUploadFileNamesKeptUseCase(keepFileNames)
+                refreshUploadFilesNamesKept()
+                stopCameraUploadsUseCase(shouldReschedule = true)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     /**
@@ -550,7 +575,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                         localFolder = newPath,
                         targetNode = null
                     )
-                    rescheduleCameraUpload()
+                    stopCameraUploadsUseCase(shouldReschedule = true)
                     refreshPrimaryFolderPath()
                 } else {
                     setInvalidFolderSelectedPromptShown(true)
@@ -777,13 +802,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Reschedule camera upload
-     */
-    fun rescheduleCameraUpload() = viewModelScope.launch {
-        rescheduleCameraUploadUseCase()
-    }
-
-    /**
      * Set Invalid Camera Uploads Sync Handle
      */
     private suspend fun setInvalidCameraUploadsHandle() {
@@ -821,7 +839,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             if (_state.value.isMediaUploadsEnabled) {
                 // we need to disable media upload
                 disableMediaUploads()
-                rescheduleCameraUpload()
+                stopCameraUploadsUseCase(shouldReschedule = true)
                 _state.update {
                     it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
                 }
@@ -833,7 +851,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     )
                 ) {
                     enableMediaUploads()
-                    rescheduleCameraUpload()
+                    stopCameraUploadsUseCase(shouldReschedule = true)
                     _state.update {
                         it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
                     }
@@ -859,7 +877,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
                     // Update Sync when the Secondary Local Folder has changed
                     updateMediaUploadsBackup(mediaUploadPath)
-                    rescheduleCameraUpload()
+                    stopCameraUploadsUseCase(shouldReschedule = true)
                     _state.update {
                         it.copy(secondaryFolderPath = mediaUploadPath.orEmpty())
                     }

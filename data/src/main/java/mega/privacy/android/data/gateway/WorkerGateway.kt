@@ -30,11 +30,6 @@ interface WorkerGateway {
     suspend fun scheduleCameraUploadJob()
 
     /**
-     * Reschedule Camera Upload with time interval
-     */
-    suspend fun rescheduleCameraUpload()
-
-    /**
      * Cancel all camera upload workers.
      * Cancel all camera upload sync heartbeat workers.
      */

@@ -842,12 +842,6 @@ class DefaultCameraUploadRepositoryTest {
         }
 
         @Test
-        fun `test that the worker is called to reschedule camera uploads`() = runTest {
-            underTest.rescheduleCameraUpload()
-            verify(workerGateway).rescheduleCameraUpload()
-        }
-
-        @Test
         fun `test that the worker is called to stop camera uploads heartbeat workers`() = runTest {
             underTest.stopCameraUploadSyncHeartbeatWorkers()
             verify(workerGateway).cancelCameraUploadAndHeartbeatWorkRequest()
