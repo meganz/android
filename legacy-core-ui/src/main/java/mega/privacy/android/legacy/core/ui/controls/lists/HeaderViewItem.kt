@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.lists
+package mega.privacy.android.legacy.core.ui.controls.lists
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

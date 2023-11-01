@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.lists
+package mega.privacy.android.legacy.core.ui.controls.lists
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 
 /**
  * Compose UI, which is used as List item, containing Image or Icon title and description. Currently is used on My Account screen

@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.lists
+package mega.privacy.android.legacy.core.ui.controls.lists
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag

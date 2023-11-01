@@ -10,11 +10,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.controls.lists.LoadingHeaderView
-import mega.privacy.android.core.ui.controls.lists.NodeLoadingGridViewItem
-import mega.privacy.android.core.ui.controls.lists.NodeLoadingListViewItem
+import mega.privacy.android.legacy.core.ui.controls.lists.LoadingHeaderView
+import mega.privacy.android.legacy.core.ui.controls.lists.NodeLoadingGridViewItem
+import mega.privacy.android.legacy.core.ui.controls.lists.NodeLoadingListViewItem
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 

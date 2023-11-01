@@ -75,7 +75,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManag
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.core.ui.controls.text.MarqueeText
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black

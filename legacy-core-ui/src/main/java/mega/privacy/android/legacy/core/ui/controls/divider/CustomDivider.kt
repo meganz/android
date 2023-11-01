@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.divider
+package mega.privacy.android.legacy.core.ui.controls.divider
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
@@ -8,8 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_012
 
 /**
  * A custom divider
