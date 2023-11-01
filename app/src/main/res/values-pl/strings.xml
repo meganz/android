@@ -5675,5 +5675,5 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA chroni Twoją komunikację za pomocą naszego systemu szyfrowania \“zero wiedzy\“, zapewniając istotne gwarancje bezpieczeństwa:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">System zapewnia, że otrzymane dane pochodzą od nadawcy, a ich zawartość nie została zmanipulowana podczas przesyłania.</string>
 </resources>

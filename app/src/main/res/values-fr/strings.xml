@@ -5440,5 +5440,5 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA protège vos communications grâce à notre système de chiffrement à divulgation nulle de connaissance apportant ainsi une garantie de sécurité essentielle&#160;:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">Le système garantit que les données reçues proviennent de l’expéditeur indiqué et que le contenu n’a pas été manipulé pendant le transfert.</string>
 </resources>

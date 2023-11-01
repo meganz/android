@@ -3544,7 +3544,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Você já tem uma assinatura. Se você comprar outra, você receberá duas cobranças. Para que isso não aconteça, cancele a sua assinatura atual via %1$s. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your Apple account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Você já tem uma assinatura. Se você comprar outra, você receberá duas cobranças. Para que isso não aconteça, cancele a sua assinatura atual na sua conta na Apple. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Você já tem uma assinatura. Se você comprar outra, você receberá duas cobranças. Para que isso não aconteça,  cancele a sua assinatura atual acessando o MEGA em um navegador. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3558,7 +3558,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Você tem uma assinatura ativa do MEGA. Ela será cancelada automaticamente após a exclusão da conta. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your Apple account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_itunes_platform_subscription">Você tem uma assinatura ativa do MEGA com a Apple. Você deve cancelá-la diretamente na sua conta da Apple, pois o MEGA não pode cancelá-la por você. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Acesse %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -5440,5 +5440,5 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">O MEGA protege a sua comunicação com o nosso sistema de criptografia de conhecimento zero, proporcionando garantias de segurança essenciais:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">O sistema garante que os dados recebidos sejam do remetente exibido, e que o conteúdo não tenha sido manipulado durante o trânsito.</string>
 </resources>

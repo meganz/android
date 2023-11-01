@@ -3358,7 +3358,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请通过%1$s取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your Apple account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请从您的Apple帐户取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请在电脑或手机网页浏览器中登录MEGA以取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3372,7 +3372,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">您当前有一个MEGA订阅。此订阅会在帐户删除后自动取消。访问我们的帮助中心了解更多信息。</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your Apple account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_itunes_platform_subscription">您当前在Apple有一个MEGA订阅。您必须从您的Apple帐户中单独取消它，因为MEGA无法为您取消订阅。访问我们的帮助中心了解更多信息。</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">访问%1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4970,5 +4970,5 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA通过我们的零知识加密系统保护您的通信，提供必要的安全保障：</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">我们的系统确保接收到的数据来自显示的发送人，并且其内容在传输过程中不会被篡改。</string>
 </resources>
