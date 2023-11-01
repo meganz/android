@@ -385,12 +385,6 @@ class PhotosFragment : Fragment() {
                 it.title = s
             }
         }
-        menu?.findItem(R.id.action_zoom_in_secondary)?.let {
-            it.isVisible = state.enableZoomIn && isShowMenu && isNewCUEnabled
-        }
-        menu?.findItem(R.id.action_zoom_out_secondary)?.let {
-            it.isVisible = state.enableZoomOut && isShowMenu && isNewCUEnabled
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -455,6 +449,46 @@ class PhotosFragment : Fragment() {
                 it.title = s
             } else {
                 it.title = s
+            }
+        }
+
+        menu.findItem(R.id.action_zoom_in_secondary).let {
+            it.isEnabled = zoomInValid
+            it.title = SpannableString(it.title.toString()).apply {
+                if (zoomInValid) return@apply
+
+                val color = if (Util.isDarkMode(requireContext())) {
+                    Color.argb(38, 255, 255, 255)
+                } else {
+                    Color.argb(38, 0, 0, 0)
+                }
+
+                setSpan(
+                    ForegroundColorSpan(color),
+                    0,
+                    it.title?.length ?: 0,
+                    0,
+                )
+            }
+        }
+
+        menu.findItem(R.id.action_zoom_out_secondary).let {
+            it.isEnabled = zoomOutValid
+            it.title = SpannableString(it.title.toString()).apply {
+                if (zoomOutValid) return@apply
+
+                val color = if (Util.isDarkMode(requireContext())) {
+                    Color.argb(38, 255, 255, 255)
+                } else {
+                    Color.argb(38, 0, 0, 0)
+                }
+
+                setSpan(
+                    ForegroundColorSpan(color),
+                    0,
+                    it.title?.length ?: 0,
+                    0,
+                )
             }
         }
     }
