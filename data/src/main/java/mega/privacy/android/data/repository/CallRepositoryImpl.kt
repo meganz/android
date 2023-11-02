@@ -359,6 +359,7 @@ internal class CallRepositoryImpl @Inject constructor(
         cancelled: Boolean,
         flags: ChatScheduledFlags?,
         rules: ChatScheduledRules?,
+        updateChatTitle: Boolean
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getChatRequestListener(
@@ -377,6 +378,7 @@ internal class CallRepositoryImpl @Inject constructor(
                 cancelled,
                 megaChatScheduledMeetingFlagsMapper(flags),
                 megaChatScheduledMeetingRulesMapper(rules),
+                updateChatTitle,
                 listener
             )
 

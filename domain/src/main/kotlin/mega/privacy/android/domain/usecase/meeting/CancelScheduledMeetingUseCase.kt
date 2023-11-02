@@ -28,6 +28,7 @@ class CancelScheduledMeetingUseCase @Inject constructor(
                     description = schedMeeting.description.orEmpty(),
                     cancelled = true,
                     flags = schedMeeting.flags,
+                    updateChatTitle = false,
                     rules = schedMeeting.rules
                 )
             }

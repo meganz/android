@@ -546,6 +546,7 @@ internal class MegaChatApiFacade @Inject constructor(
         cancelled: Boolean,
         flags: MegaChatScheduledFlags?,
         rules: MegaChatScheduledRules?,
+        updateChatTitle: Boolean,
         listener: MegaChatRequestListenerInterface,
     ) {
         chatApi.updateScheduledMeeting(
@@ -559,6 +560,7 @@ internal class MegaChatApiFacade @Inject constructor(
             cancelled,
             flags,
             rules,
+            updateChatTitle,
             listener
         )
     }

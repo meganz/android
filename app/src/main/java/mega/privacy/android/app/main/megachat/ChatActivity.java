@@ -2073,10 +2073,6 @@ public class ChatActivity extends PasscodeActivity
                 startOrJoinMeetingBanner.setVisibility(View.GONE);
             }
 
-            if (schedMeet != null) {
-                setTitle(null);
-            }
-
             long callChatId = chatState.getCurrentCallChatId();
 
             if (callChatId != MEGACHAT_INVALID_HANDLE) {
@@ -2344,16 +2340,11 @@ public class ChatActivity extends PasscodeActivity
      * Set chat room title
      */
     private void setTitle(String newTitle) {
-        String title = viewModel.getSchedTitle();
-        if (title == null) {
-            if (newTitle != null) {
-                title = newTitle;
-            } else {
-                title = getTitleChat(chatRoom);
-            }
+        if (newTitle != null) {
+            titleToolbar.setText(newTitle);
+        } else {
+            titleToolbar.setText(getTitleChat(megaChatApi.getChatRoom(idChat)));
         }
-
-        titleToolbar.setText(title);
     }
 
     /**
@@ -8752,6 +8743,7 @@ public class ChatActivity extends PasscodeActivity
             } else {
                 setAsRead = false;
             }
+            setTitle(null);
             setChatSubtitle();
             if (emojiKeyboard != null) {
                 emojiKeyboard.hideBothKeyboard(this);

@@ -494,21 +494,6 @@ class ChatViewModel @Inject constructor(
         }
 
     /**
-     * Get scheduled meeting title
-     *
-     * @return title
-     */
-    fun getSchedTitle(): String? {
-        state.value.scheduledMeeting?.let { schedMeet ->
-            schedMeet.title.takeIf { !it.isNullOrEmpty() }?.let {
-                return it
-            }
-        }
-
-        return null
-    }
-
-    /**
      * Get chat call updates
      */
     private fun getChatCallUpdates() =

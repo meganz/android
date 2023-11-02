@@ -14,6 +14,7 @@ import static mega.privacy.android.app.utils.ChatUtil.converterShortCodes;
 import static mega.privacy.android.app.utils.ChatUtil.getInvalidMetaMessage;
 import static mega.privacy.android.app.utils.ChatUtil.getMaxWidthItem;
 import static mega.privacy.android.app.utils.ChatUtil.getReactionsList;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
 import static mega.privacy.android.app.utils.ChatUtil.getVoiceClipDuration;
 import static mega.privacy.android.app.utils.ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus;
@@ -1478,7 +1479,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if (scheduledMeeting != null) {
                 holderHeaderChat.scheduledMeetingLayout.setVisibility(View.VISIBLE);
                 holderHeaderChat.scheduledMeetingMessage.setText(getAppropriateStringForScheduledMeetingDate(context, viewModel.is24HourFormat(), scheduledMeeting));
-                holderHeaderChat.scheduledMeetingTitle.setText(scheduledMeeting.getTitle());
+                holderHeaderChat.scheduledMeetingTitle.setText(getTitleChat(megaChatApi.getChatRoom(chatRoom.getChatId())));
             } else {
                 holderHeaderChat.scheduledMeetingLayout.setVisibility(View.GONE);
             }

@@ -25,6 +25,7 @@ class UpdateScheduledMeetingUseCase @Inject constructor(
      * @param cancelled True if scheduled meeting is going to be cancelled
      * @param flags Scheduled meeting flags to establish scheduled meetings flags like avoid email sending (Check MegaChatScheduledFlags class)
      * @param rules Repetition rules for creating a recurrent meeting (Check MegaChatScheduledRules class)
+     * @param updateChatTitle if true chatroom title will be updated along with scheduled meeting title
      */
     suspend operator fun invoke(
         chatId: Long,
@@ -37,6 +38,7 @@ class UpdateScheduledMeetingUseCase @Inject constructor(
         cancelled: Boolean,
         flags: ChatScheduledFlags?,
         rules: ChatScheduledRules?,
+        updateChatTitle: Boolean,
     ): ChatRequest =
         callRepository.updateScheduledMeeting(
             chatId,
@@ -48,6 +50,7 @@ class UpdateScheduledMeetingUseCase @Inject constructor(
             description,
             cancelled,
             flags,
-            rules
+            rules,
+            updateChatTitle
         )
 }

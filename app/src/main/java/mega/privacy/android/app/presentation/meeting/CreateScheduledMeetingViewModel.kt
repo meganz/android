@@ -726,7 +726,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                                     description = state.descriptionText,
                                     cancelled = false,
                                     flags = flags,
-                                    rules = state.rulesSelected
+                                    rules = state.rulesSelected,
+                                    updateChatTitle = true
                                 )
                         }
                     }

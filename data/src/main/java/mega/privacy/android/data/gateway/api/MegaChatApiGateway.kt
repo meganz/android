@@ -127,7 +127,7 @@ interface MegaChatApiGateway {
     )
 
     /**
-     * Creates a groupal chat for one or more participants, allowing you to specify their
+     * Creates a group chat for one or more participants, allowing you to specify their
      * permissions and creation chat options
      *
      * @param title Null-terminated character string with the chat title. If the title
@@ -863,6 +863,7 @@ interface MegaChatApiGateway {
      * @param cancelled True if scheduled meeting is going to be cancelled
      * @param flags Scheduled meeting flags to establish scheduled meetings flags like avoid email sending (Check MegaChatScheduledFlags class)
      * @param rules Repetition rules for creating a recurrent meeting (Check MegaChatScheduledRules class)
+     * @param updateChatTitle if true chatroom title will be updated along with scheduled meeting title
      */
     fun updateScheduledMeeting(
         chatId: Long,
@@ -875,6 +876,7 @@ interface MegaChatApiGateway {
         cancelled: Boolean,
         flags: MegaChatScheduledFlags?,
         rules: MegaChatScheduledRules?,
+        updateChatTitle: Boolean,
         listener: MegaChatRequestListenerInterface,
     )
 
