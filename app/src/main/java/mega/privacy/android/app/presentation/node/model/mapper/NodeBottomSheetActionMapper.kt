@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.node.model.mapper
 
-import androidx.compose.runtime.Composable
-import mega.privacy.android.app.presentation.node.model.bottomsheetmenuitems.NodeBottomSheetMenuItem
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.app.presentation.node.view.BottomSheetMenuItem
+import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
 
 /**
@@ -22,15 +22,22 @@ class NodeBottomSheetActionMapper @Inject constructor() {
     operator fun invoke(
         toolbarOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<*>>,
         selectedNode: TypedNode,
-    ): List<@Composable ((MenuAction) -> Unit) -> Unit> {
-        val displayableItems = toolbarOptions
-            .filter { it.shouldDisplay() }
-            .sortedBy { it.menuAction.orderInCategory }
-        return displayableItems.mapIndexed { index, item ->
-            val nextGroupId = displayableItems.getOrNull(index + 1)?.groupId
-            val showDivider = nextGroupId != null
-                    && item.groupId != nextGroupId
-            item.menuAction(selectedNode, showDivider)
-        }
+        isNodeInRubbish: Boolean,
+        accessPermission: AccessPermission?,
+        isInBackUps: Boolean,
+    ) = toolbarOptions.filter {
+        it.shouldDisplay(
+            isNodeInRubbish = isNodeInRubbish,
+            accessPermission = accessPermission,
+            isInBackups = isInBackUps,
+            node = selectedNode
+        )
+    }.map {
+        BottomSheetMenuItem(
+            group = it.groupId,
+            orderInGroup = it.menuAction.orderInCategory,
+            control = it.buildComposeControl(selectedNode)
+        )
     }
+
 }
