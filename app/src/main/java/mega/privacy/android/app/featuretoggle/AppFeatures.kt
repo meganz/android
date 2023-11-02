@@ -199,7 +199,15 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new chat activity
      */
-    NewChatActivity("Enable new chat activity", false)
+    NewChatActivity("Enable new chat activity", false),
+
+    /**
+     * Enable new design Variant A for ChooseAccount screen
+     */
+    ChooseAccountScreenVariantA(
+        "Enable new design (Variant A) for ChooseAccount screen (Onboarding Upselling dialog)",
+        false
+    )
     ;
 
     companion object : FeatureFlagValueProvider {

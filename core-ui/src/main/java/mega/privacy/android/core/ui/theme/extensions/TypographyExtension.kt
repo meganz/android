@@ -48,3 +48,9 @@ val Typography.body4: TextStyle
  */
 val Typography.badge: TextStyle
     get() = body2.copy(fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 10.sp)
+
+/**
+ * H6 medium weight
+ */
+val Typography.h6Medium: TextStyle
+    get() = h6.copy(fontWeight = FontWeight(500))

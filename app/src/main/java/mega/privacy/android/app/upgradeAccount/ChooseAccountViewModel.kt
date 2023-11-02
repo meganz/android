@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.domain.entity.billing.Pricing
@@ -14,6 +15,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,6 +26,7 @@ internal class ChooseAccountViewModel @Inject constructor(
     private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getCheapestSubscriptionUseCase: GetCheapestSubscriptionUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChooseAccountState())
@@ -57,7 +60,22 @@ internal class ChooseAccountViewModel @Inject constructor(
                     Timber.e(it)
                     null
                 }
-            _state.update { it.copy(cheapestSubscriptionAvailable = cheapestSubscriptionAvailable) }
+            _state.update {
+                it.copy(
+                    cheapestSubscriptionAvailable = cheapestSubscriptionAvailable?.let { cheapestSubscriptionAvailable ->
+                        localisedSubscriptionMapper(
+                            cheapestSubscriptionAvailable,
+                            cheapestSubscriptionAvailable
+                        )
+                    }
+                )
+            }
+        }
+        viewModelScope.launch {
+            val getFeatureFlag = getFeatureFlagValueUseCase(AppFeatures.ChooseAccountScreenVariantA)
+            _state.update {
+                it.copy(enableVariantAUI = getFeatureFlag)
+            }
         }
         refreshPricing()
     }

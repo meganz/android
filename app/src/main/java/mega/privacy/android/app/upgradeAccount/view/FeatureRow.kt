@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -19,8 +20,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.fade
+import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 
@@ -33,6 +38,7 @@ fun FeatureRow(
     title: String,
     description: String,
     testTag: String,
+    isLoading: Boolean = false,
 ) {
     Row(
         modifier = Modifier
@@ -45,20 +51,41 @@ fun FeatureRow(
             painter = drawableID,
             contentDescription = "",
             tint = MaterialTheme.colors.textColorPrimary,
-            modifier = Modifier.testTag("$testTag:icon")
+            modifier = Modifier
+                .testTag("$testTag:icon")
+                .placeholder(
+                    color = MaterialTheme.colors.grey_020_grey_900,
+                    shape = RoundedCornerShape(4.dp),
+                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
+                    visible = isLoading,
+                )
         )
         Column(modifier = Modifier.padding(start = 16.dp)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.subtitle2medium,
                 color = MaterialTheme.colors.textColorPrimary,
-                modifier = Modifier.testTag("$testTag:title")
+                modifier = Modifier
+                    .testTag("$testTag:title")
+                    .placeholder(
+                        color = MaterialTheme.colors.grey_020_grey_900,
+                        shape = RoundedCornerShape(4.dp),
+                        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
+                        visible = isLoading,
+                    )
             )
             Text(
                 text = description,
                 style = MaterialTheme.typography.subtitle2,
                 color = MaterialTheme.colors.textColorPrimary,
-                modifier = Modifier.testTag("$testTag:description")
+                modifier = Modifier
+                    .testTag("$testTag:description")
+                    .placeholder(
+                        color = MaterialTheme.colors.grey_020_grey_900,
+                        shape = RoundedCornerShape(4.dp),
+                        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
+                        visible = isLoading,
+                    )
             )
         }
     }

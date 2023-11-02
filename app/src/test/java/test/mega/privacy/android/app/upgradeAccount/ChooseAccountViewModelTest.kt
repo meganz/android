@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -56,6 +57,8 @@ class ChooseAccountViewModelTest {
         )
     private val getCheapestSubscriptionUseCase =
         mock<GetCheapestSubscriptionUseCase>()
+    private val getFeatureFlagValueUseCase =
+        mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(true) }
 
     @BeforeAll
     fun initialise() {
@@ -71,6 +74,8 @@ class ChooseAccountViewModelTest {
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
             getCheapestSubscriptionUseCase,
+            getPricing,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -81,6 +86,7 @@ class ChooseAccountViewModelTest {
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getCheapestSubscriptionUseCase = getCheapestSubscriptionUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -113,12 +119,39 @@ class ChooseAccountViewModelTest {
 
     @Test
     fun `test that initial state has cheapest Pro plan`() = runTest {
+        val expectedResult = LocalisedSubscription(
+            accountType = AccountType.PRO_LITE,
+            storage = PRO_LITE_STORAGE,
+            monthlyTransfer = PRO_LITE_TRANSFER_MONTHLY,
+            yearlyTransfer = PRO_LITE_TRANSFER_MONTHLY,
+            monthlyAmount = CurrencyAmount(PRO_LITE_PRICE_MONTHLY, Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                PRO_LITE_PRICE_MONTHLY,
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
         whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
         whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
         initViewModel()
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
-            assertThat(awaitItem()).isEqualTo(subscriptionProLiteMonthly)
+            assertThat(awaitItem()).isEqualTo(expectedResult)
+        }
+    }
+
+    @Test
+    fun `test that initial state has a feature flag set properly if it's enabled`() = runTest {
+        whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
+        whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+        whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+        initViewModel()
+
+        underTest.state.map { it.enableVariantAUI }.test {
+            assertThat(awaitItem()).isEqualTo(true)
         }
     }
 
