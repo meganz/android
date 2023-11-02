@@ -34,7 +34,7 @@ class ScaffoldWithCollapsibleHeaderTest {
     ) {
         composeTestRule.setContent {
             ScaffoldWithCollapsibleHeader(
-                headerBelowAppBar = if (!hasHeaderBelowAppbar) null else {
+                headerIncludingSystemBar = if (!hasHeaderBelowAppbar) null else {
                     @Composable {
                         Text(
                             "headerBelowAppBar",
@@ -51,7 +51,7 @@ class ScaffoldWithCollapsibleHeaderTest {
                         modifier = Modifier.testTag(TOOLBAR_APP_TAG),
                     )
                 },
-                headerAboveAppBar = @Composable {
+                header = @Composable {
                     Text(
                         "headerAboveAppBar",
                         modifier = Modifier

@@ -5,18 +5,15 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
@@ -54,8 +51,7 @@ fun CollapsibleHeaderWithTitle(
     val (titlePlaceholder, titleVisible) = createRefs()
 
     content()
-    val statusBarHeight = WindowInsets.Companion.statusBars.getTop(LocalDensity.current).dp
-    val appBarBottomGuideline = createGuidelineFromTop(statusBarHeight + APP_BAR_HEIGHT.dp)
+    val appBarBottomGuideline = createGuidelineFromTop(APP_BAR_HEIGHT.dp)
     val titleDisplacement = LocalCollapsibleHeaderTitleTransition.current.offset
     //this is just a none visible text with 1 line to place the next text with first line in the center of the virtual toolbar (appBarBottomGuideline)
     MegaAppBarTitle(
@@ -65,9 +61,8 @@ fun CollapsibleHeaderWithTitle(
             .constrainAs(titlePlaceholder) {
                 start.linkTo(parent.start, if (appBarType == AppBarType.NONE) 16.dp else 72.dp)
                 end.linkTo(parent.end, 8.dp)
-                top.linkTo(parent.top, statusBarHeight)
+                top.linkTo(parent.top)
                 bottom.linkTo(appBarBottomGuideline)
-                baseline
                 height = Dimension.wrapContent
                 width = Dimension.fillToConstraints
             }
@@ -109,11 +104,10 @@ fun CollapsibleHeaderWithTitle(
         .fillMaxWidth()
 ) {
     content()
-    val statusBarHeight = WindowInsets.Companion.statusBars.getTop(LocalDensity.current).dp
     val titleDisplacement = LocalCollapsibleHeaderTitleTransition.current.offset
     Box(
         modifier = Modifier
-            .padding(top = statusBarHeight + titleDisplacement)
+            .padding(top = titleDisplacement)
             .height(APP_BAR_HEIGHT.dp),
         contentAlignment = Alignment.CenterStart,
     ) {
