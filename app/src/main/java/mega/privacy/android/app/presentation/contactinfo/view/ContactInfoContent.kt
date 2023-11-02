@@ -19,7 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012

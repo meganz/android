@@ -19,7 +19,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,7 +46,7 @@ class BottomSheetTest {
                 sheetBody = {
                     LazyColumn {
                         items(100) {
-                            MenuActionListTile(text = "title $it")
+                            Text(text = "title $it")
                         }
                     }
                 },
@@ -87,7 +86,7 @@ class BottomSheetTest {
                 sheetBody = {
                     LazyColumn {
                         items(100) {
-                            MenuActionListTile(text = "title $it")
+                            Text(text = "title $it")
                         }
                     }
                 },

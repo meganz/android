@@ -5,16 +5,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
@@ -36,12 +42,9 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
-import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 
 /**
  * BottomSheet
@@ -149,15 +152,23 @@ private fun BottomSheetPreview() {
         BottomSheet(
             modalSheetState = modalSheetState,
             sheetHeader = {
-                MenuActionHeader(text = "Header")
+                Text(text = "Header")
             },
             sheetBody = {
                 LazyColumn {
                     items(100) {
-                        MenuActionListTile(
-                            text = "title $it",
-                            icon = painterResource(id = R.drawable.ic_folder_list)
-                        )
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            Icon(
+                                modifier = Modifier
+                                    .padding(end = 32.dp)
+                                    .size(size = 24.dp),
+                                painter = painterResource(id = R.drawable.ic_folder_list),
+                                contentDescription = null,
+                            )
+                            Text(
+                                text = "title $it",
+                            )
+                        }
                     }
                 }
             }) {
