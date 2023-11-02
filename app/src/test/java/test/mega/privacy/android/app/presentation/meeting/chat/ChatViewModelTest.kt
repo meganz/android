@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -40,7 +41,6 @@ import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUs
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
-import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -83,7 +83,9 @@ internal class ChatViewModelTest {
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase = mock {
         onBlocking { invoke(any()) } doReturn emptyFlow()
     }
-    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
+    private val monitorParticipatingInACallUseCase: MonitorParticipatingInACallUseCase = mock {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
     private val monitorACallInThisChatUseCase: MonitorACallInThisChatUseCase = mock {
         onBlocking { invoke(any()) } doReturn emptyFlow()
     }
@@ -136,7 +138,6 @@ internal class ChatViewModelTest {
             savedStateHandle,
             isChatNotificationMuteUseCase,
             getUserOnlineStatusByHandleUseCase,
-            isParticipatingInChatCallUseCase,
             isChatStatusConnectedForCallUseCase,
             requestUserLastGreenUseCase,
             getMyUserHandleUseCase,
@@ -161,6 +162,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorUserLastGreenUpdatesUseCase(userHandle) } doReturn emptyFlow()
         wheneverBlocking { monitorHasAnyContactUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorACallInThisChatUseCase(any()) } doReturn emptyFlow()
+        wheneverBlocking { monitorParticipatingInACallUseCase() } doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -171,7 +173,7 @@ internal class ChatViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             monitorUserChatStatusByHandleUseCase = monitorUserChatStatusByHandleUseCase,
-            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
+            monitorParticipatingInACallUseCase = monitorParticipatingInACallUseCase,
             monitorACallInThisChatUseCase = monitorACallInThisChatUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
@@ -423,9 +425,10 @@ internal class ChatViewModelTest {
     fun `test that is participating in a call has correct state if use case`(
         isParticipatingInChatCall: Boolean,
     ) = runTest {
-        whenever(isParticipatingInChatCallUseCase()).thenReturn(isParticipatingInChatCall)
+        val flow = MutableSharedFlow<Boolean>()
+        whenever(monitorParticipatingInACallUseCase()).thenReturn(flow)
         initTestClass()
-        testScheduler.advanceUntilIdle()
+        flow.emit(isParticipatingInChatCall)
         underTest.state.test {
             assertThat(awaitItem().isParticipatingInACall).isEqualTo(isParticipatingInChatCall)
         }

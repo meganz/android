@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -35,7 +36,6 @@ import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUs
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
-import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
@@ -63,7 +63,7 @@ class ChatViewModel @Inject constructor(
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase,
-    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
+    private val monitorParticipatingInACallUseCase: MonitorParticipatingInACallUseCase,
     private val monitorACallInThisChatUseCase: MonitorACallInThisChatUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
@@ -92,7 +92,7 @@ class ChatViewModel @Inject constructor(
                 && ownPrivilege != ChatRoomPermission.Removed
 
     init {
-        checkIfIsParticipatingInACall()
+        monitorParticipatingInACall()
         monitorStorageStateEvent()
         monitorHasAnyContact()
         chatId?.let {
@@ -101,7 +101,7 @@ class ChatViewModel @Inject constructor(
             getNotificationMute(it)
             getChatConnectionState(it)
             getScheduledMeeting(it)
-            checkIfIsParticipatingInACallInThisChat(it)
+            monitorACallInThisChat(it)
             monitorChatRoom(it)
             monitorNotificationMute(it)
             monitorChatConnectionState(it)
@@ -382,16 +382,17 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun checkIfIsParticipatingInACall() {
+    private fun monitorParticipatingInACall() {
         viewModelScope.launch {
-            runCatching { isParticipatingInChatCallUseCase() }
-                .onSuccess {
+            monitorParticipatingInACallUseCase()
+                .catch { Timber.e(it) }
+                .collect {
                     _state.update { state -> state.copy(isParticipatingInACall = it) }
-                }.onFailure { Timber.e(it) }
+                }
         }
     }
 
-    private fun checkIfIsParticipatingInACallInThisChat(chatId: Long) {
+    private fun monitorACallInThisChat(chatId: Long) {
         viewModelScope.launch {
             monitorACallInThisChatUseCase(chatId)
                 .catch { Timber.e(it) }
