@@ -258,4 +258,14 @@ interface FileSystemRepository {
      * Delete folder is its files
      */
     suspend fun deleteFolderAndItsFiles(path: String)
+
+    /**
+     * Get offline folder
+     */
+    suspend fun getOfflineFolder(): File
+
+    /**
+     * Get dir size
+     */
+    suspend fun getDirSize(dir: File?): Long
 }

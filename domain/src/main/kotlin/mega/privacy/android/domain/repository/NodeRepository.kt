@@ -576,4 +576,9 @@ interface NodeRepository {
      * Update Node to favorite
      */
     suspend fun updateFavoriteNode(nodeId: NodeId, isFavorite: Boolean)
+
+    /**
+     * Clear offline
+     */
+    suspend fun clearOffline()
 }

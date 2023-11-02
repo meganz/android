@@ -18,6 +18,8 @@ import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.offline.ClearOfflineUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFolderSizeUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import timber.log.Timber
 import javax.inject.Inject
@@ -35,6 +37,8 @@ class FilePreferencesViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val clearCacheUseCase: ClearCacheUseCase,
     private val getCacheSizeUseCase: GetCacheSizeUseCase,
+    private val getOfflineFolderSizeUseCase: GetOfflineFolderSizeUseCase,
+    private val clearOfflineUseCase: ClearOfflineUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(FilePreferencesState())
 
@@ -127,9 +131,36 @@ class FilePreferencesViewModel @Inject constructor(
     }
 
     /**
+     * Clear offline
+     */
+    fun clearOffline() {
+        viewModelScope.launch {
+            clearOfflineUseCase()
+            getOfflineFolderSize()
+        }
+    }
+
+    /**
+     * Get offline size
+     */
+    fun getOfflineFolderSize() {
+        viewModelScope.launch {
+            val size = getOfflineFolderSizeUseCase()
+            _state.update { it.copy(updateOfflineSize = size) }
+        }
+    }
+
+    /**
      * Reset updateCacheSizeSetting
      */
     fun resetUpdateCacheSizeSetting() {
         _state.update { it.copy(updateCacheSizeSetting = null) }
+    }
+
+    /**
+     * Reset updateCacheSizeSetting
+     */
+    fun resetUpdateOfflineSize() {
+        _state.update { it.copy(updateOfflineSize = null) }
     }
 }

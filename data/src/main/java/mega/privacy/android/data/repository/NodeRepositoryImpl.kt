@@ -783,6 +783,9 @@ internal class NodeRepositoryImpl @Inject constructor(
             )
         }
 
+    override suspend fun clearOffline() =
+        withContext(ioDispatcher) { megaLocalRoomGateway.clearOffline() }
+
     private suspend fun getAllOfflineNodeHandle() =
         megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
 

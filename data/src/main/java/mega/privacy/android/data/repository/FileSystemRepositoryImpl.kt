@@ -351,4 +351,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         val file = File(path)
         fileGateway.deleteFolderAndSubFolders(file)
     }
+
+    override suspend fun getOfflineFolder(): File =
+        withContext(ioDispatcher) { fileGateway.getOfflineFolder() }
+
+    override suspend fun getDirSize(dir: File?): Long =
+        withContext(ioDispatcher) { fileGateway.getDirSize(dir) }
 }

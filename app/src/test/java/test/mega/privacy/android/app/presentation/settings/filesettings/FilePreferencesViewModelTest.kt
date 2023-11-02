@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.settings.filesettings
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +21,8 @@ import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.offline.ClearOfflineUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFolderSizeUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import org.junit.After
 import org.junit.Before
@@ -47,6 +50,8 @@ internal class FilePreferencesViewModelTest {
     private val enableFileVersionsOption: EnableFileVersionsOption = mock()
     private val clearCacheUseCase: ClearCacheUseCase = mock()
     private val getCacheSizeUseCase: GetCacheSizeUseCase = mock()
+    private val getOfflineFolderSizeUseCase: GetOfflineFolderSizeUseCase = mock()
+    private val clearOfflineUseCase: ClearOfflineUseCase = mock()
 
     @Before
     fun setUp() {
@@ -68,7 +73,9 @@ internal class FilePreferencesViewModelTest {
             enableFileVersionsOption,
             isConnectedToInternetUseCase,
             clearCacheUseCase,
-            getCacheSizeUseCase
+            getCacheSizeUseCase,
+            getOfflineFolderSizeUseCase,
+            clearOfflineUseCase
         )
     }
 
@@ -151,4 +158,31 @@ internal class FilePreferencesViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that updateOfflineSize is not null value when getOfflineFolderSize is invoked`() =
+        runTest {
+            val size = 1234L
+            whenever(getOfflineFolderSizeUseCase()).thenReturn(size)
+            underTest.getOfflineFolderSize()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                val result = awaitItem()
+                assertThat(result.updateOfflineSize).isEqualTo(size)
+            }
+        }
+
+    @Test
+    fun `test that updateOfflineSize is null value when resetUpdateOfflineSize is invoked`() =
+        runTest {
+            val size = 1234L
+            whenever(getOfflineFolderSizeUseCase()).thenReturn(size)
+            underTest.getOfflineFolderSize()
+            testScheduler.advanceUntilIdle()
+            underTest.resetUpdateOfflineSize()
+            underTest.state.test {
+                val result = awaitItem()
+                assertThat(result.updateOfflineSize).isNull()
+            }
+        }
 }

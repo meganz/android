@@ -231,4 +231,9 @@ interface FileGateway {
      * Get uri of the given file
      */
     suspend fun getUriForFile(file: File, authority: String): Uri
+
+    /**
+     * Get offline folder
+     */
+    suspend fun getOfflineFolder(): File
 }

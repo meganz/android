@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUTO_PLAY_SWITCH
@@ -30,11 +31,11 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_OFFLINE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RUBBISH
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.main.tasks.ManageOfflineTask
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaAccountDetails
 import timber.log.Timber
 import javax.inject.Inject
@@ -52,7 +53,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
 
-    private val viewModel by viewModels<FilePreferencesViewModel>()
+    private val viewModel by activityViewModels<FilePreferencesViewModel>()
 
     private var offlineFileManagement: Preference? = null
     private var rubbishFileManagement: Preference? = null
@@ -168,6 +169,16 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             }
             viewModel.resetUpdateCacheSizeSetting()
         }
+
+        filePreferencesState.updateOfflineSize?.let { size ->
+            val offlineSize = Util.getSizeString(size, requireContext())
+            Intent(BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING).apply {
+                putExtra(BroadcastConstants.OFFLINE_SIZE, offlineSize)
+                setPackage(requireContext().packageName)
+                requireContext().sendBroadcast(this)
+            }
+            viewModel.resetUpdateOfflineSize()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -279,8 +290,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
      * @return offline size
      */
     fun taskGetSizeOffline() {
-        val getOfflineSizeTask = ManageOfflineTask(false)
-        getOfflineSizeTask.execute()
+        viewModel.getOfflineFolderSize()
     }
 
     /**

@@ -307,6 +307,9 @@ class FileFacade @Inject constructor(
             FileProvider.getUriForFile(context, authority, file)
         }
 
+    override suspend fun getOfflineFolder() =
+        createDirectory(context.filesDir.toString() + File.separator + OFFLINE_DIR)
+
 
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.util.TypedValue
@@ -19,8 +18,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -38,8 +37,8 @@ import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManageme
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.main.tasks.ManageOfflineTask
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -51,6 +50,8 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class FileManagementPreferencesActivity : PreferencesBaseActivity() {
+
+    private val viewModel: FilePreferencesViewModel by viewModels()
     private var sttFileManagement: SettingsFileManagementFragment? = null
     private var clearOfflineDialog: AlertDialog? = null
     private var clearRubbishBinDialog: AlertDialog? = null
@@ -177,13 +178,11 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
      */
     fun showClearOfflineDialog() {
         clearOfflineDialog = MaterialAlertDialogBuilder(this)
-            .setMessage(getFormattedStringOrDefault(R.string.clear_offline_confirmation))
-            .setPositiveButton(
-                getFormattedStringOrDefault(R.string.general_clear)
-            ) { _: DialogInterface?, _: Int ->
-                ManageOfflineTask(true).execute()
+            .setMessage(getString(R.string.clear_offline_confirmation))
+            .setPositiveButton(getString(R.string.general_clear)) { _, _ ->
+                viewModel.clearOffline()
             }
-            .setNegativeButton(getFormattedStringOrDefault(R.string.general_dismiss), null)
+            .setNegativeButton(getString(R.string.general_dismiss), null)
             .create()
         clearOfflineDialog?.show()
     }
