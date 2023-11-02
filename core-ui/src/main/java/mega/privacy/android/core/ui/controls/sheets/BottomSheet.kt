@@ -177,7 +177,8 @@ private fun BottomSheetPreview() {
                     }) {
                         Text(
                             text = "Show modal sheet",
-                            style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorPrimary),
+                            style = MaterialTheme.typography.body2,
+                            color = MegaTheme.colors.text.primary
                         )
                     }
                 }

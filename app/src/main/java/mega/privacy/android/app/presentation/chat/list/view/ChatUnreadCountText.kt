@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.text
+package mega.privacy.android.app.presentation.chat.list.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
