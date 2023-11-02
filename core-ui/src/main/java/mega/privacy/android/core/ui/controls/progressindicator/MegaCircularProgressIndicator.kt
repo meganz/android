@@ -2,7 +2,6 @@ package mega.privacy.android.core.ui.controls.progressindicator
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -12,6 +11,7 @@ import androidx.compose.ui.unit.Dp
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.white
 
 /**
@@ -28,7 +28,7 @@ fun MegaCircularProgressIndicator(
     CircularProgressIndicator(
         modifier = modifier,
         color = white.takeIf { useWhiteColor }
-            ?: MaterialTheme.colors.secondary,
+            ?: MegaTheme.colors.icon.accent,
         strokeWidth = strokeWidth,
         strokeCap = strokeCap,
     )

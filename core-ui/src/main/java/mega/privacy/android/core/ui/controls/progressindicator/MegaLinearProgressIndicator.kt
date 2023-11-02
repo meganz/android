@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_200_grey_700
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
  * Wrapper for [LinearProgressIndicator] to set default parameters to better represent the project theme
@@ -30,16 +30,16 @@ fun MegaLinearProgressIndicator(
     LinearProgressIndicator(
         modifier = modifier.fillMaxWidth(),
         progress = progress,
-        color = MaterialTheme.colors.secondary,
+        color = MegaTheme.colors.icon.accent,
         strokeCap = strokeCap,
-        backgroundColor = MaterialTheme.colors.grey_200_grey_700
+        backgroundColor = MegaTheme.colors.background.surface3
     )
 } else {
     LinearProgressIndicator(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colors.secondary,
         strokeCap = strokeCap,
-        backgroundColor = MaterialTheme.colors.grey_200_grey_700
+        backgroundColor = MegaTheme.colors.background.surface3
     )
 }
 
