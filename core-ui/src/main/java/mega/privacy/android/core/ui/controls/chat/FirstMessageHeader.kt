@@ -83,7 +83,7 @@ fun FirstMessageHeaderParagraph(
 
 @CombinedThemePreviews
 @Composable
-fun PreviewFirstMessageHeaderTitle() {
+private fun PreviewFirstMessageHeaderTitle() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeaderTitle(
             modifier = Modifier,
@@ -95,7 +95,7 @@ fun PreviewFirstMessageHeaderTitle() {
 
 @CombinedThemePreviews
 @Composable
-fun PreviewFirstMessageHeaderParagraph() {
+private fun PreviewFirstMessageHeaderParagraph() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeaderParagraph(
             modifier = Modifier,
@@ -106,7 +106,7 @@ fun PreviewFirstMessageHeaderParagraph() {
 
 @CombinedThemePreviews
 @Composable
-fun PreviewFirstMessageHeaderSubtitle() {
+private fun PreviewFirstMessageHeaderSubtitle() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeaderSubtitleWithIcon(
             modifier = Modifier,

@@ -482,6 +482,13 @@ class ChatViewTest {
     }
 
     @Test
+    fun `test that first message header title is shown when chat title is available`() {
+        val expectedTitle = "expected title"
+        initComposeRuleContent(ChatUiState(title = expectedTitle))
+        composeTestRule.onAllNodesWithText(expectedTitle)[1].assertExists()
+    }
+
+    @Test
     fun `test that last green label shows if the chat is 1to1 and the contacts last green is not null`() {
         val lastGreen = initComposeRuleContentWithLastGreen(
             ChatUiState(

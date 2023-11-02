@@ -5,6 +5,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.text.format.DateFormat
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,6 +53,7 @@ import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivit
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.view.getRecurringMeetingDateTime
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
@@ -159,7 +161,7 @@ internal fun ChatView(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            item("first_message_header") { FirstMessageHeader(uiState) }
+            item("first_message_header") { FirstMessageHeader(uiState, context) }
         }
         if (showParticipatingInACallDialog) {
             ParticipatingInACallDialog(
@@ -174,13 +176,21 @@ internal fun ChatView(
 }
 
 @Composable
-private fun FirstMessageHeader(uiState: ChatUiState) {
+private fun FirstMessageHeader(uiState: ChatUiState, context: Context) {
+    val is24HourFormat = remember { DateFormat.is24HourFormat(context) }
     Column(
         modifier = Modifier.padding(start = 72.dp, top = 40.dp, end = 24.dp),
     ) {
-        uiState.title?.let {
+        uiState.title?.let { title ->
+            val subtitle = uiState.scheduledMeeting?.let { scheduledMeeting ->
+                getRecurringMeetingDateTime(
+                    scheduledMeeting = scheduledMeeting,
+                    is24HourFormat = is24HourFormat,
+                ).text
+            }
             FirstMessageHeaderTitle(
-                title = it,
+                title = title,
+                subtitle = subtitle,
                 modifier = Modifier.padding(bottom = 24.dp),
             )
         }
