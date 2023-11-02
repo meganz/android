@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -23,6 +26,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
@@ -56,7 +60,7 @@ import javax.inject.Inject
  * @param savedStateHandle
  */
 @HiltViewModel
-class ChatViewModel @Inject constructor(
+internal class ChatViewModel @Inject constructor(
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase,
     private val getChatRoomUseCase: GetChatRoom,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
@@ -75,6 +79,8 @@ class ChatViewModel @Inject constructor(
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChat,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
+    private val getAnotherCallParticipatingUseCase: GetAnotherCallParticipatingUseCase,
+    private val passcodeManagement: PasscodeManagement,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -420,6 +426,34 @@ class ChatViewModel @Inject constructor(
                     _state.update { state -> state.copy(hasAnyContact = hasAnyContact) }
                 }
         }
+    }
+
+    /**
+     * Get another call participating
+     *
+     */
+    fun getAnotherCallParticipating() {
+        if (chatId == null) return
+        viewModelScope.launch {
+            runCatching {
+                getAnotherCallParticipatingUseCase(chatId)
+            }.onSuccess { anotherCallId ->
+                if (anotherCallId != INVALID_HANDLE) {
+                    passcodeManagement.showPasscodeScreen = true
+                    _state.update { state -> state.copy(openMeetingEvent = triggered(anotherCallId)) }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Consume open meeting event
+     *
+     */
+    fun consumeOpenMeetingEvent() {
+        _state.update { state -> state.copy(openMeetingEvent = consumed()) }
     }
 
     /**

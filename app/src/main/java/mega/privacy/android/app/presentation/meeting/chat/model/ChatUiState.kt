@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -32,6 +34,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property hasAnyContact True if the current logged in user has any contact, false otherwise.
  * @property hasCustomTitle True if it is a group and has custom subtitle, false otherwise.
  * @property participantsCount Number of participants if the chat is a group, null otherwise.
+ * @property openMeetingEvent Event to open a meeting.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -58,4 +61,5 @@ data class ChatUiState(
     val hasAnyContact: Boolean = false,
     val hasCustomTitle: Boolean = false,
     val participantsCount: Long? = null,
+    val openMeetingEvent: StateEventWithContent<Long> = consumed()
 )

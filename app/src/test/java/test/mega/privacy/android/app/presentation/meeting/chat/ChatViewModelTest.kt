@@ -3,6 +3,8 @@ package test.mega.privacy.android.app.presentation.meeting.chat
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,6 +15,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -28,6 +31,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
@@ -66,9 +70,13 @@ import java.util.stream.Stream
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ChatViewModelTest {
+    private val chatId = 123L
+    private val userHandle = 321L
     private lateinit var underTest: ChatViewModel
     private val getChatRoomUseCase: GetChatRoom = mock()
-    private val savedStateHandle: SavedStateHandle = mock()
+    private val savedStateHandle: SavedStateHandle = mock {
+        on { get<Long>(Constants.CHAT_ID) } doReturn chatId
+    }
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase = mock()
     private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase = mock()
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
@@ -116,9 +124,8 @@ internal class ChatViewModelTest {
     private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase> {
         onBlocking { invoke() } doReturn emptyFlow()
     }
-
-    private val chatId = 123L
-    private val userHandle = 321L
+    private val getAnotherCallParticipatingUseCase: GetAnotherCallParticipatingUseCase = mock()
+    private val passcodeManagement: PasscodeManagement = mock()
 
     @BeforeAll
     fun setup() {
@@ -143,7 +150,10 @@ internal class ChatViewModelTest {
             getMyUserHandleUseCase,
             getParticipantFirstNameUseCase,
             getScheduledMeetingByChat,
+            passcodeManagement,
+            getAnotherCallParticipatingUseCase
         )
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorUserChatStatusByHandleUseCase(any()) } doReturn emptyFlow()
@@ -185,6 +195,8 @@ internal class ChatViewModelTest {
             getMyUserHandleUseCase = getMyUserHandleUseCase,
             getScheduledMeetingByChatUseCase = getScheduledMeetingByChat,
             monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
+            getAnotherCallParticipatingUseCase = getAnotherCallParticipatingUseCase,
+            passcodeManagement = passcodeManagement,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -1133,6 +1145,36 @@ internal class ChatViewModelTest {
             assertThat(actual.myPermission).isEqualTo(permission)
             assertThat(actual.isGroup).isEqualTo(group)
             assertThat(actual.participantsCount).isEqualTo(newChatRoom.getNumberParticipants())
+        }
+    }
+
+    @Test
+    fun `test that triggers open meeting event when get another call participant use case returns the chat id`() =
+        runTest {
+            val expectedChatId = 234L
+            whenever(getAnotherCallParticipatingUseCase(chatId)).thenReturn(expectedChatId)
+            underTest.getAnotherCallParticipating()
+            verify(passcodeManagement).showPasscodeScreen = true
+            underTest.state.test {
+                assertThat((awaitItem().openMeetingEvent as StateEventWithContentTriggered).content).isEqualTo(
+                    expectedChatId
+                )
+            }
+        }
+
+    @Test
+    fun `test that consumed meeting event when call consumeOpenMeetingEvent`() = runTest {
+        val expectedChatId = 234L
+        whenever(getAnotherCallParticipatingUseCase(chatId)).thenReturn(expectedChatId)
+        underTest.getAnotherCallParticipating()
+        underTest.state.test {
+            assertThat((awaitItem().openMeetingEvent as StateEventWithContentTriggered).content).isEqualTo(
+                expectedChatId
+            )
+        }
+        underTest.consumeOpenMeetingEvent()
+        underTest.state.test {
+            assertThat(awaitItem().openMeetingEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
         }
     }
 

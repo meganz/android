@@ -39,11 +39,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.extensions.isValid
@@ -72,12 +74,22 @@ import timber.log.Timber
 internal fun ChatView(
     viewModel: ChatViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    EventEffect(
+        event = uiState.openMeetingEvent,
+        onConsumed = viewModel::consumeOpenMeetingEvent,
+    ) { chatId ->
+        startMeetingActivity(context, chatId)
+    }
+
     ChatView(
         uiState = uiState,
         onBackPressed = { onBackPressedDispatcher?.onBackPressed() },
         onMenuActionPressed = viewModel::handleActionPress,
+        getAnotherCallParticipating = viewModel::getAnotherCallParticipating,
     )
 }
 
@@ -93,6 +105,7 @@ internal fun ChatView(
     uiState: ChatUiState,
     onBackPressed: () -> Unit,
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
+    getAnotherCallParticipating: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
@@ -169,6 +182,7 @@ internal fun ChatView(
                 onConfirm = {
                     showParticipatingInACallDialog = false
                     // return to active call
+                    getAnotherCallParticipating()
                 }
             )
         }
@@ -351,6 +365,14 @@ private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
             ""
         }
     }
+}
+
+private fun startMeetingActivity(context: Context, chatId: Long) {
+    context.startActivity(Intent(context, MeetingActivity::class.java).apply {
+        action = MeetingActivity.MEETING_ACTION_IN
+        putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
+        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    })
 }
 
 @Preview
