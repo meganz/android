@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.imagepreview.model
 
 enum class ImagePreviewFetcherSource {
     TIMELINE,
+    ALBUM_CONTENT,
     ALBUM_SHARING,
     MEDIA_DISCOVERY,
     MEDIA_DISCOVERY_FOLDER_LINK,

@@ -118,5 +118,11 @@ interface PhotosRepository {
     /**
      * Monitor timeline nodes
      */
-    fun monitorTimelineNodes(): Flow<List<ImageNode>>
+    fun monitorImageNodes(): Flow<List<ImageNode>>
+
+    /**
+     * Get image node
+     * @param nodeId
+     */
+    suspend fun getImageNode(nodeId: NodeId): ImageNode?
 }

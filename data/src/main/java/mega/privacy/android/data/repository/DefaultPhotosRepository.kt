@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -107,7 +108,9 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     private val photosStateFlow: MutableStateFlow<List<Photo>?> = MutableStateFlow(null)
 
-    private val timelineNodesFlow: MutableStateFlow<List<ImageNode>> = MutableStateFlow(emptyList())
+    private val refreshImageNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(true)
+
+    private val imageNodesCache: MutableMap<NodeId, ImageNode> = mutableMapOf()
 
     private val photosRefreshRules = listOf(
         NodeChanges.New,
@@ -185,7 +188,13 @@ internal class DefaultPhotosRepository @Inject constructor(
                 offline = offline
             )
         }
-        timelineNodesFlow.update { nodes }
+
+        refreshImageNodesFlow.update { false }
+        for (node in nodes) {
+            imageNodesCache[node.id] = node
+        }
+
+        refreshImageNodesFlow.update { true }
     }
 
     override fun monitorPhotos(): Flow<List<Photo>> {
@@ -564,9 +573,11 @@ internal class DefaultPhotosRepository @Inject constructor(
 
         isMonitoringInitiated = false
         photosCache.clear()
+        imageNodesCache.clear()
 
         photosStateFlow.value = null
         refreshPhotosStateFlow.value = true
+        refreshImageNodesFlow.value = true
     }
 
     override suspend fun getChatPhotoByMessageId(
@@ -693,5 +704,9 @@ internal class DefaultPhotosRepository @Inject constructor(
             }
     }
 
-    override fun monitorTimelineNodes(): Flow<List<ImageNode>> = timelineNodesFlow
+    override fun monitorImageNodes(): Flow<List<ImageNode>> = refreshImageNodesFlow
+        .filter { it }
+        .mapLatest { imageNodesCache.values.toList() }
+
+    override suspend fun getImageNode(nodeId: NodeId) = imageNodesCache[nodeId]
 }
