@@ -110,7 +110,7 @@ import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PA
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.core.ui.controls.textfields.MegaTextField
+import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.autofill

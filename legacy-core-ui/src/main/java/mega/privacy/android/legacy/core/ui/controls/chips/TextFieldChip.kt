@@ -40,7 +40,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.model.Keyboard
+import mega.privacy.android.core.ui.model.KeyboardState
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
@@ -76,7 +76,7 @@ fun TextFieldChip(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    if (isKeyboardOpen == Keyboard.Closed) {
+    if (isKeyboardOpen == KeyboardState.Closed) {
         focusManager.clearFocus()
     }
 
@@ -154,8 +154,8 @@ fun TextFieldChip(
  * Control keyboard state
  */
 @Composable
-fun keyboardAsState(): State<Keyboard> {
-    val keyboardState = remember { mutableStateOf(Keyboard.Closed) }
+fun keyboardAsState(): State<KeyboardState> {
+    val keyboardState = remember { mutableStateOf(KeyboardState.Closed) }
     val view = LocalView.current
     DisposableEffect(view) {
         val onGlobalListener = ViewTreeObserver.OnGlobalLayoutListener {
@@ -164,7 +164,7 @@ fun keyboardAsState(): State<Keyboard> {
             val screenHeight = view.rootView.height
             val keypadHeight = screenHeight - rect.bottom
             keyboardState.value =
-                if (keypadHeight > screenHeight * 0.15) Keyboard.Opened else Keyboard.Closed
+                if (keypadHeight > screenHeight * 0.15) KeyboardState.Opened else KeyboardState.Closed
         }
         view.viewTreeObserver.addOnGlobalLayoutListener(onGlobalListener)
 

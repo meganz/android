@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 import java.text.BreakIterator
 
 /**
@@ -233,7 +234,7 @@ private fun PreviewMiddleEllipsisText(
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MiddleEllipsisText(
             text = text,
-            color = MaterialTheme.colors.onPrimary
+            color = MegaTheme.colors.text.primary
         )
     }
 }

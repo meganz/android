@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.textfields.MegaTextField
+import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 @Composable

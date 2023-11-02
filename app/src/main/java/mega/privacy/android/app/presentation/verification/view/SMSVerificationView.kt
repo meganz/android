@@ -53,7 +53,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.core.ui.controls.textfields.MegaTextField
+import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.blue_400_blue_200
