@@ -4,45 +4,65 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultMonitorBackupFolderTest {
     private lateinit var underTest: DefaultMonitorBackupFolder
 
     private val nodeRepository = mock<NodeRepository>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
-
+    private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
+    private val monitorLogoutUseCase = mock<MonitorLogoutUseCase>()
     private val testDispatcher = StandardTestDispatcher()
 
-    @Before
+    @BeforeEach
     fun setUp() {
         underTest = DefaultMonitorBackupFolder(
             nodeRepository = nodeRepository,
             monitorUserUpdates = monitorUserUpdates,
-            dispatcher = testDispatcher
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
+            monitorLogoutUseCase = monitorLogoutUseCase,
+            applicationScope = TestScope(testDispatcher)
         )
         Dispatchers.setMain(testDispatcher)
     }
 
-    @After
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            nodeRepository,
+            monitorUserUpdates,
+            monitorFetchNodesFinishUseCase,
+            monitorLogoutUseCase,
+        )
+    }
+
+    @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -54,6 +74,8 @@ class DefaultMonitorBackupFolderTest {
             onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow())
         }
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+        whenever(monitorLogoutUseCase()).thenReturn(emptyFlow())
 
         underTest().test {
             assertThat(awaitItem()).isEqualTo(expected)
@@ -76,6 +98,8 @@ class DefaultMonitorBackupFolderTest {
                 )
             }
             whenever(monitorUserUpdates()).thenReturn(updates.asFlow())
+            whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+            whenever(monitorLogoutUseCase()).thenReturn(emptyFlow())
             underTest().test {
                 assertThat(awaitItem()).isEqualTo(expected)
                 expectedUpdates.forEach {
@@ -88,6 +112,56 @@ class DefaultMonitorBackupFolderTest {
         }
 
     @Test
+    fun `test that when fetch node finished event is received, the new id is fetched`() =
+        runTest {
+            val events = List(5) { true }
+            val expected = Result.success(NodeId(1L))
+            val expectedUpdates =
+                List(events.size) { index -> Result.success(NodeId(index.toLong())) }
+
+            nodeRepository.stub {
+                onBlocking { getBackupFolderId() }.thenReturn(
+                    expected.getOrThrow(),
+                    *expectedUpdates.map { it.getOrThrow() }.toTypedArray()
+                )
+            }
+            whenever(monitorUserUpdates()).thenReturn(emptyFlow())
+            whenever(monitorFetchNodesFinishUseCase()).thenReturn(events.asFlow())
+            whenever(monitorLogoutUseCase()).thenReturn(emptyFlow())
+            underTest().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                expectedUpdates.forEach {
+                    assertThat(awaitItem()).isEqualTo(it)
+                }
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents() //state flow never completes
+            }
+        }
+
+    @Test
+    fun `test that when logout event is received, a failure of type NodeDoesNotExistsException is sent`() =
+        runTest {
+            val expected = Result.success(NodeId(1L))
+            nodeRepository.stub {
+                onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow())
+            }
+            whenever(monitorUserUpdates()).thenReturn(emptyFlow())
+            whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+            whenever(monitorLogoutUseCase()).thenReturn(flowOf(true))
+
+            underTest().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                with(awaitItem()) {
+                    assertThat(isFailure).isEqualTo(true)
+                    assertThat(exceptionOrNull()).isInstanceOf(NodeDoesNotExistsException::class.java)
+                }
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+
+    @Test
     fun `test that if non backup folder user updates are emitted, no new id is fetched`() =
         runTest {
             val updates = UserChanges.values().filterNot { it == UserChanges.MyBackupsFolder }
@@ -97,6 +171,8 @@ class DefaultMonitorBackupFolderTest {
                 onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow(), notExpected)
             }
             whenever(monitorUserUpdates()).thenReturn(updates.asFlow())
+            whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+            whenever(monitorLogoutUseCase()).thenReturn(emptyFlow())
 
             underTest().test {
                 assertThat(awaitItem()).isEqualTo(expected)
@@ -114,6 +190,8 @@ class DefaultMonitorBackupFolderTest {
             }
         }
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+        whenever(monitorLogoutUseCase()).thenReturn(emptyFlow())
         underTest().test {
             assertThat(awaitItem().isFailure).isTrue()
             cancelAndConsumeRemainingEvents()
@@ -135,17 +213,25 @@ class DefaultMonitorBackupFolderTest {
             )
         }
         whenever(monitorUserUpdates()).thenReturn(updates.asFlow())
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+        whenever(monitorLogoutUseCase()).thenReturn(emptyFlow())
 
-        launch {
-            underTest().take(expectedUpdates.size + 1).collect()
-        }.invokeOnCompletion {
-            launch {
-                underTest().test {
-                    assertThat(awaitItem()).isEqualTo(expectedUpdates.last())
-                    cancelAndIgnoreRemainingEvents()
-                }
+        // Simulate a previous subscriber that will initialize the flow
+        val job = launch {
+            underTest().collect {
+                if (it == expectedUpdates.last())
+                    coroutineContext.cancel()
             }
         }
+        job.join()
+
+        assertThat(underTest().replayCache.size).isEqualTo(1)
+        underTest().test {
+            assertThat(awaitItem()).isEqualTo(expectedUpdates.last())
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+
     }
 
 }
