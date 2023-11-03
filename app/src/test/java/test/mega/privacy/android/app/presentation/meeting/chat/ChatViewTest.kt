@@ -319,6 +319,7 @@ class ChatViewTest {
     fun `test that archive label shown when chat is archived`() {
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isArchived = true
             )
         )
@@ -330,6 +331,7 @@ class ChatViewTest {
     fun `test that archive label doesn't show when chat is not archived`() {
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isArchived = false
             )
         )
@@ -341,6 +343,7 @@ class ChatViewTest {
     fun `test that read only label shown when in a chat I have read only permission`() {
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 myPermission = ChatRoomPermission.ReadOnly
             )
         )
@@ -350,7 +353,11 @@ class ChatViewTest {
 
     @Test
     fun `test that ready only label does not show in a chat I do not have read only permission`() {
-        initComposeRuleContent(ChatUiState())
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+            )
+        )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.observer_permission_label_participants_panel))
             .assertDoesNotExist()
     }
@@ -359,6 +366,7 @@ class ChatViewTest {
     fun `test that inactive label shown when in a chat I have read only permission`() {
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 myPermission = ChatRoomPermission.Removed
             )
         )
@@ -368,7 +376,11 @@ class ChatViewTest {
 
     @Test
     fun `test that inactive label does not show in a chat I do not have read only permission`() {
-        initComposeRuleContent(ChatUiState())
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+            )
+        )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.inactive_chat))
             .assertDoesNotExist()
     }
@@ -442,14 +454,26 @@ class ChatViewTest {
 
     @Test
     fun `test that away label shows if the chat is 1to1 and the contacts status is away`() {
-        initComposeRuleContent(ChatUiState(isGroup = false, userChatStatus = UserChatStatus.Away))
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = false,
+                userChatStatus = UserChatStatus.Away
+            )
+        )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.away_status))
             .assertIsDisplayed()
     }
 
     @Test
     fun `test that busy label shows if the chat is 1to1 and the contacts status is busy`() {
-        initComposeRuleContent(ChatUiState(isGroup = false, userChatStatus = UserChatStatus.Busy))
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = false,
+                userChatStatus = UserChatStatus.Busy
+            )
+        )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.busy_status))
             .assertIsDisplayed()
     }
@@ -458,6 +482,7 @@ class ChatViewTest {
     fun `test that offline label shows if the chat is 1to1 and the contacts status is offline`() {
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = false,
                 userChatStatus = UserChatStatus.Offline
             )
@@ -492,6 +517,7 @@ class ChatViewTest {
     fun `test that last green label shows if the chat is 1to1 and the contacts last green is not null`() {
         val lastGreen = initComposeRuleContentWithLastGreen(
             ChatUiState(
+                isConnected = true,
                 isGroup = false,
                 userLastGreen = 123456
             )
@@ -504,6 +530,7 @@ class ChatViewTest {
         val count = 5
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 customSubtitleList = null,
                 participantsCount = count.toLong()
@@ -518,6 +545,7 @@ class ChatViewTest {
         val count = 5
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isPreviewMode = true,
                 participantsCount = count.toLong()
             )
@@ -530,6 +558,7 @@ class ChatViewTest {
     fun `test that custom subtitle shows if the chat is a group, has custom subtitle and has only me as participant`() {
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 customSubtitleList = emptyList(),
             )
@@ -541,6 +570,7 @@ class ChatViewTest {
     fun `test that custom subtitle shows if the chat is a group, has custom subtitle, is preview and does not have participants`() {
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 isPreviewMode = true,
                 customSubtitleList = emptyList(),
@@ -555,6 +585,7 @@ class ChatViewTest {
         val userA = "A"
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 customSubtitleList = listOf(userA),
             )
@@ -568,6 +599,7 @@ class ChatViewTest {
         val userA = "A"
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 isPreviewMode = true,
                 customSubtitleList = listOf(userA),
@@ -582,6 +614,7 @@ class ChatViewTest {
         val userB = "B"
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 customSubtitleList = listOf(userA, userB),
             )
@@ -596,6 +629,7 @@ class ChatViewTest {
         val userB = "B"
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 isPreviewMode = true,
                 customSubtitleList = listOf(userA, userB),
@@ -611,6 +645,7 @@ class ChatViewTest {
         val userC = "C"
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 customSubtitleList = listOf(userA, userB, userC),
             )
@@ -626,6 +661,7 @@ class ChatViewTest {
         val userC = "C"
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 isPreviewMode = true,
                 customSubtitleList = listOf(userA, userB, userC),
@@ -642,6 +678,7 @@ class ChatViewTest {
         val more = "3"
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 customSubtitleList = listOf(userA, userB, userC, more),
             )
@@ -662,6 +699,7 @@ class ChatViewTest {
         val more = "2"
         initComposeRuleContent(
             ChatUiState(
+                isConnected = true,
                 isGroup = true,
                 isPreviewMode = true,
                 customSubtitleList = listOf(userA, userB, userC, more),
@@ -673,6 +711,28 @@ class ChatViewTest {
             more.toInt()
         )
         composeTestRule.onNodeWithText(customSubtitle).assertExists()
+    }
+
+    @Test
+    fun `test that Reconnecting to chat label is shown when chat has no connection`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = false
+            )
+        )
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.invalid_connection_state))
+            .assertExists()
+    }
+
+    @Test
+    fun `test that Reconnecting to chat label is not shown when chat has connection`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true
+            )
+        )
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.invalid_connection_state))
+            .assertDoesNotExist()
     }
 
     private fun initComposeRuleContent(state: ChatUiState) {

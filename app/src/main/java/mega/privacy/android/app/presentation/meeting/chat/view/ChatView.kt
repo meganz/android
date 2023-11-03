@@ -333,6 +333,10 @@ private fun checkStorageState(context: Context, storageState: StorageState): Boo
 @Composable
 private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
     when {
+        !isConnected -> {
+            stringResource(id = R.string.invalid_connection_state)
+        }
+
         isArchived -> {
             stringResource(id = R.string.archived_chat)
         }
