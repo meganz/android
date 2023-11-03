@@ -928,12 +928,15 @@ internal class ChatRepositoryImpl @Inject constructor(
         megaChatApiGateway.hasCallInChatRoom(chatId)
     }
 
-    override suspend fun getParticipantFirstName(handle: Long): String? {
+    override suspend fun getParticipantFirstName(handle: Long, contemplateEmail: Boolean): String? {
         return megaLocalRoomGateway.getContactByHandle(handle)?.shortName?.takeIf { it.isNotBlank() }
             ?: databaseHandler.findNonContactByHandle(handle.toString())?.shortName?.takeIf { it.isNotBlank() }
+            ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserLastnameFromCache(handle)?.takeIf { it.isNotBlank() }
-            ?: megaChatApiGateway.getUserEmailFromCache(handle)?.takeIf { it.isNotBlank() }
+            ?: if (contemplateEmail) {
+                megaChatApiGateway.getUserEmailFromCache(handle)?.takeIf { it.isNotBlank() }
+            } else null
     }
 
     override suspend fun getMyUserHandle() = withContext(ioDispatcher) {

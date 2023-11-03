@@ -500,12 +500,12 @@ class ChatViewTest {
     }
 
     @Test
-    fun `test that number of participants shows if the chat is a group and does not have a custom title`() {
+    fun `test that number of participants shows if the chat is a group and does not have a custom subtitle`() {
         val count = 5
         initComposeRuleContent(
             ChatUiState(
                 isGroup = true,
-                hasCustomTitle = false,
+                customSubtitleList = null,
                 participantsCount = count.toLong()
             )
         )
@@ -524,6 +524,155 @@ class ChatViewTest {
         )
         composeTestRule.onNodeWithPlural(R.plurals.subtitle_of_group_chat, count)
             .assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle and has only me as participant`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                customSubtitleList = emptyList(),
+            )
+        )
+        composeTestRule.onNodeWithText(R.string.bucket_word_me).assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle, is preview and does not have participants`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                isPreviewMode = true,
+                customSubtitleList = emptyList(),
+            )
+        )
+        composeTestRule.onNodeWithPlural(R.plurals.subtitle_of_group_chat, 0)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle and has only one participant apart from me`() {
+        val userA = "A"
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                customSubtitleList = listOf(userA),
+            )
+        )
+        val me = composeTestRule.activity.getString(R.string.bucket_word_me)
+        composeTestRule.onNodeWithText("$userA, $me").assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle, is preview and has only one participant`() {
+        val userA = "A"
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                isPreviewMode = true,
+                customSubtitleList = listOf(userA),
+            )
+        )
+        composeTestRule.onNodeWithText(userA).assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle and has two participants apart from me`() {
+        val userA = "A"
+        val userB = "B"
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                customSubtitleList = listOf(userA, userB),
+            )
+        )
+        val me = composeTestRule.activity.getString(R.string.bucket_word_me)
+        composeTestRule.onNodeWithText("$userA, $userB, $me").assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle, is preview and has two participants`() {
+        val userA = "A"
+        val userB = "B"
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                isPreviewMode = true,
+                customSubtitleList = listOf(userA, userB),
+            )
+        )
+        composeTestRule.onNodeWithText("$userA, $userB").assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle and has three participants apart from me`() {
+        val userA = "A"
+        val userB = "B"
+        val userC = "C"
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                customSubtitleList = listOf(userA, userB, userC),
+            )
+        )
+        val me = composeTestRule.activity.getString(R.string.bucket_word_me)
+        composeTestRule.onNodeWithText("$userA, $userB, $userC, $me").assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle, is preview and has three participants`() {
+        val userA = "A"
+        val userB = "B"
+        val userC = "C"
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                isPreviewMode = true,
+                customSubtitleList = listOf(userA, userB, userC),
+            )
+        )
+        composeTestRule.onNodeWithText("$userA, $userB, $userC").assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle and has five participants apart from me`() {
+        val userA = "A"
+        val userB = "B"
+        val userC = "C"
+        val more = "3"
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                customSubtitleList = listOf(userA, userB, userC, more),
+            )
+        )
+        val customSubtitle = composeTestRule.activity.getString(
+            R.string.custom_subtitle_of_group_chat,
+            "$userA, $userB, $userC",
+            more.toInt()
+        )
+        composeTestRule.onNodeWithText(customSubtitle).assertExists()
+    }
+
+    @Test
+    fun `test that custom subtitle shows if the chat is a group, has custom subtitle, is preview and has five participants`() {
+        val userA = "A"
+        val userB = "B"
+        val userC = "C"
+        val more = "2"
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                isPreviewMode = true,
+                customSubtitleList = listOf(userA, userB, userC, more),
+            )
+        )
+        val customSubtitle = composeTestRule.activity.getString(
+            R.string.custom_subtitle_of_group_chat,
+            "$userA, $userB, $userC",
+            more.toInt()
+        )
+        composeTestRule.onNodeWithText(customSubtitle).assertExists()
     }
 
     private fun initComposeRuleContent(state: ChatUiState) {

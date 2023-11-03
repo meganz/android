@@ -353,7 +353,11 @@ private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
             stringResource(id = userChatStatus.text)
         }
 
-        participantsCount != null && (!hasCustomTitle || isPreviewMode) -> {
+        customSubtitleList != null -> {
+            getCustomSubtitle(this)
+        }
+
+        participantsCount != null -> {
             pluralStringResource(
                 id = R.plurals.subtitle_of_group_chat,
                 participantsCount.toInt(),
@@ -365,6 +369,54 @@ private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
             ""
         }
     }
+}
+
+@Composable
+private fun getCustomSubtitle(uiState: ChatUiState): String = with(uiState) {
+    customSubtitleList?.let {
+        val me = stringResource(id = R.string.bucket_word_me)
+        when {
+            customSubtitleList.isEmpty() -> {
+                if (isPreviewMode) {
+                    pluralStringResource(id = R.plurals.subtitle_of_group_chat, 0, 0)
+                } else {
+                    me
+                }
+            }
+
+            customSubtitleList.size == 1 -> {
+                if (isPreviewMode) {
+                    customSubtitleList[0]
+                } else {
+                    "${customSubtitleList[0]}, $me"
+                }
+            }
+
+            customSubtitleList.size == 2 -> {
+                if (isPreviewMode) {
+                    "${customSubtitleList[0]}, ${customSubtitleList[1]}"
+                } else {
+                    "${customSubtitleList[0]}, ${customSubtitleList[1]}, $me"
+                }
+            }
+
+            customSubtitleList.size == 3 -> {
+                if (isPreviewMode) {
+                    "${customSubtitleList[0]}, ${customSubtitleList[1]}, ${customSubtitleList[2]}"
+                } else {
+                    "${customSubtitleList[0]}, ${customSubtitleList[1]}, ${customSubtitleList[2]}, $me"
+                }
+            }
+
+            else -> {
+                stringResource(
+                    id = R.string.custom_subtitle_of_group_chat,
+                    "${customSubtitleList[0]}, ${customSubtitleList[1]}, ${customSubtitleList[2]}",
+                    customSubtitleList[3].toInt()
+                )
+            }
+        }
+    } ?: ""
 }
 
 private fun startMeetingActivity(context: Context, chatId: Long) {

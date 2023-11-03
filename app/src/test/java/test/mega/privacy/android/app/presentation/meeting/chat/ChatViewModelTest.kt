@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
+import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
@@ -129,6 +130,7 @@ internal class ChatViewModelTest {
     }
     private val getAnotherCallParticipatingUseCase: GetAnotherCallParticipatingUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
+    private val getCustomSubtitleListUseCase = mock<GetCustomSubtitleListUseCase>()
 
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase =
         mock {
@@ -159,6 +161,8 @@ internal class ChatViewModelTest {
             getParticipantFirstNameUseCase,
             getScheduledMeetingByChat,
             passcodeManagement,
+            getAnotherCallParticipatingUseCase,
+            getCustomSubtitleListUseCase,
             getAnotherCallParticipatingUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -206,6 +210,7 @@ internal class ChatViewModelTest {
             monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
             getAnotherCallParticipatingUseCase = getAnotherCallParticipatingUseCase,
             passcodeManagement = passcodeManagement,
+            getCustomSubtitleListUseCase = getCustomSubtitleListUseCase,
             savedStateHandle = savedStateHandle,
             monitorAllContactParticipantsInChatUseCase = monitorAllContactParticipantsInChatUseCase,
         )
@@ -1054,47 +1059,93 @@ internal class ChatViewModelTest {
         }
     }
 
-    @ParameterizedTest(name = " is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that has custom title is updated when getting the chat and the property`(
-        custom: Boolean,
-    ) = runTest {
+    @Test
+    fun `test that custom subtitle list is not updated if chat is not a group`() = runTest {
         val chatRoom = mock<ChatRoom> {
-            on { hasCustomTitle } doReturn custom
+            on { isGroup } doReturn false
             on { ownPrivilege } doReturn ChatRoomPermission.Moderator
         }
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         initTestClass()
+        testScheduler.advanceUntilIdle()
         underTest.state.test {
-            assertThat(awaitItem().hasCustomTitle).isEqualTo(custom)
+            assertThat(awaitItem().customSubtitleList).isNull()
+            verifyNoInteractions(getCustomSubtitleListUseCase)
         }
     }
 
-    @ParameterizedTest(name = " and is {0}")
+    @ParameterizedTest(name = " is {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that has custom title is updated when chat room update with title change is received`(
+    fun `test that custom subtitle list is updated when getting the chat and has custom title`(
         custom: Boolean,
     ) = runTest {
+        val userHandles = listOf(1L, 2L, 3L)
+        val customSubtitleList = listOf("A", "B", "C")
         val chatRoom = mock<ChatRoom> {
-            on { hasCustomTitle } doReturn false
+            on { it.chatId } doReturn chatId
+            on { isGroup } doReturn true
+            on { hasCustomTitle } doReturn custom
             on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { peerHandlesList } doReturn userHandles
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(getCustomSubtitleListUseCase(chatId, userHandles, false))
+            .thenReturn(customSubtitleList)
+        initTestClass()
+        testScheduler.advanceUntilIdle()
+        underTest.state.test {
+            if (custom) {
+                assertThat(awaitItem().customSubtitleList).isEqualTo(customSubtitleList)
+            } else {
+                assertThat(awaitItem().customSubtitleList).isNull()
+                verifyNoInteractions(getCustomSubtitleListUseCase)
+            }
+        }
+    }
+
+    @ParameterizedTest(name = " change {0}")
+    @EnumSource(value = ChatRoomChange::class, names = ["Title", "Participants"])
+    fun `test that custom subtitle is updated when chat room is a group and updates with`(
+        change: ChatRoomChange,
+    ) = runTest {
+        val userHandles = listOf(1L, 2L, 3L)
+        val customSubtitleList = listOf("A", "B", "C")
+        val updatedCustomSubtitleList = listOf("X", "B", "C")
+        val chatRoom = mock<ChatRoom> {
+            on { it.chatId } doReturn chatId
+            on { isGroup } doReturn true
+            on { hasCustomTitle } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { peerHandlesList } doReturn userHandles
+            on { isPreview } doReturn false
         }
         val updateFlow = MutableSharedFlow<ChatRoom>()
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+        whenever(getCustomSubtitleListUseCase(chatId, userHandles, false))
+            .thenReturn(customSubtitleList)
+            .thenReturn(updatedCustomSubtitleList)
         initTestClass()
+        testScheduler.advanceUntilIdle()
         underTest.state.test {
-            assertThat(awaitItem().hasCustomTitle).isFalse()
+            assertThat(awaitItem().customSubtitleList).isEqualTo(customSubtitleList)
         }
         val newChatRoom = mock<ChatRoom> {
-            on { hasCustomTitle } doReturn custom
-            on { changes } doReturn listOf(ChatRoomChange.Title)
+            on { it.chatId } doReturn chatId
+            on { isGroup } doReturn true
+            on { hasCustomTitle } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { changes } doReturn listOf(change)
+            on { peerHandlesList } doReturn userHandles
+            on { isPreview } doReturn false
         }
         updateFlow.emit(newChatRoom)
+        testScheduler.advanceUntilIdle()
         underTest.state.test {
-            assertThat(awaitItem().hasCustomTitle).isEqualTo(custom)
+            assertThat(awaitItem().customSubtitleList).isEqualTo(updatedCustomSubtitleList)
         }
     }
 

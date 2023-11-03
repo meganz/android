@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -28,10 +30,22 @@ internal class GetParticipantFirstNameUseCaseTest {
     }
 
     @Test
-    fun `test that calls repository correctly when invoke the use case`() = runTest {
+    fun `test that use case invokes correctly repository with contemplate email as default`() =
+        runTest {
+            val handle = 123L
+
+            underTest(handle)
+            verify(chatRepository).getParticipantFirstName(handle, true)
+        }
+
+    @ParameterizedTest(name = " as {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that use case invokes correctly repository with contemplate email`(
+        contemplateEmail: Boolean,
+    ) = runTest {
         val handle = 123L
 
-        underTest(handle)
-        verify(chatRepository).getParticipantFirstName(handle)
+        underTest(handle, contemplateEmail)
+        verify(chatRepository).getParticipantFirstName(handle, contemplateEmail)
     }
 }

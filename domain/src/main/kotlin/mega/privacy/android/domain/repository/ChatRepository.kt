@@ -691,10 +691,11 @@ interface ChatRepository {
     /**
      * Get participant first name
      *
-     * @param handle
-     * @return first name of the participant
+     * @param handle User handle.
+     * @param contemplateEmail True if should return the email if the name is not found, false otherwise.
+     * @return First name of a chat participant or the email if not found and contemplated.
      */
-    suspend fun getParticipantFirstName(handle: Long): String?
+    suspend fun getParticipantFirstName(handle: Long, contemplateEmail: Boolean): String?
 
     /**
      * Get my user handle

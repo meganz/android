@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
+import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
@@ -82,6 +83,7 @@ internal class ChatViewModel @Inject constructor(
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
     private val getAnotherCallParticipatingUseCase: GetAnotherCallParticipatingUseCase,
     private val passcodeManagement: PasscodeManagement,
+    private val getCustomSubtitleListUseCase: GetCustomSubtitleListUseCase,
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -219,6 +221,7 @@ internal class ChatViewModel @Inject constructor(
             }.onSuccess { chatRoom ->
                 chatRoom?.let {
                     with(chatRoom) {
+                        checkCustomTitle()
                         _state.update { state ->
                             state.copy(
                                 title = title,
@@ -230,7 +233,6 @@ internal class ChatViewModel @Inject constructor(
                                 isActive = isActive,
                                 isArchived = isArchived,
                                 isMeeting = isMeeting,
-                                hasCustomTitle = hasCustomTitle,
                                 participantsCount = getNumberParticipants(),
                             )
                         }
@@ -250,6 +252,18 @@ internal class ChatViewModel @Inject constructor(
                 }
             }.onFailure {
                 Timber.e(it)
+            }
+        }
+    }
+
+    private fun ChatRoom.checkCustomTitle() {
+        if (isGroup && hasCustomTitle) {
+            viewModelScope.launch {
+                runCatching { getCustomSubtitleListUseCase(chatId, peerHandlesList, isPreview) }
+                    .onSuccess { customSubtitleList ->
+                        _state.update { state -> state.copy(customSubtitleList = customSubtitleList) }
+                    }
+                    .onFailure { Timber.w(it) }
             }
         }
     }
@@ -289,8 +303,9 @@ internal class ChatViewModel @Inject constructor(
                     with(chat) {
                         changes?.forEach { change ->
                             when (change) {
-                                ChatRoomChange.Title -> _state.update { state ->
-                                    state.copy(title = title, hasCustomTitle = hasCustomTitle)
+                                ChatRoomChange.Title -> {
+                                    checkCustomTitle()
+                                    _state.update { state -> state.copy(title = title) }
                                 }
 
                                 ChatRoomChange.ChatMode -> _state.update { state ->
@@ -330,6 +345,7 @@ internal class ChatViewModel @Inject constructor(
                                 ChatRoomChange.UserStopTyping -> handleUserStopTyping(userTyping)
 
                                 ChatRoomChange.Participants -> {
+                                    checkCustomTitle()
                                     _state.update { state ->
                                         state.copy(participantsCount = getNumberParticipants())
                                     }

@@ -8,14 +8,15 @@ import javax.inject.Inject
  *
  */
 class GetParticipantFirstNameUseCase @Inject constructor(
-    private val contactsRepository: ChatRepository,
+    private val chatRepositoryRepository: ChatRepository,
 ) {
     /**
      * Invoke.
      *
      * @param handle    User handle.
+     * @param contemplateEmail True if should return the email if the name is not found, false otherwise.
      * @return          First name.
      */
-    suspend operator fun invoke(handle: Long): String? =
-        contactsRepository.getParticipantFirstName(handle)
+    suspend operator fun invoke(handle: Long, contemplateEmail: Boolean = true): String? =
+        chatRepositoryRepository.getParticipantFirstName(handle, contemplateEmail)
 }
