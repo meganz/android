@@ -167,15 +167,14 @@ fun MegaAppBar(
     )
 }
 
-//this will be internal once FileInfoAppbar is based on BaseMegaAppBar
-data class MegaAppBarColors(
+internal data class MegaAppBarColors(
     val iconsTintColor: Color,
     val titleColor: Color,
     val subtitleColor: Color = Color.Unspecified,
     val backgroundAlpha: Float = 1f,
 )
 
-val LocalMegaAppBarColors =
+internal val LocalMegaAppBarColors =
     compositionLocalOf { MegaAppBarColors(Color.Unspecified, Color.Unspecified) }
 
 internal val LocalMegaAppBarElevation = compositionLocalOf { AppBarDefaults.TopAppBarElevation }

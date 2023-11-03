@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -21,27 +19,24 @@ import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_026
+import mega.privacy.android.core.ui.theme.grey_alpha_050
 
 @Composable
 internal fun PreviewWithShadow(
     previewUri: String,
-    alpha: Float,
     modifier: Modifier = Modifier,
 ) {
 
     Image(
         modifier = modifier
             .testTag(TEST_TAG_PREVIEW)
-            .fillMaxSize()
-            .alpha(alpha),
+            .fillMaxSize(),
         painter = rememberAsyncImagePainter(model = previewUri),
         contentDescription = "Preview",
         contentScale = ContentScale.FillWidth,
     )
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .alpha(alpha)
+        modifier = modifier.fillMaxSize()
     ) {
         //shadow top
         Box(
@@ -52,8 +47,8 @@ internal fun PreviewWithShadow(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
+                            grey_alpha_050,
                             grey_alpha_026,
-                            Color.Transparent,
                         )
                     )
                 ),
@@ -66,8 +61,8 @@ internal fun PreviewWithShadow(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.Transparent,
                             grey_alpha_026,
+                            grey_alpha_050,
                         )
                     )
                 )
@@ -80,7 +75,7 @@ internal fun PreviewWithShadow(
 private fun PreviewWithShadowPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.height(120.dp)) {
-            PreviewWithShadow(previewUri = "a", alpha = 1f)
+            PreviewWithShadow(previewUri = "a")
         }
     }
 }

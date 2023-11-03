@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.constraintlayout.compose.Dimension
@@ -35,7 +36,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  * @param appBarType this will be used to set the correct paddings of the title, should be the same as the [AppBarForCollapsibleHeader]
  * @param title for the toolbar, should match that of the [AppBarForCollapsibleHeader]. Here, as the header has more space, it will take up to [titleMaxLines] lines.
  * @param titleMaxLines the maximum title lines when expanded. Default to 3
- * @param content any other content that will be show in the header.
+ * @param content any other content that will be show in the header. It includes a [ConstrainedLayoutReference] of the title
  */
 @Composable
 fun CollapsibleHeaderWithTitle(
@@ -43,14 +44,14 @@ fun CollapsibleHeaderWithTitle(
     title: String,
     modifier: Modifier = Modifier,
     titleMaxLines: Int = 3,
-    content: @Composable ConstraintLayoutScope.() -> Unit,
+    content: @Composable ConstraintLayoutScope.(titleConstrainedLayoutReference: ConstrainedLayoutReference) -> Unit,
 ) = ConstraintLayout(
     modifier = modifier
-        .fillMaxWidth()
+        .fillMaxSize()
 ) {
     val (titlePlaceholder, titleVisible) = createRefs()
 
-    content()
+    content(titleVisible)
     val appBarBottomGuideline = createGuidelineFromTop(APP_BAR_HEIGHT.dp)
     val titleDisplacement = LocalCollapsibleHeaderTitleTransition.current.offset
     //this is just a none visible text with 1 line to place the next text with first line in the center of the virtual toolbar (appBarBottomGuideline)

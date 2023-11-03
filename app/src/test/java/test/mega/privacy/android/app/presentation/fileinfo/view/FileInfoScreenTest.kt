@@ -40,7 +40,6 @@ class FileInfoScreenTest {
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
                 onVerifyContactClick = {},
-                statusBarHeight = 0f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_PREVIEW, true).assertExists()
@@ -71,7 +70,6 @@ class FileInfoScreenTest {
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
                 onVerifyContactClick = {},
-                statusBarHeight = 0f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ICON, true).assertDoesNotExist()

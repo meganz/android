@@ -41,7 +41,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.core.R
@@ -68,6 +70,7 @@ import mega.privacy.android.core.ui.theme.darkColorPalette
  * @param modifier the [Modifier] to be applied to the layout
  * @param headerIncludingSystemBar a Composable for a secondary collapsible header to be drawn below system bar in case of the activity is set to don't fit system windows [WindowCompat.setDecorFitsSystemWindows(window, false)]. If set, it's assumed that it will have dark content and values for Local providers such as LocalMegaAppBarElevation or LocalMegaAppBarColors will be set to transition the app bar from transparent with light content when expanded to an ordinary app bar when collapsed. Please notice that automation tool (appium) doesn't see anything behind a scaffold, so anything here won't be visible to appium, consider using [header] for this.
  * @param titleDisplacementFactor The title will be vertically displaced from the final position of the toolbar (when the header is collapsed) depending on this factor. A value of 0 indicates no displacement, while a value of 1 indicates that it will be displaced by the same amount as the header grows.
+ * @param headerBelowTopBar if true the header will be drawn below the top bar. Please notice that this makes the header not visible by automation tool (appium).
  * @param snackbarHost component to host [Snackbar]s that are pushed to be shown via
  * @param content content of your screen.
  */
@@ -78,6 +81,7 @@ fun ScaffoldWithCollapsibleHeader(
     modifier: Modifier = Modifier,
     headerIncludingSystemBar: @Composable (BoxScope.() -> Unit)? = null,
     titleDisplacementFactor: Float = 0.5f,
+    headerBelowTopBar: Boolean = false,
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     content: @Composable () -> Unit,
 ) {
@@ -214,6 +218,19 @@ fun ScaffoldWithCollapsibleHeader(
                 }
             }
         }
+        if (headerBelowTopBar) {
+            DrawHeader(
+                headerRef,
+                headerHeight.dp,
+                collapsibleHeaderTitleTransition,
+                topBarBackgroundAlpha,
+                headerAlpha,
+                iconTintColor,
+                titleColor,
+                subtitleColor,
+                header
+            )
+        }
         Scaffold(
             modifier = Modifier.systemBarsPadding(),
             backgroundColor = Color.Transparent,
@@ -250,31 +267,58 @@ fun ScaffoldWithCollapsibleHeader(
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .statusBarsPadding()
-                .constrainAs(headerRef) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    height = Dimension.wrapContent
-                    width = Dimension.fillToConstraints
-                }
-                .alpha(collapsibleHeaderTitleTransition.headerAlpha)
-        ) {
-            if (headerAlpha > 0) {
-                CompositionLocalProvider(
-                    LocalMegaAppBarColors provides MegaAppBarColors(
-                        iconsTintColor = iconTintColor,
-                        titleColor = titleColor,
-                        subtitleColor = subtitleColor,
-                        backgroundAlpha = topBarBackgroundAlpha,
-                    ),
-                    LocalCollapsibleHeaderTitleTransition provides collapsibleHeaderTitleTransition,
-                ) {
-                    Box(modifier = Modifier.height(headerHeight.dp)) {
-                        header()
-                    }
+        if (!headerBelowTopBar) {
+            DrawHeader(
+                headerRef,
+                headerHeight.dp,
+                collapsibleHeaderTitleTransition,
+                topBarBackgroundAlpha,
+                headerAlpha,
+                iconTintColor,
+                titleColor,
+                subtitleColor,
+                header
+            )
+        }
+    }
+}
+
+@Composable
+private fun ConstraintLayoutScope.DrawHeader(
+    headerRef: ConstrainedLayoutReference,
+    headerHeight: Dp,
+    collapsibleHeaderTitleTransition: CollapsibleHeaderTitleTransition,
+    topBarBackgroundAlpha: Float,
+    headerAlpha: Float,
+    iconTintColor: Color,
+    titleColor: Color,
+    subtitleColor: Color,
+    header: @Composable BoxScope.() -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .statusBarsPadding()
+            .constrainAs(headerRef) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                height = Dimension.wrapContent
+                width = Dimension.fillToConstraints
+            }
+            .alpha(collapsibleHeaderTitleTransition.headerAlpha)
+    ) {
+        if (headerAlpha > 0) {
+            CompositionLocalProvider(
+                LocalMegaAppBarColors provides MegaAppBarColors(
+                    iconsTintColor = iconTintColor,
+                    titleColor = titleColor,
+                    subtitleColor = subtitleColor,
+                    backgroundAlpha = topBarBackgroundAlpha,
+                ),
+                LocalCollapsibleHeaderTitleTransition provides collapsibleHeaderTitleTransition,
+            ) {
+                Box(modifier = Modifier.height(headerHeight)) {
+                    header()
                 }
             }
         }

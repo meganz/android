@@ -5,36 +5,21 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
@@ -42,15 +27,17 @@ import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.utils.LocationInfo
-import mega.privacy.android.app.utils.Util
-import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.core.ui.controls.appbar.AppBarForCollapsibleHeader
+import mega.privacy.android.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
+import mega.privacy.android.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
 
@@ -75,140 +62,81 @@ internal fun FileInfoScreen(
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
     onVerifyContactClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    statusBarHeight: Float = Util.getStatusBarHeight().toFloat() / LocalDensity.current.density,
 ) {
-    val scrollState = rememberScrollState()
-    Box(modifier = modifier.fillMaxSize()) {
-        val density = LocalDensity.current.density
-        val tintColorBase = MaterialTheme.colors.onSurface
-        val actionModeSelect = viewState.outShareContactsSelected.isNotEmpty()
-        val headerHeight by remember {
-            derivedStateOf {
-                (headerMaxHeight(statusBarHeight) - (scrollState.value / density))
-                    .coerceAtLeast(headerMinHeight(statusBarHeight))
-            }
-        }
-        val titleDisplacement by remember {
-            derivedStateOf {
-                ((headerHeight - headerGoneHeight(statusBarHeight)) * 0.5f).coerceAtLeast(0f)
-            }
-        }
-        val longTitleAlpha by remember {
-            derivedStateOf {
-                (titleDisplacement / (appBarHeight / 2)).coerceIn(0f, 1f)
-            }
-        }
-
-        val headerBackgroundAlpha by remember {
-            derivedStateOf {
-                ((headerHeight - headerGoneHeight(statusBarHeight))
-                        / (headerStartGoneHeight(statusBarHeight) - headerGoneHeight(statusBarHeight)))
-                    .coerceIn(0f, 1f)
-            }
-        }
-        val topBarOpacityTransitionDelta by remember {
-            derivedStateOf {
-                1 - ((headerHeight - headerMinHeight(statusBarHeight))
-                        / (headerGoneHeight(statusBarHeight) - headerMinHeight(statusBarHeight)))
-                    .coerceIn(0f, 1f)
-            }
-        }
-        val tintColor by remember(viewState.hasPreview) {
-            derivedStateOf {
-                if (viewState.hasPreview) {
-                    lerp(tintColorBase, white, headerBackgroundAlpha)
+    val actionModeSelect = viewState.outShareContactsSelected.isNotEmpty()
+    ScaffoldWithCollapsibleHeader(
+        modifier = modifier,
+        headerIncludingSystemBar = viewState.actualPreviewUriString?.takeIf { viewState.hasPreview }
+            ?.let { previewUri ->
+                {
+                    //looks like automation tool (appium) doesn't see anything behind a scaffold,
+                    // so we need to draw [FileInfoHeader] below the Scaffold. The preview needs to be drawn here to don't overlap other views.
+                    PreviewWithShadow(
+                        previewUri = previewUri,
+                    )
+                }
+            },
+        topBar = {
+            Crossfade(
+                targetState = actionModeSelect, label = "CrossfadeFileInfoTopAppBar",
+            ) { actionModeSelect ->
+                if (actionModeSelect) {
+                    val count = viewState.outShareContactsSelected.size
+                    SelectModeAppBar(
+                        title = pluralStringResource(
+                            R.plurals.general_selection_num_contacts, count, count
+                        ),
+                        onNavigationPressed = {
+                            onMenuActionClick(FileInfoMenuAction.SelectionModeAction.ClearSelection)
+                        },
+                        actions = FileInfoMenuAction.SelectionModeAction.all(),
+                        onActionPressed = { onMenuActionClick(it as FileInfoMenuAction) },
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = AppBarDefaults.TopAppBarElevation,
+                    )
                 } else {
-                    tintColorBase
-                }
-            }
-        }
-        viewState.actualPreviewUriString?.takeIf { viewState.hasPreview }?.let { previewUri ->
-            //looks like automation tool (appium) doesn't see anything behind a scaffold,
-            // so we need to draw [FileInfoHeader] below the Scaffold. The preview needs to be drawn here to don't overlap other views.
-            PreviewWithShadow(
-                alpha = headerBackgroundAlpha,
-                previewUri = previewUri,
-                modifier = Modifier.height(headerHeight.dp),
-            )
-
-        }
-        Scaffold(
-            modifier = Modifier.systemBarsPadding(),
-            backgroundColor = Color.Transparent,
-            topBar = {
-                Crossfade(
-                    targetState = actionModeSelect, label = "CrossfadeFileInfoTopAppBar",
-                ) { actionModeSelect ->
-                    if (actionModeSelect) {
-                        FileInfoSelectActionModeTopBar(
-                            count = viewState.outShareContactsSelected.size,
-                            onActionClick = onMenuActionClick
-                        )
-                    } else {
-                        FileInfoTopBar(
-                            modifier = Modifier.testTag(TEST_TAG_TOP_APPBAR),
-                            title = viewState.title,
-                            actions = viewState.actions,
-                            tintColor = tintColor,
-                            titleDisplacement = titleDisplacement.dp,
-                            titleAlpha = 1 - longTitleAlpha,
-                            opacityTransitionDelta = topBarOpacityTransitionDelta,
-                            onBackPressed = onBackPressed,
-                            onActionClick = onMenuActionClick,
-                            enabled = viewState.jobInProgressState == null
-                        )
-                    }
-                }
-            },
-            snackbarHost = {
-                SnackbarHost(hostState = snackBarHostState) { data ->
-                    MegaSnackbar(snackbarData = data)
-                }
-            },
-        ) { innerPadding ->
-            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                //to set the minimum height of the colum so it's always possible to collapse the header
-                val boxWithConstraintsScope = this
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(scrollState)
-                        .padding(innerPadding)
-                ) {
-                    Spacer(Modifier.height(spacerHeight(statusBarHeight).dp)) //to give space for the header (that it's outside this column)
-                    FileInfoContent(
-                        viewState = viewState,
-                        onTakeDownLinkClick = onTakeDownLinkClick,
-                        onLocationClick = onLocationClick,
-                        availableOfflineChanged = availableOfflineChanged,
-                        onVersionsClick = onVersionsClick,
-                        onContactClick = onSharedWithContactClick,
-                        onContactSelected = onSharedWithContactSelected,
-                        onContactUnselected = onSharedWithContactUnselected,
-                        onContactMoreOptionsClick = onSharedWithContactMoreOptionsClick,
-                        onContactsClosed = { onMenuActionClick(FileInfoMenuAction.SelectionModeAction.ClearSelection) },
-                        onShowMoreContactsClick = onShowMoreSharedWithContactsClick,
-                        onPublicLinkCopyClick = onPublicLinkCopyClick,
-                        onVerifyContactClick = onVerifyContactClick,
-                        modifier = Modifier.heightIn(
-                            min = boxWithConstraintsScope.maxHeight
-                        )
+                    AppBarForCollapsibleHeader(
+                        appBarType = AppBarType.BACK_NAVIGATION,
+                        title = viewState.title,
+                        modifier = Modifier.testTag(TEST_TAG_TOP_APPBAR),
+                        actions = viewState.actions,
+                        onNavigationPressed = onBackPressed,
+                        onActionPressed = { onMenuActionClick(it as FileInfoMenuAction) },
+                        enabled = viewState.jobInProgressState == null,
+                        maxActionsToShow = MENU_ACTIONS_TO_SHOW,
                     )
                 }
             }
-        }
-        FileInfoHeader(
-            title = viewState.title,
-            titleAlpha = longTitleAlpha,
-            titleDisplacement = titleDisplacement.dp,
-            tintColor = tintColor,
-            backgroundAlpha = headerBackgroundAlpha,
-            previewUri = null,
-            iconResource = viewState.iconResource?.takeIf { !viewState.hasPreview },
-            accessPermissionDescription = viewState.accessPermission.description()
-                ?.takeIf { viewState.isIncomingSharedNode },
-            modifier = Modifier
-                .height(headerHeight.dp),
-            statusBarHeight = statusBarHeight.dp,
+        },
+        header = {
+            FileInfoHeader(
+                title = viewState.title,
+                iconResource = viewState.iconResource?.takeIf { !viewState.hasPreview },
+                accessPermissionDescription = viewState.accessPermission.description()
+                    ?.takeIf { viewState.isIncomingSharedNode },
+            )
+        },
+        headerBelowTopBar = actionModeSelect, //actionMode doesn't have collapsible title, the header needs to be drawn below the app bar
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState) { data ->
+                MegaSnackbar(snackbarData = data)
+            }
+        },
+    ) {
+        FileInfoContent(
+            viewState = viewState,
+            onTakeDownLinkClick = onTakeDownLinkClick,
+            onLocationClick = onLocationClick,
+            availableOfflineChanged = availableOfflineChanged,
+            onVersionsClick = onVersionsClick,
+            onContactClick = onSharedWithContactClick,
+            onContactSelected = onSharedWithContactSelected,
+            onContactUnselected = onSharedWithContactUnselected,
+            onContactMoreOptionsClick = onSharedWithContactMoreOptionsClick,
+            onContactsClosed = { onMenuActionClick(FileInfoMenuAction.SelectionModeAction.ClearSelection) },
+            onShowMoreContactsClick = onShowMoreSharedWithContactsClick,
+            onPublicLinkCopyClick = onPublicLinkCopyClick,
+            onVerifyContactClick = onVerifyContactClick,
         )
         viewState.jobInProgressState?.progressMessage?.let {
             LoadingDialog(text = stringResource(id = it))
@@ -265,14 +193,6 @@ private fun FileInfoScreenPreview(
         )
     }
 }
-
-internal const val appBarHeight = 56f
-private fun headerMinHeight(statusBarHeight: Float) = appBarHeight + statusBarHeight
-private fun headerMaxHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 96f
-private fun headerStartGoneHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 76f
-private fun headerGoneHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 18f
-private fun spacerHeight(statusBarHeight: Float) =
-    headerMaxHeight(statusBarHeight) - appBarHeight - statusBarHeight
 
 /**
  * Provides different [FileInfoViewState] for previews
