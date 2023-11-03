@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.logout
 
 import mega.privacy.android.domain.repository.security.PasscodeRepository
+import mega.privacy.android.domain.usecase.passcode.SetPasscodeEnabledUseCase
 import javax.inject.Inject
 
 /**
@@ -8,11 +9,16 @@ import javax.inject.Inject
  *
  * @property passcodeRepository
  */
-class ClearPasscodeDataLogoutTask @Inject constructor(private val passcodeRepository: PasscodeRepository) :
-    LogoutTask {
+class ClearPasscodeDataLogoutTask @Inject constructor(
+    private val passcodeRepository: PasscodeRepository,
+    private val setPasscodeEnabledUseCase: SetPasscodeEnabledUseCase,
+) : LogoutTask {
     /**
      * Invoke
      *
      */
-    override suspend fun invoke() = passcodeRepository.setFailedAttempts(0)
+    override suspend fun invoke() {
+        setPasscodeEnabledUseCase(false)
+        passcodeRepository.setFailedAttempts(0)
+    }
 }

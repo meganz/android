@@ -81,4 +81,11 @@ class SetPasscodeEnabledUseCaseTest {
 
         verify(passcodeRepository).setPasscodeTimeOut(PasscodeTimeout.TimeSpan(30 * 1000))
     }
+
+    @Test
+    internal fun `test that default timeout is set if passcode is disabled`() = runTest {
+        underTest(false)
+
+        verify(passcodeRepository).setPasscodeTimeOut(PasscodeTimeout.TimeSpan(30 * 1000))
+    }
 }

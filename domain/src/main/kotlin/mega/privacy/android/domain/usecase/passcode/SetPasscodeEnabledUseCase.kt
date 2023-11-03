@@ -24,6 +24,7 @@ class SetPasscodeEnabledUseCase @Inject constructor(
         if (!enabled) {
             passcodeRepository.setPasscode(null)
             passcodeRepository.setPasscodeType(null)
+            setDefaultTimeOut()
         } else if (noTimeOutSet()) {
             setDefaultTimeOut()
         }
