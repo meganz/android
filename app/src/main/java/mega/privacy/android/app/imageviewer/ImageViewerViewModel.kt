@@ -59,7 +59,7 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
@@ -106,7 +106,7 @@ import javax.inject.Inject
  * @property moveNodeUseCase            UseCase required to move nodes
  * @property removeNodeUseCase          UseCase required to remove nodes
  * @property checkNameCollision         UseCase required to check name collisions
- * @property moveNodeToRubbishByHandle  UseCase to move node to rubbish bin
+ * @property moveNodeToRubbishBinUseCase  UseCase to move node to rubbish bin
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(
@@ -133,7 +133,7 @@ class ImageViewerViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
@@ -837,7 +837,7 @@ class ImageViewerViewModel @Inject constructor(
      */
     fun moveNodeToRubbishBin(nodeHandle: Long) {
         viewModelScope.launch {
-            runCatching { moveNodeToRubbishByHandle(NodeId(nodeHandle)) }
+            runCatching { moveNodeToRubbishBinUseCase(NodeId(nodeHandle)) }
                 .onSuccess {
                     snackBarMessage.value =
                         context.getString(R.string.context_correctly_moved_to_rubbish)

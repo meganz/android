@@ -9,7 +9,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.domain.di.ViewTypeModule
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
-import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import org.mockito.kotlin.mock
 
@@ -24,9 +23,6 @@ object TestFileInfoModule {
 
     @Provides
     fun provideMoveNodeUseCase(): MoveNodeUseCase = mock()
-
-    @Provides
-    fun provideMoveNodeToRubbishByHandle(): MoveNodeToRubbishByHandle = mock()
 
     @Provides
     fun provideDeleteNodeByHandle(): DeleteNodeByHandleUseCase = mock()

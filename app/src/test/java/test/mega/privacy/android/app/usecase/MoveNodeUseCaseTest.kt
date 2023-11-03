@@ -22,7 +22,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterAll
@@ -47,7 +47,7 @@ class MoveNodeUseCaseTest {
     private lateinit var getChatMessageUseCase: GetChatMessageUseCase
     private lateinit var copyNodeListUseCase: CopyNodeListUseCase
     private lateinit var getNodeByHandle: GetNodeByHandle
-    private lateinit var moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle
+    private lateinit var moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase
     private lateinit var accountRepository: AccountRepository
 
     @BeforeAll
@@ -63,14 +63,14 @@ class MoveNodeUseCaseTest {
         getChatMessageUseCase = mock()
         copyNodeListUseCase = mock()
         getNodeByHandle = mock()
-        moveNodeToRubbishByHandle = mock()
+        moveNodeToRubbishBinUseCase = mock()
         accountRepository = mock()
 
         underTest = LegacyMoveNodeUseCase(
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
-            moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
+            moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
         )
     }
 

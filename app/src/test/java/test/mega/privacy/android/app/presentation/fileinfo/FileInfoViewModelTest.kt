@@ -73,7 +73,7 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
-import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
@@ -118,7 +118,7 @@ internal class FileInfoViewModelTest {
     private val isNodeInRubbish: IsNodeInRubbish = mock()
     private val checkNameCollision: CheckNameCollision = mock()
     private val moveNodeUseCase: MoveNodeUseCase = mock()
-    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle = mock()
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase = mock()
     private val copyNodeUseCase: CopyNodeUseCase = mock()
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase = mock()
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle = mock()
@@ -183,7 +183,7 @@ internal class FileInfoViewModelTest {
             checkNameCollision = checkNameCollision,
             moveNodeUseCase = moveNodeUseCase,
             copyNodeUseCase = copyNodeUseCase,
-            moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
+            moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
             getPreviewUseCase = getPreviewUseCase,
@@ -1068,11 +1068,11 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun mockMoveToRubbishSuccess() {
-        whenever(moveNodeToRubbishByHandle.invoke(nodeId)).thenReturn(Unit)
+        whenever(moveNodeToRubbishBinUseCase.invoke(nodeId)).thenReturn(Unit)
     }
 
     private suspend fun mockMoveToRubbishFailure() {
-        whenever(moveNodeToRubbishByHandle.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
+        whenever(moveNodeToRubbishBinUseCase.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
     }
 
     private suspend fun mockDeleteSuccess() {

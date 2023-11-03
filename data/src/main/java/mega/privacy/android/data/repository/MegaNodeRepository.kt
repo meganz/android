@@ -67,12 +67,6 @@ interface MegaNodeRepository {
     suspend fun getRubbishBinNode(): MegaNode?
 
     /**
-     * Moves a MegaNode referenced by its handle [NodeId] to a the rubbish bin
-     * @param nodeToMove the node's handle [NodeId] that we want to move to the rubbish bin
-     */
-    suspend fun moveNodeToRubbishBinByHandle(nodeToMove: NodeId)
-
-    /**
      * Check is megaNode in rubbish bin
      *
      * @param node MegaNode

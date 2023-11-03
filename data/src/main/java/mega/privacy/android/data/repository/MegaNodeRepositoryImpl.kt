@@ -144,18 +144,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getRubbishBinNode()
     }
 
-    override suspend fun moveNodeToRubbishBinByHandle(nodeToMove: NodeId) {
-        val node = megaApiGateway.getMegaNodeByHandle(nodeToMove.longValue)
-        val rubbish = megaApiGateway.getRubbishBinNode()
-        if (node == null) {
-            throw IllegalArgumentException("Node to copy with handle $nodeToMove not found")
-        }
-        if (rubbish == null) {
-            throw IllegalArgumentException("Rubbish bin node not found")
-        }
-        moveNode(node, rubbish, null)
-    }
-
     override suspend fun isInRubbish(node: MegaNode): Boolean = withContext(ioDispatcher) {
         megaApiGateway.isInRubbish(node)
     }

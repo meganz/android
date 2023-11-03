@@ -71,7 +71,7 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
-import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
@@ -104,7 +104,7 @@ class FileInfoViewModel @Inject constructor(
     private val checkNameCollision: CheckNameCollision,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
-    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
     private val getPreviewUseCase: GetPreviewUseCase,
@@ -859,7 +859,7 @@ class FileInfoViewModel @Inject constructor(
     private fun moveNodeToRubbishBin() {
         performBlockSettingProgress(FileInfoJobInProgressState.MovingToRubbish) {
             runCatching {
-                moveNodeToRubbishByHandle(typedNode.id)
+                moveNodeToRubbishBinUseCase(typedNode.id)
             }
         }
     }

@@ -519,6 +519,14 @@ internal class NodeRepositoryImpl @Inject constructor(
         val parent = getMegaNodeByHandle(newNodeParent, true)
         requireNotNull(node) { "Node to move with handle $nodeToMove not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
+        return@withContext moveNode(node, parent, newNodeName)
+    }
+
+    private suspend fun moveNode(
+        node: MegaNode,
+        parent: MegaNode,
+        newNodeName: String?,
+    ): NodeId {
         val result = suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
@@ -535,10 +543,10 @@ internal class NodeRepositoryImpl @Inject constructor(
                 megaApiGateway.removeRequestListener(listener)
             }
         }
-        return@withContext when {
+        return when {
             result.second.errorCode == MegaError.API_OK -> NodeId(result.first.nodeHandle)
             result.second.errorCode == MegaError.API_EOVERQUOTA
-                    && megaApiGateway.isForeignNode(newNodeParent.longValue) -> throw ForeignNodeException()
+                    && megaApiGateway.isForeignNode(parent.handle) -> throw ForeignNodeException()
 
             else -> throw result.second.toException("moveNode")
         }
@@ -785,6 +793,14 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun clearOffline() =
         withContext(ioDispatcher) { megaLocalRoomGateway.clearOffline() }
+
+    override suspend fun moveNodeToRubbishBinByHandle(nodeId: NodeId) {
+        val rubbish = megaApiGateway.getRubbishBinNode()
+        val node = getMegaNodeByHandle(nodeId, true)
+        requireNotNull(node) { "Node to move with handle $node not found" }
+        requireNotNull(rubbish) { "Rubbish bin node not found" }
+        moveNode(node, rubbish, null)
+    }
 
     private suspend fun getAllOfflineNodeHandle() =
         megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }

@@ -107,7 +107,7 @@ internal class ImageViewerViewModelTest {
             getNodeByHandle = getNodeByHandle,
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
-            moveNodeToRubbishByHandle = mock(),
+            moveNodeToRubbishBinUseCase = mock(),
             getImageByAlbumImportNodeUseCase = mock(),
             context = context,
         )

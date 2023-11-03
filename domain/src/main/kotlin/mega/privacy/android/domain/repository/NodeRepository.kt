@@ -581,4 +581,10 @@ interface NodeRepository {
      * Clear offline
      */
     suspend fun clearOffline()
+
+    /**
+     * Moves a MegaNode referenced by its handle [NodeId] to a the rubbish bin
+     * @param nodeId the node's handle [NodeId] that we want to move to the rubbish bin
+     */
+    suspend fun moveNodeToRubbishBinByHandle(nodeId: NodeId)
 }

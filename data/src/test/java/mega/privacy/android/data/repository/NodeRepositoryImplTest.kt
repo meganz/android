@@ -24,14 +24,14 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
-import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
+import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
@@ -54,6 +54,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -97,7 +98,7 @@ class NodeRepositoryImplTest {
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
     private val fetChildrenMapper = mock<FetchChildrenMapper>()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
-    private val offlineAvailabilityMapper : OfflineAvailabilityMapper = mock()
+    private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
 
     private val nodeMapper: NodeMapper = NodeMapper(
         fileNodeMapper = FileNodeMapper(
@@ -236,7 +237,7 @@ class NodeRepositoryImplTest {
             on { email }.thenReturn(testEmail)
         }
         val megaNode = mockMegaNodeForConversion()
-        whenever(offlineAvailabilityMapper(megaNode,offline)).thenReturn(true)
+        whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(true)
         val nodeList = listOf(megaNode)
         whenever(megaApiGateway.getContact(testEmail)).thenReturn(user)
         whenever(megaApiGateway.getInShares(user)).thenReturn(nodeList)
@@ -482,7 +483,9 @@ class NodeRepositoryImplTest {
             val node = NodeId(1L)
             val destinationNode = NodeId(2L)
             val megaNode = mock<MegaNode>()
-            val destinationMegaNode = mock<MegaNode>()
+            val destinationMegaNode = mock<MegaNode> {
+                on { handle }.thenReturn(destinationNode.longValue)
+            }
             whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(megaNode)
             whenever(megaApiGateway.getMegaNodeByHandle(destinationNode.longValue)).thenReturn(
                 destinationMegaNode
@@ -696,6 +699,52 @@ class NodeRepositoryImplTest {
                 underTest.checkIfNodeHasTheRequiredAccessLevelPermission(nodeId, permission)
             assertThat(response).isFalse()
         }
+
+    @Test
+    fun `test that exception is returned when moveNodeToRubbishBinByHandle is invoked and rubbish bin is not found`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(null)
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(mock())
+            assertThrows<IllegalArgumentException> {
+                underTest.moveNodeToRubbishBinByHandle(NodeId(1L))
+            }
+        }
+
+    @Test
+    fun `test that exception is returned when moveNodeToRubbishBinByHandle is invoked and node is not found`() =
+        runTest {
+            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(null)
+            assertThrows<IllegalArgumentException> {
+                underTest.moveNodeToRubbishBinByHandle(NodeId(1L))
+            }
+        }
+
+    @Test
+    fun `test that moveNodeToRubbishBinByHandle success when sdk success`() = runTest {
+        val node = NodeId(1L)
+        val result = NodeId(2L)
+        val megaNode = mock<MegaNode>()
+        val rubbishBinNode = mock<MegaNode>()
+        whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(megaNode)
+        whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
+        whenever(megaApiGateway.moveNode(any(), any(), anyOrNull(), any())).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock {
+                    on { nodeHandle }.thenReturn(result.longValue)
+                },
+                error = mock {
+                    on { errorCode }.thenReturn(
+                        MegaError.API_OK
+                    )
+                },
+            )
+        }
+        assertDoesNotThrow {
+            underTest.moveNodeToRubbishBinByHandle(node)
+        }
+    }
 
     companion object {
         private const val nodeHandle = 1L

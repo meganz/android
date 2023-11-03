@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -33,7 +33,7 @@ import javax.inject.Inject
  * @property megaApiGateway             MegaApiGateway instance to copy nodes.
  * @property getChatMessageUseCase      Required for getting chat [MegaNode]s.
  * @property copyNodeListUseCase        copy list of mega nodes
- * @property moveNodeToRubbishByHandle
+ * @property moveNodeToRubbishBinUseCase
  * @property ioDispatcher
  */
 class LegacyCopyNodeUseCase @Inject constructor(
@@ -41,7 +41,7 @@ class LegacyCopyNodeUseCase @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val copyNodeListUseCase: CopyNodeListUseCase,
-    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val accountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -169,7 +169,7 @@ class LegacyCopyNodeUseCase @Inject constructor(
             ?: throw MegaNodeException.ParentDoesNotExistException()
 
         if (!rename && node.isFile) {
-            moveNodeToRubbishByHandle(NodeId(collisionResult.nameCollision.collisionHandle))
+            moveNodeToRubbishBinUseCase(NodeId(collisionResult.nameCollision.collisionHandle))
         }
 
         val newName = if (rename) collisionResult.renameName else null

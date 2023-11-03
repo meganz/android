@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class LegacyMoveNodeUseCase @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
-    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -111,7 +111,7 @@ class LegacyMoveNodeUseCase @Inject constructor(
             ?: throw MegaNodeException.ParentDoesNotExistException()
 
         if (!rename && node.isFile) {
-            moveNodeToRubbishByHandle(NodeId(collisionResult.nameCollision.collisionHandle))
+            moveNodeToRubbishBinUseCase(NodeId(collisionResult.nameCollision.collisionHandle))
         }
         val newName = if (rename) collisionResult.renameName else null
         return try {
