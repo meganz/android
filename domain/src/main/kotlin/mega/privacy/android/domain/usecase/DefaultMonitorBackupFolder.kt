@@ -1,19 +1,22 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
 import javax.inject.Inject
 
 
@@ -23,28 +26,39 @@ import javax.inject.Inject
 class DefaultMonitorBackupFolder @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val monitorUserUpdates: MonitorUserUpdates,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
+    private val monitorLogoutUseCase: MonitorLogoutUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : MonitorBackupFolder {
 
-    private val lazyFlow: SharedFlow<Result<NodeId>> by lazy {
-        flow {
-            emit(kotlin.runCatching { nodeRepository.getBackupFolderId() })
-            emitAll(
-                monitorUserUpdates()
-                    .filter { it == UserChanges.MyBackupsFolder }
-                    .map {
-                        kotlin.runCatching { nodeRepository.getBackupFolderId() }
-                    }.catch { emit(Result.failure(it)) }
-            )
+    private val flow: SharedFlow<Result<NodeId>> =
+        channelFlow<Result<NodeId>> {
+            monitorUserUpdates()
+                .filter { userUpdate -> userUpdate == UserChanges.MyBackupsFolder }
+                .onEach { trySend(getBackupFolderId()) }
+                .launchIn(applicationScope)
+
+            monitorFetchNodesFinishUseCase()
+                .onEach { trySend(getBackupFolderId()) }
+                .launchIn(applicationScope)
+
+            monitorLogoutUseCase()
+                .onEach { trySend(Result.failure(NodeDoesNotExistsException())) }
+                .launchIn(applicationScope)
+
+            awaitClose()
+        }.onStart {
+            emit(getBackupFolderId())
         }.shareIn(
-            scope = CoroutineScope(dispatcher),
-            started = SharingStarted.WhileSubscribed(),
+            scope = applicationScope,
+            started = SharingStarted.Lazily,
             replay = 1
         )
-    }
 
-    override fun invoke(): SharedFlow<Result<NodeId>> {
-        return lazyFlow
+    override fun invoke(): SharedFlow<Result<NodeId>> = flow
+
+    private suspend fun getBackupFolderId() = kotlin.runCatching {
+        nodeRepository.getBackupFolderId()
     }
 
 }
