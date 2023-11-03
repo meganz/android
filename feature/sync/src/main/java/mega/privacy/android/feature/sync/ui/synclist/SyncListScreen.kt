@@ -40,6 +40,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
+import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesRoute
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesRoute
 import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
@@ -208,7 +209,7 @@ private fun SelectedChipScreen(
         }
 
         SOLVED_ISSUES -> {
-            Box(modifier = Modifier.fillMaxSize())
+            SyncSolvedIssuesRoute()
         }
     }
 }
@@ -217,7 +218,7 @@ internal const val TAG_SYNC_LIST_SCREEN_NO_ITEMS = "sync_list_screen_no_items"
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewSyncListScreen() {
+private fun SyncListScreenPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         SyncListScreen(
             stalledIssuesCount = 3,
