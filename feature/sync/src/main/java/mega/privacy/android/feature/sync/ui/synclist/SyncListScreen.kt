@@ -81,7 +81,7 @@ internal fun SyncListScreen(
                     IssuesResolutionDialog(
                         icon = content.stalledIssueUiItem.icon,
                         conflictName = content.stalledIssueUiItem.conflictName,
-                        nodeName = content.stalledIssueUiItem.nodeName,
+                        nodeName = content.stalledIssueUiItem.nodeNames.first(),
                         actions = content.stalledIssueUiItem.actions,
                         actionSelected = { action ->
                             actionSelected(content.stalledIssueUiItem, action)

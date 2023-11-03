@@ -104,6 +104,15 @@ class FileFacade @Inject constructor(
         getExternalFile(selectionArgs) ?: getInternalFile(selectionArgs)
     }.getOrNull()
 
+    override suspend fun getFileByPath(path: String): File? {
+        val file = File(path)
+        return if (file.exists()) {
+            file
+        } else {
+            null
+        }
+    }
+
     private fun getExternalFile(
         selectionArgs: Array<String>,
     ) = getExternalCursor(selectionArgs)?.let { cursor ->

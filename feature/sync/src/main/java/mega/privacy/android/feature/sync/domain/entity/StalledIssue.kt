@@ -2,12 +2,12 @@ package mega.privacy.android.feature.sync.domain.entity
 
 import mega.privacy.android.domain.entity.node.NodeId
 
-internal class StalledIssue(
-    val nodeId: NodeId,
-    val localPath: String,
+internal data class StalledIssue(
+    val nodeIds: List<NodeId>,
+    val localPaths: List<String>,
     val issueType: StallIssueType,
     val conflictName: String,
-    val nodeName: String,
+    val nodeNames: List<String>,
 )
 
 internal enum class StallIssueType {

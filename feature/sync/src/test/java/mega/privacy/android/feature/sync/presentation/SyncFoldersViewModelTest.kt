@@ -69,11 +69,11 @@ class SyncFoldersViewModelTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
-            nodeId = NodeId(3L),
-            localPath = "DCIM/photo.jpg",
+            nodeIds = listOf(NodeId(3L)),
+            localPaths = listOf("DCIM/photo.jpg"),
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
-            nodeName = "Camera",
+            nodeNames = listOf("Camera"),
         )
     )
 

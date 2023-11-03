@@ -40,11 +40,11 @@ internal class MonitorSyncStalledIssuesUseCaseTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
-            nodeId = NodeId(3L),
-            localPath = "/storage/emulated/0/DCIM",
+            nodeIds = listOf(NodeId(3L)),
+            localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
-            nodeName = "Camera",
+            nodeNames = listOf("Camera"),
         )
     )
 

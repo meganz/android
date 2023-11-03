@@ -85,6 +85,11 @@ interface FileGateway {
     ): File?
 
     /**
+     * Get file by path if it exists
+     */
+    suspend fun getFileByPath(path: String): File?
+
+    /**
      * Get offline files root path
      *
      * @return the root path of offline files

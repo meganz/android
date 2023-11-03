@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -25,6 +26,9 @@ internal class FileFacadeTest {
 
     private lateinit var underTest: FileFacade
     private val context: Context = mock()
+
+    @TempDir
+    lateinit var temporaryFolder: File
 
     @BeforeAll
     fun setUp() {
@@ -66,5 +70,19 @@ internal class FileFacadeTest {
 
         assertThat(actual.path).isEqualTo("/storage/emulated/0/Mega.txt")
         environmentMock.close()
+    }
+
+    @Test
+    fun `test that get file by path returns file if file exists`() = runTest {
+        val result = underTest.getFileByPath(temporaryFolder.path)
+
+        assertThat(result).isEqualTo(temporaryFolder)
+    }
+
+    @Test
+    fun `test that get file by path returns null if file does not exist`() = runTest {
+        val result = underTest.getFileByPath("non/existent/path")
+
+        assertThat(result).isNull()
     }
 }

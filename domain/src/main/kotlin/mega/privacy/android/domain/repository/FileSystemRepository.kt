@@ -68,6 +68,11 @@ interface FileSystemRepository {
     suspend fun getLocalFile(fileNode: FileNode): File?
 
     /**
+     * Get file by path if it exists
+     */
+    suspend fun getFileByPath(path: String): File?
+
+    /**
      * Get file streaming uri for a node
      *
      * @param node

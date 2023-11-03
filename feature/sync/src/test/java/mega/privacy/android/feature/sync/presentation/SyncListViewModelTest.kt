@@ -18,6 +18,7 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAct
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
+import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
@@ -39,14 +40,15 @@ class SyncListViewModelTest {
     private val setOnboardingShownUseCase: SetOnboardingShownUseCase = mock()
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase = mock()
+    private val stalledIssueItemMapper: StalledIssueItemMapper = mock()
 
     private val stalledIssues = listOf(
         StalledIssue(
-            nodeId = NodeId(3L),
-            localPath = "/storage/emulated/0/DCIM",
+            nodeIds = listOf(NodeId(3L)),
+            localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
-            nodeName = "Camera",
+            nodeNames = listOf("Camera"),
         )
     )
 
@@ -61,7 +63,8 @@ class SyncListViewModelTest {
         reset(
             setOnboardingShownUseCase,
             monitorSyncStalledIssuesUseCase,
-            resolveStalledIssueUseCase
+            resolveStalledIssueUseCase,
+            stalledIssueItemMapper
         )
     }
 
@@ -104,10 +107,9 @@ class SyncListViewModelTest {
                 resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
                 actionName = "Choose remote file",
             )
-            val stalledIssueUiItem: StalledIssueUiItem = mock {
-                on { nodeId } doReturn stalledIssues.first().nodeId.longValue
-                on { localPath } doReturn stalledIssues.first().localPath
-            }
+            val stalledIssueUiItem: StalledIssueUiItem = mock()
+            val stalledIssue: StalledIssue = mock()
+            whenever(stalledIssueItemMapper(stalledIssueUiItem)).thenReturn(stalledIssue)
             initViewModel()
 
             underTest.handleAction(
@@ -119,8 +121,7 @@ class SyncListViewModelTest {
 
             verify(resolveStalledIssueUseCase).invoke(
                 selectedResolution,
-                stalledIssueUiItem.nodeId,
-                stalledIssueUiItem.localPath
+                stalledIssue
             )
             underTest
                 .state
@@ -134,7 +135,8 @@ class SyncListViewModelTest {
         underTest = SyncListViewModel(
             setOnboardingShownUseCase,
             monitorSyncStalledIssuesUseCase,
-            resolveStalledIssueUseCase
+            resolveStalledIssueUseCase,
+            stalledIssueItemMapper
         )
     }
 }

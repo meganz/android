@@ -7,16 +7,16 @@ import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import javax.inject.Inject
 
 internal class StalledIssueItemMapper @Inject constructor(
-    private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper
+    private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper,
 ) {
 
     operator fun invoke(stalledIssueEntity: StalledIssue, isFolder: Boolean) =
         StalledIssueUiItem(
-            nodeId = stalledIssueEntity.nodeId.longValue,
-            localPath = stalledIssueEntity.localPath,
+            nodeIds = stalledIssueEntity.nodeIds,
+            localPaths = stalledIssueEntity.localPaths,
             issueType = stalledIssueEntity.issueType,
             conflictName = stalledIssueEntity.conflictName,
-            nodeName = stalledIssueEntity.nodeName,
+            nodeNames = stalledIssueEntity.nodeNames,
             icon = if (isFolder) {
                 R.drawable.ic_folder_list
             } else {
@@ -24,6 +24,15 @@ internal class StalledIssueItemMapper @Inject constructor(
             },
             detailedInfo = getMockStalledIssueResolveInfo(),
             actions = stalledIssueResolutionActionMapper(stalledIssueEntity.issueType)
+        )
+
+    operator fun invoke(stalledIssueUiItem: StalledIssueUiItem): StalledIssue =
+        StalledIssue(
+            nodeIds = stalledIssueUiItem.nodeIds,
+            localPaths = stalledIssueUiItem.localPaths,
+            issueType = stalledIssueUiItem.issueType,
+            conflictName = stalledIssueUiItem.conflictName,
+            nodeNames = stalledIssueUiItem.nodeNames,
         )
 
     private fun getMockStalledIssueResolveInfo(): StalledIssueDetailedInfo =

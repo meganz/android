@@ -41,7 +41,9 @@ internal class SyncFoldersViewModel @Inject constructor(
                 .map { syncs ->
                     val stalledIssues = getSyncStalledIssuesUseCase()
                     syncs.map { sync ->
-                        sync.copy(hasStalledIssues = stalledIssues.any { it.localPath.contains(sync.deviceStoragePath) })
+                        sync.copy(hasStalledIssues = stalledIssues.any {
+                            it.localPaths.first().contains(sync.deviceStoragePath)
+                        })
                     }
                 }
                 .collectLatest { syncs ->

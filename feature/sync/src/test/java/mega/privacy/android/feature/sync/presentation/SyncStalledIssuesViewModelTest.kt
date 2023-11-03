@@ -41,21 +41,21 @@ class SyncStalledIssuesViewModelTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
-            nodeId = NodeId(3L),
-            localPath = "/storage/emulated/0/DCIM",
+            nodeIds = listOf( NodeId(3L)),
+            localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
-            nodeName = "Camera",
+            nodeNames = listOf("Camera"),
         )
     )
 
     private val stalledIssuesUiItems = listOf(
         StalledIssueUiItem(
-            nodeId = 3L,
-            localPath = "/storage/emulated/0/DCIM",
+            nodeIds = listOf(NodeId(3L)),
+            localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
-            nodeName = "Camera",
+            nodeNames = listOf("Camera"),
             icon = 0,
             detailedInfo = StalledIssueDetailedInfo("", ""),
             actions = emptyList()
@@ -89,7 +89,7 @@ class SyncStalledIssuesViewModelTest {
                 stalledIssuesUiItems.first()
             )
             val node: FolderNode = mock()
-            whenever(getNodeByHandleUseCase(stalledIssues.first().nodeId.longValue)).thenReturn(node)
+            whenever(getNodeByHandleUseCase(stalledIssues.first().nodeIds.first().longValue)).thenReturn(node)
             initViewModel()
 
             underTest.state.test {

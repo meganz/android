@@ -9,17 +9,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
+import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
 import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncListViewModel @Inject constructor(
     private val setOnboardingShownUseCase: SetOnboardingShownUseCase,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
-    private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase
+    private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase,
+    private val stalledIssueItemMapper: StalledIssueItemMapper
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncListState())
@@ -42,9 +43,8 @@ internal class SyncListViewModel @Inject constructor(
             is SyncListAction.ResolveStalledIssue -> {
                 viewModelScope.launch {
                     resolveStalledIssueUseCase(
-                        stalledIssueResolutionAction = action.selectedResolution,
-                        megaNodeId = action.uiItem.nodeId,
-                        localPath = action.uiItem.localPath,
+                        action.selectedResolution,
+                        stalledIssueItemMapper(action.uiItem)
                     )
                 }
 

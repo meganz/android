@@ -237,6 +237,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun getFileByPath(path: String): File? = withContext(ioDispatcher) {
+        fileGateway.getFileByPath(path)
+    }
+
     override suspend fun getFileStreamingUri(node: Node) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let {
             streamingGateway.getLocalLink(it)
