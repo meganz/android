@@ -60,9 +60,14 @@ interface CameraUploadsSettingsPreferenceGateway {
     /**
      * Sets the new Media Uploads Folder local path
      *
-     * @param localPath The new Media Uploads Folder local path
+     * @param path The new Media Uploads Folder local path
      */
-    suspend fun setMediaUploadsLocalPath(localPath: String?)
+    suspend fun setMediaUploadsLocalPath(path: String?)
+
+    /**
+     * Set Camera uploads enabled
+     */
+    suspend fun setCameraUploadsEnabled(isEnabled: Boolean)
 
     /**
      * Set Media uploads enabled
@@ -81,15 +86,22 @@ interface CameraUploadsSettingsPreferenceGateway {
      * Sets the new value in the Database, as to whether Location Tags should be added or not
      * when uploading Photos
      *
-     * @param enable true if Location Tags should be added when uploading Photos
+     * @param isEnabled true if Location Tags should be added when uploading Photos
      */
-    suspend fun setLocationTagsEnabled(enable: Boolean)
+    suspend fun setLocationTagsEnabled(isEnabled: Boolean)
 
 
     /**
      * Get video quality for camera upload
      */
-    suspend fun getUploadVideoQuality(): String?
+    suspend fun getUploadVideoQuality(): Int?
+
+    /**
+     * Sets the new Video Quality when uploading Videos through Camera Uploads
+     *
+     * @param quality The Video Quality, represented as an [Int]
+     */
+    suspend fun setUploadVideoQuality(quality: Int)
 
     /**
      * Sets whether the File Names of files to be uploaded will be kept or not
@@ -137,7 +149,7 @@ interface CameraUploadsSettingsPreferenceGateway {
     /**
      * Get file upload option
      */
-    suspend fun getFileUploadOption(): String?
+    suspend fun getFileUploadOption(): Int?
 
     /**
      * Sets the upload option of Camera Uploads
@@ -149,7 +161,7 @@ interface CameraUploadsSettingsPreferenceGateway {
     /**
      * Get photo time stamp
      */
-    suspend fun getPhotoTimeStamp(): String?
+    suspend fun getPhotoTimeStamp(): Long?
 
     /**
      * Set photo time stamp
@@ -159,7 +171,7 @@ interface CameraUploadsSettingsPreferenceGateway {
     /**
      * Get video time stamp
      */
-    suspend fun getVideoTimeStamp(): String?
+    suspend fun getVideoTimeStamp(): Long?
 
     /**
      * Set video time stamp
@@ -169,7 +181,7 @@ interface CameraUploadsSettingsPreferenceGateway {
     /**
      * Get media uploads photo time stamp
      */
-    suspend fun getMediaUploadsPhotoTimeStamp(): String?
+    suspend fun getMediaUploadsPhotoTimeStamp(): Long?
 
     /**
      * Set secondary photo time stamp
@@ -179,7 +191,7 @@ interface CameraUploadsSettingsPreferenceGateway {
     /**
      * Get Media Uploads video time stamp
      */
-    suspend fun getMediaUploadsVideoTimeStamp(): String?
+    suspend fun getMediaUploadsVideoTimeStamp(): Long?
 
     /**
      * Set Media Uploads video time stamp

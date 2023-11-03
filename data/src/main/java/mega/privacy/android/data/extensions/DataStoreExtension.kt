@@ -11,9 +11,15 @@ import java.io.IOException
 /**
  * read data store preferences and returns [emptyPreferences] if [IOException] is thrown
  */
-@Throws(Exception::class)
 fun <T> DataStore<Preferences>.monitor(key: Preferences.Key<T>): Flow<T?> {
-    return this.data
+    return this.data.monitor(key)
+}
+
+/**
+ * read data store preferences and returns [emptyPreferences] if [IOException] is thrown
+ */
+fun <T> Flow<Preferences>.monitor(key: Preferences.Key<T>): Flow<T?> {
+    return this
         .catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
