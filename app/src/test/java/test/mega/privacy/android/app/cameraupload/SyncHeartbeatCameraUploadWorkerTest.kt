@@ -1,106 +1,130 @@
 package test.mega.privacy.android.app.cameraupload
 
 import android.content.Context
-import android.util.Log
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.hilt.work.HiltWorkerFactory
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.Configuration
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import androidx.work.testing.SynchronousExecutor
-import androidx.work.testing.WorkManagerTestInitHelper
+import androidx.work.ForegroundInfo
+import androidx.work.ListenableWorker
+import androidx.work.WorkerFactory
+import androidx.work.WorkerParameters
+import androidx.work.impl.WorkDatabase
+import androidx.work.impl.foreground.ForegroundProcessor
+import androidx.work.impl.utils.WorkForegroundUpdater
+import androidx.work.impl.utils.WorkProgressUpdater
+import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
+import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
+import mega.privacy.android.data.wrapper.ApplicationWrapper
+import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
+import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SendMediaUploadsBackupHeartBeatUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit.MINUTES
-import javax.inject.Inject
+import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import java.util.UUID
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 /**
  * Test class of [SyncHeartbeatCameraUploadWorker]
  */
-@HiltAndroidTest
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SyncHeartbeatCameraUploadWorkerTest {
-
-    @get:Rule(order = 0)
-    val hiltRule = HiltAndroidRule(this)
-
-    @get:Rule(order = 1)
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
+    private lateinit var underTest: SyncHeartbeatCameraUploadWorker
 
     private lateinit var context: Context
-    private lateinit var underTest: WorkManager
+    private lateinit var executor: Executor
+    private lateinit var workExecutor: WorkManagerTaskExecutor
+    private lateinit var workDatabase: WorkDatabase
+
+    private val applicationWrapper = mock<ApplicationWrapper>()
+    private val backgroundFastLoginUseCase = mock<BackgroundFastLoginUseCase>()
+    private val sendCameraUploadsBackupHeartBeatUseCase =
+        mock<SendCameraUploadsBackupHeartBeatUseCase>()
+    private val sendMediaUploadsBackupHeartBeatUseCase =
+        mock<SendMediaUploadsBackupHeartBeatUseCase>()
+    private val loginMutex = mock<Mutex>()
 
     @Before
     fun setUp() {
-        hiltRule.inject()
-
         context = ApplicationProvider.getApplicationContext()
+        executor = Executors.newSingleThreadExecutor()
+        workExecutor = WorkManagerTaskExecutor(executor)
+        workDatabase = WorkDatabase.create(context, workExecutor.serialTaskExecutor, true)
 
-        val configuration = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .setMinimumLoggingLevel(Log.DEBUG)
-            .setExecutor(SynchronousExecutor())
-            .build()
+        underTest = SyncHeartbeatCameraUploadWorker(
+            context = context,
+            workerParams = WorkerParameters(
+                UUID.randomUUID(),
+                workDataOf(),
+                emptyList(),
+                WorkerParameters.RuntimeExtras(),
+                1,
+                1,
+                executor,
+                workExecutor,
+                WorkerFactory.getDefaultWorkerFactory(),
+                WorkProgressUpdater(workDatabase, workExecutor),
+                WorkForegroundUpdater(workDatabase, object : ForegroundProcessor {
+                    override fun startForeground(
+                        workSpecId: String,
+                        foregroundInfo: ForegroundInfo,
+                    ) {
+                    }
 
-        // Initialize WorkManager for instrumentation tests
-        WorkManagerTestInitHelper.initializeTestWorkManager(context, configuration)
-        underTest = WorkManager.getInstance(context)
+                    override fun stopForeground(workSpecId: String) {}
+                    override fun isEnqueuedInForeground(workSpecId: String): Boolean = true
+                }, workExecutor)
+            ),
+            applicationWrapper = applicationWrapper,
+            backgroundFastLoginUseCase = backgroundFastLoginUseCase,
+            sendCameraUploadsBackupHeartBeatUseCase = sendCameraUploadsBackupHeartBeatUseCase,
+            sendMediaUploadsBackupHeartBeatUseCase = sendMediaUploadsBackupHeartBeatUseCase,
+            loginMutex = loginMutex,
+        )
     }
 
     @Test
-    @Throws(Exception::class)
-    fun `test that one time sync heartbeat camera upload worker is successful`() {
-        // Create the OneTimeWorkRequest
-        val request = OneTimeWorkRequestBuilder<SyncHeartbeatCameraUploadWorker>().build()
+    fun `test that both primary and secondary backup heartbeats are sent`() = runTest {
+        whenever(loginMutex.isLocked).thenReturn(false)
+        val result = underTest.doWork()
 
-        // Enqueue and wait for result. This also runs the Worker synchronously
-        // due to SynchronousExecutor
-        underTest.enqueue(request).result.get()
+        val inOrder = inOrder(
+            backgroundFastLoginUseCase,
+            applicationWrapper,
+            sendCameraUploadsBackupHeartBeatUseCase,
+            sendMediaUploadsBackupHeartBeatUseCase,
+        )
 
-        // Get WorkInfo
-        val workInfo = underTest.getWorkInfoById(request.id).get()
+        inOrder.verify(backgroundFastLoginUseCase).invoke()
+        inOrder.verify(applicationWrapper).setHeartBeatAlive(true)
+        inOrder.verify(sendCameraUploadsBackupHeartBeatUseCase).invoke(
+            heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+            lastNodeHandle = -1L
+        )
+        inOrder.verify(sendMediaUploadsBackupHeartBeatUseCase).invoke(
+            heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+            lastNodeHandle = -1L
+        )
 
-        // Perform Assertion
-        assertThat(workInfo.state).isEqualTo(WorkInfo.State.RUNNING)
+        assertThat(result).isEqualTo(ListenableWorker.Result.success())
     }
 
     @Test
-    @Throws(Exception::class)
-    fun `test that periodic sync heartbeat camera upload worker is enqueued`() {
-        // Create the PeriodicWorkRequest
-        val request = PeriodicWorkRequestBuilder<SyncHeartbeatCameraUploadWorker>(
-            repeatInterval = 30,
-            repeatIntervalTimeUnit = MINUTES,
-            flexTimeInterval = 20,
-            flexTimeIntervalUnit = MINUTES,
-        ).build()
+    fun `test that a failure is returned when an exception is found`() = runTest {
+        whenever(loginMutex.isLocked).thenReturn(false)
+        whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException())
 
-        val testDriver = WorkManagerTestInitHelper.getTestDriver(context)
-
-        // Enqueue and wait for result. This also runs the Worker synchronously
-        // due to SynchronousExecutor
-        underTest.enqueue(request).result.get()
-
-        // Tells the testing framework the period delay is met
-        testDriver?.setPeriodDelayMet(request.id)
-
-        // Get WorkInfo
-        val workInfo = underTest.getWorkInfoById(request.id).get()
-
-        // Perform Assertion
-        assertThat(workInfo.state).isEqualTo(WorkInfo.State.RUNNING)
+        val result = underTest.doWork()
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 }
