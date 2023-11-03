@@ -59,6 +59,7 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
@@ -141,7 +142,7 @@ fun ImagePreviewScreen(
             )
 
             LaunchedEffect(pagerState) {
-                snapshotFlow { pagerState.currentPage }.collect { page ->
+                snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
                     imageNodes.getOrNull(page)?.let {
                         viewModel.setCurrentImageNodeIndex(page)
                         viewModel.setCurrentImageNode(it)

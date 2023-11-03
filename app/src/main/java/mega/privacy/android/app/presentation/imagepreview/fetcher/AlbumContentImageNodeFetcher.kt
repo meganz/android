@@ -8,11 +8,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.app.presentation.extensions.serializable
-import mega.privacy.android.app.presentation.photos.albums.model.Album
-import mega.privacy.android.app.presentation.photos.albums.model.Album.Custom
-import mega.privacy.android.app.presentation.photos.albums.model.Album.Favourite
-import mega.privacy.android.app.presentation.photos.albums.model.Album.Gif
-import mega.privacy.android.app.presentation.photos.albums.model.Album.Raw
+import mega.privacy.android.app.presentation.photos.albums.model.AlbumType
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -31,20 +27,20 @@ class AlbumContentImageNodeFetcher @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ImageNodeFetcher {
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
-        return when (bundle.serializable<Album>(ALBUM_TYPE)) {
-            Favourite -> {
+        return when (bundle.serializable<AlbumType>(ALBUM_TYPE)) {
+            AlbumType.Favourite -> {
                 monitorFavouriteAlbumNodesUseCase()
             }
 
-            Gif -> {
+            AlbumType.Gif -> {
                 monitorGifAlbumNodesUseCase()
             }
 
-            Raw -> {
+            AlbumType.Raw -> {
                 monitorRawAlbumNodesUseCase()
             }
 
-            Custom -> {
+            AlbumType.Custom -> {
                 val id = bundle.getLong(CUSTOM_ALBUM_ID)
                 monitorCustomAlbumNodesUseCase(albumId = AlbumId(id))
             }

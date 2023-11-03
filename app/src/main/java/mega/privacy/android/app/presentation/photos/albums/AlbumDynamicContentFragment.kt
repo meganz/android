@@ -31,16 +31,23 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
+import mega.privacy.android.app.presentation.photos.albums.model.getAlbumType
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.compose.albumcontent.AlbumContentScreen
 import mega.privacy.android.app.presentation.photos.compose.albumcontent.isFilterable
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -163,7 +170,7 @@ class AlbumDynamicContentFragment : Fragment() {
                                 photos.isNotEmpty()
                         }
                     }
-                    if (!state.showRenameDialog){
+                    if (!state.showRenameDialog) {
                         managerActivity.setToolbarTitle(getCurrentAlbumTitle())
                     }
                 }
@@ -172,16 +179,38 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun openPhotoPreview(anchorPhoto: Photo, photos: List<Photo>) {
-        val intent = ImageViewerActivity.getIntentForChildren(
-            requireContext(),
-            photos.map { it.id }.toLongArray(),
-            anchorPhoto.id,
-        )
-        startActivity(intent)
-        managerActivity.overridePendingTransition(0, 0)
+        albumsViewModel.state.value.currentAlbum?.let { currentAlbum ->
+            lifecycleScope.launch {
+                if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                    val params = buildMap {
+                        this[AlbumContentImageNodeFetcher.ALBUM_TYPE] = currentAlbum.getAlbumType()
+
+                        if (currentAlbum is UserAlbum) {
+                            this[AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID] = currentAlbum.id.id
+                        }
+                    }
+                    val intent = ImagePreviewActivity.createIntent(
+                        context = requireContext(),
+                        imageSource = ImagePreviewFetcherSource.ALBUM_CONTENT,
+                        menuOptionsSource = ImagePreviewMenuSource.ALBUM_CONTENT,
+                        anchorImageNodeId = NodeId(anchorPhoto.id),
+                        params = params,
+                    )
+                    startActivity(intent)
+                } else {
+                    val intent = ImageViewerActivity.getIntentForChildren(
+                        requireContext(),
+                        photos.map { it.id }.toLongArray(),
+                        anchorPhoto.id,
+                    )
+                    startActivity(intent)
+                    managerActivity.overridePendingTransition(0, 0)
+                }
+            }
+        }
     }
 
-    private fun openAlbumPhotosSelection(album: Album.UserAlbum) {
+    private fun openAlbumPhotosSelection(album: UserAlbum) {
         val intent = AlbumScreenWrapperActivity.createAlbumPhotosSelectionScreen(
             context = requireContext(),
             albumId = album.id,
@@ -194,7 +223,7 @@ class AlbumDynamicContentFragment : Fragment() {
 
     private fun openAlbumCoverSelectionScreen() {
         val album = albumsViewModel.state.value.currentAlbum
-        if (album !is Album.UserAlbum) return
+        if (album !is UserAlbum) return
 
         val intent = AlbumScreenWrapperActivity.createAlbumCoverSelectionScreen(
             context = requireContext(),
@@ -231,20 +260,26 @@ class AlbumDynamicContentFragment : Fragment() {
             val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
             photos.setFilterMenuItemVisibility()
-            if (album is Album.UserAlbum) {
+            if (album is UserAlbum) {
                 val isAlbumSharingEnabled = runBlocking {
                     getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)
                 }
                 menu.findItem(R.id.action_menu_get_link)?.let { menu ->
                     menu.title =
-                        context?.resources?.getQuantityString(R.plurals.album_share_get_links, 1)
-                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == false
+                        context?.resources?.getQuantityString(
+                            R.plurals.album_share_get_links,
+                            1
+                        )
+                    menu.isVisible =
+                        isAlbumSharingEnabled && currentUserAlbum?.isExported == false
                 }
                 menu.findItem(R.id.action_menu_manage_link)?.let { menu ->
-                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == true
+                    menu.isVisible =
+                        isAlbumSharingEnabled && currentUserAlbum?.isExported == true
                 }
                 menu.findItem(R.id.action_menu_remove_link)?.let { menu ->
-                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == true
+                    menu.isVisible =
+                        isAlbumSharingEnabled && currentUserAlbum?.isExported == true
                 }
 
                 menu.findItem(R.id.action_menu_rename)?.isVisible = true
@@ -326,7 +361,7 @@ class AlbumDynamicContentFragment : Fragment() {
 
     val currentAlbum: Album? get() = albumsViewModel.state.value.currentAlbum
 
-    val currentUserAlbum: Album.UserAlbum? get() = albumsViewModel.state.value.currentUserAlbum
+    val currentUserAlbum: UserAlbum? get() = albumsViewModel.state.value.currentUserAlbum
 
     override fun onPause() {
         ackPhotosAddingProgressCompleted()
@@ -337,7 +372,8 @@ class AlbumDynamicContentFragment : Fragment() {
 
     private fun ackPhotosAddingProgressCompleted() {
         val album = albumsViewModel.state.value.currentUserAlbum ?: return
-        val isProgressCompleted = albumContentViewModel.state.value.isAddingPhotosProgressCompleted
+        val isProgressCompleted =
+            albumContentViewModel.state.value.isAddingPhotosProgressCompleted
 
         if (!isProgressCompleted) return
         albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = album.id)
@@ -345,7 +381,8 @@ class AlbumDynamicContentFragment : Fragment() {
 
     private fun ackPhotosRemovingProgressCompleted() {
         val album = albumsViewModel.state.value.currentUserAlbum ?: return
-        val isProgressCompleted = albumContentViewModel.state.value.isRemovingPhotosProgressCompleted
+        val isProgressCompleted =
+            albumContentViewModel.state.value.isRemovingPhotosProgressCompleted
 
         if (!isProgressCompleted) return
         albumContentViewModel.updatePhotosRemovingProgressCompleted(albumId = album.id)

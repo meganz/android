@@ -32,14 +32,20 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
+import mega.privacy.android.app.presentation.photos.albums.model.getAlbumType
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.compose.albumcontent.isFilterable
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
 import mega.privacy.android.domain.entity.photos.Album.GifAlbum
@@ -158,7 +164,8 @@ class AlbumContentFragment : Fragment() {
                     }
 
                     menu?.let { menu ->
-                        menu.findItem(R.id.action_menu_sort_by)?.isVisible = state.photos.isNotEmpty()
+                        menu.findItem(R.id.action_menu_sort_by)?.isVisible =
+                            state.photos.isNotEmpty()
                     }
 
                     if (!state.showRenameDialog) {
@@ -170,13 +177,35 @@ class AlbumContentFragment : Fragment() {
     }
 
     private fun openPhotoPreview(anchorPhoto: Photo, photos: List<Photo>) {
-        val intent = ImageViewerActivity.getIntentForChildren(
-            requireContext(),
-            photos.map { it.id }.toLongArray(),
-            anchorPhoto.id,
-        )
-        startActivity(intent)
-        managerActivity.overridePendingTransition(0, 0)
+        albumsViewModel.state.value.currentAlbum?.let { currentAlbum ->
+            lifecycleScope.launch {
+                if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                    val params = buildMap {
+                        this[AlbumContentImageNodeFetcher.ALBUM_TYPE] = currentAlbum.getAlbumType()
+
+                        if (currentAlbum is UserAlbum) {
+                            this[AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID] = currentAlbum.id.id
+                        }
+                    }
+                    val intent = ImagePreviewActivity.createIntent(
+                        context = requireContext(),
+                        imageSource = ImagePreviewFetcherSource.ALBUM_CONTENT,
+                        menuOptionsSource = ImagePreviewMenuSource.ALBUM_CONTENT,
+                        anchorImageNodeId = NodeId(anchorPhoto.id),
+                        params = params,
+                    )
+                    startActivity(intent)
+                } else {
+                    val intent = ImageViewerActivity.getIntentForChildren(
+                        requireContext(),
+                        photos.map { it.id }.toLongArray(),
+                        anchorPhoto.id,
+                    )
+                    startActivity(intent)
+                    managerActivity.overridePendingTransition(0, 0)
+                }
+            }
+        }
     }
 
     private fun openAlbumPhotosSelection(album: UserAlbum) {
@@ -340,7 +369,8 @@ class AlbumContentFragment : Fragment() {
 
     private fun ackPhotosRemovingProgressCompleted() {
         val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
-        val isProgressCompleted = albumContentViewModel.state.value.isRemovingPhotosProgressCompleted
+        val isProgressCompleted =
+            albumContentViewModel.state.value.isRemovingPhotosProgressCompleted
 
         if (!isProgressCompleted) return
         albumContentViewModel.updatePhotosRemovingProgressCompleted(albumId = album.id)

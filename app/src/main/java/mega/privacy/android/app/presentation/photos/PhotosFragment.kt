@@ -51,6 +51,7 @@ import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
@@ -87,6 +88,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getPartialMedia
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -267,15 +269,18 @@ class PhotosFragment : Fragment() {
 
         // CU default menu
         val showCameraUploadsButton = state.enableCameraUploadButtonShowing
-        this.menu?.findItem(R.id.action_cu_status_default)?.isVisible = showCameraUploadsButton && isMenuVisible
+        this.menu?.findItem(R.id.action_cu_status_default)?.isVisible =
+            showCameraUploadsButton && isMenuVisible
 
         // CU complete menu
         val showCameraUploadsComplete = state.showCameraUploadsComplete
-        this.menu?.findItem(R.id.action_cu_status_complete)?.isVisible = showCameraUploadsComplete && isMenuVisible
+        this.menu?.findItem(R.id.action_cu_status_complete)?.isVisible =
+            showCameraUploadsComplete && isMenuVisible
 
         // CU warning menu
         val showCameraUploadsWarning = state.showCameraUploadsWarning
-        this.menu?.findItem(R.id.action_cu_status_warning)?.isVisible = showCameraUploadsWarning && isMenuVisible
+        this.menu?.findItem(R.id.action_cu_status_warning)?.isVisible =
+            showCameraUploadsWarning && isMenuVisible
     }
 
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
@@ -407,7 +412,8 @@ class PhotosFragment : Fragment() {
         this.menu?.findItem(R.id.action_photos_sortby)?.isVisible = isShowing
         this.menu?.findItem(R.id.action_zoom_in_secondary)?.isVisible = isShowing && isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_out_secondary)?.isVisible = isShowing && isNewCUEnabled
-        this.menu?.findItem(R.id.action_cu_settings)?.isVisible = isShowing && !timelineViewModel.state.value.enableCameraUploadButtonShowing && isNewCUEnabled
+        this.menu?.findItem(R.id.action_cu_settings)?.isVisible =
+            isShowing && !timelineViewModel.state.value.enableCameraUploadButtonShowing && isNewCUEnabled
     }
 
     private fun openCameraUploadsSettings() {
@@ -641,7 +647,8 @@ class PhotosFragment : Fragment() {
                 val intent = ImagePreviewActivity.createIntent(
                     context = requireContext(),
                     imageSource = ImagePreviewFetcherSource.TIMELINE,
-                    currentImageNodeId = photo.id
+                    menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
+                    anchorImageNodeId = NodeId(photo.id)
                 )
                 startActivity(intent)
             } else {

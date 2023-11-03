@@ -29,8 +29,10 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
@@ -42,6 +44,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -279,12 +282,14 @@ class ImagePreviewActivity : BaseActivity() {
         fun createIntent(
             context: Context,
             imageSource: ImagePreviewFetcherSource,
-            currentImageNodeId: Long,
+            menuOptionsSource: ImagePreviewMenuSource,
+            anchorImageNodeId: NodeId,
             params: Map<String, Any> = mapOf(),
         ): Intent {
             return Intent(context, ImagePreviewActivity::class.java).apply {
                 putExtra(IMAGE_NODE_FETCHER_SOURCE, imageSource)
-                putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, currentImageNodeId)
+                putExtra(IMAGE_PREVIEW_MENU_OPTIONS, menuOptionsSource)
+                putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId.longValue)
                 putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
             }
         }
