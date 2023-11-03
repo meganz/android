@@ -87,10 +87,6 @@ class VideoMeetingViewHolder(
                 bottomMargin = 0
             }
 
-            (binding.moderatorIcon.layoutParams as LinearLayout.LayoutParams).apply {
-                bottomMargin = 0
-            }
-
             binding.name.isVisible = false
         }
 
@@ -153,7 +149,6 @@ class VideoMeetingViewHolder(
             }
 
             updateAudioIcon(participant)
-            updatePrivilegeIcon(participant)
             updatePeerSelected(participant)
         }
     }
@@ -430,18 +425,6 @@ class VideoMeetingViewHolder(
 
         Timber.d("Video should be off")
         videoOffUI(participant)
-    }
-
-    /**
-     * Update privileges
-     *
-     * @param participant Participant whose privileges are to be updated
-     */
-    fun updatePrivilegeIcon(participant: Participant) {
-        if (isInvalid(participant)) return
-
-        Timber.d("Update privilege icon participant")
-        binding.moderatorIcon.isVisible = participant.isModerator
     }
 
     /**

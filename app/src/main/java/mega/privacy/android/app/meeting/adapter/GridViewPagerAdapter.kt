@@ -339,31 +339,6 @@ class GridViewPagerAdapter(
     }
 
     /**
-     * Update participant privileges
-     *
-     * @param participant
-     * @param currentPage the current page number
-     * @param pager the ViewPager2
-     */
-    fun updateParticipantPrivileges(participant: Participant, currentPage: Int, pager: ViewPager2) {
-        val holder = getHolder(currentPage, pager)
-        holder?.let {
-            adapterList.let {
-                if (adapterList.isEmpty())
-                    return
-
-                for (i in 0 until adapterList.size) {
-                    adapterList[i]?.updateParticipantPrivileges(participant)
-                }
-
-            }
-            return
-        }
-
-        notifyItemChanged(currentPage)
-    }
-
-    /**
      * Update participant name
      *
      * @param participant the target participant

@@ -51,24 +51,6 @@ class VideoGridViewAdapter(
     }
 
     /**
-     * Update participant privileges
-     *
-     * @param participant Participant to update
-     */
-    fun updateParticipantPrivileges(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
-        if (position == INVALID_POSITION)
-            return
-
-        getHolderAtPosition(position)?.let {
-            it.updatePrivilegeIcon(participant)
-            return
-        }
-
-        notifyItemChanged(position)
-    }
-
-    /**
      * Update participant name
      *
      * @param participant Participant to update

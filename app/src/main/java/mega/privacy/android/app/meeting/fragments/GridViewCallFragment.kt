@@ -316,28 +316,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
     }
 
     /**
-     * Check changes in privileges
-     *
-     * @param listPeers List of participants with changes
-     */
-    fun updatePrivileges(listPeers: MutableSet<Participant>) {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
-                peer.peerId,
-                peer.clientId
-            )?.let {
-                Timber.d("Update participant privileges")
-                adapterPager.updateParticipantPrivileges(
-                    it,
-                    currentPage,
-                    viewDataBinding.gridViewPager
-                )
-            }
-        }
-    }
-
-    /**
      * Update layout base on the new orientation
      *
      * @param widthPixels The screen width

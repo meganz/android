@@ -293,9 +293,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                     if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
                         Timber.d("Change in the privileges of a participant")
-                        inMeetingViewModel.updateParticipantsPrivileges(requireContext()).run {
-                            updateRemotePrivileges(this)
-                        }
+                        inMeetingViewModel.updateParticipantsPrivileges(requireContext())
                     }
                 }
             }
@@ -2438,28 +2436,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             floatingWindowFragment?.let {
                 if (it.isAdded && inMeetingViewModel.isMe(peerId)) {
                     it.updateMyAvatar()
-                }
-            }
-        }
-    }
-
-    /**
-     * Method that checks if several participants privileges has changed and updates the UI
-     *
-     * @param listParticipants list of participants with changes
-     */
-    private fun updateRemotePrivileges(listParticipants: MutableSet<Participant>) {
-        if (listParticipants.isNotEmpty()) {
-            Timber.d("Update remote privileges")
-            gridViewCallFragment?.let {
-                if (it.isAdded) {
-                    it.updatePrivileges(listParticipants)
-                }
-            }
-
-            speakerViewCallFragment?.let {
-                if (it.isAdded) {
-                    it.updatePrivileges(listParticipants)
                 }
             }
         }

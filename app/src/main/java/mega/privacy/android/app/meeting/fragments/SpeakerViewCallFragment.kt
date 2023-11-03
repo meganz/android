@@ -675,24 +675,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         }
     }
 
-    /**
-     * Check changes in privileges
-     *
-     * @param listPeers List of participants with changes
-     */
-    fun updatePrivileges(listPeers: MutableSet<Participant>) {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            inMeetingViewModel.getParticipant(
-                peer.peerId,
-                peer.clientId
-            )?.let {
-                Timber.d("Update participant privileges")
-                adapter.updateParticipantPrivileges(it)
-            }
-        }
-    }
-
     companion object {
         const val AVATAR_VIDEO_VISIBLE = 1f
         const val ROTATION = 0f
