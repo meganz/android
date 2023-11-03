@@ -452,7 +452,7 @@ class PhotosFragment : Fragment() {
             }
         }
 
-        menu.findItem(R.id.action_zoom_in_secondary).let {
+        menu.findItem(R.id.action_zoom_in_secondary)?.let {
             it.isEnabled = zoomInValid
             it.title = SpannableString(it.title.toString()).apply {
                 if (zoomInValid) return@apply
@@ -472,7 +472,7 @@ class PhotosFragment : Fragment() {
             }
         }
 
-        menu.findItem(R.id.action_zoom_out_secondary).let {
+        menu.findItem(R.id.action_zoom_out_secondary)?.let {
             it.isEnabled = zoomOutValid
             it.title = SpannableString(it.title.toString()).apply {
                 if (zoomOutValid) return@apply
