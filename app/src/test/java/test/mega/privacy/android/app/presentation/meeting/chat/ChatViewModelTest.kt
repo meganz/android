@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUse
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipantsInChatUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
@@ -119,13 +120,20 @@ internal class ChatViewModelTest {
 
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val monitorUserLastGreenUpdatesUseCase =
-        mock<MonitorUserLastGreenUpdatesUseCase>()
+        mock<MonitorUserLastGreenUpdatesUseCase> {
+            on { invoke(any()) } doReturn emptyFlow()
+        }
     private val getScheduledMeetingByChat = mock<GetScheduledMeetingByChat>()
     private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase> {
         onBlocking { invoke() } doReturn emptyFlow()
     }
     private val getAnotherCallParticipatingUseCase: GetAnotherCallParticipatingUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
+
+    private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase =
+        mock {
+            on { invoke(any()) } doReturn emptyFlow()
+        }
 
     @BeforeAll
     fun setup() {
@@ -151,7 +159,7 @@ internal class ChatViewModelTest {
             getParticipantFirstNameUseCase,
             getScheduledMeetingByChat,
             passcodeManagement,
-            getAnotherCallParticipatingUseCase
+            getAnotherCallParticipatingUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -173,6 +181,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorHasAnyContactUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorACallInThisChatUseCase(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorParticipatingInACallUseCase() } doReturn emptyFlow()
+        whenever(monitorAllContactParticipantsInChatUseCase(any())) doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -198,6 +207,7 @@ internal class ChatViewModelTest {
             getAnotherCallParticipatingUseCase = getAnotherCallParticipatingUseCase,
             passcodeManagement = passcodeManagement,
             savedStateHandle = savedStateHandle,
+            monitorAllContactParticipantsInChatUseCase = monitorAllContactParticipantsInChatUseCase,
         )
     }
 
@@ -1019,6 +1029,13 @@ internal class ChatViewModelTest {
     fun `test that hasAnyContact updates when a new flag is received`() = runTest {
         val updateFlow = MutableSharedFlow<Boolean>()
         whenever(monitorHasAnyContactUseCase()).thenReturn(updateFlow)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { peerHandlesList } doReturn listOf(1L, 2L, 3L)
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         initTestClass()
         underTest.state.test {
             assertThat(awaitItem().hasAnyContact).isFalse()
@@ -1175,6 +1192,42 @@ internal class ChatViewModelTest {
         underTest.consumeOpenMeetingEvent()
         underTest.state.test {
             assertThat(awaitItem().openMeetingEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+    }
+
+    @Test
+    fun `test that monitor all contacts participant in the chat call when monitor chat room updates with participant change`() =
+        runTest {
+            val flow = MutableSharedFlow<ChatRoom>()
+            whenever(monitorChatRoomUpdates(chatId)).thenReturn(flow)
+            val newChatRoom = mock<ChatRoom> {
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                on { peerHandlesList } doReturn listOf(1L, 2L, 3L)
+                on { changes } doReturn listOf(ChatRoomChange.Participants)
+            }
+            initTestClass()
+            flow.emit(newChatRoom)
+            verify(monitorAllContactParticipantsInChatUseCase).invoke(newChatRoom.peerHandlesList)
+        }
+
+    @ParameterizedTest(name = "emits {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that all contacts participant in the chat update correctly when monitor new contact`(
+        areAllContactParticipantsInChat: Boolean,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { peerHandlesList } doReturn listOf(1L, 2L)
+            on { isGroup } doReturn true
+        }
+        val flow = MutableSharedFlow<Boolean>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorAllContactParticipantsInChatUseCase(any())).thenReturn(flow)
+        initTestClass()
+        flow.emit(areAllContactParticipantsInChat)
+        underTest.state.test {
+            assertThat(awaitItem().allContactsParticipateInChat).isEqualTo(areAllContactParticipantsInChat)
         }
     }
 

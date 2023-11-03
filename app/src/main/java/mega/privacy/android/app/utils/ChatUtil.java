@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.buildChatTempFile;
 import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
-import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
 import static mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME;
@@ -107,12 +106,12 @@ import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ManageReactionListener;
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.domain.entity.VideoQuality;
 import mega.privacy.android.domain.entity.chat.PendingMessage;
 import mega.privacy.android.domain.entity.chat.PendingMessageState;
@@ -1978,11 +1977,12 @@ public class ChatUtil {
     }
 
     /**
-     * Method to check if all user's contacts are participants of the chat.
+     * Method to check if all user's contacts are participants of the chat. use [AreAllParticipantsInContactUseCase] instead
      *
      * @param chatRoom MegaChatRoom to check
      * @return True if all user's contacts are participants of the chat room or false otherwise.
      */
+    @Deprecated
     public static boolean areAllMyContactsChatParticipants(MegaChatRoom chatRoom) {
         if (chatRoom == null) {
             return false;

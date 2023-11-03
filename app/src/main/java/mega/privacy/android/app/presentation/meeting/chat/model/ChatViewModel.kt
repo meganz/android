@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUse
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipantsInChatUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
@@ -81,6 +82,7 @@ internal class ChatViewModel @Inject constructor(
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
     private val getAnotherCallParticipatingUseCase: GetAnotherCallParticipatingUseCase,
     private val passcodeManagement: PasscodeManagement,
+    private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -97,10 +99,11 @@ internal class ChatViewModel @Inject constructor(
         get() = ownPrivilege != ChatRoomPermission.Unknown
                 && ownPrivilege != ChatRoomPermission.Removed
 
+    private var monitorAllContactParticipantsInChatJob: Job? = null
+
     init {
         monitorParticipatingInACall()
         monitorStorageStateEvent()
-        monitorHasAnyContact()
         chatId?.let {
             updateChatId(it)
             getChatRoom(it)
@@ -112,6 +115,17 @@ internal class ChatViewModel @Inject constructor(
             monitorNotificationMute(it)
             monitorChatConnectionState(it)
             monitorNetworkConnectivity(it)
+        }
+    }
+
+    private fun monitorAllContactParticipantsInChat(peerHandles: List<Long>) {
+        monitorAllContactParticipantsInChatJob?.cancel()
+        monitorAllContactParticipantsInChatJob = viewModelScope.launch {
+            monitorAllContactParticipantsInChatUseCase(peerHandles)
+                .catch { Timber.e(it) }
+                .collect { allContactsParticipateInChat ->
+                    _state.update { state -> state.copy(allContactsParticipateInChat = allContactsParticipateInChat) }
+                }
         }
     }
 
@@ -217,14 +231,19 @@ internal class ChatViewModel @Inject constructor(
                                 isArchived = isArchived,
                                 isMeeting = isMeeting,
                                 hasCustomTitle = hasCustomTitle,
-                                participantsCount = getNumberParticipants()
+                                participantsCount = getNumberParticipants(),
                             )
                         }
-                        if (!isGroup && peerHandlesList.isNotEmpty()) {
-                            peerHandlesList[0].let {
-                                getUserChatStatus(it)
-                                monitorUserOnlineStatusUpdates(it)
-                                monitorUserLastGreen(it)
+                        if (peerHandlesList.isNotEmpty()) {
+                            if (!isGroup) {
+                                peerHandlesList[0].let {
+                                    getUserChatStatus(it)
+                                    monitorUserOnlineStatusUpdates(it)
+                                    monitorUserLastGreen(it)
+                                }
+                            } else {
+                                monitorAllContactParticipantsInChat(peerHandlesList)
+                                monitorHasAnyContact()
                             }
                         }
                     }
@@ -310,8 +329,11 @@ internal class ChatViewModel @Inject constructor(
 
                                 ChatRoomChange.UserStopTyping -> handleUserStopTyping(userTyping)
 
-                                ChatRoomChange.Participants -> _state.update { state ->
-                                    state.copy(participantsCount = getNumberParticipants())
+                                ChatRoomChange.Participants -> {
+                                    _state.update { state ->
+                                        state.copy(participantsCount = getNumberParticipants())
+                                    }
+                                    monitorAllContactParticipantsInChat(peerHandlesList)
                                 }
 
                                 else -> {}
