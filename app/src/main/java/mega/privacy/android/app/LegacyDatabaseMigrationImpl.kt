@@ -37,7 +37,8 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     "${SqliteDatabaseHandler.KEY_OFF_PARENT} INTEGER," +
                     "${SqliteDatabaseHandler.KEY_OFF_TYPE} INTEGER, " +
                     "${SqliteDatabaseHandler.KEY_OFF_INCOMING} INTEGER, " +
-                    "${SqliteDatabaseHandler.KEY_OFF_HANDLE_INCOMING} INTEGER )"
+                    "${SqliteDatabaseHandler.KEY_OFF_HANDLE_INCOMING} INTEGER, " +
+                    "${SqliteDatabaseHandler.KEY_OFF_LAST_MODIFIED_TIME} INTEGER )"
         db.execSQL(CREATE_OFFLINE_TABLE)
 
         val CREATE_CREDENTIALS_TABLE =
