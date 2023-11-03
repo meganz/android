@@ -20,6 +20,7 @@ import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
+import timber.log.Timber
 
 @Database(
     entities = [
@@ -133,6 +134,25 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_77_78 = object : Migration(77, 78) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                //Hotfix for lastModifiedTime missing column in offline table issue
+                //Certain users where missing the lastModifiedTime column in the offline table because of a bug in the migration from 76 to 77
+                //This migration will add the missing column for those users. And for existing users it will throw an error that can be ignored
+                //Since there are changes in offline table in room, some fields are INTEGER in legacy database, but TEXT in room database
+                //For that we added the alter table and related queries below
+                try {
+                    database.execSQL("ALTER TABLE offline ADD COLUMN lastModifiedTime INTEGER")
+                    database.execSQL("ALTER TABLE offline RENAME TO offline_old")
+                    database.execSQL("CREATE TABLE IF NOT EXISTS offline (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `handle` TEXT, `path` TEXT, `name` TEXT, `parentId` INTEGER, `type` TEXT, `incoming` INTEGER, `incomingHandle` TEXT, `lastModifiedTime` INTEGER)")
+                    database.execSQL("INSERT INTO offline (id, handle, path, name, parentId, type, incoming, incomingHandle) SELECT id, handle, path, name, parentId, type, incoming, incomingHandle FROM offline_old")
+                    database.execSQL("DROP TABLE offline_old")
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
@@ -140,7 +160,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_71_72,
             MIGRATION_74_75,
             MIGRATION_75_76,
-            MIGRATION_76_77
+            MIGRATION_76_77,
+            MIGRATION_77_78,
         )
     }
 }
