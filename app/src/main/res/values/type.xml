@@ -682,6 +682,12 @@
         <item name="android:textSize">10sp</item>
     </style>
 
+    <!-- Regular, 11sp, 0px, white -->
+    <style name="TextAppearance.Mega.Caption.Variant6">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
     <!-- Regular, 12sp, 0.25px -->
     <style name="TextAppearance.Mega.Caption.Secondary.Variant">
         <item name="android:letterSpacing">0.020833333</item>

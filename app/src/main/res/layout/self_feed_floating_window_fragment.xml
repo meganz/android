@@ -31,16 +31,18 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <ImageView
+    <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/micro_off_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginBottom="6dp"
-        android:src="@drawable/ic_mic_off_contact"
-        android:visibility="gone"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:padding="4dp"
+        android:src="@drawable/mic_off_participant_icon_thin"
+        android:background="@drawable/participant_mic_off_background"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        rounded:corner_radius="16dp" />
 
     <ImageView
         android:id="@+id/on_hold_icon"

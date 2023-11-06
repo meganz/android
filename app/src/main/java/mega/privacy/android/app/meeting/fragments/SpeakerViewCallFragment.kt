@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.components.RoundedImageView
+import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.databinding.SpeakerViewCallFragmentBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -36,6 +37,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private lateinit var speakerAvatar: RoundedImageView
 
     private lateinit var speakerOnHoldIcon: ImageView
+
+    private lateinit var textViewName: EmojiTextView
 
     private lateinit var speakerMuteIcon: ImageView
 
@@ -115,6 +118,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         listView = dataBinding.participantsHorizontalList
         speakerAvatar = dataBinding.speakerAvatarImage
         speakerOnHoldIcon = dataBinding.speakerOnHoldIcon
+        textViewName = dataBinding.name
         speakerMuteIcon = dataBinding.speakerMuteIcon
         surfaceContainer = dataBinding.parentSurfaceView
 
@@ -185,6 +189,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 }
 
                 val currentSpeakerParticipant = inMeetingViewModel.getCurrentSpeakerParticipant()
+                textViewName.text = currentSpeakerParticipant?.name
                 if (currentSpeakerParticipant != null && currentSpeakerParticipant.peerId == participantClicked.peerId && currentSpeakerParticipant.clientId == participantClicked.clientId) {
                     Timber.d(" Same participant, clientId ${currentSpeakerParticipant.clientId}")
                     adapter.updatePeerSelected(currentSpeakerParticipant)
@@ -534,9 +539,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             inMeetingViewModel.getParticipant(
                 peer.peerId,
                 peer.clientId
-            )?.let {
+            )?.let { participant ->
                 Timber.d("Update the peer selected")
-                adapter.updatePeerSelected(it)
+                textViewName.text = participant.name
+                adapter.updatePeerSelected(participant)
             }
         }
     }

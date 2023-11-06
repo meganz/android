@@ -64,35 +64,32 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="3"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:padding="4dp"
+        android:background="@drawable/participant_name_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
-
-        <ImageView
-            android:id="@+id/mute_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:src="@drawable/ic_mic_off_contact"
-            android:visibility="visible" />
 
         <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="3"
-            android:background="@drawable/participant_name_background"
-            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant6"
             android:textColor="@color/white_alpha_087" />
+
+        <ImageView
+            android:id="@+id/mute_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/mic_off_participant_icon_thin"
+            android:visibility="visible" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
