@@ -62,7 +62,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogVie
 import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
 import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
@@ -145,7 +144,6 @@ internal fun FolderLinkView(
     onStorageDialogActionButtonClick: () -> Unit,
     onStorageDialogAchievementButtonClick: () -> Unit,
     emptyViewString: String,
-    thumbnailViewModel: ThumbnailViewModel,
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
@@ -270,11 +268,11 @@ internal fun FolderLinkView(
                     showSortOrder = false,
                     listState = listState,
                     gridState = gridState,
-                    getThumbnail = thumbnailViewModel::getPublicNodeThumbnail,
                     onLinkClicked = onLinkClicked,
                     onDisputeTakeDownClicked = onDisputeTakeDownClicked,
                     showMediaDiscoveryButton = state.hasMediaItem,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                    isPublicNode = true
                 )
                 ImportDownloadView(
                     Modifier
@@ -304,7 +302,6 @@ internal fun FolderLinkView(
             showImport = state.hasDbCredentials,
             onImportClicked = onImportClicked,
             onSaveToDeviceClicked = onSaveToDeviceClicked,
-            getThumbnail = thumbnailViewModel::getPublicNodeThumbnail,
         )
 
         if (state.storageStatusDialogState != null) {

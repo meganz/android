@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -34,115 +33,6 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import nz.mega.sdk.MegaNode
-import java.io.File
-
-/**
- * This method will show [NodeUIItem] in vertical list
- * @param modifier
- * @param nodeUIItemList
- * @param onMenuClick
- * @param onItemClicked
- * @param onLongClick
- * @param sortOrder
- * @param onSortOrderClick
- * @param onChangeViewTypeClick
- * @param getThumbnail
- */
-@Deprecated("Use NodeListView with ThumbnailRequest instead")
-@Composable
-fun <T : TypedNode> NodeListView(
-    nodeUIItemList: List<NodeUIItem<T>>,
-    onMenuClick: (NodeUIItem<T>) -> Unit,
-    onItemClicked: (NodeUIItem<T>) -> Unit,
-    onLongClick: (NodeUIItem<T>) -> Unit,
-    onEnterMediaDiscoveryClick: () -> Unit,
-    sortOrder: String,
-    onSortOrderClick: () -> Unit,
-    onChangeViewTypeClick: () -> Unit,
-    showSortOrder: Boolean,
-    listState: LazyListState,
-    getThumbnail: ((handle: Long, onFinished: (file: File?) -> Unit) -> Unit),
-    showMediaDiscoveryButton: Boolean,
-    modifier: Modifier = Modifier,
-    showChangeViewType: Boolean = true,
-) {
-    LazyColumn(state = listState, modifier = modifier) {
-        if (showSortOrder || showChangeViewType) {
-            item(
-                key = "header"
-            ) {
-                HeaderViewItem(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    onSortOrderClick = onSortOrderClick,
-                    onChangeViewTypeClick = onChangeViewTypeClick,
-                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                    sortOrder = sortOrder,
-                    isListView = true,
-                    showSortOrder = showSortOrder,
-                    showChangeViewType = showChangeViewType,
-                    showMediaDiscoveryButton = showMediaDiscoveryButton,
-                )
-            }
-        }
-        items(count = nodeUIItemList.size,
-            key = {
-                nodeUIItemList[it].node.id.longValue
-            }) {
-            val nodeEntity = nodeUIItemList[it].node
-            val imageState = produceState<File?>(initialValue = null) {
-                getThumbnail(nodeEntity.id.longValue) { file ->
-                    value = file
-                }
-            }
-            NodeListViewItem(
-                isSelected = nodeUIItemList[it].isSelected,
-                folderInfo = nodeEntity
-                    .let { node -> node as? TypedFolderNode }
-                    ?.folderInfo(),
-                icon = nodeEntity
-                    .let { node -> node as? TypedFolderNode }
-                    ?.getIcon()
-                    ?: MimeTypeList.typeForName(nodeUIItemList[it].node.name).iconResourceId,
-                fileSize = nodeEntity
-                    .let { node -> node as? FileNode }
-                    ?.let { file -> formatFileSize(file.size, LocalContext.current) },
-                modifiedDate = nodeEntity
-                    .let { node -> node as? FileNode }
-                    ?.let { fileNode ->
-                        formatModifiedDate(
-                            java.util.Locale(
-                                Locale.current.language, Locale.current.region
-                            ),
-                            fileNode.modificationTime
-                        )
-                    },
-                name = nodeEntity.name,
-                showMenuButton = true,
-                isTakenDown = nodeEntity.isTakenDown,
-                isFavourite = nodeEntity.isFavourite,
-                isSharedWithPublicLink = nodeEntity.exportedData != null,
-                imageState = imageState,
-                onClick = { onItemClicked(nodeUIItemList[it]) },
-                onLongClick = { onLongClick(nodeUIItemList[it]) },
-                onMenuClick = { onMenuClick(nodeUIItemList[it]) },
-                labelColor = if (nodeEntity.label != MegaNode.NODE_LBL_UNKNOWN)
-                    colorResource(
-                        id = MegaNodeUtil.getNodeLabelColor(
-                            nodeEntity.label
-                        )
-                    ) else null,
-                nodeAvailableOffline = nodeUIItemList[it].isAvailableOffline
-            )
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 72.dp),
-                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-                thickness = 1.dp
-            )
-        }
-    }
-}
 
 /**
  * This method will show [NodeUIItem] in vertical list using [ThumbnailRequest] to load thumbnails
@@ -176,6 +66,7 @@ fun <T : TypedNode> NodeListView(
     showMediaDiscoveryButton: Boolean,
     modifier: Modifier = Modifier,
     showChangeViewType: Boolean = true,
+    isPublicNode: Boolean = false,
 ) {
     LazyColumn(state = listState, modifier = modifier) {
         if (showSortOrder || showChangeViewType) {
@@ -227,7 +118,7 @@ fun <T : TypedNode> NodeListView(
                 isTakenDown = nodeEntity.isTakenDown,
                 isFavourite = nodeEntity.isFavourite,
                 isSharedWithPublicLink = nodeEntity.exportedData != null,
-                thumbnailData = ThumbnailRequest(nodeEntity.id),
+                thumbnailData = ThumbnailRequest(nodeEntity.id, isPublicNode),
                 onClick = { onItemClicked(nodeUIItemList[it]) },
                 onLongClick = { onLongClick(nodeUIItemList[it]) },
                 onMenuClick = { onMenuClick(nodeUIItemList[it]) },
@@ -267,7 +158,6 @@ private fun NodeListViewPreview(
             onChangeViewTypeClick = {},
             showSortOrder = true,
             listState = LazyListState(),
-            getThumbnail = { _, _ -> },
             showMediaDiscoveryButton = false,
             modifier = Modifier,
             showChangeViewType = true

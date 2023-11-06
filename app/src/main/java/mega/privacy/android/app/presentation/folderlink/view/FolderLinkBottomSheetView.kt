@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.folderlink.view
 
+import mega.privacy.android.core.R as CoreUiR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -30,12 +32,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.R as CoreUiR
-import androidx.compose.runtime.State
-import androidx.compose.runtime.produceState
-import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fetcher.ThumbnailRequest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.core.formatter.formatFileSize
@@ -47,7 +46,6 @@ import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import java.io.File
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -58,15 +56,7 @@ internal fun FolderLinkBottomSheetView(
     showImport: Boolean,
     onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
     onSaveToDeviceClicked: (NodeUIItem<TypedNode>?) -> Unit,
-    getThumbnail: ((handle: Long, onFinished: (file: File?) -> Unit) -> Unit),
 ) {
-    val imageState = nodeUIItem?.let {
-        produceState<File?>(initialValue = null) {
-            getThumbnail(it.id.longValue) { file ->
-                value = file
-            }
-        }
-    }
     val fileIcon = MimeTypeList.typeForName(nodeUIItem?.node?.name).iconResourceId
     ModalBottomSheetLayout(
         sheetState = modalSheetState,
@@ -79,7 +69,6 @@ internal fun FolderLinkBottomSheetView(
                 showImport = showImport,
                 onImportClicked = onImportClicked,
                 onSaveToDeviceClicked = onSaveToDeviceClicked,
-                imageState = imageState,
                 icon = fileIcon
             )
         }
@@ -95,7 +84,6 @@ private fun BottomSheetContent(
     showImport: Boolean,
     onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
     onSaveToDeviceClicked: (NodeUIItem<TypedNode>?) -> Unit,
-    imageState: State<File?>?,
     icon: Int,
 ) {
     Column(
@@ -121,7 +109,7 @@ private fun BottomSheetContent(
             if (nodeUIItem != null && nodeUIItem.node is FileNode) {
                 ThumbnailView(
                     contentDescription = "Image",
-                    imageFile = imageState?.value,
+                    data = ThumbnailRequest(id = nodeUIItem.node.id, isPublicNode = true),
                     defaultImage = icon,
                     modifier = Modifier
                         .padding(16.dp)

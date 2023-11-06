@@ -43,7 +43,6 @@ import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
@@ -77,7 +76,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     private lateinit var binding: ActivityFolderLinkComposeBinding
 
     private val viewModel: FolderLinkViewModel by viewModels()
-    private val thumbnailViewModel: ThumbnailViewModel by viewModels()
     private val adsViewModel: AdsViewModel by viewModels()
 
     private var mKey: String? = null
@@ -200,7 +198,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onStorageDialogActionButtonClick = { viewModel.handleActionClick(this) },
                 onStorageDialogAchievementButtonClick = ::navigateToAchievements,
                 emptyViewString = getEmptyViewString(),
-                thumbnailViewModel = thumbnailViewModel,
                 onDisputeTakeDownClicked = ::navigateToLink,
                 onLinkClicked = ::navigateToLink,
                 onEnterMediaDiscoveryClick = ::onEnterMediaDiscoveryClick,
