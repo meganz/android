@@ -745,6 +745,24 @@ class ChatViewTest {
         }
     }
 
+    @Test
+    fun `test that all contacts added in a call dialog show when click to add participants to call`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Moderator,
+                allContactsParticipateInChat = true,
+                isGroup = true,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_left_to_add_message))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_left_to_add_title))
+            .assertIsDisplayed()
+    }
+
     private fun initComposeRuleContentWithLastGreen(state: ChatUiState): String {
         var lastGreen = "last green"
         composeTestRule.setContent {

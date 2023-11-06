@@ -129,6 +129,7 @@ internal fun ChatView(
         }
     }
     var showParticipatingInACallDialog by rememberSaveable { mutableStateOf(false) }
+    var showAllContactsParticipateInChat by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         topBar = {
             MegaAppBar(
@@ -151,6 +152,12 @@ internal fun ChatView(
 
                         is ChatRoomMenuAction.Info -> {
                             showGroupOrContactInfoActivity(context, uiState)
+                        }
+
+                        is ChatRoomMenuAction.AddParticipants -> {
+                            if (uiState.allContactsParticipateInChat) {
+                                showAllContactsParticipateInChat = true
+                            }
                         }
 
                         else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
@@ -185,6 +192,11 @@ internal fun ChatView(
                     getAnotherCallParticipating()
                 }
             )
+        }
+        if (showAllContactsParticipateInChat) {
+            AllContactsAddedDialog {
+                showAllContactsParticipateInChat = false
+            }
         }
     }
 }
