@@ -17,15 +17,15 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-internal class DefaultDeleteNodeVersionsByHandleJunit5ExampleTest {
-    private lateinit var underTest: DeleteNodeVersionsByHandle
+internal class DeleteNodeVersionsUseCaseTest {
+    private lateinit var underTest: DeleteNodeVersionsUseCase
 
     private lateinit var nodeRepository: NodeRepository
 
     @BeforeEach
     fun setUp() {
         nodeRepository = mock()
-        underTest = DefaultDeleteNodeVersionsByHandle(nodeRepository)
+        underTest = DeleteNodeVersionsUseCase(nodeRepository)
     }
 
     @Nested

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.di
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,8 +11,6 @@ import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.domain.usecase.filenode.DefaultDeleteNodeVersionsByHandle
-import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 
 /**
  * Get node module
@@ -23,16 +20,6 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 @Module
 @InstallIn(ViewModelComponent::class, SingletonComponent::class)
 abstract class GetNodeModule {
-
-
-    /**
-     * Provides the [DeleteNodeVersionsByHandle] implementation
-     *
-     * @param defaultDeleteNodeVersionsByHandle the default implementation to be provided
-     * @return [DeleteNodeVersionsByHandle]
-     */
-    @Binds
-    abstract fun provideDeleteNodeVersionsByHandle(defaultDeleteNodeVersionsByHandle: DefaultDeleteNodeVersionsByHandle): DeleteNodeVersionsByHandle
 
     companion object {
 

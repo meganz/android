@@ -70,7 +70,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCas
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
@@ -121,7 +121,7 @@ internal class FileInfoViewModelTest {
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase = mock()
     private val copyNodeUseCase: CopyNodeUseCase = mock()
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase = mock()
-    private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle = mock()
+    private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase = mock()
     private val node: MegaNode = mock()
     private val getPreviewUseCase: GetPreviewUseCase = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
@@ -185,7 +185,7 @@ internal class FileInfoViewModelTest {
             copyNodeUseCase = copyNodeUseCase,
             moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
-            deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
+            deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
             getPreviewUseCase = getPreviewUseCase,
             getFolderTreeInfo = getFolderTreeInfo,
             getNodeByIdUseCase = getNodeByIdUseCase,
@@ -1082,14 +1082,14 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun mockDeleteVersionsSuccess() {
-        whenever(deleteNodeVersionsByHandle.invoke(nodeId)).thenReturn(Unit)
+        whenever(deleteNodeVersionsUseCase.invoke(nodeId)).thenReturn(Unit)
     }
 
     private suspend fun mockDeleteVersionsFailure(
         totalRequested: Int? = null,
         totalFailure: Int? = null,
     ) {
-        whenever(deleteNodeVersionsByHandle.invoke(nodeId)).thenThrow(
+        whenever(deleteNodeVersionsUseCase.invoke(nodeId)).thenThrow(
             if (totalFailure == null) {
                 RuntimeException("fake exception")
             } else {

@@ -68,7 +68,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCas
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
@@ -106,7 +106,7 @@ class FileInfoViewModel @Inject constructor(
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
-    private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
+    private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
     private val getPreviewUseCase: GetPreviewUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
@@ -292,7 +292,7 @@ class FileInfoViewModel @Inject constructor(
     fun deleteHistoryVersions() {
         performBlockSettingProgress(FileInfoJobInProgressState.DeletingVersions) {
             runCatching {
-                deleteNodeVersionsByHandle(typedNode.id)
+                deleteNodeVersionsUseCase(typedNode.id)
             }
         }
     }
