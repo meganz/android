@@ -691,6 +691,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             )
             val peerList = state.value.getParticipantsIds()
             val chatId = state.value.scheduledMeeting?.chatId ?: -1L
+
             viewModelScope.launch {
                 runCatching {
                     _state.value.let { state ->
@@ -727,7 +728,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                                     cancelled = false,
                                     flags = flags,
                                     rules = state.rulesSelected,
-                                    updateChatTitle = true
+                                    updateChatTitle = state.meetingTitle != state.scheduledMeeting?.title
                                 )
                         }
                     }
@@ -747,6 +748,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                     }).takeIf { it != -1L }?.let { id ->
                         when (state.value.type) {
                             ScheduledMeetingType.Creation -> {
+
                                 if (state.value.enabledMeetingLinkOption) {
                                     createMeetingLink(id)
                                 }
