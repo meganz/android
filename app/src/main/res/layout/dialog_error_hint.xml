@@ -34,14 +34,5 @@
             android:textColor="?attr/colorError"
             android:textSize="12sp" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="end"
-            android:src="@drawable/ic_input_warning"
-            app:tint="?attr/colorError" />
-
     </RelativeLayout>
 </RelativeLayout>

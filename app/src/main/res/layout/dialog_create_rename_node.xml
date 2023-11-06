@@ -29,8 +29,6 @@
         android:layout_marginEnd="2dp"
         android:textColor="?attr/colorError"
         android:textSize="12sp"
-        app:drawableEndCompat="@drawable/ic_input_warning"
-        app:drawableTint="?attr/colorError"
         app:layout_constraintEnd_toEndOf="@+id/type_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/type_text" />
