@@ -47,6 +47,8 @@ class GenerateTokens {
             kotlinOutputName = jsonSemanticFileNamePrefix,
             generationType = TokenGenerationType.InterfaceDefinition,
             rootGroupName = jsonSemanticFileNamePrefix,
+            exposeAsEnum = listOf("Text"),
+            enumSuffix = "Color",
         )
 
         //generate color semantic tokens for each theme mode
@@ -69,6 +71,8 @@ class GenerateTokens {
         kotlinOutputName: String,
         generationType: TokenGenerationType,
         rootGroupName: String? = null,
+        exposeAsEnum: List<String> = emptyList(),
+        enumSuffix: String? = null
     ) {
         val json =
             File("designSystemAssets/$jsonFileName.json").bufferedReader().readText()
@@ -81,6 +85,8 @@ class GenerateTokens {
             coreObject = coreObject,
             fileName = kotlinOutputName,
             generationType = generationType,
+            exposeAsEnum = exposeAsEnum,
+            enumSuffix = enumSuffix,
         ).generateFile()
     }
 }

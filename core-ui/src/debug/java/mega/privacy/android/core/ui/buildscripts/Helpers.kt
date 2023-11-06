@@ -1,16 +1,19 @@
 package mega.privacy.android.core.ui.buildscripts
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import mega.privacy.android.core.ui.buildscripts.KotlinTokensGenerator.Companion.THEME_TOKENS_PACKAGE
 import kotlin.reflect.KClass
 
 
 internal fun createDataClass(
     name: String,
     properties: List<Triple<String, KClass<*>, String>>,
+    enumName: String? = null,
 ): TypeSpec {
     val dataClassBuilder = TypeSpec.classBuilder(name)
         .addModifiers(KModifier.DATA)
@@ -30,7 +33,40 @@ internal fun createDataClass(
     dataClassBuilder.addModifiers(KModifier.INTERNAL)
     dataClassBuilder.primaryConstructor(constructor.build())
 
+    if (enumName != null) {
+        val funCode = StringBuilder()
+        funCode.appendLine("return when (${enumName.lowercaseFirstChar()}) {")
+        properties.forEach { (propName, _, _) ->
+            funCode.appendLine("    $enumName.${propName.uppercaseFirstChar()} -> $propName")
+        }
+        funCode.appendLine("}")
+        dataClassBuilder.addFunction(
+            FunSpec
+                .builder("get$enumName")
+                .returns(properties.first().second)
+                .addParameter(
+                    ParameterSpec.builder(
+                        enumName.lowercaseFirstChar(),
+                        ClassName(THEME_TOKENS_PACKAGE, enumName)
+                    ).build()
+                )
+                .addCode(funCode.toString())
+                .build()
+        )
+    }
+
     return dataClassBuilder.build()
+}
+
+internal fun createEnumClass(
+    name: String,
+    properties: List<Triple<String, KClass<*>, String>>,
+): TypeSpec {
+    val enumClassBuilder = TypeSpec.enumBuilder(name)
+    properties.forEach { (propName, _, _) ->
+        enumClassBuilder.addEnumConstant(propName.uppercaseFirstChar())
+    }
+    return enumClassBuilder.build()
 }
 
 /**
@@ -57,6 +93,9 @@ internal fun String?.jsonNameToKotlinName(): String {
 
 internal fun String.lowercaseFirstChar(): String =
     this.replaceFirstChar { it.lowercase() }
+
+internal fun String.uppercaseFirstChar(): String =
+    this.replaceFirstChar { it.uppercase() }
 
 internal fun String?.getPropertyName(typePrefix: String, groupParentName: String?): String =
     (this.jsonNameToKotlinName()

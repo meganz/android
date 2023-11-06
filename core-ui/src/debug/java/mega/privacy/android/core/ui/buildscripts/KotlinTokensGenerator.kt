@@ -30,6 +30,8 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
     private val generationType: TokenGenerationType,
     private val packageName: String = THEME_TOKENS_PACKAGE,
     private val destinationPath: String = DESTINATION_PATH,
+    private val exposeAsEnum: List<String> = emptyList(),
+    private val enumSuffix: String? = null,
 ) {
     fun generateFile() {
         val coreUiFile = FileSpec
@@ -61,10 +63,24 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
                         it.getPropertyClass(),
                         it.getPropertyInitializer()
                     )
-                }.takeIf { it.isNotEmpty() }?.let {
+                }.takeIf { it.isNotEmpty() }?.let { properties ->
+                    val enumName = if (coreUiObject.name.jsonNameToKotlinName() in exposeAsEnum) {
+                        coreUiObject.name.jsonNameToKotlinName() + (enumSuffix ?: "Enum")
+                    } else {
+                        null
+                    }
                     file.addType(
-                        createDataClass(coreUiObject.name.jsonNameToKotlinName(), it)
+                        createDataClass(
+                            coreUiObject.name.jsonNameToKotlinName(),
+                            properties,
+                            enumName
+                        )
                     )
+                    enumName?.let {
+                        file.addType(
+                            createEnumClass(enumName, properties)
+                        )
+                    }
                 }
             coreUiObject.children.forEach {
                 addDataClasses(file, it)
@@ -198,7 +214,7 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
 
     companion object {
 
-        private const val THEME_TOKENS_PACKAGE = "mega.privacy.android.core.ui.theme.tokens"
+        internal const val THEME_TOKENS_PACKAGE = "mega.privacy.android.core.ui.theme.tokens"
         private const val DESTINATION_PATH = "core-ui/src/main/java"
     }
 }

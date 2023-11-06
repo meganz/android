@@ -61,7 +61,39 @@ internal data class Text(
     public val secondary: Color = Color.Magenta,
     public val primary: Color = Color.Magenta,
     public val inverseAccent: Color = Color.Magenta,
-)
+) {
+    public fun getTextColor(textColor: TextColor): Color = when (textColor) {
+        TextColor.Inverse -> inverse
+        TextColor.Disabled -> disabled
+        TextColor.Warning -> warning
+        TextColor.Info -> info
+        TextColor.Success -> success
+        TextColor.Error -> error
+        TextColor.OnColorDisabled -> onColorDisabled
+        TextColor.OnColor -> onColor
+        TextColor.Placeholder -> placeholder
+        TextColor.Accent -> accent
+        TextColor.Secondary -> secondary
+        TextColor.Primary -> primary
+        TextColor.InverseAccent -> inverseAccent
+    }
+}
+
+public enum class TextColor {
+    Inverse,
+    Disabled,
+    Warning,
+    Info,
+    Success,
+    Error,
+    OnColorDisabled,
+    OnColor,
+    Placeholder,
+    Accent,
+    Secondary,
+    Primary,
+    InverseAccent,
+}
 
 internal data class Background(
     public val blur: Color = Color.Magenta,
