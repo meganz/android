@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -90,6 +91,8 @@ fun MenuActionNodeHeaderWithBody(
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
                 color = MaterialTheme.colors.textColorPrimary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             Row {
                 bodyIcon?.let { nonNullBodyIcon ->
@@ -119,10 +122,22 @@ fun MenuActionNodeHeaderWithBody(
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewHeader() {
+private fun HeaderPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Node Title",
+            body = "Node Body",
+            nodeIcon = R.drawable.ic_folder_list,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun HeaderWithVeryLongTitlePreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        MenuActionNodeHeaderWithBody(
+            title = "This is a very long Title that exceeds the maximum number of two lines. An ellipsis is added for additional text",
             body = "Node Body",
             nodeIcon = R.drawable.ic_folder_list,
         )
@@ -134,7 +149,7 @@ private fun PreviewHeader() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewHeaderWithBodyIcon() {
+private fun HeaderWithBodyIconPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Node Title",
@@ -153,7 +168,7 @@ private fun PreviewHeaderWithBodyIcon() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewHeaderWithVeryLongBody() {
+private fun HeaderWithVeryLongBodyPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Backup Folder",
@@ -172,7 +187,7 @@ private fun PreviewHeaderWithVeryLongBody() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewHeaderWithBodyIconAndVeryLongBody() {
+private fun HeaderWithBodyIconAndVeryLongBodyPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Backup Folder",

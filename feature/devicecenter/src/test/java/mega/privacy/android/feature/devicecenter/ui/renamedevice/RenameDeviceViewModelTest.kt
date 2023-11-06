@@ -67,10 +67,22 @@ internal class RenameDeviceViewModelTest {
         }
     }
 
-    @Test
-    fun `test that renaming the device is successful`() = runTest {
+    @ParameterizedTest(name = "new device name: \"{0}\"")
+    @ValueSource(
+        strings = [
+            "New Device Name",
+            "DeviceNameWithOnly32Charactersss",
+            " DeviceNameWithOnly32Charactersss",
+            "DeviceNameWithOnly32Charactersss ",
+            " DeviceNameWithOnly32Charactersss ",
+            "Device Name WithOnly32Characters",
+            " Device Name WithOnly32Characters",
+            "Device Name WithOnly32Characters ",
+            " Device Name WithOnly32Characters ",
+        ]
+    )
+    fun `test that renaming the device is successful`(newDeviceName: String) = runTest {
         val deviceId = "12345-6789"
-        val newDeviceName = "New Device Name"
         val existingDeviceNames = listOf("Old Device Name")
 
         underTest.renameDevice(
@@ -102,6 +114,30 @@ internal class RenameDeviceViewModelTest {
                 assertThat(state.errorMessage).isEqualTo(R.string.device_center_rename_device_dialog_error_message_empty_device_name)
             }
         }
+
+    @ParameterizedTest(name = "new device name: \"{0}\"")
+    @ValueSource(
+        strings = [
+            "DeviceNameWithOnly33Characterssss",
+            "Device Name WithOnly33Characterss",
+        ]
+    )
+    fun `test that renaming the device fails when the new device name exceeds 32 characters`(
+        newDeviceName: String,
+    ) = runTest {
+        val deviceId = "12345-6789"
+        val existingDeviceNames = listOf("Device")
+
+        underTest.renameDevice(
+            deviceId = deviceId,
+            newDeviceName = newDeviceName,
+            existingDeviceNames = existingDeviceNames,
+        )
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.errorMessage).isEqualTo(R.string.device_center_rename_device_dialog_error_message_maximum_character_length_exceeded)
+        }
+    }
 
     @ParameterizedTest(name = "new device name: \"{0}\"")
     @ValueSource(strings = ["Device", "Device ", " Device", " Device "])

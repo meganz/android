@@ -48,6 +48,8 @@ class RenameDeviceViewModel @Inject constructor(
         val trimmedName = newDeviceName.trim()
         if (trimmedName.isBlank()) {
             _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_empty_device_name) }
+        } else if (trimmedName.length > NEW_DEVICE_NAME_MAX_LENGTH) {
+            _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_maximum_character_length_exceeded) }
         } else if (trimmedName in existingDeviceNames) {
             _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists) }
         } else if (INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName)) {
@@ -81,5 +83,6 @@ class RenameDeviceViewModel @Inject constructor(
 
     companion object {
         private const val INVALID_CHARACTER_REGEX = "[\\\\*/:<>?\"|]"
+        private const val NEW_DEVICE_NAME_MAX_LENGTH = 32
     }
 }

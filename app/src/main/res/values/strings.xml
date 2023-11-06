@@ -60,8 +60,6 @@
     <string name="error_general_nodes">Error. Please try again.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-RECOVERYKEY</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">The secondary media folder does not exist, please choose a new folder</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">No external storage detected</string>
     <!-- Button where the user can sign off or logout -->
@@ -1055,8 +1053,6 @@
     <string name="confirm_logout_from_sms_verification">Are you sure that you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">This message has been deleted by %1$s</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">Chat history has been cleared</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Chat history cleared by %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -4783,7 +4779,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatic backups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III (coming soon)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
