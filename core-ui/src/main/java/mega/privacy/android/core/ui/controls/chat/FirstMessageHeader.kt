@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -55,6 +56,7 @@ fun FirstMessageHeaderSubtitleWithIcon(
         Icon(
             modifier = Modifier.size(16.dp),
             painter = painterResource(id = iconRes),
+            tint = MegaTheme.colors.icon.primary,
             contentDescription = null,
         )
         Text(
@@ -106,12 +108,12 @@ private fun PreviewFirstMessageHeaderParagraph() {
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewFirstMessageHeaderSubtitle() {
+private fun PreviewFirstMessageHeaderSubtitleWithIcon() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeaderSubtitleWithIcon(
             modifier = Modifier,
             subtitle = "Confidentiality",
-            iconRes = android.R.drawable.ic_lock_lock
+            iconRes = R.drawable.ic_info
         )
     }
 }

@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.tooltips
+package mega.privacy.android.legacy.core.ui.controls.tooltips
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -45,7 +45,7 @@ import mega.privacy.android.core.ui.theme.extensions.white_black
  * @param content
  */
 @Composable
-fun MegaTooltip(
+fun LegacyMegaTooltip(
     modifier: Modifier = Modifier,
     titleText: String,
     descriptionText: String,

@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.tooltips.MegaTooltip
+import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
@@ -196,7 +196,7 @@ private fun TooltipView(
         showTooltip && (tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
                 || tooltip == MeetingTooltipItem.RECURRING) && itemIsRecurring -> {
             onTooltipShown()
-            MegaTooltip(
+            LegacyMegaTooltip(
                 modifier = Modifier.testTag("chat_room_list:tooltip_recurring"),
                 titleText = stringResource(R.string.meeting_list_tooltip_recurring_title),
                 descriptionText = stringResource(R.string.meeting_list_tooltip_recurring_description),
@@ -216,7 +216,7 @@ private fun TooltipView(
         showTooltip && (tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
                 || tooltip == MeetingTooltipItem.PENDING) && itemIsPending -> {
             onTooltipShown()
-            MegaTooltip(
+            LegacyMegaTooltip(
                 modifier = Modifier.testTag("chat_room_list:tooltip_start"),
                 titleText = stringResource(R.string.btn_start_meeting),
                 descriptionText = stringResource(R.string.meeting_list_tooltip_sched_description),

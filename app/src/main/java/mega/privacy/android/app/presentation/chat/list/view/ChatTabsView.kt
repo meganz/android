@@ -46,7 +46,7 @@ import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.presentation.meeting.view.CancelScheduledMeetingDialog
-import mega.privacy.android.core.ui.controls.tooltips.MegaTooltip
+import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.white_black
@@ -113,7 +113,7 @@ fun ChatTabsView(
         },
         floatingActionButton = {
             if (state.tooltip == MeetingTooltipItem.CREATE && pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
-                MegaTooltip(
+                LegacyMegaTooltip(
                     titleText = stringResource(R.string.chat_schedule_meeting),
                     descriptionText = stringResource(R.string.meeting_list_tooltip_fab_description),
                     actionText = stringResource(R.string.button_permission_info),
