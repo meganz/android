@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InviteContactActivity
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
@@ -20,7 +20,7 @@ fun AllContactsAddedDialog(
     onDismiss: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    MegaAlertDialog(
+    ConfirmationDialog(
         title = stringResource(id = R.string.chat_add_participants_no_contacts_left_to_add_title),
         text = stringResource(id = R.string.chat_add_participants_no_contacts_left_to_add_message),
         confirmButtonText = stringResource(id = R.string.contact_invite),

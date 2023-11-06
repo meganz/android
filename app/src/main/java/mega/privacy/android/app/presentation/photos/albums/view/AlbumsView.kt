@@ -76,8 +76,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
 import mega.privacy.android.app.utils.Util.dp2px
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button
 import mega.privacy.android.core.ui.theme.caption
@@ -90,6 +89,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.mobile.analytics.event.CreateAlbumDialogButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CreateAlbumFABEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
@@ -485,7 +485,7 @@ fun RemoveLinksConfirmationDialog(
     LaunchedEffect(Unit) {
         Analytics.tracker.trackEvent(RemoveLinksConfirmationDialogEvent)
     }
-    MegaAlertDialog(
+    ConfirmationDialog(
         title = pluralStringResource(
             id = R.plurals.album_share_remove_links_dialog_title,
             count = numLinks,

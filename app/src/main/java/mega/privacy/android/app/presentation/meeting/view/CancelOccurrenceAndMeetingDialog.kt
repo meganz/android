@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
@@ -21,7 +21,7 @@ fun CancelOccurrenceAndMeetingDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    MegaAlertDialog(
+    ConfirmationDialog(
         title = stringResource(id = R.string.meetings_cancel_scheduled_meeting_last_occurrence_dialog_title),
         text = stringResource(
             if (isChatHistoryEmpty) {

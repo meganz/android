@@ -36,7 +36,6 @@ import mega.privacy.android.core.ui.utils.composeLet
  * @param cancelButtonText text for the cancel button, if null there will be no cancel button
  * @param onConfirm to be triggered when confirm button is pressed
  * @param onDismiss to be triggered when dialog is hidden, whether with cancel button, confirm button, back or outside press.
- * @param title the title of the dialog, if no there will be no title
  * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
  * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
  */
@@ -49,7 +48,6 @@ fun MegaAlertDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    title: String? = null,
     onCancel: () -> Unit = onDismiss,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
@@ -60,7 +58,6 @@ fun MegaAlertDialog(
     onConfirm = onConfirm,
     onDismiss = onDismiss,
     modifier = modifier,
-    title = title,
     onCancel = onCancel,
     dismissOnClickOutside = dismissOnClickOutside,
     dismissOnBackPress = dismissOnBackPress,
@@ -131,16 +128,16 @@ internal fun BaseMegaAlertDialog(
 
 @CombinedThemeRtlPreviews
 @Composable
-private fun MegaAlertDialogPreview(
+private fun BaseMegaAlertDialogPreview(
     @PreviewParameter(PreviewAlertDialogParametersProvider::class) texts: PreviewStringParameters,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         PreviewBox {
-            MegaAlertDialog(
+            ConfirmationDialog(
                 text = texts.text.getText(),
                 confirmButtonText = texts.confirmButtonText.getText(),
                 cancelButtonText = texts.cancelButtonText?.getText(),
-                title = texts.title?.getText(),
+                title = texts.title?.getText() ?: "title",
                 onConfirm = {},
                 onDismiss = {},
             )

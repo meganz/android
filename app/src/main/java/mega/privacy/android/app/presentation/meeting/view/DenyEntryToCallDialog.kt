@@ -36,7 +36,6 @@ fun DenyEntryToCallDialog(
         )
 
         MegaAlertDialog(
-            title = null,
             text = message,
             dismissOnClickOutside = true,
             dismissOnBackPress = false,

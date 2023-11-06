@@ -74,8 +74,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoS
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.text.MarqueeText
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
@@ -93,6 +92,7 @@ import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -270,7 +270,7 @@ private fun LeaveGroupAlertDialog(
     onLeave: () -> Unit,
 ) {
     if (state.leaveGroupDialog) {
-        MegaAlertDialog(
+        ConfirmationDialog(
             title = stringResource(id = R.string.meetings_leave_meeting_confirmation_dialog_title),
             text = stringResource(id = R.string.confirmation_leave_group_chat),
             confirmButtonText = stringResource(id = R.string.general_leave),
@@ -296,7 +296,7 @@ private fun AddParticipantsAlertDialog(
 ) {
 
     if (state.addParticipantsNoContactsDialog || state.addParticipantsNoContactsLeftToAddDialog) {
-        MegaAlertDialog(
+        ConfirmationDialog(
             title = stringResource(
                 id = if (state.addParticipantsNoContactsDialog)
                     R.string.chat_add_participants_no_contacts_title

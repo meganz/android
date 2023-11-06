@@ -58,7 +58,6 @@ fun UsersInWaitingRoomDialog(
             }
 
         MegaAlertDialog(
-            title = null,
             text = message,
             dismissOnClickOutside = true,
             dismissOnBackPress = false,

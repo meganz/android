@@ -52,7 +52,7 @@ private fun PreviewConfirmationDialog() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ConfirmationDialog(
             title = "Dialog title",
-            text = "This is the message body of the text. And this is another line in the test. ",
+            text = "This is the message body of the dialog. And this is another line in the test.",
             cancelButtonText = "Cancel",
             confirmButtonText = "Ok",
             onDismiss = {},

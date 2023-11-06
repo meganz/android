@@ -48,6 +48,7 @@ import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
@@ -180,7 +181,7 @@ internal fun FileLinkView(
     }
 
     viewState.fetchPublicNodeError?.let {
-        MegaAlertDialog(
+        ConfirmationDialog(
             title = stringResource(id = it.errorDialogTitleId),
             text = stringResource(id = it.errorDialogContentId),
             confirmButtonText = stringResource(id = android.R.string.ok),

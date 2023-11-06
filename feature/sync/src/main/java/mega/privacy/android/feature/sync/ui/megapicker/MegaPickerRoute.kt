@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import nz.mega.sdk.MegaApiJava
@@ -114,7 +114,7 @@ private fun AllFilesAccessDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    MegaAlertDialog(
+    ConfirmationDialog(
         text = "Allow MEGA to read, modify or delete all files on this device.",
         confirmButtonText = "Allow",
         cancelButtonText = "Cancel",
@@ -129,7 +129,7 @@ private fun DisableBatteryOptimizationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    MegaAlertDialog(
+    ConfirmationDialog(
         text = "Allow MEGA to read, modify or delete all files on this device.",
         confirmButtonText = "Allow",
         cancelButtonText = "Cancel",

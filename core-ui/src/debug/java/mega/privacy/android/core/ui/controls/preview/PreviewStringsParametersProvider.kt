@@ -23,6 +23,6 @@ internal class PreviewAlertDialogParametersProvider :
                 text = PreviewTextValue(R.string.dialog_text_long),
                 confirmButtonText = PreviewTextValue(R.string.discard),
                 cancelButtonText = PreviewTextValue(R.string.cancel),
-                )
+            )
         )
 }

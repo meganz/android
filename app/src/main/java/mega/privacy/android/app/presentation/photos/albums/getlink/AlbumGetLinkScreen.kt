@@ -66,7 +66,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
@@ -629,7 +629,7 @@ private fun ShareKeyConfirmationDialog(
     onDismiss: () -> Unit,
     onShareKey: () -> Unit,
 ) {
-    MegaAlertDialog(
+    ConfirmationDialog(
         modifier = modifier,
         title = stringResource(id = R.string.album_share_share_link_dialog_title),
         text = stringResource(id = R.string.album_share_share_link_dialog_body),

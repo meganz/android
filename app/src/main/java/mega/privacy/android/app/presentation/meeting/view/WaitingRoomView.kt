@@ -68,6 +68,7 @@ import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.ToggleMegaButton
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.text.AutoSizeText
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
@@ -316,7 +317,7 @@ internal fun WaitingRoomView(
             onDismiss = { showLeaveDialog = false },
         )
 
-        state.inactiveHostDialog -> MegaAlertDialog(
+        state.inactiveHostDialog -> ConfirmationDialog(
             modifier = Modifier.testTag("waiting_room:dialog_inactive_host"),
             title = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_title),
             text = stringResource(R.string.meetings_waiting_room_inactive_host_dialog_description),
@@ -328,7 +329,7 @@ internal fun WaitingRoomView(
             dismissOnClickOutside = false,
         )
 
-        state.denyAccessDialog -> MegaAlertDialog(
+        state.denyAccessDialog -> ConfirmationDialog(
             modifier = Modifier.testTag("waiting_room:dialog_deny_access"),
             title = stringResource(R.string.meetings_waiting_room_deny_user_dialog_title),
             text = stringResource(R.string.meetings_waiting_room_deny_user_dialog_description),

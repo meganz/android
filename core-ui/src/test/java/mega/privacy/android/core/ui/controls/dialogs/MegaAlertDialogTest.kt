@@ -33,7 +33,7 @@ class MegaAlertDialogTest {
     @Test
     fun `test that if title is set then title is shown`() {
         composeRule.setContent {
-            MegaAlertDialog(
+            BaseMegaAlertDialog(
                 text = "text",
                 confirmButtonText = "confirm",
                 cancelButtonText = "cancel",

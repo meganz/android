@@ -50,7 +50,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -303,7 +303,7 @@ private fun AlertNoAppAvailableDialog(
         val firstText = stringResource(id = R.string.intent_not_available_2fa)
         val secondText = stringResource(id = R.string.open_play_store_2fa)
         val text = "$firstText\n\n$secondText"
-        MegaAlertDialog(
+        ConfirmationDialog(
             title = stringResource(id = R.string.no_authentication_apps_title),
             text = text,
             confirmButtonText = stringResource(id = R.string.context_open_link),
@@ -323,7 +323,7 @@ private fun AlertHelpDialog(
     onDismissRequest: () -> Unit,
 ) {
     AndroidTheme(isDark = isDarkMode) {
-        MegaAlertDialog(
+        ConfirmationDialog(
             title = stringResource(id = R.string.no_authentication_apps_title),
             text = stringResource(id = R.string.text_2fa_help),
             confirmButtonText = stringResource(id = R.string.play_store_label),

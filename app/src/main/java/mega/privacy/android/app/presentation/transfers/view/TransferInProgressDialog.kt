@@ -10,13 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.legacy.core.ui.controls.dialogs.ProgressDialog
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
- * [ProgressDialog] for showing transfer processing in progress, it handles cancel confirmation showing a [MegaAlertDialog]
+ * [ProgressDialog] for showing transfer processing in progress, it handles cancel confirmation showing a [ConfirmationDialog]
  */
 @Composable
 fun TransferInProgressDialog(
@@ -25,7 +25,7 @@ fun TransferInProgressDialog(
 ) {
     var confirmCancel by remember { mutableStateOf(false) }
     if (confirmCancel) {
-        MegaAlertDialog(
+        ConfirmationDialog(
             title = stringResource(R.string.cancel_transfers),
             text = stringResource(R.string.warning_cancel_transfers),
             confirmButtonText = stringResource(R.string.button_proceed),

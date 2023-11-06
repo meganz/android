@@ -85,8 +85,7 @@ import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -96,6 +95,7 @@ import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -454,7 +454,7 @@ private fun InviteResultDialog(
     text: String,
     onInviteResultDialogDismiss: () -> Unit,
 ) {
-    MegaAlertDialog(
+    ConfirmationDialog(
         title = title,
         text = text,
         confirmButtonText = stringResource(id = R.string.general_ok),
