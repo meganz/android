@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
@@ -63,6 +64,7 @@ import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderParagraph
 import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderSubtitleWithIcon
 import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderTitle
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -129,7 +131,9 @@ internal fun ChatView(
         }
     }
     var showParticipatingInACallDialog by rememberSaveable { mutableStateOf(false) }
+    var showNoContactToAddDialog by rememberSaveable { mutableStateOf(false) }
     var showAllContactsParticipateInChat by rememberSaveable { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             MegaAppBar(
@@ -155,6 +159,10 @@ internal fun ChatView(
                         }
 
                         is ChatRoomMenuAction.AddParticipants -> {
+                            if (!uiState.hasAnyContact) {
+                                showNoContactToAddDialog = true
+
+                            }
                             if (uiState.allContactsParticipateInChat) {
                                 showAllContactsParticipateInChat = true
                             }
@@ -183,6 +191,7 @@ internal fun ChatView(
         ) {
             item("first_message_header") { FirstMessageHeader(uiState, context) }
         }
+
         if (showParticipatingInACallDialog) {
             ParticipatingInACallDialog(
                 onDismiss = { showParticipatingInACallDialog = false },
@@ -193,6 +202,21 @@ internal fun ChatView(
                 }
             )
         }
+
+        if (showNoContactToAddDialog) {
+            ConfirmationDialog(
+                title = stringResource(id = R.string.chat_add_participants_no_contacts_title),
+                text = stringResource(id = R.string.chat_add_participants_no_contacts_message),
+                cancelButtonText = stringResource(id = R.string.button_cancel),
+                confirmButtonText = stringResource(id = R.string.contact_invite),
+                onDismiss = { showNoContactToAddDialog = false },
+                onConfirm = {
+                    showNoContactToAddDialog = false
+                    context.startActivity(Intent(context, InviteContactActivity::class.java))
+                }
+            )
+        }
+
         if (showAllContactsParticipateInChat) {
             AllContactsAddedDialog {
                 showAllContactsParticipateInChat = false

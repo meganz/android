@@ -555,6 +555,21 @@ class ChatViewTest {
     }
 
     @Test
+    fun `test that no contact to add dialog shows when hasAnyContact is false and user clicks add participant menu action`() {
+        initComposeRuleContent(
+            ChatUiState(
+                hasAnyContact = false,
+                myPermission = ChatRoomPermission.Moderator,
+                isGroup = true,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_message))
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun `test that custom subtitle shows if the chat is a group, has custom subtitle and has only me as participant`() {
         initComposeRuleContent(
             ChatUiState(

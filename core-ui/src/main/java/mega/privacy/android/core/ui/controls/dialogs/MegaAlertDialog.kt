@@ -24,7 +24,7 @@ import mega.privacy.android.core.ui.controls.preview.PreviewAlertDialogParameter
 import mega.privacy.android.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.utils.composeLet
 
 
@@ -35,14 +35,40 @@ import mega.privacy.android.core.ui.utils.composeLet
  * @param confirmButtonText text for the confirm button
  * @param cancelButtonText text for the cancel button, if null there will be no cancel button
  * @param onConfirm to be triggered when confirm button is pressed
- * @param onDismiss to be triggered when dialog is hidden, wither with cancel button, confirm button, back or outside press.
+ * @param onDismiss to be triggered when dialog is hidden, whether with cancel button, confirm button, back or outside press.
  * @param title the title of the dialog, if no there will be no title
  * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
  * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
  */
-@OptIn(ExperimentalLayoutApi::class)
+
 @Composable
 fun MegaAlertDialog(
+    text: String,
+    confirmButtonText: String,
+    cancelButtonText: String?,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    onCancel: () -> Unit = onDismiss,
+    dismissOnClickOutside: Boolean = true,
+    dismissOnBackPress: Boolean = true,
+) = BaseMegaAlertDialog(
+    text = text,
+    confirmButtonText = confirmButtonText,
+    cancelButtonText = cancelButtonText,
+    onConfirm = onConfirm,
+    onDismiss = onDismiss,
+    modifier = modifier,
+    title = title,
+    onCancel = onCancel,
+    dismissOnClickOutside = dismissOnClickOutside,
+    dismissOnBackPress = dismissOnBackPress,
+)
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun BaseMegaAlertDialog(
     text: String,
     confirmButtonText: String,
     cancelButtonText: String?,
@@ -56,6 +82,7 @@ fun MegaAlertDialog(
 ) = CompositionLocalProvider(LocalAbsoluteElevation provides 24.dp) {
     AlertDialog(
         modifier = modifier,
+        backgroundColor = MegaTheme.colors.background.surface1,
         title = title?.composeLet {
             Text(
                 modifier = Modifier
@@ -63,14 +90,14 @@ fun MegaAlertDialog(
                     .fillMaxWidth(),
                 text = it,
                 style = MaterialTheme.typography.h6,
-                color = MaterialTheme.colors.onSurface,
+                color = MegaTheme.colors.text.primary,
             )
         },
         text = {
             Text(
                 text = text,
                 style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.textColorSecondary
+                color = MegaTheme.colors.text.secondary
             )
         },
         onDismissRequest = onDismiss,
