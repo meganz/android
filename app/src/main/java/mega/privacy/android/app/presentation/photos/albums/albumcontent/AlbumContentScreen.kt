@@ -52,7 +52,7 @@ import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDi
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.white
@@ -169,7 +169,7 @@ internal fun AlbumContentScreen(
             }
         } else {
             when (albumContentState.uiAlbum?.id) {
-                FavouriteAlbum -> MegaEmptyView(
+                FavouriteAlbum -> LegacyMegaEmptyView(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_favourite_album),
                     text = stringResource(id = R.string.empty_hint_favourite_album)
                         .formatColorTag(context, 'A', R.color.grey_900_grey_100)
@@ -181,7 +181,7 @@ internal fun AlbumContentScreen(
 
                 RawAlbum -> Back()
 
-                is UserAlbum -> MegaEmptyView(
+                is UserAlbum -> LegacyMegaEmptyView(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
                     text = stringResource(id = R.string.photos_user_album_empty_album)
                         .formatColorTag(context, 'A', R.color.grey_900_grey_100)

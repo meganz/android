@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.search
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -78,7 +77,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDow
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.displayMetrics
-import mega.privacy.android.core.ui.controls.MegaEmptyViewForSearch
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ThemeMode
@@ -306,7 +305,7 @@ class SearchFragment : RotatableFragment() {
                             searchParentHandle = uiState.searchParentHandle,
                             rootNodeHandle = uiState.rootNodeHandle
                         )
-                        MegaEmptyViewForSearch(
+                        LegacyMegaEmptyViewForSearch(
                             imagePainter = painterResource(id = emptyState.first),
                             text = emptyState.second
                         )

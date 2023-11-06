@@ -66,7 +66,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
@@ -517,7 +517,7 @@ private fun AlbumImportContent(
     }
 
     if (album != null && photos.isEmpty()) {
-        MegaEmptyView(
+        LegacyMegaEmptyView(
             modifier = modifier,
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
             text = stringResource(id = R.string.photos_user_album_empty_album)

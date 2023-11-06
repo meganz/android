@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDi
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.dark_grey
@@ -185,7 +185,7 @@ fun AlbumContentScreen(
             AlbumContentSkeletonView(smallWidth = smallWidth)
         } else {
             when (albumsState.currentAlbum) {
-                Album.FavouriteAlbum -> MegaEmptyView(
+                Album.FavouriteAlbum -> LegacyMegaEmptyView(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_favourite_album),
                     text = stringResource(id = R.string.empty_hint_favourite_album)
                         .formatColorTag(context, 'A', R.color.grey_900_grey_100)
@@ -195,7 +195,7 @@ fun AlbumContentScreen(
 
                 Album.GifAlbum -> Back()
                 Album.RawAlbum -> Back()
-                is Album.UserAlbum -> MegaEmptyView(
+                is Album.UserAlbum -> LegacyMegaEmptyView(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
                     text = stringResource(id = R.string.photos_user_album_empty_album)
                         .formatColorTag(context, 'A', R.color.grey_900_grey_100)

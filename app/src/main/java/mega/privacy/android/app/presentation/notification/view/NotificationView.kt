@@ -22,8 +22,7 @@ import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.core.ui.controls.MegaEmptyView
-import java.util.Locale
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
  * Notification View in Compose
@@ -88,7 +87,7 @@ private fun NotificationEmptyView(modifier: Modifier) {
         if (isPortrait) R.drawable.empty_notification_portrait else R.drawable.empty_notification_landscape
 
     Surface(modifier.testTag("NotificationEmptyView")) {
-        MegaEmptyView(
+        LegacyMegaEmptyView(
             modifier = modifier,
             imageBitmap = ImageBitmap.imageResource(id = emptyImgResId),
             text = context.getString(R.string.context_empty_notifications)

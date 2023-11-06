@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.core.ui.controls.MegaEmptyViewForSearch
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.SortOrder
@@ -124,7 +124,7 @@ fun SearchComposeView(
                         modifier = Modifier.padding(padding)
                     )
                 } else {
-                    MegaEmptyViewForSearch(
+                    LegacyMegaEmptyViewForSearch(
                         imagePainter = painterResource(
                             id = state.emptyState?.first ?: R.drawable.ic_empty_search
                         ),

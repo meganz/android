@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls
+package mega.privacy.android.legacy.core.ui.controls
 
 import android.text.Spanned
 import android.util.TypedValue
@@ -38,12 +38,12 @@ import mega.privacy.android.core.ui.theme.extensions.light_grey_light_black
  * @param text
  */
 @Composable
-fun MegaEmptyView(
+fun LegacyMegaEmptyView(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
     text: Spanned,
 ) {
-    MegaEmptyView(modifier, text) {
+    LegacyMegaEmptyView(modifier, text) {
         Icon(
             imageVector = imageVector,
             contentDescription = "Empty Icon",
@@ -61,12 +61,12 @@ fun MegaEmptyView(
  * @param text
  */
 @Composable
-fun MegaEmptyView(
+fun LegacyMegaEmptyView(
     modifier: Modifier = Modifier,
     imageBitmap: ImageBitmap,
     text: Spanned,
 ) {
-    MegaEmptyView(modifier, text) {
+    LegacyMegaEmptyView(modifier, text) {
         Icon(
             bitmap = imageBitmap,
             contentDescription = "Empty Icon",
@@ -84,12 +84,12 @@ fun MegaEmptyView(
  * @param text
  */
 @Composable
-fun MegaEmptyView(
+fun LegacyMegaEmptyView(
     modifier: Modifier = Modifier,
     imagePainter: Painter,
     text: Spanned,
 ) {
-    MegaEmptyView(modifier, text) {
+    LegacyMegaEmptyView(modifier, text) {
         Icon(
             painter = imagePainter,
             contentDescription = "Empty Icon",
@@ -100,7 +100,7 @@ fun MegaEmptyView(
 }
 
 @Composable
-private fun MegaEmptyView(modifier: Modifier, text: Spanned, Icon: @Composable () -> Unit) {
+private fun LegacyMegaEmptyView(modifier: Modifier, text: Spanned, Icon: @Composable () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -137,12 +137,12 @@ private fun getIconTint(): Color {
  * @param imagePainter
  */
 @Composable
-fun MegaEmptyView(
+fun LegacyMegaEmptyView(
     text: String,
     imagePainter: Painter,
     modifier: Modifier = Modifier,
 ) {
-    MegaEmptyView(modifier, text) {
+    LegacyMegaEmptyView(modifier, text) {
         Icon(
             painter = imagePainter,
             contentDescription = "Empty Icon",
@@ -153,7 +153,7 @@ fun MegaEmptyView(
 }
 
 @Composable
-private fun MegaEmptyView(modifier: Modifier, text: String, Icon: @Composable () -> Unit) {
+private fun LegacyMegaEmptyView(modifier: Modifier, text: String, Icon: @Composable () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -182,7 +182,7 @@ private fun MegaEmptyView(modifier: Modifier, text: String, Icon: @Composable ()
  * @param modifier [Modifier]
  */
 @Composable
-fun MegaEmptyViewForSearch(
+fun LegacyMegaEmptyViewForSearch(
     text: String,
     imagePainter: Painter,
     modifier: Modifier = Modifier
