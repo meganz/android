@@ -9,9 +9,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 
 /**
- * Bottom sheet item
+ * Bottom sheet click handler
  */
-typealias BottomSheetItem = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit) -> Unit
+typealias BottomSheetClickHandler = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit) -> Unit
 
 /**
  * Node bottom sheet menu item
@@ -23,13 +23,12 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
      */
     fun buildComposeControl(
         selectedNode: TypedNode,
-    ): mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.BottomSheetItem =
+    ): BottomSheetClickHandler =
         { onDismiss, handler ->
             MenuActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
                 isDestructive = isDestructiveAction,
-                addSeparator = false,
                 onActionClicked = getOnClickFunction(
                     node = selectedNode,
                     onDismiss = onDismiss,

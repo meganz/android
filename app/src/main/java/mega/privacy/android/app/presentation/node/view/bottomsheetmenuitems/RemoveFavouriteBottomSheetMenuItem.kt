@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.node.model.menuaction.FavouriteMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.RemoveFavouriteMenuAction
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -13,14 +13,14 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Favourite bottom sheet menu action
+ * Remove favourite bottom sheet menu action
  *
- * @param menuAction [FavouriteMenuAction]
+ * @param menuAction [RemoveFavouriteMenuAction]
  */
-class FavouriteBottomSheetMenuItem @Inject constructor(
-    override val menuAction: FavouriteMenuAction,
+class RemoveFavouriteBottomSheetMenuItem @Inject constructor(
+    override val menuAction: RemoveFavouriteMenuAction,
     private val updateNodeFavoriteUseCase: UpdateNodeFavoriteUseCase,
-    @ApplicationScope private val scope: CoroutineScope,
+    @ApplicationScope private val coroutineScope: CoroutineScope,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -30,8 +30,7 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
-            && node.isFavourite.not()
-
+            && node.isFavourite
 
     override fun getOnClickFunction(
         node: TypedNode,
@@ -39,12 +38,13 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
     ): () -> Unit = {
         onDismiss()
-        scope.launch {
+        coroutineScope.launch {
             runCatching {
                 updateNodeFavoriteUseCase(nodeId = node.id, isFavorite = node.isFavourite.not())
             }.onFailure { Timber.e("Error updating favourite node $it") }
         }
     }
 
-    override val groupId = 3
+    override val groupId: Int
+        get() = 3
 }

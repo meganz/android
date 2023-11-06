@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -32,6 +34,34 @@ import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+
+/**
+ * Menu action list tile
+ *
+ * @param menuAction action represented by this list tile
+ * @param isDestructive if true the text will be displayed in destructive(red) colors
+ * @param onActionClicked trigger item click on menu action
+ * @param trailingItem composable widget which will be placed at the trailing end
+ * @param modifier
+ */
+@Composable
+fun MenuActionListTile(
+    menuAction: MenuAction,
+    modifier: Modifier = Modifier,
+    isDestructive: Boolean = false,
+    onActionClicked: (() -> Unit)? = null,
+    trailingItem: (@Composable () -> Unit)? = null,
+) {
+    MenuActionListTile(
+        text = menuAction.getDescription(),
+        icon = (menuAction as? MenuActionWithIcon)?.getIconPainter(),
+        modifier = modifier,
+        isDestructive = isDestructive,
+        onActionClicked = onActionClicked,
+        trailingItem = trailingItem,
+        addSeparator = false,
+    )
+}
 
 /**
  * MenuActionListTile

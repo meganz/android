@@ -7,9 +7,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.CloudDrive
@@ -18,6 +20,7 @@ import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
@@ -26,11 +29,7 @@ import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.data.mapper.FileDurationMapper
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -80,7 +79,6 @@ class SearchActivityViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val fileDurationMapper: FileDurationMapper,
     @CloudDrive private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
     @IncomingShares private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
     @OutgoingShares private val outgoingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
@@ -91,6 +89,7 @@ class SearchActivityViewModel @Inject constructor(
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
@@ -142,10 +141,7 @@ class SearchActivityViewModel @Inject constructor(
                 .filterNot { it.filter == SearchCategory.ALL }
         }.onSuccess { filters ->
             _state.update {
-                it.copy(
-                    filters = filters,
-                    selectedFilter = null,
-                )
+                it.copy(filters = filters, selectedFilter = null)
             }
         }.onFailure {
             Timber.e("Get search categories failed $it")
@@ -156,10 +152,10 @@ class SearchActivityViewModel @Inject constructor(
 
     private fun monitorNodeUpdatesForSearch() {
         viewModelScope.launch {
-            monitorNodeUpdates().collect { nodeUpdate ->
-                if (nodeUpdate.changes.keys.find { parentHandle == it.parentId.longValue } != null)
+            merge(monitorNodeUpdates(), monitorOfflineNodeUpdatesUseCase()).conflate()
+                .collectLatest {
                     performSearch()
-            }
+                }
         }
     }
 
@@ -167,9 +163,7 @@ class SearchActivityViewModel @Inject constructor(
      * Perform search by entering query or change in search type
      */
     private fun performSearch() {
-        _state.update {
-            it.copy(isSearching = true, searchItemList = emptyList())
-        }
+        _state.update { it.copy(isSearching = true) }
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             runCatching {
@@ -217,7 +211,6 @@ class SearchActivityViewModel @Inject constructor(
                         sortOrder = getCloudSortOrder()
                     )
                 }
-                updateNodeUiItemWithOfflineInfo()
             }
         }
 
@@ -226,23 +219,6 @@ class SearchActivityViewModel @Inject constructor(
         category = state.value.selectedFilter?.filter,
         searchQuery = state.value.searchQuery
     )
-
-    /**
-     * This will map list of [Node] to [NodeUIItem]
-     */
-    private suspend fun updateNodeUiItemWithOfflineInfo() = coroutineScope {
-        val nodeUiList = state.value.searchItemList.map { item ->
-            ensureActive()
-            val fileDuration = if (item.node is FileNode) {
-                fileDurationMapper(item.node.type)?.let { TimeUtils.getVideoDuration(it) }
-                    ?: run { null }
-            } else null
-            item.copy(
-                fileDuration = fileDuration
-            )
-        }
-        _state.update { it.copy(searchItemList = nodeUiList) }
-    }
 
     /**
      * Update search filter on selection
@@ -455,4 +431,5 @@ class SearchActivityViewModel @Inject constructor(
     fun errorMessageShown() {
         _state.update { it.copy(errorMessageId = null) }
     }
+
 }

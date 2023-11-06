@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
@@ -20,7 +21,6 @@ import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
-import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -72,6 +72,7 @@ class SearchActivityViewModelTest {
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val nodeToolbarActionMapper = NodeToolbarActionMapper()
+    private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
         setOf(Download(DownloadMenuAction()))
     private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
@@ -82,9 +83,7 @@ class SearchActivityViewModelTest {
         setOf(Download(DownloadMenuAction()))
     private val rubbishBinToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
         setOf(Download(DownloadMenuAction()))
-    private val fileDurationMapper: FileDurationMapper = mock {
-        onBlocking { invoke(any()) }.thenReturn(null)
-    }
+
 
     @BeforeAll
     fun setUp() {
@@ -104,7 +103,7 @@ class SearchActivityViewModelTest {
             setViewType,
             monitorViewType,
             getCloudSortOrder,
-            fileDurationMapper
+            monitorOfflineNodeUpdatesUseCase,
         )
     }
 
@@ -116,7 +115,6 @@ class SearchActivityViewModelTest {
             monitorViewType = monitorViewType,
             stateHandle = stateHandle,
             getCloudSortOrder = getCloudSortOrder,
-            fileDurationMapper = fileDurationMapper,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
             searchNodesUseCase = searchNodesUseCase,
             getSearchCategoriesUseCase = getSearchCategoriesUseCase,
@@ -132,6 +130,7 @@ class SearchActivityViewModelTest {
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
             nodeToolbarActionMapper = nodeToolbarActionMapper,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
+            monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
         )
     }
 

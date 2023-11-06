@@ -5,10 +5,18 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,11 +26,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.view.NodeOptionsBottomSheet
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.app.utils.Constants
@@ -104,12 +113,24 @@ class SearchActivity : AppCompatActivity() {
     /**
      * onCreate
      */
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.state.collectAsStateWithLifecycle()
+            val modalSheetState = rememberModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Hidden,
+                skipHalfExpanded = false,
+            )
+            var selectedNode: NodeUIItem<TypedNode>? by remember {
+                mutableStateOf(null)
+            }
+
+            BackHandler(enabled = modalSheetState.isVisible) {
+                selectedNode = null
+            }
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 SearchComposeView(
                     state = uiState,
@@ -123,7 +144,9 @@ class SearchActivity : AppCompatActivity() {
                     onSortOrderClick = {
                         showSortOrderBottomSheet()
                     },
-                    onMenuClick = ::showOptionsMenuForItem,
+                    onMenuClick = {
+                        selectedNode = it
+                    },
                     onDisputeTakeDownClicked = ::navigateToLink,
                     onLinkClicked = ::navigateToLink,
                     onErrorShown = viewModel::errorMessageShown,
@@ -132,6 +155,24 @@ class SearchActivity : AppCompatActivity() {
                     updateSearchQuery = viewModel::updateSearchQuery,
                 )
                 handleClick(uiState.lastSelectedNode)
+            }
+
+            selectedNode?.let {
+                NodeOptionsBottomSheet(
+                    modalSheetState = modalSheetState,
+                    node = it,
+                    handler = NodeBottomSheetActionHandler(this),
+                ) {
+                    selectedNode = null
+                }
+            }
+
+            LaunchedEffect(key1 = selectedNode) {
+                if (selectedNode == null) {
+                    modalSheetState.hide()
+                } else {
+                    modalSheetState.show()
+                }
             }
         }
 
@@ -222,22 +263,6 @@ class SearchActivity : AppCompatActivity() {
     private fun showSortOrderBottomSheet() {
         val bottomSheetDialogFragment =
             SortByBottomSheetDialogFragment.newInstance(Constants.ORDER_CLOUD)
-        bottomSheetDialogFragment.show(
-            supportFragmentManager,
-            bottomSheetDialogFragment.tag
-        )
-    }
-
-    /**
-     * Shows Options menu for item clicked
-     */
-    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<TypedNode>) {
-        Timber.d("showNodeOptionsPanel")
-        val bottomSheetDialogFragment =
-            NodeOptionsBottomSheetDialogFragment.newInstance(
-                nodeId = nodeUIItem.id,
-                mode = NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
-            )
         bottomSheetDialogFragment.show(
             supportFragmentManager,
             bottomSheetDialogFragment.tag
