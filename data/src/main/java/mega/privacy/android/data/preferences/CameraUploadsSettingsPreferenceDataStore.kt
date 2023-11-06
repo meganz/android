@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
@@ -32,6 +33,17 @@ internal class CameraUploadsSettingsPreferenceDataStore(
     ) : this(
         getPreferenceFlow = dataStore::data,
         editPreferences = dataStore::edit,
+        encryptData = encryptData,
+        decryptData = decryptData,
+    )
+
+    constructor(
+        preferences: MutablePreferences,
+        encryptData: EncryptData,
+        decryptData: DecryptData,
+    ) : this(
+        getPreferenceFlow = { flowOf(preferences) },
+        editPreferences = { preferences.apply { it(this) } },
         encryptData = encryptData,
         decryptData = decryptData,
     )
