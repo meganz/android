@@ -767,6 +767,7 @@ class ChatViewTest {
                 myPermission = ChatRoomPermission.Moderator,
                 allContactsParticipateInChat = true,
                 isGroup = true,
+                hasAnyContact = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertIsDisplayed()

@@ -17,7 +17,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -28,11 +30,14 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
+import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
@@ -49,6 +54,7 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import nz.mega.sdk.MegaChatError
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -136,6 +142,7 @@ internal class ChatViewModelTest {
         mock {
             on { invoke(any()) } doReturn emptyFlow()
         }
+    private val inviteToChatUseCase: InviteToChatUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -164,6 +171,7 @@ internal class ChatViewModelTest {
             getAnotherCallParticipatingUseCase,
             getCustomSubtitleListUseCase,
             getAnotherCallParticipatingUseCase,
+            inviteToChatUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -213,6 +221,7 @@ internal class ChatViewModelTest {
             getCustomSubtitleListUseCase = getCustomSubtitleListUseCase,
             savedStateHandle = savedStateHandle,
             monitorAllContactParticipantsInChatUseCase = monitorAllContactParticipantsInChatUseCase,
+            inviteToChatUseCase = inviteToChatUseCase,
         )
     }
 
@@ -1240,7 +1249,7 @@ internal class ChatViewModelTest {
                 expectedChatId
             )
         }
-        underTest.consumeOpenMeetingEvent()
+        underTest.onOpenMeetingEventConsumed()
         underTest.state.test {
             assertThat(awaitItem().openMeetingEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
         }
@@ -1278,9 +1287,138 @@ internal class ChatViewModelTest {
         initTestClass()
         flow.emit(areAllContactParticipantsInChat)
         underTest.state.test {
-            assertThat(awaitItem().allContactsParticipateInChat).isEqualTo(areAllContactParticipantsInChat)
+            assertThat(awaitItem().allContactsParticipateInChat).isEqualTo(
+                areAllContactParticipantsInChat
+            )
         }
     }
+
+    @Test
+    fun `test that multiple contacts are added to chat room`() = runTest {
+        val contactList = listOf("user1", "user2")
+        val chatRequest: ChatRequest = mock()
+
+        whenever(
+            inviteToChatUseCase(
+                chatId = chatId,
+                contactList = contactList
+            )
+        ).thenReturn(
+            listOf(
+                Result.success(chatRequest),
+                Result.success(chatRequest),
+            )
+        )
+        initTestClass()
+        underTest.inviteContactsToChat(chatId, contactList)
+        underTest.state.test {
+            assertThat((awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content).isInstanceOf(
+                InviteContactToChatResult.MultipleContactsAdded::class.java
+            )
+        }
+    }
+
+    @Test
+    fun `test that one contact is added to chat room`() = runTest {
+        val contactList = listOf("user1")
+        val chatRequest: ChatRequest = mock()
+
+        whenever(
+            inviteToChatUseCase(
+                chatId = chatId,
+                contactList = contactList
+            )
+        ).thenReturn(listOf(Result.success(chatRequest)))
+        initTestClass()
+        underTest.inviteContactsToChat(chatId, contactList)
+        underTest.state.test {
+            assertThat((awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content).isInstanceOf(
+                InviteContactToChatResult.OnlyOneContactAdded::class.java
+            )
+        }
+    }
+
+    @Test
+    fun `test that add one contact fails to chat room due to already exists`() = runTest {
+        val contactList = listOf("myself")
+        val chatRequest: ChatRequest = mock()
+
+        whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(
+            listOf(
+                Result.success(chatRequest),
+                Result.failure(
+                    ParticipantAlreadyExistsException()
+                )
+            )
+        )
+        initTestClass()
+        underTest.inviteContactsToChat(chatId, contactList)
+        underTest.state.test {
+            assertThat((awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content).isInstanceOf(
+                InviteContactToChatResult.AlreadyExistsError::class.java
+            )
+        }
+    }
+
+    @Test
+    fun `test that general error is shown when add one contact fails to chat room due to general error`() =
+        runTest {
+            val contactList = listOf("user1", "user2", "user3")
+            val chatRequest: ChatRequest = mock()
+
+            whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(
+                listOf(
+                    Result.success(chatRequest),
+                    Result.failure(
+                        MegaException(
+                            errorCode = MegaChatError.ERROR_ACCESS,
+                            errorString = "general error"
+                        )
+                    )
+                )
+            )
+            initTestClass()
+            underTest.inviteContactsToChat(chatId, contactList)
+            underTest.state.test {
+                assertThat((awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content).isInstanceOf(
+                    InviteContactToChatResult.GeneralError::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test that some contacts are added and some contacts fail to be added`() = runTest {
+        val contactList =
+            listOf("user1_added_ok", "user2_added_ok", "user3_add_failure", "user4_add_failure")
+        val chatRequest: ChatRequest = mock()
+
+        whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(
+            listOf(
+                Result.success(chatRequest),
+                Result.success(chatRequest),
+                Result.failure(
+                    ParticipantAlreadyExistsException()
+                ), Result.failure(
+                    MegaException(
+                        errorCode = MegaChatError.ERROR_ACCESS,
+                        errorString = "access error"
+                    )
+                )
+            )
+        )
+        initTestClass()
+        underTest.inviteContactsToChat(chatId, contactList)
+        underTest.state.test {
+            val result =
+                (awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content
+            assertThat(result).isInstanceOf(InviteContactToChatResult.SomeAddedSomeNot::class.java)
+            (result as InviteContactToChatResult.SomeAddedSomeNot).let {
+                assertThat(it.success).isEqualTo(2)
+                assertThat(it.error).isEqualTo(2)
+            }
+        }
+    }
+
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

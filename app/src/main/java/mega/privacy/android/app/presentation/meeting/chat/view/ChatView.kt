@@ -7,7 +7,9 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.text.format.DateFormat
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -44,6 +46,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -53,18 +56,19 @@ import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.vectorRes
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
+import mega.privacy.android.app.presentation.meeting.chat.extension.toString
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.view.getRecurringMeetingDateTime
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderParagraph
 import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderSubtitleWithIcon
 import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderTitle
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -82,7 +86,7 @@ internal fun ChatView(
 
     EventEffect(
         event = uiState.openMeetingEvent,
-        onConsumed = viewModel::consumeOpenMeetingEvent,
+        onConsumed = viewModel::onOpenMeetingEventConsumed,
     ) { chatId ->
         startMeetingActivity(context, chatId)
     }
@@ -92,6 +96,8 @@ internal fun ChatView(
         onBackPressed = { onBackPressedDispatcher?.onBackPressed() },
         onMenuActionPressed = viewModel::handleActionPress,
         getAnotherCallParticipating = viewModel::getAnotherCallParticipating,
+        inviteContactsToChat = viewModel::inviteContactsToChat,
+        onInviteContactsResultConsumed = viewModel::onInviteContactsResultConsumed,
     )
 }
 
@@ -107,6 +113,8 @@ internal fun ChatView(
     uiState: ChatUiState,
     onBackPressed: () -> Unit,
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
+    inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
+    onInviteContactsResultConsumed: () -> Unit = {},
     getAnotherCallParticipating: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -130,6 +138,22 @@ internal fun ChatView(
             }
         }
     }
+    val addContactLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            result.data?.let { intent ->
+                intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                    ?.let { contactList ->
+                        inviteContactsToChat(
+                            uiState.chatId,
+                            contactList
+                        )
+                    }
+            }
+        }
+
+
     var showParticipatingInACallDialog by rememberSaveable { mutableStateOf(false) }
     var showNoContactToAddDialog by rememberSaveable { mutableStateOf(false) }
     var showAllContactsParticipateInChat by rememberSaveable { mutableStateOf(false) }
@@ -159,12 +183,18 @@ internal fun ChatView(
                         }
 
                         is ChatRoomMenuAction.AddParticipants -> {
-                            if (!uiState.hasAnyContact) {
-                                showNoContactToAddDialog = true
+                            when {
+                                !uiState.hasAnyContact -> showNoContactToAddDialog = true
+                                uiState.allContactsParticipateInChat -> showAllContactsParticipateInChat =
+                                    true
 
-                            }
-                            if (uiState.allContactsParticipateInChat) {
-                                showAllContactsParticipateInChat = true
+                                else -> {
+                                    openAddContactActivity(
+                                        context = context,
+                                        chatId = uiState.chatId,
+                                        addContactLauncher = addContactLauncher
+                                    )
+                                }
                             }
                         }
 
@@ -204,11 +234,7 @@ internal fun ChatView(
         }
 
         if (showNoContactToAddDialog) {
-            ConfirmationDialog(
-                title = stringResource(id = R.string.chat_add_participants_no_contacts_title),
-                text = stringResource(id = R.string.chat_add_participants_no_contacts_message),
-                cancelButtonText = stringResource(id = R.string.button_cancel),
-                confirmButtonText = stringResource(id = R.string.contact_invite),
+            NoContactToAddDialog(
                 onDismiss = { showNoContactToAddDialog = false },
                 onConfirm = {
                     showNoContactToAddDialog = false
@@ -222,7 +248,43 @@ internal fun ChatView(
                 showAllContactsParticipateInChat = false
             }
         }
+
+        EventEffect(
+            event = uiState.inviteToChatResultEvent,
+            onConsumed = onInviteContactsResultConsumed
+        ) { inviteResult ->
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(
+                    inviteResult.toString(context)
+                )
+            }
+        }
     }
+}
+
+private fun openAddContactActivity(
+    context: Context,
+    chatId: Long,
+    addContactLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+) {
+    val intent =
+        Intent(context, AddContactActivity::class.java).apply {
+            putExtra(
+                AddContactActivity.EXTRA_CONTACT_TYPE,
+                CONTACT_TYPE_MEGA
+            )
+            putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
+            putExtra(
+                Constants.INTENT_EXTRA_KEY_CHAT_ID,
+                chatId
+            )
+            putExtra(
+                Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                context.getString(R.string.add_participants_menu_item)
+            )
+        }
+
+    addContactLauncher.launch(intent)
 }
 
 @Composable
@@ -482,7 +544,8 @@ private fun ChatViewPreview() {
         ChatView(
             uiState = uiState,
             onBackPressed = {},
-            onMenuActionPressed = {}
+            onMenuActionPressed = {},
+            inviteContactsToChat = { _, _ -> },
         )
     }
 }

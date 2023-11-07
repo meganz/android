@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.ChatSettings
+import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
@@ -338,8 +339,21 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun inviteParticipantToChat(chatId: Long, handle: Long): ChatRequest =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
+
                 val listener = OptionalMegaChatRequestListenerInterface(
-                    onRequestFinish = onRequestCompleted(continuation)
+                    onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
+                        when (error.errorCode) {
+                            MegaChatError.ERROR_OK -> continuation.resumeWith(
+                                Result.success(chatRequestMapper(request))
+                            )
+
+                            MegaChatError.ERROR_EXIST -> continuation.resumeWith(
+                                Result.failure(ParticipantAlreadyExistsException())
+                            )
+
+                            else -> continuation.failWithError(error, "inviteParticipantToChat")
+                        }
+                    }
                 )
 
                 megaChatApiGateway.inviteToChat(
@@ -536,7 +550,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
 
     override suspend fun removeFromChat(
-        chatId: Long, handle: Long
+        chatId: Long, handle: Long,
     ): ChatRequest = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val callback = continuation.getChatRequestListener(
@@ -555,7 +569,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun leaveChat(
-        chatId: Long
+        chatId: Long,
     ): ChatRequest = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val callback = continuation.getChatRequestListener(

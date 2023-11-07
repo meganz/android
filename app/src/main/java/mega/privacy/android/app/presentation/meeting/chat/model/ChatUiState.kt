@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property participantsCount Number of participants if the chat is a group, null otherwise.
  * @property openMeetingEvent Event to open a meeting.
  * @property allContactsParticipateInChat True if all contacts participate in this chat, false otherwise.
+ * @property inviteToChatResultEvent Event to show the result of inviting contacts to a chat.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -64,4 +65,5 @@ data class ChatUiState(
     val participantsCount: Long? = null,
     val openMeetingEvent: StateEventWithContent<Long> = consumed(),
     val allContactsParticipateInChat: Boolean = false,
+    val inviteToChatResultEvent: StateEventWithContent<InviteContactToChatResult> = consumed(),
 )
