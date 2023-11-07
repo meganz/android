@@ -48,8 +48,6 @@ import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoMapper
-import mega.privacy.android.data.mapper.VideoQualityIntMapper
-import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapperImpl
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
@@ -91,10 +89,8 @@ import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toVideo
 import mega.privacy.android.data.mapper.toVideoAttachment
-import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapper
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapperImpl
-import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapperImpl
 import mega.privacy.android.domain.entity.Currency
@@ -301,23 +297,11 @@ internal abstract class MapperModule {
             CountryCallingCodeMapper(::toCountryCallingCodes)
 
         /**
-         * Provide video quality mapper
-         */
-        @Provides
-        fun provideVideoQualityMapper(): VideoQualityMapper = ::toVideoQuality
-
-        /**
          * Provide pricing mapper
          *
          */
         @Provides
         fun providePricingMapper(): PricingMapper = ::toPricing
-
-        /**
-         * Provide video quality int mapper
-         */
-        @Provides
-        fun provideVideoQualityIntMapper(): VideoQualityIntMapper = ::videoQualityToInt
 
         @Provides
         fun provideSyncStatusIntMapper(): SyncStatusIntMapper = ::syncStatusToInt

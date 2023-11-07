@@ -17,7 +17,6 @@ class DefaultShouldCompressVideo @Inject constructor(
 ) : ShouldCompressVideo {
 
     override suspend fun invoke(): Boolean {
-        val qualitySetting = getUploadVideoQuality()
-        return qualitySetting != null && qualitySetting != VideoQuality.ORIGINAL
+        return getUploadVideoQuality() != VideoQuality.ORIGINAL
     }
 }

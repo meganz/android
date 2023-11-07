@@ -30,15 +30,6 @@ class DefaultShouldCompressVideoTest {
     }
 
     @Test
-    fun `test that false is returned if no setting is returned`() = runTest {
-        getUploadVideoQualityUseCase.stub {
-            onBlocking { invoke() }.thenReturn(null)
-        }
-
-        assertThat(underTest()).isFalse()
-    }
-
-    @Test
     fun `test that false is returned if quality is original`() = runTest {
         getUploadVideoQualityUseCase.stub {
             onBlocking { invoke() }.thenReturn(VideoQuality.ORIGINAL)

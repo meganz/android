@@ -232,7 +232,7 @@ interface MegaLocalStorageGateway {
     /**
      * Get video quality for camera upload
      */
-    suspend fun getUploadVideoQuality(): String
+    suspend fun getUploadVideoQuality(): Int?
 
     /**
      * Checks whether the File Names are kept or not when uploading content

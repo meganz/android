@@ -113,7 +113,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         secondaryUploadNodeId: NodeId,
         tempRoot: String,
     ): Flow<CameraUploadsTransferProgress> = channelFlow {
-        val videoQuality = getUploadVideoQualityUseCase() ?: VideoQuality.ORIGINAL
+        val videoQuality = getUploadVideoQualityUseCase()
         val locationTagsDisabled = !areLocationTagsEnabledUseCase()
 
         cameraUploadsRecords.mapNotNull { record ->
@@ -725,4 +725,3 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         CameraUploadFolderType.Secondary -> secondaryUploadNodeId
     }
 }
-

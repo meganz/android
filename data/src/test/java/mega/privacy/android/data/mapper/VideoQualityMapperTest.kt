@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import org.junit.Test
 
 class VideoQualityMapperTest {
-    private val underTest: VideoQualityMapper = ::toVideoQuality
+    private val underTest = VideoQualityMapper()
 
     @Test
     fun `test null value returns null`() {
@@ -14,14 +14,14 @@ class VideoQualityMapperTest {
 
     @Test
     fun `test that invalid value returns null`() {
-        assertThat(underTest("A what now?")).isNull()
+        assertThat(underTest(5)).isNull()
     }
 
     @Test
     fun `test valid values`() {
-        assertThat(underTest("0")).isEqualTo(VideoQuality.LOW)
-        assertThat(underTest("1")).isEqualTo(VideoQuality.MEDIUM)
-        assertThat(underTest("2")).isEqualTo(VideoQuality.HIGH)
-        assertThat(underTest("3")).isEqualTo(VideoQuality.ORIGINAL)
+        assertThat(underTest(0)).isEqualTo(VideoQuality.LOW)
+        assertThat(underTest(1)).isEqualTo(VideoQuality.MEDIUM)
+        assertThat(underTest(2)).isEqualTo(VideoQuality.HIGH)
+        assertThat(underTest(3)).isEqualTo(VideoQuality.ORIGINAL)
     }
 }

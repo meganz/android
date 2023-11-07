@@ -18,5 +18,6 @@ class GetUploadVideoQualityUseCase @Inject constructor(
      *
      * @return The corresponding [VideoQuality], which can be nullable
      */
-    suspend operator fun invoke(): VideoQuality? = cameraUploadRepository.getUploadVideoQuality()
+    suspend operator fun invoke(): VideoQuality =
+        cameraUploadRepository.getUploadVideoQuality() ?: VideoQuality.ORIGINAL
 }

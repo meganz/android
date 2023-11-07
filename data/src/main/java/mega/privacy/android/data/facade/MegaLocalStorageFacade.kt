@@ -5,7 +5,6 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Offline
-import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -153,8 +152,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setLocationTagsEnabled(enable: Boolean) =
         dbHandler.setRemoveGPS(!enable)
 
-    override suspend fun getUploadVideoQuality(): String =
-        dbHandler.preferences?.uploadVideoQuality ?: VideoQuality.ORIGINAL.value.toString()
+    override suspend fun getUploadVideoQuality(): Int? =
+        dbHandler.preferences?.uploadVideoQuality?.toIntOrNull()
 
     override suspend fun areUploadFileNamesKept(): Boolean =
         dbHandler.preferences?.keepFileNames.toBoolean()

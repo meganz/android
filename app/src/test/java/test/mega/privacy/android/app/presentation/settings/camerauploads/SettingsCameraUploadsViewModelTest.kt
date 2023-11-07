@@ -857,7 +857,7 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
             val nodeId = NodeId(1L)
-            val cameraUploadsNode = mock<TypedFolderNode>() {
+            val cameraUploadsNode = mock<TypedFolderNode> {
                 on { id }.thenReturn(nodeId)
                 on { name }.thenReturn("Camera Uploads")
             }
@@ -875,7 +875,7 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
             val nodeId = NodeId(1L)
-            val cameraUploadsNode = mock<TypedFolderNode>() {
+            val cameraUploadsNode = mock<TypedFolderNode> {
                 on { id }.thenReturn(nodeId)
                 on { name }.thenReturn("Media Uploads")
             }

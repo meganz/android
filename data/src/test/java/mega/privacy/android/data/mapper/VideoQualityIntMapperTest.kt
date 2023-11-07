@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.VideoQuality
 import org.junit.Test
 
-class VideoQualityIntMapperTest{
-    private val underTest: VideoQualityIntMapper = ::videoQualityToInt
+class VideoQualityIntMapperTest {
+    private val underTest = VideoQualityIntMapper()
 
     @Test
     fun `test values`() {

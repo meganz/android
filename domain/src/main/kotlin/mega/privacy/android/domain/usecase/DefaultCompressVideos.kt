@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.SyncRecord
-import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import javax.inject.Inject
@@ -25,7 +24,7 @@ class DefaultCompressVideos @Inject constructor(
         emitAll(
             cameraUploadRepository.compressVideos(
                 root = rootPath,
-                quality = getUploadVideoQualityUseCase() ?: VideoQuality.ORIGINAL,
+                quality = getUploadVideoQualityUseCase(),
                 records = pendingList,
             )
         )

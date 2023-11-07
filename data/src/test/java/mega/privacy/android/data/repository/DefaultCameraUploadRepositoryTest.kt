@@ -19,6 +19,8 @@ import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
+import mega.privacy.android.data.mapper.VideoQualityIntMapper
+import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
@@ -28,8 +30,6 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toVideoAttachment
-import mega.privacy.android.data.mapper.toVideoQuality
-import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -90,6 +90,8 @@ class DefaultCameraUploadRepositoryTest {
     private val uploadOptionMapper = mock<UploadOptionMapper>()
     private val deviceGateway = mock<AndroidDeviceGateway>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
+    private val videoQualityMapper: VideoQualityMapper = mock()
+    private val videoQualityIntMapper: VideoQualityIntMapper = mock()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -124,8 +126,8 @@ class DefaultCameraUploadRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = appEventGateway,
             deviceGateway = deviceGateway,
-            videoQualityIntMapper = ::videoQualityToInt,
-            videoQualityMapper = ::toVideoQuality,
+            videoQualityIntMapper = videoQualityIntMapper,
+            videoQualityMapper = videoQualityMapper,
             syncStatusIntMapper = ::syncStatusToInt,
             backupStateMapper = backupStateMapper,
             backupStateIntMapper = backupStateIntMapper,
@@ -243,14 +245,15 @@ class DefaultCameraUploadRepositoryTest {
         @TestFactory
         fun `test that camera uploads will upload videos on a specific video quality`() =
             listOf(
-                "0" to VideoQuality.LOW,
-                "1" to VideoQuality.MEDIUM,
-                "2" to VideoQuality.HIGH,
-                "3" to VideoQuality.ORIGINAL,
-                "4" to null,
+                0 to VideoQuality.LOW,
+                1 to VideoQuality.MEDIUM,
+                2 to VideoQuality.HIGH,
+                3 to VideoQuality.ORIGINAL,
+                4 to null,
             ).map { (input, expectedVideoQuality) ->
                 dynamicTest("test that the value $input will return $expectedVideoQuality") {
                     runTest {
+                        whenever(videoQualityMapper.invoke(input)).thenReturn(expectedVideoQuality)
                         whenever(localStorageGateway.getUploadVideoQuality()).thenReturn(input)
                         assertThat(underTest.getUploadVideoQuality()).isEqualTo(expectedVideoQuality)
                     }
@@ -261,6 +264,7 @@ class DefaultCameraUploadRepositoryTest {
         @EnumSource(VideoQuality::class)
         fun `test that a new video quality is set when uploading videos`(videoQuality: VideoQuality) =
             runTest {
+                whenever(videoQualityIntMapper.invoke(videoQuality)).thenReturn(videoQuality.value)
                 underTest.setUploadVideoQuality(videoQuality)
                 verify(localStorageGateway).setUploadVideoQuality(videoQuality.value)
             }
