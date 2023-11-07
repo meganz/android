@@ -26,10 +26,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.inappupdate.ResetInAppUpdateStatisticsUseCase
 import mega.privacy.android.domain.usecase.inappupdate.ShouldPromptUserForUpdateUseCase
 import mega.privacy.android.domain.usecase.inappupdate.ShouldResetInAppUpdateStatisticsUseCase
@@ -41,6 +39,7 @@ import mega.privacy.mobile.analytics.event.InAppUpdateUpdateButtonPressedEvent
 import org.jetbrains.anko.contentView
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 /**
  * [InAppUpdateHandler] Implementation
@@ -48,7 +47,6 @@ import javax.inject.Inject
 class InAppUpdateHandlerImpl @Inject constructor(
     @ActivityContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val resetInAppUpdateStatisticsUseCase: ResetInAppUpdateStatisticsUseCase,
     private val updateInAppUpdateStatisticsUseCase: UpdateInAppUpdateStatisticsUseCase,
     private val shouldPromptUserForUpdateUseCase: ShouldPromptUserForUpdateUseCase,
@@ -109,7 +107,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
         }
         if (shouldPromptUserForUpdate()) {
             if (canUpdate(appUpdateInfo)) {
-                return suspendCancellableCoroutine { continuation ->
+                val result = suspendCancellableCoroutine { continuation ->
                     val installStateUpdatedListener = getInstallStateListener(continuation)
 
                     appUpdateManager.registerListener(installStateUpdatedListener)
@@ -120,6 +118,10 @@ class InAppUpdateHandlerImpl @Inject constructor(
                     }
 
                     startUpdateFlow(appUpdateInfo, getIntentSenderStarter())
+                }
+
+                if (result == InstallStatus.DOWNLOADED) {
+                    popupSnackBarForCompleteUpdate(initialMessageDuration)
                 }
             }
         }
@@ -139,23 +141,28 @@ class InAppUpdateHandlerImpl @Inject constructor(
         )
 
 
-    private fun getInstallStateListener(continuation: CancellableContinuation<Unit>) =
+    private fun getInstallStateListener(continuation: CancellableContinuation<Int>) =
         InstallStateUpdatedListener { state ->
             when (state.installStatus()) {
                 InstallStatus.DOWNLOADED -> {
-                    continuation.resumeWith(Result.success(Unit))
-                    Timber.d("InAppUpdate: The user has downloaded the update")
-                    popupSnackBarForCompleteUpdate(initialMessageDuration)
+                    if (continuation.isActive) {
+                        Timber.d("InAppUpdate: The user has downloaded the update")
+                        continuation.resume(InstallStatus.DOWNLOADED)
+                    }
                 }
 
                 InstallStatus.FAILED -> {
-                    continuation.resumeWith(Result.success(Unit))
-                    Timber.d("InAppUpdate: update failed to download")
+                    if (continuation.isActive) {
+                        Timber.d("InAppUpdate: update failed to download")
+                        continuation.resume(InstallStatus.FAILED)
+                    }
                 }
 
                 InstallStatus.CANCELED -> {
-                    continuation.resumeWith(Result.success(Unit))
-                    Timber.d("InAppUpdate: The user has canceled downloading the update")
+                    if (continuation.isActive) {
+                        Timber.d("InAppUpdate: The user has canceled downloading the update")
+                        continuation.resume(InstallStatus.CANCELED)
+                    }
                 }
 
                 else -> {}
