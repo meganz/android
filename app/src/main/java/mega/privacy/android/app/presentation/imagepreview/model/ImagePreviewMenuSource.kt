@@ -4,4 +4,5 @@ enum class ImagePreviewMenuSource {
     TIMELINE,
     ALBUM_CONTENT,
     ALBUM_SHARING,
+    MEDIA_DISCOVERY,
 }

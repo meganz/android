@@ -7,6 +7,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.multibindings.IntoMap
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumContentImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuOptions
+import mega.privacy.android.app.presentation.imagepreview.menu.MediaDiscoveryImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.menu.TimelineImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 
@@ -23,4 +24,9 @@ interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ALBUM_CONTENT)
     fun AlbumContentImagePreviewMenuOptions.bindAlbumContentImagePreviewMenuOptions(): ImagePreviewMenuOptions
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.MEDIA_DISCOVERY)
+    fun MediaDiscoveryImagePreviewMenuOptions.bindMediaDiscoveryMenuOptions(): ImagePreviewMenuOptions
 }

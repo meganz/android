@@ -6,10 +6,18 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher.Companion.IS_RECURSIVE
+import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher.Companion.PARENT_ID
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -20,9 +28,11 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetAlbumPhotoFileUrlByNodeIdUseCase
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -37,6 +47,8 @@ class AlbumImportPreviewProvider @Inject constructor(
     private val getAlbumPhotoFileUrlByNodeIdUseCase: GetAlbumPhotoFileUrlByNodeIdUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
 ) {
 
     /**
@@ -70,11 +82,16 @@ class AlbumImportPreviewProvider @Inject constructor(
                     photo = photo,
                     currentSort = currentSort,
                     isFolderLink = isFolderLink,
-                    folderNodeId = folderNodeId
+                    folderNodeId = folderNodeId,
                 )
             }
         } else {
-            startImagePreviewFromMD(activity = activity, photoIds = photoIds, photo = photo)
+            startImagePreviewFromMD(
+                activity = activity,
+                photoIds = photoIds,
+                photo = photo,
+                folderNodeId = folderNodeId,
+            )
         }
     }
 
@@ -82,15 +99,46 @@ class AlbumImportPreviewProvider @Inject constructor(
         activity: Activity,
         photoIds: List<Long>,
         photo: Photo,
+        folderNodeId: Long?,
     ) {
-        ImageViewerActivity.getIntentForChildren(
-            activity,
-            photoIds.toLongArray(),
-            photo.id,
-        ).run {
-            activity.startActivity(this)
+        (activity as LifecycleOwner).lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                folderNodeId?.let { parentID ->
+                    if (getFeatureFlagValueUseCase(AppFeatures.SubFolderMediaDiscoverySetting)) {
+                        monitorSubFolderMediaDiscoverySettingsUseCase().collectLatest { recursive ->
+                            ImagePreviewActivity.createIntent(
+                                context = activity,
+                                imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
+                                menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
+                                anchorImageNodeId = NodeId(photo.id),
+                                params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
+                            ).run {
+                                activity.startActivity(this)
+                            }
+                        }
+                    } else {
+                        ImagePreviewActivity.createIntent(
+                            context = activity,
+                            imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
+                            menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
+                            anchorImageNodeId = NodeId(photo.id),
+                            params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to true),
+                        ).run {
+                            activity.startActivity(this)
+                        }
+                    }
+                }
+            } else {
+                ImageViewerActivity.getIntentForChildren(
+                    activity,
+                    photoIds.toLongArray(),
+                    photo.id,
+                ).run {
+                    activity.startActivity(this)
+                }
+                activity.overridePendingTransition(0, 0)
+            }
         }
-        activity.overridePendingTransition(0, 0)
     }
 
     private fun startImagePreviewFromAlbumSharing(

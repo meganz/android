@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -79,6 +80,7 @@ import kotlin.coroutines.resumeWithException
  * @property videoMapper VideoMapper
  */
 @Singleton
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class DefaultPhotosRepository @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val megaApiFacade: MegaApiGateway,
@@ -709,4 +711,48 @@ internal class DefaultPhotosRepository @Inject constructor(
         .mapLatest { imageNodesCache.values.toList() }
 
     override suspend fun getImageNode(nodeId: NodeId) = imageNodesCache[nodeId]
+
+    override suspend fun getMediaDiscoveryNodes(
+        parentID: Long,
+        recursive: Boolean,
+    ): List<ImageNode> {
+        return withContext(ioDispatcher) {
+            val parent = megaApiFacade.getMegaNodeByHandle(parentID)
+            val searchString = ""
+            parent?.let { parentNode ->
+                val token = MegaCancelToken.createInstance()
+                val images = async {
+                    megaApiFacade.searchByType(
+                        parentNode = parentNode,
+                        searchString = searchString,
+                        cancelToken = token,
+                        recursive = recursive,
+                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                        type = MegaApiAndroid.FILE_TYPE_PHOTO
+                    )
+                }
+                val videos = async {
+                    megaApiFacade.searchByType(
+                        parentNode = parentNode,
+                        searchString = searchString,
+                        cancelToken = token,
+                        recursive = recursive,
+                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                        type = MegaApiAndroid.FILE_TYPE_VIDEO
+                    )
+                }
+                (images.await() + videos.await()).map { node ->
+                    val offlineMap =
+                        megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
+                    val offline: Offline? = offlineMap?.get(node.handle.toString())
+                    imageNodeMapper(
+                        megaNode = node,
+                        hasVersion = megaApiFacade::hasVersion,
+                        requireSerializedData = true,
+                        offline = offline
+                    )
+                }
+            } ?: emptyList()
+        }
+    }
 }

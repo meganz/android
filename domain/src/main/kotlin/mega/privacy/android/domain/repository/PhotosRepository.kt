@@ -125,4 +125,9 @@ interface PhotosRepository {
      * @param nodeId
      */
     suspend fun getImageNode(nodeId: NodeId): ImageNode?
+
+    /**
+     * Monitor media discovery nodes
+     */
+    suspend fun getMediaDiscoveryNodes(parentID: Long, recursive: Boolean): List<ImageNode>
 }
