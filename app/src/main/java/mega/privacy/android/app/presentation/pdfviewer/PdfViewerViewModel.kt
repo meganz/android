@@ -258,4 +258,11 @@ class PdfViewerViewModel @Inject constructor(
     fun onConsumeNodeCopyError() {
         _state.update { it.copy(nodeCopyError = null) }
     }
+
+    /**
+     * Reset pdf stream data
+     */
+    fun resetPdfStreamData() {
+        _state.update { it.copy(pdfStreamData = null) }
+    }
 }
