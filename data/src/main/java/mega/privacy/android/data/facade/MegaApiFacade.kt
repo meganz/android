@@ -1438,4 +1438,9 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun resetNodeLabel(node: MegaNode) {
         megaApi.resetNodeLabel(node)
     }
+
+    override suspend fun setPublicKeyPinning(enable: Boolean) = megaApi.setPublicKeyPinning(enable)
+
+    override suspend fun changeApiUrl(apiURL: String, disablePkp: Boolean) =
+        megaApi.changeApiUrl(apiURL, disablePkp)
 }

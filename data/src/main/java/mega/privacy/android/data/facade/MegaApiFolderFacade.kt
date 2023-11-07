@@ -100,4 +100,10 @@ internal class MegaApiFolderFacade @Inject constructor(
         folderLink: String,
         listener: MegaRequestListenerInterface,
     ) = megaApiFolder.getPublicLinkInformation(folderLink, listener)
+
+    override suspend fun setPublicKeyPinning(enable: Boolean) =
+        megaApiFolder.setPublicKeyPinning(enable)
+
+    override suspend fun changeApiUrl(apiURL: String, disablePkp: Boolean) =
+        megaApiFolder.changeApiUrl(apiURL, disablePkp)
 }
