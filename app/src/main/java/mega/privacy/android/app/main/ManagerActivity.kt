@@ -5291,11 +5291,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Shows an Open link dialog.
      */
     private fun showOpenLinkDialog(isJoinMeeting: Boolean = false) {
-        val isChatScreen = drawerItem == DrawerItem.CHAT
-        OpenLinkDialogFragment.newInstance(
-            isChatScreen = isChatScreen,
-            isJoinMeeting = isJoinMeeting
-        ).show(supportFragmentManager, OpenLinkDialogFragment.TAG)
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            val isChatScreen = drawerItem == DrawerItem.CHAT
+            OpenLinkDialogFragment.newInstance(
+                isChatScreen = isChatScreen,
+                isJoinMeeting = isJoinMeeting
+            ).show(supportFragmentManager, OpenLinkDialogFragment.TAG)
+        }
     }
 
     fun showChatLink(link: String?) {
