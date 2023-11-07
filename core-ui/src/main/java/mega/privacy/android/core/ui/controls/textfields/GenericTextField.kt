@@ -37,8 +37,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
  * Text field generic.
@@ -63,20 +62,20 @@ fun GenericTextField(
     imeAction: ImeAction = ImeAction.Done,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(
-        textColor = MaterialTheme.colors.onPrimary,
-        backgroundColor = Color.Transparent,
-        cursorColor = MaterialTheme.colors.secondary,
-        errorCursorColor = MaterialTheme.colors.error,
-        errorIndicatorColor = MaterialTheme.colors.error,
-        focusedIndicatorColor = MaterialTheme.colors.secondary,
-        unfocusedIndicatorColor = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+        textColor = MegaTheme.colors.text.primary,
+        backgroundColor = MegaTheme.colors.background.surface1,
+        cursorColor = MegaTheme.colors.border.strongSelected,
+        errorCursorColor = MegaTheme.colors.text.error,
+        errorIndicatorColor = MegaTheme.colors.text.error,
+        focusedIndicatorColor = MegaTheme.colors.border.strongSelected,
+        unfocusedIndicatorColor = MegaTheme.colors.border.disabled,
     ),
 ) = Column(modifier = modifier) {
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.secondary,
-        backgroundColor = MaterialTheme.colors.secondary
+        handleColor = MegaTheme.colors.border.strongSelected,
+        backgroundColor = MegaTheme.colors.border.strongSelected
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -88,7 +87,7 @@ fun GenericTextField(
                 .background(Color.Transparent)
                 .indicatorLine(true, isError, interactionSource, colors)
                 .fillMaxWidth(),
-            textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onPrimary),
+            textStyle = MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -135,21 +134,21 @@ fun GenericTextField(
     imeAction: ImeAction = ImeAction.Done,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(
-        textColor = MaterialTheme.colors.onPrimary,
-        backgroundColor = Color.Transparent,
-        cursorColor = MaterialTheme.colors.secondary,
-        errorCursorColor = MaterialTheme.colors.error,
-        errorIndicatorColor = MaterialTheme.colors.error,
-        focusedIndicatorColor = MaterialTheme.colors.secondary,
-        unfocusedIndicatorColor = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+        textColor = MegaTheme.colors.text.primary,
+        backgroundColor = MegaTheme.colors.background.surface1,
+        cursorColor = MegaTheme.colors.border.strongSelected,
+        errorCursorColor = MegaTheme.colors.text.error,
+        errorIndicatorColor = MegaTheme.colors.text.error,
+        focusedIndicatorColor = MegaTheme.colors.border.strongSelected,
+        unfocusedIndicatorColor = MegaTheme.colors.border.disabled,
     ),
     singleLine: Boolean = true,
 ) = Column(modifier = modifier) {
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.secondary,
-        backgroundColor = MaterialTheme.colors.secondary
+        handleColor = MegaTheme.colors.border.strongSelected,
+        backgroundColor = MegaTheme.colors.border.strongSelected
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -161,7 +160,7 @@ fun GenericTextField(
                 .background(Color.Transparent)
                 .indicatorLine(true, isError, interactionSource, colors)
                 .fillMaxWidth(),
-            textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onPrimary),
+            textStyle = MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -218,7 +217,7 @@ private fun GenericDecorationBox(
         placeholder = {
             Text(
                 text = placeholder,
-                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.grey_alpha_038_white_alpha_038)
+                style = MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.placeholder)
             )
         },
         colors = colors,

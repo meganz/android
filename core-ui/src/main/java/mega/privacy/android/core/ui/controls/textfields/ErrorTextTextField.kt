@@ -11,6 +11,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
  * Error text in text field.
@@ -28,7 +29,7 @@ fun ErrorTextTextField(
             .fillMaxWidth()
             .padding(top = 4.dp),
         text = errorText,
-        style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error),
+        style = MaterialTheme.typography.caption.copy(color = MegaTheme.colors.text.error),
         textAlign = TextAlign.Start
     )
 }

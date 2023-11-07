@@ -42,6 +42,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -85,21 +86,21 @@ fun GenericDescriptionTextField(
         }
 
         val textFieldColors = TextFieldDefaults.textFieldColors(
-            textColor = if (isFocused) MaterialTheme.colors.onPrimary else MaterialTheme.colors.textColorSecondary,
-            backgroundColor = Color.Transparent,
-            cursorColor = MaterialTheme.colors.secondary,
-            errorCursorColor = MaterialTheme.colors.error,
-            errorIndicatorColor = MaterialTheme.colors.error,
-            focusedLabelColor = MaterialTheme.colors.onPrimary,
+            textColor = if (isFocused) MegaTheme.colors.text.primary else MegaTheme.colors.text.onColorDisabled,
+            backgroundColor = MegaTheme.colors.background.pageBackground,
+            cursorColor = MegaTheme.colors.icon.accent,
+            errorCursorColor = MegaTheme.colors.text.error,
+            errorIndicatorColor = MegaTheme.colors.support.error,
+            focusedLabelColor = MegaTheme.colors.text.primary,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            unfocusedLabelColor = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
-            errorLabelColor = MaterialTheme.colors.error,
+            unfocusedLabelColor = MegaTheme.colors.text.onColorDisabled,
+            errorLabelColor = MegaTheme.colors.text.error,
         )
 
         val customTextSelectionColors = TextSelectionColors(
-            handleColor = MaterialTheme.colors.secondary,
-            backgroundColor = MaterialTheme.colors.secondary
+            handleColor = MegaTheme.colors.icon.accent,
+            backgroundColor = MegaTheme.colors.icon.accent
         )
 
         val keyboardOption = KeyboardOptions(
@@ -118,7 +119,7 @@ fun GenericDescriptionTextField(
                         .padding(top = 10.dp),
                     text = stringResource(id = id),
                     style = MaterialTheme.typography.subtitle1.copy(
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MegaTheme.colors.text.primary,
                         textAlign = TextAlign.Start
                     )
                 )
@@ -155,7 +156,7 @@ fun GenericDescriptionTextField(
                     },
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.subtitle2.copy(
-                    color = if (!isFocused && value.isNotEmpty()) MaterialTheme.colors.textColorSecondary else MaterialTheme.colors.onPrimary,
+                    color = if (!isFocused && value.isNotEmpty()) MegaTheme.colors.text.onColorDisabled else MegaTheme.colors.text.primary,
                     textAlign = TextAlign.Start
                 ),
                 cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
@@ -172,7 +173,7 @@ fun GenericDescriptionTextField(
                                 Text(
                                     text = stringResource(id = id),
                                     style = MaterialTheme.typography.body1.copy(
-                                        color = if (isFocused) MaterialTheme.colors.grey_alpha_038_white_alpha_038 else MaterialTheme.colors.black_white,
+                                        color = if (isFocused) MegaTheme.colors.text.onColorDisabled else MegaTheme.colors.text.primary,
                                         textAlign = TextAlign.Start
                                     ),
                                 )

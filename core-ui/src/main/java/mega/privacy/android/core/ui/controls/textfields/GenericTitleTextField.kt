@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
  * TextField Generic Title
@@ -82,21 +82,21 @@ fun GenericTitleTextField(
         }
 
         val textFieldColors = TextFieldDefaults.textFieldColors(
-            textColor = MaterialTheme.colors.onPrimary,
-            backgroundColor = Color.Transparent,
-            cursorColor = MaterialTheme.colors.secondary,
-            errorCursorColor = MaterialTheme.colors.error,
-            errorIndicatorColor = MaterialTheme.colors.error,
-            focusedLabelColor = MaterialTheme.colors.onPrimary,
+            textColor = MegaTheme.colors.text.primary,
+            backgroundColor = MegaTheme.colors.background.pageBackground,
+            cursorColor = MegaTheme.colors.icon.accent,
+            errorCursorColor = MegaTheme.colors.support.error,
+            errorIndicatorColor = MegaTheme.colors.support.error,
+            focusedLabelColor = MegaTheme.colors.text.primary,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            unfocusedLabelColor = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
-            errorLabelColor = MaterialTheme.colors.error,
+            unfocusedLabelColor = MegaTheme.colors.text.onColorDisabled,
+            errorLabelColor = MegaTheme.colors.text.error,
         )
 
         val customTextSelectionColors = TextSelectionColors(
-            handleColor = MaterialTheme.colors.secondary,
-            backgroundColor = MaterialTheme.colors.secondary
+            handleColor = MegaTheme.colors.icon.accent,
+            backgroundColor = MegaTheme.colors.icon.accent
         )
 
         val keyboardOption = KeyboardOptions(
@@ -131,7 +131,7 @@ fun GenericTitleTextField(
                     ),
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.h6.copy(
-                    color = MaterialTheme.colors.onPrimary,
+                    color = MegaTheme.colors.text.primary,
                     textAlign = TextAlign.Start
                 ),
                 cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
@@ -150,7 +150,7 @@ fun GenericTitleTextField(
                                 Text(
                                     text = stringResource(id = id),
                                     style = MaterialTheme.typography.h6.copy(
-                                        color = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
+                                        color = MegaTheme.colors.text.onColorDisabled,
                                         textAlign = TextAlign.Start
                                     ),
                                 )
