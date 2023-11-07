@@ -377,6 +377,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     } catch (e: Exception) {
                         Timber.w("Exception loading PDF as stream", e)
                     }
+                    viewModel.resetPdfStreamData()
                     if (loading && !transfersManagement.isOnTransferOverQuota()) {
                         binding.pdfViewerProgressBar.isVisible = true
                     }
