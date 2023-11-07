@@ -29,11 +29,12 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.HandlerThread;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.AppCompatEditText;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -77,6 +78,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
@@ -165,8 +168,8 @@ public class PDFView extends RelativeLayout {
     /** Current state of the view */
     private State state = State.DEFAULT;
 
-    /** Async task used during the loading phase to decode a PDF document */
-    private DecodingAsyncTask decodingAsyncTask;
+    /** ExecutorService used during the loading phase to decode a PDF document */
+    private ExecutorService decodingExecutorService;
 
     /** The thread {@link #renderingHandler} will run on */
     private final HandlerThread renderingHandlerThread;
@@ -272,8 +275,41 @@ public class PDFView extends RelativeLayout {
 
         recycled = false;
         // Start decoding document
-        decodingAsyncTask = new DecodingAsyncTask(docSource, password, userPages, this, pdfiumCore);
-        decodingAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        decodeDocument(docSource, password, userPages, this, pdfiumCore);
+    }
+
+    private void decodeDocument(DocumentSource docSource, String password, int[] userPages, PDFView pdfView, PdfiumCore pdfiumCore) {
+        decodingExecutorService = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        try {
+            decodingExecutorService.execute(() -> {
+                Throwable error = null;
+                try {
+                    PdfDocument pdfDocument = docSource.createDocument(pdfView.getContext(), pdfiumCore, password);
+                    pdfFile = new PdfFile(pdfiumCore, pdfDocument, pdfView.getPageFitPolicy(), getViewSize(pdfView),
+                            userPages, pdfView.isSwipeVertical(), pdfView.getSpacingPx());
+                } catch (Throwable t) {
+                    error = t;
+                }
+
+                Throwable finalError = error;
+                handler.post(() -> {
+                    if (finalError != null) {
+                        pdfView.loadError(finalError);
+                    } else if (!decodingExecutorService.isShutdown()) {
+                        pdfView.loadComplete(pdfFile);
+                        decodingExecutorService.shutdownNow();
+                    }
+                });
+            });
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+    }
+
+    private Size getViewSize(PDFView pdfView) {
+        return new Size(pdfView.getWidth(), pdfView.getHeight());
     }
 
     /**
@@ -400,8 +436,8 @@ public class PDFView extends RelativeLayout {
             renderingHandler.stop();
             renderingHandler.removeMessages(RenderingHandler.MSG_RENDER_TASK);
         }
-        if (decodingAsyncTask != null) {
-            decodingAsyncTask.cancel(true);
+        if (decodingExecutorService != null) {
+            decodingExecutorService.shutdownNow();
         }
 
         // Clear caches
