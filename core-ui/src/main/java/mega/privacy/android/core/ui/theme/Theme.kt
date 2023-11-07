@@ -4,13 +4,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalView
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 
 /**
@@ -67,6 +67,10 @@ internal object MegaTheme {
     val colors: MegaColors
         @Composable
         get() = LocalMegaColors.current
+
+    @Composable
+    fun textColor(textColor: TextColor) =
+        LocalMegaColors.current.text.getTextColor(textColor)
 }
 
 @Suppress("PrivatePropertyName") //convention for staticCompositionLocalOf is Uppercase
