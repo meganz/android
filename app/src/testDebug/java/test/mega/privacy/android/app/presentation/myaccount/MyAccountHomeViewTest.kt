@@ -39,9 +39,8 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.PAYMENT_AL
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PHONE_NUMBER_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.TEXT_AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.UPGRADE_BUTTON
-import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_IMAGE
+import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_METER_BUSINESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_PROGRESS
-import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_IMAGE
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_PROGRESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountHeader
@@ -297,7 +296,7 @@ class MyAccountHomeViewTest {
     }
 
     @Test
-    fun `test that usage progress bar should be invisible and show image instead when account is BUSINESS`() {
+    fun `test that usage progress bar should be invisible and usage meter layout for Business or Pro Flexi is shown instead when account is BUSINESS`() {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isBusinessAccount = true,
@@ -309,23 +308,19 @@ class MyAccountHomeViewTest {
             .assertDoesNotExist()
         composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_PROGRESS, useUnmergedTree = true)
             .assertDoesNotExist()
-        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_IMAGE, useUnmergedTree = true)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_IMAGE, useUnmergedTree = true)
+        composeTestRule.onNodeWithTag(testTag = USAGE_METER_BUSINESS, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that usage progress bar should be invisible and show image instead when account is PRO_FLEXI`() {
+    fun `test that usage progress bar should be invisible and usage meter layout for Business or Pro Flexi is shown instead when account is PRO_FLEXI`() {
         initMyAccountWithDefaults(MyAccountHomeUIState(accountType = PRO_FLEXI))
 
         composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_PROGRESS, useUnmergedTree = true)
             .assertDoesNotExist()
         composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_PROGRESS, useUnmergedTree = true)
             .assertDoesNotExist()
-        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_IMAGE, useUnmergedTree = true)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_IMAGE, useUnmergedTree = true)
+        composeTestRule.onNodeWithTag(testTag = USAGE_METER_BUSINESS, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -342,10 +337,6 @@ class MyAccountHomeViewTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_PROGRESS, useUnmergedTree = true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_IMAGE, useUnmergedTree = true)
-            .assertDoesNotExist()
-        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_IMAGE, useUnmergedTree = true)
-            .assertDoesNotExist()
     }
 
     @Test

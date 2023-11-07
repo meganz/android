@@ -351,6 +351,14 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Blue700Blue200">
+        <item name="android:textColor">@color/blue_700_blue_200</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Teal600Teal200">
+        <item name="android:textColor">@color/teal_600_teal_200</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Normal.Grey54White54">
         <item name="android:textColor">@color/grey_054_white_054</item>
     </style>
@@ -385,6 +393,14 @@
 
     <style name="TextAppearance.Mega.Subtitle2.Medium.WhiteGrey87">
         <item name="android:textColor">@color/white_grey_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Medium.Blue700Blue200">
+        <item name="android:textColor">@color/blue_700_blue_200</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Medium.Teal600Teal200">
+        <item name="android:textColor">@color/teal_600_teal_200</item>
     </style>
 
     <!-- ================== Body1 ====================== -->

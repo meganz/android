@@ -40,10 +40,9 @@ object MyAccountViewUtil {
         usedTransfer: String,
         usedTransferPercentage: Int,
     ) {
-        storageProgressBar.isVisible = true
-        noPercentageStorageImage.isVisible = false
-        transferProgressBar.isVisible = true
-        noPercentageTransferImage.isVisible = false
+        usageLayoutBusiness.isVisible = false
+        storageLayout.isVisible = true
+        transferLayout.isVisible = true
 
         if (usedStorage.isEmpty()) {
             storageProgressPercentage.isVisible = false
@@ -135,22 +134,12 @@ object MyAccountViewUtil {
         usedStorage: String,
         usedTransFer: String,
     ) {
-        storageProgressPercentage.isVisible = false
-        storageProgressBar.isVisible = false
-        noPercentageStorageImage.isVisible = true
+        storageLayout.isVisible = false
+        transferLayout.isVisible = false
+        usageLayoutBusiness.isVisible = true
 
-        storageProgress.text = usedStorage.ifEmpty { getGettingInfo(context) }
-
-        transferProgressPercentage.isVisible = false
-        transferProgressBar.isVisible = false
-        noPercentageTransferImage.isVisible = true
-
-        transferLayout.isVisible = true
-        transferProgress.isVisible = true
-        transferLabel.isVisible = true
-        transferProgress.text = usedTransFer.ifEmpty { getGettingInfo(context) }
-
-        root.post { checkImagesOrProgressBarVisibility(false) }
+        storageProgressB.text = usedStorage.ifEmpty { getGettingInfo(context) }
+        transferProgressB.text = usedTransFer.ifEmpty { getGettingInfo(context) }
     }
 
     /**

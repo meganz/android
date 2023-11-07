@@ -97,10 +97,9 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.TIME_TO_SH
 import mega.privacy.android.app.presentation.myaccount.view.Constants.TOOLBAR_HEIGHT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.UPGRADE_BUTTON
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_METER
-import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_IMAGE
+import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_METER_BUSINESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_PROGRESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_SECTION
-import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_IMAGE
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_PROGRESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.utils.TimeUtils
@@ -113,13 +112,16 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.amber_700_amber_300
 import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.core.ui.theme.extensions.blue_700_blue_200
 import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.grey_020_black
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_700
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_900
 import mega.privacy.android.core.ui.theme.extensions.grey_100_grey_600
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.core.ui.theme.extensions.teal_600_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.extensions.white_grey_800
@@ -153,12 +155,11 @@ internal object Constants {
     const val EXPIRED_BUSINESS_BANNER_TEXT = "my_account_home_view:expired_business_banner_text"
     const val PAYMENT_ALERT_INFO = "my_account_home_view:payment_alert_info"
     const val USAGE_METER = "my_account_home_view:usage_meter"
+    const val USAGE_METER_BUSINESS = "my_account_home_view:usage_meter_business_pro_flexi"
     const val USAGE_STORAGE_SECTION = "my_account_home_view:usage_storage_section"
     const val USAGE_STORAGE_PROGRESS = "my_account_home_view:usage_storage_progress"
-    const val USAGE_STORAGE_IMAGE = "my_account_home_view:usage_storage_image"
     const val USAGE_TRANSFER_SECTION = "my_account_home_view:usage_transfer_section"
     const val USAGE_TRANSFER_PROGRESS = "my_account_home_view:usage_transfer_progress"
-    const val USAGE_TRANSFER_IMAGE = "my_account_home_view:usage_transfer_image"
     const val ADD_PHONE_NUMBER = "my_account_home_view:list_item:add_phone_number"
     const val BACKUP_RECOVERY_KEY = "my_account_home_view:list_item:backup_recovery_key"
     const val CONTACTS = "my_account_home_view:list_item:contacts"
@@ -714,31 +715,31 @@ internal fun UsageMeterSection(
     modifier: Modifier = Modifier,
 ) {
     val isStorageOverQuota = remember { usedStoragePercentage > 100 }
-
-    ConstraintLayout(
-        modifier = modifier
-            .testTag(USAGE_METER)
-            .wrapContentHeight()
-            .border(1.dp, MaterialTheme.colors.grey_050_grey_700, RoundedCornerShape(4.dp))
-            .clickable(onClick = onUsageMeterClick)
-    ) {
-        val (storageLayout, storageTop, storageBottom, transferLayout, transferTop, transferBottom) = createRefs()
-        val guideline = createGuidelineFromStart(0.5f)
-        val storageChain =
-            createVerticalChain(storageTop, storageBottom, chainStyle = ChainStyle.Packed)
-        val transferChain =
-            createVerticalChain(transferTop, transferBottom, chainStyle = ChainStyle.Packed)
-
-        Box(
-            modifier = Modifier
-                .testTag(USAGE_STORAGE_SECTION)
-                .constrainAs(storageLayout) {
-                    top.linkTo(parent.top, 14.dp)
-                    bottom.linkTo(parent.bottom, 14.dp)
-                    start.linkTo(parent.start, 14.dp)
-                }
+    if (showProgressBar) {
+        //Layout to show Storage/Transfer usage for Free/Pro accounts except Pro Flexi
+        ConstraintLayout(
+            modifier = modifier
+                .testTag(USAGE_METER)
+                .wrapContentHeight()
+                .border(1.dp, MaterialTheme.colors.grey_050_grey_700, RoundedCornerShape(4.dp))
+                .clickable(onClick = onUsageMeterClick)
         ) {
-            if (showProgressBar) {
+            val (storageLayout, storageTop, storageBottom, transferLayout, transferTop, transferBottom) = createRefs()
+            val guideline = createGuidelineFromStart(0.5f)
+            val storageChain =
+                createVerticalChain(storageTop, storageBottom, chainStyle = ChainStyle.Packed)
+            val transferChain =
+                createVerticalChain(transferTop, transferBottom, chainStyle = ChainStyle.Packed)
+
+            Box(
+                modifier = Modifier
+                    .testTag(USAGE_STORAGE_SECTION)
+                    .constrainAs(storageLayout) {
+                        top.linkTo(parent.top, 14.dp)
+                        bottom.linkTo(parent.bottom, 14.dp)
+                        start.linkTo(parent.start, 14.dp)
+                    }
+            ) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .testTag(USAGE_STORAGE_PROGRESS)
@@ -756,70 +757,60 @@ internal fun UsageMeterSection(
                     style = MaterialTheme.typography.body2medium,
                     color = if (isStorageOverQuota) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary
                 )
-            } else {
-                Image(
-                    modifier = Modifier
-                        .testTag(USAGE_STORAGE_IMAGE)
-                        .align(Alignment.Center),
-                    painter = painterResource(id = R.drawable.ic_storage),
-                    contentDescription = "Storage"
-                )
             }
-        }
 
-        constrain(storageChain) {
-            top.linkTo(storageLayout.top)
-            bottom.linkTo(storageLayout.bottom)
-        }
-
-        Text(
-            modifier = Modifier.constrainAs(storageTop) {
-                start.linkTo(storageLayout.end, 9.dp)
-                end.linkTo(guideline, 9.dp)
+            constrain(storageChain) {
                 top.linkTo(storageLayout.top)
-                bottom.linkTo(storageBottom.top)
-                width = Dimension.fillToConstraints
-            },
-            text = buildAnnotatedString {
-                if (isStorageOverQuota) {
-                    withStyle(style = SpanStyle(MaterialTheme.colors.red_600_red_300)) {
+                bottom.linkTo(storageLayout.bottom)
+            }
+
+            Text(
+                modifier = Modifier.constrainAs(storageTop) {
+                    start.linkTo(storageLayout.end, 9.dp)
+                    end.linkTo(if (showTransfer) guideline else parent.end, 1.dp)
+                    top.linkTo(storageLayout.top)
+                    bottom.linkTo(storageBottom.top)
+                    width = Dimension.fillToConstraints
+                },
+                text = buildAnnotatedString {
+                    if (isStorageOverQuota) {
+                        withStyle(style = SpanStyle(MaterialTheme.colors.red_600_red_300)) {
+                            append(formatSize(size = usedStorage))
+                        }
+                    } else {
                         append(formatSize(size = usedStorage))
                     }
-                } else {
-                    append(formatSize(size = usedStorage))
-                }
 
-                append("/${formatSize(size = totalStorage)}")
-            },
-            style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.onPrimary,
-        )
+                    append("/${formatSize(size = totalStorage)}")
+                },
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.onPrimary,
+            )
 
-        Text(
-            modifier = Modifier.constrainAs(storageBottom) {
-                start.linkTo(storageLayout.end, 9.dp)
-                end.linkTo(guideline, 9.dp)
-                top.linkTo(storageTop.bottom)
-                bottom.linkTo(storageLayout.bottom)
-                width = Dimension.fillToConstraints
-            },
-            text = stringResource(id = R.string.account_storage_label),
-            style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium),
-            color = MaterialTheme.colors.onPrimary,
-        )
+            Text(
+                modifier = Modifier.constrainAs(storageBottom) {
+                    start.linkTo(storageLayout.end, 9.dp)
+                    end.linkTo(guideline, 9.dp)
+                    top.linkTo(storageTop.bottom)
+                    bottom.linkTo(storageLayout.bottom)
+                    width = Dimension.fillToConstraints
+                },
+                text = stringResource(id = R.string.account_storage_label),
+                style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium),
+                color = MaterialTheme.colors.onPrimary,
+            )
 
-        if (showTransfer) {
-            Box(
-                modifier = Modifier
-                    .testTag(USAGE_TRANSFER_SECTION)
-                    .wrapContentSize()
-                    .constrainAs(transferLayout) {
-                        top.linkTo(parent.top, 14.dp)
-                        bottom.linkTo(parent.bottom, 14.dp)
-                        start.linkTo(guideline)
-                    }
-            ) {
-                if (showProgressBar) {
+            if (showTransfer) {
+                Box(
+                    modifier = Modifier
+                        .testTag(USAGE_TRANSFER_SECTION)
+                        .wrapContentSize()
+                        .constrainAs(transferLayout) {
+                            top.linkTo(parent.top, 14.dp)
+                            bottom.linkTo(parent.bottom, 14.dp)
+                            start.linkTo(guideline)
+                        }
+                ) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .size(55.dp)
@@ -836,46 +827,91 @@ internal fun UsageMeterSection(
                         style = MaterialTheme.typography.body2medium,
                         color = MaterialTheme.colors.secondary
                     )
-                } else {
-                    Image(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .testTag(USAGE_TRANSFER_IMAGE),
-                        painter = painterResource(id = R.drawable.ic_transfer),
-                        contentDescription = "Transfer"
-                    )
                 }
-            }
 
-            constrain(transferChain) {
-                top.linkTo(transferLayout.top)
-                bottom.linkTo(transferLayout.bottom)
+                constrain(transferChain) {
+                    top.linkTo(transferLayout.top)
+                    bottom.linkTo(transferLayout.bottom)
+                }
+
+                Text(
+                    modifier = Modifier.constrainAs(transferTop) {
+                        end.linkTo(parent.end)
+                        start.linkTo(transferLayout.end, 9.dp)
+                        top.linkTo(transferLayout.top)
+                        bottom.linkTo(transferBottom.top)
+                        width = Dimension.fillToConstraints
+                    },
+                    text = "${formatSize(size = usedTransfer)}/${formatSize(size = totalTransfer)}",
+                    style = MaterialTheme.typography.caption,
+                    color = MaterialTheme.colors.onPrimary,
+                )
+
+                Text(
+                    modifier = Modifier.constrainAs(transferBottom) {
+                        end.linkTo(parent.end, 9.dp)
+                        start.linkTo(transferLayout.end, 9.dp)
+                        top.linkTo(transferTop.bottom)
+                        bottom.linkTo(transferLayout.bottom)
+                        width = Dimension.fillToConstraints
+                    },
+                    text = stringResource(id = R.string.transfer_label),
+                    style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium),
+                    color = MaterialTheme.colors.onPrimary,
+                )
             }
+        }
+    } else {
+        //Layout to show Storage/Transfer usage for Business or Pro Flexi account
+        ConstraintLayout(
+            modifier = modifier
+                .testTag(USAGE_METER_BUSINESS)
+                .wrapContentHeight()
+                .border(1.dp, MaterialTheme.colors.grey_050_grey_700, RoundedCornerShape(4.dp))
+                .clickable(onClick = onUsageMeterClick)
+        ) {
+            val (storageText, storageSize, transferText, transferSize) = createRefs()
 
             Text(
-                modifier = Modifier.constrainAs(transferTop) {
-                    end.linkTo(parent.end, 9.dp)
-                    start.linkTo(transferLayout.end, 9.dp)
-                    top.linkTo(transferLayout.top)
-                    bottom.linkTo(transferBottom.top)
-                    width = Dimension.fillToConstraints
+                modifier = Modifier.constrainAs(storageText) {
+                    start.linkTo(parent.start, 16.dp)
+                    top.linkTo(parent.top, 17.dp)
+                    bottom.linkTo(transferText.top, 12.dp)
                 },
-                text = "${formatSize(size = usedTransfer)}/${formatSize(size = totalTransfer)}",
-                style = MaterialTheme.typography.caption,
-                color = MaterialTheme.colors.onPrimary,
+                text = stringResource(id = R.string.account_storage_label),
+                style = MaterialTheme.typography.subtitle2medium,
+                color = MaterialTheme.colors.blue_700_blue_200,
             )
 
             Text(
-                modifier = Modifier.constrainAs(transferBottom) {
-                    end.linkTo(parent.end, 9.dp)
-                    start.linkTo(transferLayout.end, 9.dp)
-                    top.linkTo(transferTop.bottom)
-                    bottom.linkTo(transferLayout.bottom)
-                    width = Dimension.fillToConstraints
+                modifier = Modifier.constrainAs(storageSize) {
+                    end.linkTo(parent.end, 16.dp)
+                    top.linkTo(parent.top, 17.dp)
+                    bottom.linkTo(transferSize.top, 12.dp)
+                },
+                text = formatSize(size = usedStorage),
+                style = MaterialTheme.typography.subtitle2,
+                color = MaterialTheme.colors.blue_700_blue_200,
+            )
+
+            Text(
+                modifier = Modifier.constrainAs(transferText) {
+                    start.linkTo(parent.start, 16.dp)
+                    bottom.linkTo(parent.bottom, 15.dp)
                 },
                 text = stringResource(id = R.string.transfer_label),
-                style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium),
-                color = MaterialTheme.colors.onPrimary,
+                style = MaterialTheme.typography.subtitle2medium,
+                color = MaterialTheme.colors.teal_600_teal_200,
+            )
+
+            Text(
+                modifier = Modifier.constrainAs(transferSize) {
+                    end.linkTo(parent.end, 16.dp)
+                    bottom.linkTo(parent.bottom, 15.dp)
+                },
+                text = formatSize(size = usedTransfer),
+                style = MaterialTheme.typography.subtitle2,
+                color = MaterialTheme.colors.teal_600_teal_200,
             )
         }
     }

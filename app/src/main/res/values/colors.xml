@@ -149,6 +149,7 @@
     <color name="blue_200">#61D2FF</color>
     <color name="blue_300">#00C0FD</color>
     <color name="blue_400">#00B2FC</color>
+    <color name="blue_700">#0083D7</color>
 
     <color name="amber_300">#FFD54F</color>
     <color name="amber_400">#FFCA28</color>
@@ -526,6 +527,12 @@
     <color name="grey_010_white_009">@color/grey_010</color>
     <color name="amber_800_amber_700">@color/amber_800</color>
     <color name="red_400_red_300">@color/red_400</color>
+
+    <!-- Storage usage on MyAccountUsage view -->
+    <color name="blue_700_blue_200">@color/blue_700</color>
+
+    <!-- Transfer usage on MyAccountUsage view -->
+    <color name="teal_600_teal_200">@color/teal_600</color>
 
     <!-- Expiration/Renew time on MyAccountUsage view -->
     <color name="grey_087_white_054">@color/grey_alpha_087</color>

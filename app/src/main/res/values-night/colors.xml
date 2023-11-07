@@ -337,6 +337,11 @@
     <color name="amber_800_amber_700">@color/amber_700</color>
     <color name="red_400_red_300">@color/red_300</color>
 
+    <!-- Storage usage on MyAccountUsage view -->
+    <color name="blue_700_blue_200">@color/blue_200</color>
+    <!-- Transfer usage on MyAccountUsage view -->
+    <color name="teal_600_teal_200">@color/teal_200</color>
+
     <!-- Expiration/Renew time on MyAccountUsage view -->
     <color name="grey_087_white_054">@color/white_alpha_054</color>
 

@@ -289,6 +289,8 @@ val blue_400 = Color(0xFF00B2FC)
 
 val blue_500 = Color(0xFF00A4FA)
 
+val blue_700 = Color(0xFF0083D7)
+
 val amber_300 = Color(0xFFFFD54F)
 
 val amber_400 = Color(0xFFFFCA28)
