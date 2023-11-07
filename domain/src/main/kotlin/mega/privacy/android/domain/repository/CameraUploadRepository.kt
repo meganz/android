@@ -103,7 +103,7 @@ interface CameraUploadRepository {
      *
      * @return The corresponding [UploadOption]
      */
-    suspend fun getUploadOption(): UploadOption
+    suspend fun getUploadOption(): UploadOption?
 
     /**
      * Sets the upload option of Camera Uploads

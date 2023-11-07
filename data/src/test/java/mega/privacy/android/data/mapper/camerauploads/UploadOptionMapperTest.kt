@@ -1,39 +1,37 @@
 package mega.privacy.android.data.mapper.camerauploads
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.exception.mapper.UnknownMapperParameterException
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 /**
  * Test class for [UploadOptionMapper]
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UploadOptionMapperTest {
     private lateinit var underTest: UploadOptionMapper
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = UploadOptionMapper()
     }
 
-    @Test
-    fun `test that UploadOption can be mapped correctly`() {
-        val expectedResults = HashMap<String?, UploadOption>().apply {
-            put(null, UploadOption.PHOTOS)
-            put(MegaPreferences.ONLY_PHOTOS.toString(), UploadOption.PHOTOS)
-            put(MegaPreferences.ONLY_VIDEOS.toString(), UploadOption.VIDEOS)
-            put(MegaPreferences.PHOTOS_AND_VIDEOS.toString(), UploadOption.PHOTOS_AND_VIDEOS)
-        }
-
-        expectedResults.forEach { (state, uploadOption) ->
-            assertThat(underTest(state)).isEqualTo(uploadOption)
-        }
+    @ParameterizedTest(name = "when input is {0}, mapped to {1}")
+    @MethodSource("provideParams")
+    fun `test that UploadOption can be mapped correctly`(state: Int?, uploadOption: UploadOption?) {
+        assertThat(underTest(state)).isEqualTo(uploadOption)
     }
 
-    @Test(expected = UnknownMapperParameterException::class)
-    fun `test that a different state throws an error`() {
-        underTest("-1")
-    }
+    private fun provideParams() = Stream.of(
+        Arguments.of(1004, null),
+        Arguments.of(1001, UploadOption.PHOTOS),
+        Arguments.of(1002, UploadOption.VIDEOS),
+        Arguments.of(1003, UploadOption.PHOTOS_AND_VIDEOS),
+        Arguments.of(null, null),
+    )
 }

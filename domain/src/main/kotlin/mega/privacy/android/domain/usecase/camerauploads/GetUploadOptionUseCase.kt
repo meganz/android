@@ -18,5 +18,6 @@ class GetUploadOptionUseCase @Inject constructor(
      *
      * @return [UploadOption]
      */
-    suspend operator fun invoke(): UploadOption = cameraUploadRepository.getUploadOption()
+    suspend operator fun invoke(): UploadOption =
+        cameraUploadRepository.getUploadOption() ?: UploadOption.PHOTOS
 }

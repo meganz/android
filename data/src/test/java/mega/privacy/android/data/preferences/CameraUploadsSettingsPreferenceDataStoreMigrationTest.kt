@@ -8,7 +8,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPreferenceDataStoreMigration
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.anyOrNull
@@ -62,7 +61,7 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         verify(dataStore).setChargingRequiredForVideoCompression(true)
         verify(dataStore).setUploadFileNamesKept(true)
         verify(dataStore).setVideoCompressionSizeLimit(200)
-        verify(dataStore).setFileUploadOption(UploadOption.PHOTOS.position)
+        verify(dataStore).setFileUploadOption(1001)
         verify(dataStore).setPhotoTimeStamp(0L)
         verify(dataStore).setVideoTimeStamp(0L)
         verify(dataStore).setMediaUploadsPhotoTimeStamp(0L)
@@ -83,7 +82,7 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         val expectedUploadFileNamesKept = true
         val expectedChargingRequiredForVideoCompression = true
         val expectedVideoCompressionSizeLimit = 400
-        val expectedFileUploadOption = UploadOption.PHOTOS_AND_VIDEOS.position
+        val expectedFileUploadOption = 1001
         val expectedPhotoTimeStamp = 1234L
         val expectedVideoTimeStamp = 5678L
         val expectedMediaUploadsPhotoTimeStamp = 1234L

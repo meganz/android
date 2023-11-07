@@ -6,7 +6,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 
 internal class CameraUploadsSettingsPreferenceDataStoreMigration constructor(
     private val databaseHandler: DatabaseHandler,
@@ -44,7 +43,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration constructor(
             areUploadFileNamesKept = true,
             isChargingRequiredForVideoCompression = true,
             videoCompressionSizeLimit = SIZE,
-            fileUploadOption = UploadOption.PHOTOS.position,
+            fileUploadOption = 1001,
             photoTimeStamp = 0L,
             videoTimeStamp = 0L,
             mediaUploadsPhotoTimeStamp = 0L,
@@ -74,7 +73,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration constructor(
                 ?: true,
             videoCompressionSizeLimit = oldPreferences.chargingOnSize.toIntOrNull() ?: SIZE,
             fileUploadOption = oldPreferences.camSyncFileUpload.toIntOrNull()
-                ?: UploadOption.PHOTOS.position,
+                ?: 1001,
             photoTimeStamp = oldPreferences.camSyncTimeStamp.toLongOrNull() ?: 0L,
             videoTimeStamp = oldPreferences.camVideoSyncTimeStamp.toLongOrNull() ?: 0L,
             mediaUploadsPhotoTimeStamp = oldPreferences.secSyncTimeStamp.toLongOrNull() ?: 0L,

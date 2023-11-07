@@ -96,8 +96,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun isCameraUploadsByWifi(): Boolean =
         dbHandler.preferences?.camSyncWifi?.toBoolean() ?: true
 
-    override suspend fun getCameraSyncFileUpload(): String? =
-        dbHandler.preferences?.camSyncFileUpload
+    override suspend fun getCameraSyncFileUpload(): Int? =
+        dbHandler.preferences?.camSyncFileUpload?.toIntOrNull()
 
     override suspend fun setCameraSyncFileUpload(uploadOption: Int) =
         dbHandler.setCamSyncFileUpload(uploadOption)

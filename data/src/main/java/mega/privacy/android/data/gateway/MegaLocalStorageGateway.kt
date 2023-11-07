@@ -109,7 +109,7 @@ interface MegaLocalStorageGateway {
     /**
      * Get sync file upload
      */
-    suspend fun getCameraSyncFileUpload(): String?
+    suspend fun getCameraSyncFileUpload(): Int?
 
     /**
      * Sets the upload option of Camera Uploads

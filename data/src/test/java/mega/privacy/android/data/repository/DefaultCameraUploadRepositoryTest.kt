@@ -189,9 +189,10 @@ class DefaultCameraUploadRepositoryTest {
         @TestFactory
         fun `test that camera uploads will upload specific content`() =
             listOf(
-                "0" to UploadOption.PHOTOS,
-                "1" to UploadOption.VIDEOS,
-                "2" to UploadOption.PHOTOS_AND_VIDEOS,
+                1001 to UploadOption.PHOTOS,
+                1002 to UploadOption.VIDEOS,
+                1003 to UploadOption.PHOTOS_AND_VIDEOS,
+                1004 to null
             ).map { (input, expectedUploadOption) ->
                 dynamicTest("test that the value $input will return $expectedUploadOption") {
                     runTest {
