@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/storage_transfer_layout"
     android:layout_width="match_parent"
@@ -42,16 +43,6 @@
                 android:layout_centerInParent="true"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
                 tools:text="30%" />
-
-            <ImageView
-                android:id="@+id/no_percentage_storage_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginStart="2dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/ic_storage"
-                tools:ignore="ContentDescription" />
 
         </RelativeLayout>
 
@@ -105,16 +96,6 @@
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
                 tools:text="30%" />
 
-            <ImageView
-                android:id="@+id/no_percentage_transfer_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginStart="2dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/ic_transfer"
-                tools:ignore="ContentDescription" />
-
         </RelativeLayout>
 
         <TextView
@@ -136,5 +117,61 @@
             android:textAppearance="@style/TextAppearance.Mega.Caption.Medium.GreyWhite87" />
 
     </RelativeLayout>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/usage_layout_business"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/storage_label_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="17dp"
+        android:text="@string/account_storage_label"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Medium.Blue700Blue200"
+        app:layout_constraintBottom_toTopOf="@id/transfer_label_b"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/transfer_label_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="15dp"
+        android:text="@string/transfer_label"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Medium.Teal600Teal200"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/storage_label_b" />
+
+    <TextView
+        android:id="@+id/storage_progress_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="16dp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Blue700Blue200"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="11GG/50GB" />
+
+    <TextView
+        android:id="@+id/transfer_progress_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="15dp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Teal600Teal200"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/storage_progress_b"
+        tools:text="11GG/50GB" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
