@@ -37,7 +37,7 @@ import mega.privacy.android.core.ui.controls.text.MarqueeText
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -109,7 +109,8 @@ internal fun ContactItemView(
                 secondLineText?.let {
                     MarqueeText(
                         text = secondLineText,
-                        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorSecondary)
+                        style = MaterialTheme.typography.subtitle2,
+                        color = TextColor.Secondary,
                     )
                 }
             }

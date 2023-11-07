@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.text
+package mega.privacy.android.legacy.core.ui.controls.text
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
@@ -13,29 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.MegaTheme
-import mega.privacy.android.core.ui.theme.tokens.TextColor
 
-/**
- * Marquee text.
- *
- * @param text Text to show.
- * @param color Text color.
- * @param modifier [Modifier].
- * @param style Text style (color will be ignored).
- */
-@Composable
-fun MarqueeText(
-    text: String,
-    color: TextColor,
-    modifier: Modifier = Modifier,
-    style: TextStyle = LocalTextStyle.current,
-) = MarqueeText(
-    text = text,
-    color = MegaTheme.textColor(color),
-    modifier = modifier,
-    style = style
-)
 
 /**
  * Marquee text.
@@ -47,7 +25,11 @@ fun MarqueeText(
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun MarqueeText(
+@Deprecated(
+    message = "This has been deprecated in favour of MarqueeText core component in core-ui module that uses TextColor to ensure usage of design system color tokens",
+    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.text.MarqueeText")
+)
+fun MarqueeText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
@@ -68,7 +50,7 @@ private fun MarqueeTextPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MarqueeText(
             text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-            color = MegaTheme.colors.text.secondary
+            color = Color.Black
         )
     }
 }
