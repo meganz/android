@@ -1,6 +1,6 @@
 @file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 
-package mega.privacy.android.core.ui.controls.menus
+package mega.privacy.android.core.ui.controls.tooltips
 
 
 import androidx.compose.animation.core.MutableTransitionState
@@ -18,7 +18,6 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuPositionProvider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -27,15 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import androidx.core.graphics.ColorUtils
 import kotlinx.coroutines.delay
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 
 /**
@@ -47,18 +44,14 @@ import kotlinx.coroutines.delay
  * that will be used as the 'anchor'. Note that a [Tooltip] by itself will not take up any
  * space in a layout, as the tooltip is displayed in a separate window, on top of other content.
  *
- * The [content] of a [Tooltip] will typically be [Text], as well as custom content.
- *
  * [Tooltip] changes its positioning depending on the available space, always trying to be
  * fully visible. It will try to expand horizontally, depending on layout direction, to the end of
  * its parent, then to the start of its parent, and then screen end-aligned. Vertically, it will
  * try to expand to the bottom of its parent, then from the top of its parent, and then screen
- * top-aligned. An [offset] can be provided to adjust the positioning of the menu for cases when
- * the layout bounds of its parent do not coincide with its visual bounds. Note the offset will
- * be applied in the direction in which the menu will decide to expand.
+ * top-aligned.
  *
  * @param expanded Whether the tooltip is currently visible to the user
- * @param offset [DpOffset] to be added to the position of the tooltip
+ * @param text The text to be shown
  *
  * @see androidx.compose.material.DropdownMenu
  * @see androidx.compose.material.DropdownMenuPositionProvider
@@ -69,13 +62,27 @@ import kotlinx.coroutines.delay
 @Composable
 fun Tooltip(
     expanded: MutableState<Boolean>,
+    text: String,
     modifier: Modifier = Modifier,
-    timeoutMillis: Long = TooltipTimeout,
-    backgroundColor: Color = MaterialTheme.colors.onBackground,
-    offset: DpOffset = DpOffset(0.dp, 0.dp),
+) = Tooltip(
+    expanded, modifier
+) {
+    Text(
+        text = text,
+        color = MegaTheme.colors.text.inverse,
+        style = MaterialTheme.typography.body2,
+    )
+}
+
+@Composable
+internal fun Tooltip(
+    expanded: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+    timeoutMillis: Long = TOOLTIP_TIMEOUT,
     properties: PopupProperties = PopupProperties(focusable = false),
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val offset = DpOffset(0.dp, 0.dp)
     val expandedStates = remember { MutableTransitionState(false) }
     expandedStates.targetState = expanded.value
 
@@ -94,9 +101,9 @@ fun Tooltip(
         ) {
             Box(
                 // Add space for elevation shadow
-                modifier = Modifier.padding(TooltipElevation),
+                modifier = Modifier.padding(TOOLTIP_ELEVATION.dp),
             ) {
-                TooltipContent(expandedStates, backgroundColor, modifier, content)
+                TooltipContent(expandedStates, MegaTheme.colors.icon.primary, modifier, content)
             }
         }
     }
@@ -119,22 +126,21 @@ private fun TooltipContent(
         transitionSpec = {
             if (false isTransitioningTo true) {
                 // Dismissed to expanded
-                tween(durationMillis = InTransitionDuration)
+                tween(durationMillis = IN_TRANSITION_DURATION)
             } else {
                 // Expanded to dismissed.
-                tween(durationMillis = OutTransitionDuration)
+                tween(durationMillis = OUT_TRANSITION_DURATION)
             }
         }
     ) { if (it) 1f else 0f }
 
     Card(
-        backgroundColor = backgroundColor.copy(alpha = 0.75f),
-        contentColor = MaterialTheme.colors.contentColorFor(backgroundColor)
-            .takeOrElse { backgroundColor.onColor() },
+        backgroundColor = backgroundColor,
+        contentColor = MegaTheme.colors.text.inverse,
         modifier = Modifier.alpha(alpha),
-        elevation = TooltipElevation,
+        elevation = TOOLTIP_ELEVATION.dp,
     ) {
-        val p = TooltipPadding
+        val p = TOOLTIP_PADDING.dp
         Column(
             modifier = modifier
                 .padding(start = p, top = p * 0.5f, end = p, bottom = p * 0.7f)
@@ -144,37 +150,12 @@ private fun TooltipContent(
     }
 }
 
-private val TooltipElevation = 16.dp
-private val TooltipPadding = 16.dp
+private const val TOOLTIP_ELEVATION = 16
+private const val TOOLTIP_PADDING = 16
 
 // Tooltip open/close animation duration.
-private const val InTransitionDuration = 64
-private const val OutTransitionDuration = 240
+private const val IN_TRANSITION_DURATION = 64
+private const val OUT_TRANSITION_DURATION = 240
 
 // Default timeout before tooltip close
-private const val TooltipTimeout = 2_000L - OutTransitionDuration
-
-
-// Color utils
-
-/**
- * Calculates an 'on' color for this color.
- *
- * @return [Color.Black] or [Color.White], depending on [isLightColor].
- */
-private fun Color.onColor(): Color = if (isLightColor()) Color.Black else Color.White
-
-/**
- * Calculates if this color is considered light.
- *
- * @return true or false, depending on the higher contrast between [Color.Black] and [Color.White].
- *
- */
-private fun Color.isLightColor(): Boolean {
-    val contrastForBlack = calculateContrastFor(foreground = Color.Black)
-    val contrastForWhite = calculateContrastFor(foreground = Color.White)
-    return contrastForBlack > contrastForWhite
-}
-
-private fun Color.calculateContrastFor(foreground: Color) =
-    ColorUtils.calculateContrast(foreground.toArgb(), toArgb())
+private const val TOOLTIP_TIMEOUT = 2_000L - OUT_TRANSITION_DURATION

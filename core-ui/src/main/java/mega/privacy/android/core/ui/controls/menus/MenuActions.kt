@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarColors
+import mega.privacy.android.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -157,9 +158,7 @@ private fun IconButtonWithTooltip(
                 tint = if (enabled) LocalMegaAppBarColors.current.iconsTintColor else MegaTheme.colors.icon.disabled,
             )
         }
-        Tooltip(showTooltip) {
-            Text(description)
-        }
+        Tooltip(showTooltip, description)
     }
 }
 
