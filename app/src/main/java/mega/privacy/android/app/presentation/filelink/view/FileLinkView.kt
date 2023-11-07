@@ -81,13 +81,13 @@ internal fun FileLinkView(
     onForeignNodeErrorConsumed: () -> Unit,
     adsUiState: AdsUIState,
     onAdClicked: (uri: Uri?) -> Unit,
+    onAdDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
     val showForeignNodeErrorDialog = remember { mutableStateOf(false) }
-    val isAdDismissed = remember { mutableStateOf(false) }
 
     EventEffect(
         event = viewState.errorMessage,
@@ -150,12 +150,12 @@ internal fun FileLinkView(
                 onImportClicked = onImportClicked,
                 onSaveToDeviceClicked = onSaveToDeviceClicked
             )
-            if (isAdDismissed.value.not()) {
+            if (adsUiState.showAdsView) {
                 AdsBannerView(
                     uiState = adsUiState,
                     onAdClicked = onAdClicked,
                     onAdsWebpageLoaded = {},
-                    onAdDismissed = { isAdDismissed.value = true }
+                    onAdDismissed = onAdDismissed
                 )
             }
         }
@@ -292,6 +292,7 @@ private fun PreviewFileLinkView() {
             onForeignNodeErrorConsumed = {},
             adsUiState = AdsUIState(),
             onAdClicked = {},
+            onAdDismissed = {}
         )
     }
 }

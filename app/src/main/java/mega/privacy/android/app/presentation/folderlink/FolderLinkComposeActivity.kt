@@ -212,6 +212,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                         }
                     }
                 },
+                onAdDismissed = adsViewModel::onAdDismissed
             )
         }
     }

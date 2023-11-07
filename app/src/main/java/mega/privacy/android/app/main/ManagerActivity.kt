@@ -8274,10 +8274,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 }
                             }
                         }, onAdDismissed = {
-                            //To handle the close button behaviour in ticket: AP-658
                             hideAdsView()
                             showBNVImmediate()
                             showHideBottomNavigationView(hide = false)
+                            adsViewModel.onAdDismissed()
                         }
                     )
                 }

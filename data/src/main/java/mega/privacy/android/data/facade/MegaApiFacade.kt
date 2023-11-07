@@ -1074,6 +1074,8 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.resetTotalUploads()
     }
 
+    override suspend fun isAccountNew(): Boolean = megaApi.accountIsNew()
+
     override suspend fun getExportMasterKey(): String? = megaApi.exportMasterKey()
 
     override fun setMasterKeyExported(listener: MegaRequestListenerInterface?) {

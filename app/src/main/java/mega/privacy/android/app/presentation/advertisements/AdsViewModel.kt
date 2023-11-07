@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.advertisements.FetchAdDetailRequest
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.advertisements.FetchAdDetailUseCase
+import mega.privacy.android.domain.usecase.advertisements.IsAccountNewUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AdsViewModel @Inject constructor(
     private val fetchAdDetailUseCase: FetchAdDetailUseCase,
+    private val isAccountNewUseCase: IsAccountNewUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorStartScreenPreference: MonitorStartScreenPreference,
 ) : ViewModel() {
@@ -42,10 +44,23 @@ class AdsViewModel @Inject constructor(
      * Feature Flag for InAppAdvertisement
      */
     private var isAdsFeatureEnabled: Boolean = false
+    private var isAccountNew: Boolean = false
     private var fetchAdUrlJob: Job? = null
 
     init {
-        getDefaultStartScreen()
+        checkForInApAdvertisementFeature()
+    }
+
+    /**
+     * Checks before fetching new Ad if account is not new
+     */
+    fun onAdDismissed() {
+        _uiState.update { state ->
+            state.copy(showAdsView = false)
+        }
+        if (isAccountNew) return
+        val currentSlotId = _uiState.value.slotId
+        fetchNewAd(currentSlotId)
     }
 
     /**
@@ -60,29 +75,50 @@ class AdsViewModel @Inject constructor(
         }
     }
 
+
+    /**
+     * Check for the status of the account if new or not
+     */
+    private suspend fun checkIsNewAccount() {
+        runCatching {
+            isAccountNew = isAccountNewUseCase()
+        }.onFailure {
+            Timber.e("Failed to fetch isNewAccount with error: ${it.message}")
+        }
+    }
+
+    private fun checkForInApAdvertisementFeature() {
+        viewModelScope.launch {
+            runCatching {
+                isAdsFeatureEnabled = getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
+                if (isAdsFeatureEnabled) {
+                    getDefaultStartScreen()
+                    checkIsNewAccount()
+                }
+            }.onFailure {
+                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+            }
+        }
+    }
+
     /**
      * gets the default start screen and fetch the Ad based on the assigned slot
      */
-    private fun getDefaultStartScreen() {
-        viewModelScope.launch {
-            isAdsFeatureEnabled = getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
-            if (isAdsFeatureEnabled) {
-                when (monitorStartScreenPreference().firstOrNull()) {
-                    StartScreen.CloudDrive -> {
-                        fetchNewAd(AdsSlotIDs.TAB_CLOUD_SLOT_ID)
-                    }
-
-                    StartScreen.Photos -> {
-                        fetchNewAd(AdsSlotIDs.TAB_PHOTOS_SLOT_ID)
-                    }
-
-                    StartScreen.Home -> {
-                        fetchNewAd(AdsSlotIDs.TAB_HOME_SLOT_ID)
-                    }
-
-                    else -> {}
-                }
+    private suspend fun getDefaultStartScreen() {
+        when (monitorStartScreenPreference().firstOrNull()) {
+            StartScreen.CloudDrive -> {
+                fetchNewAd(AdsSlotIDs.TAB_CLOUD_SLOT_ID)
             }
+
+            StartScreen.Photos -> {
+                fetchNewAd(AdsSlotIDs.TAB_PHOTOS_SLOT_ID)
+            }
+
+            StartScreen.Home -> {
+                fetchNewAd(AdsSlotIDs.TAB_HOME_SLOT_ID)
+            }
+
+            else -> {}
         }
     }
 
@@ -111,6 +147,7 @@ class AdsViewModel @Inject constructor(
                     _uiState.update { state ->
                         state.copy(
                             showAdsView = url != null && isPortrait,
+                            slotId = slotId,
                             adsBannerUrl = url.orEmpty()
                         )
                     }
@@ -120,7 +157,7 @@ class AdsViewModel @Inject constructor(
             }
         } else {
             _uiState.update { state ->
-                state.copy(showAdsView = false, adsBannerUrl = "")
+                state.copy(showAdsView = false, slotId = slotId, adsBannerUrl = "")
             }
         }
     }

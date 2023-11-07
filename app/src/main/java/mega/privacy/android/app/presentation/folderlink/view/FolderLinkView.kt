@@ -149,13 +149,13 @@ internal fun FolderLinkView(
     onEnterMediaDiscoveryClick: () -> Unit,
     adsUiState: AdsUIState,
     onAdClicked: (uri: Uri?) -> Unit,
+    onAdDismissed: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    val isAdDismissed = remember { mutableStateOf(false) }
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
@@ -284,12 +284,12 @@ internal fun FolderLinkView(
                     onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                 )
 
-                if (isAdDismissed.value.not()) {
+                if (adsUiState.showAdsView) {
                     AdsBannerView(
                         uiState = adsUiState,
                         onAdClicked = onAdClicked,
                         onAdsWebpageLoaded = {},
-                        onAdDismissed = { isAdDismissed.value = true }
+                        onAdDismissed = onAdDismissed
                     )
                 }
             }

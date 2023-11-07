@@ -2037,6 +2037,17 @@ interface MegaApiGateway {
     fun resetTotalUploads()
 
     /**
+     * @brief Check if the logged in account is considered new
+     *
+     * This function will NOT return a valid value until the callback onEvent with
+     * type MegaApi::EVENT_MISC_FLAGS_READY is received. You can also rely on the completion of
+     * a fetchnodes to check this value.
+     *
+     * @return True if account is considered new. Otherwise, false.
+     */
+    suspend fun isAccountNew(): Boolean
+
+    /**
      * Get Export Master Key
      */
     suspend fun getExportMasterKey(): String?
@@ -3006,7 +3017,7 @@ interface MegaApiGateway {
     fun createEphemeralAccountPlusPlus(
         firstName: String,
         lastName: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     )
 
     /**

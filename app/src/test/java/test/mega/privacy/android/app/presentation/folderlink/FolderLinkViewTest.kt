@@ -71,7 +71,8 @@ class FolderLinkViewTest {
                 onDisputeTakeDownClicked = { },
                 onEnterMediaDiscoveryClick = { },
                 adsUiState = adsUiState,
-                onAdClicked = { }
+                onAdClicked = { },
+                onAdDismissed = { }
             )
         }
     }

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.advertisements.AdDetails
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.advertisements.FetchAdDetailUseCase
+import mega.privacy.android.domain.usecase.advertisements.IsAccountNewUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -36,6 +37,7 @@ class AdsViewModelTest {
     private val fetchAdDetailUseCase = mock<FetchAdDetailUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorStartScreenPreference = mock<MonitorStartScreenPreference>()
+    private val isAccountNewUseCase = mock<IsAccountNewUseCase>()
 
     private val slotId = "ANDFB"
     private val url = "https://megaad.nz/#z_xyz"
@@ -52,6 +54,7 @@ class AdsViewModelTest {
         reset(
             fetchAdDetailUseCase,
             getFeatureFlagValueUseCase,
+            isAccountNewUseCase,
             monitorStartScreenPreference
         )
     }
@@ -59,6 +62,7 @@ class AdsViewModelTest {
     private fun initTestClass() {
         underTest = AdsViewModel(
             fetchAdDetailUseCase = fetchAdDetailUseCase,
+            isAccountNewUseCase = isAccountNewUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorStartScreenPreference = monitorStartScreenPreference
         )
@@ -155,6 +159,18 @@ class AdsViewModelTest {
         }
 
     @Test
+    fun `test that showAdsView is false when onAdDismissed is called`() = runTest {
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+        initTestClass()
+        testScheduler.advanceUntilIdle()
+        underTest.onAdDismissed()
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showAdsView).isFalse()
+        }
+    }
+
+    @Test
     fun `test that showAdsView will be true when fetchAdDetailUseCase is successful`() =
         runTest {
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
@@ -166,7 +182,6 @@ class AdsViewModelTest {
                 val state = awaitItem()
                 assertThat(state.showAdsView).isTrue()
                 assertThat(state.adsBannerUrl).isEqualTo(fetchedAdDetail.url)
-
             }
         }
 }

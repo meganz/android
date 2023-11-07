@@ -956,6 +956,15 @@ internal class DefaultAccountRepository @Inject constructor(
         megaApiGateway.getExportMasterKey()?.let(recoveryKeyToFileMapper::invoke)
     }
 
+    /**
+     * Get a boolean value that represent whether the user account is new or not
+     *
+     * @return if the account is new or not
+     */
+    override suspend fun isAccountNew() = withContext(ioDispatcher) {
+        megaApiGateway.isAccountNew()
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"

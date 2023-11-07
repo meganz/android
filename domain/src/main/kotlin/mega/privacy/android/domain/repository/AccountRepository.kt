@@ -518,4 +518,11 @@ interface AccountRepository {
      * Get recovery key file
      */
     suspend fun getRecoveryKeyFile(): File?
+
+    /**
+     * Get a boolean value that represent whether the user account is new or not
+     *
+     * @return if the account is new or not
+     */
+    suspend fun isAccountNew(): Boolean
 }

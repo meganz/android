@@ -20,8 +20,8 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.extensions.isPortrait
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -129,6 +129,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                             }
                         }
                     },
+                    onAdDismissed = adsViewModel::onAdDismissed
                 )
             }
         }
