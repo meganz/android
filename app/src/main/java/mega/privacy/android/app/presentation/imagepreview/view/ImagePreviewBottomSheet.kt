@@ -29,13 +29,13 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.core.R.drawable.link_ic
-import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 
 @OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews

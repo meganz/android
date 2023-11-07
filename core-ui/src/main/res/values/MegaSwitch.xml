@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MegaSwitch">
+        <attr name="mega_switch_checked" format="boolean"/>
+        <attr name="mega_switch_enabled" format="boolean"/>
+    </declare-styleable>
+</resources>

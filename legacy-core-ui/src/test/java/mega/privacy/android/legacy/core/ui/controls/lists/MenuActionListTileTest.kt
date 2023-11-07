@@ -8,7 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

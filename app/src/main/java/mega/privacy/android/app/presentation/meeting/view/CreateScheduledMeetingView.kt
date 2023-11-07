@@ -65,10 +65,8 @@ import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetin
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.core.ui.controls.textfields.GenericTitleTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -80,6 +78,8 @@ import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 

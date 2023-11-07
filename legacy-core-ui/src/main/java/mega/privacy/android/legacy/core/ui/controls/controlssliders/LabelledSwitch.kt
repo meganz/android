@@ -18,7 +18,6 @@ import androidx.compose.ui.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -59,7 +58,7 @@ fun LabelledSwitch(
 
 @CombinedTextAndThemePreviews
 @Composable
-private fun PreviewLabelledSwitch(
+private fun LabelledSwitchPreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
 ) {
     var checked by remember { mutableStateOf(initialValue) }
