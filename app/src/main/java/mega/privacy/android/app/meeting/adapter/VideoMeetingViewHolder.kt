@@ -510,17 +510,16 @@ class VideoMeetingViewHolder(
     private fun landscapeLayout(isFirstPage: Boolean, itemCount: Int) {
         if (!isGrid) return
 
-        val borderWidth = dp2px(BORDER_WIDTH)
         var w = 0
         var h = 0
 
         val layoutParams: GridLayoutManager.LayoutParams =
             binding.root.layoutParams as GridLayoutManager.LayoutParams
 
-        var marginLeft = 0
-        val marginTop = 0
-        var marginRight = 0
-        var marginBottom = 0
+        var marginLeft = if (isFirstPage && itemCount == SLOT_NUM_1) 0 else dp2px(DEFAULT_MARGIN)
+        val marginTop = if (isFirstPage && itemCount == SLOT_NUM_1) 0 else dp2px(DEFAULT_MARGIN)
+        var marginRight = if (isFirstPage && itemCount == SLOT_NUM_1) 0 else dp2px(DEFAULT_MARGIN)
+        var marginBottom = if (isFirstPage && itemCount == SLOT_NUM_1) 0 else dp2px(DEFAULT_MARGIN)
 
         if (isFirstPage) {
             when (itemCount) {
@@ -531,84 +530,48 @@ class VideoMeetingViewHolder(
                     marginLeft = w / 2
                     marginRight = marginLeft
                 }
+
                 SLOT_NUM_2 -> {
-                    w = screenWidth / TWO_COLUMNS
-                    h = screenHeight
-
+                    w = (screenWidth - 3 * dp2px(DEFAULT_MARGIN)) / TWO_COLUMNS
+                    h = screenHeight - 2 * dp2px(DEFAULT_MARGIN)
                 }
+
                 SLOT_NUM_3 -> {
-                    w = screenWidth / THREE_COLUMNS
-                    h = screenHeight
-
+                    w = (screenWidth - 4 * dp2px(DEFAULT_MARGIN)) / THREE_COLUMNS
+                    h = screenHeight - 2 * dp2px(DEFAULT_MARGIN)
                 }
+
                 SLOT_NUM_4 -> {
-                    w = (screenWidth / FOUR_COLUMNS)
-                    h = (screenHeight - borderWidth) / TWO_FILES
+                    w = (screenWidth - 3 * dp2px(DEFAULT_MARGIN)) / FOUR_COLUMNS
+                    h = (screenHeight - 3 * dp2px(DEFAULT_MARGIN)) / TWO_ROWS
                     when (bindingAdapterPosition) {
-                        POSITION_0 -> {
-                            w -= borderWidth
-                            marginBottom = borderWidth
-                        }
-                        POSITION_1 -> {
-                            marginBottom = borderWidth
-                        }
-                        POSITION_2 -> {
-                            w -= borderWidth
-                        }
+                        POSITION_0, POSITION_1 -> marginBottom = 0
                     }
                 }
+
                 SLOT_NUM_5 -> {
-                    w = screenWidth / FOUR_COLUMNS
-                    h = (screenHeight - borderWidth) / TWO_FILES
+                    w = (screenWidth - 4 * dp2px(DEFAULT_MARGIN)) / FOUR_COLUMNS
+                    h = (screenHeight - 3 * dp2px(DEFAULT_MARGIN)) / TWO_ROWS
 
                     when (bindingAdapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            w -= borderWidth
-                            marginBottom = borderWidth
-                        }
-                        POSITION_2 -> {
-                            marginBottom = borderWidth
-                        }
-                        POSITION_3 -> {
-                            w -= borderWidth
-                            marginLeft = w / 2
-                        }
-                        POSITION_4 -> {
-                            marginLeft = w / 2
-                        }
+                        POSITION_0, POSITION_1, POSITION_2 -> marginBottom = 0
+                        POSITION_3, POSITION_4 -> marginLeft = w / 2
                     }
                 }
+
                 SLOT_NUM_6 -> {
-                    w = screenWidth / FOUR_COLUMNS
-                    h = (screenHeight - borderWidth) / TWO_FILES
+                    w = (screenWidth - 4 * dp2px(DEFAULT_MARGIN)) / FOUR_COLUMNS
+                    h = (screenHeight - 3 * dp2px(DEFAULT_MARGIN)) / TWO_ROWS
                     when (bindingAdapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            w -= borderWidth
-                            marginBottom = borderWidth
-                        }
-                        POSITION_2 -> {
-                            marginBottom = borderWidth
-                        }
-                        POSITION_3, POSITION_4 -> {
-                            w -= borderWidth
-                        }
+                        POSITION_0, POSITION_1, POSITION_2 -> marginBottom = 0
                     }
                 }
             }
         } else {
-            w = screenWidth / FOUR_COLUMNS
-            h = (screenHeight - borderWidth) / TWO_FILES
+            w = (screenWidth - 4 * dp2px(DEFAULT_MARGIN)) / FOUR_COLUMNS
+            h = (screenHeight - 3 * dp2px(DEFAULT_MARGIN)) / TWO_ROWS
             when (bindingAdapterPosition) {
-                POSITION_0, POSITION_1 -> {
-                    w -= borderWidth
-                    marginBottom = borderWidth
-                }
-                POSITION_2 -> {
-                    marginBottom = borderWidth
-                }
-                POSITION_3, POSITION_4 -> {
-                    w -= borderWidth
-                }
+                POSITION_0, POSITION_1, POSITION_2 -> marginBottom = 0
             }
         }
 
@@ -626,8 +589,6 @@ class VideoMeetingViewHolder(
     private fun portraitLayout(isFirstPage: Boolean, itemCount: Int) {
         if (!isGrid) return
 
-        val borderWidth = dp2px(BORDER_WIDTH)
-
         // Margin top for the first and second items when total item count >= 4.
         val nonZeroMarginTop = (screenHeight - screenWidth / 2 * 3) / 2
 
@@ -637,10 +598,10 @@ class VideoMeetingViewHolder(
         val layoutParams: GridLayoutManager.LayoutParams =
             binding.root.layoutParams as GridLayoutManager.LayoutParams
 
-        var marginLeft = 0
-        var marginTop = 0
-        var marginRight = 0
-        val marginBottom = 0
+        var marginLeft = if (isFirstPage && itemCount == SLOT_NUM_1) 0 else dp2px(DEFAULT_MARGIN)
+        var marginTop = if (isFirstPage && itemCount == SLOT_NUM_1) 0 else dp2px(DEFAULT_MARGIN)
+        var marginRight = if (isFirstPage && itemCount == SLOT_NUM_1) 0 else dp2px(DEFAULT_MARGIN)
+        val marginBottom = if (isFirstPage && itemCount == SLOT_NUM_1) 0 else dp2px(DEFAULT_MARGIN)
 
         if (isFirstPage) {
             when (itemCount) {
@@ -648,79 +609,84 @@ class VideoMeetingViewHolder(
                     w = screenWidth
                     h = screenHeight
                 }
+
                 SLOT_NUM_2 -> {
-                    w = screenWidth
-                    h = screenHeight / TWO_FILES
+                    w = screenWidth - 2 * dp2px(DEFAULT_MARGIN)
+                    h = (screenHeight - 3 * dp2px(DEFAULT_MARGIN)) / TWO_ROWS
+
+                    when (bindingAdapterPosition) {
+                        POSITION_1 -> marginTop = 0
+                    }
                 }
+
                 SLOT_NUM_3 -> {
-                    w = screenWidth
-                    h = screenHeight / THREE_FILES
+                    w = screenWidth - 2 * dp2px(DEFAULT_MARGIN)
+                    h = (screenHeight - 4 * dp2px(DEFAULT_MARGIN)) / THREE_ROWS
+
+                    when (bindingAdapterPosition) {
+                        POSITION_1, POSITION_2 -> marginTop = 0
+                    }
                 }
+
                 SLOT_NUM_4 -> {
-                    w = screenWidth / TWO_COLUMNS
+                    w = (screenWidth - 3 * dp2px(DEFAULT_MARGIN)) / TWO_COLUMNS
                     h = w
 
                     when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
+                        POSITION_2, POSITION_3 -> marginTop = 0
                     }
 
                     when (bindingAdapterPosition) {
-                        POSITION_2, POSITION_3 -> marginTop = borderWidth
-                    }
-
-                    when (bindingAdapterPosition) {
-                        POSITION_1, POSITION_3 -> marginLeft = borderWidth
+                        POSITION_1, POSITION_3 -> marginLeft = dp2px(DEFAULT_HALF_MARGIN)
                     }
                 }
+
                 SLOT_NUM_5 -> {
-                    w = screenWidth / TWO_COLUMNS
+                    w = (screenWidth - 3 * dp2px(DEFAULT_MARGIN)) / TWO_COLUMNS
                     h = w
 
                     when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
-
-                        POSITION_2, POSITION_3 -> marginTop = borderWidth
-
+                        POSITION_2, POSITION_3 -> marginTop = 0
                         POSITION_4 -> {
-                            marginTop = borderWidth
+                            marginTop = 0
                             marginLeft = (screenWidth - w) / 2
                             marginRight = marginLeft
                         }
                     }
 
                     when (bindingAdapterPosition) {
-                        POSITION_1, POSITION_3 -> marginLeft = borderWidth
+                        POSITION_1, POSITION_3 -> marginLeft = dp2px(DEFAULT_HALF_MARGIN)
                     }
                 }
+
                 SLOT_NUM_6 -> {
-                    w = screenWidth / TWO_COLUMNS
+                    w = (screenWidth - 3 * dp2px(DEFAULT_MARGIN)) / TWO_COLUMNS
                     h = w
 
                     when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
-
-                        POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> marginTop = borderWidth
+                        POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> marginTop = 0
                     }
 
                     when (bindingAdapterPosition) {
-                        POSITION_1, POSITION_3, POSITION_5 -> marginLeft = borderWidth
+                        POSITION_1, POSITION_3, POSITION_5 -> marginLeft =
+                            dp2px(DEFAULT_HALF_MARGIN)
                     }
                 }
             }
         } else {
-            w = screenWidth / TWO_COLUMNS
+            w = (screenWidth - 3 * dp2px(DEFAULT_MARGIN)) / TWO_COLUMNS
             h = w
 
             when (bindingAdapterPosition) {
                 POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
-
-                POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> {
-                    marginTop = borderWidth
-                }
+                POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> marginTop = 0
             }
 
             when (bindingAdapterPosition) {
-                POSITION_1, POSITION_3, POSITION_5 -> marginLeft = borderWidth
+                POSITION_1, POSITION_3, POSITION_5 -> marginLeft = dp2px(DEFAULT_HALF_MARGIN)
             }
         }
 
@@ -767,13 +733,14 @@ class VideoMeetingViewHolder(
         const val SMALL_AVATAR = 60
         const val AVATAR_VIDEO_VISIBLE = 1f
         const val AVATAR_WITH_TRANSPARENCY = 0.5f
-        const val BORDER_WIDTH = 2f
         const val ROTATION = 0f
+        const val DEFAULT_MARGIN = 4f
+        const val DEFAULT_HALF_MARGIN = 2f
 
         const val TWO_COLUMNS = 2
-        const val TWO_FILES = 2
+        const val TWO_ROWS = 2
         const val THREE_COLUMNS = 3
-        const val THREE_FILES = 3
+        const val THREE_ROWS = 3
         const val FOUR_COLUMNS = 4
         const val SLOT_NUM_1 = 1
         const val SLOT_NUM_2 = 2
