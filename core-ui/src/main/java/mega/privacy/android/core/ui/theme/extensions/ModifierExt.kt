@@ -45,7 +45,7 @@ fun Modifier.autofill(
         node.boundingBox = it.boundsInWindow()
     }.onFocusChanged { focusState ->
         autofill?.run {
-            if (focusState.isFocused) {
+            if (focusState.isFocused && node.boundingBox != null) {
                 requestAutofillForNode(node)
             } else {
                 cancelAutofillForNode(node)

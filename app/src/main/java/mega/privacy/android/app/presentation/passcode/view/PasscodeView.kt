@@ -30,6 +30,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
@@ -291,10 +293,15 @@ private fun PasscodeContent(
 @Composable
 private fun ShowPasswordField(onPasswordEntered: (String) -> Unit, hintText: String? = null) {
     var password by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(key1 = Unit) {
+        focusRequester.requestFocus()
+    }
     PasswordTextField(
         modifier = Modifier
             .fillMaxWidth(0.5f)
-            .testTag(PASSWORD_FIELD_TAG),
+            .testTag(PASSWORD_FIELD_TAG)
+            .focusRequester(focusRequester),
         onTextChange = { password = it },
         text = password,
         imeAction = ImeAction.Done,
