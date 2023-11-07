@@ -56,6 +56,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -125,6 +126,14 @@ fun ImagePreviewScreen(
             }
 
             val inFullScreenMode = viewState.inFullScreenMode
+            val systemUiController = rememberSystemUiController()
+            LaunchedEffect(systemUiController, inFullScreenMode) {
+                systemUiController.setStatusBarColor(
+                    color = if (inFullScreenMode) Color.Black else Color.Transparent,
+                    darkIcons = inFullScreenMode
+                )
+            }
+
             val scaffoldState = rememberScaffoldState()
             val isLight = MaterialTheme.colors.isLight
             val photoState = rememberPhotoState()
@@ -250,6 +259,10 @@ fun ImagePreviewScreen(
                         },
                     ) {
                         ImagePreviewContent(
+                            modifier = Modifier.background(
+                                color = Color.Black.takeIf { inFullScreenMode }
+                                    ?: MaterialTheme.colors.surface,
+                            ),
                             innerPadding = innerPadding,
                             pagerState = pagerState,
                             imageNodes = imageNodes,
@@ -341,7 +354,6 @@ private fun ImagePreviewContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.Black)
     ) {
         HorizontalPager(
             modifier = Modifier
