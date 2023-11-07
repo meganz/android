@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -77,64 +78,70 @@ fun VariantAOnboardingDialogView(
             .verticalScroll(state = scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(30.dp))
-        Image(
-            painter = painterResource(id = R.drawable.image_upselling_onboarding_dialog),
-            contentDescription = "",
-            modifier = Modifier.testTag(IMAGE_TAG)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        GetProPlanColumn(state = state, isLoading = isLoading)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(id = R.string.dialog_onboarding_some_features_title),
-            style = MaterialTheme.typography.subtitle1medium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.textColorPrimary,
+        Column(
             modifier = Modifier
-                .testTag(FEATURE_TITLE)
-                .placeholder(
-                    color = MaterialTheme.colors.grey_020_grey_900,
-                    shape = RoundedCornerShape(4.dp),
-                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
-                    visible = isLoading,
-                ),
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        //Storage
-        FeatureRow(
-            drawableID = painterResource(id = R.drawable.ic_storage_onboarding_dialog),
-            title = stringResource(id = R.string.dialog_onboarding_feature_title_storage),
-            description = if (minimalStorageString != null) stringResource(
-                id = R.string.dialog_onboarding_feature_description_storage,
-                minimalStorageString
+                .width(390.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ){
+            Spacer(modifier = Modifier.height(32.dp))
+            Image(
+                painter = painterResource(id = R.drawable.image_upselling_onboarding_dialog),
+                contentDescription = "",
+                modifier = Modifier.testTag(IMAGE_TAG)
             )
-            else stringResource(id = R.string.dialog_onboarding_feature_description_storage),
-            testTag = STORAGE_DESCRIPTION_ROW,
-            isLoading = isLoading,
-        )
-        //Transfer
-        FeatureRow(
-            drawableID = painterResource(id = R.drawable.ic_transfer_onboarding_dialog),
-            title = stringResource(id = R.string.dialog_onboarding_feature_title_transfer),
-            description = stringResource(id = R.string.dialog_onboarding_feature_description_transfer),
-            testTag = TRANSFER_DESCRIPTION_ROW,
-            isLoading = isLoading,
-        )
-        //Security
-        FeatureRow(
-            drawableID = painterResource(id = R.drawable.ic_security_onboarding_dialog),
-            title = stringResource(id = R.string.dialog_onboarding_feature_title_security),
-            description = stringResource(id = R.string.dialog_onboarding_feature_description_security),
-            testTag = SECURITY_DESCRIPTION_ROW,
-            isLoading = isLoading,
-        )
-        Spacer(modifier = Modifier.height(38.dp))
-        ButtonsRow(
-            onSkipPressed = onSkipPressed,
-            onViewPlansPressed = onViewPlansPressed,
-            isLoading = isLoading,
-        )
+            Spacer(modifier = Modifier.height(16.dp))
+            GetProPlanColumn(state = state, isLoading = isLoading)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(id = R.string.dialog_onboarding_some_features_title),
+                style = MaterialTheme.typography.subtitle1medium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.textColorPrimary,
+                modifier = Modifier
+                    .testTag(FEATURE_TITLE)
+                    .placeholder(
+                        color = MaterialTheme.colors.grey_020_grey_900,
+                        shape = RoundedCornerShape(4.dp),
+                        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
+                        visible = isLoading,
+                    ),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            //Storage
+            FeatureRow(
+                drawableID = painterResource(id = R.drawable.ic_storage_onboarding_dialog),
+                title = stringResource(id = R.string.dialog_onboarding_feature_title_storage),
+                description = if (minimalStorageString != null) stringResource(
+                    id = R.string.dialog_onboarding_feature_description_storage,
+                    minimalStorageString
+                )
+                else stringResource(id = R.string.dialog_onboarding_feature_description_storage),
+                testTag = STORAGE_DESCRIPTION_ROW,
+                isLoading = isLoading,
+            )
+            //Transfer
+            FeatureRow(
+                drawableID = painterResource(id = R.drawable.ic_transfer_onboarding_dialog),
+                title = stringResource(id = R.string.dialog_onboarding_feature_title_transfer),
+                description = stringResource(id = R.string.dialog_onboarding_feature_description_transfer),
+                testTag = TRANSFER_DESCRIPTION_ROW,
+                isLoading = isLoading,
+            )
+            //Security
+            FeatureRow(
+                drawableID = painterResource(id = R.drawable.ic_security_onboarding_dialog),
+                title = stringResource(id = R.string.dialog_onboarding_feature_title_security),
+                description = stringResource(id = R.string.dialog_onboarding_feature_description_security),
+                testTag = SECURITY_DESCRIPTION_ROW,
+                isLoading = isLoading,
+            )
+            Spacer(modifier = Modifier.height(38.dp))
+            ButtonsRow(
+                onSkipPressed = onSkipPressed,
+                onViewPlansPressed = onViewPlansPressed,
+                isLoading = isLoading,
+            )
+        }
     }
 }
 
