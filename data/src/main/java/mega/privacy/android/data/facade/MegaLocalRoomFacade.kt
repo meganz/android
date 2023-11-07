@@ -157,7 +157,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteCompletedTransfersByState(states: List<Int>): List<CompletedTransfer> {
         val encryptedStates = states.mapNotNull { encryptData(it.toString()) }
         val entities = completedTransferDao.getCompletedTransfersByState(encryptedStates)
-        completedTransferDao.deleteCompletedTransferByIds(entities.mapNotNull { it.id })
+        deleteCompletedTransferBatch(entities.mapNotNull { it.id })
         return entities.map { entity -> completedTransferModelMapper(entity) }
     }
 
@@ -178,7 +178,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
                     .mapNotNull { it.id }
 
             if (deletedTransfers.isNotEmpty()) {
-                completedTransferDao.deleteCompletedTransferByIds(deletedTransfers)
+                deleteCompletedTransferBatch(deletedTransfers)
             }
         }
     }
@@ -480,6 +480,12 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun removeOfflineInformationById(id: Int) {
         offlineDao.deleteOfflineById(id)
+    }
+
+    private suspend fun deleteCompletedTransferBatch(ids: List<Int>) {
+        ids.chunked(50).forEach {
+            completedTransferDao.deleteCompletedTransferByIds(it)
+        }
     }
 
     companion object {
