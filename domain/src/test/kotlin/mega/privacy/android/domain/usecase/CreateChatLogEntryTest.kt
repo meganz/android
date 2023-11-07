@@ -3,12 +3,16 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.logging.CreateLogEntryRequest
 import mega.privacy.android.domain.entity.logging.LogPriority
+import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateChatLogEntryTest {
@@ -19,19 +23,28 @@ class CreateChatLogEntryTest {
 
     private val createTraceString = mock<CreateTraceString> {
         onBlocking { invoke(any(), any()) }.thenReturn(
-            traceString)
+            traceString
+        )
     }
 
     private val getCurrentTimeString = mock<GetCurrentTimeString> {
         onBlocking { invoke(any(), any()) }.thenReturn(
-            timeString)
+            timeString
+        )
+    }
+
+    private val appVersion = "v1"
+
+    private val environmentRepository = mock<EnvironmentRepository> {
+        onBlocking { getAppInfo() }.thenReturn(AppInfo(appVersion, null))
     }
 
     @Before
     fun setUp() {
         underTest = CreateChatLogEntry(
             createTraceString = createTraceString,
-            getCurrentTimeString = getCurrentTimeString
+            getCurrentTimeString = getCurrentTimeString,
+            environmentRepository = environmentRepository,
         )
     }
 
@@ -86,7 +99,7 @@ class CreateChatLogEntryTest {
 
     @Test
     fun `test that trace from non sdk loggers have the client app tag added`() = runTest {
-        val clientAppTag = "[clientApp]"
+        val clientAppTag = "[clientApp"
 
         val request = CreateLogEntryRequest(
             tag = null,
@@ -158,5 +171,44 @@ class CreateChatLogEntryTest {
         val actual = underTest(request)
 
         assertThat(actual?.stackTrace).isEqualTo(traceString)
+    }
+
+    @Test
+    fun `test that client app logs contain the app version`() = runTest {
+
+        val request = CreateLogEntryRequest(
+            tag = null,
+            message = "message",
+            priority = LogPriority.DEBUG,
+            throwable = null,
+            trace = emptyList(),
+            loggingClasses = emptyList(),
+            sdkLoggers = emptyList()
+        )
+        val actual = underTest(request)
+
+        assertThat(actual?.tag).contains(appVersion)
+    }
+
+    @Test
+    internal fun `test that app version is only fetched once`() = runTest {
+        val request = CreateLogEntryRequest(
+            tag = null,
+            message = "message",
+            priority = LogPriority.DEBUG,
+            throwable = null,
+            trace = emptyList(),
+            loggingClasses = emptyList(),
+            sdkLoggers = emptyList()
+        )
+        val first = underTest(request)
+        assertThat(first?.tag).contains(appVersion)
+
+        verify(environmentRepository).getAppInfo()
+
+        val second = underTest(request)
+        assertThat(second?.tag).contains(appVersion)
+
+        verifyNoMoreInteractions(environmentRepository)
     }
 }
